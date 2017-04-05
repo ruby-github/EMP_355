@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!--
+  apt install maven git
+  apt install libgoocanvas-dev libxtst-dev libdbus-glib-1-dev libopencv-dev libsqlite3-dev libcups2-dev libx264-dev
+  apt install libxml2-dev libssl-dev libwrap0-dev
+-->
+<project xmlns='http://maven.apache.org/POM/4.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>ubuntu</groupId>
+  <artifactId>09001Color</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>uexe</packaging>
+
+  <properties>
+    <concurrent.number>5</concurrent.number>
+    <output>output</output>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.0.0</version>
+
+        <executions>
+          <execution>
+            <id>clean.clean</id>
+            <phase>clean</phase>
+
+            <goals>
+              <goal>clean</goal>
+            </goals>
+
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${output}</directory>
+                </fileset>
+              </filesets>
+
+              <failOnError>false</failOnError>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <version>1.0-alpha-8</version>
+        <extensions>true</extensions>
+
+        <configuration>
+          <sources>
+            <source>
+              <directory>src/main/native</directory>
+
+              <includes>
+                <include>**/*.cpp</include>
+              </includes>
+            </source>
+
+            <source>
+              <directory>src/main/include</directory>
+            </source>
+          </sources>
+
+          <numberOfConcurrentCompilation>${concurrent.number}</numberOfConcurrentCompilation>
+
+          <compilerProvider>generic</compilerProvider>
+          <compilerExecutable>g++</compilerExecutable>
+
+          <linkerProvider>generic</linkerProvider>
+          <linkerExecutable>g++</linkerExecutable>
+
+          <compilerEndOptions>
+            <compilerEndOption>-Wall -ggdb3 -DEMP_355 -DREPORTPICS_6 -D_IPP_PRIVATE_STRUCTURES</compilerEndOption>
+            <compilerEndOption>-Ithirdparty/include -Ithirdparty/include/hal</compilerEndOption>
+
+            <compilerEndOption>-Isrc/main/native/base -Isrc/main/native/calcPeople -Isrc/main/native/display -Isrc/main/native/imageProc -Isrc/main/native/measure -Isrc/main/native/patient -Isrc/main/native/probe -Isrc/main/native/bodymark -Isrc/main/native/comment -Isrc/main/native/imageControl -Isrc/main/native/keyboard -Isrc/main/native/periDevice -Isrc/main/native/sysMan</compilerEndOption>
+
+            <!-- pkg-config - -cflags dbus-glib-1 goocanvas opencv -->
+            <compilerEndOption>-pthread -I/usr/include/dbus-1.0 -I/usr/lib/i386-linux-gnu/dbus-1.0/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/include/cairo -I/usr/lib/i386-linux-gnu/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/opencv -I/usr/include/goocanvas-1.0</compilerEndOption>
+          </compilerEndOptions>
+
+          <linkerEndOptions>
+            <linkerEndOption>-lpthread -lm -lcups -lcrypto -lssl -lpng -ltiff -lsqlite3 -lX11 -lXft -lXtst</linkerEndOption>
+
+            <linkerEndOption>-Lthirdparty/lib/hal -lhal</linkerEndOption>
+
+            <linkerEndOption>-Lthirdparty/lib -ldicom -lDSC -lDSP -lEmpRegister -lhasp_linux_106877 -lImageFile -lIniFile -lIMT -lUIS4DReceiveInterface</linkerEndOption>
+
+            <linkerEndOption>-Lthirdparty/lib/dcm -ldcmdata -ldcmdsig -ldcmimage -ldcmimgle -ldcmjpeg -ldcmnet -ldcmpstat -ldcmqrdb -ldcmsr -ldcmtls -ldcmwlm -lijg12 -lijg16 -lijg8 -lofstd</linkerEndOption>
+
+            <linkerEndOption>-lavcodec -lavformat -lavutil -ljpeg -lswscale -lwrap -lx264 -lxml2</linkerEndOption>
+
+            <linkerEndOption>-Lthirdparty/lib -Lthirdparty/bin -lcgos -limf -lintlc -liomp5 -lippcore -lippi -lippiv8 -lippm -lipps -lippsv8 -lirc -lsvml</linkerEndOption>
+
+            <!-- pkg-config - -libs dbus-glib-1 goocanvas opencv -->
+            <linkerEndOption>-ldbus-glib-1 -ldbus-1 -lgoocanvas -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfontconfig -lgobject-2.0 -lglib-2.0 -lfreetype -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab</linkerEndOption>
+          </linkerEndOptions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+
+        <executions>
+          <execution>
+            <id>install</id>
+            <phase>install</phase>
+
+            <goals>
+              <goal>run</goal>
+            </goals>
+
+            <configuration>
+              <target name='install'>
+                <copy todir='${output}' overwrite='true' failonerror='true'>
+                  <fileset dir='src/assembly'/>
+                </copy>
+
+                <copy todir='${output}/lib' overwrite='true' failonerror='true'>
+                  <fileset dir='thirdparty/bin'/>
+                </copy>
+
+                <copy file='${project.build.directory}/${project.artifactId}.${project.packaging}' tofile='${output}/${project.artifactId}'/>
+
+                <exec executable='strip' failonerror='false'>
+                  <arg line='${output}/${project.artifactId}'/>
+                </exec>
+
+                <chmod file='${output}/*.sh' perm='0777'/>
+                <chmod file='${output}/${project.artifactId}' perm='0777'/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>concurrent</id>
+
+      <activation>
+        <property>
+          <name>jobs</name>
+        </property>
+      </activation>
+
+      <properties>
+        <concurrent.number>${jobs}</concurrent.number>
+      </properties>
+    </profile>
+  </profiles>
+</project>
