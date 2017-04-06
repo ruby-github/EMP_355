@@ -304,8 +304,8 @@ void TopArea::DrawDateTime(void)
             break;
     }
     //ClearArea(TOP_AREA_W-180, 5, 180, 17);
-    //ClearArea(TOP_AREA_W-180, 5, 192, 35);//瑙ｅ喅涓嫳鏂囧垏鎹紝鍒锋柊鏃堕棿鍜屾棩鏈熶笉鍏ㄧ殑闂
-    ClearArea(TOP_AREA_P4+15, 5, TOP_AREA_W-TOP_AREA_P4, 35);//瑙ｅ喅涓嫳鏂囧垏鎹紝鍒锋柊鏃堕棿鍜屾棩鏈熶笉鍏ㄧ殑闂
+    //ClearArea(TOP_AREA_W-180, 5, 192, 35);
+    ClearArea(TOP_AREA_P4+15, 5, TOP_AREA_W-TOP_AREA_P4, 35);
     DrawString(buf, TOP_AREA_P4+15, 5, g_white, NULL);
 }
 
