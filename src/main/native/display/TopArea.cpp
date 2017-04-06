@@ -175,6 +175,26 @@ void TopArea::UpdateSysInfo(void)
 		probe_type = m_probeType;
 	}
 
+  // "35C50L",  "70L40J", "65C10L", "35C20I", "65C15E", "30P16B", "10L25K"
+  // "C35",     "L75",    "C65",    "C35-20", "C65-15", "P30",    "L10"
+
+  if (probe_type == "35C50L") {
+    probe_type = "C35";
+  } else if (probe_type == "70L40J") {
+    probe_type = "L75";
+  } else if (probe_type == "65C10L") {
+    probe_type = "C65";
+  } else if (probe_type == "35C20I") {
+    probe_type = "C35-20";
+  } else if (probe_type == "65C15E") {
+    probe_type = "C65-15";
+  } else if (probe_type == "30P16B") {
+    probe_type = "P30";
+  } else if (probe_type == "10L25K") {
+    probe_type = "L10";
+  } else {
+  }
+
   if (m_image_param.empty()) {
     sprintf(probe_info, "%s    %s", probe_type.c_str(), m_checkPart);
   } else {
