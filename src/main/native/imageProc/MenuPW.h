@@ -8,17 +8,16 @@
 #include "Def.h"
 #include "display/CusSpin.h"
 
-class MenuPW
-{
+class MenuPW {
 public:
     MenuPW();
-    ~MenuPW(){};
+    ~MenuPW() {};
     void Hide(void);
     void Show(void);
     bool GetAutoTraceStatus(void);
     GtkWidget * Create(void);
 
-	void Sensitive(bool on);
+    void Sensitive(bool on);
     void UpdateTimeRes(const char* str, EKnobReturn status);
     void UpdateAutoTrace(bool on);
     void UpdateAutoCalc(bool on);
@@ -65,59 +64,93 @@ private:
     void UpdateThresholdModel(GtkTreeModel *model);
     void UpdateSmoothModel(GtkTreeModel *model);
 
-	static CusSpin::CusSpinItem item_timeres;
+    static CusSpin::CusSpinItem item_timeres;
 //	static CusSpin::CusSpinItem item_threshold;
 //	static CusSpin::CusSpinItem item_smooth;
 
-	bool m_sensitive;
+    bool m_sensitive;
 
-	static void ChgTimeRes(EKnobOper oper);
-	static GtkTreeModel *CreateScaleModel();
-	static GtkTreeModel *CreateTraceTypeModel();
-	static GtkTreeModel *CreateDirectionModel();
-	static GtkTreeModel *CreateThresholdModel();
-	static GtkTreeModel *CreateSmoothModel();
+    static void ChgTimeRes(EKnobOper oper);
+    static GtkTreeModel *CreateScaleModel();
+    static GtkTreeModel *CreateTraceTypeModel();
+    static GtkTreeModel *CreateDirectionModel();
+    static GtkTreeModel *CreateThresholdModel();
+    static GtkTreeModel *CreateSmoothModel();
 
 //signal handle
     void ChkAutoTraceClicked(GtkToggleButton *togglebutton);
     void ChkTimeMarkClicked(GtkToggleButton *togglebutton);
     void ChkAutoCalcClicked(GtkToggleButton *togglebutton);
-	void BtnAdjustClicked(GtkButton *button);
-	void BtnAngleSubClicked(GtkButton *button);
-	void BtnAngleAddClicked(GtkButton *button);
-	void BtnFormat1Clicked(GtkButton *button);
-	void BtnFormat2Clicked(GtkButton *button);
-	void BtnFormat3Clicked(GtkButton *button);
-	void BtnFormat4Clicked(GtkButton *button);
-	void BtnFormat5Clicked(GtkButton *button);
-	void BtnComboScaleChanged(GtkComboBox *widget);
-	void BtnComboTraceTypeChanged(GtkComboBox *widget);
-	void BtnComboDirectionChanged(GtkComboBox *widget);
-	void BtnComboThresholdChanged(GtkComboBox *widget);
-	void BtnComboSmoothChanged(GtkComboBox *widget);
+    void BtnAdjustClicked(GtkButton *button);
+    void BtnAngleSubClicked(GtkButton *button);
+    void BtnAngleAddClicked(GtkButton *button);
+    void BtnFormat1Clicked(GtkButton *button);
+    void BtnFormat2Clicked(GtkButton *button);
+    void BtnFormat3Clicked(GtkButton *button);
+    void BtnFormat4Clicked(GtkButton *button);
+    void BtnFormat5Clicked(GtkButton *button);
+    void BtnComboScaleChanged(GtkComboBox *widget);
+    void BtnComboTraceTypeChanged(GtkComboBox *widget);
+    void BtnComboDirectionChanged(GtkComboBox *widget);
+    void BtnComboThresholdChanged(GtkComboBox *widget);
+    void BtnComboSmoothChanged(GtkComboBox *widget);
     void ForeachWidget(GtkWidget *widget);
 
-	bool StatusChangeFormat();
+    bool StatusChangeFormat();
     void WriteFormatPw(int format);
 
 //signal connect
-    static void HandleChkAutoTrace(GtkToggleButton *togglebutton, MenuPW *data) { data->ChkAutoTraceClicked(togglebutton); }
-    static void HandleChkTimeMark(GtkToggleButton *togglebutton, MenuPW *data) { data->ChkTimeMarkClicked(togglebutton); }
-    static void HandleChkAutoCalc(GtkToggleButton *togglebutton, MenuPW *data) { data->ChkAutoCalcClicked(togglebutton); }
-    static void HandleBtnAdjust(GtkButton *button, MenuPW *data) { data->BtnAdjustClicked(button); }
-    static void HandleBtnAngleSub(GtkButton *button, MenuPW *data) { data->BtnAngleSubClicked(button); }
-    static void HandleBtnAngleAdd(GtkButton *button, MenuPW *data) { data->BtnAngleAddClicked(button); }
-    static void HandleBtnFormat1(GtkButton *button, MenuPW *data) { data->BtnFormat1Clicked(button); }
-    static void HandleBtnFormat2(GtkButton *button, MenuPW *data) { data->BtnFormat2Clicked(button); }
-    static void HandleBtnFormat3(GtkButton *button, MenuPW *data) { data->BtnFormat3Clicked(button); }
-    static void HandleBtnFormat4(GtkButton *button, MenuPW *data) { data->BtnFormat4Clicked(button); }
-    static void HandleBtnFormat5(GtkButton *button, MenuPW *data) { data->BtnFormat5Clicked(button); }
-    static void HandleComboScaleChanged(GtkComboBox *widget, MenuPW *data) { data->BtnComboScaleChanged(widget); }
-    static void HandleComboTraceTypeChanged(GtkComboBox *widget, MenuPW *data) { data->BtnComboTraceTypeChanged(widget); }
-    static void HandleComboDirectionChanged(GtkComboBox *widget, MenuPW *data) { data->BtnComboDirectionChanged(widget); }
-    static void HandleComboThresholdChanged(GtkComboBox *widget, MenuPW *data) { data->BtnComboThresholdChanged(widget); }
-    static void HandleComboSmoothChanged(GtkComboBox *widget, MenuPW *data) { data->BtnComboSmoothChanged(widget); }
-    static void HandleForeachWidget(gpointer element, MenuPW *data) { data->ForeachWidget(GTK_WIDGET(element)); }
+    static void HandleChkAutoTrace(GtkToggleButton *togglebutton, MenuPW *data) {
+        data->ChkAutoTraceClicked(togglebutton);
+    }
+    static void HandleChkTimeMark(GtkToggleButton *togglebutton, MenuPW *data) {
+        data->ChkTimeMarkClicked(togglebutton);
+    }
+    static void HandleChkAutoCalc(GtkToggleButton *togglebutton, MenuPW *data) {
+        data->ChkAutoCalcClicked(togglebutton);
+    }
+    static void HandleBtnAdjust(GtkButton *button, MenuPW *data) {
+        data->BtnAdjustClicked(button);
+    }
+    static void HandleBtnAngleSub(GtkButton *button, MenuPW *data) {
+        data->BtnAngleSubClicked(button);
+    }
+    static void HandleBtnAngleAdd(GtkButton *button, MenuPW *data) {
+        data->BtnAngleAddClicked(button);
+    }
+    static void HandleBtnFormat1(GtkButton *button, MenuPW *data) {
+        data->BtnFormat1Clicked(button);
+    }
+    static void HandleBtnFormat2(GtkButton *button, MenuPW *data) {
+        data->BtnFormat2Clicked(button);
+    }
+    static void HandleBtnFormat3(GtkButton *button, MenuPW *data) {
+        data->BtnFormat3Clicked(button);
+    }
+    static void HandleBtnFormat4(GtkButton *button, MenuPW *data) {
+        data->BtnFormat4Clicked(button);
+    }
+    static void HandleBtnFormat5(GtkButton *button, MenuPW *data) {
+        data->BtnFormat5Clicked(button);
+    }
+    static void HandleComboScaleChanged(GtkComboBox *widget, MenuPW *data) {
+        data->BtnComboScaleChanged(widget);
+    }
+    static void HandleComboTraceTypeChanged(GtkComboBox *widget, MenuPW *data) {
+        data->BtnComboTraceTypeChanged(widget);
+    }
+    static void HandleComboDirectionChanged(GtkComboBox *widget, MenuPW *data) {
+        data->BtnComboDirectionChanged(widget);
+    }
+    static void HandleComboThresholdChanged(GtkComboBox *widget, MenuPW *data) {
+        data->BtnComboThresholdChanged(widget);
+    }
+    static void HandleComboSmoothChanged(GtkComboBox *widget, MenuPW *data) {
+        data->BtnComboSmoothChanged(widget);
+    }
+    static void HandleForeachWidget(gpointer element, MenuPW *data) {
+        data->ForeachWidget(GTK_WIDGET(element));
+    }
 };
 
 extern MenuPW g_menuPW;

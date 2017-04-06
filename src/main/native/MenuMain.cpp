@@ -9,24 +9,20 @@
 
 MenuMain g_menuMain;
 
-MenuMain::MenuMain(void)
-{
+MenuMain::MenuMain(void) {
     m_tableMain = 0;
     ptrMenuArea = MenuArea::GetInstance();
 }
 
-void MenuMain::Hide(void)
-{
+void MenuMain::Hide(void) {
     gtk_widget_hide_all(m_tableMain);
 }
 
-void MenuMain::Show(void)
-{
+void MenuMain::Show(void) {
     gtk_widget_show_all(m_tableMain);
 }
 
-GtkWidget * MenuMain::Create(void)
-{
+GtkWidget * MenuMain::Create(void) {
     m_tableMain = gtk_table_new(20, 1, TRUE);
 
     GtkWidget *btn_2d;
@@ -112,8 +108,7 @@ GtkWidget * MenuMain::Create(void)
     return m_tableMain;
 }
 
-void MenuMain::UpdateLabel(void)
-{
+void MenuMain::UpdateLabel(void) {
     gtk_label_set_text(GTK_LABEL(m_label2d), _("2D Post-process"));
     gtk_label_set_text(GTK_LABEL(m_labelM), _("M Post-process"));
     gtk_label_set_text(GTK_LABEL(m_labelPw), _("PW Post-process"));
@@ -129,79 +124,67 @@ void MenuMain::UpdateLabel(void)
     gtk_label_set_text(GTK_LABEL(m_labelBiopsy), _("Biopsy"));
 }
 
-void MenuMain::Btn2DClicked(GtkButton *button)
-{
+void MenuMain::Btn2DClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->Show2DMenu();
 }
 
-void MenuMain::BtnMClicked(GtkButton *button)
-{
+void MenuMain::BtnMClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->ShowMMenu();
 }
 
-void MenuMain::BtnPWClicked(GtkButton *button)
-{
+void MenuMain::BtnPWClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->ShowPWMenu();
 }
 
-void MenuMain::BtnCWClicked(GtkButton *button)
-{
+void MenuMain::BtnCWClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->ShowCWMenu();
 }
 
-void MenuMain::BtnCFMClicked(GtkButton *button)
-{
+void MenuMain::BtnCFMClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->ShowCFMMenu();
 }
 
-void MenuMain::BtnNoteClicked(GtkButton *button)
-{
+void MenuMain::BtnNoteClicked(GtkButton *button) {
     Hide();
 //	ptrMenuArea->ShowNoteMenu();
-	MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::TEXT);
-	NoteArea *m_ptrNoteArea = NoteArea::GetInstance();
-	m_ptrNoteArea->Show();
+    MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::TEXT);
+    NoteArea *m_ptrNoteArea = NoteArea::GetInstance();
+    m_ptrNoteArea->Show();
 }
 
-void MenuMain::BtnBDMKClicked(GtkButton *button)
-{
-	Hide();
-	ptrMenuArea->ShowBDMKMenu();
+void MenuMain::BtnBDMKClicked(GtkButton *button) {
+    Hide();
+    ptrMenuArea->ShowBDMKMenu();
 }
 
-void MenuMain::BtnMeasureClicked(GtkButton *button)
-{
+void MenuMain::BtnMeasureClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->ShowMeasureMenu();
 }
 
-void MenuMain::BtnReviewClicked(GtkButton *button)
-{
-	FreezeMode::EFreezeMode freezemode = FreezeMode::GetInstance()->GetFreezeMode();
-	if(freezemode != FreezeMode::FREEZE)
-	{
-		//add code to show hint
-		PRINTF("Please frozen first!\n");
-		return;
-	}
+void MenuMain::BtnReviewClicked(GtkButton *button) {
+    FreezeMode::EFreezeMode freezemode = FreezeMode::GetInstance()->GetFreezeMode();
+    if(freezemode != FreezeMode::FREEZE) {
+        //add code to show hint
+        PRINTF("Please frozen first!\n");
+        return;
+    }
 
     Hide();
     ptrMenuArea->ShowReviewMenu();
 }
 
-void MenuMain::BtnCalcClicked(GtkButton *button)
-{
+void MenuMain::BtnCalcClicked(GtkButton *button) {
     Hide();
     ptrMenuArea->ShowCalcMenu();
 }
 
-void MenuMain::BtnBiopsyClicked(GtkButton *button)
-{
+void MenuMain::BtnBiopsyClicked(GtkButton *button) {
     Hide();
 //    ptrMenuArea->ShowBiopsyMenu();
 }

@@ -6,48 +6,40 @@
 
 MenuEFOV g_menuEFOV;
 
-MenuEFOV::MenuEFOV(void)
-{
+MenuEFOV::MenuEFOV(void) {
     m_table = 0;
 }
 
-void MenuEFOV::Hide(void)
-{
+void MenuEFOV::Hide(void) {
     gtk_widget_hide_all(m_table);
 }
 
-void MenuEFOV::Show(void)
-{
+void MenuEFOV::Show(void) {
     gtk_widget_show_all(m_table);
 }
 
-void MenuEFOV::ShowPrepare(void)
-{
+void MenuEFOV::ShowPrepare(void) {
     Show();
     gtk_widget_hide_all(m_fixedCapture);
     gtk_widget_show_all(m_fixedPrepare);
 
 }
 
-void MenuEFOV::ShowView(void)
-{
+void MenuEFOV::ShowView(void) {
     Hide();
 }
 
-void MenuEFOV::ShowReview(void)
-{
+void MenuEFOV::ShowReview(void) {
     Hide();
 }
 
-void MenuEFOV::ShowCapture(void)
-{
+void MenuEFOV::ShowCapture(void) {
     Show();
     gtk_widget_hide_all(m_fixedPrepare);
     gtk_widget_show_all(m_fixedCapture);
 }
 
-GtkWidget* MenuEFOV::Create(void)
-{
+GtkWidget* MenuEFOV::Create(void) {
     m_table = gtk_table_new(20, 1, TRUE);
 
     m_fixedPrepare = gtk_fixed_new();
@@ -92,10 +84,10 @@ GtkWidget* MenuEFOV::Create(void)
 #if (defined (EMP_322) || defined(EMP_313))
     GtkWidget *image_update2 = create_pixmap("./res/icon/set.png");
 #else
-GtkWidget *image_update2 = create_pixmap("./res/icon/update.png");
+    GtkWidget *image_update2 = create_pixmap("./res/icon/update.png");
 
 #endif
-   // GtkWidget *image_update2 = create_pixmap("./res/icon/update.png");
+    // GtkWidget *image_update2 = create_pixmap("./res/icon/update.png");
     gtk_fixed_put (GTK_FIXED (m_fixedCapture), image_update2, 40, 200);
     gtk_widget_set_size_request (image_update2, 100, 55);
     gtk_misc_set_alignment (GTK_MISC (image_update2), 0.1, 0.5);
@@ -109,8 +101,7 @@ GtkWidget *image_update2 = create_pixmap("./res/icon/update.png");
     return m_table;
 }
 
-void MenuEFOV::UpdateLabel(void)
-{
+void MenuEFOV::UpdateLabel(void) {
     gtk_label_set_markup(GTK_LABEL(m_labelPress), _(" <b>Press</b>"));
     gtk_label_set_markup(GTK_LABEL(m_labelPress2), _(" <b>Press</b>"));
     gtk_label_set_markup(GTK_LABEL(m_labelPress3), _(" <b>Press</b>"));

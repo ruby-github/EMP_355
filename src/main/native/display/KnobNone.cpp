@@ -22,47 +22,45 @@
 #include "imageControl/KnobEFOV.h"
 #ifdef EMP_322
 KnobMenu::KnobItem KnobNoneMenu[6] = {
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
 };
 #else
 KnobMenu::KnobItem KnobNoneMenu[5] = {
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
 };
 #endif
-void KnobNoneCreate()
-{
+void KnobNoneCreate() {
     KnobMenu::GetInstance()->SetItem(KnobNoneMenu, sizeof(KnobNoneMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::NONE);
 }
 
-void KnobUndo()
-{
-	ModeStatus ms;
-	ScanMode::EScanMode mode = ms.GetScanMode();
+void KnobUndo() {
+    ModeStatus ms;
+    ScanMode::EScanMode mode = ms.GetScanMode();
 
     if ((mode == ScanMode::EFOV) && !(Replay::GetInstance()->GetReadSnapStatus())) {
         ScanMode::EFOVStatus status = ScanMode::GetInstance()->GetEFOVStatus();
         switch (status) {
-            case ScanMode::PREPARE:
-                KnobEFOVPrepareCreate();
-                break;
-            case ScanMode::CAPTURE:
-                KnobEFOVCaptureCreate();
-                break;
-            case ScanMode::VIEW:
-                KnobEFOVViewCreate();
-                break;
-            case ScanMode::REVIEW:
-                KnobEFOVReviewCreate();
-                break;
+        case ScanMode::PREPARE:
+            KnobEFOVPrepareCreate();
+            break;
+        case ScanMode::CAPTURE:
+            KnobEFOVCaptureCreate();
+            break;
+        case ScanMode::VIEW:
+            KnobEFOVViewCreate();
+            break;
+        case ScanMode::REVIEW:
+            KnobEFOVReviewCreate();
+            break;
         }
         return ;
     }
@@ -108,9 +106,9 @@ void KnobUndo()
             break;
         }
     } else {
-		if(Replay::GetInstance()->GetReadSnapStatus())
-			KnobLoadSnapCreate();
-		else
-			KnobReplayCreate();
+        if(Replay::GetInstance()->GetReadSnapStatus())
+            KnobLoadSnapCreate();
+        else
+            KnobReplayCreate();
     }
 }

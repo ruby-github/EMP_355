@@ -22,55 +22,54 @@
 #include "display/KnobMenu.h"
 #include "base/CalcTime.h"
 
-class MultiFuncArrow: public CAbsUpdateArrow, public CKnobEvent, public AbsMultiFunc
-{
+class MultiFuncArrow: public CAbsUpdateArrow, public CKnobEvent, public AbsMultiFunc {
 public:
-	MultiFuncArrow();
-	virtual ~MultiFuncArrow();
+    MultiFuncArrow();
+    virtual ~MultiFuncArrow();
 
-	virtual void Do();
-	virtual void Undo();
-	virtual void Value(EKnobOper opr);
-	virtual void Mouse(int offsetX, int offsetY);
-	virtual void Esc();
+    virtual void Do();
+    virtual void Undo();
+    virtual void Value(EKnobOper opr);
+    virtual void Mouse(int offsetX, int offsetY);
+    virtual void Esc();
 
     virtual void DrawArrow(POINT pos, unsigned int direction, double scale,
-            unsigned int color, unsigned int shape);
+                           unsigned int color, unsigned int shape);
 
-	virtual void KeyEvent(unsigned char keyValue);
-	virtual void KnobEvent(unsigned char keyValue, unsigned char offset);
-	virtual void MouseEvent(char offsetX, char offsetY);
-	virtual void KnobArrowCreate();
+    virtual void KeyEvent(unsigned char keyValue);
+    virtual void KnobEvent(unsigned char keyValue, unsigned char offset);
+    virtual void MouseEvent(char offsetX, char offsetY);
+    virtual void KnobArrowCreate();
 
     static EKnobReturn PressSetShape(void);
-	static EKnobReturn SetShape(EKnobOper opr);
+    static EKnobReturn SetShape(EKnobOper opr);
     static EKnobReturn PressSetSize(void);
-	static EKnobReturn SetSize(EKnobOper opr);
-	static EKnobReturn PressSetColor(void);
-	static EKnobReturn SetColor(EKnobOper opr);
-	POINT GetPoint(int offsetX, int offsetY);
+    static EKnobReturn SetSize(EKnobOper opr);
+    static EKnobReturn PressSetColor(void);
+    static EKnobReturn SetColor(EKnobOper opr);
+    POINT GetPoint(int offsetX, int offsetY);
 
 protected:
-	enum PRESSMODE{ CLICK, DBLCLK };
-	enum ARROWOPR{ ADD, MODIFY };
+    enum PRESSMODE { CLICK, DBLCLK };
+    enum ARROWOPR { ADD, MODIFY };
 
 private:
-	static MultiFuncArrow *m_pThis;
-	CArrow *m_arrow;
-	POINT m_pos;
-	PRESSMODE m_pressMode;
-	ARROWOPR m_arrowOpr;
-	int m_timer;
-	KnobMenu::KnobItem *m_knobItemBku;
+    static MultiFuncArrow *m_pThis;
+    CArrow *m_arrow;
+    POINT m_pos;
+    PRESSMODE m_pressMode;
+    ARROWOPR m_arrowOpr;
+    int m_timer;
+    KnobMenu::KnobItem *m_knobItemBku;
     KnobMenu::EKnobType m_knobTypeBku;
 
-	gboolean Clicked();
+    gboolean Clicked();
 
-	static EKnobReturn GetKnobRetShape(CArrow::SHAPE shape);
-	static EKnobReturn GetKnobRetSize(CArrow::SIZE size);
-	static EKnobReturn GetKnobRetColor(CArrow::COLOR color);
+    static EKnobReturn GetKnobRetShape(CArrow::SHAPE shape);
+    static EKnobReturn GetKnobRetSize(CArrow::SIZE size);
+    static EKnobReturn GetKnobRetColor(CArrow::COLOR color);
 
-	static gboolean HandleClicked(gpointer data);
+    static gboolean HandleClicked(gpointer data);
 };
 
 #endif //MULTIFUNCARROW_H

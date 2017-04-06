@@ -1,25 +1,24 @@
 #ifndef __MONITORCONTROL_H__
 #define __MONITORCONTROL_H__
 
-class MonitorControl
-{
-    public:
+class MonitorControl {
+public:
 
-        MonitorControl();
-        ~MonitorControl();
+    MonitorControl();
+    ~MonitorControl();
 
-        int SetBrightAdd(void);
-        int SetBrightSub(void);
-        int SetContrastAdd(void);
-        int SetContrastSub(void);
-        int PowerOff(void);
-        int PowerOn(void);
-        int AutoAdjust(void);
-        int AutoBalance(void);
+    int SetBrightAdd(void);
+    int SetBrightSub(void);
+    int SetContrastAdd(void);
+    int SetContrastSub(void);
+    int PowerOff(void);
+    int PowerOn(void);
+    int AutoAdjust(void);
+    int AutoBalance(void);
 
-    private:
-        int DisplayWrite(unsigned char reg, unsigned char value = 0xff );//jufeng
-        int DisplayWrite1(unsigned char reg);//ruixian
+private:
+    int DisplayWrite(unsigned char reg, unsigned char value = 0xff );//jufeng
+    int DisplayWrite1(unsigned char reg);//ruixian
 
 #define VIDEO_ADDR1 0x37//鐫挎樉
 #define BRIGHT_ADD      0x03

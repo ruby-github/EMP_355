@@ -6,8 +6,7 @@
 #include "probe/ProbeSelect.h"
 #include "display/FakeXEvent.h"
 
-class ViewProbe : public FakeXEvent
-{
+class ViewProbe : public FakeXEvent {
 public:
     ~ViewProbe();
     static ViewProbe* GetInstance();
@@ -17,13 +16,18 @@ public:
     void ReadProbe(void);
     void ReadOneProbe(int socket);
     const gchar* GetUserName(void);
-    string GetItemNameUserDef() { return m_itemNameUserDef; }
-    int GetProbeIndex() { return m_probeIndex; }
-    int GetCurExamItemIndex() { return m_examItemIndex; }
+    string GetItemNameUserDef() {
+        return m_itemNameUserDef;
+    }
+    int GetProbeIndex() {
+        return m_probeIndex;
+    }
+    int GetCurExamItemIndex() {
+        return m_examItemIndex;
+    }
 
 private:
-    enum
-    {
+    enum {
         PROBE_INDEX,
         EXAM_COLUMN,
         N_COLUMNS
@@ -76,9 +80,13 @@ private:
     void TreeViewBtnClicked(GtkWidget *widget, GdkEventButton *event);
 
     // signal connect
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewProbe *data) { return data->WindowDeleteEvent(widget, event); }
+    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewProbe *data) {
+        return data->WindowDeleteEvent(widget, event);
+    }
     // static void on_button_ok_clicked(GtkButton *button, ViewProbe *data) { data->BtnOKClicked(button); }
-    static void on_button_cancel_clicked(GtkButton *button, ViewProbe *data) { data->BtnCancelClicked(button); }
+    static void on_button_cancel_clicked(GtkButton *button, ViewProbe *data) {
+        data->BtnCancelClicked(button);
+    }
     static gboolean HandleTreeViewFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewProbe *data) {
         data->TreeViewFocusOut(widget, event);
         return FALSE;
@@ -86,11 +94,13 @@ private:
     static void HandleTreeSelectionChanged(GtkTreeSelection *treeselection, ViewProbe *data) {
         data->TreeSelectionChanged(treeselection);
     }
-    static void HandleProbeUserChanged(GtkWidget *widget, ViewProbe *data) {data->ProbeUserChanged(widget); }
+    static void HandleProbeUserChanged(GtkWidget *widget, ViewProbe *data) {
+        data->ProbeUserChanged(widget);
+    }
 
     static gboolean HandleTreeViewButtonClick(GtkWidget *widget, GdkEventButton *event, ViewProbe *data) {
-            data->TreeViewBtnClicked(widget, event);
-			return TRUE;
+        data->TreeViewBtnClicked(widget, event);
+        return TRUE;
     }
 };
 #endif

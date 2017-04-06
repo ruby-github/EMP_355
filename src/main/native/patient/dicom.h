@@ -696,149 +696,149 @@
 #define DEF_OUR_IMPCLSUID "1.2.803.116.3"
 
 typedef enum {
-	DCM_SC_ROLE_DEFAULT,
-	DCM_SC_ROLE_SCU,
-	DCM_SC_ROLE_SCP,
-	DCM_SC_ROLE_SCUSCP
+    DCM_SC_ROLE_DEFAULT,
+    DCM_SC_ROLE_SCU,
+    DCM_SC_ROLE_SCP,
+    DCM_SC_ROLE_SCUSCP
 }   DCM_SC_ROLE;
 
 typedef enum {
-	PHOTMETR_INTEPR_NONE,
-	PHOTMETR_INTEPR_MONOCHROME1,
-	PHOTMETR_INTEPR_MONOCHROME2,
-	PHOTMETR_INTEPR_PALETTECOLOR,
-	PHOTMETR_INTEPR_RGB,
-	PHOTMETR_INTEPR_HSV,
-	PHOTMETR_INTEPR_ARGB,
-	PHOTMETR_INTEPR_CMYK,
-	PHOTMETR_INTEPR_YBR_FULL,
-	PHOTMETR_INTEPR_YBR_FULL_422,
-	PHOTMETR_INTEPR_YBR_PARTIAL_422
+    PHOTMETR_INTEPR_NONE,
+    PHOTMETR_INTEPR_MONOCHROME1,
+    PHOTMETR_INTEPR_MONOCHROME2,
+    PHOTMETR_INTEPR_PALETTECOLOR,
+    PHOTMETR_INTEPR_RGB,
+    PHOTMETR_INTEPR_HSV,
+    PHOTMETR_INTEPR_ARGB,
+    PHOTMETR_INTEPR_CMYK,
+    PHOTMETR_INTEPR_YBR_FULL,
+    PHOTMETR_INTEPR_YBR_FULL_422,
+    PHOTMETR_INTEPR_YBR_PARTIAL_422
 
 }   PHOTMETR_INTEPR;
 
 struct DICOM_DECL_SPEC DCMImgPixInfo {
-	int				nNumbofFram;		//0028,0008) Number of Frames
-	unsigned short	sSampperPix;		//Samples per Pixel (0028,0002)
-	PHOTMETR_INTEPR ePhotmetrIntepr;	//Photometric Interpretation (0028,0004)
-	unsigned short  sRows;				//Rows (0028,0010)
-	unsigned short  sColumns;			//Columns (0028,0011)
-	unsigned short  sBitsAllocated;		//Bits Allocated (0028,0100)
-	unsigned short  sBitsStored;		//Bits Stored (0028,0101)
-	unsigned short  sHighBit;			//High Bit (0028,0102)
-	bool			bPixRepr;			//Pixel Representation (0028,0103)
-	bool			bPlanConf;			//Planar Configuration (0028,0006)
-	int				nVPixAspRat;		//Pixel Aspect Ratio (0028,0034)
-	int				nHPixAspRat;		//
-	short			sSmallestImgPixValue;//Smallest Image Pixel Value (0028,0106)
-	short			sLargestImgPixValue;//Largest Image Pixel Value (0028,0107)
-	short			sRedPalColLUTDes[3];//Red Palette Color Lookup Table Descriptor	(0028,1101)
-	short			sGreenPalColLUTDes[3];//Green Palette Color Lookup Table Descriptor(0028,1102)
-	short			sBluePalColLUTDes[3];//Blue Palette Color Lookup Table	Descriptor(0028,1103)
-	WORD *			pRedPalColLUTData;	//Red Palette Color Lookup Table Data (0028,1201)
-	WORD *			pGreenPalColLUTData;//Green Palette Color Lookup Table Data	(0028,1202)
-	WORD *			pBluePalColLUTData;	//Blue Palette Color Lookup Table Data (0028,1203)
-	int				nXferSyn;
+    int				nNumbofFram;		//0028,0008) Number of Frames
+    unsigned short	sSampperPix;		//Samples per Pixel (0028,0002)
+    PHOTMETR_INTEPR ePhotmetrIntepr;	//Photometric Interpretation (0028,0004)
+    unsigned short  sRows;				//Rows (0028,0010)
+    unsigned short  sColumns;			//Columns (0028,0011)
+    unsigned short  sBitsAllocated;		//Bits Allocated (0028,0100)
+    unsigned short  sBitsStored;		//Bits Stored (0028,0101)
+    unsigned short  sHighBit;			//High Bit (0028,0102)
+    bool			bPixRepr;			//Pixel Representation (0028,0103)
+    bool			bPlanConf;			//Planar Configuration (0028,0006)
+    int				nVPixAspRat;		//Pixel Aspect Ratio (0028,0034)
+    int				nHPixAspRat;		//
+    short			sSmallestImgPixValue;//Smallest Image Pixel Value (0028,0106)
+    short			sLargestImgPixValue;//Largest Image Pixel Value (0028,0107)
+    short			sRedPalColLUTDes[3];//Red Palette Color Lookup Table Descriptor	(0028,1101)
+    short			sGreenPalColLUTDes[3];//Green Palette Color Lookup Table Descriptor(0028,1102)
+    short			sBluePalColLUTDes[3];//Blue Palette Color Lookup Table	Descriptor(0028,1103)
+    WORD *			pRedPalColLUTData;	//Red Palette Color Lookup Table Data (0028,1201)
+    WORD *			pGreenPalColLUTData;//Green Palette Color Lookup Table Data	(0028,1202)
+    WORD *			pBluePalColLUTData;	//Blue Palette Color Lookup Table Data (0028,1203)
+    int				nXferSyn;
 
-	DCMImgPixInfo();
-	void clear();
+    DCMImgPixInfo();
+    void clear();
 };
 
 struct DICOM_DECL_SPEC DCMUSRegions {				//Sequence of Ultrasound Regions (0018,6011)
-	unsigned long	lRegionLocaMinx0;			//Region Location Min x0 (0018,6018)
-	unsigned long	lRegionLocaMiny0;			//Region Location Min y0 (0018,601A)
-	unsigned long	lRegionLocaMaxx1;			//Region Location Max x1 (0018,601C)
-	unsigned long	lRegionLocaMaxy1;			//Region Location Max y1 (0018,601E)
-	unsigned short  sPhysicalUnitsX;			//Physical Units X Direction (0018,6024)
-	unsigned short  sPhysicalUnitsY;			//Physical Units Y Direction (0018,6026)
-	double			dPhysicalDeltaX;			//Physical Delta X (0018,602C)
-	double			dPhysicalDeltaY;			//Physical Delta Y (0018,602E)
-	long			lRefPixelx0;				//Reference Pixel x0 (0018,6020)
-	long			lRefPixely0;				//Reference Pixel y0 (0018,6022)
-	double			dRefPixelPhysX;				//Ref. Pixel Physical Value X (0018,6028)
-	double			dRefPixelPhysY;				//Ref. Pixel Physical Value Y (0018,602A)
-	unsigned short	sRegSpatFormat;				//Region Spatial Format (0018,6012)
-	unsigned short	sRegDataType;				//Region Data Type (0018,6014)
-	unsigned long	lRegionFlags;				//Region Flags (0018,6016)
-	unsigned short	sPixelCompOrgan;			//Pixel Component Organization (0018,6044)
-	unsigned long	lPixelCompMask;				//Pixel Component Mask (0018,6046)
-	unsigned long	lPixelCompStart;			//Pixel Component Range Start (0018,6048)
-	unsigned long	lPixelCompStop;				//Pixel Component Range Stop (0018,604A)
-	unsigned short	sPixelCompPhysUnits;		//Pixel Component Physical	Units		(0018,604C)
-	unsigned short	sPixelCompDataType;			//Pixel Component Data Type (0018,604E)
-	unsigned long	lNumofTabBreakPoints;		//Number of Table Break Points (0018,6050)
-	unsigned long * pTabofXBreakPoints;			//Table of X Break Points (0018,6052)
-	double *		pTableofYBreakPoints;		//Table of Y Break Points (0018,6054)
-	unsigned long	lNumofTabEntries;			//Number of Table Entries (0018,6056)
-	unsigned long *	pTabofPixelValues;			//Table of Pixel Values (0018,6058)
-	float *			pTabofParamValues;			//Table of Parameter Values (0018,605A)
-	unsigned long	lTranducerFreq;				//Tranducer Frequency (0018,6030)
-	unsigned long	lPulseRepFreq;				//Pulse Repetition Frequency (0018,6032)
-	double			dDoppCorrAngle;				//Doppler Correction Angle (0018,6034)
-	double			dSteeringAngle;				//Steering Angle (0018,6036)
-	unsigned long	lDoppSampVolXPos;			//Doppler Sample Volume X Position (0018,6039)
-	unsigned long	lDoppSampVolYPos;			//Doppler Sample Volume Y Position (0018,603B)
-	unsigned long	lTMLinePosx0;				//TM-Line Position x0 (0018,603D)
-	unsigned long	lTMLinePosy0;				//TM-Line Position y0 (0018,603F)
-	unsigned long	lTMLinePosx1;				//TM-Line Position x1 (0018,6041)
-	unsigned long	lTMLinePosy1;				//TM-Line Position y1 (0018,6043)
-	DCMUSRegions * pNext;
+    unsigned long	lRegionLocaMinx0;			//Region Location Min x0 (0018,6018)
+    unsigned long	lRegionLocaMiny0;			//Region Location Min y0 (0018,601A)
+    unsigned long	lRegionLocaMaxx1;			//Region Location Max x1 (0018,601C)
+    unsigned long	lRegionLocaMaxy1;			//Region Location Max y1 (0018,601E)
+    unsigned short  sPhysicalUnitsX;			//Physical Units X Direction (0018,6024)
+    unsigned short  sPhysicalUnitsY;			//Physical Units Y Direction (0018,6026)
+    double			dPhysicalDeltaX;			//Physical Delta X (0018,602C)
+    double			dPhysicalDeltaY;			//Physical Delta Y (0018,602E)
+    long			lRefPixelx0;				//Reference Pixel x0 (0018,6020)
+    long			lRefPixely0;				//Reference Pixel y0 (0018,6022)
+    double			dRefPixelPhysX;				//Ref. Pixel Physical Value X (0018,6028)
+    double			dRefPixelPhysY;				//Ref. Pixel Physical Value Y (0018,602A)
+    unsigned short	sRegSpatFormat;				//Region Spatial Format (0018,6012)
+    unsigned short	sRegDataType;				//Region Data Type (0018,6014)
+    unsigned long	lRegionFlags;				//Region Flags (0018,6016)
+    unsigned short	sPixelCompOrgan;			//Pixel Component Organization (0018,6044)
+    unsigned long	lPixelCompMask;				//Pixel Component Mask (0018,6046)
+    unsigned long	lPixelCompStart;			//Pixel Component Range Start (0018,6048)
+    unsigned long	lPixelCompStop;				//Pixel Component Range Stop (0018,604A)
+    unsigned short	sPixelCompPhysUnits;		//Pixel Component Physical	Units		(0018,604C)
+    unsigned short	sPixelCompDataType;			//Pixel Component Data Type (0018,604E)
+    unsigned long	lNumofTabBreakPoints;		//Number of Table Break Points (0018,6050)
+    unsigned long * pTabofXBreakPoints;			//Table of X Break Points (0018,6052)
+    double *		pTableofYBreakPoints;		//Table of Y Break Points (0018,6054)
+    unsigned long	lNumofTabEntries;			//Number of Table Entries (0018,6056)
+    unsigned long *	pTabofPixelValues;			//Table of Pixel Values (0018,6058)
+    float *			pTabofParamValues;			//Table of Parameter Values (0018,605A)
+    unsigned long	lTranducerFreq;				//Tranducer Frequency (0018,6030)
+    unsigned long	lPulseRepFreq;				//Pulse Repetition Frequency (0018,6032)
+    double			dDoppCorrAngle;				//Doppler Correction Angle (0018,6034)
+    double			dSteeringAngle;				//Steering Angle (0018,6036)
+    unsigned long	lDoppSampVolXPos;			//Doppler Sample Volume X Position (0018,6039)
+    unsigned long	lDoppSampVolYPos;			//Doppler Sample Volume Y Position (0018,603B)
+    unsigned long	lTMLinePosx0;				//TM-Line Position x0 (0018,603D)
+    unsigned long	lTMLinePosy0;				//TM-Line Position y0 (0018,603F)
+    unsigned long	lTMLinePosx1;				//TM-Line Position x1 (0018,6041)
+    unsigned long	lTMLinePosy1;				//TM-Line Position y1 (0018,6043)
+    DCMUSRegions * pNext;
 };
 
 struct DICOM_DECL_SPEC DCMOverlayInfo {
-	int				nRows;		// (60xx,0010) 1 Number of Rows in Overlay.
-	int				nColumns;	// (60xx,0011) 1 Number of Columns in Overlay.
-	char			szType[MAX_VRCS+1];// (60xx,0040) 1 Indicates whether this overlay representsa region of interest or other graphics. Enumerated Values: G = Graphics R = ROI.
-	int				nOriginRows;	// (60xx,0050) 1 Location of first overlay point with respect to pixels in the image, given as row\column. The upper left pixel of the image has the coordinate 1\1. Column values greater than 1 indicate the overlay plane origin is to the right of the image origin. Row values greater than 1 indicate the overlay plane origin is below the image origin. Values less than 1 indicate the overlay plane origin is above or to the left of the image origin. Note: Values of 0\0 indicate that the overlay pixels start 1 row above and one column to the left of the image pixels.
-	int				nOriginColumns;	// (60xx,0050) 1 Location of first overlay point with respect to pixels in the image, given as row\column. The upper left pixel of the image has the coordinate 1\1. Column values greater than 1 indicate the overlay plane origin is to the right of the image origin. Row values greater than 1 indicate the overlay plane origin is below the image origin. Values less than 1 indicate the overlay plane origin is above or to the left of the image origin. Note: Values of 0\0 indicate that the overlay pixels start 1 row above and one column to the left of the image pixels.
-	int				nBitsAllocated; //(60xx,0100) 1 Number of Bits Allocated in the Overlay. If the overlay data are embedded in the Image Pixel Data (7FE0,0010), the value of this Attribute shall be the same as Bits Allocated (0028,0100). If the overlay data are stored in the Overlay Data (60xx,3000) Attribute, the value of this Attribute shall be 1.
-	int				nBitPosition; //(60xx,0102) 1 Bit in which Overlay is stored. See PS 3.5 for further explanation. If the overlay data are stored in the Overlay Data (60xx,3000) Attribute, the value of this Attribute shall be 0.
-	char *			pData; //(60xx,3000) 1C Overlay pixel data. The order of pixels sent for each overlay is left to right, top to bottom, i.e., the upper left pixel is sent first followed by the remainder of the first row , followed by the first pixel of the 2nd row, then the remainder of the 2nd row and so on. Overlay data shall be contained in this Attribute or imbedded with the image pixel data in Group 7FE0. Required if overlay data are in this Group. See C.9.2.1.1 for further explanation.
-	char			szDescription[MAX_VRLO+1]; //(60xx,0022) 3 User-defined comments about the overlay.
-	char			szSubtype[MAX_VRLO+1]; // (60xx,0045) 3 Defined term which identifies the intended purpose of the Overlay Type. See C.9.2.1.3 for further explanation.
-	char			szLabel[MAX_VRLO+1]; // (60xx,1500) 3 A user defined text string which may be used to label or name this overlay.
-	int				nROIArea;				// (60xx,1301) 3 Number of pixels in ROI area. See C.9.2.1.2 for further explanation.
-	double			dROIMean; // (60xx,1302) 3 ROI Mean. See C.9.2.1.2 for further explanation.
-	double			dROIStandardDeviation; // (60xx,1303) 3 ROI standard deviation.See C.9.2.1.2 for further explanation.
+    int				nRows;		// (60xx,0010) 1 Number of Rows in Overlay.
+    int				nColumns;	// (60xx,0011) 1 Number of Columns in Overlay.
+    char			szType[MAX_VRCS+1];// (60xx,0040) 1 Indicates whether this overlay representsa region of interest or other graphics. Enumerated Values: G = Graphics R = ROI.
+    int				nOriginRows;	// (60xx,0050) 1 Location of first overlay point with respect to pixels in the image, given as row\column. The upper left pixel of the image has the coordinate 1\1. Column values greater than 1 indicate the overlay plane origin is to the right of the image origin. Row values greater than 1 indicate the overlay plane origin is below the image origin. Values less than 1 indicate the overlay plane origin is above or to the left of the image origin. Note: Values of 0\0 indicate that the overlay pixels start 1 row above and one column to the left of the image pixels.
+    int				nOriginColumns;	// (60xx,0050) 1 Location of first overlay point with respect to pixels in the image, given as row\column. The upper left pixel of the image has the coordinate 1\1. Column values greater than 1 indicate the overlay plane origin is to the right of the image origin. Row values greater than 1 indicate the overlay plane origin is below the image origin. Values less than 1 indicate the overlay plane origin is above or to the left of the image origin. Note: Values of 0\0 indicate that the overlay pixels start 1 row above and one column to the left of the image pixels.
+    int				nBitsAllocated; //(60xx,0100) 1 Number of Bits Allocated in the Overlay. If the overlay data are embedded in the Image Pixel Data (7FE0,0010), the value of this Attribute shall be the same as Bits Allocated (0028,0100). If the overlay data are stored in the Overlay Data (60xx,3000) Attribute, the value of this Attribute shall be 1.
+    int				nBitPosition; //(60xx,0102) 1 Bit in which Overlay is stored. See PS 3.5 for further explanation. If the overlay data are stored in the Overlay Data (60xx,3000) Attribute, the value of this Attribute shall be 0.
+    char *			pData; //(60xx,3000) 1C Overlay pixel data. The order of pixels sent for each overlay is left to right, top to bottom, i.e., the upper left pixel is sent first followed by the remainder of the first row , followed by the first pixel of the 2nd row, then the remainder of the 2nd row and so on. Overlay data shall be contained in this Attribute or imbedded with the image pixel data in Group 7FE0. Required if overlay data are in this Group. See C.9.2.1.1 for further explanation.
+    char			szDescription[MAX_VRLO+1]; //(60xx,0022) 3 User-defined comments about the overlay.
+    char			szSubtype[MAX_VRLO+1]; // (60xx,0045) 3 Defined term which identifies the intended purpose of the Overlay Type. See C.9.2.1.3 for further explanation.
+    char			szLabel[MAX_VRLO+1]; // (60xx,1500) 3 A user defined text string which may be used to label or name this overlay.
+    int				nROIArea;				// (60xx,1301) 3 Number of pixels in ROI area. See C.9.2.1.2 for further explanation.
+    double			dROIMean; // (60xx,1302) 3 ROI Mean. See C.9.2.1.2 for further explanation.
+    double			dROIStandardDeviation; // (60xx,1303) 3 ROI standard deviation.See C.9.2.1.2 for further explanation.
 };
 
 struct DICOM_DECL_SPEC DCMModLUTInfo {
-	double dRescIntercept;				//Rescale Intercept (0028,1052)
-	double dRescSlope;					//Rescale Slope (0028,1053)
-	BOOL bLUT;							//When the transformation is linear, the Modality LUT is described by
-										//Rescale Slope (0028,1053) and Rescale Intercept (0028,1052). When the transformation is non-linear,
-										//the Modality LUT is described by Modality LUT Sequence (0028,3000).
-	BOOL bRescale;						//
-	unsigned short sLUTDescriptor[3];	//LUT Descriptor (0028,3002)
-	unsigned short * pLUTData;			//LUT Data (0028,3006)
-	char szRescOrLUTType[MAX_VRLO+1];	//Modality LUT Type (0028,3004)
-	char szLUTExplanation[MAX_VRLO+1];	//LUT Explanation (0028,3003)
+    double dRescIntercept;				//Rescale Intercept (0028,1052)
+    double dRescSlope;					//Rescale Slope (0028,1053)
+    BOOL bLUT;							//When the transformation is linear, the Modality LUT is described by
+    //Rescale Slope (0028,1053) and Rescale Intercept (0028,1052). When the transformation is non-linear,
+    //the Modality LUT is described by Modality LUT Sequence (0028,3000).
+    BOOL bRescale;						//
+    unsigned short sLUTDescriptor[3];	//LUT Descriptor (0028,3002)
+    unsigned short * pLUTData;			//LUT Data (0028,3006)
+    char szRescOrLUTType[MAX_VRLO+1];	//Modality LUT Type (0028,3004)
+    char szLUTExplanation[MAX_VRLO+1];	//LUT Explanation (0028,3003)
 
-	BOOL bRelease;						//added by shape 20070205 for 控制是否释放pLUTData内存
-	DCMModLUTInfo();
-	void clear();
-	const DCMModLUTInfo & operator=(const DCMModLUTInfo &dcmModLUTInfo);
+    BOOL bRelease;						//added by shape 20070205 for 控制是否释放pLUTData内存
+    DCMModLUTInfo();
+    void clear();
+    const DCMModLUTInfo & operator=(const DCMModLUTInfo &dcmModLUTInfo);
 };
 
 struct DICOM_DECL_SPEC DCMCineInfo {
-	int nNumbofFram;			//Number of Frames (0028,0008)
-	DWORD * pFramIncrPnt;		//Frame Increment Pointer (0028,0009)
-	short sPrefPlaybackSeq;		//Preferred Playback Sequencing (0018,1244)
-	double dFrameTime;			//Frame Time (0018,1063)
-	char * pFrameTimeVect;		//Frame Time Vector (0018,1065)
-	int nStartTrim;				//Start Trim (0008,2142)
-	int nStopTrim;				//Stop Trim (0008,2143)
-	int nRecomDispFramRat;		//Recommended Display Frame Rate (0008,2144)
-	int nCineRate;				//Cine Rate (0018,0040)
-	double dFrameDelay;			//Frame Delay (0018,1066)
-	double dImgTrigDelay;		//Image Trigger Delay (0018,1067)
-	double dEffecDuration;		//Effective Duration (0018,0072)
-	int nActFramDuration;		//Actual Frame Duration (0018,1242)
+    int nNumbofFram;			//Number of Frames (0028,0008)
+    DWORD * pFramIncrPnt;		//Frame Increment Pointer (0028,0009)
+    short sPrefPlaybackSeq;		//Preferred Playback Sequencing (0018,1244)
+    double dFrameTime;			//Frame Time (0018,1063)
+    char * pFrameTimeVect;		//Frame Time Vector (0018,1065)
+    int nStartTrim;				//Start Trim (0008,2142)
+    int nStopTrim;				//Stop Trim (0008,2143)
+    int nRecomDispFramRat;		//Recommended Display Frame Rate (0008,2144)
+    int nCineRate;				//Cine Rate (0018,0040)
+    double dFrameDelay;			//Frame Delay (0018,1066)
+    double dImgTrigDelay;		//Image Trigger Delay (0018,1067)
+    double dEffecDuration;		//Effective Duration (0018,0072)
+    int nActFramDuration;		//Actual Frame Duration (0018,1242)
 
-	BOOL bRelease;						//added by shape 20070205 for 控制是否释放pLUTData内存
-	DCMCineInfo();
-	void clear();
-	const DCMCineInfo & operator=(const DCMCineInfo &dcmCineInfo);
+    BOOL bRelease;						//added by shape 20070205 for 控制是否释放pLUTData内存
+    DCMCineInfo();
+    void clear();
+    const DCMCineInfo & operator=(const DCMCineInfo &dcmCineInfo);
 };
 
 /************************************************************************/
@@ -846,179 +846,177 @@ struct DICOM_DECL_SPEC DCMCineInfo {
 *      Object
 */
 /************************************************************************/
-enum DCM_OBJ{
-	DCM_OBJ_None,/*defaultinitializerorerrcondition*/
-	DCM_OBJ_Assoc=0X1001,		//edited by shape 20070706 for 和DCM_OBJ_CStoreRq冲突 1 -> 0X1001
-	DCM_OBJ_Elemlist,
-	DCM_OBJ_Elem,
-	DCM_OBJ_CEchoRq=0x0030,
-	DCM_OBJ_CEchoRsp=0x8030,
-	DCM_OBJ_CFindRq=0x0020,
-	DCM_OBJ_CFindRsp=0x8020,
-	DCM_OBJ_CCancelRq=0x0fff,
-	DCM_OBJ_CGetRq=0x0010,
-	DCM_OBJ_CGetRsp=0x8010,
-	DCM_OBJ_CMoveRq=0x0021,
-	DCM_OBJ_CMoveRsp=0x8021,
-	DCM_OBJ_CStoreRq=0x0001,
-	DCM_OBJ_CStoreRsp=0x8001,
-	DCM_OBJ_NActionRq=0x0130,
-	DCM_OBJ_NActionRsp=0x8130,
-	DCM_OBJ_NCreateRq=0x0140,
-	DCM_OBJ_NCreateRsp=0x8140,
-	DCM_OBJ_NDeleteRq=0x0150,
-	DCM_OBJ_NDeleteRsp=0x8150,
-	DCM_OBJ_NEventRq=0x0100,
-	DCM_OBJ_NEventRsp=0x8100,
-	DCM_OBJ_NGetRq=0x0110,
-	DCM_OBJ_NGetRsp=0x8110,
-	DCM_OBJ_NSetRq=0x0120,
-	DCM_OBJ_NSetRsp=0x8120,
-	DCM_OBJ_NetWork,
-	DCM_OBJ_DicomDir,
+enum DCM_OBJ {
+    DCM_OBJ_None,/*defaultinitializerorerrcondition*/
+    DCM_OBJ_Assoc=0X1001,		//edited by shape 20070706 for 和DCM_OBJ_CStoreRq冲突 1 -> 0X1001
+    DCM_OBJ_Elemlist,
+    DCM_OBJ_Elem,
+    DCM_OBJ_CEchoRq=0x0030,
+    DCM_OBJ_CEchoRsp=0x8030,
+    DCM_OBJ_CFindRq=0x0020,
+    DCM_OBJ_CFindRsp=0x8020,
+    DCM_OBJ_CCancelRq=0x0fff,
+    DCM_OBJ_CGetRq=0x0010,
+    DCM_OBJ_CGetRsp=0x8010,
+    DCM_OBJ_CMoveRq=0x0021,
+    DCM_OBJ_CMoveRsp=0x8021,
+    DCM_OBJ_CStoreRq=0x0001,
+    DCM_OBJ_CStoreRsp=0x8001,
+    DCM_OBJ_NActionRq=0x0130,
+    DCM_OBJ_NActionRsp=0x8130,
+    DCM_OBJ_NCreateRq=0x0140,
+    DCM_OBJ_NCreateRsp=0x8140,
+    DCM_OBJ_NDeleteRq=0x0150,
+    DCM_OBJ_NDeleteRsp=0x8150,
+    DCM_OBJ_NEventRq=0x0100,
+    DCM_OBJ_NEventRsp=0x8100,
+    DCM_OBJ_NGetRq=0x0110,
+    DCM_OBJ_NGetRsp=0x8110,
+    DCM_OBJ_NSetRq=0x0120,
+    DCM_OBJ_NSetRsp=0x8120,
+    DCM_OBJ_NetWork,
+    DCM_OBJ_DicomDir,
 };
 
 typedef DWORD DCMElemTag;
-class DICOM_DECL_SPEC DCMObj
-{
+class DICOM_DECL_SPEC DCMObj {
 public:
-	bool m_bAutoRelease;
+    bool m_bAutoRelease;
     USHORT type;    /* identifies class object type */
     void *ptr;      /* pointer to class object */
 
-	DCMObj(bool bAutoRelease=false);
-	virtual ~DCMObj();
+    DCMObj(bool bAutoRelease=false);
+    virtual ~DCMObj();
 };
 typedef DCMObj *DCMObjPtr;
 
 typedef struct PreContextItemRQ_ {	//A structure used for Presentation Context
-	BYTE btPreContextID;
-	int nSop;	//SOP class, e.g. DCM_SOP_CR_STORAGE
-	int nTranSyntax[DCM_MAX_ALLOWED_TS]; //Aarry of Transfer Syntax, e.g. DCM_TS_IMPLICIT_VR_LE.
-	int nValidTS;
-	DCM_SC_ROLE proSCRole;
+    BYTE btPreContextID;
+    int nSop;	//SOP class, e.g. DCM_SOP_CR_STORAGE
+    int nTranSyntax[DCM_MAX_ALLOWED_TS]; //Aarry of Transfer Syntax, e.g. DCM_TS_IMPLICIT_VR_LE.
+    int nValidTS;
+    DCM_SC_ROLE proSCRole;
 } PreContextItemRQ;
 
 typedef struct PreContextItemAC_ {	//A structure used for Presentation Context
-	BYTE btPreContextID;
-	BYTE btResultReason; // used for AC.
-	int nSop;	//SOP class, e.g. DCM_SOP_CR_STORAGE
-	int nTranSyntax; //Aarry of Transfer Syntax, e.g. DCM_TS_IMPLICIT_VR_LE.
-	BOOL bValid;
-	DCM_SC_ROLE accSCRole;
+    BYTE btPreContextID;
+    BYTE btResultReason; // used for AC.
+    int nSop;	//SOP class, e.g. DCM_SOP_CR_STORAGE
+    int nTranSyntax; //Aarry of Transfer Syntax, e.g. DCM_TS_IMPLICIT_VR_LE.
+    BOOL bValid;
+    DCM_SC_ROLE accSCRole;
 } PreContextItemAC;
 
 typedef struct SCPSCURoleSelection_ {	//A structure used for SCP SCU Role Selection
-	char			szSOPClassUID[MAX_VRUI+1];
-	BYTE			bySCURole;
-	BYTE			bySCPRole;
+    char			szSOPClassUID[MAX_VRUI+1];
+    BYTE			bySCURole;
+    BYTE			bySCPRole;
 } SCPSCURoleSelection;
 
 typedef struct SOPClassExtNegotiation_ {	//A structure used for
-	char			szSOPClassUID[MAX_VRUI+1];
-	BYTE			byServClassAppinformation[100];
-	unsigned short	sServClsAppInfoLen;
+    char			szSOPClassUID[MAX_VRUI+1];
+    BYTE			byServClassAppinformation[100];
+    unsigned short	sServClsAppInfoLen;
 } SOPClassExtNegotiation;
 
 typedef struct RelaGenSOPClsIdentification_ {	//A structure used for
-	char			szSOPClassUID[MAX_VRUI+1];
+    char			szSOPClassUID[MAX_VRUI+1];
 } RelaGenSOPClsIdentification;
 
 typedef struct SOPClassComExtNegotiation_ {	//A structure used for
-	char			szSOPClassUID[MAX_VRUI+1];
-	char			szServiceClassUID[MAX_VRUI+1];
-	RelaGenSOPClsIdentification RelaGenSOPClsIdentifications[100];
-	int nValidRelaGenSOPClsIdentification;
+    char			szSOPClassUID[MAX_VRUI+1];
+    char			szServiceClassUID[MAX_VRUI+1];
+    RelaGenSOPClsIdentification RelaGenSOPClsIdentifications[100];
+    int nValidRelaGenSOPClsIdentification;
 } SOPClassComExtNegotiation;
 
 struct DCMScuInfo {
-	unsigned short sProtocolversion;
+    unsigned short sProtocolversion;
     char szCallingAEtitle[MAX_VRAE+1];/* calling AE title */
     char szCalledAEtitle[MAX_VRAE+1];/* called AE title */
     PreContextItemRQ * pPreContextItemRQs;
-	int nValidPC;
+    int nValidPC;
     char szAppContextName[MAX_VRUI+1];   /* application context name */
     char szImpClassUid[MAX_VRUI+1]; /* implementation class uid */
     char szimpVerName[MAX_VRAE+1];  /* implementation version name */
     unsigned long lMaxPduLenth;                /* maximum pdu length */
-	unsigned short	sMaxNumOperInvoked;	/*0xffff for invalidate*/
-	unsigned short	sMaxNumOperPerformed; /*0xffff for invalidate*/
+    unsigned short	sMaxNumOperInvoked;	/*0xffff for invalidate*/
+    unsigned short	sMaxNumOperPerformed; /*0xffff for invalidate*/
 //	SCPSCURoleSelection * pSCPSCURoleSelections;
 // 	int nValidRoleSelect;
-	SOPClassExtNegotiation * pSOPClsExtNegotiations;
- 	int nValidClsExtNegotiation;
-	SOPClassComExtNegotiation * pSOPClsComExtNegotiations;
-  	int nValidClsComExtNegotiation;
-	int nTimeout;                 /* timeout in seconds */
+    SOPClassExtNegotiation * pSOPClsExtNegotiations;
+    int nValidClsExtNegotiation;
+    SOPClassComExtNegotiation * pSOPClsComExtNegotiations;
+    int nValidClsComExtNegotiation;
+    int nTimeout;                 /* timeout in seconds */
 
-	DCMScuInfo()
-	{
-		memset(this, 0, sizeof(DCMScuInfo));
-	}
+    DCMScuInfo() {
+        memset(this, 0, sizeof(DCMScuInfo));
+    }
 };
 
 typedef struct DCMScpInfo_ {
-	unsigned short sProtocolversion;
+    unsigned short sProtocolversion;
     char szCallingAEtitle[MAX_VRAE+1];/* calling AE title */
     char szCalledAEtitle[MAX_VRAE+1];/* called AE title */
     char szAppContextName[MAX_VRUI+1];   /* application context name */
     PreContextItemAC * pPreContextItemACs;
-	int nValidPC;
+    int nValidPC;
     char szImpClassUid[MAX_VRUI+1]; /* implementation class uid */
     char szimpVerName[MAX_VRAE+1];  /* implementation version name */
     unsigned long lMaxPduLenth;                /* maximum pdu length */
-	unsigned short	sMaxNumOperInvoked;	/*0xffff for invalidate*/
-	unsigned short	sMaxNumOperPerformed; /*0xffff for invalidate*/
+    unsigned short	sMaxNumOperInvoked;	/*0xffff for invalidate*/
+    unsigned short	sMaxNumOperPerformed; /*0xffff for invalidate*/
 //	SCPSCURoleSelection * pSCPSCURoleSelections;
 // 	int nValidRoleSelect;
-	SOPClassExtNegotiation * pSOPClsExtNegotiations;
- 	int nValidClsExtNegotiation;
+    SOPClassExtNegotiation * pSOPClsExtNegotiations;
+    int nValidClsExtNegotiation;
 }   DCMScpInfo;
 
 typedef enum {
-	DCMPRIT_MEDIUM,
-	DCMPRIT_HIGH,
-	DCMPRIT_LOW,
-	DCMPRIT_NONE
+    DCMPRIT_MEDIUM,
+    DCMPRIT_HIGH,
+    DCMPRIT_LOW,
+    DCMPRIT_NONE
 }   DCMPRIT;
 
 typedef struct AttribIdList_ {
-	DWORD dwAttribIdList[DCM_MAX_ALLOWED_AT];
-	unsigned long lVMCount;
+    DWORD dwAttribIdList[DCM_MAX_ALLOWED_AT];
+    unsigned long lVMCount;
 } AttribIdList;
 
 typedef struct DCMDIMSERQInfo_ {
-	int nAffecSOP;
-	char szAffecSOPInstUID[MAX_VRUI+1];
-	int nRequeSOP;
-	char szRequeSOPInstUID[MAX_VRUI+1];
-	char szMoveOrigAETitle[MAX_VRAE+1];
-	char szMoveDestination[MAX_VRAE+1];
-	AttribIdList aAttribIdList;
-	BOOL bDataSetType;
-	unsigned short sMessID;
-	unsigned short sMoveOrigMessID;
-	unsigned short sMessIDBeRespTo;
-	unsigned short sEventTypeID;
-	unsigned short sActionTypeID;
-	DCMPRIT ePriority;
+    int nAffecSOP;
+    char szAffecSOPInstUID[MAX_VRUI+1];
+    int nRequeSOP;
+    char szRequeSOPInstUID[MAX_VRUI+1];
+    char szMoveOrigAETitle[MAX_VRAE+1];
+    char szMoveDestination[MAX_VRAE+1];
+    AttribIdList aAttribIdList;
+    BOOL bDataSetType;
+    unsigned short sMessID;
+    unsigned short sMoveOrigMessID;
+    unsigned short sMessIDBeRespTo;
+    unsigned short sEventTypeID;
+    unsigned short sActionTypeID;
+    DCMPRIT ePriority;
 }   DCMDIMSERQInfo;
 
 typedef struct DCMDIMSERSPInfo_ {
-	int nTranSyntax;
-	int nAffecSOP;
-	BOOL bDataSetType;
-	char szAffecSOPInstUID[MAX_VRUI+1];
-	unsigned short sStatus;
-	unsigned short sNumofRemaSuboper;
-	unsigned short sNumofCompSuboper;
-	unsigned short sNumofFailSuboper;
-	unsigned short sNumofWarnSuboper;
+    int nTranSyntax;
+    int nAffecSOP;
+    BOOL bDataSetType;
+    char szAffecSOPInstUID[MAX_VRUI+1];
+    unsigned short sStatus;
+    unsigned short sNumofRemaSuboper;
+    unsigned short sNumofCompSuboper;
+    unsigned short sNumofFailSuboper;
+    unsigned short sNumofWarnSuboper;
 
-	unsigned short sMessID;
-	unsigned short sMessIDBeRespTo;
-	unsigned short sEventTypeID;
-	unsigned short sActionTypeID;
+    unsigned short sMessID;
+    unsigned short sMessIDBeRespTo;
+    unsigned short sEventTypeID;
+    unsigned short sActionTypeID;
 }   DCMDIMSERSPInfo;
 
 #define JPG_BIT_AUTO		0
@@ -1053,42 +1051,42 @@ typedef struct DCMDIMSERSPInfo_ {
 #define JPG_HUFFMAN_STANDARD	0
 
 typedef enum {
-	COMP_TYPE_NONE,
-	COMP_TYPE_JPEG,
-	COMP_TYPE_RLE
-}COMP_TYPE;
+    COMP_TYPE_NONE,
+    COMP_TYPE_JPEG,
+    COMP_TYPE_RLE
+} COMP_TYPE;
 
 typedef struct DCMCJpgOpt_ {
-	int nTranSyntax;
-	int nSelValue;	//lossless JPEG representation options: --selection-value      [sv]: integer (1..7, default: 6) use selection value only with --encode-lossless
-	int nPntTranf;	//lossless JPEG representation options: point-transform      [pt]: integer (0..15, default: 0) use point transform
-	int nQuality;	//lossy JPEG representation options: --quality              [q]: integer (0..100, default: 90) use quality factor q
-	int nHuffOptim;	//other JPEG options: --huffman-optimize     1: optimize huffman tables (default) 0:use standard huffman tables if 8 bits/sample
-	int nSmooth;	//other JPEG options: --smooth               [s]: integer (0..100, default: 0)
-	//	int nBitPerSampOpt;	// compressed bits per sample options:  0: --bits-auto            choose bits/sample automatically (default)
-	//										1: --bits-force-8         force 8 bits/sample
-	//										2: --bits-force-12        force 12 bits/sample (not with baseline)
-	//										3: --bits-force-16        force 16 bits/sample (lossless only)
+    int nTranSyntax;
+    int nSelValue;	//lossless JPEG representation options: --selection-value      [sv]: integer (1..7, default: 6) use selection value only with --encode-lossless
+    int nPntTranf;	//lossless JPEG representation options: point-transform      [pt]: integer (0..15, default: 0) use point transform
+    int nQuality;	//lossy JPEG representation options: --quality              [q]: integer (0..100, default: 90) use quality factor q
+    int nHuffOptim;	//other JPEG options: --huffman-optimize     1: optimize huffman tables (default) 0:use standard huffman tables if 8 bits/sample
+    int nSmooth;	//other JPEG options: --smooth               [s]: integer (0..100, default: 0)
+    //	int nBitPerSampOpt;	// compressed bits per sample options:  0: --bits-auto            choose bits/sample automatically (default)
+    //										1: --bits-force-8         force 8 bits/sample
+    //										2: --bits-force-12        force 12 bits/sample (not with baseline)
+    //										3: --bits-force-16        force 16 bits/sample (lossless only)
 
-	int nColorSpaceOpt;	//compression color space conversion options:   0: --color-ybr            use YCbCr for color images if lossy (default)
-	//												1: --color-rgb            use RGB for color images if lossy
-	//												2: --monochrome           convert color images to monochrome
-	int nCompSubsampOpt;//standard YCbCr component subsampling options:		0: --sample-444           4:4:4 sampling with YBR_FULL (default)
-	//													1: --sample-422           4:2:2 subsampling with YBR_FULL_422
-	//non-standard YCbCr component subsampling options:	2: --nonstd-422-full      4:2:2 subsampling with YBR_FULL
-	//													3: --nonstd-411-full      4:1:1 subsampling with YBR_FULL
-	//													4: --nonstd-411           4:1:1 subsampling with YBR_FULL_422
-	//	int nScalMono;		//pixel scaling for monochrome images:	0: --scaling-pixel        scale using min/max pixel value (default)
-	//										1: --scaling-range        scale using min/max range
-	//	int nRescalOpt;		//rescale slope/intercept encoding for monochrome (--no-windowing): 0: --rescale-identity     encode identity modality rescale (default) Never used for CT images
-	//																	1: --rescale-map          use modality rescale to scale pixel range Never used for XA/RF/XA Biplane images
+    int nColorSpaceOpt;	//compression color space conversion options:   0: --color-ybr            use YCbCr for color images if lossy (default)
+    //												1: --color-rgb            use RGB for color images if lossy
+    //												2: --monochrome           convert color images to monochrome
+    int nCompSubsampOpt;//standard YCbCr component subsampling options:		0: --sample-444           4:4:4 sampling with YBR_FULL (default)
+    //													1: --sample-422           4:2:2 subsampling with YBR_FULL_422
+    //non-standard YCbCr component subsampling options:	2: --nonstd-422-full      4:2:2 subsampling with YBR_FULL
+    //													3: --nonstd-411-full      4:1:1 subsampling with YBR_FULL
+    //													4: --nonstd-411           4:1:1 subsampling with YBR_FULL_422
+    //	int nScalMono;		//pixel scaling for monochrome images:	0: --scaling-pixel        scale using min/max pixel value (default)
+    //										1: --scaling-range        scale using min/max range
+    //	int nRescalOpt;		//rescale slope/intercept encoding for monochrome (--no-windowing): 0: --rescale-identity     encode identity modality rescale (default) Never used for CT images
+    //																	1: --rescale-map          use modality rescale to scale pixel range Never used for XA/RF/XA Biplane images
 
-	int nSopClsUIDOpt;	// SOP Class UID options:	0: --class-default        keep SOP Class UID (default)
-	//							1: --class-sc             convert to Secondary Capture Image(implies --uid-always)
-	int nSopInstUIDOpt;	// SOP Instance UID options:0: --uid-default          assign new UID if lossy compression (default)
-	//							1: --uid-always           always assign new UID
-	//							2: --uid-never            never assign new UID
-	char szSopInstUID[MAX_VRUI + 1];// SOP Instance UID
+    int nSopClsUIDOpt;	// SOP Class UID options:	0: --class-default        keep SOP Class UID (default)
+    //							1: --class-sc             convert to Secondary Capture Image(implies --uid-always)
+    int nSopInstUIDOpt;	// SOP Instance UID options:0: --uid-default          assign new UID if lossy compression (default)
+    //							1: --uid-always           always assign new UID
+    //							2: --uid-never            never assign new UID
+    char szSopInstUID[MAX_VRUI + 1];// SOP Instance UID
 }	DCMCJpgOpt;
 
 #define JPG_COLORCONV_PHOTOMETRIC		0
@@ -1101,23 +1099,23 @@ typedef struct DCMCJpgOpt_ {
 #define JPG_PLANARCONF_BYPLANE			2
 
 typedef struct DCMDJpgOpt_ {
-	int nColorSpaceConv;	//  color space conversion options:
-	// 0   --conv-photometric     convert if YCbCr photom. interpr. (default)
-	// 1   --conv-lossy           convert YCbCr to RGB if lossy JPEG
-	// 2   --conv-always          always convert YCbCr to RGB
-	// 3   --conv-never           never convert color space
-	int nPlanarConfig;		// planar configuration options:
-	// 0   --planar-auto          automatically determine planar configuration
-	//							  from SOP class and color space (default)
-	// 1   --color-by-pixel       always store color-by-pixel
-	// 2   --color-by-plane       always store color-by-plane
-	int nSopInstUIDOpt;		// SOP Instance UID options:
-	//	0   --uid-default          keep same SOP Instance UID (default)
-	//  1 --uid-always           always assign new UID
+    int nColorSpaceConv;	//  color space conversion options:
+    // 0   --conv-photometric     convert if YCbCr photom. interpr. (default)
+    // 1   --conv-lossy           convert YCbCr to RGB if lossy JPEG
+    // 2   --conv-always          always convert YCbCr to RGB
+    // 3   --conv-never           never convert color space
+    int nPlanarConfig;		// planar configuration options:
+    // 0   --planar-auto          automatically determine planar configuration
+    //							  from SOP class and color space (default)
+    // 1   --color-by-pixel       always store color-by-pixel
+    // 2   --color-by-plane       always store color-by-plane
+    int nSopInstUIDOpt;		// SOP Instance UID options:
+    //	0   --uid-default          keep same SOP Instance UID (default)
+    //  1 --uid-always           always assign new UID
 
-	char szSopInstUID[MAX_VRUI + 1];// SOP Instance UID
+    char szSopInstUID[MAX_VRUI + 1];// SOP Instance UID
 
-}DCMDJpgOpt;
+} DCMDJpgOpt;
 
 void DICOM_DECL_SPEC DCMRegisterCodecs(DCMCJpgOpt *pDCMCJpgOpt=NULL);
 void DICOM_DECL_SPEC DCMCleanUpCodecs();

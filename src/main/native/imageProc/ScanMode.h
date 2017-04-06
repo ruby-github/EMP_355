@@ -16,16 +16,14 @@
 #include "imageProc/Replay.h"
 #include <UIS4DReceiveInterface.h>
 
-class ScanMode
-{
+class ScanMode {
 public:
 
     ///> new type
-    enum EScanMode{D2, M_INIT, M, PW_INIT, PW, PW_SIMULT, CW_INIT, CW, CFM, PDI, PWCFM_INIT, PWCFM, PWCFM_SIMULT, PWPDI_INIT, PWPDI, PWPDI_SIMULT, CWCFM_INIT, CWCFM, CWPDI_INIT, CWPDI, CFM_VS_2D, PDI_VS_2D, ANATOMIC_M, EFOV}; ///< scan mode, "PWCFM"=PW+CFM, "CWPDI"=CW+PDI,
-    enum EFOVStatus{PREPARE, CAPTURE, VIEW, REVIEW};
+    enum EScanMode {D2, M_INIT, M, PW_INIT, PW, PW_SIMULT, CW_INIT, CW, CFM, PDI, PWCFM_INIT, PWCFM, PWCFM_SIMULT, PWPDI_INIT, PWPDI, PWPDI_SIMULT, CWCFM_INIT, CWCFM, CWPDI_INIT, CWPDI, CFM_VS_2D, PDI_VS_2D, ANATOMIC_M, EFOV}; ///< scan mode, "PWCFM"=PW+CFM, "CWPDI"=CW+PDI,
+    enum EFOVStatus {PREPARE, CAPTURE, VIEW, REVIEW};
 
-    struct SpecialMeasurePara
-    {
+    struct SpecialMeasurePara {
         EScanMode mode;
         Format2D::EFormat2D format2D;
         FormatCfm::EFormatCfm formatCfm;
@@ -89,15 +87,18 @@ public:
 
     void EnterAnatomicM();
 
-    ScanMode::EScanMode GetScanMode()
-    {
+    ScanMode::EScanMode GetScanMode() {
         if (m_isSpecialMeasure)
             return m_scanModeMeasure;
         else
             return m_scanMode;
     }
-    ScanMode::EScanMode GetFpgaScanMode() { return m_fpgaScanMode; }
-    int GetPwCurImg() { return m_pwCurImg; } //1-2d, 2-pw, 3-both 2d and pw
+    ScanMode::EScanMode GetFpgaScanMode() {
+        return m_fpgaScanMode;
+    }
+    int GetPwCurImg() {
+        return m_pwCurImg;    //1-2d, 2-pw, 3-both 2d and pw
+    }
 
     void EnterEFOV(void);
     void EnterEFOVPrepare(void);
@@ -107,7 +108,7 @@ public:
     EFOVStatus GetEFOVStatus();
 
     ///> spetial measure(example: measure on snap image)
-	void GetSpecialMeasurePara(SpecialMeasurePara *para);
+    void GetSpecialMeasurePara(SpecialMeasurePara *para);
     void EnterSpecialMeasure(SpecialMeasurePara para);
     void ExitSpecialMeasure(void);
     bool IsSpecialMeasureStatus(void);
@@ -117,7 +118,7 @@ private:
     ScanMode();
 
     static ScanMode* m_ptrInstance;
-    		AbsUpdatePw* m_ptrUpdate;
+    AbsUpdatePw* m_ptrUpdate;
     // extern
     FpgaCtrl2D m_fpgaCtrl2D;
 
@@ -150,7 +151,7 @@ private:
     ///>test
     int m_pulseNumTmp;
 
-        ///> 0-pw and 2D both real
+    ///> 0-pw and 2D both real
     ///> 1-2D real
     ///> 2-pw real
     int m_pwCurImg;
@@ -168,6 +169,8 @@ public:
     ///>test
     ///>func
     void ChangePulseNum(EKnobOper oper);
-    int GetCFMPulseNum() { return m_pulseNumTmp; }
+    int GetCFMPulseNum() {
+        return m_pulseNumTmp;
+    }
 };
 #endif

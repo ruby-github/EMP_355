@@ -5,8 +5,7 @@
 #define HINT_AREA_W 844 //ModLayout 844 PreLayout 804
 #define HINT_AREA_H 35
 
-class HintArea
-{
+class HintArea {
 public:
     ~HintArea();
     static HintArea *GetInstance();
@@ -30,14 +29,17 @@ private:
     void HintAreaConfigure(GtkWidget *widget, GdkEventConfigure *event);
     void HintAreaExpose(GtkWidget *widget, GdkEventExpose *event);
 //signal connect
-    static gboolean HandleHintAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, HintArea *data)
-	{ data->HintAreaConfigure(widget, event); return FALSE; }
-    static gboolean HandleHintAreaExpose(GtkWidget *widget, GdkEventExpose *event, HintArea *data)
-	{ data->HintAreaExpose(widget, event); return FALSE; }
+    static gboolean HandleHintAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, HintArea *data) {
+        data->HintAreaConfigure(widget, event);
+        return FALSE;
+    }
+    static gboolean HandleHintAreaExpose(GtkWidget *widget, GdkEventExpose *event, HintArea *data) {
+        data->HintAreaExpose(widget, event);
+        return FALSE;
+    }
 };
 
-inline void HintArea::UpdateHintArea(void)
-{
+inline void HintArea::UpdateHintArea(void) {
     gtk_widget_queue_draw(m_hintArea);
 }
 

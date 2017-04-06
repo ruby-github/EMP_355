@@ -43,28 +43,24 @@ const char* CdromIconPath = "res/icon/cdrom.png";
 
 ViewIcon* ViewIcon::m_ptrInstance = NULL;
 
-ViewIcon::ViewIcon(void)
-{
+ViewIcon::ViewIcon(void) {
     m_countScanIcon = 0;
     m_timeout = 0;
 }
 
-ViewIcon::~ViewIcon()
-{
+ViewIcon::~ViewIcon() {
     if (m_ptrInstance != NULL)
-	delete m_ptrInstance;
+        delete m_ptrInstance;
 }
 
-ViewIcon* ViewIcon::GetInstance(void)
-{
+ViewIcon* ViewIcon::GetInstance(void) {
     if (m_ptrInstance == NULL)
-	    m_ptrInstance = new ViewIcon;
+        m_ptrInstance = new ViewIcon;
     return m_ptrInstance;
 }
 
-void ViewIcon::Create(void)
-{
-	const int num = 6;
+void ViewIcon::Create(void) {
+    const int num = 6;
     m_table = gtk_table_new(1, num, TRUE);
 //    gtk_widget_set_size_request (m_table, 180, 32);
     gtk_widget_set_size_request (m_table, 26*num, 24);
@@ -98,18 +94,15 @@ void ViewIcon::Create(void)
 
 }
 
-GtkWidget * ViewIcon::GetIconArea(void)
-{
+GtkWidget * ViewIcon::GetIconArea(void) {
     return m_table;
 }
 
-void ViewIcon::ScanIcon(const char *iconName)
-{
+void ViewIcon::ScanIcon(const char *iconName) {
     gtk_image_set_from_file(GTK_IMAGE(m_replay), iconName);
 }
 
-gboolean ScrollScanIcon(gpointer data)
-{
+gboolean ScrollScanIcon(gpointer data) {
     char path[256];
     ViewIcon *tmp;
     tmp = (ViewIcon *)data;
@@ -134,31 +127,28 @@ gboolean ScrollScanIcon(gpointer data)
     tmp->ScanIcon(path);
 
     if (count < 4)
-	count++;
+        count++;
     else
-	count = 0;
+        count = 0;
 
     tmp->SetCountScanIcon(count);
     return TRUE;
 }
 
-void ViewIcon::Replay(bool on)
-{
+void ViewIcon::Replay(bool on) {
     if (on) {
         if (m_timeout > 0) {
             g_source_remove(m_timeout);
             m_timeout = 0;
         }
         ScanIcon(ReplayIconPath);
-    }
-    else {
+    } else {
         if(m_timeout == 0)
             m_timeout = g_timeout_add(500, ScrollScanIcon, this);
     }
 }
 
-void ViewIcon::Network(bool on)
-{
+void ViewIcon::Network(bool on) {
     char path[256];
     if (on)
         sprintf(path, "%s/%s", CFG_RES_PATH, NetworkIconPath[1]);
@@ -167,8 +157,7 @@ void ViewIcon::Network(bool on)
     gtk_image_set_from_file(GTK_IMAGE(m_network), path);
 }
 
-void ViewIcon::Sound(bool on)
-{
+void ViewIcon::Sound(bool on) {
     char path[256];
     if (on)
         sprintf(path, "%s/%s", CFG_RES_PATH, SoundIconPath[1]);
@@ -177,44 +166,37 @@ void ViewIcon::Sound(bool on)
     gtk_image_set_from_file(GTK_IMAGE(m_sound), path);
 }
 
-void ViewIcon::Udisk(bool on)
-{
+void ViewIcon::Udisk(bool on) {
     char path[256];
     if (on) {
         sprintf(path, "%s/%s", CFG_RES_PATH, FlashIconPath);
         gtk_image_set_from_file(GTK_IMAGE(m_udisk), path);
-    }
-    else
+    } else
         gtk_image_set_from_file(GTK_IMAGE(m_udisk), NULL);
 }
 
-void ViewIcon::Cdrom(bool on)
-{
+void ViewIcon::Cdrom(bool on) {
     char path[256];
     if (on) {
         sprintf(path, "%s/%s", CFG_RES_PATH, CdromIconPath);
         gtk_image_set_from_file(GTK_IMAGE(m_cdrom), path);
-    }
-    else
+    } else
         gtk_image_set_from_file(GTK_IMAGE(m_cdrom), NULL);
 
 }
 
-void ViewIcon::Printer(bool on)
-{
+void ViewIcon::Printer(bool on) {
 #if 0
     char path[256];
     if (on) {
         sprintf(path, "%s/%s", CFG_RES_PATH, PrinterIconPath);
         gtk_image_set_from_file(GTK_IMAGE(m_printer), path);
-    }
-    else
+    } else
         gtk_image_set_from_file(GTK_IMAGE(m_printer), NULL);
 #endif
 }
 
-void ViewIcon::Charge(int data)
-{
+void ViewIcon::Charge(int data) {
     char path[256];
     int value = 80 / 4;
     int count = 0;
@@ -226,46 +208,43 @@ void ViewIcon::Charge(int data)
         count = 1 + (data - 10) / value;
     PRINTF("--count =%d\n", count);
     switch (count) {
-        case 0:
-            sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[0]);
-            break;
-        case 1:
-            sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[1]);
-            break;
-        case 2:
-            sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[2]);
-            break;
-        case 3:
-            sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[3]);
-            break;
-        case 4:
-            sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[4]);
-            break;
-        case 5:
-            sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[5]);
-            break;
+    case 0:
+        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[0]);
+        break;
+    case 1:
+        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[1]);
+        break;
+    case 2:
+        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[2]);
+        break;
+    case 3:
+        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[3]);
+        break;
+    case 4:
+        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[4]);
+        break;
+    case 5:
+        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[5]);
+        break;
 
     }
 
     gtk_image_set_from_file(GTK_IMAGE(m_charge), path);
 }
 
-void ViewIcon::UpdateCharge()
-{
+void ViewIcon::UpdateCharge() {
     Battery battery;
     Charge(battery.GetCapacity());
 }
 
-gboolean CallBackUpdateCharge(gpointer data)
-{
+gboolean CallBackUpdateCharge(gpointer data) {
     ViewIcon *tmp;
     tmp = (ViewIcon *)data;
     tmp->UpdateCharge();
     return true;
 }
 
-void ViewIcon::InitCharge()
-{
+void ViewIcon::InitCharge() {
     UpdateCharge();
     g_timeout_add( 6000, CallBackUpdateCharge, this );
 }

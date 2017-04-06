@@ -20,8 +20,7 @@ POINT MeasureDraw::m_cursor;
 int MeasureDraw::m_cursorType = 0;
 int MeasureDraw::m_orderNumber = 1;
 
-MeasureDraw::MeasureDraw()
-{
+MeasureDraw::MeasureDraw() {
     m_ptrImgArea = ImageArea::GetInstance();
     // m_cursor.x = IMAGE_W/2;
     // m_cursor.y = IMAGE_Y + IMAGE_H/2;
@@ -35,12 +34,10 @@ MeasureDraw::MeasureDraw()
     m_colorConfirmIndex = sysMeasure.GetMeasureColorConfirm();
 }
 
-MeasureDraw::~MeasureDraw()
-{
+MeasureDraw::~MeasureDraw() {
 }
 
-void MeasureDraw::DrawCursor(POINT p, bool isCur, EDrawMode mode, bool restrict)
-{
+void MeasureDraw::DrawCursor(POINT p, bool isCur, EDrawMode mode, bool restrict) {
 //	printf("%s: x=%d, y=%d, isCur=%d, Mode=%d, restrict=%d\n", __FUNCTION__, p.x, p.y, isCur, mode, restrict);
     if (restrict) {
         int boundUp, boundDown, boundLeft, boundRight;
@@ -54,45 +51,42 @@ void MeasureDraw::DrawCursor(POINT p, bool isCur, EDrawMode mode, bool restrict)
 
     GdkColor *color;
 
-	if (isCur) {
-		color = MeasureColorConvert(m_colorCurIndex);
-		if (mode == XOR)
-			m_ptrImgArea->DrawMeaCursor(GDK_XOR, m_cursorType, m_cursorSize, color, p.x, p.y);
-		else if (mode == COPY)
-			m_ptrImgArea->DrawMeaCursor(GDK_COPY, m_cursorType, m_cursorSize, color, p.x, p.y);
-	}
-	else {
-		color = MeasureColorConvert(m_colorConfirmIndex);
-		if (mode == XOR)
-			m_ptrImgArea->DrawMeaCursor(GDK_XOR, m_cursorType, m_cursorSize, color, p.x, p.y);
-		else if (mode == COPY)
-			m_ptrImgArea->DrawMeaCursor(GDK_COPY, m_cursorType, m_cursorSize, color, p.x, p.y);
-	}
-	POINT tmp;
-	tmp.x = p.x;
-	tmp.y = p.y;
-	SetCursor(tmp);
+    if (isCur) {
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR)
+            m_ptrImgArea->DrawMeaCursor(GDK_XOR, m_cursorType, m_cursorSize, color, p.x, p.y);
+        else if (mode == COPY)
+            m_ptrImgArea->DrawMeaCursor(GDK_COPY, m_cursorType, m_cursorSize, color, p.x, p.y);
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR)
+            m_ptrImgArea->DrawMeaCursor(GDK_XOR, m_cursorType, m_cursorSize, color, p.x, p.y);
+        else if (mode == COPY)
+            m_ptrImgArea->DrawMeaCursor(GDK_COPY, m_cursorType, m_cursorSize, color, p.x, p.y);
+    }
+    POINT tmp;
+    tmp.x = p.x;
+    tmp.y = p.y;
+    SetCursor(tmp);
 }
 
-void MeasureDraw::ChangeCursorType(void)
-{
+void MeasureDraw::ChangeCursorType(void) {
     //if (m_cursorType == 3 || m_cursorType > 3)
-	m_cursorType = 0;
+    m_cursorType = 0;
     //else
-	//++m_cursorType;
+    //++m_cursorType;
 }
 
-POINT MeasureDraw::DrawInitialCursor(void)
-{
-	CalcMeasureCenter();
+POINT MeasureDraw::DrawInitialCursor(void) {
+    CalcMeasureCenter();
 
-	// draw cursor at point m_cursor
-	DrawCursor(m_cursor, true, XOR);
+    // draw cursor at point m_cursor
+    DrawCursor(m_cursor, true, XOR);
 
-	// hide system cursor
-	InvisibleCursor(TRUE); //lhm 2012.07.04
+    // hide system cursor
+    InvisibleCursor(TRUE); //lhm 2012.07.04
 
-	return m_cursor;
+    return m_cursor;
 }
 /*
  *Function: 测量过程中为下一个光标预定一个位置
@@ -100,55 +94,46 @@ POINT MeasureDraw::DrawInitialCursor(void)
  *method = 1:深度方向距离测量定下一个光标
  *method = 2:M或PW模式用竖直线的测量定下一个光标
 */
-POINT MeasureDraw::CalcNextP(POINT p1, int method)
-{
-    	POINT p2;
+POINT MeasureDraw::CalcNextP(POINT p1, int method) {
+    POINT p2;
 
-	if (method == 0)
-	{
-		p2.x = p1.x;
-		p2.y = p1.y;
-	}
-	else if (method == 1)
-	{
-		p2.x = p1.x;
-		p2.y = p1.y + 30;
-	}
-	else if (method == 2)
-	{
-		p2.x = p1.x + 50; //50
-		p2.y = p1.y + 20;
-	}
-	else
-	{
-	    	p2 = p1;
-	}
+    if (method == 0) {
+        p2.x = p1.x;
+        p2.y = p1.y;
+    } else if (method == 1) {
+        p2.x = p1.x;
+        p2.y = p1.y + 30;
+    } else if (method == 2) {
+        p2.x = p1.x + 50; //50
+        p2.y = p1.y + 20;
+    } else {
+        p2 = p1;
+    }
 
-	return p2;
+    return p2;
 }
 
-void MeasureDraw::DrawPoint(POINT p, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawPoint(POINT p, bool isCur, EDrawMode mode) {
 //	ConvertPoint(p);
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
-	} else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
+        }
     } else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
-	} else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
-	}
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawPoint(m_imgAttr, color, p.x, p.y);
+        }
     }
 }
 
@@ -160,66 +145,62 @@ void MeasureDraw::DrawPoint(POINT p, bool isCur, EDrawMode mode)
  * FALSE: draw not current cursor
  */
 
-void MeasureDraw::DrawBaseLine(POINT p1, POINT p2, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawBaseLine(POINT p1, POINT p2, bool isCur, EDrawMode mode) {
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
-	} else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
+        }
     } else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
-	} else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
-	}
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y);
+        }
     }
 }
 
-void MeasureDraw::DrawDotLine(POINT p1, POINT p2, bool isCur, EDrawMode mode)
-{
-	SysMeasurementSetting sysMeasure;
+void MeasureDraw::DrawDotLine(POINT p1, POINT p2, bool isCur, EDrawMode mode) {
+    SysMeasurementSetting sysMeasure;
     if(sysMeasure.GetMeasureLineDisplay())
-    	return;
+        return;
 
-	GdkColor *color;
-	if (isCur) {
-		color = MeasureColorConvert(m_colorCurIndex);
-		if (mode == XOR) {
-			m_imgAttr.mode.gdkMode = GDK_XOR;
-			m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
-		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;
-			m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
-		}
-	} else {
-		color = MeasureColorConvert(m_colorConfirmIndex);
-		if (mode == XOR) {
-			m_imgAttr.mode.gdkMode = GDK_XOR;
-			m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
-		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;
-			m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
-		}
-	}
+    GdkColor *color;
+    if (isCur) {
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p1.x, p1.y, p2.x, p2.y, true, 10);
+        }
+    }
 }
 
-void MeasureDraw::DrawTraceLine(POINT p1, POINT p2, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawTraceLine(POINT p1, POINT p2, bool isCur, EDrawMode mode) {
     DrawBaseLine(p1, p2, isCur, mode);
 }
-void MeasureDraw::DrawINTEGRALTraceLine(POINT p1, POINT p2, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawINTEGRALTraceLine(POINT p1, POINT p2, bool isCur, EDrawMode mode) {
 
- int boundUp, boundDown, boundLeft, boundRight;
+    int boundUp, boundDown, boundLeft, boundRight;
     ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
 
     if (p1.y < boundUp) p1.y = (boundUp);
@@ -229,272 +210,219 @@ void MeasureDraw::DrawINTEGRALTraceLine(POINT p1, POINT p2, bool isCur, EDrawMod
 
     DrawBaseLine(p1, p2, isCur, mode);
 }
-void MeasureDraw::DrawLine(POINT p1, POINT p2, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawLine(POINT p1, POINT p2, bool isCur, EDrawMode mode) {
     SysMeasurementSetting sysMeasure;
     if(sysMeasure.GetMeasureLineDisplay())
-    	return;
+        return;
 
     DrawBaseLine(p1, p2, isCur, mode);
 }
 
 //用一个点和角度的tan确定的直线
-void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode mode)
-{
-	POINT endp1, endp2;
-	double temp;
-	const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
+void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode mode) {
+    POINT endp1, endp2;
+    double temp;
+    const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
 
-	//	ConvertPoint(point1);
+    //	ConvertPoint(point1);
 
-	if(tan == 0)//姘村钩
-	{
-		endp1.x = bou1_x;
-		endp2.x = bou2_x;
-		endp1.y = point1.y;
-		endp2.y = point1.y;
-	}
-	else if((tan > 999)||(tan < -999))//绔栫洿
-	{
-		endp1.y = bou1_y;
-		endp2.y = bou2_y;
-		endp1.x = point1.x;
-		endp2.x = point1.x;
-	}
-	else//鏂滅嚎
-	{
-		temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
-		if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y))
-		{
-			endp1.x = bou2_x;
-			endp1.y = (int)temp;
-		}
-		else
-		{
-			if(temp < (double)bou1_y)
-			{
-				endp1.x = point1.x + (int)((double)(bou1_y-point1.y) / tan);
-				endp1.y = bou1_y;
-			}
-			else
-			{
-				endp1.x = point1.x + (int)((double)(bou2_y-point1.y) / tan);
-				endp1.y = bou2_y;
-			}
-		}
-
-		temp = (double)point1.y - ((double)(point1.x - bou1_x)) * tan;
-		if ((temp >= (double)bou1_y) && (temp <= (double)bou2_y))
-		{
-			endp2.x = bou1_x;
-			endp2.y = (int)temp;
-		}
-		else
-		{
-			if(temp < (double)bou1_y)
-			{
-				endp2.x = point1.x - (int)((double)(point1.y-bou1_y) / tan);
-				endp2.y = bou1_y;
-			}
-			else
-			{
-				endp2.x = point1.x - (int)((double)(point1.y-bou2_y) / tan);
-				endp2.y = bou2_y;
-			}
-		}
-	}
-
-	GdkColor *color;
-	if (isCur)
-	{
-		color = MeasureColorConvert(m_colorCurIndex);
-		if (mode == XOR) {
-			m_imgAttr.mode.gdkMode = GDK_XOR;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		}
-	}
-	else
-	{
-		color = MeasureColorConvert(m_colorConfirmIndex);
-		if (mode == XOR) {
-			m_imgAttr.mode.gdkMode = GDK_XOR;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		}
-	}
-}
-
-//用一个点和角度的确定的线段
-vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int length, bool isCur, EDrawMode mode)
-{
-	vector<POINT> vec;
-	POINT endp1, endp2;
-	double tanTheta = tan(theta);
-	const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H-1;
-	const int half_len = length/2;
-
-//	printf("%s-%s: cursor (%d, %d)\n", __FILE__, __FUNCTION__, point1.x, point1.y);
-	vec.clear();
-	if(tanTheta == 0)//姘村钩
-	{
-//		printf("%s-%s: H\n", __FILE__, __FUNCTION__);
-		endp1.x = ((point1.x - half_len) > bou1_x) ? (point1.x - half_len) : bou1_x;
-		endp2.x = ((point1.x + half_len) < bou2_x) ? (point1.x + half_len) : bou2_x;
-		endp1.y = point1.y;
-		endp2.y = point1.y;
-//		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
-	}
-	else if(tanTheta > 999 || tanTheta < -999)//绔栫洿
-	{
-//		printf("%s-%s: V\n", __FILE__, __FUNCTION__);
-		endp1.y = ((point1.y - half_len) > bou1_y) ? (point1.y - half_len) : bou1_y;
-		endp2.y = ((point1.y + half_len) < bou2_y) ? (point1.y + half_len) : bou2_y;
-		endp1.x = point1.x;
-		endp2.x = point1.x;
-//		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
-	}
-	else//鏂滅嚎
-	{
-//		printf("%s-%s: O\n", __FILE__, __FUNCTION__);
-		double sinTheta = sin(theta);
-		double cosTheta = cos(theta);
-		endp1.x = point1.x + cosTheta * half_len;
-		endp2.x = point1.x - cosTheta * half_len;
-		endp1.y = point1.y - sinTheta * half_len;
-		endp2.y = point1.y + sinTheta * half_len;
-	}
-	vec.push_back(endp1);
-	vec.push_back(endp2);
-
-	GdkColor *color;
-	if (isCur)
-	{
-		color = MeasureColorConvert(m_colorCurIndex);
-		if (mode == XOR) {
-			m_imgAttr.mode.gdkMode = GDK_XOR;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		}
-	}
-	else
-	{
-		color = MeasureColorConvert(m_colorConfirmIndex);
-		if (mode == XOR) {
-			m_imgAttr.mode.gdkMode = GDK_XOR;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;
-			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-		}
-	}
-
-	return vec;
-}
-
-//用两个点确定的直线
-void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMode mode)
-{
-	POINT endp1, endp2;
-	double tan;
-	double temp;
-	const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
-
-	if(point1.y == point2.y)//姘村钩
-	{
+    if(tan == 0) { //姘村钩
         endp1.x = bou1_x;
         endp2.x = bou2_x;
         endp1.y = point1.y;
         endp2.y = point1.y;
-	}
-	else if(point1.x == point2.x)//绔栫洿
-	{
+    } else if((tan > 999)||(tan < -999)) { //绔栫洿
         endp1.y = bou1_y;
         endp2.y = bou2_y;
         endp1.x = point1.x;
         endp2.x = point1.x;
-	}
-	else//鏂滅嚎
-	{
-        tan = ((double)(point2.y - point1.y)) / ((double)(point2.x - point1.x));
+    } else { //鏂滅嚎
         temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
-        if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y))
-        {
+        if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y)) {
             endp1.x = bou2_x;
             endp1.y = (int)temp;
-        }
-        else
-        {
-            if(temp < (double)bou1_y)
-            {
+        } else {
+            if(temp < (double)bou1_y) {
                 endp1.x = point1.x + (int)((double)(bou1_y-point1.y) / tan);
                 endp1.y = bou1_y;
-            }
-            else
-            {
+            } else {
                 endp1.x = point1.x + (int)((double)(bou2_y-point1.y) / tan);
                 endp1.y = bou2_y;
             }
         }
 
         temp = (double)point1.y - ((double)(point1.x - bou1_x)) * tan;
-        if ((temp >= (double)bou1_y) && (temp <= (double)bou2_y))
-        {
+        if ((temp >= (double)bou1_y) && (temp <= (double)bou2_y)) {
             endp2.x = bou1_x;
             endp2.y = (int)temp;
-        }
-        else
-        {
-            if(temp < (double)bou1_y)
-            {
+        } else {
+            if(temp < (double)bou1_y) {
                 endp2.x = point1.x - (int)((double)(point1.y-bou1_y) / tan);
                 endp2.y = bou1_y;
-            }
-            else
-            {
+            } else {
                 endp2.x = point1.x - (int)((double)(point1.y-bou2_y) / tan);
                 endp2.y = bou2_y;
             }
         }
-	}
+    }
+
+    GdkColor *color;
+    if (isCur) {
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        }
+    }
+}
+
+//用一个点和角度的确定的线段
+vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int length, bool isCur, EDrawMode mode) {
+    vector<POINT> vec;
+    POINT endp1, endp2;
+    double tanTheta = tan(theta);
+    const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H-1;
+    const int half_len = length/2;
+
+//	printf("%s-%s: cursor (%d, %d)\n", __FILE__, __FUNCTION__, point1.x, point1.y);
+    vec.clear();
+    if(tanTheta == 0) { //姘村钩
+//		printf("%s-%s: H\n", __FILE__, __FUNCTION__);
+        endp1.x = ((point1.x - half_len) > bou1_x) ? (point1.x - half_len) : bou1_x;
+        endp2.x = ((point1.x + half_len) < bou2_x) ? (point1.x + half_len) : bou2_x;
+        endp1.y = point1.y;
+        endp2.y = point1.y;
+//		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
+    } else if(tanTheta > 999 || tanTheta < -999) { //绔栫洿
+//		printf("%s-%s: V\n", __FILE__, __FUNCTION__);
+        endp1.y = ((point1.y - half_len) > bou1_y) ? (point1.y - half_len) : bou1_y;
+        endp2.y = ((point1.y + half_len) < bou2_y) ? (point1.y + half_len) : bou2_y;
+        endp1.x = point1.x;
+        endp2.x = point1.x;
+//		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
+    } else { //鏂滅嚎
+//		printf("%s-%s: O\n", __FILE__, __FUNCTION__);
+        double sinTheta = sin(theta);
+        double cosTheta = cos(theta);
+        endp1.x = point1.x + cosTheta * half_len;
+        endp2.x = point1.x - cosTheta * half_len;
+        endp1.y = point1.y - sinTheta * half_len;
+        endp2.y = point1.y + sinTheta * half_len;
+    }
+    vec.push_back(endp1);
+    vec.push_back(endp2);
+
+    GdkColor *color;
+    if (isCur) {
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        }
+    }
+
+    return vec;
+}
+
+//用两个点确定的直线
+void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMode mode) {
+    POINT endp1, endp2;
+    double tan;
+    double temp;
+    const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
+
+    if(point1.y == point2.y) { //姘村钩
+        endp1.x = bou1_x;
+        endp2.x = bou2_x;
+        endp1.y = point1.y;
+        endp2.y = point1.y;
+    } else if(point1.x == point2.x) { //绔栫洿
+        endp1.y = bou1_y;
+        endp2.y = bou2_y;
+        endp1.x = point1.x;
+        endp2.x = point1.x;
+    } else { //鏂滅嚎
+        tan = ((double)(point2.y - point1.y)) / ((double)(point2.x - point1.x));
+        temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
+        if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y)) {
+            endp1.x = bou2_x;
+            endp1.y = (int)temp;
+        } else {
+            if(temp < (double)bou1_y) {
+                endp1.x = point1.x + (int)((double)(bou1_y-point1.y) / tan);
+                endp1.y = bou1_y;
+            } else {
+                endp1.x = point1.x + (int)((double)(bou2_y-point1.y) / tan);
+                endp1.y = bou2_y;
+            }
+        }
+
+        temp = (double)point1.y - ((double)(point1.x - bou1_x)) * tan;
+        if ((temp >= (double)bou1_y) && (temp <= (double)bou2_y)) {
+            endp2.x = bou1_x;
+            endp2.y = (int)temp;
+        } else {
+            if(temp < (double)bou1_y) {
+                endp2.x = point1.x - (int)((double)(point1.y-bou1_y) / tan);
+                endp2.y = bou1_y;
+            } else {
+                endp2.x = point1.x - (int)((double)(point1.y-bou2_y) / tan);
+                endp2.y = bou2_y;
+            }
+        }
+    }
     //printf("*******endp1 endp2 %d %d %d %d\n",endp1.x, endp1.y, endp2.x, endp2.y);
 
-	GdkColor *color;
-	if (isCur)
-	{
-	    color = MeasureColorConvert(m_colorCurIndex);
-	    if (mode == XOR) {
-		m_imgAttr.mode.gdkMode = GDK_XOR;
-		m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-	    } else if (mode == COPY) {
-		m_imgAttr.mode.gdkMode = GDK_COPY;
-		m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-	    }
-	}
-	else
-	{
-	    color = MeasureColorConvert(m_colorConfirmIndex);
-	    if (mode == XOR) {
-		m_imgAttr.mode.gdkMode = GDK_XOR;
-		m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-	    } else if (mode == COPY) {
-		m_imgAttr.mode.gdkMode = GDK_COPY;
-		m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
-	    }
-	}
+    GdkColor *color;
+    if (isCur) {
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
+        }
+    }
 }
 
 /*
  * @brief draw horizontal line
  */
-void MeasureDraw::DrawHLine(POINT p, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawHLine(POINT p, bool isCur, EDrawMode mode) {
 //    ConvertPoint(p);
     int boundUp, boundDown, boundLeft, boundRight;
     ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
@@ -504,34 +432,30 @@ void MeasureDraw::DrawHLine(POINT p, bool isCur, EDrawMode mode)
 
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
-    }
-    else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        }
     }
 }
 
 /*
  * @brief draw vetical line
  */
-void MeasureDraw::DrawVLine(POINT p, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawVLine(POINT p, bool isCur, EDrawMode mode) {
 //    ConvertPoint(p);
 
     int boundUp, boundDown, boundLeft, boundRight;
@@ -542,34 +466,30 @@ void MeasureDraw::DrawVLine(POINT p, bool isCur, EDrawMode mode)
 
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-    }
-    else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        }
     }
     POINT tmp;
     tmp.x = p.x;
     tmp.y = p.y;
     SetCursor(tmp);
 }
-void MeasureDraw::DrawCrossLine(POINT p, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawCrossLine(POINT p, bool isCur, EDrawMode mode) {
 //    ConvertPoint(p);
 
     int boundUp, boundDown, boundLeft, boundRight;
@@ -582,30 +502,27 @@ void MeasureDraw::DrawCrossLine(POINT p, bool isCur, EDrawMode mode)
 
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-    }
-    else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	    m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+            m_ptrImgArea->DrawLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        }
     }
 
     POINT tmp;
@@ -614,8 +531,7 @@ void MeasureDraw::DrawCrossLine(POINT p, bool isCur, EDrawMode mode)
     SetCursor(tmp);
 }
 
-void MeasureDraw::DrawHDotLine(POINT p, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawHDotLine(POINT p, bool isCur, EDrawMode mode) {
 //    ConvertPoint(p);
     int boundUp, boundDown, boundLeft, boundRight;
     ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
@@ -625,26 +541,23 @@ void MeasureDraw::DrawHDotLine(POINT p, bool isCur, EDrawMode mode)
 
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
-    }
-    else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, boundLeft, p.y, boundRight, p.y);
+        }
     }
     POINT tmp;
     tmp.x = p.x;
@@ -652,34 +565,30 @@ void MeasureDraw::DrawHDotLine(POINT p, bool isCur, EDrawMode mode)
     SetCursor(tmp);
 }
 
-void MeasureDraw::DrawVDotLine(POINT p, bool isCur, EDrawMode mode)
-{
+void MeasureDraw::DrawVDotLine(POINT p, bool isCur, EDrawMode mode) {
 //    ConvertPoint(p);
     int boundUp, boundDown, boundLeft, boundRight;
     ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
 
     GdkColor *color;
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-    }
-    else {
-	color = MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR) {
-	    m_imgAttr.mode.gdkMode = GDK_XOR;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
-	else if (mode == COPY) {
-	    m_imgAttr.mode.gdkMode = GDK_COPY;
-	    m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
-	}
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawDashLine(m_imgAttr, color, p.x, boundUp, p.x, boundDown);
+        }
     }
 
     POINT tmp;
@@ -690,50 +599,46 @@ void MeasureDraw::DrawVDotLine(POINT p, bool isCur, EDrawMode mode)
 /*
  * @brief draw initial horizontal line and initial cursor
  */
-POINT MeasureDraw::DrawInitialHLine(bool isCur)
-{
-	CalcMeasureCenter();
+POINT MeasureDraw::DrawInitialHLine(bool isCur) {
+    CalcMeasureCenter();
 
-	// draw cursor at point m_cursor
-	DrawHDotLine(m_cursor, true, XOR);
+    // draw cursor at point m_cursor
+    DrawHDotLine(m_cursor, true, XOR);
 
-	// hide system cursor
-	//InvisibleCursor(TRUE);
+    // hide system cursor
+    //InvisibleCursor(TRUE);
 
-	return m_cursor;
+    return m_cursor;
 }
 
 /*
  * @brief draw initial vertical line and initial cursor
  */
-POINT MeasureDraw::DrawInitialVLine(bool isCur)
-{
-	CalcMeasureCenter();
+POINT MeasureDraw::DrawInitialVLine(bool isCur) {
+    CalcMeasureCenter();
 
-	// draw cursor at point m_cursor
-	DrawVLine(m_cursor, true, XOR);
+    // draw cursor at point m_cursor
+    DrawVLine(m_cursor, true, XOR);
 
-	// hide system cursor
-	//InvisibleCursor(TRUE);
+    // hide system cursor
+    //InvisibleCursor(TRUE);
 
-	return m_cursor;
+    return m_cursor;
 }
 
-POINT MeasureDraw::DrawInitialCrossLine(bool isCur)
-{
-	CalcMeasureCenter();
+POINT MeasureDraw::DrawInitialCrossLine(bool isCur) {
+    CalcMeasureCenter();
 
-	// draw cursor at point m_cursor
-	DrawCrossLine(m_cursor, true, XOR);
+    // draw cursor at point m_cursor
+    DrawCrossLine(m_cursor, true, XOR);
 
-	// hide system cursor
-	InvisibleCursor(TRUE);
+    // hide system cursor
+    InvisibleCursor(TRUE);
 
-	return m_cursor;
+    return m_cursor;
 }
 
-void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
-{
+void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
     int x1 = p1.x, x2 = p2.x, x3 = p3.x, y1 = p1.y, y2 = p2.y, y3 = p3.y;
     float r,r1,r2,r12,r22,i,j,k,l,length1;
     int x0, y0, x, y, xmax, t;
@@ -750,7 +655,8 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
     j = (x3-x0)*(x3-x0)+(y3-y0)*(y3-y0); //璁＄畻鐭酱鍗婂緞 r2
     r2 = sqrt(j);
 
-    x = 0; y = r2;
+    x = 0;
+    y = r2;
     r12 = r1*r1;
     r22 = r2*r2;
     k = r12+r22;
@@ -764,44 +670,42 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
 
     GdkColor *color;
     if (isCur)
-	color = MeasureColorConvert(m_colorCurIndex);
+        color = MeasureColorConvert(m_colorCurIndex);
     else
-	color = MeasureColorConvert(m_colorConfirmIndex);
+        color = MeasureColorConvert(m_colorConfirmIndex);
 
     GdkGC *gc = m_ptrImgArea->NewMeasureGC(color, GDK_XOR);
 
-    while (x <= xmax)
-    {
-	if ( tn<0||y==0 )
-	    tn += (4*x+2)*r22;
-	else
-	{
-	    tn += (4*x+2)*r22+(1-y)*4*r12;
-	    y--;
-	}
+    while (x <= xmax) {
+        if ( tn<0||y==0 )
+            tn += (4*x+2)*r22;
+        else {
+            tn += (4*x+2)*r22+(1-y)*4*r12;
+            y--;
+        }
 
-	t=x%6;
-	if(t==1)t=1;
-	else t = 0;
+        t=x%6;
+        if(t==1)t=1;
+        else t = 0;
 
-	xcos = x*temp1;
-	xsin = x*temp2;
-	ycos = y*temp3;
-	ysin = y*temp4;
+        xcos = x*temp1;
+        xsin = x*temp2;
+        ycos = y*temp3;
+        ysin = y*temp4;
 
-	if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(IMAGE_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0+xcos-ysin, y0+xsin+ycos);
-	if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(IMAGE_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0-xcos-ysin, y0-xsin+ycos);
-	if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(IMAGE_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0+xcos+ysin, y0+xsin-ycos);
-	if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(IMAGE_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0-xcos+ysin, y0-xsin-ycos);
-	x++;
+        if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(IMAGE_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0+xcos-ysin, y0+xsin+ycos);
+        if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(IMAGE_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0-xcos-ysin, y0-xsin+ycos);
+        if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(IMAGE_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0+xcos+ysin, y0+xsin-ycos);
+        if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(IMAGE_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0-xcos+ysin, y0-xsin-ycos);
+        x++;
     }
 
     t=x%6;
@@ -814,58 +718,59 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
     ysin = y*temp4;
 
     if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(IMAGE_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0+xcos-ysin, y0+xsin+ycos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0+xcos-ysin, y0+xsin+ycos);
     if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(IMAGE_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0-xcos-ysin, y0-xsin+ycos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0-xcos-ysin, y0-xsin+ycos);
     if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(IMAGE_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0+xcos+ysin, y0+xsin-ycos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0+xcos+ysin, y0+xsin-ycos);
     if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(IMAGE_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0-xcos+ysin, y0-xsin-ycos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0-xcos+ysin, y0-xsin-ycos);
 
-    r = r1; r1 = r2;
+    r = r1;
+    r1 = r2;
     r2 = (int)r;
-    x = 0; y = r2;
-    r12 = r1*r1; r22 = r2*r2;
+    x = 0;
+    y = r2;
+    r12 = r1*r1;
+    r22 = r2*r2;
     l = r12 + r22;
 
     xmax = r12/sqrt(l);
     tn = r12-2*r2*r12;
-    while ( x <= xmax )
-    {
-	if ( tn<0||y==0 )
-	    tn += (4*x+2)*r22;
-	else
-	{
-	    tn += (4*x+2)*r22+(1-y)*4*r12;
-	    y--;
-	}
+    while ( x <= xmax ) {
+        if ( tn<0||y==0 )
+            tn += (4*x+2)*r22;
+        else {
+            tn += (4*x+2)*r22+(1-y)*4*r12;
+            y--;
+        }
 
-	t=x%6;
-	if(t==1)t=1;
-	else t = 0;
+        t=x%6;
+        if(t==1)t=1;
+        else t = 0;
 
-	xcos = x*temp1;
-	xsin = x*temp2;
-	ycos = y*temp3;
-	ysin = y*temp4;
+        xcos = x*temp1;
+        xsin = x*temp2;
+        ycos = y*temp3;
+        ysin = y*temp4;
 
-	if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(IMAGE_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0+ycos-xsin, y0+ysin+xcos);
-	if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(IMAGE_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0-ycos-xsin, y0-ysin+xcos);
-	if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(IMAGE_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0+ycos+xsin, y0+ysin-xcos);
-	if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(IMAGE_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(IMAGE_H)))
-	    if(t)
-		m_ptrImgArea->DrawPixmapPt(gc, x0-ycos+xsin, y0-ysin-xcos);
-	x++;
+        if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(IMAGE_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0+ycos-xsin, y0+ysin+xcos);
+        if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(IMAGE_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0-ycos-xsin, y0-ysin+xcos);
+        if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(IMAGE_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0+ycos+xsin, y0+ysin-xcos);
+        if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(IMAGE_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(IMAGE_H)))
+            if(t)
+                m_ptrImgArea->DrawPixmapPt(gc, x0-ycos+xsin, y0-ysin-xcos);
+        x++;
     }
 
     t=x%6;
@@ -878,38 +783,35 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
     ysin = y*temp4;
 
     if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(IMAGE_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(0+IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0+ycos-xsin, y0+ysin+xcos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0+ycos-xsin, y0+ysin+xcos);
     if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(IMAGE_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0-ycos-xsin, y0-ysin+xcos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0-ycos-xsin, y0-ysin+xcos);
     if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(IMAGE_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0+ycos+xsin, y0+ysin-xcos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0+ycos+xsin, y0+ysin-xcos);
     if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(IMAGE_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(IMAGE_H)))
-	if(t)
-	    m_ptrImgArea->DrawPixmapPt(gc, x0-ycos+xsin, y0-ysin-xcos);
+        if(t)
+            m_ptrImgArea->DrawPixmapPt(gc, x0-ycos+xsin, y0-ysin-xcos);
 
     g_object_unref(gc);
     m_ptrImgArea->UpdateImgArea();
 }
 
 ///> private
-void MeasureDraw::ConvertPoint(POINT &p)
-{
-	// p.x = p.x + IMAGE_X;
-	// p.y = p.y + IMAGE_Y;
+void MeasureDraw::ConvertPoint(POINT &p) {
+    // p.x = p.x + IMAGE_X;
+    // p.y = p.y + IMAGE_Y;
 }
 
-void MeasureDraw::CalcMeasureCenter()
-{
-	m_cursor.x = IMAGE_W/2;
-	m_cursor.y = IMAGE_Y + IMAGE_H*2/3;
-	//m_cursor.y = IMAGE_Y + IMAGE_H/2;
+void MeasureDraw::CalcMeasureCenter() {
+    m_cursor.x = IMAGE_W/2;
+    m_cursor.y = IMAGE_Y + IMAGE_H*2/3;
+    //m_cursor.y = IMAGE_Y + IMAGE_H/2;
 }
 
-void MeasureDraw::ClearPwCycle(int begin, int end)
-{
+void MeasureDraw::ClearPwCycle(int begin, int end) {
 //    if(begin == 0 && end == 0)
     if(begin == end)
         return;
@@ -920,8 +822,7 @@ void MeasureDraw::ClearPwCycle(int begin, int end)
     m_ptrImgArea->DrawTrace(GDK_COPY, g_black, end, up, end, down);
 }
 
-void MeasureDraw::PwCycle(int begin, int end)
-{
+void MeasureDraw::PwCycle(int begin, int end) {
     //    if(begin == 0 && end == 0)
     if(begin == end)
         return;
@@ -932,16 +833,15 @@ void MeasureDraw::PwCycle(int begin, int end)
     m_ptrImgArea->DrawTrace(GDK_COPY, g_yellow, end, up, end, down);
 }
 
-void MeasureDraw::PwTrace(const vector<POINT>& trace, EDrawMode mode)
-{
+void MeasureDraw::PwTrace(const vector<POINT>& trace, EDrawMode mode) {
     if (trace.empty())
         return ;
 
     GdkFunction gdk_mode;
     if (mode == XOR)
-	    gdk_mode = GDK_XOR;
+        gdk_mode = GDK_XOR;
     else
-	    gdk_mode = GDK_COPY;
+        gdk_mode = GDK_COPY;
 
     vector<POINT>::const_iterator iter;
     // draw trace
@@ -953,31 +853,28 @@ void MeasureDraw::PwTrace(const vector<POINT>& trace, EDrawMode mode)
     }
 }
 
-void MeasureDraw::DrawTraceTag(POINT p, bool isCur, EDrawMode mode, bool update)
-{
+void MeasureDraw::DrawTraceTag(POINT p, bool isCur, EDrawMode mode, bool update) {
     if(p.x == 0)
         return;
     GdkColor *color;
 
     if (isCur) {
-	color = MeasureColorConvert(m_colorCurIndex);
-	if (mode == XOR)
-	    m_ptrImgArea->DrawTraceTag(GDK_XOR, color, p.x, p.y, update);
-	else if (mode == COPY)
-	    m_ptrImgArea->DrawTraceTag(GDK_COPY, color, p.x, p.y, update);
-    }
-    else {
-	color = g_red; //MeasureColorConvert(m_colorConfirmIndex);
-	if (mode == XOR)
-	    m_ptrImgArea->DrawTraceTag(GDK_XOR, color, p.x, p.y, update);
-	else if (mode == COPY)
-	    m_ptrImgArea->DrawTraceTag(GDK_COPY, color, p.x, p.y, update);
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR)
+            m_ptrImgArea->DrawTraceTag(GDK_XOR, color, p.x, p.y, update);
+        else if (mode == COPY)
+            m_ptrImgArea->DrawTraceTag(GDK_COPY, color, p.x, p.y, update);
+    } else {
+        color = g_red; //MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR)
+            m_ptrImgArea->DrawTraceTag(GDK_XOR, color, p.x, p.y, update);
+        else if (mode == COPY)
+            m_ptrImgArea->DrawTraceTag(GDK_COPY, color, p.x, p.y, update);
     }
 }
 
 //hlx
-void MeasureDraw::DrawIMTBox(POINT p1, POINT p2, bool draw)
-{
+void MeasureDraw::DrawIMTBox(POINT p1, POINT p2, bool draw) {
     m_imgAttr.area = ImageArea::IMT;
     m_imgAttr.mode.cvDraw = draw;
     int w = p2.x - p1.x;
@@ -986,8 +883,7 @@ void MeasureDraw::DrawIMTBox(POINT p1, POINT p2, bool draw)
     m_ptrImgArea->DrawRectangle(m_imgAttr, color, p1.x, p1.y, w, h, false);
 }
 
-void MeasureDraw::DrawIMTIntima(POINT start, unsigned int *pIntima, int count, bool draw)
-{
+void MeasureDraw::DrawIMTIntima(POINT start, unsigned int *pIntima, int count, bool draw) {
     m_imgAttr.area = ImageArea::IMT;
     m_imgAttr.mode.cvDraw = draw;
     int x1, y1;
@@ -999,165 +895,149 @@ void MeasureDraw::DrawIMTIntima(POINT start, unsigned int *pIntima, int count, b
     else
         color = g_red;
 #endif
-    for(int i=0;i<count;i++)
-    {
-        if (pIntima[i] > 0)
-        {
+    for(int i=0; i<count; i++) {
+        if (pIntima[i] > 0) {
             x1 = i+start.x;
             y1 = pIntima[i]+start.y;
             if (y1 <= start.y)
                 break;
-                m_ptrImgArea->DrawLine(m_imgAttr, g_red, x1, y1, x1, y1);//lihauemi 2012.07.11
-                //m_ptrImgArea->DrawLine(m_imgAttr, color, x1, y1, x1, y1);
+            m_ptrImgArea->DrawLine(m_imgAttr, g_red, x1, y1, x1, y1);//lihauemi 2012.07.11
+            //m_ptrImgArea->DrawLine(m_imgAttr, color, x1, y1, x1, y1);
         }
     }
 }
 
-void MeasureDraw::DrawIMTAdvent(POINT start, unsigned int *pAdventitia, int count, bool draw)
-{
+void MeasureDraw::DrawIMTAdvent(POINT start, unsigned int *pAdventitia, int count, bool draw) {
     m_imgAttr.area = ImageArea::IMT;
     m_imgAttr.mode.cvDraw = draw;
-      int x1, y1;
+    int x1, y1;
 #if 0
-      GdkColor* color;
-      bool updown = ImgProc2D::GetInstance()->GetUpDownStatusForIMT();
-      if (updown)
-          color = g_red;
-      else
-          color = g_yellow;
+    GdkColor* color;
+    bool updown = ImgProc2D::GetInstance()->GetUpDownStatusForIMT();
+    if (updown)
+        color = g_red;
+    else
+        color = g_yellow;
 #endif
-      for(int i=0;i<count;i++)
-    {
-        if (pAdventitia[i] > 0)
-        {
+    for(int i=0; i<count; i++) {
+        if (pAdventitia[i] > 0) {
             x1 = i+start.x;
             y1 = pAdventitia[i]+start.y;
             if (y1 <= start.y)
                 break;
-                m_ptrImgArea->DrawLine(m_imgAttr, g_yellow, x1, y1, x1, y1);
-                //m_ptrImgArea->DrawLine(m_imgAttr, color, x1, y1, x1, y1);
+            m_ptrImgArea->DrawLine(m_imgAttr, g_yellow, x1, y1, x1, y1);
+            //m_ptrImgArea->DrawLine(m_imgAttr, color, x1, y1, x1, y1);
         }
     }
 }
 
-void MeasureDraw::DrawAngleArc(POINT center, POINT left, POINT right, bool isCur, EDrawMode mode)
-{
-	float angle[2] = {0.0f, 0.0f};
-	POINT P[2] = {left, right};
-	float alpha = 0.0f;
-	float beta = 0.0f;
-	float value = 0.0f;
+void MeasureDraw::DrawAngleArc(POINT center, POINT left, POINT right, bool isCur, EDrawMode mode) {
+    float angle[2] = {0.0f, 0.0f};
+    POINT P[2] = {left, right};
+    float alpha = 0.0f;
+    float beta = 0.0f;
+    float value = 0.0f;
 
-	for (int i = 0; i < 2; i++)
-	{
-		alpha = asin((center.y - P[i].y) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) +
-					(center.y - P[i].y) * (center.y - P[i].y)));
-		beta = acos((P[i].x - center.x) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) +
-					(center.y - P[i].y) * (center.y - P[i].y)));
-		if ((alpha >= (float)0) && (beta < (float)PI / 2))
-			angle[i] = alpha * 180 / (float)PI;
-		else if ((alpha >= (float)0) && (beta >= (float)PI / 2))
-			angle[i] = beta * 180 / (float)PI;
-		else if ((alpha < (float)0) && (beta < (float)PI / 2))
-			angle[i] = alpha * 180 / (float)PI;
-		else if ((alpha < (float)0) && (beta >= (float)PI / 2))
-		{
-			angle[i] = (PI - alpha) * 180 / (float)PI;
-		}
+    for (int i = 0; i < 2; i++) {
+        alpha = asin((center.y - P[i].y) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) +
+                                                (center.y - P[i].y) * (center.y - P[i].y)));
+        beta = acos((P[i].x - center.x) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) +
+                                               (center.y - P[i].y) * (center.y - P[i].y)));
+        if ((alpha >= (float)0) && (beta < (float)PI / 2))
+            angle[i] = alpha * 180 / (float)PI;
+        else if ((alpha >= (float)0) && (beta >= (float)PI / 2))
+            angle[i] = beta * 180 / (float)PI;
+        else if ((alpha < (float)0) && (beta < (float)PI / 2))
+            angle[i] = alpha * 180 / (float)PI;
+        else if ((alpha < (float)0) && (beta >= (float)PI / 2)) {
+            angle[i] = (PI - alpha) * 180 / (float)PI;
+        }
 
-		angle[i] -= value;
-		value = angle[i];
-	}
+        angle[i] -= value;
+        value = angle[i];
+    }
 
-	if (fabs(angle[1]) > 180)
-		angle[1] = -(360 - fabs(angle[1])) * (angle[1] / fabs(angle[1]));
+    if (fabs(angle[1]) > 180)
+        angle[1] = -(360 - fabs(angle[1])) * (angle[1] / fabs(angle[1]));
 
-	GdkColor *color;
-	if (isCur)
-	{
-	    color = MeasureColorConvert(m_colorCurIndex);
-	    if (mode == XOR) {
-		m_imgAttr.mode.gdkMode = GDK_XOR;
-		m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
-	    } else if (mode == COPY) {
-		m_imgAttr.mode.gdkMode = GDK_COPY;
-		m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
-	    }
-	}
-	else
-	{
-	    color = MeasureColorConvert(m_colorConfirmIndex);
-	    if (mode == XOR) {
-		m_imgAttr.mode.gdkMode = GDK_XOR;
-		m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
-	    } else if (mode == COPY) {
-		m_imgAttr.mode.gdkMode = GDK_COPY;
-		m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
-	    }
-	}
+    GdkColor *color;
+    if (isCur) {
+        color = MeasureColorConvert(m_colorCurIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
+        }
+    } else {
+        color = MeasureColorConvert(m_colorConfirmIndex);
+        if (mode == XOR) {
+            m_imgAttr.mode.gdkMode = GDK_XOR;
+            m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
+        } else if (mode == COPY) {
+            m_imgAttr.mode.gdkMode = GDK_COPY;
+            m_ptrImgArea->DrawArc(m_imgAttr, color, center.x - 20, center.y - 20, 40, 40, angle[0], angle[1]);
+        }
+    }
 }
 
-void MeasureDraw::DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode)
-{
+void MeasureDraw::DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode) {
 
-	p.x = p.x + 10;
-	if (p.x < 0) p.x = 0;
-	if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
-	if (p.y < 0) p.y = 0;
-	if (p.y > IMAGE_H - 20) p.y = IMAGE_H - 20;
+    p.x = p.x + 10;
+    if (p.x < 0) p.x = 0;
+    if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
+    if (p.y < 0) p.y = 0;
+    if (p.y > IMAGE_H - 20) p.y = IMAGE_H - 20;
     SysMeasurementSetting sysMeasure;
     m_colorConfirmIndex = sysMeasure.GetMeasureColorConfirm();
-	GdkColor *color = MeasureColorConvert(m_colorConfirmIndex);
-	char str[3] = {0};
-	snprintf(str, 3, "%d", orderNumber);
+    GdkColor *color = MeasureColorConvert(m_colorConfirmIndex);
+    char str[3] = {0};
+    snprintf(str, 3, "%d", orderNumber);
 
-	if (mode == XOR)
-		m_ptrImgArea->DrawString(str, p.x , p.y, color, true);
-	else if (mode == COPY)
-		m_ptrImgArea->DrawString(str, p.x, p.y, color, false);
+    if (mode == XOR)
+        m_ptrImgArea->DrawString(str, p.x , p.y, color, true);
+    else if (mode == COPY)
+        m_ptrImgArea->DrawString(str, p.x, p.y, color, false);
 }
 
-void MeasureDraw::DrawOrderNumberForErase(POINT p, int orderNumber, int confirmColor, EDrawMode mode)
-{
+void MeasureDraw::DrawOrderNumberForErase(POINT p, int orderNumber, int confirmColor, EDrawMode mode) {
 
-	p.x = p.x + 10;
-	if (p.x < 0) p.x = 0;
-	if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
-	if (p.y < 0) p.y = 0;
-	if (p.y > IMAGE_H - 20) p.y = IMAGE_H - 20;
-	GdkColor *color = MeasureColorConvert(confirmColor);
-	char str[3] = {0};
-	snprintf(str, 3, "%d", orderNumber);
+    p.x = p.x + 10;
+    if (p.x < 0) p.x = 0;
+    if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
+    if (p.y < 0) p.y = 0;
+    if (p.y > IMAGE_H - 20) p.y = IMAGE_H - 20;
+    GdkColor *color = MeasureColorConvert(confirmColor);
+    char str[3] = {0};
+    snprintf(str, 3, "%d", orderNumber);
 
-	if (mode == XOR)
-		m_ptrImgArea->DrawString(str, p.x , p.y, color, true);
-	else if (mode == COPY)
-		m_ptrImgArea->DrawString(str, p.x, p.y, color, false);
+    if (mode == XOR)
+        m_ptrImgArea->DrawString(str, p.x , p.y, color, true);
+    else if (mode == COPY)
+        m_ptrImgArea->DrawString(str, p.x, p.y, color, false);
 }
 
-void MeasureDraw::ChangeOrderNumber()
-{
+void MeasureDraw::ChangeOrderNumber() {
 #ifdef TRANSDUCER
     SysMeasurementSetting sysMeasure;
     int m_meaResultFontSize = sysMeasure.GetMeasureResult();
     int measure_line_max = 14;
-    if(m_meaResultFontSize == 1)
-    {
+    if(m_meaResultFontSize == 1) {
         measure_line_max = 10;
     }
-	m_orderNumber++;
+    m_orderNumber++;
     printf("m_order=%d\n", m_orderNumber);
     if (m_orderNumber > measure_line_max)
-		m_orderNumber = 1;
+        m_orderNumber = 1;
 #else
-	m_orderNumber++;
+    m_orderNumber++;
     if (m_orderNumber > MEASURE_RES_LINES_MAX)
-		m_orderNumber = 1;
+        m_orderNumber = 1;
 #endif
 }
 
-void MeasureDraw::DrawFanshaped(POINT center, POINT left, POINT right, double angle)
-{
+void MeasureDraw::DrawFanshaped(POINT center, POINT left, POINT right, double angle) {
 
 #if 0
     int radius = 20;
@@ -1166,8 +1046,7 @@ void MeasureDraw::DrawFanshaped(POINT center, POINT left, POINT right, double an
     int x1, y1;//first point
     int x2, y2;//second point
     //m_ptrImgArea->DrawArc(m_imgAttr, g_green, center.x, center.y, 50, 100, 180 - angle, angle, false);
-    while((alpha+detal) < angle)
-    {
+    while((alpha+detal) < angle) {
         alpha += detal;
         x1 = center.x + radius * cos(alpha);
         y1 = center.y + radius * sin(alpha);

@@ -3,8 +3,7 @@
 
 #include "base/IniFile.h"
 
-class SysNoteSetting
-{
+class SysNoteSetting {
 public:
 
     SysNoteSetting();

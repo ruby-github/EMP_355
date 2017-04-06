@@ -12,24 +12,20 @@
 
 DicomLocalSetting* DicomLocalSetting::m_ptrInstance = NULL;
 
-DicomLocalSetting::DicomLocalSetting()
-{
+DicomLocalSetting::DicomLocalSetting() {
 }
 
-DicomLocalSetting::~DicomLocalSetting()
-{
+DicomLocalSetting::~DicomLocalSetting() {
 }
 
-DicomLocalSetting* DicomLocalSetting::GetInstance()
-{
+DicomLocalSetting* DicomLocalSetting::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new DicomLocalSetting;
 
     return m_ptrInstance;
 }
 
-GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
-{
+GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent) {
     GtkWidget *fixed_local;
     GtkWidget *frame_network;
     GtkWidget *table_network;
@@ -75,8 +71,8 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     gtk_widget_show (m_entry_network_ip);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), m_entry_network_ip, 1, 3, 0, 1);
     gtk_table_attach (GTK_TABLE (table_network), m_entry_network_ip, 1, 3, 0, 1,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
     gtk_widget_set_size_request (m_entry_network_ip, -1, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_network_ip), 15);
@@ -86,8 +82,8 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     gtk_widget_show (ip_style);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), label_network_ip, 0, 1, 0, 1);
     gtk_table_attach (GTK_TABLE (table_network), ip_style, 1, 3, 1, 2,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (ip_style), TRUE);
 
     m_entry_network_mask = gtk_entry_new ();
@@ -95,8 +91,8 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
 
     //gtk_table_attach_defaults(GTK_TABLE (table_network), m_entry_network_mask, 1, 3, 1, 2);
     gtk_table_attach (GTK_TABLE (table_network), m_entry_network_mask, 1, 3, 2, 3,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
     gtk_widget_set_size_request (m_entry_network_mask, -1, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_network_mask), 15);
@@ -106,16 +102,16 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     gtk_widget_show (mask_style);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), label_network_ip, 0, 1, 0, 1);
     gtk_table_attach (GTK_TABLE (table_network), mask_style, 1, 3,3 , 4,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (mask_style), TRUE);
 #endif
     m_entry_network_gateway = gtk_entry_new ();
     gtk_widget_show (m_entry_network_gateway);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), m_entry_network_gateway, 1, 3, 2, 3);
     gtk_table_attach (GTK_TABLE (table_network), m_entry_network_gateway, 1,3 , 4, 5,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
     gtk_widget_set_size_request (m_entry_network_gateway, -1, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_network_gateway), 15);
@@ -125,24 +121,24 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     gtk_widget_show (gateway_style);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), label_network_ip, 0, 1, 0, 1);
     gtk_table_attach (GTK_TABLE (table_network), gateway_style, 1, 3,5, 6,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (gateway_style), TRUE);
 #endif
     label_network_ip = gtk_label_new (_("<b>IP Address:     </b>"));
     gtk_widget_show (label_network_ip);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), label_network_ip, 0, 1, 0, 1);
     gtk_table_attach (GTK_TABLE (table_network), label_network_ip, 0, 1, 0, 1,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (label_network_ip), TRUE);
 
     label_network_mask = gtk_label_new (_("<b>Netmask :</b>"));
     gtk_widget_show (label_network_mask);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), label_network_mask, 0, 1, 1, 2);
     gtk_table_attach (GTK_TABLE (table_network), label_network_mask, 0, 1, 2, 3,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
     gtk_label_set_use_markup (GTK_LABEL (label_network_mask), TRUE);
 
@@ -150,8 +146,8 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     gtk_widget_show (label_network_gateway);
     //gtk_table_attach_defaults (GTK_TABLE (table_network), label_network_gateway, 0, 1, 2, 3);
     gtk_table_attach (GTK_TABLE (table_network), label_network_gateway, 0, 1, 4, 5,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
 
     gtk_label_set_use_markup (GTK_LABEL (label_network_gateway), TRUE);
 
@@ -186,15 +182,15 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     label_host_ae = gtk_label_new (_("<b>AE Title :</b>"));
     gtk_widget_show (label_host_ae);
     gtk_table_attach (GTK_TABLE (table_host), label_host_ae, 0, 1, 0, 1,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (label_host_ae), TRUE);
 
     m_entry_host_ae = gtk_entry_new ();
     gtk_widget_show (m_entry_host_ae);
     gtk_table_attach (GTK_TABLE (table_host), m_entry_host_ae, 1,2 , 0, 1,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_widget_set_size_request (m_entry_host_ae, -1, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_host_ae), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_host_ae), 9679);
@@ -202,15 +198,15 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
     label_host_port = gtk_label_new (_("<b>Port :</b>"));
     gtk_widget_show (label_host_port);
     gtk_table_attach (GTK_TABLE (table_host), label_host_port, 0, 1, 1, 2,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (label_host_port), TRUE);
 
     m_entry_host_port = gtk_entry_new ();
     gtk_widget_show (m_entry_host_port);
     gtk_table_attach (GTK_TABLE (table_host), m_entry_host_port, 1, 2, 1, 2,
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-            (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), 0, 0);
     gtk_widget_set_size_request (m_entry_host_port, -1, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_host_port), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_host_port), 9679);
@@ -220,8 +216,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget *parent)
 
 }
 
-void DicomLocalSetting::init_local_setting(void)
-{
+void DicomLocalSetting::init_local_setting(void) {
     SysDicomSetting *sysDicomSetting = new SysDicomSetting;
     string local_ip, local_netmask, local_gateway, local_AE;
     int host_port;
@@ -243,8 +238,7 @@ void DicomLocalSetting::init_local_setting(void)
     delete sysDicomSetting;
 }
 
-void DicomLocalSetting::ButtonSettingClicked(GtkButton *button)
-{
+void DicomLocalSetting::ButtonSettingClicked(GtkButton *button) {
     char info[256];
     const char *local_ip, *local_mask, *local_gateway, *local_ae, *host_port, *host_ae;
 
@@ -257,15 +251,13 @@ void DicomLocalSetting::ButtonSettingClicked(GtkButton *button)
     printf("------Setting:%s %s %s %s %s\n", local_ip,local_mask,local_gateway,host_port,host_ae);
 
     //if(host_ae[0] == '\0' || host_port[0] == '\0' || local_ip[0] == '\0' || local_mask[0] == '\0' || local_ae[0] == '\0')
-    if (strcmp(local_ip,"")==0 ||strcmp(local_mask,"")==0 ||strcmp(local_gateway,"")==0 ||strcmp(host_port,"")==0 ||strcmp(host_ae,"")==0)
-    {
+    if (strcmp(local_ip,"")==0 ||strcmp(local_mask,"")==0 ||strcmp(local_gateway,"")==0 ||strcmp(host_port,"")==0 ||strcmp(host_ae,"")==0) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Local information must be not empty!"), NULL);
         return ;
     }
 
     CNetworkMan localIP;
-    if(localIP.SetLocalIP(local_ip, local_gateway, local_mask))
-    {
+    if(localIP.SetLocalIP(local_ip, local_gateway, local_mask)) {
         CDCMMan::GetMe()->SetLocalAE(host_ae);
         CDCMMan::GetMe()->SetLocalPort(atoi(host_port));
         sprintf(info, _("Sucess to set the local network!"));
@@ -277,55 +269,51 @@ void DicomLocalSetting::ButtonSettingClicked(GtkButton *button)
 
         sysDicomSetting.SyncFile();
 
-    }
-    else
-    {
+    } else {
         PRINTF("Fail to set the local network!\n");
         sprintf(info, _("Fail to set the local network!"));
     }
 
     ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-            ViewDialog::INFO,
-            info,
-            NULL);
+                                      ViewDialog::INFO,
+                                      info,
+                                      NULL);
 
+}
+
+gboolean DicomLocalSetting::KeyFilter(GtkWidget *entry, GdkEventKey *event) {
+    switch(event->keyval) {
+    case GDK_0:
+    case GDK_1:
+    case GDK_2:
+    case GDK_3:
+    case GDK_4:
+    case GDK_5:
+    case GDK_6:
+    case GDK_7:
+    case GDK_8:
+    case GDK_9:
+    case GDK_KP_0:
+    case GDK_KP_1:
+    case GDK_KP_2:
+    case GDK_KP_3:
+    case GDK_KP_4:
+    case GDK_KP_5:
+    case GDK_KP_6:
+    case GDK_KP_7:
+    case GDK_KP_8:
+    case GDK_KP_9:
+    case GDK_BackSpace:
+    case GDK_Left:
+    case GDK_Up:
+    case GDK_Right:
+    case GDK_Down:
+    case GDK_Delete:
+    case GDK_Home:
+    case GDK_End:
+    case GDK_Tab:
+        return FALSE;
+    default:
+        return TRUE;
     }
-
-gboolean DicomLocalSetting::KeyFilter(GtkWidget *entry, GdkEventKey *event)
-{
-        switch(event->keyval)
-        {
-                case GDK_0:
-                case GDK_1:
-                case GDK_2:
-                case GDK_3:
-                case GDK_4:
-                case GDK_5:
-                case GDK_6:
-                case GDK_7:
-                case GDK_8:
-                case GDK_9:
-                case GDK_KP_0:
-                case GDK_KP_1:
-                case GDK_KP_2:
-                case GDK_KP_3:
-                case GDK_KP_4:
-                case GDK_KP_5:
-                case GDK_KP_6:
-                case GDK_KP_7:
-                case GDK_KP_8:
-                case GDK_KP_9:
-                case GDK_BackSpace:
-                case GDK_Left:
-                case GDK_Up:
-                case GDK_Right:
-                case GDK_Down:
-                case GDK_Delete:
-                case GDK_Home:
-                case GDK_End:
-				case GDK_Tab:
-                        return FALSE;
-                default:
-                        return TRUE;
-        }
 }

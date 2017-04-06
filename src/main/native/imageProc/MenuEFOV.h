@@ -1,8 +1,7 @@
 #ifndef _MENUEFOV_H_
 #define _MENUEFOV_H_
 
-class MenuEFOV
-{
+class MenuEFOV {
 public:
     MenuEFOV();
     ~MenuEFOV() {}

@@ -7,11 +7,10 @@
 
 #include "display/MenuArea.h"
 
-class MenuMain
-{
+class MenuMain {
 public:
     MenuMain();
-    ~MenuMain(){};
+    ~MenuMain() {};
 
     GtkWidget * Create(void);
     void UpdateLabel(void);
@@ -48,17 +47,39 @@ private:
     void BtnBiopsyClicked(GtkButton *button);
 
 //signal connect
-    static void Handle2DClicked(GtkButton *button, MenuMain *data) { data->Btn2DClicked(button); }
-    static void HandleMClicked(GtkButton *button, MenuMain *data) { data->BtnMClicked(button); }
-    static void HandlePWClicked(GtkButton *button, MenuMain *data) { data->BtnPWClicked(button); }
-    static void HandleCWClicked(GtkButton *button, MenuMain *data) { data->BtnCWClicked(button); }
-    static void HandleCFMClicked(GtkButton *button, MenuMain *data) { data->BtnCFMClicked(button); }
-    static void HandleMeasureClicked(GtkButton *button, MenuMain *data) { data->BtnMeasureClicked(button); }
-    static void HandleNoteClicked(GtkButton *button, MenuMain *data) { data->BtnNoteClicked(button); }
-    static void HandleBDMKClicked(GtkButton *button, MenuMain *data) { data->BtnBDMKClicked(button); }
-    static void HandleReviewClicked(GtkButton *button, MenuMain *data) { data->BtnReviewClicked(button); }
-    static void HandleCalcClicked(GtkButton *button, MenuMain *data) { data->BtnCalcClicked(button); }
-    static void HandleBiopsyClicked(GtkButton *button, MenuMain *data) { data->BtnBiopsyClicked(button); }
+    static void Handle2DClicked(GtkButton *button, MenuMain *data) {
+        data->Btn2DClicked(button);
+    }
+    static void HandleMClicked(GtkButton *button, MenuMain *data) {
+        data->BtnMClicked(button);
+    }
+    static void HandlePWClicked(GtkButton *button, MenuMain *data) {
+        data->BtnPWClicked(button);
+    }
+    static void HandleCWClicked(GtkButton *button, MenuMain *data) {
+        data->BtnCWClicked(button);
+    }
+    static void HandleCFMClicked(GtkButton *button, MenuMain *data) {
+        data->BtnCFMClicked(button);
+    }
+    static void HandleMeasureClicked(GtkButton *button, MenuMain *data) {
+        data->BtnMeasureClicked(button);
+    }
+    static void HandleNoteClicked(GtkButton *button, MenuMain *data) {
+        data->BtnNoteClicked(button);
+    }
+    static void HandleBDMKClicked(GtkButton *button, MenuMain *data) {
+        data->BtnBDMKClicked(button);
+    }
+    static void HandleReviewClicked(GtkButton *button, MenuMain *data) {
+        data->BtnReviewClicked(button);
+    }
+    static void HandleCalcClicked(GtkButton *button, MenuMain *data) {
+        data->BtnCalcClicked(button);
+    }
+    static void HandleBiopsyClicked(GtkButton *button, MenuMain *data) {
+        data->BtnBiopsyClicked(button);
+    }
 };
 
 extern MenuMain g_menuMain;

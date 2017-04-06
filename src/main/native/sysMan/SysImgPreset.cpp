@@ -2,13 +2,12 @@
 #include "sysMan/ViewSystem.h"
 #include "probe/ExamItem.h"
 
-void ExecSetting(ExamItem::EItem itemIndex)
-{
-	ExamItem examItem;
-	ExamItem::ParaItem paraItem;
+void ExecSetting(ExamItem::EItem itemIndex) {
+    ExamItem examItem;
+    ExamItem::ParaItem paraItem;
     int probeIndex = ViewSystem::GetInstance()->GetProbeType();
     if (probeIndex != -1) {
-         char *itemName="Adult Abdomen";
+        char *itemName="Adult Abdomen";
         PRINTF("PROBE iNDEX = %d, itemIndex = %d\n", probeIndex, itemIndex);
         examItem.ReadExamItemPara(probeIndex, (int)itemIndex, &paraItem, itemName);
         ViewSystem::GetInstance()->SetImagePara(paraItem);
@@ -16,138 +15,111 @@ void ExecSetting(ExamItem::EItem itemIndex)
 }
 #ifdef VET
 #else
-void SetAdultAbdo(void)
-{
+void SetAdultAbdo(void) {
     ExecSetting(ExamItem::ABDO_ADULT);
 }
 
-void SetAdultLiver(void)
-{
+void SetAdultLiver(void) {
     ExecSetting(ExamItem::ABDO_LIVER);
 }
 
-void SetKidAbdo(void)
-{
+void SetKidAbdo(void) {
     ExecSetting(ExamItem::ABDO_KID);
 }
 
-void SetEarlyPreg(void)
-{
-	ExecSetting(ExamItem::EARLY_PREG);
+void SetEarlyPreg(void) {
+    ExecSetting(ExamItem::EARLY_PREG);
 }
 
-void SetMiddleLaterPreg(void)
-{
+void SetMiddleLaterPreg(void) {
     ExecSetting(ExamItem::LATER_PREG);
 }
 
-void SetFetusCardio(void)
-{
+void SetFetusCardio(void) {
     ExecSetting(ExamItem::CAR_FETUS);
 }
 
-void SetGyn(void)
-{
+void SetGyn(void) {
     ExecSetting(ExamItem::GYN);
 }
 
-void SetKidneyUreter(void)
-{
+void SetKidneyUreter(void) {
     ExecSetting(ExamItem::KIDNEY);
 }
 
-void SetBladderProstate(void)
-{
+void SetBladderProstate(void) {
     ExecSetting(ExamItem::BLADDER);
 }
 
-void SetAdultCardio(void)
-{
+void SetAdultCardio(void) {
     ExecSetting(ExamItem::CAR_ADULT);
 }
 
-void SetKidCardio(void)
-{
+void SetKidCardio(void) {
     ExecSetting(ExamItem::CAR_KID);
 }
 
-void SetMammaryGlands(void)
-{
+void SetMammaryGlands(void) {
     ExecSetting(ExamItem::GLANDS);
 }
 
-void SetThyroid(void)
-{
+void SetThyroid(void) {
     ExecSetting(ExamItem::THYROID);
 }
 
-void SetEyeBall(void)
-{
+void SetEyeBall(void) {
     ExecSetting(ExamItem::EYE);
 }
 
-void SetSmallPart(void)
-{
+void SetSmallPart(void) {
     ExecSetting(ExamItem::SMALL_PART);
 }
 
-void SetCarotid(void)
-{
+void SetCarotid(void) {
     ExecSetting(ExamItem::CAROTID);
 }
 
-void SetJugular(void)
-{
+void SetJugular(void) {
     ExecSetting(ExamItem::JUGULAR);
 }
 
-void SetPeripheryArtery(void)
-{
+void SetPeripheryArtery(void) {
     ExecSetting(ExamItem::PERI_ARTERY);
 }
 
-void SetPeripheryVein(void)
-{
+void SetPeripheryVein(void) {
     ExecSetting(ExamItem::PERI_VEIN);
 }
 
-void SetHipJoint(void)
-{
+void SetHipJoint(void) {
     ExecSetting(ExamItem::HIP_JOINT);
 }
 
-void SetMeniscus(void)
-{
+void SetMeniscus(void) {
     ExecSetting(ExamItem::MENISCUS);
 }
 
-void SetJointCavity(void)
-{
+void SetJointCavity(void) {
     ExecSetting(ExamItem::JOINT_CAVITY);
 }
 
-void SetSpine(void)
-{
+void SetSpine(void) {
     ExecSetting(ExamItem::SPINE);
 }
 
-void SetUser1(void)
-{
+void SetUser1(void) {
     ExecSetting(ExamItem::USER1);
 }
 
-void SetUser2(void)
-{
+void SetUser2(void) {
     ExecSetting(ExamItem::USER2);
 }
 
-void SetUser3(void)
-{
+void SetUser3(void) {
     ExecSetting(ExamItem::USER3);
 }
 
-void SetUser4(void)
-{
+void SetUser4(void) {
     ExecSetting(ExamItem::USER4);
 }
 #endif

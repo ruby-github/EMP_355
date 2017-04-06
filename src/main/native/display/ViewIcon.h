@@ -25,8 +25,12 @@ public:
     void Charge(int data);
 
     void ScanIcon(const char *iconName);
-    int GetCountScanIcon(void) { return m_countScanIcon; }
-    void SetCountScanIcon(int count) { m_countScanIcon = count; }
+    int GetCountScanIcon(void) {
+        return m_countScanIcon;
+    }
+    void SetCountScanIcon(int count) {
+        m_countScanIcon = count;
+    }
     void InitCharge();
     void UpdateCharge();
 private:

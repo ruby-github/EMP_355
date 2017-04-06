@@ -9,24 +9,20 @@
 
 DicomServerSetting* DicomServerSetting::m_ptrInstance = NULL;
 
-DicomServerSetting::DicomServerSetting()
-{
+DicomServerSetting::DicomServerSetting() {
 }
 
-DicomServerSetting::~DicomServerSetting()
-{
+DicomServerSetting::~DicomServerSetting() {
 }
 
-DicomServerSetting* DicomServerSetting::GetInstance()
-{
+DicomServerSetting* DicomServerSetting::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new DicomServerSetting;
 
     return m_ptrInstance;
 }
 
-GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget *parent)
-{
+GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget *parent) {
     GtkWidget *fixed_server;
     GtkWidget *frame_equipment;
     GtkWidget *label_equipment;
@@ -128,8 +124,8 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget *parent)
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrollWin), GTK_SHADOW_IN);
 
     m_treeview = create_server_treeview();
-	gtk_container_add(GTK_CONTAINER(scrollWin), m_treeview);
-	gtk_widget_set_size_request (m_treeview, 250, 120);
+    gtk_container_add(GTK_CONTAINER(scrollWin), m_treeview);
+    gtk_widget_set_size_request (m_treeview, 250, 120);
     gtk_widget_show (m_treeview);
 
     button_delete = gtk_button_new_with_mnemonic (_("Delete"));
@@ -141,50 +137,47 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget *parent)
     return fixed_server;
 }
 
-GtkWidget* DicomServerSetting::create_server_treeview()
-{
-	GtkWidget *treeview;
+GtkWidget* DicomServerSetting::create_server_treeview() {
+    GtkWidget *treeview;
     GtkTreeModel *model = NULL;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
     treeview = gtk_tree_view_new ();
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
+    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
 
-	renderer = gtk_cell_renderer_toggle_new ();
-	//g_signal_connect (G_OBJECT(renderer), "toggled", G_CALLBACK (HandleToggleRecord), this);
+    renderer = gtk_cell_renderer_toggle_new ();
+    //g_signal_connect (G_OBJECT(renderer), "toggled", G_CALLBACK (HandleToggleRecord), this);
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Device"), renderer, "text", COL_DEVICE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 180, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 180, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("IP Address"), renderer, "text", COL_IP, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 120, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 120, NULL);
 
     model = create_device_model();
     if (model != NULL)
-		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
+        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
     g_object_unref (model);
 
-	return treeview;
+    return treeview;
 }
 
-GtkTreeModel* DicomServerSetting::create_device_model()
-{
+GtkTreeModel* DicomServerSetting::create_device_model() {
     GtkListStore *store;
 
     store = gtk_list_store_new(NUM_COLS,
-			G_TYPE_STRING,
-			G_TYPE_STRING);
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
 
-	return GTK_TREE_MODEL (store);
+    return GTK_TREE_MODEL (store);
 }
 
-void DicomServerSetting::GetSingleServerAttribute(string device, string ip, void *data)
-{
+void DicomServerSetting::GetSingleServerAttribute(string device, string ip, void *data) {
     DicomServerSetting *tmp;
     tmp = (DicomServerSetting *)data;
 
@@ -198,16 +191,15 @@ void DicomServerSetting::GetSingleServerAttribute(string device, string ip, void
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(tmp->m_treeview));
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                COL_DEVICE, device.c_str(),
-                COL_IP,ip.c_str(),
-                -1);
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                       COL_DEVICE, device.c_str(),
+                       COL_IP,ip.c_str(),
+                       -1);
 
-        gtk_tree_model_iter_next(model, &iter);
+    gtk_tree_model_iter_next(model, &iter);
 }
 
-void DicomServerSetting::init_server_setting(void)
-{
+void DicomServerSetting::init_server_setting(void) {
     GtkTreeModel *model;
 
     m_group_device_server.clear();
@@ -217,27 +209,24 @@ void DicomServerSetting::init_server_setting(void)
     CDCMMan::GetMe()->GetAllServer(GetSingleServerAttribute, this);
 }
 
-void DicomServerSetting::ButtonPingClicked(GtkButton *button)
-{
+void DicomServerSetting::ButtonPingClicked(GtkButton *button) {
     const char * ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
     const char * device = gtk_entry_get_text(GTK_ENTRY(m_entry_device));
-   if(ip[0] == '\0' || device[0] == '\0')
-   {
-       ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-            ViewDialog::INFO,
-            _("Device or IP is empty, please input!"),
-            NULL);
-       return;
-   }
+    if(ip[0] == '\0' || device[0] == '\0') {
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          ViewDialog::INFO,
+                                          _("Device or IP is empty, please input!"),
+                                          NULL);
+        return;
+    }
 
     ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-            _("Ping..."));
+                                          _("Ping..."));
 
     g_timeout_add(2000, PingTimeout, this);
 }
 
-gboolean DicomServerSetting::PingTimeout(gpointer data)
-{
+gboolean DicomServerSetting::PingTimeout(gpointer data) {
     DicomServerSetting *pData = (DicomServerSetting *)data;
     const char * ip = gtk_entry_get_text(GTK_ENTRY(pData->m_entry_ip));
     char strHint[256] = {0};
@@ -247,59 +236,53 @@ gboolean DicomServerSetting::PingTimeout(gpointer data)
         sprintf(strHint, "%s %s\n", _("Failed to ping ip"), ip);
 
     ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-            ViewDialog::INFO,
-            strHint,
-            NULL);
+                                      ViewDialog::INFO,
+                                      strHint,
+                                      NULL);
 
     return FALSE;
 }
 
-void DicomServerSetting::ButtonAddClicked(GtkButton *button)
-{
+void DicomServerSetting::ButtonAddClicked(GtkButton *button) {
     const char * device = gtk_entry_get_text(GTK_ENTRY(m_entry_device));
     const char * ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
-    if(strcmp(device,"localhost")==0)
-    {
+    if(strcmp(device,"localhost")==0) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                ViewDialog::INFO,
-                _("'localhost' has been used, please input again!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("'localhost' has been used, please input again!"),
+                                          NULL);
         return;
 
     }
 
-    if(ip[0] == '\0' || device[0] == '\0')
-    {
+    if(ip[0] == '\0' || device[0] == '\0') {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                ViewDialog::INFO,
-                _("Device or IP is empty, please input!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("Device or IP is empty, please input!"),
+                                          NULL);
         return;
     }
 
     char device_tmp[256];
     char ip_tmp[256];
-    for(int i=0;i<m_group_device_server.size();i++)
-    {
+    for(int i=0; i<m_group_device_server.size(); i++) {
         sprintf(device_tmp,"%s",m_group_device_server[i].c_str());
         sprintf(ip_tmp,"%s",m_group_ip_server[i].c_str());
-        if((strcmp(device,device_tmp)==0)||(strcmp(ip,ip_tmp)==0))
-        {
+        if((strcmp(device,device_tmp)==0)||(strcmp(ip,ip_tmp)==0)) {
             PRINTF("------add failed\n");
             ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-            ViewDialog::INFO,
-            _("Add failed,device or IP has been existed\n"),
-            NULL);
+                                              ViewDialog::INFO,
+                                              _("Add failed,device or IP has been existed\n"),
+                                              NULL);
             return;
         }
     }
 
-    if(!CDCMMan::GetMe()->AddServer(device,ip))
-    {
+    if(!CDCMMan::GetMe()->AddServer(device,ip)) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-            ViewDialog::INFO,
-            _("Add failed,device or IP has been existed\n"),
-            NULL);
+                                          ViewDialog::INFO,
+                                          _("Add failed,device or IP has been existed\n"),
+                                          NULL);
         return;
     }
 
@@ -309,9 +292,9 @@ void DicomServerSetting::ButtonAddClicked(GtkButton *button)
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview));
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_DEVICE, device,
-            COL_IP,ip,
-            -1);
+                       COL_DEVICE, device,
+                       COL_IP,ip,
+                       -1);
 
     m_group_device_server.push_back(device);
     m_group_ip_server.push_back(ip);
@@ -320,8 +303,7 @@ void DicomServerSetting::ButtonAddClicked(GtkButton *button)
 
 }
 
-void DicomServerSetting::ButtonDeleteClicked(GtkButton *button)
-{
+void DicomServerSetting::ButtonDeleteClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
@@ -332,20 +314,18 @@ void DicomServerSetting::ButtonDeleteClicked(GtkButton *button)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview));
-    if(gtk_tree_selection_get_selected(selection,NULL,&iter))
-    {
+    if(gtk_tree_selection_get_selected(selection,NULL,&iter)) {
         gtk_tree_model_get(model, &iter,
-                COL_DEVICE,&device,
-                COL_IP,&ip,
-                -1);
+                           COL_DEVICE,&device,
+                           COL_IP,&ip,
+                           -1);
 
-        for(Iter = m_group_device_server.begin();Iter < m_group_device_server.end();Iter++ )
-        {
+        for(Iter = m_group_device_server.begin(); Iter < m_group_device_server.end(); Iter++ ) {
             if (strcmp(device,(*Iter).c_str())==0)
                 m_group_device_server.erase(Iter);
         }
 
-            gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
 
         //CDCMMan::GetMe()->DeleteServer(device);
         printf("-----------Delete:%d %s\n",CDCMMan::GetMe()->DeleteServer(device),device);

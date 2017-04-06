@@ -15,28 +15,24 @@
 ViewPPDSelect* ViewPPDSelect::m_ptrInstance = NULL;
 
 namespace {
-    const string ppd_path = "./res/printer/ppd_specific/";
+const string ppd_path = "./res/printer/ppd_specific/";
 }
-ViewPPDSelect::ViewPPDSelect()
-{
+ViewPPDSelect::ViewPPDSelect() {
 }
 
-ViewPPDSelect::~ViewPPDSelect()
-{
+ViewPPDSelect::~ViewPPDSelect() {
     if (m_ptrInstance != NULL)
-	delete m_ptrInstance;
+        delete m_ptrInstance;
 }
 
-ViewPPDSelect* ViewPPDSelect::GetInstance()
-{
+ViewPPDSelect* ViewPPDSelect::GetInstance() {
     if (m_ptrInstance == NULL)
-	m_ptrInstance = new ViewPPDSelect;
+        m_ptrInstance = new ViewPPDSelect;
 
     return m_ptrInstance;
 }
 
-void ViewPPDSelect::CreateWindow(GtkWindow *parent)
-{
+void ViewPPDSelect::CreateWindow(GtkWindow *parent) {
     GtkWidget *fixed;
     GtkWidget *scrolledwindow;
     GtkWidget *treeview;
@@ -89,8 +85,7 @@ void ViewPPDSelect::CreateWindow(GtkWindow *parent)
     return ;
 }
 
-void ViewPPDSelect::DestroyWindow(void)
-{
+void ViewPPDSelect::DestroyWindow(void) {
     if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
@@ -98,27 +93,24 @@ void ViewPPDSelect::DestroyWindow(void)
     }
 }
 
-gboolean ViewPPDSelect::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
-{
+gboolean ViewPPDSelect::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     DestroyWindow();
     return FALSE;
 }
 
-void ViewPPDSelect::KeyEvent(unsigned char keyValue)
-{
+void ViewPPDSelect::KeyEvent(unsigned char keyValue) {
     FakeXEvent::KeyEvent(keyValue);
 
     switch(keyValue) {
     case KEY_ESC:
-	BtnCancelClicked(NULL);
-	break;
+        BtnCancelClicked(NULL);
+        break;
     default:
-	break;
+        break;
     }
 }
 
-void ViewPPDSelect::BtnOpenClicked(GtkButton *button)
-{
+void ViewPPDSelect::BtnOpenClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter;
 
@@ -136,14 +128,12 @@ void ViewPPDSelect::BtnOpenClicked(GtkButton *button)
     DestroyWindow();
 }
 
-void ViewPPDSelect::BtnCancelClicked(GtkButton *button)
-{
+void ViewPPDSelect::BtnCancelClicked(GtkButton *button) {
     DestroyWindow();
     ViewPrinterAdd::GetInstance()->SetPPDName("", "");
 }
 
-GtkWidget* ViewPPDSelect::create_treeview(void)
-{
+GtkWidget* ViewPPDSelect::create_treeview(void) {
     GtkWidget *treeview;
     GtkTreeModel *model;
 
@@ -174,21 +164,19 @@ GtkWidget* ViewPPDSelect::create_treeview(void)
 }
 
 namespace {
-	struct ppd_info{
-	string name;
-	string path;
-	string size;
-	string time;
+struct ppd_info {
+    string name;
+    string path;
+    string size;
+    string time;
 };
 
-bool SortModel(const ppd_info &p1, const ppd_info &p2)
-{
-	return p1.name < p2.name;
+bool SortModel(const ppd_info &p1, const ppd_info &p2) {
+    return p1.name < p2.name;
 }
 }
 
-GtkTreeModel* ViewPPDSelect::create_tree_model(void)
-{
+GtkTreeModel* ViewPPDSelect::create_tree_model(void) {
     GtkListStore  *store;
     GtkTreeIter    iter;
 
@@ -203,7 +191,7 @@ GtkTreeModel* ViewPPDSelect::create_tree_model(void)
         return NULL;
     }
 
-	vector<ppd_info> vec;
+    vector<ppd_info> vec;
 
     const char *file_name = g_dir_read_name (ppd_dir);
     FileMan fm;
@@ -211,45 +199,43 @@ GtkTreeModel* ViewPPDSelect::create_tree_model(void)
     char str_time[64];
     struct stat file_stat;
     while (file_name) {
-		if (fm.CompareSuffix(file_name, "ppd") == 0) {
-			std::string path = ppd_path + file_name;
-			if (stat(path.c_str(), &file_stat) == -1) {
-				g_dir_close(ppd_dir);
-				perror("stat");
-				return NULL;
-			}
-			sprintf(str_size, "%lld bytes", (long long)file_stat.st_size);
-			sprintf(str_time, "%.24s", ctime(&file_stat.st_mtime));
+        if (fm.CompareSuffix(file_name, "ppd") == 0) {
+            std::string path = ppd_path + file_name;
+            if (stat(path.c_str(), &file_stat) == -1) {
+                g_dir_close(ppd_dir);
+                perror("stat");
+                return NULL;
+            }
+            sprintf(str_size, "%lld bytes", (long long)file_stat.st_size);
+            sprintf(str_time, "%.24s", ctime(&file_stat.st_mtime));
 
-			struct ppd_info ppd;
-			ppd.name = file_name;
-			ppd.path = path;
-			ppd.size = str_size;
-			ppd.time = str_time;
-			vec.push_back(ppd);
-		}
-		file_name = g_dir_read_name (ppd_dir);
+            struct ppd_info ppd;
+            ppd.name = file_name;
+            ppd.path = path;
+            ppd.size = str_size;
+            ppd.time = str_time;
+            vec.push_back(ppd);
+        }
+        file_name = g_dir_read_name (ppd_dir);
     }
 
-	sort(vec.begin(), vec.end(), SortModel);
+    sort(vec.begin(), vec.end(), SortModel);
 
-	for(vector<ppd_info>::iterator it=vec.begin(); it!=vec.end(); ++it)
-	{
-		gtk_list_store_append (store, &iter);
-		gtk_list_store_set(store, &iter,
-				NAME, it->name.c_str(),
-				PATH, it->path.c_str(),
-				SIZE, it->size.c_str(),
-				MODIFIED, it->time.c_str(),
-				-1);
-	}
+    for(vector<ppd_info>::iterator it=vec.begin(); it!=vec.end(); ++it) {
+        gtk_list_store_append (store, &iter);
+        gtk_list_store_set(store, &iter,
+                           NAME, it->name.c_str(),
+                           PATH, it->path.c_str(),
+                           SIZE, it->size.c_str(),
+                           MODIFIED, it->time.c_str(),
+                           -1);
+    }
 
     g_dir_close(ppd_dir);
     return GTK_TREE_MODEL (store);
 }
 
-void ViewPPDSelect::update_tree_model(void)
-{
+void ViewPPDSelect::update_tree_model(void) {
     // GtkTreeModel* model = create_tree_model();
     // if (model != NULL)
     //     gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeview), model);

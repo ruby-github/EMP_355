@@ -3,7 +3,7 @@
 
 #include "base/IniFile.h"
 
-struct OBSetting{
+struct OBSetting {
     int cer;
     int hl;
     int bpd;
@@ -23,8 +23,7 @@ const int GetCurEfwMethod(void);
 
 extern OBSetting g_obSetting;
 
-class SysCalculateSetting
-{
+class SysCalculateSetting {
 public:
 
     SysCalculateSetting();

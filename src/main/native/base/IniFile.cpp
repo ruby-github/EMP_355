@@ -3,15 +3,13 @@
 
 using std::string;
 
-IniFile::IniFile(const char* file)
-{
+IniFile::IniFile(const char* file) {
     GError *error = NULL;
     m_fileName = file;
 
-	if (!g_file_test(file, G_FILE_TEST_EXISTS))
-	{
-		g_build_filename(file, NULL);
-	}
+    if (!g_file_test(file, G_FILE_TEST_EXISTS)) {
+        g_build_filename(file, NULL);
+    }
     gchar *contents;
     gsize length;
     if (!g_file_get_contents(file, &contents, &length, &error)) {
@@ -29,61 +27,55 @@ IniFile::IniFile(const char* file)
     g_free(contents);
 }
 
-IniFile::~IniFile()
-{
+IniFile::~IniFile() {
     g_key_file_free(m_keyFile);
 }
 
-string IniFile::ReadString(const char *group, const char *key)
-{
+string IniFile::ReadString(const char *group, const char *key) {
     GError *error = NULL;
-	string value("");
+    string value("");
 
     gchar *ret_val = g_key_file_get_string(m_keyFile, group, key, &error);
-	if (ret_val != NULL)
-		value = ret_val;
+    if (ret_val != NULL)
+        value = ret_val;
     if (error) {
-	PRINTF("%s\n", error->message);
-	g_error_free(error);
+        PRINTF("%s\n", error->message);
+        g_error_free(error);
     }
     return value;
 }
 
-int IniFile::ReadInt(const char *group, const char *key)
-{
+int IniFile::ReadInt(const char *group, const char *key) {
     GError *error = NULL;
     int value = g_key_file_get_integer(m_keyFile, group, key, &error);
     if (error) {
-	PRINTF("%s\n", error->message);
-	g_error_free(error);
+        PRINTF("%s\n", error->message);
+        g_error_free(error);
     }
     return value;
 }
 
-bool IniFile::ReadBool(const char *group, const char *key)
-{
+bool IniFile::ReadBool(const char *group, const char *key) {
     GError *error = NULL;
     bool value = g_key_file_get_boolean(m_keyFile, group, key, &error);
     if (error) {
-	PRINTF("%s\n", error->message);
-	g_error_free(error);
+        PRINTF("%s\n", error->message);
+        g_error_free(error);
     }
     return value;
 }
 
-double IniFile::ReadDouble(const char *group, const char *key)
-{
+double IniFile::ReadDouble(const char *group, const char *key) {
     GError *error = NULL;
     double value = g_key_file_get_double(m_keyFile, group, key, &error);
     if (error) {
-	PRINTF("%s\n", error->message);
-	g_error_free(error);
+        PRINTF("%s\n", error->message);
+        g_error_free(error);
     }
     return value;
 }
 
-vector<double> IniFile::ReadDoubleList(const char *group, const char *key)
-{
+vector<double> IniFile::ReadDoubleList(const char *group, const char *key) {
     vector<double> value;
     if(!value.empty())
         value.clear();
@@ -101,89 +93,75 @@ vector<double> IniFile::ReadDoubleList(const char *group, const char *key)
     return value;
 }
 
-void IniFile::WriteString(const char *group, const char *key, const char *value)
-{
+void IniFile::WriteString(const char *group, const char *key, const char *value) {
     g_key_file_set_string(m_keyFile, group, key, value);
 }
 
-void IniFile::WriteBool(const char *group, const char *key, const bool value)
-{
+void IniFile::WriteBool(const char *group, const char *key, const bool value) {
     g_key_file_set_boolean(m_keyFile, group, key, value);
 }
 
-void IniFile::WriteInt(const char *group, const char *key, const int value)
-{
+void IniFile::WriteInt(const char *group, const char *key, const int value) {
     g_key_file_set_integer(m_keyFile, group, key, value);
 }
 
-void IniFile::WriteDouble(const char *group, const char *key, const double value)
-{
+void IniFile::WriteDouble(const char *group, const char *key, const double value) {
     g_key_file_set_double(m_keyFile, group, key, value);
 }
 #include <iostream>
 using namespace std;
 
-void IniFile::WriteDoubleList(const char *group, const char *key, double value[], int length)
-{
+void IniFile::WriteDoubleList(const char *group, const char *key, double value[], int length) {
     g_key_file_set_double_list(m_keyFile, group, key, value, length);
 }
 
-void IniFile::RemoveString(const char *group, const char *key)
-{
+void IniFile::RemoveString(const char *group, const char *key) {
     GError *error = NULL;
-    if (!g_key_file_remove_key(m_keyFile, group, key, &error))
-    {
+    if (!g_key_file_remove_key(m_keyFile, group, key, &error)) {
         PRINTF("---%s\n", error->message);
     }
 }
 
-void IniFile::RemoveGroup(const gchar *group)
-{
+void IniFile::RemoveGroup(const gchar *group) {
     GError *error = NULL;
-    if (!g_key_file_remove_group(m_keyFile, group, &error))
-    {
+    if (!g_key_file_remove_group(m_keyFile, group, &error)) {
         PRINTF("---%s\n", error->message);
     }
 }
 
-vector <string> IniFile::GetGroupName(void)
-{
-   // char tmp_l[256];
+vector <string> IniFile::GetGroupName(void) {
+    // char tmp_l[256];
     gsize length;
     char **tmp = g_key_file_get_groups(m_keyFile, &length);
     vector<string> group_name;
-    for(gsize i = 0; i < length; i++)
-    {
+    for(gsize i = 0; i < length; i++) {
         group_name.push_back(tmp[i]);
     }
     g_strfreev(tmp);
     return group_name;
 }
 
-vector <string> IniFile::GetGroupKey(const gchar *group)
-{
+vector <string> IniFile::GetGroupKey(const gchar *group) {
     gsize length;
     GError *error = NULL;
     char  **tmp = g_key_file_get_keys(m_keyFile, group, &length,&error);
     vector<string> group_key;
-    for(gsize i=0; i<length; i++)
-    {
+    for(gsize i=0; i<length; i++) {
         group_key.push_back(tmp[i]);
     }
     g_strfreev(tmp);
     return group_key;
 }
 
-bool IniFile::SyncConfigFile(void)
-{
+bool IniFile::SyncConfigFile(void) {
     gsize length;
     GError *error = NULL;
     gchar *contents = g_key_file_to_data(m_keyFile, &length, NULL);
     if (!g_file_set_contents (m_fileName.c_str(), contents, length, &error)) {
-	PRINTF("%s\n", error->message);
-	g_error_free(error);
-	g_free(contents);
-	return false;
+        PRINTF("%s\n", error->message);
+        g_error_free(error);
+        g_free(contents);
+        return false;
     }
     g_free(contents);
     return true;

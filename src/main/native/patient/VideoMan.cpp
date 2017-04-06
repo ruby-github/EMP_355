@@ -31,28 +31,24 @@ struct VideoMan::VideoItem* VideoMan::m_ptrVideoItem = NULL;
 
 const string VideoMan::SECTION = "Video";
 
-VideoMan* VideoMan::GetInstance()
-{
-	if(m_ptrInstance == NULL)
-	{
-		m_ptrInstance = new VideoMan;
-	}
+VideoMan* VideoMan::GetInstance() {
+    if(m_ptrInstance == NULL) {
+        m_ptrInstance = new VideoMan;
+    }
 
-	return m_ptrInstance;
+    return m_ptrInstance;
 }
 
 ///> construct
-VideoMan::VideoMan()
-{
-	SysOptions so;
-	m_Format = so.GetCineFormat();
+VideoMan::VideoMan() {
+    SysOptions so;
+    m_Format = so.GetCineFormat();
 //	m_Storage = so.GetCineMedia();
-	m_Storage = HOST;
-	m_NameMode = so.GetCineAutoName();
-	m_listName.clear();
+    m_Storage = HOST;
+    m_NameMode = so.GetCineAutoName();
+    m_listName.clear();
 }
-VideoMan::~VideoMan()
-{
+VideoMan::~VideoMan() {
 
 }
 
@@ -64,26 +60,24 @@ VideoMan::~VideoMan()
  * @retval 0: success to save the config file
  *         1: failed to save the config file, it is existed
  */
-unsigned char VideoMan::SaveIniFile(const char *absPath)
-{
-	char absIniPath[256];
+unsigned char VideoMan::SaveIniFile(const char *absPath) {
+    char absIniPath[256];
 
-	GetIniFilePath(absPath, absIniPath);
+    GetIniFilePath(absPath, absIniPath);
 
-	if(CheckFileName(absIniPath)==1)
-	{
-		char hint[255];
-		sprintf(hint, "%s", _("Fail to save. The file name is already existed, please input another file name!"));
-		HintArea::GetInstance()->UpdateHint(hint, 2);
-		return 1;
-	}
+    if(CheckFileName(absIniPath)==1) {
+        char hint[255];
+        sprintf(hint, "%s", _("Fail to save. The file name is already existed, please input another file name!"));
+        HintArea::GetInstance()->UpdateHint(hint, 2);
+        return 1;
+    }
 
-	int fd = open(absIniPath, O_CREAT, 0666);
-	close(fd);
-	IniFile ini(absIniPath);
-	WriteConfigPara(m_ptrVideoItem, SECTION, &ini);
+    int fd = open(absIniPath, O_CREAT, 0666);
+    close(fd);
+    IniFile ini(absIniPath);
+    WriteConfigPara(m_ptrVideoItem, SECTION, &ini);
 
-	return 0;
+    return 0;
 }
 /*
  * @brief save snap to the directory for current patient
@@ -99,122 +93,115 @@ unsigned char VideoMan::SaveIniFile(const char *absPath)
  *		   3: error with save video file
  *		   4: the directory not existed
  */
-char VideoMan::SaveVideo(unsigned int no, const char* filename, const char* filepath, struct VideoItem* item)
-{
-	unsigned long size = 0;
-	char absPath[256];
-	bool ret = false;
-	int total = m_listName.size();
-	char hint[255];
+char VideoMan::SaveVideo(unsigned int no, const char* filename, const char* filepath, struct VideoItem* item) {
+    unsigned long size = 0;
+    char absPath[256];
+    bool ret = false;
+    int total = m_listName.size();
+    char hint[255];
 
-	m_ptrVideoItem = item;
+    m_ptrVideoItem = item;
 
-	//check the disk free space
-	if(!CheckFreeSpace(filepath, size))
-	{
-		sprintf(hint, "%s", _("Fail to save. No enough space!"));
-		HintArea::GetInstance()->UpdateHint(hint, 2);
-		return 1;	//no enough space
-	}
+    //check the disk free space
+    if(!CheckFreeSpace(filepath, size)) {
+        sprintf(hint, "%s", _("Fail to save. No enough space!"));
+        HintArea::GetInstance()->UpdateHint(hint, 2);
+        return 1;	//no enough space
+    }
 
-	sprintf(absPath, "%s/%d/%s", filepath, no, filename);
+    sprintf(absPath, "%s/%d/%s", filepath, no, filename);
 
-	if(CheckDir(absPath) == 0)
-		return 4;
+    if(CheckDir(absPath) == 0)
+        return 4;
 
     char videoFileNameTmp[256];
     sprintf(videoFileNameTmp,"%s",filename);
 
-	switch(m_Format)
-	{
-		case CINE:
-			strcat(absPath, ".cine");
-			strcat(videoFileNameTmp, ".cine");
-			if(SaveIniFile(absPath))
-				return 2;
-			ret = SaveVideoToCine(absPath);
-			break;
-		case AVI:
-			strcat(absPath, ".avi");
-			strcat(videoFileNameTmp, ".avi");
-			if(SaveIniFile(absPath))
-				return 2;
-			ret = SaveVideoToAVI(absPath);
-			break;
-		default:
-			strcat(absPath, ".avi");
-			strcat(videoFileNameTmp, ".avi");
-			if(SaveIniFile(absPath))
-				return 2;
-			ret = SaveVideoToAVI(absPath);
-			break;
-	}
-	if(!ret)
-		return 3;
+    switch(m_Format) {
+    case CINE:
+        strcat(absPath, ".cine");
+        strcat(videoFileNameTmp, ".cine");
+        if(SaveIniFile(absPath))
+            return 2;
+        ret = SaveVideoToCine(absPath);
+        break;
+    case AVI:
+        strcat(absPath, ".avi");
+        strcat(videoFileNameTmp, ".avi");
+        if(SaveIniFile(absPath))
+            return 2;
+        ret = SaveVideoToAVI(absPath);
+        break;
+    default:
+        strcat(absPath, ".avi");
+        strcat(videoFileNameTmp, ".avi");
+        if(SaveIniFile(absPath))
+            return 2;
+        ret = SaveVideoToAVI(absPath);
+        break;
+    }
+    if(!ret)
+        return 3;
 
-	string s(filename);
-	if(total >= MAX_VIDEO)
-	{
-		DeleteVideo(no, m_listName.front().c_str(), filepath);
-		m_listName.pop_front();
-	}
-	m_listName.push_back(s);
+    string s(filename);
+    if(total >= MAX_VIDEO) {
+        DeleteVideo(no, m_listName.front().c_str(), filepath);
+        m_listName.pop_front();
+    }
+    m_listName.push_back(s);
 
-	sprintf(hint, "%s\"%s\".", _("Success to save cine. Filename is "), filename);
-	HintArea::GetInstance()->UpdateHint(hint, 2);
+    sprintf(hint, "%s\"%s\".", _("Success to save cine. Filename is "), filename);
+    HintArea::GetInstance()->UpdateHint(hint, 2);
 
     m_videoFileName = (string)videoFileNameTmp;
     CDCMMan::GetMe()->AddImage(GetImageElement());
     return 0;
 }
 
-char VideoMan::SaveVideoForRetrieve(unsigned int no, const char* filename, const char* filepath, struct VideoItem* item)
-{
-	unsigned long size = 0;
-	char absPath[256];
-	bool ret = false;
-	char hint[255];
+char VideoMan::SaveVideoForRetrieve(unsigned int no, const char* filename, const char* filepath, struct VideoItem* item) {
+    unsigned long size = 0;
+    char absPath[256];
+    bool ret = false;
+    char hint[255];
 
-	m_ptrVideoItem = item;
+    m_ptrVideoItem = item;
 
-	//check the disk free space
-	if(!CheckFreeSpace(filepath, size))
-	{
-		sprintf(hint, "%s", _("Fail to save. No enough space!"));
-		HintArea::GetInstance()->UpdateHint(hint, 2);
-		return 1;	//no enough space
-	}
+    //check the disk free space
+    if(!CheckFreeSpace(filepath, size)) {
+        sprintf(hint, "%s", _("Fail to save. No enough space!"));
+        HintArea::GetInstance()->UpdateHint(hint, 2);
+        return 1;	//no enough space
+    }
 
-	sprintf(absPath, "%s/%d/%s", filepath, no, filename);
+    sprintf(absPath, "%s/%d/%s", filepath, no, filename);
 
-	if(CheckDir(absPath) == 0)
-		return 4;
+    if(CheckDir(absPath) == 0)
+        return 4;
 
-	switch(m_Format)
-	{
-		case CINE:
-			strcat(absPath, ".cine");
-			if(SaveIniFile(absPath))
-				return 2;
-			ret = SaveVideoToCineForRetrieve(absPath);
-			break;
-		case AVI:
-			strcat(absPath, ".avi");
-			if(SaveIniFile(absPath))
-				return 2;
-			ret = SaveVideoToAVIForRetrieve(absPath);
-			break;
-		default:
-			strcat(absPath, ".avi");
-			if(SaveIniFile(absPath))
-				return 2;
-			ret = SaveVideoToAVIForRetrieve(absPath);
-			break;
-	}
-	if(!ret)
-		return 3;
+    switch(m_Format) {
+    case CINE:
+        strcat(absPath, ".cine");
+        if(SaveIniFile(absPath))
+            return 2;
+        ret = SaveVideoToCineForRetrieve(absPath);
+        break;
+    case AVI:
+        strcat(absPath, ".avi");
+        if(SaveIniFile(absPath))
+            return 2;
+        ret = SaveVideoToAVIForRetrieve(absPath);
+        break;
+    default:
+        strcat(absPath, ".avi");
+        if(SaveIniFile(absPath))
+            return 2;
+        ret = SaveVideoToAVIForRetrieve(absPath);
+        break;
+    }
+    if(!ret)
+        return 3;
 
-	return 0;
+    return 0;
 }
 
 /*
@@ -227,51 +214,45 @@ char VideoMan::SaveVideoForRetrieve(unsigned int no, const char* filename, const
  *		   2: error with delete image file
  *		   3: error with delete image ini file
  */
-char VideoMan::DeleteVideo(unsigned int no, const char* filename, const char* filepath)
-{
-	char absPath[256];
-	char absIniPath[256];
+char VideoMan::DeleteVideo(unsigned int no, const char* filename, const char* filepath) {
+    char absPath[256];
+    char absIniPath[256];
 
-	sprintf(absPath, "%s/%d/%s", filepath, no, filename);
-	if(CheckFileName(absPath) != 1)
-		return 1;
-	GetIniFilePath(absPath, absIniPath);
+    sprintf(absPath, "%s/%d/%s", filepath, no, filename);
+    if(CheckFileName(absPath) != 1)
+        return 1;
+    GetIniFilePath(absPath, absIniPath);
 
-	if(unlink(absPath))
-	{
-		perror("Delete Image File Error:");
-		return 2;
-	}
-	if(unlink(absIniPath))
-	{
-		perror("Delete Image Ini File Error:");
-		return 3;
-	}
+    if(unlink(absPath)) {
+        perror("Delete Image File Error:");
+        return 2;
+    }
+    if(unlink(absIniPath)) {
+        perror("Delete Image Ini File Error:");
+        return 3;
+    }
 
-	return 0;
+    return 0;
 }
 
-char VideoMan::DeleteVideo(const char* absPath)
-{
-	char absIniPath[256];
+char VideoMan::DeleteVideo(const char* absPath) {
+    char absIniPath[256];
 
-	if(CheckFileName(absPath) != 1)
-		return 1;
+    if(CheckFileName(absPath) != 1)
+        return 1;
 
-	GetIniFilePath(absPath, absIniPath);
+    GetIniFilePath(absPath, absIniPath);
 
-	if(unlink(absPath))
-	{
-		perror("Delete Image File Error:");
-		return 2;
-	}
-	if(unlink(absIniPath))
-	{
-		perror("Delete Image Ini File Error:");
-		return 3;
-	}
+    if(unlink(absPath)) {
+        perror("Delete Image File Error:");
+        return 2;
+    }
+    if(unlink(absIniPath)) {
+        perror("Delete Image Ini File Error:");
+        return 3;
+    }
 
-	return 0;
+    return 0;
 }
 /*
  * @brief load all video filename to vector by patient's id
@@ -284,63 +265,55 @@ char VideoMan::DeleteVideo(const char* absPath)
  *		   1: can not open the dir
  *		   2: the path is empty
  */
-char VideoMan::LoadVideo(unsigned int no, const char* filepath, vector<string> *vec)
-{
-	char *path;
-	char tmp[10];
-	string str;
-	const char *name;
-	char NameIni[256];
-	char absNameIni[256];
-	GDir *dir;
+char VideoMan::LoadVideo(unsigned int no, const char* filepath, vector<string> *vec) {
+    char *path;
+    char tmp[10];
+    string str;
+    const char *name;
+    char NameIni[256];
+    char absNameIni[256];
+    GDir *dir;
 
-   /* if(vec->size() != 0)
-    {
-        vec->clear();
+    /* if(vec->size() != 0)
+     {
+         vec->clear();
+     }
+    */
+    sprintf(tmp, "%d", no);
+    path = g_build_filename(filepath, tmp, NULL);
+    dir = g_dir_open(path, 0, NULL);
+    g_free(path);
+    if(!dir) {
+        PRINTF("Error: Cannot open the dir '%s'\n", path);
+        return 1;
     }
-*/
-	sprintf(tmp, "%d", no);
-	path = g_build_filename(filepath, tmp, NULL);
-	dir = g_dir_open(path, 0, NULL);
-	g_free(path);
-	if(!dir)
-	{
-		PRINTF("Error: Cannot open the dir '%s'\n", path);
-		return 1;
-	}
 
-	name = g_dir_read_name(dir);
-	if(!name)
-	{
-		PRINTF("Error: The dir '%s' is empty!\n", path);
-		g_dir_close(dir);
-		return 2;
-	}
+    name = g_dir_read_name(dir);
+    if(!name) {
+        PRINTF("Error: The dir '%s' is empty!\n", path);
+        g_dir_close(dir);
+        return 2;
+    }
 
-	while(name != NULL)
-	{
-		if(!CompareSuffix(name, "avi") || !CompareSuffix(name, "cine"))
-		{
-			GetIniFilePath(name, NameIni);
-			sprintf(absNameIni, "%s/%d/%s", filepath, no, NameIni);
-			if(CheckFileName(absNameIni) != 0)
-			{
-				str = name;
-				vec->push_back(str);
-			}
-			else
-			{
-				path = g_build_filename(filepath, tmp, name, NULL);
-				unlink(path);
-				g_free(path);
-			}
-		}
+    while(name != NULL) {
+        if(!CompareSuffix(name, "avi") || !CompareSuffix(name, "cine")) {
+            GetIniFilePath(name, NameIni);
+            sprintf(absNameIni, "%s/%d/%s", filepath, no, NameIni);
+            if(CheckFileName(absNameIni) != 0) {
+                str = name;
+                vec->push_back(str);
+            } else {
+                path = g_build_filename(filepath, tmp, name, NULL);
+                unlink(path);
+                g_free(path);
+            }
+        }
 
-		name = g_dir_read_name(dir);
-	}
+        name = g_dir_read_name(dir);
+    }
 
-	g_dir_close(dir);
-	return 0;
+    g_dir_close(dir);
+    return 0;
 }
 
 /*
@@ -353,56 +326,48 @@ char VideoMan::LoadVideo(unsigned int no, const char* filepath, vector<string> *
  *		   1: can not open the dir
  *		   2: the path is empty
  */
-char VideoMan::LoadVideo(const char* filepath, vector<string> *vec)
-{
-	string str;
-	const char *name;
-	char NameIni[256];
-	char absNameIni[256];
-	GDir *dir;
-	GError *err = NULL;
+char VideoMan::LoadVideo(const char* filepath, vector<string> *vec) {
+    string str;
+    const char *name;
+    char NameIni[256];
+    char absNameIni[256];
+    GDir *dir;
+    GError *err = NULL;
 
 //	if(vec->size() != 0)
 //		vec->clear();
 
-	dir = g_dir_open(filepath, 0, &err);
-	if(!dir)
-	{
-		PRINTF("%s: g_dir_open with error: %s\n", __FUNCTION__, err->message);
-		return 1;
-	}
+    dir = g_dir_open(filepath, 0, &err);
+    if(!dir) {
+        PRINTF("%s: g_dir_open with error: %s\n", __FUNCTION__, err->message);
+        return 1;
+    }
 
-	name = g_dir_read_name(dir);
-	if(!name)
-	{
-		PRINTF("%s: the dir is null!\n", __FUNCTION__);
-		g_dir_close(dir);
-		return 2;
-	}
+    name = g_dir_read_name(dir);
+    if(!name) {
+        PRINTF("%s: the dir is null!\n", __FUNCTION__);
+        g_dir_close(dir);
+        return 2;
+    }
 
-	while(name != NULL)
-	{
-		//	PRINTF("name is %s\n", name);
-		if(!CompareSuffix(name, "avi") || !CompareSuffix(name, "cine"))
-		{
-			GetIniFilePath(name, NameIni);
-			sprintf(absNameIni, "%s/%s", filepath, NameIni);
-			if(CheckFileName(absNameIni) != 0)
-			{
-				str = name;
-				vec->push_back(str);
-			}
-			else
-			{
-				unlink(filepath);
-			}
-		}
+    while(name != NULL) {
+        //	PRINTF("name is %s\n", name);
+        if(!CompareSuffix(name, "avi") || !CompareSuffix(name, "cine")) {
+            GetIniFilePath(name, NameIni);
+            sprintf(absNameIni, "%s/%s", filepath, NameIni);
+            if(CheckFileName(absNameIni) != 0) {
+                str = name;
+                vec->push_back(str);
+            } else {
+                unlink(filepath);
+            }
+        }
 
-		name = g_dir_read_name(dir);
-	}
+        name = g_dir_read_name(dir);
+    }
 
-	g_dir_close(dir);
-	return 0;
+    g_dir_close(dir);
+    return 0;
 }
 
 /*
@@ -419,201 +384,163 @@ char VideoMan::LoadVideo(const char* filepath, vector<string> *vec)
  *		   2: file format is wrong
  *		   3: error with read the first frame data
  */
-char VideoMan::ReadVideoInfo(unsigned int no, const char* filename, const char* filepath, struct VideoItem* item)
-{
-	int i, j;
-	char suffix[10];
-	char absPath[256];
-	char absIniPath[256];
-	int len = strlen(filename);
+char VideoMan::ReadVideoInfo(unsigned int no, const char* filename, const char* filepath, struct VideoItem* item) {
+    int i, j;
+    char suffix[10];
+    char absPath[256];
+    char absIniPath[256];
+    int len = strlen(filename);
 
-	//check the file name
-	sprintf(absPath, "%s/%d/%s", filepath, no, filename);
-	if(CheckFileName(absPath) != 1)
-		return 1;
+    //check the file name
+    sprintf(absPath, "%s/%d/%s", filepath, no, filename);
+    if(CheckFileName(absPath) != 1)
+        return 1;
 
-	strcpy(item->path, absPath);
+    strcpy(item->path, absPath);
 
-	// check the suffix of filename
-	for(i=0; i<len; i++)
-	{
-		if(filename[i]=='.')
-			break;
-	}
-	for(j=i+1; j<len; j++)
-		suffix[j-i-1] = filename[j];
-	suffix[j-i-1] = '\0';
+    // check the suffix of filename
+    for(i=0; i<len; i++) {
+        if(filename[i]=='.')
+            break;
+    }
+    for(j=i+1; j<len; j++)
+        suffix[j-i-1] = filename[j];
+    suffix[j-i-1] = '\0';
 
-	//get config file path
-	GetIniFilePath(absPath, absIniPath);
-	IniFile ini(absIniPath);
-	ReadConfigPara(item, SECTION, &ini);
+    //get config file path
+    GetIniFilePath(absPath, absIniPath);
+    IniFile ini(absIniPath);
+    ReadConfigPara(item, SECTION, &ini);
 
-	if(!strcmp(suffix, "avi"))
-		item->format= AVI;
-	else if(!strcmp(suffix, "cine"))
-		item->format= CINE;
-	else
-		return 2;
+    if(!strcmp(suffix, "avi"))
+        item->format= AVI;
+    else if(!strcmp(suffix, "cine"))
+        item->format= CINE;
+    else
+        return 2;
 
-    if (item->format == AVI)
-    {
+    if (item->format == AVI) {
         unsigned char *buf = (unsigned char*)malloc(item->width * item->height * 3);
-        if (buf != NULL)
-        {
-            if (!ReadAviData(item->path, buf, 0, item->width, item->height, NULL))
-            {
+        if (buf != NULL) {
+            if (!ReadAviData(item->path, buf, 0, item->width, item->height, NULL)) {
                 PRINTF("ReadAviData Error!\n");
                 free(buf);
                 return 3;
-            }
-            else
-            {
+            } else {
                 item->data = buf;
             }
 
-        }
-        else
-        {
+        } else {
             return 3;
         }
-    }
-    else
-    {
+    } else {
         FILE* fs = fopen(item->path, "rb");
-        if(fs==NULL)
-        {
+        if(fs==NULL) {
             perror("fopen error!");
             return 3;
         }
         unsigned char *buf = (unsigned char*)malloc(item->width * item->height * 3);
-        if(buf != NULL)
-        {
-            if(!ReadVideoData(fs, buf, item->format, 0, item->width, item->height))
-            {
+        if(buf != NULL) {
+            if(!ReadVideoData(fs, buf, item->format, 0, item->width, item->height)) {
                 PRINTF("ReadVideoData Error!\n");
                 fclose(fs);
                 return 3;
-            }
-            else
+            } else
                 item->data = buf;
-        }
-        else
-        {
+        } else {
             fclose(fs);
             return 3;
         }
         fclose(fs);
     }
-	return 0;
+    return 0;
 }
 
-char VideoMan::ReadVideoInfo(const char *absPath, struct VideoItem* item)
-{
-	int i, j;
-	char suffix[10];
-	char absIniPath[256];
-	int len = strlen(absPath);
+char VideoMan::ReadVideoInfo(const char *absPath, struct VideoItem* item) {
+    int i, j;
+    char suffix[10];
+    char absIniPath[256];
+    int len = strlen(absPath);
 
-	//check the file name
-	if(CheckFileName(absPath) != 1)
-		return 1;
+    //check the file name
+    if(CheckFileName(absPath) != 1)
+        return 1;
 
-	strcpy(item->path, absPath);
+    strcpy(item->path, absPath);
 
-	// check the suffix of filename
-	for(i=0; i<len; i++)
-	{
-		if(absPath[i]=='.')
-			break;
-	}
-	for(j=i+1; j<len; j++)
-		suffix[j-i-1] = absPath[j];
-	suffix[j-i-1] = '\0';
+    // check the suffix of filename
+    for(i=0; i<len; i++) {
+        if(absPath[i]=='.')
+            break;
+    }
+    for(j=i+1; j<len; j++)
+        suffix[j-i-1] = absPath[j];
+    suffix[j-i-1] = '\0';
 
-	//get config file path
-	GetIniFilePath(absPath, absIniPath);
-	IniFile ini(absIniPath);
-	ReadConfigPara(item, SECTION, &ini);
+    //get config file path
+    GetIniFilePath(absPath, absIniPath);
+    IniFile ini(absIniPath);
+    ReadConfigPara(item, SECTION, &ini);
 
-	if(!strcmp(suffix, "avi"))
-		item->format= AVI;
-	else if(!strcmp(suffix, "cine"))
-		item->format= CINE;
-	else
-		return 2;
+    if(!strcmp(suffix, "avi"))
+        item->format= AVI;
+    else if(!strcmp(suffix, "cine"))
+        item->format= CINE;
+    else
+        return 2;
 
-    if (item->format == AVI)
-    {
+    if (item->format == AVI) {
         unsigned char *buf = (unsigned char*)malloc(item->width * item->height * 3);
-        if (buf != NULL)
-        {
-            if (!ReadAviData(item->path, buf, 0, item->width, item->height, NULL))
-            {
+        if (buf != NULL) {
+            if (!ReadAviData(item->path, buf, 0, item->width, item->height, NULL)) {
                 PRINTF("ReadAviData Error!\n");
                 free(buf);
                 return 3;
-            }
-            else
-            {
+            } else {
                 item->data = buf;
             }
 
-        }
-        else
-        {
+        } else {
             return 3;
         }
-    }
-    else
-    {
+    } else {
 
         FILE* fs = fopen(item->path, "rb");
-        if(fs==NULL)
-        {
+        if(fs==NULL) {
             perror("fopen error!");
             return 3;
         }
         unsigned char *buf = (unsigned char*)malloc(item->width * item->height * 3);
-        if(buf != NULL)
-        {
-            if(!ReadVideoData(fs, buf, item->format, 0, item->width, item->height))
-            {
+        if(buf != NULL) {
+            if(!ReadVideoData(fs, buf, item->format, 0, item->width, item->height)) {
                 PRINTF("ReadVideoData Error!\n");
                 fclose(fs);
                 return 3;
-            }
-            else
+            } else
                 item->data = buf;
-        }
-        else
-        {
+        } else {
             fclose(fs);
             return 3;
         }
         fclose(fs);
     }
-	return 0;
+    return 0;
 }
 
 /*
  * @brief read the appointed frame data to the buffer
  */
-bool VideoMan::ReadVideoData(FILE *fs,unsigned char* buf, int format, int spec_frame, unsigned int width, unsigned int height)
-{
-	if(format == AVI)
-	{
-       PRINTF("read the avi\n");
-		if(!ReadAvi(fs, buf, spec_frame, width, height))
-			return false;
-	}
-	else if(format == CINE)
-	{
-       PRINTF("read the cine\n");
-		if(!ReadCineEmp(fs, buf, spec_frame, width, height))
-			return false;
-	}
-	return true;
+bool VideoMan::ReadVideoData(FILE *fs,unsigned char* buf, int format, int spec_frame, unsigned int width, unsigned int height) {
+    if(format == AVI) {
+        PRINTF("read the avi\n");
+        if(!ReadAvi(fs, buf, spec_frame, width, height))
+            return false;
+    } else if(format == CINE) {
+        PRINTF("read the cine\n");
+        if(!ReadCineEmp(fs, buf, spec_frame, width, height))
+            return false;
+    }
+    return true;
 }
 
 ///> /////////////////////////////////[private func]////////////////////////////
@@ -623,48 +550,42 @@ bool VideoMan::ReadVideoData(FILE *fs,unsigned char* buf, int format, int spec_f
  *
  * @param absPath: the absolute path to save
  */
-bool VideoMan::SaveVideoToCine(const char* absPath)
-{
-	PRINTF("%s: absPath=%s\n", __FUNCTION__, absPath);
+bool VideoMan::SaveVideoToCine(const char* absPath) {
+    PRINTF("%s: absPath=%s\n", __FUNCTION__, absPath);
 
-	FILE* file = fopen(absPath, "wb");
-	if(!file)
-	{
-		PRINTF("(SaveVideoToCine) Fail to open file, the error is %s!\n", strerror(errno));
-		return false;
-	}
+    FILE* file = fopen(absPath, "wb");
+    if(!file) {
+        PRINTF("(SaveVideoToCine) Fail to open file, the error is %s!\n", strerror(errno));
+        return false;
+    }
 
-	unsigned char* data[m_ptrVideoItem->frames];
-	int i, j;
-    for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++)
-	{
-		data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
-	}
+    unsigned char* data[m_ptrVideoItem->frames];
+    int i, j;
+    for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++) {
+        data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
+    }
     CreateCineEmp(data, file, m_ptrVideoItem->frames, m_ptrVideoItem->width, m_ptrVideoItem->height);
-        PRINTF("save videotocine frames = %d\n",m_ptrVideoItem->frames);
+    PRINTF("save videotocine frames = %d\n",m_ptrVideoItem->frames);
     fclose(file);
-	return true;
+    return true;
 }
 
-bool VideoMan::SaveVideoToCineForRetrieve(const char* absPath)
-{
+bool VideoMan::SaveVideoToCineForRetrieve(const char* absPath) {
 
-	FILE* file = fopen(absPath, "wb");
-	if(!file)
-	{
-		PRINTF("(SaveVideoToCine) Fail to open file, the error is %s!\n", strerror(errno));
-		return false;
-	}
+    FILE* file = fopen(absPath, "wb");
+    if(!file) {
+        PRINTF("(SaveVideoToCine) Fail to open file, the error is %s!\n", strerror(errno));
+        return false;
+    }
 
-	unsigned char* data[m_ptrVideoItem->frames];
-	int i, j;
-    for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++)
-	{
+    unsigned char* data[m_ptrVideoItem->frames];
+    int i, j;
+    for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++) {
         data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
-	}
+    }
     CreateCineEmp(data, file, m_ptrVideoItem->frames, m_ptrVideoItem->width, m_ptrVideoItem->height);
     fclose(file);
-	return true;
+    return true;
 }
 
 /*
@@ -672,61 +593,54 @@ bool VideoMan::SaveVideoToCineForRetrieve(const char* absPath)
  *
  * @param absPath: the absolute path to save
  */
-bool VideoMan::SaveVideoToAVI(const char* absPath)
-{
-	PRINTF("absPath=%s\n",absPath);
+bool VideoMan::SaveVideoToAVI(const char* absPath) {
+    PRINTF("absPath=%s\n",absPath);
 
-	FILE* file = fopen(absPath, "wb");
-	if(!file)
-	{
-		PRINTF("(SaveVideoToAVI) Fail to open file, the error is %s!\n", strerror(errno));
-		return false;
-	}
+    FILE* file = fopen(absPath, "wb");
+    if(!file) {
+        PRINTF("(SaveVideoToAVI) Fail to open file, the error is %s!\n", strerror(errno));
+        return false;
+    }
 
 #if 0
-	unsigned char* data[m_ptrVideoItem->deq->size()];
-	int i, j;
-	for(j=0, i=m_ptrVideoItem->begin; i< m_ptrVideoItem->deq->size(); i++, j++)
-	{
-		data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
-	//	PRINTF("frame%d=0x%x\n", j, data[i]);
-	}
+    unsigned char* data[m_ptrVideoItem->deq->size()];
+    int i, j;
+    for(j=0, i=m_ptrVideoItem->begin; i< m_ptrVideoItem->deq->size(); i++, j++) {
+        data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
+        //	PRINTF("frame%d=0x%x\n", j, data[i]);
+    }
 #endif
     unsigned char* data[m_ptrVideoItem->frames];
-	int i, j;
-	for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++)
-	{
-		data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
-	}
-	//CreateAvi(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);//2012.05.26
-	//CreateAvi(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
-	CreateAviEncode(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
+    int i, j;
+    for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++) {
+        data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
+    }
+    //CreateAvi(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);//2012.05.26
+    //CreateAvi(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
+    CreateAviEncode(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
 
     fclose(file);
-	return true;
+    return true;
 }
 
-bool VideoMan::SaveVideoToAVIForRetrieve(const char* absPath)
-{
+bool VideoMan::SaveVideoToAVIForRetrieve(const char* absPath) {
 
-	FILE* file = fopen(absPath, "wb");
-	if(!file)
-	{
-		PRINTF("(SaveVideoToAVI) Fail to open file, the error is %s!\n", strerror(errno));
-		return false;
-	}
+    FILE* file = fopen(absPath, "wb");
+    if(!file) {
+        PRINTF("(SaveVideoToAVI) Fail to open file, the error is %s!\n", strerror(errno));
+        return false;
+    }
 
     unsigned char* data[m_ptrVideoItem->frames];
-	int i, j;
-	for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++)
-	{
+    int i, j;
+    for(j=0, i=m_ptrVideoItem->begin; i<(m_ptrVideoItem->begin + m_ptrVideoItem->frames); i++, j++) {
         data[j] = (unsigned char *)(m_ptrVideoItem->deq->at(i).GetImg());
-	}
+    }
 //	CreateAvi(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
-	CreateAviEncode(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
+    CreateAviEncode(data, file, m_ptrVideoItem->width, m_ptrVideoItem->height, m_ptrVideoItem->frames, m_ptrVideoItem->frame_rate);
 
     fclose(file);
-	return true;
+    return true;
 }
 
 /*
@@ -736,18 +650,17 @@ bool VideoMan::SaveVideoToAVIForRetrieve(const char* absPath)
  * @param section: item name
  * @param ptrIni: which file will be written
  */
-void VideoMan::WriteConfigPara(VideoItem *ptrItem, string section, IniFile* ptrIni)
-{
-	const char* ptrSection = section.c_str();
+void VideoMan::WriteConfigPara(VideoItem *ptrItem, string section, IniFile* ptrIni) {
+    const char* ptrSection = section.c_str();
 
-	ptrIni->WriteInt(ptrSection, "Video-Width", ptrItem->width);
-	ptrIni->WriteInt(ptrSection, "Video-Height", ptrItem->height);
-	ptrIni->WriteInt(ptrSection, "Video-Frames", ptrItem->frames);
-	ptrIni->WriteInt(ptrSection, "Video-FrameRate", ptrItem->frame_rate);
-	ptrIni->SyncConfigFile();
+    ptrIni->WriteInt(ptrSection, "Video-Width", ptrItem->width);
+    ptrIni->WriteInt(ptrSection, "Video-Height", ptrItem->height);
+    ptrIni->WriteInt(ptrSection, "Video-Frames", ptrItem->frames);
+    ptrIni->WriteInt(ptrSection, "Video-FrameRate", ptrItem->frame_rate);
+    ptrIni->SyncConfigFile();
 #if 0
-	ptrIni->WriteString(ptrSection, "Image-DepthL", ptrItem->depthL);
-	ptrIni->WriteString(ptrSection, "Image-DepthR", ptrItem->depthR);
+    ptrIni->WriteString(ptrSection, "Image-DepthL", ptrItem->depthL);
+    ptrIni->WriteString(ptrSection, "Image-DepthR", ptrItem->depthR);
 #endif
 }
 
@@ -758,106 +671,96 @@ void VideoMan::WriteConfigPara(VideoItem *ptrItem, string section, IniFile* ptrI
  * @param section: item name
  * @param ptrIni: which file will be read
  */
-void VideoMan::ReadConfigPara(VideoItem *ptrItem, string section, IniFile* ptrIni)
-{
-	const char* ptrSection = section.c_str();
+void VideoMan::ReadConfigPara(VideoItem *ptrItem, string section, IniFile* ptrIni) {
+    const char* ptrSection = section.c_str();
 
-	ptrItem->width = ptrIni->ReadInt(ptrSection, "Video-Width");
-	ptrItem->height = ptrIni->ReadInt(ptrSection, "Video-Height");
-	ptrItem->frames = ptrIni->ReadInt(ptrSection, "Video-Frames");
-	ptrItem->frame_rate = ptrIni->ReadInt(ptrSection, "Video-FrameRate");
+    ptrItem->width = ptrIni->ReadInt(ptrSection, "Video-Width");
+    ptrItem->height = ptrIni->ReadInt(ptrSection, "Video-Height");
+    ptrItem->frames = ptrIni->ReadInt(ptrSection, "Video-Frames");
+    ptrItem->frame_rate = ptrIni->ReadInt(ptrSection, "Video-FrameRate");
 #if 0
-	ptrItem->depthL = ptrIni->ReadInt(ptrSection, "Image-DepthL");
-	ptrItem->depthR = ptrIni->ReadInt(ptrSection, "Image-DepthR");
+    ptrItem->depthL = ptrIni->ReadInt(ptrSection, "Image-DepthL");
+    ptrItem->depthR = ptrIni->ReadInt(ptrSection, "Image-DepthR");
 #endif
 }
 
-char VideoMan::SaveEFOVVideo(unsigned int no, const char *filename, const char *filepath)
-{
-	unsigned long size = 0;
-	char absPath[256];
-	bool ret = false;
-	int total = m_listName.size();
-	char hint[255];
+char VideoMan::SaveEFOVVideo(unsigned int no, const char *filename, const char *filepath) {
+    unsigned long size = 0;
+    char absPath[256];
+    bool ret = false;
+    int total = m_listName.size();
+    char hint[255];
 
-	//check the disk free space
-	if(!CheckFreeSpace(filepath, size))
-	{
-		sprintf(hint, "%s", _("Fail to save. No enough space!"));
-		HintArea::GetInstance()->UpdateHint(hint, 2);
-		return 1;	//no enough space
-	}
+    //check the disk free space
+    if(!CheckFreeSpace(filepath, size)) {
+        sprintf(hint, "%s", _("Fail to save. No enough space!"));
+        HintArea::GetInstance()->UpdateHint(hint, 2);
+        return 1;	//no enough space
+    }
 
-        //test
-	sprintf(absPath, "%s/%d/%s", filepath, no, "EFOV");
-	//sprintf(absPath, "%s/%d/%s", filepath, no, filename);
+    //test
+    sprintf(absPath, "%s/%d/%s", filepath, no, "EFOV");
+    //sprintf(absPath, "%s/%d/%s", filepath, no, filename);
 
-	if(CheckDir(absPath) == 0)
-		return 4;
+    if(CheckDir(absPath) == 0)
+        return 4;
 
-	strcat(absPath, ".efov");
+    strcat(absPath, ".efov");
 //	if(SaveIniFile(absPath))
 //		return 2;
-	ret = SaveVideoToEFOVCine(absPath);
-	if(!ret)
-		return 3;
+    ret = SaveVideoToEFOVCine(absPath);
+    if(!ret)
+        return 3;
 
-	string s(filename);
-	if(total >= MAX_VIDEO)
-	{
-		DeleteEFOVVideo(no, m_listName.front().c_str(), filepath);
-		m_listName.pop_front();
-	}
-	m_listName.push_back(s);
+    string s(filename);
+    if(total >= MAX_VIDEO) {
+        DeleteEFOVVideo(no, m_listName.front().c_str(), filepath);
+        m_listName.pop_front();
+    }
+    m_listName.push_back(s);
 
-	sprintf(hint, "%s\"%s\".", _("Success to save eView cine. Filename is "), filename);
-	HintArea::GetInstance()->UpdateHint(hint, 2);
+    sprintf(hint, "%s\"%s\".", _("Success to save eView cine. Filename is "), filename);
+    HintArea::GetInstance()->UpdateHint(hint, 2);
 
-	return 0;
+    return 0;
 }
 
-bool VideoMan::SaveVideoToEFOVCine(const char* absPath)
-{
-	unsigned char *data;
-	int size;
-	Replay::GetInstance()->GetEFOVCineImg(&data, size);
+bool VideoMan::SaveVideoToEFOVCine(const char* absPath) {
+    unsigned char *data;
+    int size;
+    Replay::GetInstance()->GetEFOVCineImg(&data, size);
 
-	FILE* file = fopen(absPath, "wb");
-	if(!file)
-	{
-		PRINTF("(SaveVideoToCine) Fail to open file, the error is %s!\n", strerror(errno));
-		return false;
-	}
-	if(fwrite(data, sizeof(unsigned char), size, file) != (size_t)size)
-	{
-		perror("Failed to write video data, error:");
-		return false;
-	}
+    FILE* file = fopen(absPath, "wb");
+    if(!file) {
+        PRINTF("(SaveVideoToCine) Fail to open file, the error is %s!\n", strerror(errno));
+        return false;
+    }
+    if(fwrite(data, sizeof(unsigned char), size, file) != (size_t)size) {
+        perror("Failed to write video data, error:");
+        return false;
+    }
 
-	fclose(file);
-	return true;
+    fclose(file);
+    return true;
 }
 
-char VideoMan::DeleteEFOVVideo(unsigned int no, const char* filename, const char* filepath)
-{
-	char absPath[256];
-	char absIniPath[256];
+char VideoMan::DeleteEFOVVideo(unsigned int no, const char* filename, const char* filepath) {
+    char absPath[256];
+    char absIniPath[256];
 
-	sprintf(absPath, "%s/%d/%s", filepath, no, filename);
-	if(CheckFileName(absPath) != 1)
-		return 1;
-	GetIniFilePath(absPath, absIniPath);
+    sprintf(absPath, "%s/%d/%s", filepath, no, filename);
+    if(CheckFileName(absPath) != 1)
+        return 1;
+    GetIniFilePath(absPath, absIniPath);
 
-	if(unlink(absPath))
-	{
-		perror("Delete Image File Error:");
-		return 2;
-	}
-	return 0;
+    if(unlink(absPath)) {
+        perror("Delete Image File Error:");
+        return 2;
+    }
+    return 0;
 }
 
-DCMIMAGEELEMENT VideoMan::GetImageElement(void)
-{
+DCMIMAGEELEMENT VideoMan::GetImageElement(void) {
     DCMIMAGEELEMENT Img;
     Img.imgHeight = m_ptrVideoItem->height;
     Img.imgWidth = m_ptrVideoItem->width;
@@ -874,8 +777,7 @@ DCMIMAGEELEMENT VideoMan::GetImageElement(void)
     return Img;
 }
 
-void VideoMan::SaveReplay(uint8_t *buf, int width, int height)
-{
+void VideoMan::SaveReplay(uint8_t *buf, int width, int height) {
     // add image to replay memory
     Image::AutoTracePara para;
     Image image((unsigned int*)buf, para);

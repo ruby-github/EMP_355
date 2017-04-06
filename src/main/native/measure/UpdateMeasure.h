@@ -12,21 +12,20 @@ using std::string;
 using std::deque;
 class ImageArea;
 // class ViewMeasureResult;
-class UpdateMeasure
-{
+class UpdateMeasure {
 public:
     UpdateMeasure();
     ~UpdateMeasure();
 
     struct ResultAttr {
-	int cursorType;
-	int curColor;		// color index
-	int confirmColor;	// color index
+        int cursorType;
+        int curColor;		// color index
+        int confirmColor;	// color index
     };
     struct Result {
-	string text;
-	int lines;
-	ResultAttr attr;
+        string text;
+        int lines;
+        ResultAttr attr;
     };
 
     void ClearPwResultUnFreeze(int cursorType);
@@ -97,7 +96,7 @@ private:
     int m_resultX;
     int m_resultY;
     int m_dateFormat;
-		void NewLineSign(unsigned char newLineSign[2], int sign);
+    void NewLineSign(unsigned char newLineSign[2], int sign);
 
     static deque<Result> m_dequeResult;
     ImageArea* m_ptrImg;

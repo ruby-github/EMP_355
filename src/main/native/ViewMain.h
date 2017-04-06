@@ -66,8 +66,7 @@ class MenuArea;
 class TopArea;
 class NoteArea;
 
-class ViewMain:public CKnobEvent
-{
+class ViewMain:public CKnobEvent {
 public:
     ~ViewMain();
     static ViewMain* GetInstance();
@@ -75,8 +74,8 @@ public:
     void Create(void);
     void Show(void);
     void Hide(void);
-	void ShowMenu(void);
-	void HideMenu(void);
+    void ShowMenu(void);
+    void HideMenu(void);
 
     void MenuReviewCallBack(void);
 
@@ -86,15 +85,19 @@ public:
     void SliderEvent(unsigned char keyValue, unsigned char offset);
     void MouseEvent(char offsetX, char offsetY);
     void KnobKeyEvent(unsigned char keyValue);
-	bool GetCursorVisible(void) { return m_cursorVisible; }
-	void SetCursorVisible(bool visible) { m_cursorVisible = visible; }
+    bool GetCursorVisible(void) {
+        return m_cursorVisible;
+    }
+    void SetCursorVisible(bool visible) {
+        m_cursorVisible = visible;
+    }
 
 private:
     ViewMain();
 
     unsigned char m_keyValue;
     static ViewMain* m_ptrInstance;
-	static bool m_cursorVisible;
+    static bool m_cursorVisible;
     int countN;
     GtkWidget* m_mainWindow;
     GtkWidget* m_fixedWindow;
@@ -122,8 +125,12 @@ private:
     int m_super_timer;
     gboolean IsAuthenValid(void);
     gboolean IsSuperAuthenValid(void);
-    static gboolean HandleAuthen(gpointer data) { return m_ptrInstance->IsAuthenValid(); }
-    static gboolean HandleSuperAuthen(gpointer data) { return m_ptrInstance->IsSuperAuthenValid(); }
+    static gboolean HandleAuthen(gpointer data) {
+        return m_ptrInstance->IsAuthenValid();
+    }
+    static gboolean HandleSuperAuthen(gpointer data) {
+        return m_ptrInstance->IsSuperAuthenValid();
+    }
 
 };
 

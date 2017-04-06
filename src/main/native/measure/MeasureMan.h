@@ -20,98 +20,96 @@ void SetChangePointerCalc(void);
 ///> change pointer when input "true" to SetChangePointer
 void ChangePointerWhenMeasure(void);
 
-class MeasureMan
-{
-	public:
-		~MeasureMan();
-		static MeasureMan* GetInstance();
+class MeasureMan {
+public:
+    ~MeasureMan();
+    static MeasureMan* GetInstance();
 
-        void AddNew(EMeaType measureType, int cursorType ,vector<POINT> vec, int cursorSize, int confirmColor);
-        void AddNewAdjust(EMeaType measureType, int cursorType ,vector<POINT> vec, int cursorSize, int confirmColor);
-        void ClearPwTraceUnFreeze();
-        void ClearLast();
-		void ClearFirst();
-		void ClearAll();
-		void ClearAllValue(void);
-        void GetMeasureUnit(float& coeffi, string& units, int unit);
-        int GetDequeSize();
+    void AddNew(EMeaType measureType, int cursorType ,vector<POINT> vec, int cursorSize, int confirmColor);
+    void AddNewAdjust(EMeaType measureType, int cursorType ,vector<POINT> vec, int cursorSize, int confirmColor);
+    void ClearPwTraceUnFreeze();
+    void ClearLast();
+    void ClearFirst();
+    void ClearAll();
+    void ClearAllValue(void);
+    void GetMeasureUnit(float& coeffi, string& units, int unit);
+    int GetDequeSize();
 
-		void DeleteAllForClearScreen(bool update=true);
+    void DeleteAllForClearScreen(bool update=true);
 
-		void SetMeasureResult(float value[MEA_MULTI], const int item, const int valueNums);
-		const char* GetMeasureTitle(int item);
-		void GetMeasureString(int item, const SingleItemInfo **ptrSingleItemInfo, const MultiItemInfo **ptrMultiItemInfo);//本函数提供测量和计算的名称单位
-		void SingleMeaDataMan(const float meaData, const SingleItemInfo *itemInfo, float allData[SINGLE_MAX], const int saveR);
-		void MultiMeaDataMan(float meaData[MEA_MULTI], const MultiItemInfo *itemInfo, float allData[SINGLE_MAX], const int saveR);
-		void BPDMeaDataMan(const float meaData, const SingleItemInfo *itemInfo, float allData[SINGLE_MAX], const int saveR);//用BPD计算的计算值太多，超出了CALC_MAX的范围
-        void SetManualAutoTrace(POINT start, POINT end, POINT ps, POINT ed, int curOpt=1);
-        void ReDrawManualAutoStartLine(bool draw=false);
-        void ManualAutoAdjust(int current, bool draw=false);
+    void SetMeasureResult(float value[MEA_MULTI], const int item, const int valueNums);
+    const char* GetMeasureTitle(int item);
+    void GetMeasureString(int item, const SingleItemInfo **ptrSingleItemInfo, const MultiItemInfo **ptrMultiItemInfo);//本函数提供测量和计算的名称单位
+    void SingleMeaDataMan(const float meaData, const SingleItemInfo *itemInfo, float allData[SINGLE_MAX], const int saveR);
+    void MultiMeaDataMan(float meaData[MEA_MULTI], const MultiItemInfo *itemInfo, float allData[SINGLE_MAX], const int saveR);
+    void BPDMeaDataMan(const float meaData, const SingleItemInfo *itemInfo, float allData[SINGLE_MAX], const int saveR);//用BPD计算的计算值太多，超出了CALC_MAX的范围
+    void SetManualAutoTrace(POINT start, POINT end, POINT ps, POINT ed, int curOpt=1);
+    void ReDrawManualAutoStartLine(bool draw=false);
+    void ManualAutoAdjust(int current, bool draw=false);
 
-    private:
-		MeasureMan();
+private:
+    MeasureMan();
 
-		struct MeasureInfo
-		{
-			EMeaType measureType;
-			int cursorType;
-		    int cursorSize;
-		    int confirmColor;
-			vector<POINT> vecPoint;
-			vector< vector<POINT> > vecTrackPoint;
-			int meaType;
-			int step;//当前测量如果被解冻中断，则记录解冻发生在第几个步骤
-			int orderNumber;
-			//string strResult;
-		};
+    struct MeasureInfo {
+        EMeaType measureType;
+        int cursorType;
+        int cursorSize;
+        int confirmColor;
+        vector<POINT> vecPoint;
+        vector< vector<POINT> > vecTrackPoint;
+        int meaType;
+        int step;//当前测量如果被解冻中断，则记录解冻发生在第几个步骤
+        int orderNumber;
+        //string strResult;
+    };
 
-		MeasureDraw m_draw;
-		UpdateMeasure m_update;
+    MeasureDraw m_draw;
+    UpdateMeasure m_update;
 
-		static MeasureMan* s_ptrInstance;
-		static const int MAX = 4;//屏幕上测量线最多保留MAX个
+    static MeasureMan* s_ptrInstance;
+    static const int MAX = 4;//屏幕上测量线最多保留MAX个
 
-		deque<MeasureInfo> m_deq; ///< define an sequence container, including MAX memebers.
+    deque<MeasureInfo> m_deq; ///< define an sequence container, including MAX memebers.
 
-		MeaResult *m_ptrMeaResult;
-        POINT m_startP;
-        POINT m_endP;
-        POINT m_psP;
-        POINT m_edP;
-        bool m_pwAdjust;
-        int m_orderNumBak;
+    MeaResult *m_ptrMeaResult;
+    POINT m_startP;
+    POINT m_endP;
+    POINT m_psP;
+    POINT m_edP;
+    bool m_pwAdjust;
+    int m_orderNumBak;
 
-		///> fun
-		void EraseMeasureLine(MeasureInfo info);
-		void EraseDist(MeasureInfo info);
-		void EraseDist2Line(MeasureInfo info);
-		void EraseTrack(MeasureInfo info);
-		void EraseINTEGRALTrack(MeasureInfo info);
-       void EraseSimpson(MeasureInfo info);
-		void EraseAL(MeasureInfo info);
-	//	void EraseSimpsonDiam(vector<POINT> track);
-		void EraseDot(MeasureInfo info);
-		void EraseRectangle(MeasureInfo info);
-		void EraseEllipse(MeasureInfo info);
-		void EraseVol3Axis(MeasureInfo info);
-		void EraseVolEllipse2(MeasureInfo info);
-		void EraseAngleDot(MeasureInfo info);//三点法
-		void EraseAngleLine(MeasureInfo info);//两线法
-		void EraseRatioDistDot(MeasureInfo info);//璺濈姣斾緥娴嬮噺锛嶄袱鐐规硶
-		void EraseRatioDistPeri(MeasureInfo info);//璺濈鍛ㄩ暱姣斾緥娴嬮噺
-		void EraseRatioArea(MeasureInfo info);//闈㈢Н姣斾緥锛忕嫮绐勬瘮
-		void EraseRatioVol(MeasureInfo info);//浣撶Н姣斾緥
-		void EraseRatioAngle(MeasureInfo info);//瑙掑害姣斾緥
-		void EraseHip(MeasureInfo info);
-		void EraseEF(MeasureInfo info);
-		void EraseTime(MeasureInfo info);
-		void EraseVelD(MeasureInfo info);
-		void EraseRI(MeasureInfo info);
-		void ErasePGmean(MeasureInfo info);
-		void EraseAccel(MeasureInfo info);
-		void EraseTrace(MeasureInfo info);
-		void EraseMeasureOrderNumber(MeasureInfo info);
-		void ClearAllMeasureOrderNumber(void);
+    ///> fun
+    void EraseMeasureLine(MeasureInfo info);
+    void EraseDist(MeasureInfo info);
+    void EraseDist2Line(MeasureInfo info);
+    void EraseTrack(MeasureInfo info);
+    void EraseINTEGRALTrack(MeasureInfo info);
+    void EraseSimpson(MeasureInfo info);
+    void EraseAL(MeasureInfo info);
+    //	void EraseSimpsonDiam(vector<POINT> track);
+    void EraseDot(MeasureInfo info);
+    void EraseRectangle(MeasureInfo info);
+    void EraseEllipse(MeasureInfo info);
+    void EraseVol3Axis(MeasureInfo info);
+    void EraseVolEllipse2(MeasureInfo info);
+    void EraseAngleDot(MeasureInfo info);//三点法
+    void EraseAngleLine(MeasureInfo info);//两线法
+    void EraseRatioDistDot(MeasureInfo info);//璺濈姣斾緥娴嬮噺锛嶄袱鐐规硶
+    void EraseRatioDistPeri(MeasureInfo info);//璺濈鍛ㄩ暱姣斾緥娴嬮噺
+    void EraseRatioArea(MeasureInfo info);//闈㈢Н姣斾緥锛忕嫮绐勬瘮
+    void EraseRatioVol(MeasureInfo info);//浣撶Н姣斾緥
+    void EraseRatioAngle(MeasureInfo info);//瑙掑害姣斾緥
+    void EraseHip(MeasureInfo info);
+    void EraseEF(MeasureInfo info);
+    void EraseTime(MeasureInfo info);
+    void EraseVelD(MeasureInfo info);
+    void EraseRI(MeasureInfo info);
+    void ErasePGmean(MeasureInfo info);
+    void EraseAccel(MeasureInfo info);
+    void EraseTrace(MeasureInfo info);
+    void EraseMeasureOrderNumber(MeasureInfo info);
+    void ClearAllMeasureOrderNumber(void);
 };
 
 #endif

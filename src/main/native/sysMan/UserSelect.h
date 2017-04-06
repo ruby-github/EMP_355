@@ -6,20 +6,18 @@
 //#define USER_PATH  "/home/lilong/LL/work/09001Color/res/username"
 //#define USER_PATH  "/mnt/harddisk/emp/res/username"
 
-typedef struct NameList{
-	char name[50];
-	struct NameList *next;
-}namelist, *nmlst;
+typedef struct NameList {
+    char name[50];
+    struct NameList *next;
+} namelist, *nmlst;
 //extern nmlst Head;
 
-typedef struct node
-{
+typedef struct node {
     int active_user_id;
     char active_username[50];
-}Active_user;
+} Active_user;
 
-class UserSelect
-{
+class UserSelect {
 public:
     ~UserSelect();
     static UserSelect* GetInstance();
@@ -60,6 +58,6 @@ private:
     char cur_username[50];
     //FILE *fp_user;
 
-   };
+};
 
 #endif

@@ -15,17 +15,15 @@ using std::string;
 using std::vector;
 
 namespace {
-    const char *kFirmwarePath = "./res/printer/firmware";
+const char *kFirmwarePath = "./res/printer/firmware";
 }
 
-Printer::Printer(void)
-{
+Printer::Printer(void) {
     m_printers.clear();
 }
 
 // lpstat.c show_printers
-bool Printer::GetPrinters(void)
-{
+bool Printer::GetPrinters(void) {
     int num_dests = 0;          /* Number of user destinations */
     cups_dest_t	*dests = NULL;  /* User destinations */
 
@@ -60,11 +58,11 @@ bool Printer::GetPrinters(void)
     ipp_t *request = ippNewRequest(CUPS_GET_PRINTERS);
 
     ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-            "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
-            NULL, pattrs);
+                  "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+                  NULL, pattrs);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-            NULL, cupsUser());
+                 NULL, cupsUser());
     /*
      * Do the request and get back a response...
      */
@@ -185,13 +183,13 @@ bool Printer::GetPrinters(void)
                 request->request.op.request_id   = 1;
 
                 ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                        "requested-attributes",
-                        sizeof(jattrs) / sizeof(jattrs[0]), NULL, jattrs);
+                              "requested-attributes",
+                              sizeof(jattrs) / sizeof(jattrs[0]), NULL, jattrs);
 
                 httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
-                        "ipp", NULL, "localhost", 0, "/printers/%s", printer);
+                                 "ipp", NULL, "localhost", 0, "/printers/%s", printer);
                 ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-                        "printer-uri", NULL, printer_uri);
+                             "printer-uri", NULL, printer_uri);
 
                 if ((jobs = cupsDoRequest(http, request, "/")) != NULL) {
                     /*
@@ -227,18 +225,18 @@ bool Printer::GetPrinters(void)
              */
             printer_attr prt;
             switch (pstate) {
-                case IPP_PRINTER_IDLE :
-                    PRINTF("printer %s is idle.  enabled\n", printer);
-                    prt.status = _("idle");
-                    break;
-                case IPP_PRINTER_PROCESSING :
-                    PRINTF("printer %s now printing jobid is %d. enabled\n", printer, jobid);
-                    prt.status = _("printing");
-                    break;
-                case IPP_PRINTER_STOPPED :
-                    PRINTF("printer %s disabled\n", printer);
-                    prt.status = _("disable");
-                    break;
+            case IPP_PRINTER_IDLE :
+                PRINTF("printer %s is idle.  enabled\n", printer);
+                prt.status = _("idle");
+                break;
+            case IPP_PRINTER_PROCESSING :
+                PRINTF("printer %s now printing jobid is %d. enabled\n", printer, jobid);
+                prt.status = _("printing");
+                break;
+            case IPP_PRINTER_STOPPED :
+                PRINTF("printer %s disabled\n", printer);
+                prt.status = _("disable");
+                break;
             }
             prt.name = printer;
             if (cnt < num_dests)
@@ -259,18 +257,18 @@ bool Printer::GetPrinters(void)
                 if (!strcasecmp(printer, dests[i].name) && dests[i].instance) {
                     printer_attr prt_instance;
                     switch (pstate) {
-                        case IPP_PRINTER_IDLE :
-                            PRINTF("printer %s/%s is idle. enabled\n", printer, dests[i].instance);
-                            prt_instance.status = _("idle");
-                            break;
-                        case IPP_PRINTER_PROCESSING :
-                            PRINTF("printer %s/%s now printing jobid is %d enabled\n", printer, dests[i].instance, jobid);
-                            prt_instance.status = _("printing");
-                            break;
-                        case IPP_PRINTER_STOPPED :
-                            PRINTF("printer %s/%s disabled \n", printer, dests[i].instance);
-                            prt_instance.status = _("disable");
-                            break;
+                    case IPP_PRINTER_IDLE :
+                        PRINTF("printer %s/%s is idle. enabled\n", printer, dests[i].instance);
+                        prt_instance.status = _("idle");
+                        break;
+                    case IPP_PRINTER_PROCESSING :
+                        PRINTF("printer %s/%s now printing jobid is %d enabled\n", printer, dests[i].instance, jobid);
+                        prt_instance.status = _("printing");
+                        break;
+                    case IPP_PRINTER_STOPPED :
+                        PRINTF("printer %s/%s disabled \n", printer, dests[i].instance);
+                        prt_instance.status = _("disable");
+                        break;
                     }
                     string prt_name = printer;
                     string instance_name = dests[i].instance;
@@ -299,44 +297,36 @@ bool Printer::GetPrinters(void)
     return true;
 }
 
-void Printer::GetJobs(void)
-{
+void Printer::GetJobs(void) {
 
 }
 
-bool Printer::IsSonyPrinter()
-{
-	char *file = GetDefaultPrinterPPD();
-	ppd_file_t *ppd;
-	bool ret = 0;
-	if((ppd = ppdOpenFile(file)) == NULL)
-	{
-		PRINTF("ppdOpenfile error!\n");
+bool Printer::IsSonyPrinter() {
+    char *file = GetDefaultPrinterPPD();
+    ppd_file_t *ppd;
+    bool ret = 0;
+    if((ppd = ppdOpenFile(file)) == NULL) {
+        PRINTF("ppdOpenfile error!\n");
         return ret;
-	}
+    }
     //printf("%s-%s: Printer's manufacturer is %s\n", __FILE__, __FUNCTION__, ppd->manufacturer);
-	if(ppd->manufacturer)
-	{
-		char *ptr = strcasestr(ppd->manufacturer, "SONY");
-		if(ptr)
-			ret = 1;
-	}
-	else
-	{
-		PRINTF("Printer's manufacturer is NULL\n");
-	}
-	ppdClose(ppd);
-	if(file)
-	{
-		unlink(file);
-		free(file);
-	}
-	return ret;
+    if(ppd->manufacturer) {
+        char *ptr = strcasestr(ppd->manufacturer, "SONY");
+        if(ptr)
+            ret = 1;
+    } else {
+        PRINTF("Printer's manufacturer is NULL\n");
+    }
+    ppdClose(ppd);
+    if(file) {
+        unlink(file);
+        free(file);
+    }
+    return ret;
 }
-char* Printer::GetDefaultPrinterPPD(void)
-{
-	char *ppd;
-	cups_dest_t	*dests;         /* Destinations */
+char* Printer::GetDefaultPrinterPPD(void) {
+    char *ppd;
+    cups_dest_t	*dests;         /* Destinations */
     int num_dests = cupsGetDests(&dests);
     cups_dest_t *dest;          /* Current destination */
     if (num_dests == 0 || !dests || (dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL) {
@@ -344,13 +334,12 @@ char* Printer::GetDefaultPrinterPPD(void)
         cupsFreeDests(num_dests, dests);
         return false;
     }
-	ppd = g_strdup(cupsGetPPD(dest->name));
+    ppd = g_strdup(cupsGetPPD(dest->name));
     cupsFreeDests(num_dests, dests);
     PRINTF("ppd is %s",ppd);
-	return ppd;
+    return ppd;
 }
-bool Printer::SetDefault(const char *printer)
-{
+bool Printer::SetDefault(const char *printer) {
     if (printer == NULL)
         return false;
 
@@ -383,8 +372,8 @@ bool Printer::SetDefault(const char *printer)
     for (int i = 0; i < dest->num_options; i++)
         if (cupsGetOption(dest->options[i].name, num_options, options) == NULL)
             num_options = cupsAddOption(dest->options[i].name,
-                    dest->options[i].value,
-                    num_options, &options);
+                                        dest->options[i].value,
+                                        num_options, &options);
 
     cupsFreeDests(num_dests, dests);
     return true;
@@ -392,8 +381,7 @@ bool Printer::SetDefault(const char *printer)
 
 // grp_options is space-delimited name/value pairs
 // like this "name=value [name=value ... ]"
-int Printer::print(char *printer, const char* filename, const char *grp_options, int copies)
-{
+int Printer::print(char *printer, const char* filename, const char *grp_options, int copies) {
     int num_options = 0;           /* Number of options */
     cups_option_t *options = NULL; /* Options */
     int num_dests = 0;             /* Number of destinations */
@@ -413,18 +401,17 @@ int Printer::print(char *printer, const char* filename, const char *grp_options,
             printer = dest->name;
 
             for (int i = 0; i < dest->num_options; i ++)
-                if (cupsGetOption(dest->options[i].name, num_options, options) == NULL){
+                if (cupsGetOption(dest->options[i].name, num_options, options) == NULL) {
                     num_options = cupsAddOption(dest->options[i].name,
-                            dest->options[i].value,
-                            num_options, &options);
+                                                dest->options[i].value,
+                                                num_options, &options);
                 }
         }
     }
-    if (printer == NULL)
-	{
+    if (printer == NULL) {
         cupsFreeDests(num_dests, dests);
         return -2;
-	}
+    }
 #if 0
     else if ((instance = strrchr(printer, '/')) != NULL)
         *instance++ = '\0';
@@ -434,8 +421,8 @@ int Printer::print(char *printer, const char* filename, const char *grp_options,
         for (int i = 0; i < dest->num_options; i++)
             if (cupsGetOption(dest->options[i].name, num_options, options) == NULL)
                 num_options = cupsAddOption(dest->options[i].name,
-                        dest->options[i].value,
-                        num_options, &options);
+                                            dest->options[i].value,
+                                            num_options, &options);
     }
     if (printer && !cupsGetDest(printer, NULL, num_dests, dests)) {
         PRINTF("%s: Error : non-existent destination!\n", printer);
@@ -457,19 +444,18 @@ int Printer::print(char *printer, const char* filename, const char *grp_options,
     int job_id = cupsPrintFiles(printer, num_files, files, filename, num_options, options);
     if (job_id < 1) {
         PRINTF("Print Error: %s\n", cupsLastErrorString());
-		cupsFreeOptions(num_options, options);
-		cupsFreeDests(num_dests, dests);
+        cupsFreeOptions(num_options, options);
+        cupsFreeDests(num_dests, dests);
         return -1;
     }
 
-	cupsFreeOptions(num_options, options);
-	cupsFreeDests(num_dests, dests);
+    cupsFreeOptions(num_options, options);
+    cupsFreeDests(num_dests, dests);
 
     return 0;
 }
 
-bool Printer::CancelAllJobs(void)
-{
+bool Printer::CancelAllJobs(void) {
     ipp_op_t op = IPP_PURGE_JOBS; /* Operation */
     ipp_t *request = NULL;        /* IPP request */
     const int purge = 1;          /* Purge or cancel jobs? */
@@ -500,8 +486,7 @@ bool Printer::CancelAllJobs(void)
 }
 
 // lpinfo.c show_devices()
-bool Printer::GetUsbPrinterUri(string &uri)
-{
+bool Printer::GetUsbPrinterUri(string &uri) {
     ipp_t *request;		/* IPP Request */
     ipp_t *response;            /* IPP Response */
     ipp_attribute_t *attr;      /* Current attribute */
@@ -612,8 +597,7 @@ bool Printer::GetUsbPrinterUri(string &uri)
 }
 
 // lpadmin.c validate_name()
-bool Printer::ValidateName(const char *name)
-{
+bool Printer::ValidateName(const char *name) {
     const char	*ptr;			/* Pointer into name */
     /*
      * Scan the whole name...
@@ -632,8 +616,7 @@ bool Printer::ValidateName(const char *name)
 }
 
 // lpadmin.c set_printer_device()
-bool Printer::SetDevice(const char* printer, const char* device_uri)
-{
+bool Printer::SetDevice(const char* printer, const char* device_uri) {
     http_t *http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
     ipp_t *request;                        /* IPP Request */
@@ -652,9 +635,9 @@ bool Printer::SetDevice(const char* printer, const char* device_uri)
     request = ippNewRequest(CUPS_ADD_PRINTER);
 
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-            "localhost", 0, "/printers/%s", printer);
+                     "localhost", 0, "/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-            "printer-uri", NULL, uri);
+                 "printer-uri", NULL, uri);
 
     /*
      * Add the device URI...
@@ -667,11 +650,10 @@ bool Printer::SetDevice(const char* printer, const char* device_uri)
 
         snprintf(uri, sizeof(uri), "file://%s", device_uri);
         ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
-                uri);
-    }
-    else
+                     uri);
+    } else
         ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
-                device_uri);
+                     device_uri);
 
     /*
      * Do the request and get back a response...
@@ -692,8 +674,7 @@ bool Printer::SetDevice(const char* printer, const char* device_uri)
 }
 
 // lpadmin.c set_printer_file()
-bool Printer::SetPPDFile(const char *printer, const char *file)
-{
+bool Printer::SetPPDFile(const char *printer, const char *file) {
     http_t *http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
     ipp_t *request;             /* IPP Request */
@@ -712,9 +693,9 @@ bool Printer::SetPPDFile(const char *printer, const char *file)
     request = ippNewRequest(CUPS_ADD_PRINTER);
 
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-            "localhost", 0, "/printers/%s", printer);
+                     "localhost", 0, "/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-            "printer-uri", NULL, uri);
+                 "printer-uri", NULL, uri);
 
     /*
      * Do the request and get back a response...
@@ -732,8 +713,7 @@ bool Printer::SetPPDFile(const char *printer, const char *file)
     }
 }
 
-bool Printer::AddPrinter(const char* printer, const char* device_uri, const char* ppd_file)
-{
+bool Printer::AddPrinter(const char* printer, const char* device_uri, const char* ppd_file) {
     if (!ValidateName(printer)) {
         PRINTF("AddPrinter: Printer name can only contain printable characters!\n");
         return false;
@@ -749,8 +729,7 @@ bool Printer::AddPrinter(const char* printer, const char* device_uri, const char
 }
 
 // lpadmin.c enable_printer()
-bool Printer::EnablePrinter(const char *printer) /* I - Printer to enable */
-{
+bool Printer::EnablePrinter(const char *printer) { /* I - Printer to enable */
     ipp_t *request;             /* IPP Request */
     ipp_t *response;            /* IPP Response */
     char uri[HTTP_MAX_URI];     /* URI for printer/class */
@@ -777,12 +756,12 @@ bool Printer::EnablePrinter(const char *printer) /* I - Printer to enable */
     request = ippNewRequest(CUPS_ADD_PRINTER);
 
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-            "localhost", 0, "/printers/%s", printer);
+                     "localhost", 0, "/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-            "printer-uri", NULL, uri);
+                 "printer-uri", NULL, uri);
 
     ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
-            IPP_PRINTER_IDLE);
+                  IPP_PRINTER_IDLE);
 
     ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
 
@@ -805,8 +784,7 @@ bool Printer::EnablePrinter(const char *printer) /* I - Printer to enable */
 }
 
 // lpadmin.c delete_printer()
-bool Printer::DeletePrinter(const char *printer)
-{
+bool Printer::DeletePrinter(const char *printer) {
     ipp_t *request;             /* IPP Request */
     ipp_t *response;            /* IPP Response */
     char uri[HTTP_MAX_URI];     /* URI for printer/class */
@@ -831,9 +809,9 @@ bool Printer::DeletePrinter(const char *printer)
     request = ippNewRequest(CUPS_DELETE_PRINTER);
 
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-            "localhost", 0, "/printers/%s", printer);
+                     "localhost", 0, "/printers/%s", printer);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-            "printer-uri", NULL, uri);
+                 "printer-uri", NULL, uri);
 
     /*
      * Do the request and get back a response...
@@ -852,8 +830,7 @@ bool Printer::DeletePrinter(const char *printer)
     }
 }
 
-void Printer::LoadFirmware(const string uri)
-{
+void Printer::LoadFirmware(const string uri) {
     char device[256];
     if (!PeripheralMan::GetInstance()->GetPrinterDev(device))
         return;

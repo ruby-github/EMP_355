@@ -16,44 +16,37 @@ CusSpin::CusSpinItem  MenuM::item_line = {N_("Line aver."), "1", OK, ChgLine};
 CusSpin::CusSpinItem  MenuM::item_smooth = {N_("Smooth"), "1", OK, ChgSmooth};
 CusSpin::CusSpinItem  MenuM::item_enhanceM = {N_("Enhance M"), "1", OK, ChgEnhanceM};
 
-MenuM::MenuM(void)
-{
+MenuM::MenuM(void) {
     m_format = 1;
 }
 
-void MenuM::Hide(void)
-{
+void MenuM::Hide(void) {
     gtk_widget_hide_all(m_table);
 }
 
-void MenuM::Show(void)
-{
+void MenuM::Show(void) {
     //UpdateDisplayL();
     gtk_widget_show_all(m_table);
 
     gtk_widget_hide(m_check_btn_polarity);
 }
 
-void MenuM::ForeachWidget(GtkWidget *widget)
-{
-	gtk_widget_set_sensitive(widget, (bool)m_sensitive);
+void MenuM::ForeachWidget(GtkWidget *widget) {
+    gtk_widget_set_sensitive(widget, (bool)m_sensitive);
 }
 
-void MenuM::Sensitive(bool on)
-{
-	m_sensitive = on;
+void MenuM::Sensitive(bool on) {
+    m_sensitive = on;
 
-	GList *list = NULL;
-	list = gtk_container_get_children(GTK_CONTAINER(m_table));
-	if(list)
-	{
-		g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
-		g_list_free(list);
-	}
+    GList *list = NULL;
+    list = gtk_container_get_children(GTK_CONTAINER(m_table));
+    if(list) {
+        g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
+        g_list_free(list);
+    }
 }
 
-GtkWidget * MenuM::Create(void)
-{
+GtkWidget * MenuM::Create(void) {
     char path[256];
     m_table = gtk_table_new(20, 1, TRUE);
 
@@ -93,8 +86,7 @@ GtkWidget * MenuM::Create(void)
 
     //anatomic
 #ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[1]))
-    {
+    if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[1])) {
         m_labelAnatomicM = create_label("", 0, 0, g_lightGray, NULL);
         GtkWidget *btn_anatomic = create_button(m_labelAnatomicM, 0, 0, g_deep);
         gtk_widget_modify_bg(btn_anatomic, GTK_STATE_INSENSITIVE, g_deepGray);
@@ -191,8 +183,7 @@ GtkWidget * MenuM::Create(void)
     return m_table;
 }
 
-void MenuM::UpdateLabel(void)
-{
+void MenuM::UpdateLabel(void) {
     gtk_label_set_text(GTK_LABEL(m_labelPolarity), _("Polarity"));
     gtk_label_set_text(GTK_LABEL(m_labelTimemark), _("Time Mark"));
     spin_line.UpdateLabel();
@@ -207,66 +198,54 @@ void MenuM::UpdateLabel(void)
     gtk_frame_set_label(GTK_FRAME(m_frameFormat), _("Display Format"));
 }
 
-void MenuM::UpdatePolarity(bool on)
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_polarity),on);
+void MenuM::UpdatePolarity(bool on) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_polarity),on);
 }
-void MenuM::UpdateTimeMark(bool on)
-{
+void MenuM::UpdateTimeMark(bool on) {
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_timemark), on);
 }
-void MenuM::UpdateLine(const char* str, EKnobReturn status)
-{
+void MenuM::UpdateLine(const char* str, EKnobReturn status) {
     spin_line.SetValue(str, status);
 }
 
-void MenuM::UpdateEnhanceM(const char* str, EKnobReturn status)
-{
+void MenuM::UpdateEnhanceM(const char* str, EKnobReturn status) {
     spin_enhanceM.SetValue(str, status);
 }
 
-void MenuM::UpdateSmooth(const char* str, EKnobReturn status)
-{
+void MenuM::UpdateSmooth(const char* str, EKnobReturn status) {
     spin_smooth.SetValue(str, status);
 }
 
-void MenuM::BtnAnatomic(GtkButton *button)
-{
-	ScanMode::GetInstance()->EnterAnatomicM();
+void MenuM::BtnAnatomic(GtkButton *button) {
+    ScanMode::GetInstance()->EnterAnatomicM();
 }
 
 ///> private
-void MenuM::ChkPolarity(GtkButton *button)
-{
-	gboolean value;
-	value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-	ImgProc2D::GetInstance()->ChangePolarity(value);
+void MenuM::ChkPolarity(GtkButton *button) {
+    gboolean value;
+    value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+    ImgProc2D::GetInstance()->ChangePolarity(value);
 }
-void MenuM::ChkTimemark(GtkButton *button)
-{
-	gboolean value;
-	value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-	ImgProcM::GetInstance()->ChangeTimeMark(value);
+void MenuM::ChkTimemark(GtkButton *button) {
+    gboolean value;
+    value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+    ImgProcM::GetInstance()->ChangeTimeMark(value);
 }
 
-void MenuM::ChgLine(EKnobOper oper)
-{
-	ImgProc2D::GetInstance()->ChangeLineAver(oper);
+void MenuM::ChgLine(EKnobOper oper) {
+    ImgProc2D::GetInstance()->ChangeLineAver(oper);
 }
 
-void MenuM::ChgEnhanceM(EKnobOper oper)
-{
-	ImgProcM::GetInstance()->ChangeEnhanceM(oper);
+void MenuM::ChgEnhanceM(EKnobOper oper) {
+    ImgProcM::GetInstance()->ChangeEnhanceM(oper);
 }
 
-void MenuM::ChgSmooth(EKnobOper oper)
-{
-	ImgProcM::GetInstance()->ChangeMSmooth(oper);
+void MenuM::ChgSmooth(EKnobOper oper) {
+    ImgProcM::GetInstance()->ChangeMSmooth(oper);
 }
 
 //lhm
-void  MenuM::UpdateDisplayL(void)
-{
+void  MenuM::UpdateDisplayL(void) {
 #if 0
     char path[256];
     SysOptions sysoption;
@@ -279,93 +258,66 @@ void  MenuM::UpdateDisplayL(void)
 #endif
 }
 
-void MenuM::BtnFormatClicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
+void MenuM::BtnFormatClicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
         if (ModeStatus::IsMImgMode())
             FormatM::GetInstance()->ChangeFormat(FormatM::EFormatM(m_format - 1));
         else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuM::BtnFormat1Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
-        if (ModeStatus::IsMImgMode())
-        {
+void MenuM::BtnFormat1Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
+        if (ModeStatus::IsMImgMode()) {
             FormatM::GetInstance()->ChangeFormat(FormatM::M_TOTAL);
             WriteFormatM(FormatM::M_TOTAL);
-        }
-        else
+        } else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuM::BtnFormat2Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
+void MenuM::BtnFormat2Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
         FormatM::GetInstance()->ChangeFormat(FormatM::BM11_UD);
         WriteFormatM(FormatM::BM11_UD);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuM::BtnFormat3Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
+void MenuM::BtnFormat3Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
         FormatM::GetInstance()->ChangeFormat(FormatM::BM21_UD);
         WriteFormatM(FormatM::BM21_UD);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuM::BtnFormat4Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
+void MenuM::BtnFormat4Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
         FormatM::GetInstance()->ChangeFormat(FormatM::BM12_UD);
         WriteFormatM(FormatM::BM12_UD);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuM::BtnFormat5Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
+void MenuM::BtnFormat5Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
         FormatM::GetInstance()->ChangeFormat(FormatM::BM11_LR);
         WriteFormatM(FormatM::BM11_LR);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuM::WriteFormatM(int format)
-{
+void MenuM::WriteFormatM(int format) {
     SysOptions sp;
     //write to config file
     sp.SetDisplayFormatM(format);

@@ -17,8 +17,7 @@
 #include <string>
 #include <vector>
 using namespace std;
-class IniFile
-{
+class IniFile {
 public:
     IniFile(const char* file);
     ~IniFile();
@@ -37,7 +36,7 @@ public:
 
     void RemoveString(const char *group, const char *key);
     void RemoveGroup(const gchar *group);
-  vector <string> GetItemGroup(void);
+    vector <string> GetItemGroup(void);
 
     vector <string> GetGroupName(void);
     vector <string>  GetGroupKey(const char *group);

@@ -4,8 +4,7 @@
 #include <gtk/gtk.h>
 #include "display/FakeXEvent.h"
 
-class ViewPrintSetting : public FakeXEvent
-{
+class ViewPrintSetting : public FakeXEvent {
 public:
     ViewPrintSetting();
     ~ViewPrintSetting();
@@ -31,9 +30,15 @@ private:
     void BtnCancelClicked(GtkButton *button);
     void BtnDefaultClicked(GtkButton *button);
 // signal connect
-    static void on_button_ok_clicked(GtkButton *button, ViewPrintSetting *data) { data->BtnOkClicked(button); }
-    static void on_button_cancel_clicked(GtkButton *button, ViewPrintSetting *data) { data->BtnCancelClicked(button); }
-    static void on_button_default_clicked(GtkButton *button, ViewPrintSetting *data) { data->BtnDefaultClicked(button); }
+    static void on_button_ok_clicked(GtkButton *button, ViewPrintSetting *data) {
+        data->BtnOkClicked(button);
+    }
+    static void on_button_cancel_clicked(GtkButton *button, ViewPrintSetting *data) {
+        data->BtnCancelClicked(button);
+    }
+    static void on_button_default_clicked(GtkButton *button, ViewPrintSetting *data) {
+        data->BtnDefaultClicked(button);
+    }
 };
 
 #endif /* _VIEWPRINTSETTING_H_ */

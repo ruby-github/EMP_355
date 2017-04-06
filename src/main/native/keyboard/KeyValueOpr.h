@@ -21,30 +21,29 @@ using std::vector;
  *.SendKeyValue:	灏嗘帴鏀跺埌鐨勯敭鍊煎彂閫佺粰鍚勪釜绐楀彛
  ***********************************/
 
-class KeyValueOpr
-{
-	public:
-		KeyValueOpr( );
+class KeyValueOpr {
+public:
+    KeyValueOpr( );
 
-		void CtrlLight(bool on, unsigned char lightValue );
-		void Push( AbsKeyboardEvent * win_opr );
-		void Pop( );
-		bool Empty();
-		int Size();
-		AbsKeyboardEvent * GetElement( int n );
-		void SendKeyValue( unsigned char *keyValue );
-		void SetMouseSpeed( int s);
-		int GetMouseSpeed(void);
-		bool IsLighten(unsigned char lightValue);
-		void ListLighten(); //for debug
-	private:
-		int m_mouseSpeed;
-		vector<AbsKeyboardEvent *> WinOprStack;
-		void SendLightValue( unsigned char light_value );
+    void CtrlLight(bool on, unsigned char lightValue );
+    void Push( AbsKeyboardEvent * win_opr );
+    void Pop( );
+    bool Empty();
+    int Size();
+    AbsKeyboardEvent * GetElement( int n );
+    void SendKeyValue( unsigned char *keyValue );
+    void SetMouseSpeed( int s);
+    int GetMouseSpeed(void);
+    bool IsLighten(unsigned char lightValue);
+    void ListLighten(); //for debug
+private:
+    int m_mouseSpeed;
+    vector<AbsKeyboardEvent *> WinOprStack;
+    void SendLightValue( unsigned char light_value );
 
-		vector<unsigned char> m_vecLighten;
-		void AddLighten(unsigned char lightValue);
-		void RemoveLighten(unsigned char lightValue);
+    vector<unsigned char> m_vecLighten;
+    void AddLighten(unsigned char lightValue);
+    void RemoveLighten(unsigned char lightValue);
 };
 
 extern KeyValueOpr g_keyInterface;

@@ -6,8 +6,7 @@
 
 using std::string;
 
-class ImageAreaPara
-{
+class ImageAreaPara {
 public:
     ~ImageAreaPara();
     static ImageAreaPara* GetInstance();
@@ -71,7 +70,7 @@ public:
     void UpdateCfmDopplerFreq(const char* freq, bool draw=TRUE);
     void UpdatePdiDopplerFreq(const char* freq, bool draw=TRUE);
     void UpdateDepth(int depth, bool draw=TRUE);
-	void FillRectangle(int x, int y, int w, int h);
+    void FillRectangle(int x, int y, int w, int h);
 
 #ifdef TRANSDUCER
     void UpdateTransducer(int data,bool draw =TRUE);
@@ -92,7 +91,7 @@ private:
 
     char m_bufText[100];
     char m_freq[100];
-	char m_freqDoppler[100];
+    char m_freqDoppler[100];
     int m_depth;
 
     int m_pwr;
@@ -137,9 +136,9 @@ private:
     bool m_optimize;
 
     ImageArea::DrawAttr m_attr;
-	static const int m_eareH = 20;
-	static const int m_eareWl = 220;
-	static const int m_eareWs = 40;
+    static const int m_eareH = 20;
+    static const int m_eareWl = 220;
+    static const int m_eareWs = 40;
 
 };
 #endif

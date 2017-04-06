@@ -4,8 +4,7 @@
 #include <gtk/gtk.h>
 
 class FakeXEvent;
-class ViewPPDSelect : public FakeXEvent
-{
+class ViewPPDSelect : public FakeXEvent {
 public:
     ~ViewPPDSelect();
     static ViewPPDSelect* GetInstance();
@@ -21,8 +20,8 @@ private:
     enum {
         NAME,
         PATH,
-		SIZE,
-		MODIFIED,
+        SIZE,
+        MODIFIED,
         NUM_COLS
     };
 
@@ -36,9 +35,15 @@ private:
     void BtnCancelClicked(GtkButton *button);
 
 // signal connect
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewPPDSelect *data) { return data->WindowDeleteEvent(widget, event); }
-    static void on_button_open_clicked(GtkButton *button, ViewPPDSelect *data) { data->BtnOpenClicked(button); }
-    static void on_button_cancel_clicked(GtkButton *button, ViewPPDSelect *data) { data->BtnCancelClicked(button); }
+    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewPPDSelect *data) {
+        return data->WindowDeleteEvent(widget, event);
+    }
+    static void on_button_open_clicked(GtkButton *button, ViewPPDSelect *data) {
+        data->BtnOpenClicked(button);
+    }
+    static void on_button_cancel_clicked(GtkButton *button, ViewPPDSelect *data) {
+        data->BtnCancelClicked(button);
+    }
 };
 
 #endif /* _VIEWPPDSELECT_H_ */

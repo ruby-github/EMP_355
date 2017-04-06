@@ -23,8 +23,7 @@ using std::vector;
 ViewQueryRetrieve* ViewQueryRetrieve::m_ptrInstance = NULL;
 PatientInfo ViewQueryRetrieve::m_patientInfo;
 
-ViewQueryRetrieve::ViewQueryRetrieve()
-{
+ViewQueryRetrieve::ViewQueryRetrieve() {
     SysGeneralSetting sys;
     m_dateFormat = sys.GetDateFormat();
 
@@ -37,22 +36,19 @@ ViewQueryRetrieve::ViewQueryRetrieve()
     m_retrieveFlag = false;
 }
 
-ViewQueryRetrieve::~ViewQueryRetrieve()
-{
+ViewQueryRetrieve::~ViewQueryRetrieve() {
     if (m_ptrInstance != NULL)
         delete m_ptrInstance;
 }
 
-ViewQueryRetrieve* ViewQueryRetrieve::GetInstance()
-{
+ViewQueryRetrieve* ViewQueryRetrieve::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new ViewQueryRetrieve;
 
     return m_ptrInstance;
 }
 #ifndef VET
-GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent)
-{
+GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent) {
     GtkWidget *window_query_retrieve;
     GtkWidget *fixed_window;
     GtkWidget *frame_query;
@@ -61,8 +57,8 @@ GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent)
     GtkWidget *label_ID;
     GtkWidget *label_name;
     GtkWidget *label_accession;
-   // GtkWidget *label_gender;
-   // GtkWidget *combobox_gender;
+    // GtkWidget *label_gender;
+    // GtkWidget *combobox_gender;
     GtkWidget *label_exam;
     GtkWidget *label_to;
     GtkWidget *button_query;
@@ -230,8 +226,8 @@ GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent)
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrollWin_source), GTK_SHADOW_IN);
 
     m_treeview_source = create_query_treeview();
-	gtk_container_add(GTK_CONTAINER(scrollWin_source), m_treeview_source);
-	gtk_widget_set_size_request (m_treeview_source, 780+210, 260+80);
+    gtk_container_add(GTK_CONTAINER(scrollWin_source), m_treeview_source);
+    gtk_widget_set_size_request (m_treeview_source, 780+210, 260+80);
     gtk_widget_show (m_treeview_source);
 
     m_checkbutton_select_all = gtk_check_button_new_with_mnemonic (_("Select All"));
@@ -252,10 +248,8 @@ GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent)
     gtk_widget_set_size_request (m_combobox_device, 100, 30);
 
     vector<string> group_device_service = CDCMMan::GetMe()->GetAllRetrieveDestinationServerDevice();
-    if(group_device_service.size()>0)
-    {
-        for(int i = 0;i<group_device_service.size();i++)
-        {
+    if(group_device_service.size()>0) {
+        for(int i = 0; i<group_device_service.size(); i++) {
             gtk_combo_box_insert_text (GTK_COMBO_BOX (m_combobox_device),i,group_device_service[i].c_str());
             if(strcmp(group_device_service[i].c_str(),"localhost")==0)
                 gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_device),i);
@@ -286,8 +280,8 @@ GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent)
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrollWin_destination), GTK_SHADOW_IN);
 
     m_treeview_detination = create_retrieve_treeview();
-	gtk_container_add(GTK_CONTAINER(scrollWin_destination), m_treeview_detination);
-	gtk_widget_set_size_request (m_treeview_detination, 780+210, 260+20);
+    gtk_container_add(GTK_CONTAINER(scrollWin_destination), m_treeview_detination);
+    gtk_widget_set_size_request (m_treeview_detination, 780+210, 260+20);
     gtk_widget_show (m_treeview_detination);
 
     button_quit = gtk_button_new_with_mnemonic (_("Exit"));
@@ -306,8 +300,7 @@ GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent)
     return window_query_retrieve;
 }
 
-void ViewQueryRetrieve::SetProgressBar(double fraction)
-{
+void ViewQueryRetrieve::SetProgressBar(double fraction) {
     PRINTF("---------SetProgressBar:%f\n",fraction);
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_progress_bar), fraction);
     char text_buf[10];
@@ -316,8 +309,7 @@ void ViewQueryRetrieve::SetProgressBar(double fraction)
     gtk_widget_show_all(m_progress_bar);
 }
 
-GtkWidget* ViewQueryRetrieve::create_query_treeview()
-{
+GtkWidget* ViewQueryRetrieve::create_query_treeview() {
     GtkWidget *treeview;
     GtkTreeModel *model = NULL;
     GtkCellRenderer *renderer;
@@ -325,26 +317,26 @@ GtkWidget* ViewQueryRetrieve::create_query_treeview()
 
     treeview = gtk_tree_view_new ();
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
+    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
     renderer = gtk_cell_renderer_toggle_new ();
-	g_signal_connect (G_OBJECT(renderer), "toggled", G_CALLBACK (HandleToggleRecord), this);
-	column = gtk_tree_view_column_new_with_attributes ("", renderer, "active", COL_CHECKED_S, NULL);
+    g_signal_connect (G_OBJECT(renderer), "toggled", G_CALLBACK (HandleToggleRecord), this);
+    column = gtk_tree_view_column_new_with_attributes ("", renderer, "active", COL_CHECKED_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 30, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 30, NULL);
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("patient ID"), renderer, "text", COL_PATIENT_ID_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Name"), renderer, "text", COL_NAME_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Gender"), renderer, "text", COL_Gender_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Accession Number"), renderer, "text", COL_ACCESSION_NUMBER_S, NULL);
@@ -352,47 +344,45 @@ GtkWidget* ViewQueryRetrieve::create_query_treeview()
     g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Birth Date"), renderer, "text", COL_BIRTH_DATE_S, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Birth Date"), renderer, "text", COL_BIRTH_DATE_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Exam Date"), renderer, "text", COL_EXAM_DATE_S, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Exam Date"), renderer, "text", COL_EXAM_DATE_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Exam Description"), renderer, "text", COL_EXAM_DESCRIPTION_S, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Exam Description"), renderer, "text", COL_EXAM_DESCRIPTION_S, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 200, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 200, NULL);
 
     model = create_query_model();
     if (model != NULL)
-		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
+        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
     g_object_unref (model);
 
-	return treeview;
+    return treeview;
 }
 
-GtkTreeModel* ViewQueryRetrieve::create_query_model()
-{
+GtkTreeModel* ViewQueryRetrieve::create_query_model() {
     GtkListStore *store;
 
     store = gtk_list_store_new(NUM_COLS_S,
-			G_TYPE_BOOLEAN,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING);
+                               G_TYPE_BOOLEAN,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
 
-	return GTK_TREE_MODEL (store);
+    return GTK_TREE_MODEL (store);
 }
 
-GtkWidget* ViewQueryRetrieve::create_retrieve_treeview()
-{
+GtkWidget* ViewQueryRetrieve::create_retrieve_treeview() {
     GtkWidget *treeview;
     GtkTreeModel *model = NULL;
     GtkCellRenderer *renderer;
@@ -400,37 +390,37 @@ GtkWidget* ViewQueryRetrieve::create_retrieve_treeview()
 
     treeview = gtk_tree_view_new ();
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
+    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("patient ID"), renderer, "text", COL_PATIENT_ID_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Name"), renderer, "text", COL_NAME_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Gender"), renderer, "text", COL_Gender_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Age"), renderer, "text", COL_AGE_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Stature"), renderer, "text", COL_SIZE_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Weight"), renderer, "text", COL_WEIGHT_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Accession Number"), renderer, "text", COL_ACCESSION_NUMBER_D, NULL);
@@ -438,14 +428,14 @@ GtkWidget* ViewQueryRetrieve::create_retrieve_treeview()
     g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Birth Date"), renderer, "text", COL_BIRTH_DATE_D, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Birth Date"), renderer, "text", COL_BIRTH_DATE_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Exam Date"), renderer, "text", COL_EXAM_DATE_D, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Exam Date"), renderer, "text", COL_EXAM_DATE_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Exam Time"), renderer, "text", COL_EXAM_TIME_D, NULL);
@@ -458,65 +448,61 @@ GtkWidget* ViewQueryRetrieve::create_retrieve_treeview()
     g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 130, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Exam Description"), renderer, "text", COL_EXAM_DESCRIPTION_D, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Exam Description"), renderer, "text", COL_EXAM_DESCRIPTION_D, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 200, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 200, NULL);
 
     model = create_retrieve_model();
     if (model != NULL)
-		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
+        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
     g_object_unref (model);
 
-	return treeview;
+    return treeview;
 }
 
-GtkTreeModel* ViewQueryRetrieve::create_retrieve_model()
-{
+GtkTreeModel* ViewQueryRetrieve::create_retrieve_model() {
     GtkListStore *store;
 
     store = gtk_list_store_new(NUM_COLS_D,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING);
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
 
-	return GTK_TREE_MODEL (store);
+    return GTK_TREE_MODEL (store);
 }
 
-void ViewQueryRetrieve::ToggleRecord(GtkCellRendererToggle *cell, gchar *path_str)
-{
-	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(m_treeview_source));
-	GtkTreeIter  iter;
-	GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
-	gboolean checked;
+void ViewQueryRetrieve::ToggleRecord(GtkCellRendererToggle *cell, gchar *path_str) {
+    GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(m_treeview_source));
+    GtkTreeIter  iter;
+    GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
+    gboolean checked;
 
-	/* get toggled iter */
-	gtk_tree_model_get_iter (model, &iter, path);
-	gtk_tree_model_get (model, &iter, COL_CHECKED_S, &checked, -1);
+    /* get toggled iter */
+    gtk_tree_model_get_iter (model, &iter, path);
+    gtk_tree_model_get (model, &iter, COL_CHECKED_S, &checked, -1);
 
-	/* do something with the value */
-	checked ^= 1; //鎸変綅寮傛垨
+    /* do something with the value */
+    checked ^= 1; //鎸変綅寮傛垨
 
-	/* set new value */
+    /* set new value */
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED_S, checked, -1);
 
     gtk_widget_set_sensitive(m_button_retrieve,false);
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_device));
     bool exist = gtk_tree_model_get_iter_first(model, &iter);
     bool isSelect = false;
-    while(exist)
-    {
+    while(exist) {
         gtk_tree_model_get(model, &iter, COL_CHECKED_S, &isSelect, -1);
-        if (isSelect)
-        {
+        if (isSelect) {
             if(device != NULL)
                 gtk_widget_set_sensitive(m_button_retrieve,true);
         }
@@ -524,128 +510,112 @@ void ViewQueryRetrieve::ToggleRecord(GtkCellRendererToggle *cell, gchar *path_st
     }
 
     /* clean up */
-	gtk_tree_path_free (path);
+    gtk_tree_path_free (path);
 }
 
-void ViewQueryRetrieve::StartCalendarPress(GtkWidget *widget, GdkEventButton *event)
-{
-	ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::START, this);
+void ViewQueryRetrieve::StartCalendarPress(GtkWidget *widget, GdkEventButton *event) {
+    ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::START, this);
 }
 #ifndef VET
-void ViewQueryRetrieve::SetStartDate(int year, int month, int day)
-{
+void ViewQueryRetrieve::SetStartDate(int year, int month, int day) {
     char buf[256];
-    switch(m_dateFormat)
-    {
-        case 0:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
-        case 1:
-            sprintf(buf,"%02d/%02d/%04d",month,day,year);
-            break;
-        case 2:
-            sprintf(buf,"%02d/%02d/%04d",day,month,year);
-            break;
-        default:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
+    switch(m_dateFormat) {
+    case 0:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
+    case 1:
+        sprintf(buf,"%02d/%02d/%04d",month,day,year);
+        break;
+    case 2:
+        sprintf(buf,"%02d/%02d/%04d",day,month,year);
+        break;
+    default:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
     }
     sprintf(startDate,"%04d%02d%02d",year,month,day);
     gtk_entry_set_text(GTK_ENTRY(m_entry_exam1),buf);
 
 }
 
-void ViewQueryRetrieve::EndCalendarPress(GtkWidget *widget, GdkEventButton *event)
-{
-	ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::END, this);
+void ViewQueryRetrieve::EndCalendarPress(GtkWidget *widget, GdkEventButton *event) {
+    ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::END, this);
 }
 
-void ViewQueryRetrieve::SetEndDate(int year, int month, int day)
-{
+void ViewQueryRetrieve::SetEndDate(int year, int month, int day) {
     char buf[256];
-    switch(m_dateFormat)
-    {
-        case 0:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
-        case 1:
-            sprintf(buf,"%02d/%02d/%04d",month,day,year);
-            break;
-        case 2:
-            sprintf(buf,"%02d/%02d/%04d",day,month,year);
-            break;
-        default:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
+    switch(m_dateFormat) {
+    case 0:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
+    case 1:
+        sprintf(buf,"%02d/%02d/%04d",month,day,year);
+        break;
+    case 2:
+        sprintf(buf,"%02d/%02d/%04d",day,month,year);
+        break;
+    default:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
     }
     sprintf(endDate,"%04d%02d%02d",year,month,day);
     gtk_entry_set_text(GTK_ENTRY(m_entry_exam2),buf);
 }
 #endif
-void ViewQueryRetrieve::ButtonQueryClicked(GtkButton *button)
-{
+void ViewQueryRetrieve::ButtonQueryClicked(GtkButton *button) {
     QueryRes.clear();
     const char *patientName = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
     const char *patientID = gtk_entry_get_text(GTK_ENTRY(m_entry_ID));
     const char *accessionNumber = gtk_entry_get_text(GTK_ENTRY(m_entry_accession));
     //const char *startStudyDate = gtk_entry_get_text(GTK_ENTRY(m_entry_exam1));
     //const char *endStudyDate = gtk_entry_get_text(GTK_ENTRY(m_entry_exam2));
-	char name[256] = {0};
-	snprintf(name, 256, "*%s*", patientName);
-	name[255] = '\0';
+    char name[256] = {0};
+    snprintf(name, 256, "*%s*", patientName);
+    name[255] = '\0';
     EDCMReturnStatus status = CDCMMan::GetMe()->Query(name,patientID,accessionNumber,startDate,endDate,QueryRes);
-    if(status == DCMSUCCESS)
-    {
+    if(status == DCMSUCCESS) {
         GtkTreeModel *model;
         GtkTreeIter iter;
 
         model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_source));
         gtk_list_store_clear(GTK_LIST_STORE(model));
 
-        for(int i= 0;i<QueryRes.size();i++)
-        {
-			string patientName;
-			ChangePersonNameFormatForShow(QueryRes[i].qrPatientName, patientName);
+        for(int i= 0; i<QueryRes.size(); i++) {
+            string patientName;
+            ChangePersonNameFormatForShow(QueryRes[i].qrPatientName, patientName);
             gtk_list_store_append(GTK_LIST_STORE(model), &iter);
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                    COL_CHECKED_S,FALSE,
-                    COL_PATIENT_ID_S,QueryRes[i].qrPatientID.c_str(),
-                    COL_NAME_S,patientName.c_str(),
-                    COL_Gender_S,QueryRes[i].qrPatientSex.c_str(),
-                    COL_ACCESSION_NUMBER_S,QueryRes[i].qrAccessionNumber.c_str(),
-                    COL_BIRTH_DATE_S,QueryRes[i].qrPatientBirthDate.c_str(),
-                    COL_EXAM_DATE_S,QueryRes[i].qrStudyDate.c_str(),
-                    COL_EXAM_DESCRIPTION_S,QueryRes[i].qrStudyDescription.c_str(),
-                    -1);
+                               COL_CHECKED_S,FALSE,
+                               COL_PATIENT_ID_S,QueryRes[i].qrPatientID.c_str(),
+                               COL_NAME_S,patientName.c_str(),
+                               COL_Gender_S,QueryRes[i].qrPatientSex.c_str(),
+                               COL_ACCESSION_NUMBER_S,QueryRes[i].qrAccessionNumber.c_str(),
+                               COL_BIRTH_DATE_S,QueryRes[i].qrPatientBirthDate.c_str(),
+                               COL_EXAM_DATE_S,QueryRes[i].qrStudyDate.c_str(),
+                               COL_EXAM_DESCRIPTION_S,QueryRes[i].qrStudyDescription.c_str(),
+                               -1);
             gtk_tree_model_iter_next(model, &iter);
         }
-    }
-    else if(status == DCMNODEFALUTSERVER)
-    {
+    } else if(status == DCMNODEFALUTSERVER) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No default server!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("No default server!"),
+                                          NULL);
 
-    }
-    else if(status == DCMCONNECTIONFAILURE)
-    {
+    } else if(status == DCMCONNECTIONFAILURE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("Server connection is failed!"),
-                NULL);
-    }
-    else
-    {
+                                          ViewDialog::INFO,
+                                          _("Server connection is failed!"),
+                                          NULL);
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("Query unsuccessfully!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("Query unsuccessfully!"),
+                                          NULL);
     }
 }
 
-void ViewQueryRetrieve::ButtonClearClicked(GtkButton *button)
-{
+void ViewQueryRetrieve::ButtonClearClicked(GtkButton *button) {
     gtk_entry_set_text(GTK_ENTRY(m_entry_ID),"");
     gtk_entry_set_text(GTK_ENTRY(m_entry_name),"");
     gtk_entry_set_text(GTK_ENTRY(m_entry_accession),"");
@@ -653,18 +623,16 @@ void ViewQueryRetrieve::ButtonClearClicked(GtkButton *button)
     gtk_entry_set_text(GTK_ENTRY(m_entry_exam2),"");
 }
 
-unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
-{
+unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element) {
     PatientInfo::Info info;
     info.p.id = element.stPatientID;
-	string firstName, midName, lastName;
-	ChangePersonNameFormat(element.stPatientName, firstName, lastName, midName);
+    string firstName, midName, lastName;
+    ChangePersonNameFormat(element.stPatientName, firstName, lastName, midName);
     info.p.name.last = lastName;
     info.p.name.first = firstName;
     info.p.name.mid = midName;
 
-    if(element.stPatientSex.c_str() !=NULL)
-    {
+    if(element.stPatientSex.c_str() !=NULL) {
         string sex = element.stPatientSex;
         if(strcmp(sex.c_str(),"F")==0)
             info.p.sex = 0;
@@ -677,12 +645,10 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
         else
             info.p.sex = -1;
 
-    }
-    else
+    } else
         info.p.sex = -1;
 
-    if(strlen(element.stPatientAge.c_str())!=0)
-    {
+    if(strlen(element.stPatientAge.c_str())!=0) {
         string age = element.stPatientAge;
         int age_len = strlen(age.c_str());
         char str[256]="\0";
@@ -697,15 +663,12 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
             info.p.ageUnit = 1;
         else if(strcmp(str_tmp,"D")==0)
             info.p.ageUnit = 2;
-    }
-    else
-    {
+    } else {
         info.p.age = 0;
         info.p.ageUnit = 0;
     }
 
-    if(strlen(element.stPatientBirthDate.c_str())!=0)
-    {
+    if(strlen(element.stPatientBirthDate.c_str())!=0) {
         string birthDate = element.stPatientBirthDate;
         char birth_year[100] = "\0";
         char birth_month[100] = "\0";
@@ -716,9 +679,7 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.p.birthDate.year = atoi(birth_year);
         info.p.birthDate.month = atoi(birth_month);
         info.p.birthDate.day = atoi(birth_day);
-    }
-    else
-    {
+    } else {
         info.p.birthDate.year =0;
         info.p.birthDate.month = 0;
         info.p.birthDate.day = 0;
@@ -748,8 +709,7 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.e.weight = 0.0;
 
     info.e.BSA =0.0;
-    if(strlen(element.stStudyDate.c_str())!=0)
-    {
+    if(strlen(element.stStudyDate.c_str())!=0) {
         string studyDate = element.stStudyDate;
         char exam_year[100] = "\0";
         char exam_month[100] = "\0";
@@ -761,16 +721,13 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.e.examDate.year = atoi(exam_year);
         info.e.examDate.month = atoi(exam_month);
         info.e.examDate.day = atoi(exam_day);
-    }
-    else
-    {
+    } else {
         info.e.examDate.year = 0;
         info.e.examDate.month =0;
         info.e.examDate.day = 0;
     }
 
-    if(strlen(element.stStudyTime.c_str())!=0)
-    {
+    if(strlen(element.stStudyTime.c_str())!=0) {
         string studyTime= element.stStudyTime;
         char exam_hour[100] = "\0";
         char exam_minute[100] = "\0";
@@ -782,15 +739,13 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.e.examTime.hour = atoi(exam_hour);
         info.e.examTime.second = atoi(exam_second);
         info.e.examTime.minute = atoi(exam_minute);
-    }
-    else
-    {
+    } else {
         info.e.examTime.hour = 0;
         info.e.examTime.second = 0;
         info.e.examTime.minute = 0;
     }
 
-	ChangePersonNameFormatForShow(element.stStudyDoctor, info.e.examDoctor);
+    ChangePersonNameFormatForShow(element.stStudyDoctor, info.e.examDoctor);
     info.e.comment = element.stStudyDescription;
     info.e.reportDoctor = "";
 
@@ -823,13 +778,10 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
     string errmsg;
     string studyNo;
     Database db;
-	if (db.ArchivePat(info,errmsg))
-    {
-		db.GetExamIDCurrent(info.e.examNum);
+    if (db.ArchivePat(info,errmsg)) {
+        db.GetExamIDCurrent(info.e.examNum);
         printf("Achieve successfully!\n");
-    }
-    else
-    {
+    } else {
 
         printf("Achieve unsuccessfully!\n");
     }
@@ -843,39 +795,34 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element)
     return m_ptrInstance->m_studyNo;
 }
 
-void ViewQueryRetrieve::CreateExamDir(int examNum)
-{
+void ViewQueryRetrieve::CreateExamDir(int examNum) {
     gchar *path;
-	gchar buf[100];
+    gchar buf[100];
 
     char strExamNum[100];
     sprintf(strExamNum, "%d", examNum);
-	path = g_build_path(G_DIR_SEPARATOR_S, STORE_PATH, strExamNum, NULL);
-	if (g_access(path, F_OK) == 0)
-	{
-		PRINTF("-----------------------folder of store path %d is exist, path = %s\n", examNum, path);
-		sprintf(buf, "rm -rf %s\n", path);
-		FileMan fm;
-		if (fm.DelDirectory(buf) == -1)
-		{
-			perror("rmdir fail!");
-			PRINTF("delete folder of store path 0 error\n");
-			g_free(path);
-			return;
-		}
-	}
+    path = g_build_path(G_DIR_SEPARATOR_S, STORE_PATH, strExamNum, NULL);
+    if (g_access(path, F_OK) == 0) {
+        PRINTF("-----------------------folder of store path %d is exist, path = %s\n", examNum, path);
+        sprintf(buf, "rm -rf %s\n", path);
+        FileMan fm;
+        if (fm.DelDirectory(buf) == -1) {
+            perror("rmdir fail!");
+            PRINTF("delete folder of store path 0 error\n");
+            g_free(path);
+            return;
+        }
+    }
 
-	if (g_mkdir(path, 0755) == -1)
-	{
-		PRINTF("create folder of store path %d error\n", examNum);
-	}
+    if (g_mkdir(path, 0755) == -1) {
+        PRINTF("create folder of store path %d error\n", examNum);
+    }
 
-	g_free(path);
+    g_free(path);
 
 }
 
-string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned char *pImageBuf, unsigned long bufLen)
-{
+string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned char *pImageBuf, unsigned long bufLen) {
     m_ptrInstance->CreateExamDir(m_ptrInstance->m_studyNo);
 
     time_t at;
@@ -889,8 +836,7 @@ string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned ch
     memset(fileName, 0, 15);
     sprintf(fileName, "%d%d%d%d%d%d%d%d%d%d%d%d", (ct->tm_year+1900), (ct->tm_mon+1)/10, (ct->tm_mon+1)%10, (ct->tm_mday)/10, (ct->tm_mday)%10, (ct->tm_hour)/10, (ct->tm_hour)%10, (ct->tm_min)/10, (ct->tm_min)%10, (ct->tm_sec)/10, (ct->tm_sec)%10, m_ptrInstance->m_imageNum);
     m_ptrInstance->m_imageNum++;
-    if(element.imgFrameNumber>1)
-    {
+    if(element.imgFrameNumber>1) {
         SysOptions so;
         int format = so.GetCineFormat();
 
@@ -899,13 +845,12 @@ string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned ch
         VideoMan::VideoItem item;
         //item.path =(string)fileName;
         if(videoFormat == 0)
-                item.format = VideoMan::AVI;
+            item.format = VideoMan::AVI;
         else
             item.format = VideoMan::CINE;
         item.data = pImageBuf;
 
-        for(int i = 0;i<element.imgFrameNumber;i++)
-        {
+        for(int i = 0; i<element.imgFrameNumber; i++) {
             Image::AutoTracePara para;
             Image image((unsigned int*)pImageBuf, para);
             pImageBuf=pImageBuf+IMG_AREA_W*IMG_AREA_H*IMG_BPP;
@@ -920,21 +865,18 @@ string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned ch
         VideoMan::GetInstance()->SaveVideoForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item);
         m_ptrInstance->deq.clear();
 
-        switch(format)
-        {
-            case VideoMan::CINE:
-                strcat(fileName, ".cine");
-                break;
-            case VideoMan::AVI:
-                strcat(fileName, ".avi");
-                break;
-            default:
-                strcat(fileName, ".avi");
-                break;
+        switch(format) {
+        case VideoMan::CINE:
+            strcat(fileName, ".cine");
+            break;
+        case VideoMan::AVI:
+            strcat(fileName, ".avi");
+            break;
+        default:
+            strcat(fileName, ".avi");
+            break;
         }
-    }
-    else if (element.imgFrameNumber == 1)
-    {
+    } else if (element.imgFrameNumber == 1) {
         SysOptions so;
         int format = so.GetImageFormat();
 
@@ -949,29 +891,27 @@ string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned ch
         ImgMan::ImgItem item_frm;
         int format_bak = ImgMan::GetInstance()->GetImgFormat();
 
-        if(ImgMan::GetInstance()->SaveSnapForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item) == 0)
-        {
+        if(ImgMan::GetInstance()->SaveSnapForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item) == 0) {
             ImgMan::GetInstance()->SetImgFormat(ImgMan::FRM);
             ImgMan::GetInstance()->SaveSnapForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item_frm);
             ImgMan::GetInstance()->SetImgFormat(format_bak);
         }
-        switch(format)
-        {
-            case ImgMan::FRM:
-                strcat(fileName, ".frm");
-                break;
-            case ImgMan::EMP:
-                strcat(fileName, ".emp");
-                break;
-            case ImgMan::BMP:
-                strcat(fileName, ".bmp");
-                break;
-            case ImgMan::JPEG:
-                strcat(fileName, ".jpg");
-                break;
-            default:
-                strcat(fileName, ".bmp");
-                break;
+        switch(format) {
+        case ImgMan::FRM:
+            strcat(fileName, ".frm");
+            break;
+        case ImgMan::EMP:
+            strcat(fileName, ".emp");
+            break;
+        case ImgMan::BMP:
+            strcat(fileName, ".bmp");
+            break;
+        case ImgMan::JPEG:
+            strcat(fileName, ".jpg");
+            break;
+        default:
+            strcat(fileName, ".bmp");
+            break;
         }
     }
 
@@ -992,8 +932,7 @@ string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned ch
     return imgFileName;
 }
 
-void ViewQueryRetrieve::GetDCMSRElement(DCMSRELEMENT element)
-{
+void ViewQueryRetrieve::GetDCMSRElement(DCMSRELEMENT element) {
     m_ptrInstance->m_srIndication = element.srIndication;
     m_ptrInstance->m_srComments = element.srComments;
     m_ptrInstance->m_srReferenceImageFilename = element.srReferenceImageFilename;
@@ -1005,30 +944,24 @@ void ViewQueryRetrieve::GetDCMSRElement(DCMSRELEMENT element)
 #endif
 }
 
-void ViewQueryRetrieve::SetProgressPos(int nPos)
-{
+void ViewQueryRetrieve::SetProgressPos(int nPos) {
     gdouble frac;
     int size = m_ptrInstance->vecIndex.size();
-    if(size >= 2)
-    {
+    if(size >= 2) {
         gdouble x1 = m_ptrInstance->m_itemIndex/(gdouble)size;
         gdouble x2 = 1/(gdouble)size;
         frac = x1 + nPos*0.01*x2;
-    }
-    else
-    {
+    } else {
         frac = nPos*0.01;
     }
-    if(frac>= 0 && frac <= 1.0)
-    {
+    if(frac>= 0 && frac <= 1.0) {
         m_ptrInstance->SetProgressBar(frac);
         while (gtk_events_pending())
             gtk_main_iteration();
     }
 }
 
-void ViewQueryRetrieve::ChkSelectAllToggled(GtkToggleButton *togglebutton)
-{
+void ViewQueryRetrieve::ChkSelectAllToggled(GtkToggleButton *togglebutton) {
     if(QueryRes.size()==0)
         return;
     GtkTreeModel *model;
@@ -1036,30 +969,24 @@ void ViewQueryRetrieve::ChkSelectAllToggled(GtkToggleButton *togglebutton)
     GtkTreeIter iter;
     m_isSelect = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_select_all));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_source));
-    if(m_isSelect)
-    {
+    if(m_isSelect) {
         exist = gtk_tree_model_get_iter_first(model, &iter);
-        while(exist)
-        {
+        while(exist) {
             gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_CHECKED_S, TRUE, -1);
             exist = gtk_tree_model_iter_next(model, &iter);
         }
         gtk_widget_set_sensitive(m_button_retrieve,true);
-    }
-    else
-    {
+    } else {
         gtk_widget_set_sensitive(m_button_retrieve,false);
         exist = gtk_tree_model_get_iter_first(model, &iter);
-        while(exist)
-        {
+        while(exist) {
             gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_CHECKED_S, false, -1);
             exist = gtk_tree_model_iter_next(model, &iter);
         }
     }
 }
 
-void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button)
-{
+void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_device));
 
     vecIndex.clear();
@@ -1070,11 +997,9 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button)
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_source));
     exist = gtk_tree_model_get_iter_first(model, &iter);
-    while(exist)
-    {
+    while(exist) {
         gtk_tree_model_get(model, &iter, COL_CHECKED_S, &isSelect, -1);
-        if (isSelect)
-        {
+        if (isSelect) {
             GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
             char *path_string = gtk_tree_path_to_string(path);
             int path_num = atoi(path_string);
@@ -1089,60 +1014,48 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button)
     while (gtk_events_pending())
         gtk_main_iteration();
     int size = vecIndex.size();
-    if((size>0)&&(device != NULL))
-    {
+    if((size>0)&&(device != NULL)) {
         Replay::GetInstance()->ClearCurReplayData();
         Replay::GetInstance()->DisplayReplayBar();
 
-        for(int i=0;i<size;i++)
-        {
+        for(int i=0; i<size; i++) {
             m_ptrInstance->m_itemIndex = i;
             InsertPatInfo(vecIndex[i],device,size);
         }
-       if(size >1)
-       {
-        char info[256];
-        sprintf(info, "%s\n%s %d\n%s %d", _("Retrieve finished!"), _("Success:"), m_count_success,  _("Fail:"), m_count_failed);
+        if(size >1) {
+            char info[256];
+            sprintf(info, "%s\n%s %d\n%s %d", _("Retrieve finished!"), _("Success:"), m_count_success,  _("Fail:"), m_count_failed);
 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              ViewDialog::INFO,
+                                              info,
+                                              NULL);
+            m_count_failed =0;
+            m_count_success = 0;
+        }
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-            ViewDialog::INFO,
-            info,
-            NULL);
-        m_count_failed =0;
-        m_count_success = 0;
-       }
-    }
-    else
-    {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No record or device is selected!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("No record or device is selected!"),
+                                          NULL);
         return;
     }
 #if 0
-    if(m_isSelect)
-    {
+    if(m_isSelect) {
         int size = m_ptrInstance->QueryRes.size();
-        if((device != NULL)&&(size>0))
-        {
-            for(int i=0;i<size;i++)
-            {
+        if((device != NULL)&&(size>0)) {
+            for(int i=0; i<size; i++) {
                 m_ptrInstance->m_itemIndex = i;
                 InsertPatInfo(i,(string)device);
             }
-        }
-        else
-        {
+        } else {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("No record or server existed!"),
-                    NULL);
+                                              ViewDialog::INFO,
+                                              _("No record or server existed!"),
+                                              NULL);
             return;
         }
-    }
-    else
-    {
+    } else {
         GtkTreeModel *model;
         gboolean exist;
         GtkTreeIter iter;
@@ -1150,11 +1063,9 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button)
 
         model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_source));
         exist = gtk_tree_model_get_iter_first(model, &iter);
-        while(exist)
-        {
+        while(exist) {
             gtk_tree_model_get(model, &iter, COL_CHECKED, &isSelect, -1);
-            if (isSelect)
-            {
+            if (isSelect) {
                 GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
                 char *path_string = gtk_tree_path_to_string(path);
                 int path_num = atoi(path_string);
@@ -1166,46 +1077,36 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button)
         }
 
         int size = vecIndex.size();
-        if((size>0)&&(device != NULL))
-        {
-            for(int i=0;i<size;i++)
-            {
+        if((size>0)&&(device != NULL)) {
+            for(int i=0; i<size; i++) {
                 InsertPatInfo(vecIndex[i],device);
             }
-        }
-        else
-        {
+        } else {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("No record or device is selected!"),
-                    NULL);
+                                              ViewDialog::INFO,
+                                              _("No record or device is selected!"),
+                                              NULL);
             return;
         }
     }
 #endif
 }
 
-void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
-{
-   m_ptrInstance->m_srIndication = "";
-   m_ptrInstance->m_srComments = "";
-   m_ptrInstance->m_srReferenceImageFilename.clear();
+void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
+    m_ptrInstance->m_srIndication = "";
+    m_ptrInstance->m_srComments = "";
+    m_ptrInstance->m_srReferenceImageFilename.clear();
 
-   if(num ==1)
-    {
+    if(num ==1) {
         EDCMReturnStatus status = CDCMMan::GetMe()->Retrieve(index,(string)device,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement, SetProgressPos);
-        if(status == DCMSUCCESS)
-        {
+        if(status == DCMSUCCESS) {
             string errmsg;
             string studyNo;
             Database db;
-            if (db.ArchivePat(m_ptrInstance->m_info,errmsg))
-            {
+            if (db.ArchivePat(m_ptrInstance->m_info,errmsg)) {
                 db.GetExamIDCurrent(m_ptrInstance->m_info.e.examNum);
                 PRINTF("Achieve successfully!\n");
-            }
-            else
-            {
+            } else {
                 PRINTF("Achieve unsuccessfully!\n");
             }
             SetRetrieveFlag(true);
@@ -1214,12 +1115,12 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
             gchar deststr[512];
             sprintf(deststr, "%s/%d", STORE_PATH, m_ptrInstance->m_studyNo);
 
-           // ViewPrintPreview *ptrVPrintPreview = ViewPrintPreview::GetInstance();
-           // delete ptrVPrintPreview;
+            // ViewPrintPreview *ptrVPrintPreview = ViewPrintPreview::GetInstance();
+            // delete ptrVPrintPreview;
 
             ViewPrintPreview::GetInstance()->CreatePagesForRetrieve(deststr,m_ptrInstance->m_srIndication,m_ptrInstance->m_srComments,m_ptrInstance->m_srReferenceImageFilename);
 
-          //  delete ViewPrintPreview::GetInstance();
+            //  delete ViewPrintPreview::GetInstance();
             //m_patientInfo.ClearAll();
             ViewReport::GetInstance()->ClearIndicationandComments();
 
@@ -1230,10 +1131,10 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
             char studyTime[125]="\0";
             sprintf(studyTime,"%d",time);
 
-			string patientName;
-			ChangePersonNameFormatForShow(QueryRes[index].qrPatientName, patientName);
-			string doctorName;
-			ChangePersonNameFormatForShow(QueryRes[index].qrStudyDoctor, doctorName);
+            string patientName;
+            ChangePersonNameFormatForShow(QueryRes[index].qrPatientName, patientName);
+            string doctorName;
+            ChangePersonNameFormatForShow(QueryRes[index].qrStudyDoctor, doctorName);
 
             //Size
             char sizeT[256];
@@ -1248,90 +1149,70 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_detination));
             gtk_list_store_append(GTK_LIST_STORE(model), &iter);
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                    COL_PATIENT_ID_D,QueryRes[index].qrPatientID.c_str(),
-                    COL_NAME_D,patientName.c_str(),
-                    COL_Gender_D,QueryRes[index].qrPatientSex.c_str(),
-                    COL_AGE_D,QueryRes[index].qrPatientAge.c_str(),
-                    COL_SIZE_D,sizeT,
-                    COL_WEIGHT_D,weightT,
-                    COL_ACCESSION_NUMBER_D,QueryRes[index].qrAccessionNumber.c_str(),
-                    COL_BIRTH_DATE_D,QueryRes[index].qrPatientBirthDate.c_str(),
-                    COL_EXAM_DATE_D,QueryRes[index].qrStudyDate.c_str(),
-                    COL_EXAM_TIME_D,studyTime,
-                    COL_EXAM_DOCTOR_D,doctorName.c_str(),
-                    COL_EXAM_DESCRIPTION_D,QueryRes[index].qrStudyDescription.c_str(),
-                    -1);
+                               COL_PATIENT_ID_D,QueryRes[index].qrPatientID.c_str(),
+                               COL_NAME_D,patientName.c_str(),
+                               COL_Gender_D,QueryRes[index].qrPatientSex.c_str(),
+                               COL_AGE_D,QueryRes[index].qrPatientAge.c_str(),
+                               COL_SIZE_D,sizeT,
+                               COL_WEIGHT_D,weightT,
+                               COL_ACCESSION_NUMBER_D,QueryRes[index].qrAccessionNumber.c_str(),
+                               COL_BIRTH_DATE_D,QueryRes[index].qrPatientBirthDate.c_str(),
+                               COL_EXAM_DATE_D,QueryRes[index].qrStudyDate.c_str(),
+                               COL_EXAM_TIME_D,studyTime,
+                               COL_EXAM_DOCTOR_D,doctorName.c_str(),
+                               COL_EXAM_DESCRIPTION_D,QueryRes[index].qrStudyDescription.c_str(),
+                               -1);
 
             gtk_tree_model_iter_next(model, &iter);
-        }
-        else if(status == DCMINVALIDQRDESTSERVER)
-        {
+        } else if(status == DCMINVALIDQRDESTSERVER) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("Destination server is invalid!"),
-                    NULL);
-        }
-        else if(status == DCMRETRIEVEFAILURE)
-        {
+                                              ViewDialog::INFO,
+                                              _("Destination server is invalid!"),
+                                              NULL);
+        } else if(status == DCMRETRIEVEFAILURE) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("Retrieve failedly!"),
-                    NULL);
-        }
-        else if(status == DCMNONSUPPORTSTUDYROOT)
-        {
+                                              ViewDialog::INFO,
+                                              _("Retrieve failedly!"),
+                                              NULL);
+        } else if(status == DCMNONSUPPORTSTUDYROOT) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("Not support study root!"),
-                    NULL);
-        }
-        else if(status == DCMNODEFALUTSERVER)
-        {
+                                              ViewDialog::INFO,
+                                              _("Not support study root!"),
+                                              NULL);
+        } else if(status == DCMNODEFALUTSERVER) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("No default server!"),
-                    NULL);
+                                              ViewDialog::INFO,
+                                              _("No default server!"),
+                                              NULL);
 
-        }
-        else if(status == DCMCONNECTIONFAILURE)
-        {
+        } else if(status == DCMCONNECTIONFAILURE) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("Server connection is failed!"),
-                    NULL);
-        }
-        else if(status == DCMSTUDYEXISTED)
-        {
+                                              ViewDialog::INFO,
+                                              _("Server connection is failed!"),
+                                              NULL);
+        } else if(status == DCMSTUDYEXISTED) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("Study has existed!"),
-                    NULL);
-        }
-        else
-        {
+                                              ViewDialog::INFO,
+                                              _("Study has existed!"),
+                                              NULL);
+        } else {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("Retrieve unsuccessfully!"),
-                    NULL);
+                                              ViewDialog::INFO,
+                                              _("Retrieve unsuccessfully!"),
+                                              NULL);
         }
-    }
-    else
-    {
+    } else {
 
         EDCMReturnStatus status = CDCMMan::GetMe()->Retrieve(index,(string)device,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement, SetProgressPos);
-        if(status == DCMSUCCESS)
-        {
+        if(status == DCMSUCCESS) {
             m_count_success++;
             string errmsg;
             string studyNo;
             Database db;
-            if (db.ArchivePat(m_ptrInstance->m_info,errmsg))
-            {
+            if (db.ArchivePat(m_ptrInstance->m_info,errmsg)) {
                 db.GetExamIDCurrent(m_ptrInstance->m_info.e.examNum);
                 PRINTF("Achieve successfully!\n");
-            }
-            else
-            {
+            } else {
                 PRINTF("Achieve unsuccessfully!\n");
             }
             SetRetrieveFlag(true);
@@ -1356,10 +1237,10 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
             char studyTime[125]="\0";
             sprintf(studyTime,"%d",time);
 
-			string patientName;
-			ChangePersonNameFormatForShow(QueryRes[index].qrPatientName, patientName);
-			string doctorName;
-			ChangePersonNameFormatForShow(QueryRes[index].qrStudyDoctor, doctorName);
+            string patientName;
+            ChangePersonNameFormatForShow(QueryRes[index].qrPatientName, patientName);
+            string doctorName;
+            ChangePersonNameFormatForShow(QueryRes[index].qrStudyDoctor, doctorName);
             //Size
             char sizeT[256];
             strcpy(sizeT,QueryRes[index].qrPatientSize.c_str());
@@ -1373,24 +1254,22 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_detination));
             gtk_list_store_append(GTK_LIST_STORE(model), &iter);
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                    COL_PATIENT_ID_D,QueryRes[index].qrPatientID.c_str(),
-                    COL_NAME_D,patientName.c_str(),
-                    COL_Gender_D,QueryRes[index].qrPatientSex.c_str(),
-                    COL_AGE_D,QueryRes[index].qrPatientAge.c_str(),
-                    COL_SIZE_D,sizeT,
-                    COL_WEIGHT_D,weightT,
-                    COL_ACCESSION_NUMBER_D,QueryRes[index].qrAccessionNumber.c_str(),
-                    COL_BIRTH_DATE_D,QueryRes[index].qrPatientBirthDate.c_str(),
-                    COL_EXAM_DATE_D,QueryRes[index].qrStudyDate.c_str(),
-                    COL_EXAM_TIME_D,studyTime,
-                    COL_EXAM_DOCTOR_D,doctorName.c_str(),
-                    COL_EXAM_DESCRIPTION_D,QueryRes[index].qrStudyDescription.c_str(),
-                    -1);
+                               COL_PATIENT_ID_D,QueryRes[index].qrPatientID.c_str(),
+                               COL_NAME_D,patientName.c_str(),
+                               COL_Gender_D,QueryRes[index].qrPatientSex.c_str(),
+                               COL_AGE_D,QueryRes[index].qrPatientAge.c_str(),
+                               COL_SIZE_D,sizeT,
+                               COL_WEIGHT_D,weightT,
+                               COL_ACCESSION_NUMBER_D,QueryRes[index].qrAccessionNumber.c_str(),
+                               COL_BIRTH_DATE_D,QueryRes[index].qrPatientBirthDate.c_str(),
+                               COL_EXAM_DATE_D,QueryRes[index].qrStudyDate.c_str(),
+                               COL_EXAM_TIME_D,studyTime,
+                               COL_EXAM_DOCTOR_D,doctorName.c_str(),
+                               COL_EXAM_DESCRIPTION_D,QueryRes[index].qrStudyDescription.c_str(),
+                               -1);
 
             gtk_tree_model_iter_next(model, &iter);
-        }
-        else
-        {
+        } else {
             m_count_failed ++;
         }
 
@@ -1398,27 +1277,22 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num)
     m_imageNum = 0;
 }
 
-void ViewQueryRetrieve::SetRetrieveFlag(bool retrieveFlag)
-{
+void ViewQueryRetrieve::SetRetrieveFlag(bool retrieveFlag) {
     m_retrieveFlag = retrieveFlag;
 }
 
-bool ViewQueryRetrieve::GetRetrieveFlag(void)
-{
+bool ViewQueryRetrieve::GetRetrieveFlag(void) {
     return m_retrieveFlag;
 }
 
-void ViewQueryRetrieve::ButtonQuitClicked(GtkButton *button)
-{
+void ViewQueryRetrieve::ButtonQuitClicked(GtkButton *button) {
     DestroyWin();
 }
 
-void ViewQueryRetrieve::DestroyWin(void)
-{
+void ViewQueryRetrieve::DestroyWin(void) {
     QueryRes.clear();
     vecIndex.clear();
-    if (m_window)
-    {
+    if (m_window) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
         if (g_keyInterface.Size() == 1)
@@ -1427,67 +1301,56 @@ void ViewQueryRetrieve::DestroyWin(void)
     m_window = NULL;
 }
 
-static gboolean ExitWindow(gpointer data)
-{
+static gboolean ExitWindow(gpointer data) {
     ViewQueryRetrieve *tmp;
     tmp = (ViewQueryRetrieve *)data;
     tmp->DestroyWin();
     return FALSE;
 }
 #ifndef VET
-void ViewQueryRetrieve::KeyEvent(unsigned char keyValue)
-{
-	FakeXEvent::KeyEvent(keyValue);
+void ViewQueryRetrieve::KeyEvent(unsigned char keyValue) {
+    FakeXEvent::KeyEvent(keyValue);
 
-	switch(keyValue)
-	{
-		case KEY_ESC:
-			g_timeout_add(100, ExitWindow, this);
-			FakeEscKey();
-			break;
+    switch(keyValue) {
+    case KEY_ESC:
+        g_timeout_add(100, ExitWindow, this);
+        FakeEscKey();
+        break;
 
-		default:
-			break;
-	}
+    default:
+        break;
+    }
 }
 #endif
-void ViewQueryRetrieve::ChangePersonNameFormat(string wlPersonName, string &firstName, string &lastName, string &midName)
-{
-	int nPos = -1;
-	int nPosT = -1;
+void ViewQueryRetrieve::ChangePersonNameFormat(string wlPersonName, string &firstName, string &lastName, string &midName) {
+    int nPos = -1;
+    int nPosT = -1;
 
-	if ((nPos = wlPersonName.find('^')) != -1)
-	{
-		lastName = wlPersonName.substr(0, nPos);
-		if ((nPosT = wlPersonName.find('^', nPos+1)) != -1)
-		{
-			firstName = wlPersonName.substr(nPos+1, nPosT-nPos-1);
-			midName = wlPersonName.substr(nPosT+1);
-		}
-		else
-		{
-			firstName = wlPersonName.substr(nPos+1);
-			midName = "";
-		}
-	}
-	else
-	{
-		lastName = wlPersonName;
-		firstName = "";
-		midName = "";
-	}
+    if ((nPos = wlPersonName.find('^')) != -1) {
+        lastName = wlPersonName.substr(0, nPos);
+        if ((nPosT = wlPersonName.find('^', nPos+1)) != -1) {
+            firstName = wlPersonName.substr(nPos+1, nPosT-nPos-1);
+            midName = wlPersonName.substr(nPosT+1);
+        } else {
+            firstName = wlPersonName.substr(nPos+1);
+            midName = "";
+        }
+    } else {
+        lastName = wlPersonName;
+        firstName = "";
+        midName = "";
+    }
 }
 
-void ViewQueryRetrieve::ChangePersonNameFormatForShow(string wlPersonName, string &name)
-{
-	string firstName, lastName, midName;
+void ViewQueryRetrieve::ChangePersonNameFormatForShow(string wlPersonName, string &name) {
+    string firstName, lastName, midName;
 
-	ChangePersonNameFormat(wlPersonName, firstName, lastName, midName);
-	SysGeneralSetting sgs;
-	 int lang = sgs.GetLanguage();
-	 if(!lang)
-		 name = firstName + " " + midName + " " + lastName;
-	 else
-		 name = lastName + firstName;
+    ChangePersonNameFormat(wlPersonName, firstName, lastName, midName);
+    SysGeneralSetting sgs;
+    int lang = sgs.GetLanguage();
+    if(!lang)
+        name = firstName + " " + midName + " " + lastName;
+    else
+        name = lastName + firstName;
 }
 #endif

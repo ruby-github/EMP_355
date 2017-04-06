@@ -25,8 +25,7 @@ using std::vector;
 
 ViewWorkList* ViewWorkList::m_ptrInstance = NULL;
 
-ViewWorkList::ViewWorkList()
-{
+ViewWorkList::ViewWorkList() {
     SysGeneralSetting sys;
     m_dateFormat = sys.GetDateFormat();
 
@@ -35,13 +34,11 @@ ViewWorkList::ViewWorkList()
 
 }
 
-ViewWorkList::~ViewWorkList()
-{
+ViewWorkList::~ViewWorkList() {
 
 }
 #if 1
-ViewWorkList* ViewWorkList::GetInstance()
-{
+ViewWorkList* ViewWorkList::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new ViewWorkList;
 
@@ -49,8 +46,7 @@ ViewWorkList* ViewWorkList::GetInstance()
 }
 #endif
 #ifndef VET
-GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
-{
+GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent) {
     GtkWidget *window_worklist;
     GtkWidget *fixed_window;
     GtkWidget *frame_query;
@@ -102,7 +98,7 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_widget_show (frame_query);
     gtk_fixed_put (GTK_FIXED (fixed_window), frame_query, 20, 10);
     gtk_widget_set_size_request (frame_query, 800, 140);
-   // gtk_frame_set_label_align (GTK_FRAME (frame_query), 0.5, 0.5);
+    // gtk_frame_set_label_align (GTK_FRAME (frame_query), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_query), GTK_SHADOW_IN);
 
     label_query = gtk_label_new (_("Query"));
@@ -115,15 +111,15 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_container_add (GTK_CONTAINER (frame_query), fixed);
 
 #ifdef VET
-	 label_ID = gtk_label_new (_("ID :"));
+    label_ID = gtk_label_new (_("ID :"));
 #else
     label_ID = gtk_label_new (_("Patient ID :"));
 #endif
-	gtk_widget_show (label_ID);
+    gtk_widget_show (label_ID);
     gtk_fixed_put (GTK_FIXED (fixed), label_ID, 10-10, 8);
     gtk_label_set_use_markup (GTK_LABEL (label_ID), TRUE);
 #ifdef VET
-   gtk_widget_set_size_request (label_ID, 45, 30);
+    gtk_widget_set_size_request (label_ID, 45, 30);
 #else
     gtk_widget_set_size_request (label_ID, 100, 30);
 #endif
@@ -132,7 +128,7 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     m_entry_ID = gtk_entry_new ();
     gtk_widget_show (m_entry_ID);
 #ifdef VET
- 	gtk_fixed_put (GTK_FIXED (fixed), m_entry_ID, 65-10, 8);
+    gtk_fixed_put (GTK_FIXED (fixed), m_entry_ID, 65-10, 8);
 #else
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_ID, 110+8-10, 8);
 #endif
@@ -147,7 +143,7 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
 #endif
     gtk_widget_show (label_name);
 #ifdef VET
-   gtk_fixed_put (GTK_FIXED (fixed), label_name, 328-18+5-130, 8);
+    gtk_fixed_put (GTK_FIXED (fixed), label_name, 328-18+5-130, 8);
 #else
     gtk_fixed_put (GTK_FIXED (fixed), label_name, 328+30-130, 8);
 #endif
@@ -195,10 +191,10 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_widget_show (m_entry_request);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_request,180+10, 45);
 #ifdef VET
-   gtk_widget_set_size_request (m_entry_request, 200+50-100, 30);
+    gtk_widget_set_size_request (m_entry_request, 200+50-100, 30);
 #else
     gtk_widget_set_size_request (m_entry_request, 200-100, 30);
-  #endif
+#endif
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_request), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_request), 9679);
 
@@ -207,25 +203,25 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_fixed_put (GTK_FIXED (fixed), label_date, 10-10, 82);
     gtk_label_set_use_markup (GTK_LABEL (label_date), TRUE);
 //#ifdef VET
-  	gtk_widget_set_size_request (label_date, 130+40, 30);
+    gtk_widget_set_size_request (label_date, 130+40, 30);
 //#else
-  //  gtk_widget_set_size_request (label_date, 130, 30);
+    //  gtk_widget_set_size_request (label_date, 130, 30);
 //#endif
-  	gtk_misc_set_alignment (GTK_MISC (label_date), 0.9, 0.5);
+    gtk_misc_set_alignment (GTK_MISC (label_date), 0.9, 0.5);
 
     m_entry_date1 = gtk_entry_new ();
     gtk_widget_show (m_entry_date1);
 //#ifdef VET
-	gtk_fixed_put (GTK_FIXED (fixed), m_entry_date1, 140+30+10, 82);
+    gtk_fixed_put (GTK_FIXED (fixed), m_entry_date1, 140+30+10, 82);
 //#else
-  //  gtk_fixed_put (GTK_FIXED (fixed), m_entry_date1, 140-10, 82);
+    //  gtk_fixed_put (GTK_FIXED (fixed), m_entry_date1, 140-10, 82);
 //#endif
     gtk_widget_set_size_request (m_entry_date1, 100-20, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_date1), 10);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_date1), 9679);
     gtk_editable_set_editable(GTK_EDITABLE(m_entry_date1),false);
     //g_signal_connect(G_OBJECT(m_entry_date1), "insert_text", G_CALLBACK(on_entry_insert_start_date), this);
-   // g_signal_connect(G_OBJECT(m_entry_date2), "delete_text", G_CALLBACK(on_entry_delete_start_date), this);
+    // g_signal_connect(G_OBJECT(m_entry_date2), "delete_text", G_CALLBACK(on_entry_delete_start_date), this);
 
     img_start_calendar = gtk_image_new_from_file ("./res/icon/Calendar.png");
     gtk_widget_show (img_start_calendar);
@@ -234,18 +230,18 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_widget_set_size_request (eventbox_start_calendar, 40, 30);
     gtk_container_add (GTK_CONTAINER (eventbox_start_calendar), img_start_calendar);
 //#ifdef VET
- 	gtk_fixed_put (GTK_FIXED (fixed), eventbox_start_calendar, 230+30+10, 82);
+    gtk_fixed_put (GTK_FIXED (fixed), eventbox_start_calendar, 230+30+10, 82);
 //#else
-  //  gtk_fixed_put (GTK_FIXED (fixed), eventbox_start_calendar, 230-10, 82);
+    //  gtk_fixed_put (GTK_FIXED (fixed), eventbox_start_calendar, 230-10, 82);
 //#endif
- 	g_signal_connect (G_OBJECT(eventbox_start_calendar), "button_press_event", G_CALLBACK(HandleStartCalendarPress), this);
+    g_signal_connect (G_OBJECT(eventbox_start_calendar), "button_press_event", G_CALLBACK(HandleStartCalendarPress), this);
 
     label_to = gtk_label_new (_("To :"));
     gtk_widget_show (label_to);
 //#ifdef VET
-   gtk_fixed_put (GTK_FIXED (fixed), label_to, 230-50+100, 82);
+    gtk_fixed_put (GTK_FIXED (fixed), label_to, 230-50+100, 82);
 //#else
-  //  gtk_fixed_put (GTK_FIXED (fixed), label_to, 230-10-10, 82);
+    //  gtk_fixed_put (GTK_FIXED (fixed), label_to, 230-10-10, 82);
 //#endif
     gtk_label_set_use_markup (GTK_LABEL (label_to), TRUE);
     gtk_widget_set_size_request (label_to, 100-20, 30);
@@ -256,7 +252,7 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
 //#ifdef VET
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_date2, 300+50, 82);
 //#else
-  //  gtk_fixed_put (GTK_FIXED (fixed), m_entry_date2, 300-10, 82);
+    //  gtk_fixed_put (GTK_FIXED (fixed), m_entry_date2, 300-10, 82);
 //#endif
     gtk_widget_set_size_request (m_entry_date2, 100-20, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_date2), 10);
@@ -270,9 +266,9 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_widget_set_size_request (eventbox_end_calendar, 40-10, 30);
     gtk_container_add (GTK_CONTAINER (eventbox_end_calendar), img_end_calendar);
 //#ifdef VET
-   gtk_fixed_put (GTK_FIXED (fixed), eventbox_end_calendar, 390+50, 82);
+    gtk_fixed_put (GTK_FIXED (fixed), eventbox_end_calendar, 390+50, 82);
 //#else
- //   gtk_fixed_put (GTK_FIXED (fixed), eventbox_end_calendar, 390, 82);
+//   gtk_fixed_put (GTK_FIXED (fixed), eventbox_end_calendar, 390, 82);
 //#endif
     g_signal_connect (G_OBJECT(eventbox_end_calendar), "button_press_event", G_CALLBACK(HandleEndCalendarPress), this);
 
@@ -281,9 +277,9 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     button_query = gtk_button_new_with_mnemonic (_("Query"));
     gtk_widget_show (button_query);
 //#ifdef VET
- 	gtk_fixed_put (GTK_FIXED (fixed), button_query, 500+58, 82);
+    gtk_fixed_put (GTK_FIXED (fixed), button_query, 500+58, 82);
 //#else
-  //  gtk_fixed_put (GTK_FIXED (fixed), button_query, 500, 82);
+    //  gtk_fixed_put (GTK_FIXED (fixed), button_query, 500, 82);
 //#endif
     gtk_widget_set_size_request (button_query, 85, 35);
     g_signal_connect(button_query, "clicked", G_CALLBACK(HandleButtonQueryClicked), this);
@@ -291,9 +287,9 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     button_clear = gtk_button_new_with_mnemonic (_("Clear"));
     gtk_widget_show (button_clear);
 //#ifdef VET
-     gtk_fixed_put (GTK_FIXED (fixed), button_clear, 635+58, 82);
+    gtk_fixed_put (GTK_FIXED (fixed), button_clear, 635+58, 82);
 //#else
-  //  gtk_fixed_put (GTK_FIXED (fixed), button_clear, 630, 82);
+    //  gtk_fixed_put (GTK_FIXED (fixed), button_clear, 630, 82);
 //#endif
     gtk_widget_set_size_request (button_clear, 85, 35);
     g_signal_connect(button_clear, "clicked", G_CALLBACK(HandleButtonClearClicked), this);
@@ -312,8 +308,8 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrollWin), GTK_SHADOW_IN);
 
     m_treeview_worklist = create_worklist_treeview();
-	gtk_container_add(GTK_CONTAINER(scrollWin), m_treeview_worklist);
-	gtk_widget_set_size_request (m_treeview_worklist, 790, 260+100);
+    gtk_container_add(GTK_CONTAINER(scrollWin), m_treeview_worklist);
+    gtk_widget_set_size_request (m_treeview_worklist, 790, 260+100);
     gtk_widget_show (m_treeview_worklist);
 
     SysDicomSetting sysDicomSetting;
@@ -362,8 +358,7 @@ GtkWidget* ViewWorkList::CreateWorkListWin(GtkWidget *parent)
     return window_worklist;
 }
 #endif
-GtkWidget* ViewWorkList::create_worklist_treeview()
-{
+GtkWidget* ViewWorkList::create_worklist_treeview() {
     GtkWidget *treeview;
     GtkTreeModel *model = NULL;
     GtkCellRenderer *renderer;
@@ -371,15 +366,15 @@ GtkWidget* ViewWorkList::create_worklist_treeview()
 
     treeview = gtk_tree_view_new ();
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
+    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Scheduled Date"), renderer, "text", COL_SCHEDULED_DATE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 #ifdef VET
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 170, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 170, NULL);
 #else
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 120, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 120, NULL);
 #endif
     renderer = gtk_cell_renderer_text_new();
 #ifdef VET
@@ -388,17 +383,17 @@ GtkWidget* ViewWorkList::create_worklist_treeview()
     column = gtk_tree_view_column_new_with_attributes(_("patient ID"), renderer, "text", COL_PATIENT_ID, NULL);
 #endif
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Name"), renderer, "text", COL_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 80, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 80, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Gender"), renderer, "text", COL_Gender, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 80, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 80, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Accession Number"), renderer, "text", COL_ACCESSION_NUMBER, NULL);
@@ -406,41 +401,39 @@ GtkWidget* ViewWorkList::create_worklist_treeview()
     g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Birth Date"), renderer, "text", COL_BIRTH_DATE, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Birth Date"), renderer, "text", COL_BIRTH_DATE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
 
     renderer = gtk_cell_renderer_text_new();
-   column = gtk_tree_view_column_new_with_attributes(_("Exam Description"), renderer, "text", COL_EXAM_DESCRIPTION, NULL);
+    column = gtk_tree_view_column_new_with_attributes(_("Exam Description"), renderer, "text", COL_EXAM_DESCRIPTION, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 180, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 180, NULL);
 
     model = create_worklist_model();
     if (model != NULL)
-		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
+        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
     g_object_unref (model);
 
-	return treeview;
+    return treeview;
 }
 
-GtkTreeModel* ViewWorkList::create_worklist_model()
-{
+GtkTreeModel* ViewWorkList::create_worklist_model() {
     GtkListStore *store;
 
     store = gtk_list_store_new(NUM_COLS,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING,
-			G_TYPE_STRING);
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
 
-	return GTK_TREE_MODEL (store);
+    return GTK_TREE_MODEL (store);
 }
 
-void ViewWorkList::InitScheduledDate()
-{
+void ViewWorkList::InitScheduledDate() {
     time_t now;
     struct tm *now_tm;
     char buf[50];
@@ -449,94 +442,86 @@ void ViewWorkList::InitScheduledDate()
     now_tm = localtime(&now);
 
     switch (m_dateFormat) {
-        case 0:
-            sprintf(buf, "%04d/%02d/%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
-            break;
-        case 1:
-            sprintf(buf, "%02d/%02d/%04d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900);
-            break;
-        case 2:
-            sprintf(buf, "%02d/%02d/%04d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900);
-            break;
-        default:
-            sprintf(buf, "%04d/%02d/%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
-            break;
+    case 0:
+        sprintf(buf, "%04d/%02d/%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
+        break;
+    case 1:
+        sprintf(buf, "%02d/%02d/%04d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900);
+        break;
+    case 2:
+        sprintf(buf, "%02d/%02d/%04d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900);
+        break;
+    default:
+        sprintf(buf, "%04d/%02d/%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
+        break;
     }
-            sprintf(startDate, "%04d%02d%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
-            sprintf(endDate, "%04d%02d%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
-            gtk_entry_set_text(GTK_ENTRY(m_entry_date1), buf);
-            gtk_entry_set_text(GTK_ENTRY(m_entry_date2), buf);
+    sprintf(startDate, "%04d%02d%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
+    sprintf(endDate, "%04d%02d%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday);
+    gtk_entry_set_text(GTK_ENTRY(m_entry_date1), buf);
+    gtk_entry_set_text(GTK_ENTRY(m_entry_date2), buf);
 
 }
 
-void ViewWorkList::StartCalendarPress(GtkWidget *widget, GdkEventButton *event)
-{
-	ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::START, this);
+void ViewWorkList::StartCalendarPress(GtkWidget *widget, GdkEventButton *event) {
+    ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::START, this);
 }
 
-void ViewWorkList::SetStartDate(int year, int month, int day)
-{
+void ViewWorkList::SetStartDate(int year, int month, int day) {
     char buf[256];
-    switch(m_dateFormat)
-    {
-        case 0:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
-        case 1:
-            sprintf(buf,"%02d/%02d/%04d",month,day,year);
-            break;
-        case 2:
-            sprintf(buf,"%02d/%02d/%04d",day,month,year);
-            break;
-        default:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
+    switch(m_dateFormat) {
+    case 0:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
+    case 1:
+        sprintf(buf,"%02d/%02d/%04d",month,day,year);
+        break;
+    case 2:
+        sprintf(buf,"%02d/%02d/%04d",day,month,year);
+        break;
+    default:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
     }
     sprintf(startDate,"%04d%02d%02d",year,month,day);
     gtk_entry_set_text(GTK_ENTRY(m_entry_date1),buf);
 
 }
 
-void ViewWorkList::EndCalendarPress(GtkWidget *widget, GdkEventButton *event)
-{
-	ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::END, this);
+void ViewWorkList::EndCalendarPress(GtkWidget *widget, GdkEventButton *event) {
+    ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::END, this);
 }
 
-void ViewWorkList::SetEndDate(int year, int month, int day)
-{
+void ViewWorkList::SetEndDate(int year, int month, int day) {
     char buf[256];
-    switch(m_dateFormat)
-    {
-        case 0:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
-        case 1:
-            sprintf(buf,"%02d/%02d/%04d",month,day,year);
-            break;
-        case 2:
-            sprintf(buf,"%02d/%02d/%04d",day,month,year);
-            break;
-        default:
-            sprintf(buf,"%04d/%02d/%02d",year,month,day);
-            break;
+    switch(m_dateFormat) {
+    case 0:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
+    case 1:
+        sprintf(buf,"%02d/%02d/%04d",month,day,year);
+        break;
+    case 2:
+        sprintf(buf,"%02d/%02d/%04d",day,month,year);
+        break;
+    default:
+        sprintf(buf,"%04d/%02d/%02d",year,month,day);
+        break;
     }
     sprintf(endDate,"%04d%02d%02d",year,month,day);
     gtk_entry_set_text(GTK_ENTRY(m_entry_date2),buf);
 }
 
-void ViewWorkList::ButtonClearClicked(GtkButton *button)
-{
+void ViewWorkList::ButtonClearClicked(GtkButton *button) {
     gtk_entry_set_text(GTK_ENTRY(m_entry_ID),"");
     gtk_entry_set_text(GTK_ENTRY(m_entry_name),"");
     gtk_entry_set_text(GTK_ENTRY(m_entry_accession),"");
     gtk_entry_set_text(GTK_ENTRY(m_entry_request),"");
-   // gtk_entry_set_text(GTK_ENTRY(m_entry_date1),"");
-   // gtk_entry_set_text(GTK_ENTRY(m_entry_date2),"");
+    // gtk_entry_set_text(GTK_ENTRY(m_entry_date1),"");
+    // gtk_entry_set_text(GTK_ENTRY(m_entry_date2),"");
     InitScheduledDate();
 }
 
-void ViewWorkList::LoadPatientInfo()
-{
+void ViewWorkList::LoadPatientInfo() {
     const char * patientID = gtk_entry_get_text(GTK_ENTRY(m_entry_ID));
     const char * patientName = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
     const char * accessionNumber = gtk_entry_get_text(GTK_ENTRY(m_entry_accession));
@@ -544,30 +529,29 @@ void ViewWorkList::LoadPatientInfo()
     //const char * startDate = gtk_entry_get_text(GTK_ENTRY(m_entry_date1));
     //const char * endDate = gtk_entry_get_text(GTK_ENTRY(m_entry_date2));
 
-     //printf("-----Query patientID patientName accessionNumber requestedProcedureID startDate endDate:%s %s %s %s %s %s\n",patientID, patientName, accessionNumber, requestedProcedureID ,startDate ,endDate);
+    //printf("-----Query patientID patientName accessionNumber requestedProcedureID startDate endDate:%s %s %s %s %s %s\n",patientID, patientName, accessionNumber, requestedProcedureID ,startDate ,endDate);
 
-	char name[256] = {0};
-	snprintf(name, 256, "*%s*", patientName);
-	name[255] = '\0';
+    char name[256] = {0};
+    snprintf(name, 256, "*%s*", patientName);
+    name[255] = '\0';
 
-     m_query = CDCMMan::GetMe()->QueryWorklist(patientID, name,accessionNumber,requestedProcedureID, startDate, endDate);
+    m_query = CDCMMan::GetMe()->QueryWorklist(patientID, name,accessionNumber,requestedProcedureID, startDate, endDate);
 }
 #ifndef VET
-int StartExam(gpointer data)
-{
-	string errmsg;
-	// archive patient info
-	if (g_patientInfo.ArchivePatientInfo(errmsg)) {
+int StartExam(gpointer data) {
+    string errmsg;
+    // archive patient info
+    if (g_patientInfo.ArchivePatientInfo(errmsg)) {
         ViewNewPat::GetInstance()->UpdateStudyInfo();
         g_menuCalc.ClearAllData();
-		// archive and clear image and viedo
-		//g_patientInfo.ArchiveImg();
-		// archive report
-		g_patientInfo.ArchiveReport();
-		// archive and clear image and viedo
-		g_patientInfo.ArchiveImg();
-		// clear patient info
-		g_patientInfo.ClearAll();
+        // archive and clear image and viedo
+        //g_patientInfo.ArchiveImg();
+        // archive report
+        g_patientInfo.ArchiveReport();
+        // archive and clear image and viedo
+        g_patientInfo.ArchiveImg();
+        // clear patient info
+        g_patientInfo.ClearAll();
         ViewNewPat::GetInstance()->ClearStudyInfo();
         // clear desctiption and comment
         ViewReport::GetInstance()->ClearIndicationandComments();
@@ -583,13 +567,10 @@ int StartExam(gpointer data)
         }
 #endif
         setlocale(LC_NUMERIC, "en_US.UTF-8");
-        if(CDCMMan::GetMe()->EndStudy())
-        {
+        if(CDCMMan::GetMe()->EndStudy()) {
             SysDicomSetting sysDicomSetting;
-            if(sysDicomSetting.GetMPPS())
-            {
-                if(ViewNewPat::GetInstance()->GetMPPSFlag())
-                {
+            if(sysDicomSetting.GetMPPS()) {
+                if(ViewNewPat::GetInstance()->GetMPPSFlag()) {
                     int Year, Month, Day, Hour, Minute, Second;
                     GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
 
@@ -609,64 +590,48 @@ int StartExam(gpointer data)
 
         SysGeneralSetting sysGS;
         int language= sysGS.GetLanguage();
-        if (ZH == language)
-        {
+        if (ZH == language) {
             setlocale(LC_NUMERIC, "zh_CN.UTF-8");
-        }
-        else if (RU == language)
-        {
+        } else if (RU == language) {
             setlocale(LC_NUMERIC, "ru_RU.UTF-8");
-        }
-        else if (PL == language)
-        {
+        } else if (PL == language) {
             setlocale(LC_NUMERIC, "pl_PL.UTF-8");
-        }
-        else if (FR == language)
-        {
+        } else if (FR == language) {
             setlocale(LC_NUMERIC, "fr_FR.UTF-8");
-        }
-        else if (DE == language)
-        {
+        } else if (DE == language) {
             setlocale(LC_NUMERIC, "de_DE.UTF-8");
-        }
-        else if(ES == language)
-        {
+        } else if(ES == language) {
             setlocale(LC_NUMERIC, "es_ES.UTF-8");
-        }
-        else
-        {
+        } else {
             setlocale(LC_NUMERIC, "en_US.UTF-8");
         }
 
         ViewWorkList::GetInstance()->ImportPatInfo();
         //  ViewWorkList::GetInstance()->GetSelectedPatInfo();
         // ViewWorkList::GetInstance()->DestroyWin();
-       // ViewNewPat::GetInstance()->DestroyWindow();
-	} else {
-          if (GTK_IS_WIDGET(ViewWorkList::GetInstance()->GetWindow())) {
-			ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewWorkList::GetInstance()->GetWindow()), ViewDialog::ERROR, _(errmsg.c_str()), NULL);
+        // ViewNewPat::GetInstance()->DestroyWindow();
+    } else {
+        if (GTK_IS_WIDGET(ViewWorkList::GetInstance()->GetWindow())) {
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewWorkList::GetInstance()->GetWindow()), ViewDialog::ERROR, _(errmsg.c_str()), NULL);
         }
 
     }
-	return 0;
+    return 0;
 }
-int InserInfo(gpointer data)
-{
+int InserInfo(gpointer data) {
     ViewWorkList::GetInstance()->InserPatInfo();
     return 0;
 }
-void ViewWorkList::InserPatInfo()
-{
-	PatientInfo::Name patientName;
-	ChangePersonNameFormat(m_query[selectedIndex].wlPatientName, patientName.first, patientName.last, patientName.mid);
-	string doctorName;
-	ChangePersonNameFormatForShow(m_query[selectedIndex].wlStudyDoctor, doctorName);
-	ViewNewPat::GetInstance()->InsertPatientInfo(m_query[selectedIndex].wlPatientID.c_str(),patientName,m_query[selectedIndex].wlPatientBirthDate,m_query[selectedIndex].wlPatientAge,m_query[selectedIndex].wlPatientSex.c_str(),m_query[selectedIndex].wlPatientSize.c_str(),m_query[selectedIndex].wlPatientWeight.c_str(),m_query[selectedIndex].wlPatientAddress.c_str(),doctorName.c_str(),m_query[selectedIndex].wlStudyDescription.c_str());
+void ViewWorkList::InserPatInfo() {
+    PatientInfo::Name patientName;
+    ChangePersonNameFormat(m_query[selectedIndex].wlPatientName, patientName.first, patientName.last, patientName.mid);
+    string doctorName;
+    ChangePersonNameFormatForShow(m_query[selectedIndex].wlStudyDoctor, doctorName);
+    ViewNewPat::GetInstance()->InsertPatientInfo(m_query[selectedIndex].wlPatientID.c_str(),patientName,m_query[selectedIndex].wlPatientBirthDate,m_query[selectedIndex].wlPatientAge,m_query[selectedIndex].wlPatientSex.c_str(),m_query[selectedIndex].wlPatientSize.c_str(),m_query[selectedIndex].wlPatientWeight.c_str(),m_query[selectedIndex].wlPatientAddress.c_str(),doctorName.c_str(),m_query[selectedIndex].wlStudyDescription.c_str());
     DestroyWin();
 }
 
-bool ViewWorkList::ArchiveWorkListPatInfo(bool startExam)
-{
+bool ViewWorkList::ArchiveWorkListPatInfo(bool startExam) {
     const char* info = N_("End Exam?");
     if(startExam)
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _(info), StartExam);
@@ -676,9 +641,8 @@ bool ViewWorkList::ArchiveWorkListPatInfo(bool startExam)
     return TRUE;
 }
 #endif
-void ViewWorkList::ButtonQueryClicked(GtkButton *button)
-{
-   ClearQueryRes();
+void ViewWorkList::ButtonQueryClicked(GtkButton *button) {
+    ClearQueryRes();
 
     GtkTreeModel *model;
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_worklist));
@@ -693,19 +657,17 @@ void ViewWorkList::ButtonQueryClicked(GtkButton *button)
     //get the number of the patient record
     sprintf(record_str,"%d %s",num,_("record is found"));
     gtk_label_set_text(GTK_LABEL(m_label_record),record_str);
-   // gtk_label_set_use_markup (GTK_LABEL (m_label_record), TRUE);
+    // gtk_label_set_use_markup (GTK_LABEL (m_label_record), TRUE);
     gtk_widget_show (m_label_record);
 
     DisplayPatientRecord();
 }
 #ifndef VET
-void ViewWorkList::ButtonNewExamClicked(GtkButton *button)
-{
-    if(m_timeout > 0)
-        {
-            g_source_remove(m_timeout);
-            m_timeout = 0;
-        }
+void ViewWorkList::ButtonNewExamClicked(GtkButton *button) {
+    if(m_timeout > 0) {
+        g_source_remove(m_timeout);
+        m_timeout = 0;
+    }
 
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -713,13 +675,12 @@ void ViewWorkList::ButtonNewExamClicked(GtkButton *button)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_worklist));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_worklist));
-    if(gtk_tree_selection_get_selected(selection,NULL,&iter))
-    {
+    if(gtk_tree_selection_get_selected(selection,NULL,&iter)) {
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
         char *path_string = gtk_tree_path_to_string(path);
         int path_num = atoi(path_string);
         selectedIndex = path_num;
-       // printf("----%s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str());
+        // printf("----%s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str());
 
         if (g_patientInfo.GetExist()) {
             // end exam
@@ -733,31 +694,27 @@ void ViewWorkList::ButtonNewExamClicked(GtkButton *button)
         else
             ImportPatInfo();
 
-    }
-    else
-    {
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No patient is selected!"),
-                NULL);
-     }
+                                          ViewDialog::INFO,
+                                          _("No patient is selected!"),
+                                          NULL);
+    }
 }
 #endif
-void ViewWorkList::ImportPatInfo()
-{
-    if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[selectedIndex]))
-    {
+void ViewWorkList::ImportPatInfo() {
+    if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[selectedIndex])) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("The exam record  has exsited, please select other record again!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("The exam record  has exsited, please select other record again!"),
+                                          NULL);
         return;
 
     }
 #ifndef VET
     GetSelectedPatInfo();
-	PatientInfo::Name patientName;
-	ChangePersonNameFormat(m_query[selectedIndex].wlPatientName, patientName.first, patientName.last, patientName.mid);
+    PatientInfo::Name patientName;
+    ChangePersonNameFormat(m_query[selectedIndex].wlPatientName, patientName.first, patientName.last, patientName.mid);
     g_patientInfo.UpdatePatInfoToTopArea(patientName,m_query[selectedIndex].wlPatientSex,m_query[selectedIndex].wlPatientAge,m_query[selectedIndex].wlPatientID);
 #endif
     DestroyWin();
@@ -765,49 +722,40 @@ void ViewWorkList::ImportPatInfo()
 
 }
 
-void ViewWorkList::ChangePersonNameFormat(string wlPersonName, string &firstName, string &lastName, string &midName)
-{
-	int nPos = -1;
-	int nPosT = -1;
+void ViewWorkList::ChangePersonNameFormat(string wlPersonName, string &firstName, string &lastName, string &midName) {
+    int nPos = -1;
+    int nPosT = -1;
 
-	if ((nPos = wlPersonName.find('^')) != -1)
-	{
-		lastName = wlPersonName.substr(0, nPos);
-		if ((nPosT = wlPersonName.find('^', nPos+1)) != -1)
-		{
-			firstName = wlPersonName.substr(nPos+1, nPosT-nPos-1);
-			midName = wlPersonName.substr(nPosT+1);
-		}
-		else
-		{
-			firstName = wlPersonName.substr(nPos+1);
-			midName = "";
-		}
-	}
-	else
-	{
-		lastName = wlPersonName;
-		firstName = "";
-		midName = "";
-	}
+    if ((nPos = wlPersonName.find('^')) != -1) {
+        lastName = wlPersonName.substr(0, nPos);
+        if ((nPosT = wlPersonName.find('^', nPos+1)) != -1) {
+            firstName = wlPersonName.substr(nPos+1, nPosT-nPos-1);
+            midName = wlPersonName.substr(nPosT+1);
+        } else {
+            firstName = wlPersonName.substr(nPos+1);
+            midName = "";
+        }
+    } else {
+        lastName = wlPersonName;
+        firstName = "";
+        midName = "";
+    }
 }
 
-void ViewWorkList::ChangePersonNameFormatForShow(string wlPersonName, string &name)
-{
-	string firstName, lastName, midName;
+void ViewWorkList::ChangePersonNameFormatForShow(string wlPersonName, string &name) {
+    string firstName, lastName, midName;
 
-	ChangePersonNameFormat(wlPersonName, firstName, lastName, midName);
-	SysGeneralSetting sgs;
-	 int lang = sgs.GetLanguage();
-	 if(!lang)
-		 name = firstName + " " + midName + " " + lastName;
-	 else
-		 name = lastName + firstName;
+    ChangePersonNameFormat(wlPersonName, firstName, lastName, midName);
+    SysGeneralSetting sgs;
+    int lang = sgs.GetLanguage();
+    if(!lang)
+        name = firstName + " " + midName + " " + lastName;
+    else
+        name = lastName + firstName;
 }
 #ifndef VET
 
-void ViewWorkList::GetSelectedPatInfo()
-{
+void ViewWorkList::GetSelectedPatInfo() {
     PatientInfo::Info info;
     g_patientInfo.GetInfo(info);
 
@@ -817,11 +765,11 @@ void ViewWorkList::GetSelectedPatInfo()
 
     info.p.id = m_query[selectedIndex].wlPatientID;
 
-	PatientInfo::Name patientName;
-	ChangePersonNameFormat(m_query[selectedIndex].wlPatientName, patientName.first, patientName.last, patientName.mid);
-	info.p.name.last = patientName.last;
-	info.p.name.first = patientName.first;
-	info.p.name.mid = patientName.mid;
+    PatientInfo::Name patientName;
+    ChangePersonNameFormat(m_query[selectedIndex].wlPatientName, patientName.first, patientName.last, patientName.mid);
+    info.p.name.last = patientName.last;
+    info.p.name.first = patientName.first;
+    info.p.name.mid = patientName.mid;
 
     if(strcmp(buf,"F")==0)
         info.p.sex = 0;
@@ -894,20 +842,17 @@ void ViewWorkList::GetSelectedPatInfo()
     db.GetExamIDNext(info.e.examNum);
 
     CDCMMan::GetMe()->EditStudyInfo(EditStudyInfo(info));
-            //MPPS
-            if(!g_patientInfo.GetExist())
-            {
-                SysDicomSetting sysDicomSetting;
-                if(sysDicomSetting.GetMPPS())
-                {
-                    if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="")
-                    {
-                        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Please Set the default MPPS service in system setting"), NULL);
-                        return ;
-                    }
-                    CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
-                }
+    //MPPS
+    if(!g_patientInfo.GetExist()) {
+        SysDicomSetting sysDicomSetting;
+        if(sysDicomSetting.GetMPPS()) {
+            if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
+                ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Please Set the default MPPS service in system setting"), NULL);
+                return ;
             }
+            CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
+        }
+    }
 
     g_patientInfo.SetInfo(info);
     TopArea* ptrTopArea = TopArea::GetInstance();
@@ -916,8 +861,7 @@ void ViewWorkList::GetSelectedPatInfo()
 
 }
 #endif
-void ViewWorkList::ButtonDetailClicked(GtkButton *button)
-{
+void ViewWorkList::ButtonDetailClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
@@ -925,49 +869,43 @@ void ViewWorkList::ButtonDetailClicked(GtkButton *button)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_worklist));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_worklist));
-    if(gtk_tree_selection_get_selected(selection,NULL,&iter))
-    {
+    if(gtk_tree_selection_get_selected(selection,NULL,&iter)) {
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
         char *path_string = gtk_tree_path_to_string(path);
         int path_num = atoi(path_string);
-       // printf("----%s %s %s %s %s %s %s %s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str(),m_query[path_num].wlPatientSize.c_str(),m_query[path_num].wlPatientWeight.c_str(),m_query[path_num].wlPatientAddress.c_str(),m_query[path_num].wlStudyDoctor.c_str(),m_query[path_num].wlStudyDescription.c_str(),m_query[path_num].wlRequestedProcedureID.c_str(),m_query[path_num].wlAccessionNumber.c_str(),m_query[path_num].wlScheduleDate.c_str());
+        // printf("----%s %s %s %s %s %s %s %s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str(),m_query[path_num].wlPatientSize.c_str(),m_query[path_num].wlPatientWeight.c_str(),m_query[path_num].wlPatientAddress.c_str(),m_query[path_num].wlStudyDoctor.c_str(),m_query[path_num].wlStudyDescription.c_str(),m_query[path_num].wlRequestedProcedureID.c_str(),m_query[path_num].wlAccessionNumber.c_str(),m_query[path_num].wlScheduleDate.c_str());
         m_patDetail.CreatePatDetailWin(m_window);
         m_patDetail.ClearData();
         if(m_query.size()==0)
             return;
-        else
-		{
-			string patientName;
-			ChangePersonNameFormatForShow(m_query[path_num].wlPatientName, patientName);
-			string doctorName;
-			ChangePersonNameFormatForShow(m_query[path_num].wlStudyDoctor, doctorName);
+        else {
+            string patientName;
+            ChangePersonNameFormatForShow(m_query[path_num].wlPatientName, patientName);
+            string doctorName;
+            ChangePersonNameFormatForShow(m_query[path_num].wlStudyDoctor, doctorName);
             m_patDetail.InsertPatDetail(m_query[path_num].wlPatientID.c_str(),patientName.c_str(),m_query[path_num].wlPatientBirthDate,m_query[path_num].wlPatientAge,m_query[path_num].wlPatientSex.c_str(),m_query[path_num].wlPatientSize.c_str(),m_query[path_num].wlPatientWeight.c_str(),m_query[path_num].wlPatientAddress.c_str(),doctorName.c_str(),m_query[path_num].wlStudyDescription.c_str(),m_query[path_num].wlRequestedProcedureID.c_str(),m_query[path_num].wlAccessionNumber.c_str(),m_query[path_num].wlScheduleDate);
-		}
-    }
-    else
-    {
+        }
+    } else {
 #ifdef VET
- 		ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No animal is selected!"),
-                NULL);
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          ViewDialog::INFO,
+                                          _("No animal is selected!"),
+                                          NULL);
 #else
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No patient is selected!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("No patient is selected!"),
+                                          NULL);
 #endif
-   return;
+        return;
     }
 }
 #ifndef VET
-void ViewWorkList::ButtonTransferClicked(GtkButton *button)
-{
-    if(m_timeout > 0)
-        {
-            g_source_remove(m_timeout);
-            m_timeout = 0;
-        }
+void ViewWorkList::ButtonTransferClicked(GtkButton *button) {
+    if(m_timeout > 0) {
+        g_source_remove(m_timeout);
+        m_timeout = 0;
+    }
 
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -976,94 +914,81 @@ void ViewWorkList::ButtonTransferClicked(GtkButton *button)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_worklist));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_worklist));
-    if(gtk_tree_selection_get_selected(selection,NULL,&iter))
-    {
+    if(gtk_tree_selection_get_selected(selection,NULL,&iter)) {
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
         char *path_string = gtk_tree_path_to_string(path);
         int path_num = atoi(path_string);
         selectedIndex = path_num;
         //printf("----%s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str());
-        if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[path_num]))
-        {
+        if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[path_num])) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                    ViewDialog::INFO,
-                    _("The exam record  has exsited, please select other record again!"),
-                    NULL);
+                                              ViewDialog::INFO,
+                                              _("The exam record  has exsited, please select other record again!"),
+                                              NULL);
             return;
 
-        }
-        else
-		{
-			PatientInfo::Name patientName;
-			ChangePersonNameFormat(m_query[path_num].wlPatientName, patientName.first, patientName.last, patientName.mid);
-			string doctorName;
-			ChangePersonNameFormatForShow(m_query[path_num].wlStudyDoctor, doctorName);
-			ViewNewPat::GetInstance()->InsertPatientInfo(m_query[path_num].wlPatientID.c_str(),patientName,m_query[path_num].wlPatientBirthDate,m_query[path_num].wlPatientAge,m_query[path_num].wlPatientSex.c_str(),m_query[path_num].wlPatientSize.c_str(),m_query[path_num].wlPatientWeight.c_str(),m_query[path_num].wlPatientAddress.c_str(),doctorName.c_str(),m_query[path_num].wlStudyDescription.c_str());
+        } else {
+            PatientInfo::Name patientName;
+            ChangePersonNameFormat(m_query[path_num].wlPatientName, patientName.first, patientName.last, patientName.mid);
+            string doctorName;
+            ChangePersonNameFormatForShow(m_query[path_num].wlStudyDoctor, doctorName);
+            ViewNewPat::GetInstance()->InsertPatientInfo(m_query[path_num].wlPatientID.c_str(),patientName,m_query[path_num].wlPatientBirthDate,m_query[path_num].wlPatientAge,m_query[path_num].wlPatientSex.c_str(),m_query[path_num].wlPatientSize.c_str(),m_query[path_num].wlPatientWeight.c_str(),m_query[path_num].wlPatientAddress.c_str(),doctorName.c_str(),m_query[path_num].wlStudyDescription.c_str());
             ViewNewPat::GetInstance()->SetStudyInfo(m_query[path_num]);
             DestroyWin();
         }
-    }
-    else
-    {
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No patient is selected!"),
-                NULL);
-      return;
+                                          ViewDialog::INFO,
+                                          _("No patient is selected!"),
+                                          NULL);
+        return;
     }
 
 }
 #endif
-void ViewWorkList::ButtonQuitClicked(GtkButton *button)
-{
+void ViewWorkList::ButtonQuitClicked(GtkButton *button) {
     DestroyWin();
 }
 
-void ViewWorkList::DisplayPatientRecord()
-{
+void ViewWorkList::DisplayPatientRecord() {
     GtkTreeModel *model;
     GtkTreeIter iter;
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_worklist));
     gtk_list_store_clear(GTK_LIST_STORE(model));
 
-    for(int i= 0;i<m_query.size();i++)
-    {
+    for(int i= 0; i<m_query.size(); i++) {
         //ScheduleDate
         char date_year[20] = "\0";
         char date_month[20] = "\0";
         char date_day[20] = "\0";
         char scheduleDate_buf[125] = "\0";
 
-        if(strlen(m_query[i].wlScheduleDate.c_str())!=0)
-        {
+        if(strlen(m_query[i].wlScheduleDate.c_str())!=0) {
 
             sprintf(date_year,"%c%c%c%c",m_query[i].wlScheduleDate[0],m_query[i].wlScheduleDate[1],m_query[i].wlScheduleDate[2],m_query[i].wlScheduleDate[3]);
             sprintf(date_month,"%c%c",m_query[i].wlScheduleDate[4],m_query[i].wlScheduleDate[5]);
             sprintf(date_day,"%c%c",m_query[i].wlScheduleDate[6],m_query[i].wlScheduleDate[7]);
-           switch(m_dateFormat)
-           {
-               case 0:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
-                   break;
-               case 1:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_month,date_day,date_year);
-                   break;
-               case 2:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_day,date_month,date_year);
-                   break;
-               default:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
-                   break;
-           }
-        }
-        else
+            switch(m_dateFormat) {
+            case 0:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
+                break;
+            case 1:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_month,date_day,date_year);
+                break;
+            case 2:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_day,date_month,date_year);
+                break;
+            default:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
+                break;
+            }
+        } else
             sprintf(scheduleDate_buf,"%s","");
 
         //Sex
         char sex_tmp[256]="\0";
-        if (strlen(m_query[i].wlPatientSex.c_str())!=0)
-        {
+        if (strlen(m_query[i].wlPatientSex.c_str())!=0) {
 #ifdef VET
             if(strcmp(m_query[i].wlPatientSex.c_str(),"F")==0)
                 sprintf(sex_tmp,"%s",_("Female "));
@@ -1078,8 +1003,7 @@ void ViewWorkList::DisplayPatientRecord()
             else if(strcmp(m_query[i].wlPatientSex.c_str(),"O")==0)
                 sprintf(sex_tmp,"%s",_("Other"));
 
-        }
-        else
+        } else
             sprintf(sex_tmp,"%s","");
 
         //BirthDate
@@ -1088,8 +1012,7 @@ void ViewWorkList::DisplayPatientRecord()
         char birth_day[20] = "\0";
         char birthDate_buf[125] = "\0";
 
-        if(strlen(m_query[i].wlPatientBirthDate.c_str())!=0)
-        {
+        if(strlen(m_query[i].wlPatientBirthDate.c_str())!=0) {
             sprintf(birth_year,"%c%c%c%c",m_query[i].wlPatientBirthDate[0],m_query[i].wlPatientBirthDate[1],m_query[i].wlPatientBirthDate[2],m_query[i].wlPatientBirthDate[3]);
             sprintf(birth_month,"%c%c",m_query[i].wlPatientBirthDate[4],m_query[i].wlPatientBirthDate[5]);
             sprintf(birth_day,"%c%c",m_query[i].wlPatientBirthDate[6],m_query[i].wlPatientBirthDate[7]);
@@ -1100,90 +1023,78 @@ void ViewWorkList::DisplayPatientRecord()
             strcat(birthDate_buf,"/");
             strcat(birthDate_buf,birth_day);
 #endif
-            switch(m_dateFormat)
-            {
-                case 0:
-                    sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
-                   break;
-               case 1:
-                   sprintf(birthDate_buf,"%s/%s/%s",birth_month,birth_day,birth_year);
-                   break;
-               case 2:
-                   sprintf(birthDate_buf,"%s/%s/%s",birth_day,birth_month,birth_year);
-                   break;
-               default:
-                   sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
-                   break;
-           }
+            switch(m_dateFormat) {
+            case 0:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
+                break;
+            case 1:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_month,birth_day,birth_year);
+                break;
+            case 2:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_day,birth_month,birth_year);
+                break;
+            default:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
+                break;
+            }
 
-        }
-        else
-        {
+        } else {
             sprintf(birthDate_buf,"%s","");
         }
 
-		string patientName;
-		ChangePersonNameFormatForShow(m_query[i].wlPatientName, patientName);
+        string patientName;
+        ChangePersonNameFormatForShow(m_query[i].wlPatientName, patientName);
 
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                COL_SCHEDULED_DATE,scheduleDate_buf,
-                COL_PATIENT_ID,m_query[i].wlPatientID.c_str(),
-                COL_NAME,patientName.c_str(),
-                COL_Gender,sex_tmp,
-                COL_ACCESSION_NUMBER,m_query[i].wlAccessionNumber.c_str(),
-                COL_BIRTH_DATE,birthDate_buf,
-                COL_EXAM_DESCRIPTION,m_query[i].wlStudyDescription.c_str(),
-                -1);
+                           COL_SCHEDULED_DATE,scheduleDate_buf,
+                           COL_PATIENT_ID,m_query[i].wlPatientID.c_str(),
+                           COL_NAME,patientName.c_str(),
+                           COL_Gender,sex_tmp,
+                           COL_ACCESSION_NUMBER,m_query[i].wlAccessionNumber.c_str(),
+                           COL_BIRTH_DATE,birthDate_buf,
+                           COL_EXAM_DESCRIPTION,m_query[i].wlStudyDescription.c_str(),
+                           -1);
         gtk_tree_model_iter_next(model, &iter);
     }
     //m_query.clear();
 
 }
 
-gboolean UpdateAutoQuery(gpointer data)
-{
-	ViewWorkList *tmp;
-	tmp = (ViewWorkList *)data;
-	tmp->GetAndDisplayPatientRecord();
-	return TRUE;
+gboolean UpdateAutoQuery(gpointer data) {
+    ViewWorkList *tmp;
+    tmp = (ViewWorkList *)data;
+    tmp->GetAndDisplayPatientRecord();
+    return TRUE;
 }
 
-void ViewWorkList::AutoQuery()
-{
+void ViewWorkList::AutoQuery() {
 
-    if(m_autoQueryFlag)
-    {
+    if(m_autoQueryFlag) {
 #if 0
-    if(!(CDCMMan::GetMe()->TestLinkDefaultWorklist()))
-    {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Test Link is failed"), NULL);
-        return;
-    }
+        if(!(CDCMMan::GetMe()->TestLinkDefaultWorklist())) {
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Test Link is failed"), NULL);
+            return;
+        }
 #endif
 
         GetAndDisplayPatientRecord();
 
-        if(m_timeout > 0)
-        {
+        if(m_timeout > 0) {
             g_source_remove(m_timeout);
             m_timeout = 0;
         }
 
         m_timeout = g_timeout_add(30000, UpdateAutoQuery, this);
-    }
-    else
-    {
-        if(m_timeout > 0)
-        {
+    } else {
+        if(m_timeout > 0) {
             g_source_remove(m_timeout);
             m_timeout = 0;
         }
     }
 }
 
-void ViewWorkList::GetAndDisplayPatientRecord()
-{
+void ViewWorkList::GetAndDisplayPatientRecord() {
     m_query.clear();
     LoadPatientInfo();
 
@@ -1204,16 +1115,14 @@ void ViewWorkList::GetAndDisplayPatientRecord()
     if(m_query.size()==0)
         return;
 
-    for(int i= 0;i<m_query.size();i++)
-    {
+    for(int i= 0; i<m_query.size(); i++) {
         //ScheduleDate
         char date_year[20] = "\0";
         char date_month[20] = "\0";
         char date_day[20] = "\0";
         char scheduleDate_buf[125] = "\0";
 
-        if(strlen(m_query[i].wlScheduleDate.c_str())!=0)
-        {
+        if(strlen(m_query[i].wlScheduleDate.c_str())!=0) {
 
             sprintf(date_year,"%c%c%c%c",m_query[i].wlScheduleDate[0],m_query[i].wlScheduleDate[1],m_query[i].wlScheduleDate[2],m_query[i].wlScheduleDate[3]);
             sprintf(date_month,"%c%c",m_query[i].wlScheduleDate[4],m_query[i].wlScheduleDate[5]);
@@ -1225,30 +1134,27 @@ void ViewWorkList::GetAndDisplayPatientRecord()
             strcat(scheduleDate_buf,"/");
             strcat(scheduleDate_buf,date_day);
 #endif
-            switch(m_dateFormat)
-           {
-               case 0:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
-                   break;
-               case 1:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_month,date_day,date_year);
-                   break;
-               case 2:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_day,date_month,date_year);
-                   break;
-               default:
-                   sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
-                   break;
-           }
+            switch(m_dateFormat) {
+            case 0:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
+                break;
+            case 1:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_month,date_day,date_year);
+                break;
+            case 2:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_day,date_month,date_year);
+                break;
+            default:
+                sprintf(scheduleDate_buf,"%s/%s/%s",date_year,date_month,date_day);
+                break;
+            }
 
-        }
-        else
+        } else
             sprintf(scheduleDate_buf,"%s","");
 
         //Sex
         char sex_tmp[256]="\0";
-        if (strlen(m_query[i].wlPatientSex.c_str())!=0)
-        {
+        if (strlen(m_query[i].wlPatientSex.c_str())!=0) {
 #ifdef VET
             if(strcmp(m_query[i].wlPatientSex.c_str(),"F")==0)
                 sprintf(sex_tmp,"%s",_("Female "));
@@ -1263,8 +1169,7 @@ void ViewWorkList::GetAndDisplayPatientRecord()
             else if(strcmp(m_query[i].wlPatientSex.c_str(),"O")==0)
                 sprintf(sex_tmp,"%s",_("Other"));
 
-        }
-        else
+        } else
             sprintf(sex_tmp,"%s","");
 
         //BirthDate
@@ -1273,8 +1178,7 @@ void ViewWorkList::GetAndDisplayPatientRecord()
         char birth_day[20] = "\0";
         char birthDate_buf[125] = "\0";
 
-        if(strlen(m_query[i].wlPatientBirthDate.c_str())!=0)
-        {
+        if(strlen(m_query[i].wlPatientBirthDate.c_str())!=0) {
             sprintf(birth_year,"%c%c%c%c",m_query[i].wlPatientBirthDate[0],m_query[i].wlPatientBirthDate[1],m_query[i].wlPatientBirthDate[2],m_query[i].wlPatientBirthDate[3]);
             sprintf(birth_month,"%c%c",m_query[i].wlPatientBirthDate[4],m_query[i].wlPatientBirthDate[5]);
             sprintf(birth_day,"%c%c",m_query[i].wlPatientBirthDate[6],m_query[i].wlPatientBirthDate[7]);
@@ -1285,54 +1189,49 @@ void ViewWorkList::GetAndDisplayPatientRecord()
             strcat(birthDate_buf,"/");
             strcat(birthDate_buf,birth_day);
 #endif
-            switch(m_dateFormat)
-            {
-                case 0:
-                    sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
-                   break;
-               case 1:
-                   sprintf(birthDate_buf,"%s/%s/%s",birth_month,birth_day,birth_year);
-                   break;
-               case 2:
-                   sprintf(birthDate_buf,"%s/%s/%s",birth_day,birth_month,birth_year);
-                   break;
-               default:
-                   sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
-                   break;
-           }
+            switch(m_dateFormat) {
+            case 0:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
+                break;
+            case 1:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_month,birth_day,birth_year);
+                break;
+            case 2:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_day,birth_month,birth_year);
+                break;
+            default:
+                sprintf(birthDate_buf,"%s/%s/%s",birth_year,birth_month,birth_day);
+                break;
+            }
 
-        }
-        else
-        {
+        } else {
             sprintf(birthDate_buf,"%s","");
         }
 
-		string patientName;
-		ChangePersonNameFormatForShow(m_query[i].wlPatientName, patientName);
+        string patientName;
+        ChangePersonNameFormatForShow(m_query[i].wlPatientName, patientName);
 
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                COL_SCHEDULED_DATE,scheduleDate_buf,
-                COL_PATIENT_ID,m_query[i].wlPatientID.c_str(),
-                COL_NAME,patientName.c_str(),
-                COL_Gender,sex_tmp,
-                COL_ACCESSION_NUMBER,m_query[i].wlAccessionNumber.c_str(),
-                COL_BIRTH_DATE,birthDate_buf,
-                COL_EXAM_DESCRIPTION,m_query[i].wlStudyDescription.c_str(),
-                -1);
+                           COL_SCHEDULED_DATE,scheduleDate_buf,
+                           COL_PATIENT_ID,m_query[i].wlPatientID.c_str(),
+                           COL_NAME,patientName.c_str(),
+                           COL_Gender,sex_tmp,
+                           COL_ACCESSION_NUMBER,m_query[i].wlAccessionNumber.c_str(),
+                           COL_BIRTH_DATE,birthDate_buf,
+                           COL_EXAM_DESCRIPTION,m_query[i].wlStudyDescription.c_str(),
+                           -1);
         gtk_tree_model_iter_next(model, &iter);
     }
 
 }
 
-int ViewWorkList::GetWorkListQuery(void)
-{
+int ViewWorkList::GetWorkListQuery(void) {
     int size = m_query.size();
     return size;
 }
 
-DCMMPPSELEMENT ViewWorkList::GetMPPSElement(PatientInfo::Info &info)
-{
+DCMMPPSELEMENT ViewWorkList::GetMPPSElement(PatientInfo::Info &info) {
     DCMMPPSELEMENT ms;
     ms.msSpecificCharacterSet = m_query[selectedIndex].wlSpecificCharacterSet;
     ms.msPatientName = m_query[selectedIndex].wlPatientName;
@@ -1359,8 +1258,7 @@ DCMMPPSELEMENT ViewWorkList::GetMPPSElement(PatientInfo::Info &info)
     return ms;
 }
 
-DCMSTUDYELEMENT ViewWorkList::EditStudyInfo(PatientInfo::Info &info)
-{
+DCMSTUDYELEMENT ViewWorkList::EditStudyInfo(PatientInfo::Info &info) {
     DCMSTUDYELEMENT st;
     st.stSpecificCharacterSet = m_query[selectedIndex].wlSpecificCharacterSet;
     st.stPatientName = m_query[selectedIndex].wlPatientName;
@@ -1416,48 +1314,41 @@ DCMSTUDYELEMENT ViewWorkList::EditStudyInfo(PatientInfo::Info &info)
 #endif
 }
 
-void ViewWorkList::ClearQueryRes(void)
-{
+void ViewWorkList::ClearQueryRes(void) {
     m_query.clear();
     selectedIndex = 0;
 }
 
-static gboolean ExitWindow(gpointer data)
-{
-	ViewWorkList *tmp;
-	tmp = (ViewWorkList *)data;
-	tmp->DestroyWin();
-	return FALSE;
+static gboolean ExitWindow(gpointer data) {
+    ViewWorkList *tmp;
+    tmp = (ViewWorkList *)data;
+    tmp->DestroyWin();
+    return FALSE;
 }
 
-void ViewWorkList::KeyEvent(unsigned char keyValue)
-{
-	FakeXEvent::KeyEvent(keyValue);
+void ViewWorkList::KeyEvent(unsigned char keyValue) {
+    FakeXEvent::KeyEvent(keyValue);
 
-	switch(keyValue)
-	{
-		case KEY_ESC:
-			g_timeout_add(100, ExitWindow, this);
-			FakeEscKey();
-			break;
+    switch(keyValue) {
+    case KEY_ESC:
+        g_timeout_add(100, ExitWindow, this);
+        FakeEscKey();
+        break;
 
-		default:
-			break;
-	}
+    default:
+        break;
+    }
 }
 
-void ViewWorkList::CloseWindow(GtkWidget *window)
-{
-   // DestroyWin();
+void ViewWorkList::CloseWindow(GtkWidget *window) {
+    // DestroyWin();
 #if 1
-    if(m_timeout > 0)
-    {
+    if(m_timeout > 0) {
         g_source_remove(m_timeout);
         m_timeout = 0;
     }
 
-    if (window)
-    {
+    if (window) {
         g_keyInterface.Pop();
         gtk_widget_destroy(window);
         if (g_keyInterface.Size() == 1)
@@ -1467,17 +1358,14 @@ void ViewWorkList::CloseWindow(GtkWidget *window)
 #endif
 }
 
-void ViewWorkList::DestroyWin(void)
-{
+void ViewWorkList::DestroyWin(void) {
 #if 1
-    if(m_timeout > 0)
-        {
-            g_source_remove(m_timeout);
-            m_timeout = 0;
-        }
+    if(m_timeout > 0) {
+        g_source_remove(m_timeout);
+        m_timeout = 0;
+    }
 #endif
-    if (m_window)
-    {
+    if (m_window) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
         if (g_keyInterface.Size() == 1)
@@ -1488,27 +1376,23 @@ void ViewWorkList::DestroyWin(void)
 
 //PatDetail* PatDetail::m_ptrInstance = NULL;
 
-PatDetail::PatDetail()
-{
+PatDetail::PatDetail() {
 
 }
 
-PatDetail::~PatDetail()
-{
+PatDetail::~PatDetail() {
     //if (m_ptrInstance != NULL)
-     //   delete m_ptrInstance;
+    //   delete m_ptrInstance;
 }
 #if 0
-PatDetail* PatDetail::GetInstance()
-{
+PatDetail* PatDetail::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new PatDetail;
     return m_ptrInstance;
 }
 #endif
 
-GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
-{
+GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent) {
     GtkWidget *window_detail;
     GtkWidget *fixed_detail;
     GtkWidget *frame_detail;
@@ -1555,7 +1439,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_widget_show (frame_detail);
     gtk_fixed_put (GTK_FIXED (fixed_detail), frame_detail, 10+10, 5+20);
     gtk_widget_set_size_request (frame_detail, 800, 600-200);
-   // gtk_frame_set_label_align (GTK_FRAME (frame_detail), 0.5, 0.5);
+    // gtk_frame_set_label_align (GTK_FRAME (frame_detail), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_detail), GTK_SHADOW_IN);
 
     label_detail = gtk_label_new (_("<b>Detail</b>"));
@@ -1568,7 +1452,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_container_add (GTK_CONTAINER (frame_detail), fixed);
 
 #ifdef VET
-	label_ID = gtk_label_new (_("ID :"));
+    label_ID = gtk_label_new (_("ID :"));
 #else
     label_ID = gtk_label_new (_("Patient ID :"));
 #endif
@@ -1588,7 +1472,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     //gtk_widget_set_sensitive(m_entry_ID,false);
 
 #ifdef VET
- 	label_name = gtk_label_new (_("Animal Name:"));
+    label_name = gtk_label_new (_("Animal Name:"));
 #else
     label_name = gtk_label_new (_("Patient Name :"));
 #endif
@@ -1596,7 +1480,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_fixed_put (GTK_FIXED (fixed), label_name, 200-20, 8);
     gtk_label_set_use_markup (GTK_LABEL (label_name), TRUE);
 #ifdef VET
- 	 gtk_widget_set_size_request (label_name, 130+10+5, 30);
+    gtk_widget_set_size_request (label_name, 130+10+5, 30);
 #else
     gtk_widget_set_size_request (label_name, 130+10, 30);
 #endif
@@ -1605,7 +1489,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     m_entry_name = gtk_entry_new ();
     gtk_widget_show (m_entry_name);
 #ifdef VET
- 	gtk_fixed_put (GTK_FIXED (fixed), m_entry_name, 330-10+5, 8);
+    gtk_fixed_put (GTK_FIXED (fixed), m_entry_name, 330-10+5, 8);
     gtk_widget_set_size_request (m_entry_name, 200-20, 30);
 #else
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_name, 330-10, 8);
@@ -1678,7 +1562,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_request), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_request), 9679);
     gtk_editable_set_editable(GTK_EDITABLE(m_entry_request),false);
-   // gtk_widget_set_sensitive(m_entry_request,false);
+    // gtk_widget_set_sensitive(m_entry_request,false);
 
     label_sex = gtk_label_new (_("Gender :"));
     gtk_widget_show (label_sex);
@@ -1694,7 +1578,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_sex), 10);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_sex), 9679);
     gtk_editable_set_editable(GTK_EDITABLE(m_entry_sex),false);
-   // gtk_widget_set_sensitive(m_entry_sex,false);
+    // gtk_widget_set_sensitive(m_entry_sex,false);
 
     label_date = gtk_label_new (_("Scheduled Date :"));
     gtk_widget_show (label_date);
@@ -1710,7 +1594,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_date), 10);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_date), 9679);
     gtk_editable_set_editable(GTK_EDITABLE(m_entry_date),false);
-   // gtk_widget_set_sensitive(m_entry_date,false);
+    // gtk_widget_set_sensitive(m_entry_date,false);
 
     label_doctor = gtk_label_new (_("Diagnostician :"));
     gtk_widget_show (label_doctor);
@@ -1726,7 +1610,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_doctor), 45);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_doctor), 9679);
     gtk_editable_set_editable(GTK_EDITABLE(m_entry_doctor),false);
-   // gtk_widget_set_sensitive(m_entry_doctor,false);
+    // gtk_widget_set_sensitive(m_entry_doctor,false);
 
     label_stature = gtk_label_new (_("Stature :"));
     gtk_widget_show (label_stature);
@@ -1742,7 +1626,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_stature), 10);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_stature), 9679);
     gtk_editable_set_editable(GTK_EDITABLE(m_entry_stature),false);
-  //  gtk_widget_set_sensitive(m_entry_stature,false);
+    //  gtk_widget_set_sensitive(m_entry_stature,false);
 
     label_weight = gtk_label_new (_("Weight :"));
     gtk_widget_show (label_weight);
@@ -1758,7 +1642,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_weight), 10);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_weight), 9679);
     gtk_editable_set_editable(GTK_EDITABLE (m_entry_weight),false);
-  //  gtk_widget_set_sensitive(m_entry_weight,false);
+    //  gtk_widget_set_sensitive(m_entry_weight,false);
 
     label_address = gtk_label_new (_("Address :"));
     gtk_widget_show (label_address);
@@ -1774,7 +1658,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_address), 100);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_address), 9679);
     gtk_editable_set_editable(GTK_EDITABLE (m_entry_address),false);
-  //  gtk_widget_set_sensitive(m_entry_address,false);
+    //  gtk_widget_set_sensitive(m_entry_address,false);
 
     label_comment = gtk_label_new (_(" Comment "));
     gtk_widget_show (label_comment);
@@ -1794,7 +1678,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (m_textview_comment), GTK_WRAP_WORD);
     gtk_container_add (GTK_CONTAINER (scrolledwindow_comment), m_textview_comment);
     gtk_text_view_set_editable(GTK_TEXT_VIEW (m_textview_comment),false);
-   // gtk_widget_set_sensitive(m_textview_comment,false);
+    // gtk_widget_set_sensitive(m_textview_comment,false);
 
     image_quit = gtk_image_new_from_stock ("gtk-quit", GTK_ICON_SIZE_BUTTON);
     label_quit = gtk_label_new_with_mnemonic (_("Exit"));
@@ -1813,8 +1697,7 @@ GtkWidget* PatDetail::CreatePatDetailWin(GtkWidget *parent)
     return window_detail;
 }
 
-void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate,string age,const char *sex,const char *size,const char *weight,const char *address,const char *doctor,const char *description,const char *requestedID,const char *accessionNumber,string scheduleDate)
-{
+void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate,string age,const char *sex,const char *size,const char *weight,const char *address,const char *doctor,const char *description,const char *requestedID,const char *accessionNumber,string scheduleDate) {
     int dateFormat = ViewWorkList::GetInstance()->GetDateFormat();
 
     char size_tmp[100]="\0";
@@ -1830,8 +1713,7 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
     gtk_entry_set_text(GTK_ENTRY(m_entry_accession),accessionNumber);
 
     //birthDate
-    if(strlen(birthDate.c_str())!=0)
-    {
+    if(strlen(birthDate.c_str())!=0) {
         char birth_year[100] = "\0";
         char birth_month[100] = "\0";
         char birth_day[100] = "\0";
@@ -1847,29 +1729,27 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
         strcat(buf,"/");
         strcat(buf,birth_day);
 #endif
-        switch(dateFormat)
-            {
-                case 0:
-                    sprintf(buf,"%s/%s/%s",birth_year,birth_month,birth_day);
-                   break;
-               case 1:
-                   sprintf(buf,"%s/%s/%s",birth_month,birth_day,birth_year);
-                   break;
-               case 2:
-                   sprintf(buf,"%s/%s/%s",birth_day,birth_month,birth_year);
-                   break;
-               default:
-                   sprintf(buf,"%s/%s/%s",birth_year,birth_month,birth_day);
-                   break;
-           }
+        switch(dateFormat) {
+        case 0:
+            sprintf(buf,"%s/%s/%s",birth_year,birth_month,birth_day);
+            break;
+        case 1:
+            sprintf(buf,"%s/%s/%s",birth_month,birth_day,birth_year);
+            break;
+        case 2:
+            sprintf(buf,"%s/%s/%s",birth_day,birth_month,birth_year);
+            break;
+        default:
+            sprintf(buf,"%s/%s/%s",birth_year,birth_month,birth_day);
+            break;
+        }
 
         gtk_entry_set_text(GTK_ENTRY(m_entry_birth_date), buf);
     }
 
     char str[100];
     //age
-    if(strlen(age.c_str())!= 0)
-    {
+    if(strlen(age.c_str())!= 0) {
 
         char buf[100] = "\0";
         char tmp[100] = "\0";
@@ -1894,8 +1774,7 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
     gtk_entry_set_text(GTK_ENTRY(m_entry_request),requestedID);
 
     //sex
-    if(sex !=NULL)
-    {
+    if(sex !=NULL) {
 #ifdef VET
         if(strcmp(sex ,"F")==0)
             gtk_entry_set_text(GTK_ENTRY(m_entry_sex),_("Female "));
@@ -1910,13 +1789,11 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
         else if(strcmp(sex , "O")==0)
             gtk_entry_set_text(GTK_ENTRY(m_entry_sex),_("Other"));
 
-    }
-    else
+    } else
         gtk_entry_set_text(GTK_ENTRY(m_entry_sex),_("Other"));
 
     //scheduleDate
-    if(strlen(scheduleDate.c_str())!=0)
-    {
+    if(strlen(scheduleDate.c_str())!=0) {
         char date_year[256] = "\0";
         char date_month[100] = "\0";
         char date_day[100] = "\0";
@@ -1932,21 +1809,20 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
         strcat(buf,"/");
         strcat(buf,date_day);
 #endif
-        switch(dateFormat)
-           {
-               case 0:
-                   sprintf(buf,"%s/%s/%s",date_year,date_month,date_day);
-                   break;
-               case 1:
-                   sprintf(buf,"%s/%s/%s",date_month,date_day,date_year);
-                   break;
-               case 2:
-                   sprintf(buf,"%s/%s/%s",date_day,date_month,date_year);
-                   break;
-               default:
-                   sprintf(buf,"%s/%s/%s",date_year,date_month,date_day);
-                   break;
-           }
+        switch(dateFormat) {
+        case 0:
+            sprintf(buf,"%s/%s/%s",date_year,date_month,date_day);
+            break;
+        case 1:
+            sprintf(buf,"%s/%s/%s",date_month,date_day,date_year);
+            break;
+        case 2:
+            sprintf(buf,"%s/%s/%s",date_day,date_month,date_year);
+            break;
+        default:
+            sprintf(buf,"%s/%s/%s",date_year,date_month,date_day);
+            break;
+        }
 
         gtk_entry_set_text(GTK_ENTRY(m_entry_date), buf);
 
@@ -1959,8 +1835,7 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
     char weightT[256];
     strcpy(weightT,weight);
 
-    if(sizeT !=NULL)
-    {
+    if(sizeT !=NULL) {
         DotToCommaLocaleNumeric(sizeT, sizeof(sizeT));
 
         float stature = atof(sizeT);
@@ -1969,8 +1844,7 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
         gtk_entry_set_text(GTK_ENTRY(m_entry_stature),size_tmp);
     }
 
-    if(weightT != NULL)
-    {
+    if(weightT != NULL) {
         char weight_buf[30]="\0";
         DotToCommaLocaleNumeric(weightT, sizeof(weightT));
 
@@ -1981,16 +1855,14 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
 
     gtk_entry_set_text(GTK_ENTRY(m_entry_address),address);
 
-    if(description != NULL)
-    {
+    if(description != NULL) {
         GtkTextBuffer *buffer;
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_comment));
         gtk_text_buffer_set_text(buffer, description, -1);
     }
 }
 
-void PatDetail::ClearData()
-{
+void PatDetail::ClearData() {
     gtk_entry_set_text(GTK_ENTRY(m_entry_ID), "");
     gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
     gtk_entry_set_text(GTK_ENTRY(m_entry_accession), "");
@@ -2011,34 +1883,29 @@ void PatDetail::ClearData()
 }
 
 #if 1
-static gboolean ExitDetailWindow(gpointer data)
-{
-	PatDetail *tmp;
-	tmp = (PatDetail *)data;
-	tmp->DestroyPatDetailWin();
-	return FALSE;
+static gboolean ExitDetailWindow(gpointer data) {
+    PatDetail *tmp;
+    tmp = (PatDetail *)data;
+    tmp->DestroyPatDetailWin();
+    return FALSE;
 }
 
-void PatDetail::KeyEvent(unsigned char keyValue)
-{
-	FakeXEvent::KeyEvent(keyValue);
+void PatDetail::KeyEvent(unsigned char keyValue) {
+    FakeXEvent::KeyEvent(keyValue);
 
-	switch(keyValue)
-	{
-		case KEY_ESC:
-			g_timeout_add(100, ExitDetailWindow, this);
-			FakeEscKey();
-			break;
+    switch(keyValue) {
+    case KEY_ESC:
+        g_timeout_add(100, ExitDetailWindow, this);
+        FakeEscKey();
+        break;
 
-		default:
-			break;
-	}
+    default:
+        break;
+    }
 }
 #endif
-void PatDetail::DestroyPatDetailWin(void)
-{
-    if (m_window_detail)
-    {
+void PatDetail::DestroyPatDetailWin(void) {
+    if (m_window_detail) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window_detail);
         if (g_keyInterface.Size() == 1)
@@ -2047,7 +1914,6 @@ void PatDetail::DestroyPatDetailWin(void)
     m_window_detail = NULL;
 }
 
-void PatDetail::ButtonQuitClicked(GtkButton *button)
-{
+void PatDetail::ButtonQuitClicked(GtkButton *button) {
     DestroyPatDetailWin();
 }

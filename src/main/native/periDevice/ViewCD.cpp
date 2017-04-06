@@ -20,38 +20,33 @@
 
 ViewCD* ViewCD::m_ptrInstance = NULL;
 
-ViewCD::ViewCD()
-{
+ViewCD::ViewCD() {
     m_window = NULL;
     m_vecFolder.clear();
     m_vecPath.clear();
     m_iscd = true;
 }
 
-ViewCD::~ViewCD()
-{
+ViewCD::~ViewCD() {
     if(m_ptrInstance != NULL)
         delete m_ptrInstance;
 }
 
-ViewCD* ViewCD::GetInstance()
-{
+ViewCD* ViewCD::GetInstance() {
     if(m_ptrInstance == NULL)
         m_ptrInstance = new ViewCD;
 
     return m_ptrInstance;
 }
 
-GtkWidget* ViewCD::GetWindow(void)
-{
+GtkWidget* ViewCD::GetWindow(void) {
     if (GTK_IS_WIDGET(m_window))
         return m_window;
     else
         return NULL;
 }
 
-void ViewCD::add_column(GtkTreeView *treeview)
-{
+void ViewCD::add_column(GtkTreeView *treeview) {
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
@@ -60,8 +55,7 @@ void ViewCD::add_column(GtkTreeView *treeview)
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 }
 
-GtkTreeModel* ViewCD::create_from_model(vector<string> vec)
-{
+GtkTreeModel* ViewCD::create_from_model(vector<string> vec) {
     GtkTreeIter iter;
     GtkTreeStore *store = gtk_tree_store_new(1, G_TYPE_STRING);
 
@@ -71,8 +65,8 @@ GtkTreeModel* ViewCD::create_from_model(vector<string> vec)
     while (ite < vec.end()) {
         gtk_tree_store_append(store, &iter, NULL);
         gtk_tree_store_set(store, &iter,
-                0, (*ite).c_str(),
-                -1);
+                           0, (*ite).c_str(),
+                           -1);
 
         vec_child.clear();
         ImgMan::GetInstance()->LoadSnap(atoi((*ite).c_str()), STORE_PATH, &vec_child);
@@ -83,8 +77,8 @@ GtkTreeModel* ViewCD::create_from_model(vector<string> vec)
             GtkTreeIter child_iter;
             gtk_tree_store_append(store, &child_iter, &iter);
             gtk_tree_store_set(store, &child_iter,
-                    0, (*ite_child).c_str(),
-                    -1);
+                               0, (*ite_child).c_str(),
+                               -1);
             ite_child++;
         }
 
@@ -93,22 +87,18 @@ GtkTreeModel* ViewCD::create_from_model(vector<string> vec)
     return GTK_TREE_MODEL(store);
 }
 
-static gboolean UpdateUSBInfo(gpointer data)
-{
+static gboolean UpdateUSBInfo(gpointer data) {
     ViewCD *ptrCD = (ViewCD *)data;
-    if(PeripheralMan::GetInstance()->CheckUSBInfo())
-    {
+    if(PeripheralMan::GetInstance()->CheckUSBInfo()) {
         PeripheralMan::GetInstance()->MountUsbStorage();
         ptrCD->UpdateSize(false);
         ptrCD->SetBackupStatus(ViewCD::USB_READY);
-    }
-    else
+    } else
         ptrCD->SetBackupStatus(ViewCD::USB_EMPTY);
     return FALSE;
 }
 extern KeyValueOpr keyInterface;
-void ViewCD::CreateWindow(GtkWidget *parent, vector<string> vec, bool is_cd)
-{
+void ViewCD::CreateWindow(GtkWidget *parent, vector<string> vec, bool is_cd) {
     GtkWidget *fixed;
     GtkWidget *btnAdd;
     GtkWidget *btnDel;
@@ -236,11 +226,9 @@ void ViewCD::CreateWindow(GtkWidget *parent, vector<string> vec, bool is_cd)
     gtk_table_attach_defaults (GTK_TABLE(tableSize), labelRemainMb, 2, 3, 1, 2);
 
     m_btnBackup = gtk_button_new_with_mnemonic (_("Export"));
-    if (!is_cd)
-    {
+    if (!is_cd) {
         g_signal_connect(G_OBJECT(m_btnBackup), "clicked", G_CALLBACK(HandleBtnExportClicked), this);
-    }
-    else
+    } else
         g_signal_connect(G_OBJECT(m_btnBackup), "clicked", G_CALLBACK(HandleBtnBackupClicked), this);
     gtk_fixed_put (GTK_FIXED (fixed), m_btnBackup, 110, 440);
     gtk_widget_set_size_request (m_btnBackup, 80, 60);
@@ -265,41 +253,33 @@ void ViewCD::CreateWindow(GtkWidget *parent, vector<string> vec, bool is_cd)
     g_keyInterface.Push(this);
     gtk_widget_show_all(m_window);
 
-    if (is_cd)
-    {
+    if (is_cd) {
         UpdateSize(true);
         if(PeripheralMan::GetInstance()->CheckDiscInfo())
             SetBackupStatus(READY);
         else
             SetBackupStatus(EMPTY);
-    }
-    else
-    {
+    } else {
         SetBackupStatus(ViewCD::USB_SCAN);
         g_timeout_add(50, UpdateUSBInfo, this);
 #if 0
         UpdateSize(false);
-        if(PeripheralMan::GetInstance()->CheckUSBInfo())
-        {
+        if(PeripheralMan::GetInstance()->CheckUSBInfo()) {
             printf("read\n");
             SetBackupStatus(USB_READY);
-        }
-        else
+        } else
             SetBackupStatus(USB_EMPTY);
 #endif
     }
 }
 
-gboolean ViewCD::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
-{
+gboolean ViewCD::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     DestroyWindow();
     return FALSE;
 }
 
-void ViewCD::DestroyWindow()
-{
-    if(GTK_IS_WIDGET(m_window))
-    {
+void ViewCD::DestroyWindow() {
+    if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
         m_window = NULL;
@@ -308,44 +288,38 @@ void ViewCD::DestroyWindow()
         PeripheralMan::GetInstance()->UmountUsbStorage();
 }
 
-void ViewCD::KeyEvent(unsigned char keyValue)
-{
+void ViewCD::KeyEvent(unsigned char keyValue) {
     FakeXEvent::KeyEvent(keyValue);
 
-    switch(keyValue)
-    {
-        case KEY_ESC:
-            DestroyWindow();
-            break;
+    switch(keyValue) {
+    case KEY_ESC:
+        DestroyWindow();
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
-void ViewCD::SetEstimatedSize(float size)
-{
+void ViewCD::SetEstimatedSize(float size) {
     char str[50];
     sprintf(str, "%.2f", size);
     gtk_entry_set_text(GTK_ENTRY(m_entryEstimated), str);
 }
 
-void ViewCD::SetRemainSize(float size)
-{
+void ViewCD::SetRemainSize(float size) {
     char str[50];
     sprintf(str, "%.2f", size);
     gtk_entry_set_text(GTK_ENTRY(m_entryRemain), str);
 }
 
-void ViewCD::SetAvailSize(float size)
-{
+void ViewCD::SetAvailSize(float size) {
     char str[50];
     sprintf(str, "%.2f", size);
     gtk_entry_set_text(GTK_ENTRY(m_entryAvail), str);
 }
 
-void ViewCD::UpdateSize(bool is_cd)
-{
+void ViewCD::UpdateSize(bool is_cd) {
     gboolean valid1, valid2;
     GtkTreeIter iter1, iter2;
     gchar *val1, *val2, *folder, *file;
@@ -355,8 +329,7 @@ void ViewCD::UpdateSize(bool is_cd)
     m_vecPath.clear();
 
     valid1 = gtk_tree_model_get_iter_first(model, &iter1);
-    while(valid1)
-    {
+    while(valid1) {
         gtk_tree_model_get(model, &iter1, 0, &val1, -1);
 
         folder = g_build_filename(STORE_PATH, val1, NULL);
@@ -365,8 +338,7 @@ void ViewCD::UpdateSize(bool is_cd)
         g_free(folder);
 
         valid2 = gtk_tree_model_iter_children(model, &iter2, &iter1);
-        while(valid2)
-        {
+        while(valid2) {
             gtk_tree_model_get(model, &iter2, 0, &val2, -1);
             file = g_build_filename(STORE_PATH, val1, val2, NULL);
             m_vecPath.push_back(file);
@@ -380,131 +352,110 @@ void ViewCD::UpdateSize(bool is_cd)
 
     m_estimated = 0;
     vector<string>::iterator it;
-    for(it=m_vecPath.begin(); it<m_vecPath.end(); it++)
-    {
+    for(it=m_vecPath.begin(); it<m_vecPath.end(); it++) {
         struct stat buf;
-        if( stat((*it).c_str(), &buf)==0 )
-        {
+        if( stat((*it).c_str(), &buf)==0 ) {
             m_estimated += buf.st_size;
             //	PRINTF("file: %s, size: %d\n", (*it).c_str(), buf.st_size);
         }
     }
-	if(m_estimated > 0)
-		m_estimated = m_estimated + m_estimated / 10;
+    if(m_estimated > 0)
+        m_estimated = m_estimated + m_estimated / 10;
 
-	PRINTF("Estimated size: %llu\n", m_estimated);
+    PRINTF("Estimated size: %llu\n", m_estimated);
 
     SetEstimatedSize( (float)m_estimated/1024/1024 );
 
-    if (is_cd)
-    {
+    if (is_cd) {
         //clear Replay data for exe cmd
         Replay::GetInstance()->ClearCurReplayData();
         Replay::GetInstance()->DisplayReplayBar();
 
         PeripheralMan::DiscInfo info;
-        if(PeripheralMan::GetInstance()->GetDiscInfo(&info))
-        {
+        if(PeripheralMan::GetInstance()->GetDiscInfo(&info)) {
             if(info.capacity > info.data_size)
                 m_available = info.capacity - info.data_size;
             else
                 m_available = 0;
-            if(m_available >= m_estimated)
-            {
+            if(m_available >= m_estimated) {
                 m_remain = m_available - m_estimated;
                 SetBackupStatus(READY);
-            }
-            else
-            {
+            } else {
                 m_remain = 0;
                 SetBackupStatus(OVER);
             }
             SetRemainSize( (double)m_remain/1024/1024 );
             SetAvailSize( (double)m_available/1024/1024 );
             PRINTF("disc capacity=%llu, data_size=%llu, total available=%llu, remain=%llu\n", info.capacity, info.data_size, m_available, m_remain);
-        }
-        else
-        {
+        } else {
             SetRemainSize(0);
             SetAvailSize(0);
         }
-    }
-    else
-    {
+    } else {
         PeripheralMan::StorageInfo info;
-        if(PeripheralMan::GetInstance()->GetUSBInfo(&info))
-        {
+        if(PeripheralMan::GetInstance()->GetUSBInfo(&info)) {
             if(info.capacity > info.data_size)
                 m_available = info.capacity - info.data_size;
             else
                 m_available = 0;
-            if(m_available >= m_estimated)
-            {
+            if(m_available >= m_estimated) {
                 m_remain = m_available - m_estimated;
                 SetBackupStatus(USB_READY);
-            }
-            else
-            {
+            } else {
                 m_remain = 0;
                 SetBackupStatus(USB_OVER);
             }
             SetRemainSize( (double)m_remain/1024/1024 );
             SetAvailSize( (double)m_available/1024/1024 );
             PRINTF("disc capacity=%llu, data_size=%llu, total available=%llu, remain=%llu\n", info.capacity, info.data_size, m_available, m_remain);
-        }
-        else
-        {
+        } else {
             SetRemainSize(0);
             SetAvailSize(0);
         }
     }
 }
 
-void ViewCD::UpdateStatusBar(const char* msg)
-{
+void ViewCD::UpdateStatusBar(const char* msg) {
     gtk_statusbar_pop(GTK_STATUSBAR(m_statusbar), 0); /* clear any preview message */
 
     gtk_statusbar_push(GTK_STATUSBAR(m_statusbar), 0, msg);
 }
 
-void ViewCD::SetBackupStatus(guchar status)
-{
-   // printf("_%s, %d\n", __FUNCTION__, status);
-    switch(status)
-    {
-        case READY:
-        case USB_READY:
-            UpdateStatusBar(_("Ready!"));
-            gtk_widget_set_sensitive(m_btnBackup, TRUE);
-            break;
-        case SCAN:
-        case USB_SCAN:
-            if (m_iscd)
-                UpdateStatusBar(_("Getting the media info, Please wait..."));
-            else
-                UpdateStatusBar(_("Getting the USB info, Please wait..."));
-            gtk_widget_set_sensitive(m_btnBackup, FALSE);
-            break;
-        case EMPTY:
-        case USB_EMPTY:
-            if (m_iscd)
-                UpdateStatusBar(_("Please insert disc!"));
-            else
-                UpdateStatusBar(_("Please insert one USB!"));
-            gtk_widget_set_sensitive(m_btnBackup, FALSE);
-            break;
-        case OVER:
-        case USB_OVER:
-            if (m_iscd)
-                UpdateStatusBar(_("Beyond the available capacity of the disc!"));
-            else
-                UpdateStatusBar(_("Beyond the available capacity of the USB!"));
-            gtk_widget_set_sensitive(m_btnBackup, FALSE);
+void ViewCD::SetBackupStatus(guchar status) {
+    // printf("_%s, %d\n", __FUNCTION__, status);
+    switch(status) {
+    case READY:
+    case USB_READY:
+        UpdateStatusBar(_("Ready!"));
+        gtk_widget_set_sensitive(m_btnBackup, TRUE);
+        break;
+    case SCAN:
+    case USB_SCAN:
+        if (m_iscd)
+            UpdateStatusBar(_("Getting the media info, Please wait..."));
+        else
+            UpdateStatusBar(_("Getting the USB info, Please wait..."));
+        gtk_widget_set_sensitive(m_btnBackup, FALSE);
+        break;
+    case EMPTY:
+    case USB_EMPTY:
+        if (m_iscd)
+            UpdateStatusBar(_("Please insert disc!"));
+        else
+            UpdateStatusBar(_("Please insert one USB!"));
+        gtk_widget_set_sensitive(m_btnBackup, FALSE);
+        break;
+    case OVER:
+    case USB_OVER:
+        if (m_iscd)
+            UpdateStatusBar(_("Beyond the available capacity of the disc!"));
+        else
+            UpdateStatusBar(_("Beyond the available capacity of the USB!"));
+        gtk_widget_set_sensitive(m_btnBackup, FALSE);
     }
 }
 
-void ViewCD::AppendParent(const char* parent, vector<string> child)
-{
+void ViewCD::AppendParent(const char* parent, vector<string> child) {
     gboolean valid, exist;
     GtkTreeIter iter_parent, iter_child;
     gchar *val;
@@ -513,38 +464,33 @@ void ViewCD::AppendParent(const char* parent, vector<string> child)
     valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter_parent);
     exist = FALSE;
     // Check whether parent exist
-    while(valid)
-    {
+    while(valid) {
         gtk_tree_model_get(GTK_TREE_MODEL(store), &iter_parent, 0, &val, -1);
-        if(strcmp(parent, val)==0)
-        {
+        if(strcmp(parent, val)==0) {
             exist = TRUE;
             break;
         }
         valid =  gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter_parent);
     }
-    if(exist)
-    {
+    if(exist) {
         // remove the exist then append new
         gtk_tree_store_remove (store, &iter_parent);
     }
     gtk_tree_store_append(store, &iter_parent, NULL);
     gtk_tree_store_set(store, &iter_parent,
-            0, parent,
-            -1);
+                       0, parent,
+                       -1);
 
     vector<string>::iterator it;
-    for(it=child.begin(); it < child.end(); it++)
-    {
+    for(it=child.begin(); it < child.end(); it++) {
         gtk_tree_store_append(store, &iter_child, &iter_parent);
         gtk_tree_store_set(store, &iter_child,
-                0, (*it).c_str(),
-                -1);
+                           0, (*it).c_str(),
+                           -1);
     }
 }
 
-void ViewCD::AppendChild(const char* parent, const char* child)
-{
+void ViewCD::AppendChild(const char* parent, const char* child) {
     gboolean valid, exist;
     GtkTreeIter iter_parent, iter_child;
     gchar *val;
@@ -553,50 +499,43 @@ void ViewCD::AppendChild(const char* parent, const char* child)
     valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter_parent);
     exist = FALSE;
     // Check whether parent exist
-    while(valid)
-    {
+    while(valid) {
         gtk_tree_model_get(GTK_TREE_MODEL(store), &iter_parent, 0, &val, -1);
-        if(strcmp(parent, val)==0)
-        {
+        if(strcmp(parent, val)==0) {
             exist = TRUE;
             break;
         }
         valid =  gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter_parent);
     }
 
-    if(!exist)
-    {
+    if(!exist) {
         gtk_tree_store_append(store, &iter_parent, NULL);
         gtk_tree_store_set(store, &iter_parent,
-                0, parent,
-                -1);
+                           0, parent,
+                           -1);
     }
 
     valid = gtk_tree_model_iter_children(GTK_TREE_MODEL(store), &iter_child, &iter_parent);
     exist = FALSE;
     // Check whether child exist
-    while(valid)
-    {
+    while(valid) {
         gtk_tree_model_get(GTK_TREE_MODEL(store), &iter_child, 0, &val, -1);
-        if(strcmp(child, val)==0)
-        {
+        if(strcmp(child, val)==0) {
             exist = TRUE;
             break;
         }
         valid =  gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter_child);
     }
 
-    if(!exist)
-    {
+    if(!exist) {
         gtk_tree_store_append(store, &iter_child, &iter_parent);
         gtk_tree_store_set(store, &iter_child,
-                0, child,
-                -1);
+                           0, child,
+                           -1);
     }
 }
 
-void ViewCD::BtnAddClicked(GtkButton *button)
-{
+void ViewCD::BtnAddClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter1, iter2;
     gboolean valid;
@@ -606,22 +545,17 @@ void ViewCD::BtnAddClicked(GtkButton *button)
         return;
 
     gtk_tree_model_get(model, &iter1, 0, &val1, -1);
-    if( gtk_tree_model_iter_has_child(model, &iter1) )
-    {
+    if( gtk_tree_model_iter_has_child(model, &iter1) ) {
         vector<string> vec;
         valid = gtk_tree_model_iter_children(model, &iter2, &iter1);
-        while(valid)
-        {
+        while(valid) {
             gtk_tree_model_get(model, &iter2, 0, &val2, -1);
             vec.push_back(val2);
             valid = gtk_tree_model_iter_next(model, &iter2);
         }
         AppendParent(val1, vec);
-    }
-    else
-    {
-        if( gtk_tree_model_iter_parent(model, &iter2, &iter1) )
-        {
+    } else {
+        if( gtk_tree_model_iter_parent(model, &iter2, &iter1) ) {
             gtk_tree_model_get(model, &iter2, 0, &val2, -1);
             AppendChild(val2, val1);
         }
@@ -630,8 +564,7 @@ void ViewCD::BtnAddClicked(GtkButton *button)
     UpdateSize(m_iscd);
 }
 
-void ViewCD::BtnAddAllClicked(GtkButton *button)
-{
+void ViewCD::BtnAddAllClicked(GtkButton *button) {
     BtnDelAllClicked(NULL);
 
     GtkTreeIter iter1, iter2;
@@ -641,13 +574,11 @@ void ViewCD::BtnAddAllClicked(GtkButton *button)
     GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeFrom));
 
     valid1 = gtk_tree_model_get_iter_first(model, &iter1);
-    while(valid1)
-    {
+    while(valid1) {
         vec.clear();
         gtk_tree_model_get(model, &iter1, 0, &val1, -1);
         valid2 = gtk_tree_model_iter_children(model, &iter2, &iter1);
-        while(valid2)
-        {
+        while(valid2) {
             gtk_tree_model_get(model, &iter2, 0, &val2, -1);
             vec.push_back(val2);
             valid2 = gtk_tree_model_iter_next(model, &iter2);
@@ -659,8 +590,7 @@ void ViewCD::BtnAddAllClicked(GtkButton *button)
     UpdateSize(m_iscd);
 }
 
-void ViewCD::BtnDelClicked(GtkButton *button)
-{
+void ViewCD::BtnDelClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter1, iter2;
 
@@ -668,63 +598,50 @@ void ViewCD::BtnDelClicked(GtkButton *button)
     if (gtk_tree_selection_get_selected(selection, &model, &iter1) != TRUE)
         return;
 
-    if( gtk_tree_model_iter_parent(model, &iter2, &iter1) )
-    {
+    if( gtk_tree_model_iter_parent(model, &iter2, &iter1) ) {
         gtk_tree_store_remove (GTK_TREE_STORE(model), &iter1);
         if( ! gtk_tree_model_iter_has_child(model, &iter2) )
             gtk_tree_store_remove (GTK_TREE_STORE(model), &iter2);
-    }
-    else
-    {
+    } else {
         gtk_tree_store_remove (GTK_TREE_STORE(model), &iter1);
     }
 
     UpdateSize(m_iscd);
 }
 
-void ViewCD::BtnDelAllClicked(GtkButton *button)
-{
+void ViewCD::BtnDelAllClicked(GtkButton *button) {
     GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeTo)));
     gtk_tree_store_clear(store);
 
     UpdateSize(m_iscd);
 }
 
-gboolean ViewCD::PrepareData(vector<string> folder, vector<string> path)
-{
+gboolean ViewCD::PrepareData(vector<string> folder, vector<string> path) {
     char buf[256];
     vector<string>::iterator it;
     struct stat filestat;
 
     FILE *fp = fopen(LIST_PATH, "w");
 
-    if(stat(TMPDIR, &filestat) != 0)
-    {
-        if(mkdir(TMPDIR, 0755) != 0)
-        {
+    if(stat(TMPDIR, &filestat) != 0) {
+        if(mkdir(TMPDIR, 0755) != 0) {
             perror("mkir error: ");
             return FALSE;
         }
-    }
-    else
-    {
-        if(S_ISREG(filestat.st_mode))
-        {
-            if(unlink(TMPDIR) != 0)
-            {
+    } else {
+        if(S_ISREG(filestat.st_mode)) {
+            if(unlink(TMPDIR) != 0) {
                 perror("unlink error: ");
                 return FALSE;
             }
-            if(mkdir(TMPDIR, 0755) != 0)
-            {
+            if(mkdir(TMPDIR, 0755) != 0) {
                 perror("mkdir error: ");
                 return FALSE;
             }
         }
     }
 
-    for(it=folder.begin(); it<folder.end(); it++)
-    {
+    for(it=folder.begin(); it<folder.end(); it++) {
         gchar *basename = g_path_get_basename((*it).c_str());
         sprintf(buf, "/%s=%s\n", basename, TMPDIR);
         PRINTF("buf: %s\n", buf);
@@ -732,8 +649,7 @@ gboolean ViewCD::PrepareData(vector<string> folder, vector<string> path)
         g_free(basename);
     }
 
-    for(it=path.begin(); it<path.end(); it++)
-    {
+    for(it=path.begin(); it<path.end(); it++) {
         gchar *basename = g_path_get_basename((*it).c_str());
         gchar *dirname = g_path_get_dirname((*it).c_str());
         gchar *parent = g_path_get_basename(dirname);
@@ -752,27 +668,23 @@ gboolean ViewCD::PrepareData(vector<string> folder, vector<string> path)
 }
 
 #if 0
-gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition)
-{
+gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition) {
     gchar *buffer = NULL, *f;
     GIOStatus status;
 
-    if (condition == G_IO_HUP || condition == G_IO_ERR)
-    {
+    if (condition == G_IO_HUP || condition == G_IO_ERR) {
         perror("MakeIso GIOChannel error:");
         m_cont = 0;
         return TRUE;
     }
 
     status = g_io_channel_read_line(source, &buffer, NULL, NULL, NULL);
-    if (!buffer || status == G_IO_STATUS_ERROR || status == G_IO_STATUS_AGAIN)
-    {
+    if (!buffer || status == G_IO_STATUS_ERROR || status == G_IO_STATUS_AGAIN) {
         return TRUE;
     }
     PRINTF("%s: %s", __FUNCTION__, buffer);
 
-    if (strstr(buffer, MKISOFS_ESTIMATE) && buffer[3]=='.') //progress of mkisofs
-    {
+    if (strstr(buffer, MKISOFS_ESTIMATE) && buffer[3]=='.') { //progress of mkisofs
         buffer[3] = 0;
         f = buffer;
 
@@ -790,19 +702,14 @@ gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition)
         g_snprintf(Lsbuf2, sizeof(Lsbuf2)-1, "%.0f%%", Ltava*100);
         gtk_progress_bar_set_text(Lprogressbar, Lsbuf2);
 #endif
-    }
-    else if(strstr(buffer, MKISOFS_ERROR) && !strstr(buffer, MKISOFS_IGNORE))	//error with mkisofs
-    {
+    } else if(strstr(buffer, MKISOFS_ERROR) && !strstr(buffer, MKISOFS_IGNORE)) {	//error with mkisofs
         m_cont = 0;
-        if (!strstr(buffer, MKISOFS_NOSPACE))
-        {
+        if (!strstr(buffer, MKISOFS_NOSPACE)) {
             PRINTF("Not enough free disk space to create iso image!\n");
             g_free(buffer);
             return FALSE;
         }
-    }
-    else if(!strncmp(buffer, MKISOFS_OK, strlen(MKISOFS_OK)))
-    {
+    } else if(!strncmp(buffer, MKISOFS_OK, strlen(MKISOFS_OK))) {
         m_cont = 0;
         PRINTF("mkisofs progress: 100%%\n");
 #if 0
@@ -819,13 +726,11 @@ gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition)
     return TRUE;
 }
 
-gboolean HandleMakeIsoCallback(GIOChannel *source, GIOCondition condition, gpointer data)
-{
+gboolean HandleMakeIsoCallback(GIOChannel *source, GIOCondition condition, gpointer data) {
     return ViewCD::GetInstance()->MakeIsoCallback(source, condition);
 }
 
-gboolean ViewCD::MakeIso()
-{
+gboolean ViewCD::MakeIso() {
     gboolean status = FALSE;
     gint cmdstatus = 0;
     gint g_out, g_err, arg, pid;
@@ -843,11 +748,10 @@ gboolean ViewCD::MakeIso()
 
     if(info.is_blank)
         cmdline = g_strdup_printf("/usr/bin/mkisofs -r -J -o %s -graft-points -path-list %s", ISOPATH, PATHLIST);
-    else
-    {
+    else {
         if(info.last_track_addr < info.next_writable_addr && info.next_writable_addr)
             cmdline = g_strdup_printf("/usr/bin/mkisofs -r -J -o %s -C %lld,%lld -M %s -graft-points -path-list %s",
-                    ISOPATH, info.last_track_addr, info.next_writable_addr, info.device.c_str(), PATHLIST);
+                                      ISOPATH, info.last_track_addr, info.next_writable_addr, info.device.c_str(), PATHLIST);
         else
             return FALSE;
     }
@@ -855,8 +759,7 @@ gboolean ViewCD::MakeIso()
 
     status = g_shell_parse_argv(cmdline, &arg, &cmd, NULL);
     g_free(cmdline);
-    if(status == FALSE)
-    {
+    if(status == FALSE) {
         PRINTF("MakeISO error: shell pares argv\n");
         return FALSE;
     }
@@ -864,11 +767,10 @@ gboolean ViewCD::MakeIso()
 
     GError *error = NULL;
     status = g_spawn_async_with_pipes(NULL, cmd, NULL,
-            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
-            NULL, NULL, &pid, NULL, &g_out, &g_err, &error);
+                                      (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
+                                      NULL, NULL, &pid, NULL, &g_out, &g_err, &error);
     g_strfreev(cmd);
-    if(status == FALSE)
-    {
+    if(status == FALSE) {
         PRINTF("MakeISO error: %s\n", error->message);
         perror("g_spawn_async_with_pipes");
         return FALSE;
@@ -880,24 +782,22 @@ gboolean ViewCD::MakeIso()
     g_io_channel_set_encoding(com, NULL, NULL);
     g_io_channel_set_flags(com, G_IO_FLAG_NONBLOCK, NULL);
     event = g_io_add_watch (com, (GIOCondition)(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
-            HandleMakeIsoCallback, NULL);
+                            HandleMakeIsoCallback, NULL);
 
     comerr = g_io_channel_unix_new(g_err);
     g_io_channel_set_encoding(comerr, NULL, NULL);
     g_io_channel_set_flags(comerr, G_IO_FLAG_NONBLOCK, NULL);
     eventerr = g_io_add_watch (comerr, (GIOCondition)(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
-            HandleMakeIsoCallback, NULL);
+                               HandleMakeIsoCallback, NULL);
 
-    while(m_cont)
-    {
+    while(m_cont) {
         gtk_main_iteration();
     }
 
     /* exit mkisofs process	*/
     waitpid(pid, &cmdstatus, 0);
     if ((WIFEXITED(cmdstatus) && WEXITSTATUS(cmdstatus)!=0) //command exit normal with error
-            || (!(WIFEXITED(cmdstatus))))	//command exit abnormal
-    {
+            || (!(WIFEXITED(cmdstatus)))) {	//command exit abnormal
         PRINTF("mkisofs command exit with error\n");
         return FALSE;
     }
@@ -915,21 +815,18 @@ gboolean ViewCD::MakeIso()
     return TRUE;
 }
 
-gboolean ViewCD::BurnCDCallback(GIOChannel *source, GIOCondition condition)
-{
+gboolean ViewCD::BurnCDCallback(GIOChannel *source, GIOCondition condition) {
     gchar *buffer = NULL;
     GIOStatus status;
 
-    if (condition == G_IO_HUP || condition == G_IO_ERR)
-    {
+    if (condition == G_IO_HUP || condition == G_IO_ERR) {
         perror("BurnCD GIOChannel error:");
         m_cont = 0;
         return TRUE;
     }
 
     status = g_io_channel_read_line(source, &buffer, NULL, NULL, NULL);
-    if (!buffer || status == G_IO_STATUS_ERROR || status == G_IO_STATUS_AGAIN)
-    {
+    if (!buffer || status == G_IO_STATUS_ERROR || status == G_IO_STATUS_AGAIN) {
         return TRUE;
     }
     PRINTF("%s: %s", __FUNCTION__, buffer);
@@ -937,13 +834,11 @@ gboolean ViewCD::BurnCDCallback(GIOChannel *source, GIOCondition condition)
     return TRUE;
 }
 
-gboolean HandleBurnCDCallback(GIOChannel *source, GIOCondition condition, gpointer data)
-{
+gboolean HandleBurnCDCallback(GIOChannel *source, GIOCondition condition, gpointer data) {
     return ViewCD::GetInstance()->BurnCDCallback(source, condition);
 }
 
-gboolean ViewCD::BurnCD(const char *device)
-{
+gboolean ViewCD::BurnCD(const char *device) {
     gboolean status = FALSE;
     gchar *cmdline, **cmd;
     gint cmdstatus = 0;
@@ -955,19 +850,17 @@ gboolean ViewCD::BurnCD(const char *device)
 
     status = g_shell_parse_argv(cmdline, &arg, &cmd, NULL);
     g_free(cmdline);
-    if(status == FALSE)
-    {
+    if(status == FALSE) {
         PRINTF("BurnCD error: shell pares argv\n");
         return FALSE;
     }
     //	PRINTF("cmd: %s arg num=%d\n", cmd, arg);
 
     status = g_spawn_async_with_pipes(NULL, cmd, NULL,
-            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
-            NULL, NULL, &pid, NULL, &g_out, &g_err, NULL);
+                                      (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
+                                      NULL, NULL, &pid, NULL, &g_out, &g_err, NULL);
     g_strfreev(cmd);
-    if(status == FALSE)
-    {
+    if(status == FALSE) {
         PRINTF("BurnCD error: g_spawn_async_with_pipes\n");
         return FALSE;
     }
@@ -978,24 +871,22 @@ gboolean ViewCD::BurnCD(const char *device)
     g_io_channel_set_encoding(com, NULL, NULL);
     g_io_channel_set_flags(com, G_IO_FLAG_NONBLOCK, NULL);
     event = g_io_add_watch (com, (GIOCondition)(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
-            HandleBurnCDCallback, NULL);
+                            HandleBurnCDCallback, NULL);
 
     comerr = g_io_channel_unix_new(g_err);
     g_io_channel_set_encoding(comerr, NULL, NULL);
     g_io_channel_set_flags(comerr, G_IO_FLAG_NONBLOCK, NULL);
     eventerr = g_io_add_watch (comerr, (GIOCondition)(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
-            HandleBurnCDCallback, NULL);
+                               HandleBurnCDCallback, NULL);
 
-    while(m_cont)
-    {
+    while(m_cont) {
         gtk_main_iteration();
     }
 
     /* exit mkisofs process	*/
     waitpid(pid, &cmdstatus, 0);
     if ((WIFEXITED(cmdstatus) && WEXITSTATUS(cmdstatus)!=0) //command exit normal with error
-            || (!(WIFEXITED(cmdstatus))))	//command exit abnormal
-    {
+            || (!(WIFEXITED(cmdstatus)))) {	//command exit abnormal
         PRINTF("BurnCD command exit with error\n");
         return FALSE;
     }
@@ -1013,21 +904,18 @@ gboolean ViewCD::BurnCD(const char *device)
     return TRUE;
 }
 
-gboolean ViewCD::BurnDVDCallback(GIOChannel *source, GIOCondition condition)
-{
+gboolean ViewCD::BurnDVDCallback(GIOChannel *source, GIOCondition condition) {
     gchar *buffer = NULL;
     GIOStatus status;
 
-    if (condition == G_IO_HUP || condition == G_IO_ERR)
-    {
+    if (condition == G_IO_HUP || condition == G_IO_ERR) {
         perror("BurnDVD GIOChannel error:");
         m_cont = 0;
         return TRUE;
     }
 
     status = g_io_channel_read_line(source, &buffer, NULL, NULL, NULL);
-    if (!buffer || status == G_IO_STATUS_ERROR || status == G_IO_STATUS_AGAIN)
-    {
+    if (!buffer || status == G_IO_STATUS_ERROR || status == G_IO_STATUS_AGAIN) {
         return TRUE;
     }
     PRINTF("%s: %s", __FUNCTION__, buffer);
@@ -1035,13 +923,11 @@ gboolean ViewCD::BurnDVDCallback(GIOChannel *source, GIOCondition condition)
     return TRUE;
 }
 
-gboolean HandleBurnDVDCallback(GIOChannel *source, GIOCondition condition, gpointer data)
-{
+gboolean HandleBurnDVDCallback(GIOChannel *source, GIOCondition condition, gpointer data) {
     return ViewCD::GetInstance()->BurnDVDCallback(source, condition);
 }
 
-gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device)
-{
+gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device) {
     gboolean status = FALSE;
     gchar *cmdline, **cmd;
     gint cmdstatus = 0;
@@ -1056,19 +942,17 @@ gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device)
 
     status = g_shell_parse_argv(cmdline, &arg, &cmd, NULL);
     g_free(cmdline);
-    if(status == FALSE)
-    {
+    if(status == FALSE) {
         PRINTF("BurnDVD error: shell pares argv\n");
         return FALSE;
     }
     //	PRINTF("cmd: %s arg num=%d\n", cmd, arg);
 
     status = g_spawn_async_with_pipes(NULL, cmd, NULL,
-            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
-            NULL, NULL, &pid, NULL, &g_out, &g_err, NULL);
+                                      (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
+                                      NULL, NULL, &pid, NULL, &g_out, &g_err, NULL);
     g_strfreev(cmd);
-    if(status == FALSE)
-    {
+    if(status == FALSE) {
         PRINTF("BurnDVD error: g_spawn_async_with_pipes\n");
         return FALSE;
     }
@@ -1079,24 +963,22 @@ gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device)
     g_io_channel_set_encoding(com, NULL, NULL);
     g_io_channel_set_flags(com, G_IO_FLAG_NONBLOCK, NULL);
     event = g_io_add_watch (com, (GIOCondition)(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
-            HandleBurnDVDCallback, NULL);
+                            HandleBurnDVDCallback, NULL);
 
     comerr = g_io_channel_unix_new(g_err);
     g_io_channel_set_encoding(comerr, NULL, NULL);
     g_io_channel_set_flags(comerr, G_IO_FLAG_NONBLOCK, NULL);
     eventerr = g_io_add_watch (comerr, (GIOCondition)(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_PRI),
-            HandleBurnDVDCallback, NULL);
+                               HandleBurnDVDCallback, NULL);
 
-    while(m_cont)
-    {
+    while(m_cont) {
         gtk_main_iteration();
     }
 
     /* exit mkisofs process	*/
     waitpid(pid, &cmdstatus, 0);
     if ((WIFEXITED(cmdstatus) && WEXITSTATUS(cmdstatus)!=0) //command exit normal with error
-            || (!(WIFEXITED(cmdstatus))))	//command exit abnormal
-    {
+            || (!(WIFEXITED(cmdstatus)))) {	//command exit abnormal
         PRINTF("BurnDVD command exit with error\n");
         return FALSE;
     }
@@ -1122,25 +1004,22 @@ gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device)
 //     return FALSE;
 // }
 
-gboolean TimeoutInfoDialog(gpointer data)
-{
+gboolean TimeoutInfoDialog(gpointer data) {
     ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()),
-            ViewDialog::INFO,
-            _((char*)data),
-            NULL);
+                                      ViewDialog::INFO,
+                                      _((char*)data),
+                                      NULL);
 
     return FALSE;
 }
 
-gboolean TimeoutUpdateDialog(gpointer data)
-{
+gboolean TimeoutUpdateDialog(gpointer data) {
     ViewDialog::GetInstance()->SetText(_((char*)data));
 
     return FALSE;
 }
 
-void ViewCD::HintDialog(guint timeout, int type, const char *info)
-{
+void ViewCD::HintDialog(guint timeout, int type, const char *info) {
     // if(type==ViewDialog::HINT)
     // 	g_timeout_add(timeout, TimeoutHintDialog, (void*)info);
     if(type==ViewDialog::INFO)
@@ -1151,26 +1030,22 @@ void ViewCD::HintDialog(guint timeout, int type, const char *info)
         g_timeout_add(timeout, TimeoutInfoDialog, (void*)info);
 }
 
-void ViewCD::BtnBackupClicked(GtkButton *button)
-{
-    if(m_vecFolder.size()==0 || m_vecPath.size()==0)
-    {
+void ViewCD::BtnBackupClicked(GtkButton *button) {
+    if(m_vecFolder.size()==0 || m_vecPath.size()==0) {
         PRINTF("No file selected!\n");
         const char *buf_info = "No any files selected!\nPlease select files to export first.";
         HintDialog(10, (int)ViewDialog::INFO, buf_info);
         return;
     }
 
-    if(!PrepareData(m_vecFolder, m_vecPath))
-    {
+    if(!PrepareData(m_vecFolder, m_vecPath)) {
         PRINTF("PrepareData Error!\n");
         const char *buf_info = "Failed to prepare data!";
         HintDialog(10, (int)ViewDialog::INFO, buf_info);
         return;
     }
 
-    if(m_remain <= 0)
-    {
+    if(m_remain <= 0) {
         PRINTF("The remain space not enough!\n");
         const char *buf_info = "No enough space!";
         HintDialog(10, (int)ViewDialog::INFO, buf_info);
@@ -1180,18 +1055,15 @@ void ViewCD::BtnBackupClicked(GtkButton *button)
     CdBurn::GetInstance()->StartBurn(LIST_PATH);
 }
 
-void ViewCD::BtnExportClicked(GtkButton *button)
-{
-    if(m_vecFolder.size()==0 || m_vecPath.size()==0)
-    {
+void ViewCD::BtnExportClicked(GtkButton *button) {
+    if(m_vecFolder.size()==0 || m_vecPath.size()==0) {
         PRINTF("No file selected!\n");
         const char *buf_info = "No any files selected!\nPlease select files to export first.";
         HintDialog(10, (int)ViewDialog::INFO, buf_info);
         return;
     }
 
-    if(m_remain <= 0)
-    {
+    if(m_remain <= 0) {
         PRINTF("The remain space not enough!\n");
         const char *buf_info = "No enough space!";
         HintDialog(10, (int)ViewDialog::INFO, buf_info);
@@ -1201,11 +1073,9 @@ void ViewCD::BtnExportClicked(GtkButton *button)
     ViewArchive::GetInstance()->StartUsbExport(GetWindow());
 }
 
-void ViewCD::BtnEraseClicked(GtkButton *button)
-{
+void ViewCD::BtnEraseClicked(GtkButton *button) {
 }
 
-void ViewCD::BtnExitClicked(GtkButton *button)
-{
+void ViewCD::BtnExitClicked(GtkButton *button) {
     DestroyWindow();
 }

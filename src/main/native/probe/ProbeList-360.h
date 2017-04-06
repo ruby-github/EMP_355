@@ -5,8 +5,7 @@
 #define PROBE_INFO_SIZE  128
 #ifndef EMP_440
 enum EProbeList360 {P35CV, P65VMC, P75LVS, P35MC, P65MC, PT30P16A,PT35D40JSNR, PT35D40JNDK};
-unsigned char Probe35CV[PROBE_INFO_SIZE] = //3.5CV
-{
+unsigned char Probe35CV[PROBE_INFO_SIZE] = { //3.5CV
     // black-white
     '3',	'5',	'C',	'5',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		72,		0,		48,		0,		0,
@@ -26,8 +25,7 @@ unsigned char Probe35CV[PROBE_INFO_SIZE] = //3.5CV
     'E',		'M',		'P',		0x5a,
 };
 
-unsigned char Probe65VMC[PROBE_INFO_SIZE] = //6.5VMC //TV
-{
+unsigned char Probe65VMC[PROBE_INFO_SIZE] = { //6.5VMC //TV
     // black-white
     '6',   '5',    'C',    '1',    '0',    'J',    '0',	    '0',	'0',	'0',
     'C',    1,		28,		2,		56,		150,	0,		10,		0,		0,
@@ -46,8 +44,7 @@ unsigned char Probe65VMC[PROBE_INFO_SIZE] = //6.5VMC //TV
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe75LVS[PROBE_INFO_SIZE] = //7.5LVS
-{
+unsigned char Probe75LVS[PROBE_INFO_SIZE] = { //7.5LVS
     // black-white
     '7',   '5',    'L',    '4',    '0',    'J',		'0',	'0',	'0',	'0',
     'L',    1,		28,		2,		56,		38,		0,		0,		0,		0,
@@ -67,8 +64,7 @@ unsigned char Probe75LVS[PROBE_INFO_SIZE] = //7.5LVS
     'E',		'M',		'P',		0x5a,
 };
 #endif
-unsigned char Probe35MC[PROBE_INFO_SIZE] = //3.5MC
-{
+unsigned char Probe35MC[PROBE_INFO_SIZE] = { //3.5MC
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
     'C',    0,		96,		1,		92,		88,		0,		21,		0,		0,
@@ -87,8 +83,7 @@ unsigned char Probe35MC[PROBE_INFO_SIZE] = //3.5MC
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65MC[PROBE_INFO_SIZE] = //6.5MC
-{
+unsigned char Probe65MC[PROBE_INFO_SIZE] = { //6.5MC
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
     'C',	0,		80,		1,		60,		98,		0,		15,		0,		0,
@@ -110,8 +105,7 @@ unsigned char Probe65MC[PROBE_INFO_SIZE] = //6.5MC
 
 //30P16A  同340
 #if 0
-unsigned char Probe35D40J[PROBE_INFO_SIZE] = //volume convex
-{
+unsigned char Probe35D40J[PROBE_INFO_SIZE] = { //volume convex
     // black-white
     '3',	'5',	'D',	'4',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		68,		20,		40,		0,		0,

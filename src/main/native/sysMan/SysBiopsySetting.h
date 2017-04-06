@@ -3,8 +3,7 @@
 
 #include "base/IniFile.h"
 
-class SysBiopsySetting
-{
+class SysBiopsySetting {
 public:
     SysBiopsySetting();
     ~SysBiopsySetting();

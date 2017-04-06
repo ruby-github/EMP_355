@@ -4,9 +4,9 @@
 #include "Def.h"
 
 #if (defined (EMP_322) || defined(EMP_313))
-    enum EKnobReview {REVIEW_NEXT, REVIEW_PREVIOUS, REVIEW_SLIDE_PLAY, REVIEW_SLIDE_SPEED};
+enum EKnobReview {REVIEW_NEXT, REVIEW_PREVIOUS, REVIEW_SLIDE_PLAY, REVIEW_SLIDE_SPEED};
 #else
-    enum EKnobReview {REVIEW_NEXT, REVIEW_SLIDE_PLAY, REVIEW_SLIDE_SPEED};
+enum EKnobReview {REVIEW_NEXT, REVIEW_SLIDE_PLAY, REVIEW_SLIDE_SPEED};
 #endif
 
 void KnobLoadSnapCreate();

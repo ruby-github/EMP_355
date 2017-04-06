@@ -22,7 +22,7 @@
 KnobMenu::KnobItem KnobMMenu[6] = {
 //	{_("Freq."), "", MIN, MChgFreq, NULL},
     {_("M Speed"), "", MIN, MChgSpeed, MPressChgSpeed},
- //   {_("【Chroma】"), "", MIN, MChgChroma, MPressChroma},
+//   {_("【Chroma】"), "", MIN, MChgChroma, MPressChroma},
     {N_("MBP"),"", MIN, NULL, MPressChgMBP},
     {N_("Sound Power"),"", MIN, NULL, MPressChgSoundPower},
     {"", "", ERROR, NULL, NULL},
@@ -32,49 +32,45 @@ KnobMenu::KnobItem KnobMMenu[6] = {
 };
 KnobMenu::KnobItem KnobAnatomicMMenu[6] = {
 //	{_("Freq."), "", MIN, MChgFreq, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
 
 };
 #else
 KnobMenu::KnobItem KnobMMenu[5] = {
-	{_("Freq."), "", MIN, MChgFreq, MPressChgStatusTHI},
-	{_("M Speed"), "", MIN, MChgSpeed, NULL},
+    {_("Freq."), "", MIN, MChgFreq, MPressChgStatusTHI},
+    {_("M Speed"), "", MIN, MChgSpeed, NULL},
     {_("【Chroma】"), "", MIN, MChgChroma, MPressChroma},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
 };
 KnobMenu::KnobItem KnobAnatomicMMenu[5] = {
-	{_("Freq."), "", MIN, MChgFreq, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
-	{"", "", ERROR, NULL, NULL},
+    {_("Freq."), "", MIN, MChgFreq, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
 };
 #endif
 
-void KnobMCreate()
-{
+void KnobMCreate() {
     KnobMenu::GetInstance()->SetItem(KnobMMenu, sizeof(KnobMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::M);
 }
 
-void KnobAnatomicMCreate()
-{
+void KnobAnatomicMCreate() {
     KnobMenu::GetInstance()->SetItem(KnobAnatomicMMenu, sizeof(KnobAnatomicMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::ANATOMIC_M);
 }
 
 ///> knob menu need to be sync
-void SyncKnobM(EKnobM type, const char* s, EKnobReturn status, bool draw)
-{
+void SyncKnobM(EKnobM type, const char* s, EKnobReturn status, bool draw) {
     sprintf(KnobMMenu[type].value, "%s", s);
-	KnobMMenu[type].status = status;
+    KnobMMenu[type].status = status;
 #if not defined(EMP_322)
-    if (type == M_FREQ)
-    {
+    if (type == M_FREQ) {
         sprintf(KnobAnatomicMMenu[type].value, "%s", s);
         KnobAnatomicMMenu[type].status = status;
     }
@@ -84,9 +80,8 @@ void SyncKnobM(EKnobM type, const char* s, EKnobReturn status, bool draw)
 }
 
 ///> callback function
-EKnobReturn MChgFreq(EKnobOper oper)
-{
-	EKnobReturn ret;
+EKnobReturn MChgFreq(EKnobOper oper) {
+    EKnobReturn ret;
     bool status = Img2D::GetInstance()->GetStatusTHI();
     //printf("status:%d\n", status);
 
@@ -96,14 +91,13 @@ EKnobReturn MChgFreq(EKnobOper oper)
         ret = Img2D::GetInstance()->ChangeFreq(oper);
 
     // change Tis
-	ChangeTis();
+    ChangeTis();
 
-	return ret;
+    return ret;
     //return Img2D::GetInstance()->ChangeFreq(oper);                //M模式下也应该由谐波
 }
 
-EKnobReturn MPressChgStatusTHI(void)
-{
+EKnobReturn MPressChgStatusTHI(void) {
     EKnobReturn ret;
     ret = ERROR;
     Img2D::GetInstance()->ChangeHarmonicStatus(ROTATE);
@@ -112,8 +106,7 @@ EKnobReturn MPressChgStatusTHI(void)
 }
 
 //emp5800 按键切换，改变M模式下的速度（0 --- 7）
-EKnobReturn MPressChgSpeed(void)
-{
+EKnobReturn MPressChgSpeed(void) {
     EKnobOper oper;
     oper = ROTATE;
     EKnobReturn ret = ERROR;
@@ -121,35 +114,29 @@ EKnobReturn MPressChgSpeed(void)
     return ret;
 }
 
-EKnobReturn MChgSpeed(EKnobOper oper)
-{
+EKnobReturn MChgSpeed(EKnobOper oper) {
     return Img2D::GetInstance()->ChangeMSpeed(oper);
 }
-EKnobReturn MChgChroma(EKnobOper oper)
-{
+EKnobReturn MChgChroma(EKnobOper oper) {
     return ImgProc2D::GetInstance()->ChangeChroma(oper);
 }
 
-EKnobReturn MPressChroma(void)
-{
-	return ImgProc2D::GetInstance()->PressChroma();
+EKnobReturn MPressChroma(void) {
+    return ImgProc2D::GetInstance()->PressChroma();
 }
 
 // change mbp
-EKnobReturn MPressChgMBP(void)
-{
-    if (ModeStatus::IsEFOVMode() || (!ModeStatus::IsUnFreezeMode()))
-    {
+EKnobReturn MPressChgMBP(void) {
+    if (ModeStatus::IsEFOVMode() || (!ModeStatus::IsUnFreezeMode())) {
         HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
         return ERROR;
     }
 
     return Img2D::GetInstance()->ChangeMBP(ROTATE);
- }
+}
 
 //change sound power
-EKnobReturn MPressChgSoundPower(void)
-{
+EKnobReturn MPressChgSoundPower(void) {
     EKnobOper oper = ROTATE;
     EKnobReturn ret = ERROR;
     ret = Img2D::GetInstance()->ChangeSoundPower(oper);

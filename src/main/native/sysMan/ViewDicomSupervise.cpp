@@ -16,51 +16,43 @@
 //std::string ViewDicomSupervise::noticeInfo = _("Note: According to the license file,the manufacturer will generate\na unique register key for every machine. You can register DICOM\nfunction by inputting this register key. If register is successful,\nyou can use the DICOM function.");
 //std::string ViewDicomSupervise::noticeInfo1=_("Please insert Udisk,and click button 'Export License File'. You will\nfind this file named 'license' in Udisk. Please send this file to\nmanufacturer.");
 ViewDicomSupervise* ViewDicomSupervise::m_ptrInstance = NULL;
-ViewDicomSupervise::ViewDicomSupervise()
-{
+ViewDicomSupervise::ViewDicomSupervise() {
 
 }
 
-ViewDicomSupervise::~ViewDicomSupervise()
-{
+ViewDicomSupervise::~ViewDicomSupervise() {
     if (m_ptrInstance != NULL)
         delete m_ptrInstance;
 }
 
-ViewDicomSupervise* ViewDicomSupervise::GetInstance()
-{
+ViewDicomSupervise* ViewDicomSupervise::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new ViewDicomSupervise;
 
     return m_ptrInstance;
 }
 
-void ViewDicomSupervise::DestroyWindow(void)
-{
+void ViewDicomSupervise::DestroyWindow(void) {
     if(GTK_IS_WIDGET(m_window))	{
         Exit();
         gtk_widget_destroy(m_window);
-        if (g_keyInterface.Size() == 1)
-        {
+        if (g_keyInterface.Size() == 1) {
             SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
         }
     }
 }
 
-void ViewDicomSupervise::Exit(void)
-{
+void ViewDicomSupervise::Exit(void) {
     g_keyInterface.Pop();
 }
 
-gboolean ViewDicomSupervise::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
-{
+gboolean ViewDicomSupervise::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     DestroyWindow();
     return FALSE;
 }
 
 //GtkWidget* ViewDicomSupervise::CreateWindow(GtkWidget *parent)
-void ViewDicomSupervise::CreateWindow(void)
-{
+void ViewDicomSupervise::CreateWindow(void) {
     GtkWidget *fixed;
     GtkWidget *labelNote;
     GtkWidget *btnExport;
@@ -75,14 +67,14 @@ void ViewDicomSupervise::CreateWindow(void)
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
 
     m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	gtk_widget_set_size_request (m_window, 480, 400);
-	gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
-	gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
-	gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
+    gtk_widget_set_size_request (m_window, 480, 400);
+    gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
+    gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
+    gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
     gtk_window_set_title (GTK_WINDOW (m_window), _("DICOM Register"));
-	gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
-	//gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(parent));
-	g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(HandleWindowDeleteEvent), this);
+    gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
+    //gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(parent));
+    g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(HandleWindowDeleteEvent), this);
 
     fixed = gtk_fixed_new ();
     gtk_container_add (GTK_CONTAINER (m_window), fixed);
@@ -102,7 +94,7 @@ void ViewDicomSupervise::CreateWindow(void)
     btnExport = gtk_button_new_with_mnemonic(_("Export License File"));
     gtk_fixed_put (GTK_FIXED (fixed), btnExport, 250, 155);
     gtk_widget_set_size_request (btnExport, 200, 35);
-	g_signal_connect (G_OBJECT(btnExport), "clicked", G_CALLBACK(HandleBtnExportClicked), this);
+    g_signal_connect (G_OBJECT(btnExport), "clicked", G_CALLBACK(HandleBtnExportClicked), this);
     hseparator1 = gtk_hseparator_new ();
     gtk_widget_show (hseparator1);
     gtk_fixed_put (GTK_FIXED (fixed), hseparator1, 8, 200);
@@ -128,7 +120,7 @@ void ViewDicomSupervise::CreateWindow(void)
     btnRegister = gtk_button_new_with_mnemonic(_("Register"));
     gtk_fixed_put (GTK_FIXED (fixed), btnRegister, 300+45, 300);
     gtk_widget_set_size_request (btnRegister, 100, 35);
-	g_signal_connect (G_OBJECT(btnRegister), "clicked", G_CALLBACK(HandleBtnRegisterClicked), this);
+    g_signal_connect (G_OBJECT(btnRegister), "clicked", G_CALLBACK(HandleBtnRegisterClicked), this);
 
     hseparator2 = gtk_hseparator_new ();
     gtk_widget_show (hseparator2);
@@ -138,7 +130,7 @@ void ViewDicomSupervise::CreateWindow(void)
     btnExit = gtk_button_new_with_mnemonic(_("Exit"));
     gtk_fixed_put (GTK_FIXED (fixed), btnExit, 300+45, 360);
     gtk_widget_set_size_request (btnExit, 100, 35);
-	g_signal_connect (G_OBJECT(btnExit), "clicked", G_CALLBACK(HandleBtnExitClicked), this);
+    g_signal_connect (G_OBJECT(btnExit), "clicked", G_CALLBACK(HandleBtnExitClicked), this);
 
     gtk_widget_show_all(m_window);
     window_register = m_window;
@@ -149,10 +141,8 @@ void ViewDicomSupervise::CreateWindow(void)
     //return window_register;
 }
 
-void ViewDicomSupervise::Authenticate(void)
-{
-    if (m_timer > 0)
-    {
+void ViewDicomSupervise::Authenticate(void) {
+    if (m_timer > 0) {
         g_source_remove(m_timer);
         m_timer = 0;
         g_keyInterface.Pop();
@@ -164,32 +154,26 @@ void ViewDicomSupervise::Authenticate(void)
     m_timer = g_timeout_add(10000, HandleAuthen, NULL);
 }
 
-gboolean ViewDicomSupervise::IsAuthenValid(void)
-{
+gboolean ViewDicomSupervise::IsAuthenValid(void) {
     m_timer = 0;
-    if (m_vecAuthenInfo.empty() || ((!m_vecAuthenInfo.empty()) && m_vecAuthenInfo[0] != 'I'))
-    {
+    if (m_vecAuthenInfo.empty() || ((!m_vecAuthenInfo.empty()) && m_vecAuthenInfo[0] != 'I')) {
         PRINTF("not authen\n");
         Exit();
-    }
-    else
-    {
+    } else {
         PRINTF("authen\n");
     }
 
     return FALSE;
 }
 
-void ViewDicomSupervise::ConfirmAuthen(void)
-{
+void ViewDicomSupervise::ConfirmAuthen(void) {
     unsigned char info[AUTHEN_NUM+1];
     int size = m_vecAuthenInfo.size();
     int i;
 
     ASSERT(size <= (int)AUTHEN_NUM);
     info[size] = '\0';
-    for (i = 0; i < size; i ++)
-    {
+    for (i = 0; i < size; i ++) {
         info[i] = m_vecAuthenInfo[i];
     }
 
@@ -201,22 +185,17 @@ void ViewDicomSupervise::ConfirmAuthen(void)
         CreateWindow();
 }
 
-void ViewDicomSupervise::BtnExportClicked(GtkButton *button)
-{
-   PeripheralMan *ptr = PeripheralMan::GetInstance();
-   char info1[256];
-    if(!ptr->CheckUsbStorageState())
-    {
+void ViewDicomSupervise::BtnExportClicked(GtkButton *button) {
+    PeripheralMan *ptr = PeripheralMan::GetInstance();
+    char info1[256];
+    if(!ptr->CheckUsbStorageState()) {
         sprintf(info1,"%s",_("No USB storage found!"));
         gtk_label_set_text(GTK_LABEL(m_labelExport),info1);
         gtk_widget_show (m_labelExport);
 
         return;
-    }
-    else
-    {
-        if(!ptr->MountUsbStorage())
-        {
+    } else {
+        if(!ptr->MountUsbStorage()) {
             sprintf(info1,"%s",_("Failed to mount USB storage!"));
             gtk_label_set_text(GTK_LABEL(m_labelExport),info1);
             gtk_widget_show (m_labelExport);
@@ -228,12 +207,9 @@ void ViewDicomSupervise::BtnExportClicked(GtkButton *button)
         return;
     bool value = CDCMRegister::GetMe()->GenerateLicenseFile(destFileDir);
     char info[256];
-    if(value)
-    {
+    if(value) {
         sprintf(info,"%s",_("Succeed to export file!"));
-    }
-    else
-    {
+    } else {
         sprintf(info,"%s",_("Fail to export file!"));
     }
     gtk_label_set_text(GTK_LABEL(m_labelExport),info);
@@ -242,82 +218,66 @@ void ViewDicomSupervise::BtnExportClicked(GtkButton *button)
     ptr->UmountUsbStorage();
 }
 
-void ViewDicomSupervise::BtnRegisterClicked(GtkButton *button)
-{
-   const gchar *registerKey = gtk_entry_get_text(GTK_ENTRY(m_entry_key));
+void ViewDicomSupervise::BtnRegisterClicked(GtkButton *button) {
+    const gchar *registerKey = gtk_entry_get_text(GTK_ENTRY(m_entry_key));
     if(CDCMRegister::GetMe()==NULL)
         return;
 
     bool value =CDCMRegister::GetMe()->CheckAuthorize(registerKey);
     char info[256];
-    if(value)
-    {
+    if(value) {
         sprintf(info,"%s",_("Succeed to register!"));
-    }
-    else
-    {
+    } else {
         sprintf(info,"%s",_("Fail to register!"));
     }
     gtk_label_set_text(GTK_LABEL(m_labelRegister),info);
     gtk_widget_show (m_labelRegister);
 }
 
-void ViewDicomSupervise::BtnExitClicked(GtkButton *button)
-{
+void ViewDicomSupervise::BtnExitClicked(GtkButton *button) {
     DestroyWindow();
 }
 
-static gboolean ExitWindow(gpointer data)
-{
+static gboolean ExitWindow(gpointer data) {
     ViewDicomSupervise *tmp;
     tmp = (ViewDicomSupervise*)data;
     tmp->DestroyWindow();
     return FALSE;
 }
 
-void ViewDicomSupervise::KeyEvent(unsigned char keyValue)
-{
-    switch(keyValue)
-    {
-        case KEY_ESC:
-            g_timeout_add(100, ExitWindow, this);
-			FakeEscKey();
-			break;
+void ViewDicomSupervise::KeyEvent(unsigned char keyValue) {
+    switch(keyValue) {
+    case KEY_ESC:
+        g_timeout_add(100, ExitWindow, this);
+        FakeEscKey();
+        break;
 
-		default:
-            FakeXEvent::KeyEvent(keyValue);
-			break;
+    default:
+        FakeXEvent::KeyEvent(keyValue);
+        break;
 
 #if 0
-            if (m_statusAuthen)
-            {
-                Exit();
+        if (m_statusAuthen) {
+            Exit();
+        } else {
+            //DestroyWindow();
+            g_timeout_add(100, ExitWindow, this);
+            FakeEscKey();
+        }
+        break;
+    default: {
+        if (m_statusAuthen) {
+            m_vecAuthenInfo.push_back(keyValue);
+            if (m_vecAuthenInfo.size() == AUTHEN_NUM) {
+                g_keyInterface.Pop();
+                m_statusAuthen = FALSE;
+                ConfirmAuthen();
             }
-            else
-            {
-                //DestroyWindow();
-                g_timeout_add(100, ExitWindow, this);
-                FakeEscKey();
-            }
-            break;
-        default:
-            {
-                if (m_statusAuthen)
-                {
-                    m_vecAuthenInfo.push_back(keyValue);
-                    if (m_vecAuthenInfo.size() == AUTHEN_NUM)
-                    {
-                        g_keyInterface.Pop();
-                        m_statusAuthen = FALSE;
-                        ConfirmAuthen();
-                    }
-                }
-                else
-                {
-                    FakeXEvent::KeyEvent(keyValue);
-                }
-            }
-            break;
+        } else {
+            FakeXEvent::KeyEvent(keyValue);
+        }
+    }
+    break;
 #endif
     }
 }

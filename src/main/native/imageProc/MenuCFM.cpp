@@ -20,19 +20,16 @@ CusSpin::CusSpinItem MenuCFM::item_reject = {N_("Color Reject"), "1", OK, ChgRej
 CusSpin::CusSpinItem MenuCFM::item_smooth = {N_("Smooth"), "1", OK, ChgSmooth};
 CusSpin::CusSpinItem MenuCFM::item_artifact = {N_("Artifact"), "1", OK, ChgArtifact};
 
-MenuCFM::MenuCFM(void)
-{
-	m_table = 0;
+MenuCFM::MenuCFM(void) {
+    m_table = 0;
 }
 
-void MenuCFM::Hide(void)
-{
+void MenuCFM::Hide(void) {
     gtk_combo_box_popdown(GTK_COMBO_BOX(m_comboScale));
     gtk_widget_hide_all(m_table);
 }
 
-void MenuCFM::Show(void)
-{
+void MenuCFM::Show(void) {
     //鍐嶆璧嬪€硷紝鐩殑鏄垏鎹㈠埌cfm妯″紡涓嬬殑鏃跺€欓槇鍊煎拰褰╄壊鎶戝埗涓嶅彲鎿嶄綔
     spin_threshold.SetItem(&item_threshold);
     spin_reject.SetItem(&item_reject);
@@ -40,7 +37,7 @@ void MenuCFM::Show(void)
     gtk_widget_show_all(m_table);
 
     //if (ModeStatus::IsPDIMode()) {
-     //   gtk_widget_hide(m_btnCompare);
+    //   gtk_widget_hide(m_btnCompare);
     //}
     if (ModeStatus::IsCFMMode() || ModeStatus::IsCFMCompareMode()) {
         gtk_widget_hide(m_check_btn_PdiDir);
@@ -57,29 +54,25 @@ void MenuCFM::Show(void)
     }
 }
 
-void MenuCFM::ForeachWidget(GtkWidget *widget)
-{
-	if (widget != m_btn4BCFM &&
-	    widget != m_btnCompare &&
-	    widget != m_btnScale && widget != m_comboScale)
-		gtk_widget_set_sensitive(widget, (bool)m_sensitive);
+void MenuCFM::ForeachWidget(GtkWidget *widget) {
+    if (widget != m_btn4BCFM &&
+            widget != m_btnCompare &&
+            widget != m_btnScale && widget != m_comboScale)
+        gtk_widget_set_sensitive(widget, (bool)m_sensitive);
 }
 
-void MenuCFM::Sensitive(bool on)
-{
-	m_sensitive = on;
+void MenuCFM::Sensitive(bool on) {
+    m_sensitive = on;
 
-	GList *list = NULL;
-	list = gtk_container_get_children(GTK_CONTAINER(m_table));
-	if(list)
-	{
-		g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
-		g_list_free(list);
-	}
+    GList *list = NULL;
+    list = gtk_container_get_children(GTK_CONTAINER(m_table));
+    if(list) {
+        g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
+        g_list_free(list);
+    }
 }
 
-GtkWidget* MenuCFM::Create(void)
-{
+GtkWidget* MenuCFM::Create(void) {
     m_table = gtk_table_new(20, 8, TRUE);
 
     // Background Hide
@@ -191,8 +184,7 @@ GtkWidget* MenuCFM::Create(void)
     return m_table;
 }
 
-void MenuCFM::UpdateLabel(void)
-{
+void MenuCFM::UpdateLabel(void) {
     gtk_label_set_text(GTK_LABEL(m_labelColorhide), _("Color Hide"));
     gtk_label_set_text(GTK_LABEL(m_labelBghide), _("Background Hide"));
     gtk_label_set_text(GTK_LABEL(m_labelBC), _("B/C"));
@@ -209,21 +201,19 @@ void MenuCFM::UpdateLabel(void)
 }
 
 ///> private
-GtkTreeModel *MenuCFM::CreateScaleModel()
-{
-	GtkListStore *liststore;
-	GtkTreeIter iter;
-	liststore = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("cm/s"), -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("kHz"), -1);
+GtkTreeModel *MenuCFM::CreateScaleModel() {
+    GtkListStore *liststore;
+    GtkTreeIter iter;
+    liststore = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("cm/s"), -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("kHz"), -1);
 
-	return GTK_TREE_MODEL(liststore);
+    return GTK_TREE_MODEL(liststore);
 }
 
-void MenuCFM::UpdateScaleModel(GtkTreeModel *model)
-{
+void MenuCFM::UpdateScaleModel(GtkTreeModel *model) {
     GtkTreeIter iter;
     GtkListStore *store = GTK_LIST_STORE(model);
 
@@ -233,115 +223,93 @@ void MenuCFM::UpdateScaleModel(GtkTreeModel *model)
     gtk_list_store_set(store, &iter, 0, _("kHz"), -1);
 }
 
-void MenuCFM::UpdateBackgroundHide(bool on)
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_bghide),on);
+void MenuCFM::UpdateBackgroundHide(bool on) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_bghide),on);
 }
-void MenuCFM::UpdateBCWidth(bool on)
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_btnBC),on);
+void MenuCFM::UpdateBCWidth(bool on) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_btnBC),on);
 }
-void MenuCFM::UpdateCfmCompare(bool on)
-{
+void MenuCFM::UpdateCfmCompare(bool on) {
 #if 0
-	if(GTK_IS_TOGGLE_BUTTON(m_btnCompare))
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_btnCompare),on);
+    if(GTK_IS_TOGGLE_BUTTON(m_btnCompare))
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_btnCompare),on);
 #endif
 }
 
-void MenuCFM::UpdatePdiDir(bool on)
-{
-	if(GTK_IS_TOGGLE_BUTTON(m_check_btn_PdiDir))
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_PdiDir),on);
+void MenuCFM::UpdatePdiDir(bool on) {
+    if(GTK_IS_TOGGLE_BUTTON(m_check_btn_PdiDir))
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_PdiDir),on);
 }
 
-void MenuCFM::UpdateThreshold(const char* str, EKnobReturn status)
-{
-	spin_threshold.SetValue(str, status);
+void MenuCFM::UpdateThreshold(const char* str, EKnobReturn status) {
+    spin_threshold.SetValue(str, status);
 }
-void MenuCFM::UpdatePersist(const char* str, EKnobReturn status)
-{
-	spin_persist.SetValue(str, status);
+void MenuCFM::UpdatePersist(const char* str, EKnobReturn status) {
+    spin_persist.SetValue(str, status);
 }
-void MenuCFM::UpdateReject(const char* str, EKnobReturn status)
-{
-	spin_reject.SetValue(str, status);
+void MenuCFM::UpdateReject(const char* str, EKnobReturn status) {
+    spin_reject.SetValue(str, status);
 }
-void MenuCFM::UpdateSmooth(const char* str, EKnobReturn status)
-{
-	spin_smooth.SetValue(str, status);
+void MenuCFM::UpdateSmooth(const char* str, EKnobReturn status) {
+    spin_smooth.SetValue(str, status);
 }
-void MenuCFM::UpdateArtifact(const char* str, EKnobReturn status)
-{
-	spin_artifact.SetValue(str, status);
+void MenuCFM::UpdateArtifact(const char* str, EKnobReturn status) {
+    spin_artifact.SetValue(str, status);
 }
 
 ///> private
-void MenuCFM::ChkColorHideClicked(GtkButton *button)
-{
-	ImgProcCfm::GetInstance()->ChangeColorHide();
+void MenuCFM::ChkColorHideClicked(GtkButton *button) {
+    ImgProcCfm::GetInstance()->ChangeColorHide();
 }
 
-void MenuCFM::ChkBgHideClicked(GtkButton *button)
-{
-	gboolean value;
-	value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-	ImgProcCfm::GetInstance()->ChangeBackgroundHide(value);
+void MenuCFM::ChkBgHideClicked(GtkButton *button) {
+    gboolean value;
+    value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+    ImgProcCfm::GetInstance()->ChangeBackgroundHide(value);
 }
 
-void MenuCFM::Chk4BCFM(GtkButton *button)
-{
+void MenuCFM::Chk4BCFM(GtkButton *button) {
     g_menu2D.Btn4B(button);
-   //ScanMode::GetInstance()->EnterCwCfmFromCfm();
+    //ScanMode::GetInstance()->EnterCwCfmFromCfm();
 }
 
-void MenuCFM::ChkBCClicked(GtkButton *button)
-{
+void MenuCFM::ChkBCClicked(GtkButton *button) {
     //ScanMode::GetInstance()->UpdateCwCfmFromInit();
-	ImgCfm::GetInstance()->BCWidth();
+    ImgCfm::GetInstance()->BCWidth();
 }
-void MenuCFM::ChkPdiDirClicked(GtkButton *button)
-{
-	if (ModeStatus::IsPDIMode() || ModeStatus::IsPDICompareMode())
-	{
-		gboolean value;
-		value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+void MenuCFM::ChkPdiDirClicked(GtkButton *button) {
+    if (ModeStatus::IsPDIMode() || ModeStatus::IsPDICompareMode()) {
+        gboolean value;
+        value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
 
-		ImgCfm::GetInstance()->SwitchPdiAndDir(value);
-	}
+        ImgCfm::GetInstance()->SwitchPdiAndDir(value);
+    }
 }
 
-void MenuCFM::ChkCompareClicked(GtkButton *button)
-{
+void MenuCFM::ChkCompareClicked(GtkButton *button) {
     if (ModeStatus::IsCFMMode())
         ScanMode::GetInstance()->EnterCfmVs2D();
     else if (ModeStatus::IsPDIMode())
         ScanMode::GetInstance()->EnterPdiVs2D();
 }
 
-void MenuCFM::BtnComboScaleChanged(GtkComboBox *widget)
-{
+void MenuCFM::BtnComboScaleChanged(GtkComboBox *widget) {
     ImageAreaDraw::GetInstance()->SetColorScaleUnit((ImageAreaDraw::SCALEUNIT)gtk_combo_box_get_active(widget));
 }
 
-void MenuCFM::ChgThreshold(EKnobOper oper)
-{
-	ImgProcCfm::GetInstance()->ChangeThreshold(oper);
+void MenuCFM::ChgThreshold(EKnobOper oper) {
+    ImgProcCfm::GetInstance()->ChangeThreshold(oper);
 }
-void MenuCFM::ChgPersist(EKnobOper oper)
-{
-	ImgProcCfm::GetInstance()->ChangePersist(oper);
+void MenuCFM::ChgPersist(EKnobOper oper) {
+    ImgProcCfm::GetInstance()->ChangePersist(oper);
 }
-void MenuCFM::ChgReject(EKnobOper oper)
-{
-	ImgProcCfm::GetInstance()->ChangeReject(oper);
+void MenuCFM::ChgReject(EKnobOper oper) {
+    ImgProcCfm::GetInstance()->ChangeReject(oper);
 }
-void MenuCFM::ChgSmooth(EKnobOper oper)
-{
-	ImgProcCfm::GetInstance()->ChangeSmooth(oper);
+void MenuCFM::ChgSmooth(EKnobOper oper) {
+    ImgProcCfm::GetInstance()->ChangeSmooth(oper);
 }
 
-void MenuCFM::ChgArtifact(EKnobOper oper)
-{
-	ImgProcCfm::GetInstance()->ChangeArtifact(oper);
+void MenuCFM::ChgArtifact(EKnobOper oper) {
+    ImgProcCfm::GetInstance()->ChangeArtifact(oper);
 }

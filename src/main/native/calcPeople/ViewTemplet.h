@@ -8,21 +8,20 @@
 #define TEMPLET_CH_DB "./res/glossary_ch.db"
 static const unsigned int maxNodeLen = 60;
 
-class ViewTemplet:public FakeXEvent
-{
+class ViewTemplet:public FakeXEvent {
 public:
     ~ViewTemplet();
     static ViewTemplet* GetInstance();
     void CreateWindow(void);
     void DestroyWindow(void);
     bool DefaultFactory(void);
- void tree_auto_scroll(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path, gpointer user_data);
+    void tree_auto_scroll(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path, gpointer user_data);
 
 private:
     ViewTemplet();
 
     GtkTreeModel* CreateTreeModel(void);
-	void KeyEvent(unsigned char keyValue);
+    void KeyEvent(unsigned char keyValue);
     void AddTreeViewColumn(GtkTreeView *treeview);
     bool OpenDB(void);
     bool CloseDB(void);
@@ -75,28 +74,53 @@ private:
     void DefaultClicked(GtkButton *button);
     void ReturnClicked(GtkButton *button);
     void CellRendererEdited(GtkCellRendererText *renderer, gchar *path, gchar *new_text);
-  bool TempletTestRowExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path);
-   gboolean BtnTempletClicked(GtkWidget *widget, GdkEventButton *event);
+    bool TempletTestRowExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path);
+    gboolean BtnTempletClicked(GtkWidget *widget, GdkEventButton *event);
 
 // signal connect
-static void HandleTempletBtnClicked(GtkWidget *widget, GdkEventButton *event, ViewTemplet *data) { data->BtnTempletClicked(widget, event); }
-  static bool HandleTempletExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path, ViewTemplet *data)
-    {
+    static void HandleTempletBtnClicked(GtkWidget *widget, GdkEventButton *event, ViewTemplet *data) {
+        data->BtnTempletClicked(widget, event);
+    }
+    static bool HandleTempletExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path, ViewTemplet *data) {
         return data->TempletTestRowExpandBefore(treeview, iter, path);
     }
 
-    static void HandleTreeSelectionChanged(GtkTreeSelection *selection, ViewTemplet *data) { data->TreeSelectionChanged(selection); }
-    static void HandleInsertClicked(GtkButton *button, ViewTemplet *data) { data->InsertClicked(button); }
-    static void HandleDeleteClicked(GtkButton *button, ViewTemplet *data) { data->DeleteClicked(button); }
-    static void HandleCopyClicked(GtkButton *button, ViewTemplet *data) { data->CopyClicked(button); }
-    static void HandlePasteClicked(GtkButton *button, ViewTemplet *data) { data->PasteClicked(button); }
-    static void HandleTransferClicked(GtkButton *button, ViewTemplet *data) { data->TransferClicked(button); }
-    static void HandleExitClicked(GtkButton *button, ViewTemplet *data) { data->ExitClicked(button); }
-    static void HandleEditClicked(GtkButton *button, ViewTemplet *data) { data->EditClicked(button); }
-    static void HandleSaveClicked(GtkButton *button, ViewTemplet *data) { data->SaveClicked(button); }
-    static void HandleDefaultClicked(GtkButton *button, ViewTemplet *data) { data->DefaultClicked(button); }
-    static void HandleReturnClicked(GtkButton *button, ViewTemplet *data) { data->ReturnClicked(button); }
-    static void HandleCellRendererEdited(GtkCellRendererText *renderer, gchar *path, gchar *new_text, ViewTemplet *data) { data->CellRendererEdited(renderer, path, new_text); }
+    static void HandleTreeSelectionChanged(GtkTreeSelection *selection, ViewTemplet *data) {
+        data->TreeSelectionChanged(selection);
+    }
+    static void HandleInsertClicked(GtkButton *button, ViewTemplet *data) {
+        data->InsertClicked(button);
+    }
+    static void HandleDeleteClicked(GtkButton *button, ViewTemplet *data) {
+        data->DeleteClicked(button);
+    }
+    static void HandleCopyClicked(GtkButton *button, ViewTemplet *data) {
+        data->CopyClicked(button);
+    }
+    static void HandlePasteClicked(GtkButton *button, ViewTemplet *data) {
+        data->PasteClicked(button);
+    }
+    static void HandleTransferClicked(GtkButton *button, ViewTemplet *data) {
+        data->TransferClicked(button);
+    }
+    static void HandleExitClicked(GtkButton *button, ViewTemplet *data) {
+        data->ExitClicked(button);
+    }
+    static void HandleEditClicked(GtkButton *button, ViewTemplet *data) {
+        data->EditClicked(button);
+    }
+    static void HandleSaveClicked(GtkButton *button, ViewTemplet *data) {
+        data->SaveClicked(button);
+    }
+    static void HandleDefaultClicked(GtkButton *button, ViewTemplet *data) {
+        data->DefaultClicked(button);
+    }
+    static void HandleReturnClicked(GtkButton *button, ViewTemplet *data) {
+        data->ReturnClicked(button);
+    }
+    static void HandleCellRendererEdited(GtkCellRendererText *renderer, gchar *path, gchar *new_text, ViewTemplet *data) {
+        data->CellRendererEdited(renderer, path, new_text);
+    }
 };
 
 #endif

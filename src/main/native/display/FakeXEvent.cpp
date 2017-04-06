@@ -3,43 +3,38 @@
 #include "keyboard/KeyFunc.h"
 #include "keyboard/KeyDef.h"
 
-void FakeXEvent::KeyEvent(unsigned char keyValue)
-{
+void FakeXEvent::KeyEvent(unsigned char keyValue) {
 #if defined(EMP_322)
-    if(keyValue == KEY_CTRL_SHIFT_SPACE)
-    {
-		KeySwitchIM ksim;
+    if(keyValue == KEY_CTRL_SHIFT_SPACE) {
+        KeySwitchIM ksim;
         ksim.ExcuteChange(TRUE);
-		return;
+        return;
     }
 #elif defined(EMP_313)
     {
-        if (keyValue == KEY_ONE)
-        {
+        if (keyValue == KEY_ONE) {
             KeySwitchIM ksim;
             ksim.ExcuteChange(TRUE);
             return;
         }
     }
 #else
-	if(keyValue==KEY_SHIFT_CTRL)
-	{
-		KeySwitchIM ksim;
+    if(keyValue==KEY_SHIFT_CTRL) {
+        KeySwitchIM ksim;
         ksim.ExcuteChange(TRUE);
-		return;
-	}
+        return;
+    }
 #endif
     if(FakeMouseButton(keyValue))
-		return;
+        return;
     if(FakeNumKey(keyValue))
-		return;
+        return;
     if(FakeAlphabet(keyValue))
-		return;
-	if(FakePunctuation(keyValue))
-		return;
+        return;
+    if(FakePunctuation(keyValue))
+        return;
 }
 
-void FakeXEvent::MouseEvent(char offsetX, char offsetY)
-{
+void FakeXEvent::MouseEvent(char offsetX, char offsetY) {
     fakeXMotionEventFullRange(offsetX, offsetY);
 }
