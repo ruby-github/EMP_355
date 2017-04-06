@@ -171,7 +171,7 @@ EKnobReturn KnobEFOVSavePress(void) {
     if (Replay::GetInstance()->EFOVVideoOutOfRange()) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
                                           ViewDialog::QUESTION,
-                                          _("eView cine is oversized. Intercept the cine automatically?"),
+                                          _("pScape cine is oversized. Intercept the cine automatically?"),
                                           &SaveCine);
         return PRESS;
     } else {
