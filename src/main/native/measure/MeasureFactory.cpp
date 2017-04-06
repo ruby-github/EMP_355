@@ -1,15 +1,15 @@
-#include "MeasureFactory.h"
-#include "Measure2D.h"
-#include "MeasureM.h"
-#include "MeasureD.h"
-#include "DrawHistogram.h"
-#include "MeaCalcFun.h"
+#include "measure/MeasureFactory.h"
+#include "measure/Measure2D.h"
+#include "measure/MeasureM.h"
+#include "measure/MeasureD.h"
+#include "measure/DrawHistogram.h"
+#include "calcPeople/MeaCalcFun.h"
 //#include "ModeStatus.h"
-#include "SysMeasurementSetting.h"
-#include "ImgProcPw.h"
-#include "../display/HintArea.h"
-#include "../keyboard/KeyFunc.h"
-#include "../imageProc/ImgProc2D.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "imageProc/ImgProcPw.h"
+#include "display/HintArea.h"
+#include "keyboard/KeyFunc.h"
+#include "imageProc/ImgProc2D.h"
 
 AbsMeasure* g_ptrAbsMeasure = NULL;
 
@@ -95,7 +95,7 @@ MeasureFactory::EMeasureMode MeasureFactory::JudgeMode(void)
 					return MEA_2D_PW;
 			}
 			break;
-		
+
 		case ScanMode::PW_SIMULT:
 		case ScanMode::PWPDI_SIMULT:
 		case ScanMode::PWCFM_SIMULT:
@@ -116,17 +116,16 @@ FreezeMode::EFreezeMode MeasureFactory::JudgeFreeze(void)
 	return(getStatus.GetFreezeMode());
 }
 
-
 AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 {
 	unsigned int parError = 0;
 
-	if(g_ptrAbsMeasure != NULL) 
+	if(g_ptrAbsMeasure != NULL)
 	{
 		delete g_ptrAbsMeasure;
 		g_ptrAbsMeasure = NULL;
 	}
-	//自动计算打开时，禁止测量
+	//鑷姩璁＄畻鎵撳紑鏃讹紝绂佹娴嬮噺
 	bool autoCalcStatus = ImgProcPw::GetInstance()->GetAutoCalc();
     if (autoCalcStatus)
 	{
@@ -134,7 +133,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 		return g_ptrAbsMeasure;
 	}
 
-	//检查所选择测量的模式和当前扫描模式是否相符	
+	//妫€鏌ユ墍閫夋嫨娴嬮噺鐨勬ā寮忓拰褰撳墠鎵弿妯″紡鏄惁鐩哥
 	EMeasureMode currMeaMode;
 	currMeaMode = JudgeMode();
     ModeStatus ms;
@@ -147,7 +146,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 	{
 		case D2_DIST_DOT:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new D2MeasureDistDot(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new D2MeasureDistDot(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -159,7 +158,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 				g_ptrAbsMeasure = NULL;
 			break;
 
-		case D2_LEN_TRACK: 
+		case D2_LEN_TRACK:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
 				g_ptrAbsMeasure = new D2MeasureLengthTrack(&BasicInfo[type - BASIC_MEA_START]);
 			else
@@ -175,7 +174,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 		case D2_AREA_TRACK:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new D2MeasureAreaTrack(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new D2MeasureAreaTrack(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -189,7 +188,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 		case D2_AREA_ELLIPSE:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new D2MeasureVolEllipse1(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new D2MeasureVolEllipse1(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -212,7 +211,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 		case D2_VOLUME_ELLIPSE:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new D2MeasureVolEllipse1(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new D2MeasureVolEllipse1(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -247,15 +246,15 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 		case D2_DEPTH:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new D2MeasureDistDot(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new D2MeasureDistDot(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
 	//	case D2_SIMPSONS:
-	//		g_ptrAbsMeasure = new D2MeasureSimpsons(&BasicInfo[type - BASIC_MEA_START]);	
+	//		g_ptrAbsMeasure = new D2MeasureSimpsons(&BasicInfo[type - BASIC_MEA_START]);
 
-			//========================特殊测量
+			//========================鐗规畩娴嬮噺
 		case D2_ANGUSTY_DIST:
 			if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
 				g_ptrAbsMeasure = new D2MeasureRatioDistDot(0,&BasicInfo[type - BASIC_MEA_START]);
@@ -343,15 +342,15 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
             {
                 if (rotate == 0)
                 {
-                    if (currMeaMode == MEA_2D)  
+                    if (currMeaMode == MEA_2D)
                     {
                         g_ptrAbsMeasure = new D2MeasureIMT(false);
                     }
                     else
-                        g_ptrAbsMeasure = NULL;  
+                        g_ptrAbsMeasure = NULL;
                 }
                 else
-                { 
+                {
                     HintArea::GetInstance()->UpdateHint(_("Invalid when image is rotated!"), 1);
                     parError = 1;
                     break;
@@ -359,7 +358,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
             }
             else
             {
-                g_ptrAbsMeasure = NULL; 
+                g_ptrAbsMeasure = NULL;
             }
             break;
 
@@ -368,15 +367,15 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
             {
                 if (rotate == 0)
                 {
-                    if (currMeaMode == MEA_2D)  
+                    if (currMeaMode == MEA_2D)
                     {
                         g_ptrAbsMeasure = new D2MeasureIMT(true);
                     }
                     else
-                        g_ptrAbsMeasure = NULL;  
+                        g_ptrAbsMeasure = NULL;
                 }
                 else
-                { 
+                {
                     HintArea::GetInstance()->UpdateHint(_("Invalid when image is rotated!"), 1);
                     parError = 1;
                         break;
@@ -384,50 +383,50 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
             }
             else
             {
-                g_ptrAbsMeasure = NULL; 
+                g_ptrAbsMeasure = NULL;
             }
             break;
 
-            //========================M模式测量
+            //========================M妯″紡娴嬮噺
         case M_TIME:
             if ((currMeaMode == MEA_M) || (currMeaMode == MEA_2D_M))
-                g_ptrAbsMeasure = new MMeasureTime(&BasicInfo[type - BASIC_MEA_START]);	
+                g_ptrAbsMeasure = new MMeasureTime(&BasicInfo[type - BASIC_MEA_START]);
             else
                 g_ptrAbsMeasure = NULL;
             break;
 
 		case M_VEL:
 			if ((currMeaMode == MEA_M) || (currMeaMode == MEA_2D_M))
-				g_ptrAbsMeasure = new MMeasureVel(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new MMeasureVel(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
 		case M_DEPTH:
 			if ((currMeaMode == MEA_M) || (currMeaMode == MEA_2D_M))
-				g_ptrAbsMeasure = new MMeasureDepth(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new MMeasureDepth(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
 		case M_HR:
 			if ((currMeaMode == MEA_M) || (currMeaMode == MEA_2D_M))
-				g_ptrAbsMeasure = new MMeasureTime(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new MMeasureTime(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
 		case M_SLOPE:
 			if ((currMeaMode == MEA_M) || (currMeaMode == MEA_2D_M))
-				g_ptrAbsMeasure = new MMeasureVel(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new MMeasureVel(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
-			//=========================D模式测量			
+			//=========================D妯″紡娴嬮噺
 		case D_VEL:
 			if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new DMeasureVel(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new DMeasureVel(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -448,14 +447,14 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 		case D_TIME:
 			if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new DMeasureTime(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new DMeasureTime(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
 		case D_ACCEL:
 			if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new DMeasureAccel(&BasicInfo[type - BASIC_MEA_START]);	
+				g_ptrAbsMeasure = new DMeasureAccel(&BasicInfo[type - BASIC_MEA_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -469,14 +468,14 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 		case D_HR:
 			if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new DMeasureHR(&BasicMultiInfo[D_HR_MULTI-BASIC_MULTI_START]);	
+				g_ptrAbsMeasure = new DMeasureHR(&BasicMultiInfo[D_HR_MULTI-BASIC_MULTI_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
 
 		case D_PGMAX:
 			if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
-				g_ptrAbsMeasure = new DMeasurePGmax(&BasicMultiInfo[D_PGMAX_MULTI-BASIC_MULTI_START]);	
+				g_ptrAbsMeasure = new DMeasurePGmax(&BasicMultiInfo[D_PGMAX_MULTI-BASIC_MULTI_START]);
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
@@ -509,7 +508,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 		{
 			SysMeasurementSetting sys;
 			int manualMethod;
-			
+
 			if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
 			{
 				manualMethod = sys.GetTraceMethod();
@@ -562,5 +561,3 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type)
 
 	return g_ptrAbsMeasure;
 }
-
-

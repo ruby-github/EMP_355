@@ -1,17 +1,17 @@
 #ifndef _VIEW_PAT_SEARCH_H_
 #define _VIEW_PAT_SEARCH_H_
 
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 #include <string>
 #include <vector>
-#include "Database.h"
+#include "patient/Database.h"
 
 class ViewPatSearch:public FakeXEvent
 {
 public:
     ~ViewPatSearch();
     static ViewPatSearch* GetInstance();
-    
+
     void CreateWindow(GtkWindow *parent, const std::vector<Database::NewPatSearchResult>& result);
     void DestroyWindow(void);
 private:
@@ -47,7 +47,7 @@ private:
 	EXAMTYPE_COL,
 	N_COLUMNS
     };
-#endif 
+#endif
 // signal handle
     gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
     void BtnOkClicked(GtkButton *button);

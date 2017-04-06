@@ -1,6 +1,6 @@
 /**
 * @brief AbsDCMData.h: interface for the CAbsDCMData class.
-* CAbsDCMData is abstract base class used to get datas of DICOM 
+* CAbsDCMData is abstract base class used to get datas of DICOM
 * image that be send.
 *
 * @version: 1.0
@@ -10,8 +10,7 @@
 
 #ifndef ABS_DCMDATA_H
 #define ABS_DCMDATA_H
-#include "DCMDef.h"
-
+#include "periDevice/DCMDef.h"
 
 class CAbsDCMData
 {

@@ -2,7 +2,7 @@
 #define BODYMARK_H
 
 #include <gtk/gtk.h>
-#include "UpdateBodyMark.h"
+#include "bodymark/UpdateBodyMark.h"
 #include "Def.h"
 
 class BodyMark
@@ -27,7 +27,7 @@ class BodyMark
 		SIZE GetBodyMarkSize();
 		COLOR GetProbeMarkColor();
 
-		void SetProbeMarkPos(POINT pos, guint index); 
+		void SetProbeMarkPos(POINT pos, guint index);
 		bool ChangeProbeMarkDir(EKnobOper opr, guint index);
 
 		void MoveBodyBegin(guint index);

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 //#include "AbsKeyboardEvent.h"
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 
 using std::string;
 using std::vector;
@@ -21,7 +21,7 @@ class ViewCD:public FakeXEvent
         GtkWidget* GetWindow(void);
         void UpdateSize(bool is_cd);
 		void SetBackupStatus(guchar status);
-	
+
 		gboolean MakeIsoCallback(GIOChannel *source, GIOCondition condition);
 		gboolean BurnCDCallback(GIOChannel *source, GIOCondition condition);
 		gboolean BurnDVDCallback(GIOChannel *source, GIOCondition condition);
@@ -43,7 +43,7 @@ class ViewCD:public FakeXEvent
 		vector<string> m_vecFolder;
 		vector<string> m_vecPath;
 		guint64 m_estimated, m_remain, m_available;
-	        gint m_iscd;	
+	        gint m_iscd;
 
 		GtkTreeModel* create_from_model(vector<string> vec);
 		void add_column(GtkTreeView *treeview);
@@ -85,6 +85,5 @@ class ViewCD:public FakeXEvent
 	//	static gboolean HandleCallbackMakeIso(GIOChannel *source, GIOCondition condition, ViewCD *data)
 	//	{ return data->MakeIsoCallback(source, condition); }
 };
-
 
 #endif

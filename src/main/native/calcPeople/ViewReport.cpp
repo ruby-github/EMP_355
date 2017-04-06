@@ -5,33 +5,31 @@
 #include <pango-1.0/pango/pangoft2.h>
 #include FT_FREETYPE_H
 
-#include "KeyValueOpr.h"
-#include "gui_global.h"
-#include "KeyDef.h"
-#include "PatientInfo.h"
-#include "ViewCalendar.h"
-#include "ViewReport.h"
-#include "ViewPrintPreview.h"
-#include "Usblp.h"
-#include "gui_func.h"
+#include "keyboard/KeyValueOpr.h"
+#include "display/gui_global.h"
+#include "keyboard/KeyDef.h"
+#include "patient/PatientInfo.h"
+#include "display/ViewCalendar.h"
+#include "calcPeople/ViewReport.h"
+#include "periDevice/ViewPrintPreview.h"
+#include "periDevice/Usblp.h"
+#include "display/gui_func.h"
 #include "ViewMain.h"
-#include "SysGeneralSetting.h"
-#include "SysCalculateSetting.h"
-#include "MeasureMan.h"
-#include "MeasureTable.h"
-#include "MeaCalcFun.h"
-#include "ViewTemplet.h"
-#include "ImgMan.h"
-#include "TopArea.h"
-#include "ProbeSelect.h"
-#include "ViewSystem.h"
-#include "MenuCalcNew.h"
-#include "DCMMan.h"
-#include "ImgMan.h"
-#include "SysGeneralSetting.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/SysCalculateSetting.h"
+#include "measure/MeasureMan.h"
+#include "calcPeople/MeasureTable.h"
+#include "calcPeople/MeaCalcFun.h"
+#include "calcPeople/ViewTemplet.h"
+#include "patient/ImgMan.h"
+#include "display/TopArea.h"
+#include "probe/ProbeSelect.h"
+#include "sysMan/ViewSystem.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "periDevice/DCMMan.h"
 
-#include "CreateBitmap.h"
-#include "MultiFuncFactory.h"
+#include "patient/CreateBitmap.h"
+#include "keyboard/MultiFuncFactory.h"
 extern pthread_t pidInitTable;
 extern gboolean ReportInit;
 
@@ -39,7 +37,7 @@ extern gboolean ReportInit;
 //static void* ThreadLoadData2(void* argv);
 //static void* ThreadLoadImage(void* argv);
 
-static const char str_Des[7][3][50] = { 
+static const char str_Des[7][3][50] = {
 	{N_("FHR ≤ 1 times"), N_("FHR ≥ 15 times/m, time ≥ 15s, 1~4 times"), N_("FHR ≥ 15 times/m, time ≥ 15s, ≥ 5 times")},
 	{N_("No FM"), N_("1~2 times FM"), N_("FM ≥ 3 times")},
 	{N_("No FBM or time ≤ 30s"), N_("FBM ≥ 1 times,time 30-60s"), N_("FBM ≥ 1 times,time ≥ 60s")},
@@ -271,7 +269,6 @@ void ViewReport::CreateWindow(void)
 	gtk_editable_set_editable (GTK_EDITABLE (m_entryItem), FALSE);
 #endif
 
-
 	labelDate = gtk_label_new (_("Exam Date:"));
 	gtk_table_attach (GTK_TABLE (tablePatInfo), labelDate, 0, 1, 3, 4, (GtkAttachOptions) (GTK_FILL), (GtkAttachOptions) (0), 0, 0);
 	gtk_misc_set_alignment (GTK_MISC (labelDate), 0, 0.5);
@@ -311,13 +308,12 @@ void ViewReport::CreateWindow(void)
 	m_viewportOB = CreateSW2NB(m_notebook, NB_OB, _("Obstetrics"));
 #endif
 //修改 动物超 在动物超中没有妇科
-//hlx 
+//hlx
 #ifdef VET
 #else
 	m_viewportGYN = CreateSW2NB(m_notebook, NB_GYN, _("Gynecology"));
-#endif    
+#endif
 
- 
 	m_viewportSP = CreateSW2NB(m_notebook, NB_SP, _("Small Part"));
 #if (defined(EMP_313) || defined(EMP_322))
 	m_viewportFE = CreateSW2NB(m_notebook, NB_FE, _("Fetal Cardio"));
@@ -329,11 +325,11 @@ void ViewReport::CreateWindow(void)
     m_viewportORT = CreateSW2NB(m_notebook, NB_ORT, _("Orthopedic"));
 
 //添加 动物超 添加肌腱科别
-//hlx 
+//hlx
 #ifdef VET
 	m_viewportTD = CreateSW2NB(m_notebook, NB_TD, _("Tendon"));
 #endif
-    
+
 	g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(HandleNotebookChanged), this);
 
 	//edit reprot
@@ -352,7 +348,7 @@ void ViewReport::CreateWindow(void)
 	gtk_widget_show_all (m_window);
 	gtk_widget_hide_all(m_frameEdit);
 	gtk_widget_hide_all(m_frameImage);
-	
+
 	g_keyInterface.Push(this);
 	SetSystemCursorToCenter();
 #endif
@@ -366,7 +362,6 @@ void ViewReport::CreateWindow(void)
 //	LoadMeasureData(NB_ABD);
 
 #else
-
 
 	int index = 0;
 	ExamItem::EItem item = ProbeSelect::GetItemIndex();
@@ -440,8 +435,8 @@ void ViewReport::CreateWindow(void)
 #endif
 	PRINTF("index = %d\n", index);
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(m_notebook), index);
-    LoadMeasureData(); 
-    ShowMeasureData(index);  
+    LoadMeasureData();
+    ShowMeasureData(index);
 //#endif
 }
 
@@ -464,13 +459,13 @@ void ViewReport::ShowMeasureData(guint page_num)
 #else
     gtk_widget_hide_all(m_viewportTCD);
     gtk_widget_hide_all(m_viewportVES);
-#endif 
+#endif
     gtk_widget_hide_all(m_viewportFE);
     gtk_widget_hide_all(m_viewportORT);
 #ifdef VET
     gtk_widget_hide_all(m_viewportTD);
 #endif
-	switch (page_num) 
+	switch (page_num)
 	{
 		case NB_ABD:
 			gtk_widget_show_all(m_viewportABD);
@@ -528,7 +523,7 @@ void ViewReport::LoadMeasureData(void)
     GtkWidget *fixed;
     fixed = NULL;
 
-//	switch (page_num) 
+//	switch (page_num)
 //	{
 	//	case NB_ABD:
             if(!gtk_bin_get_child(GTK_BIN(m_viewportABD)))
@@ -552,7 +547,7 @@ void ViewReport::LoadMeasureData(void)
 			}
 	//		break;
 //修改 动物超  在动物超中的产科和人用超的产科有很大的不一样
-//hlx 
+//hlx
 	//	case NB_ANOB:
 			if (!gtk_bin_get_child(GTK_BIN(m_viewportAnOB)))
 			{
@@ -770,7 +765,7 @@ bool ViewReport::Sort(const string s1, const string s2)
 	int len;
 	char str1[255], str2[255];
 
-	len = strlen(s1.c_str()); 
+	len = strlen(s1.c_str());
 	for(i=0; i<len; i++)
 	{
 		if(s1.c_str()[i]=='.')
@@ -779,7 +774,7 @@ bool ViewReport::Sort(const string s1, const string s2)
 	strncpy(str1, s1.c_str(), i);
 	str1[i] = '\0';
 
-	len = strlen(s2.c_str()); 
+	len = strlen(s2.c_str());
 	for(i=0; i<len; i++)
 	{
 		if(s2.c_str()[i]=='.')
@@ -849,7 +844,7 @@ GtkWidget* ViewReport::CreateImageItem(int sid, int id)
 //	gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(chkbtn)), GTK_STATE_PRELIGHT, g_black);
     gtk_box_pack_start (GTK_BOX (hbox), chkbtn, FALSE, FALSE, 0);
 	g_object_set_data(G_OBJECT(chkbtn), "id", GINT_TO_POINTER(id));
-	g_signal_connect(G_OBJECT(chkbtn), "clicked", G_CALLBACK(HandleChkBtnImageClicked), this); 
+	g_signal_connect(G_OBJECT(chkbtn), "clicked", G_CALLBACK(HandleChkBtnImageClicked), this);
 
 	m_vecChkBtn.push_back(chkbtn);
 
@@ -892,7 +887,7 @@ void ViewReport::BtnAddOKClicked(GtkButton *button)
     if(organization =="")
         organization = "VerifyOrganization";
     CDCMMan::GetMe()->SetSRVerifyOrganization(organization);
-   
+
     HideImageView();
 }
 
@@ -1038,7 +1033,7 @@ void ViewReport::BtnAddImageClicked(GtkButton *button)
 #endif
 
 void ViewReport::BtnEditOKClicked(GtkButton *button)
-{	
+{
 	char *text;
     GtkTextIter iter_start, iter_end;
 
@@ -1150,7 +1145,6 @@ GtkWidget* ViewReport::CreateEditView(void)
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw_indication), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sw_indication), GTK_SHADOW_IN);
 
-
     m_textview_indication = gtk_text_view_new ();
     m_buffer_indication = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_indication));
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (m_textview_indication), GTK_WRAP_WORD_CHAR);
@@ -1174,7 +1168,7 @@ GtkWidget* ViewReport::CreateEditView(void)
     gtk_widget_set_size_request (label_comments, -1, 30);
     gtk_label_set_use_markup (GTK_LABEL (label_comments), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label_comments), 0, 0.5);
- 
+
     sw_comments = gtk_scrolled_window_new (NULL, NULL);
     gtk_fixed_put (GTK_FIXED (fixed_edit_report), sw_comments, 10, 160);
     gtk_widget_set_size_request (sw_comments, 790, 80);
@@ -1227,7 +1221,7 @@ void ViewReport::InsertIndication(const char* text)
     gtk_text_buffer_get_end_iter(m_buffer_indication, &iter_end);
     gtk_text_buffer_insert(m_buffer_indication, &iter_end, text, -1);
 
-    //插入换行
+    //鎻掑叆鎹㈣
     gtk_text_buffer_get_end_iter(m_buffer_indication, &iter_end);
     gtk_text_buffer_insert(m_buffer_indication, &iter_end, "\n\n", -1);
 }
@@ -1244,7 +1238,7 @@ void ViewReport::InsertComments(const char* text)
     gtk_text_buffer_get_end_iter(m_buffer_comments, &iter_end);
     gtk_text_buffer_insert(m_buffer_comments, &iter_end, text, -1);
 
-    //插入换行
+    //鎻掑叆鎹㈣
     gtk_text_buffer_get_end_iter(m_buffer_comments, &iter_end);
     gtk_text_buffer_insert(m_buffer_comments, &iter_end, "\n\n", -1);
 }
@@ -1254,10 +1248,9 @@ void ViewReport::BtnTransferClicked(GtkButton *button)
     ViewTemplet::GetInstance()->CreateWindow();
 }
 
-
 void ViewReport::BtnClearIndicationClicked(GtkButton *button)
 {
-    GtkTextBuffer *buffer_indication = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_indication));    
+    GtkTextBuffer *buffer_indication = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_indication));
     gtk_text_buffer_set_text(buffer_indication, "", -1);
 }
 
@@ -1284,7 +1277,7 @@ void ViewReport::BtnPrintClicked(GtkButton *button)
 
 #ifdef VET
 void ViewReport::NotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num)
-{ 
+{
     ShowMeasureData(page_num);
 	//LoadMeasureData(page_num);
 
@@ -1544,7 +1537,6 @@ int ViewReport::SearchIDFromCalcArr(gint stamp, gint row)
 	return -1;
 }
 
-
 bool ViewReport::SetCheckToCalcArr(int id, char *title, bool fixed)
 {
     CalcNode_t *p = CalcArrListHead;
@@ -1555,7 +1547,7 @@ bool ViewReport::SetCheckToCalcArr(int id, char *title, bool fixed)
         	p->check = fixed;
         	return true;
         }
-        p = p->next; 
+        p = p->next;
     }
     return false;
 }
@@ -1626,7 +1618,7 @@ void CheckBoxToggleClicked(GtkCellRendererToggle *cell, gchar *path_str, gpointe
 	/* get toggled iter */
 	gtk_tree_model_get_iter (model, &iter, path);
 	gtk_tree_model_get (model, &iter, 0, &fixed, -1);
-	
+
 	/* do something with the value */
 	fixed ^= 1;
 
@@ -1649,7 +1641,7 @@ void CheckBoxToggleClicked(GtkCellRendererToggle *cell, gchar *path_str, gpointe
     {
         gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, fixed,-1);
     }
-    
+
 	/* clean up */
 	if(path)gtk_tree_path_free(path);
 	if(title)g_free(title);
@@ -1663,11 +1655,11 @@ gint ViewReport::AddResultToObTree( GtkWidget *treeview, ResultObTable result, i
 	gchar  Value[256], v[3][256];
 	memset(v, 0, sizeof(v));
 	memset(Value, 0, sizeof(Value));
-	
+
 	GtkTreeIter iter;
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(treeview));
 	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-	
+
 	sprintf(Value, "%.2f%s", result.data[0], result.units);
 	for(gint t = 0; t<3; t++)
 	{
@@ -1685,7 +1677,7 @@ gint ViewReport::AddResultToObTree( GtkWidget *treeview, ResultObTable result, i
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
 					C_OB_COL, fixed,
 					T_OB_COL, result.title,
-					V_OB_COL, Value,					
+					V_OB_COL, Value,
 					V1_OB_COL, v[0],
 					V2_OB_COL, v[1],
 					V3_OB_COL, v[2],
@@ -1703,7 +1695,7 @@ gint ViewReport::AddResultToTree(GtkWidget *treeview, ResultTable result, bool s
 	char  Value[256], v[3][256];
 	memset(v, 0, sizeof(v));
 	memset(Value, 0, sizeof(Value));
-	
+
 	GtkTreeIter iter;
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(treeview));
 	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -1728,7 +1720,7 @@ gint ViewReport::AddResultToTree(GtkWidget *treeview, ResultTable result, bool s
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
 					C_L_GEN_COL, fixed,
 					T_L_GEN_COL, result.title,
-					V_L_GEN_COL, Value,					
+					V_L_GEN_COL, Value,
 					V1_L_GEN_COL, v[0],
 					V2_L_GEN_COL, v[1],
 					V3_L_GEN_COL, v[2],
@@ -1887,15 +1879,15 @@ int ViewReport::CheckItemType(int i)
     //	else if(i>=OB_CER_GW && i<=OB_OFD_EDCB) //GW or EDCB
     else if(i>=OB_CER_GW && i<=OB_FTA_EDCB) //GW or EDCB
     {
-        if(i==OB_CER_GW || i==OB_HL_GW || i==OB_BPD_GW || i==OB_FL_GW || i==OB_OOD_GW || i==OB_TIBIA_GW || 
-                i==OB_TTD_GW || i==OB_ULNA_GW || i==OB_CRL_GW || i==OB_GS_GW || i==OB_AC_GW || i==OB_HC_GW || 
+        if(i==OB_CER_GW || i==OB_HL_GW || i==OB_BPD_GW || i==OB_FL_GW || i==OB_OOD_GW || i==OB_TIBIA_GW ||
+                i==OB_TTD_GW || i==OB_ULNA_GW || i==OB_CRL_GW || i==OB_GS_GW || i==OB_AC_GW || i==OB_HC_GW ||
                 i==OB_TAD_GW || i==OB_APAD_GW || i==OB_THD_GW || i==OB_OFD_GW || i==OB_FTA_GW )
             return 1;
-        else if(i==OB_CER_EDCB || i==OB_HL_EDCB || i==OB_BPD_EDCB || i==OB_FL_EDCB || i==OB_OOD_EDCB || i==OB_TIBIA_EDCB || 
-                i==OB_TTD_EDCB || i==OB_ULNA_EDCB || i==OB_CRL_EDCB || i==OB_GS_EDCB || i==OB_AC_EDCB || i==OB_HC_EDCB || 
+        else if(i==OB_CER_EDCB || i==OB_HL_EDCB || i==OB_BPD_EDCB || i==OB_FL_EDCB || i==OB_OOD_EDCB || i==OB_TIBIA_EDCB ||
+                i==OB_TTD_EDCB || i==OB_ULNA_EDCB || i==OB_CRL_EDCB || i==OB_GS_EDCB || i==OB_AC_EDCB || i==OB_HC_EDCB ||
                 i==OB_TAD_EDCB || i==OB_APAD_EDCB || i==OB_THD_EDCB || i==OB_OFD_EDCB || i==OB_FTA_EDCB )
             return 2;
-        else 
+        else
             return 0;
     }
 #endif
@@ -1918,15 +1910,15 @@ GtkTreeView* ViewReport::create_ob_treeview(GtkTreeModel *model)
 	for(i=0; i<N_OB_COLS; i++)
 	{
 		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
-		g_object_set(G_OBJECT(renderer),  
+		g_object_set(G_OBJECT(renderer),
 				"height", 30,
 				NULL);
 
 		GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer, "text", i, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
-		g_object_set(G_OBJECT(column),  
-				"sizing", GTK_TREE_VIEW_COLUMN_FIXED, 
-				"fixed-width", w[i], 
+		g_object_set(G_OBJECT(column),
+				"sizing", GTK_TREE_VIEW_COLUMN_FIXED,
+				"fixed-width", w[i],
 				NULL);
 	}
 
@@ -1950,15 +1942,15 @@ GtkTreeView* ViewReport::create_ob_afi_treeview(GtkTreeModel *model)
 	for(i=0; i<N_OB_AFI_COLS; i++)
 	{
 		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
-		g_object_set(G_OBJECT(renderer),  
+		g_object_set(G_OBJECT(renderer),
 				"height", 30,
 				NULL);
 
 		GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer, "text", i, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
-		g_object_set(G_OBJECT(column),  
-				"sizing", GTK_TREE_VIEW_COLUMN_FIXED, 
-				"fixed-width", w[i], 
+		g_object_set(G_OBJECT(column),
+				"sizing", GTK_TREE_VIEW_COLUMN_FIXED,
+				"fixed-width", w[i],
 				NULL);
 	}
 
@@ -1980,39 +1972,39 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 	GtkTreeModel *model = NULL;
 	GtkWidget *treeview = NULL;
 
-    //修改 动物超 产科 
-    //hlx 
+    //修改 动物超 产科
+    //hlx
 #ifdef VET
-    store = gtk_list_store_new(N_OB_COLS, 
+    store = gtk_list_store_new(N_OB_COLS,
             G_TYPE_BOOLEAN,
-            G_TYPE_STRING, 
-            G_TYPE_STRING, 
-            G_TYPE_STRING, 
-            G_TYPE_STRING, 
-            G_TYPE_STRING, 
-            G_TYPE_STRING, 
+            G_TYPE_STRING,
+            G_TYPE_STRING,
+            G_TYPE_STRING,
+            G_TYPE_STRING,
+            G_TYPE_STRING,
+            G_TYPE_STRING,
             G_TYPE_STRING);
 #else
 	if(start != OB_AFI_LUQ && start != OB_RA_DIMEN && start != OB_EAR)
 	{
 		store = gtk_list_store_new(N_OB_COLS,
 				G_TYPE_BOOLEAN,
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
 				G_TYPE_STRING);
 	}
 	else
 	{
 		store = gtk_list_store_new(N_OB_AFI_COLS,
 				G_TYPE_BOOLEAN,
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
-				G_TYPE_STRING, 
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
 				G_TYPE_STRING);
 	}
 #endif
@@ -2023,10 +2015,10 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 
 	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (treeview));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
-	
+
 	if (model != NULL)
 	{
-		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model); 
+		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
 	}
 
 	for(i=start; i<end; i++)
@@ -2034,7 +2026,7 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 		//clear data
 		for(m=0; m<MEA_MULTI; m++)
 		{
-			value[m] = INVALID_VAL;	
+			value[m] = INVALID_VAL;
 			for(n=0; n<MEA_TIMES; n++)
 				allvalue[m][n] = INVALID_VAL;
 		}
@@ -2042,7 +2034,7 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 			result.data[m] = INVALID_VAL;
 		result.GW = result.EDCB = NULL;
 
-		//get value 
+		//get value
 		ret = ptrRes->GetValue(i, value, allvalue, IN_REPORT_MEAN, fetal);
 		if(ret!=MEA_SUCCESS)
 			continue;
@@ -2056,9 +2048,8 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
         if ((i < USER_END) && (i >= USER_START))
         {
             if(IsETypeInSection(i, OB_M) != true)
-                continue;         
+                continue;
         }
-
 
 #ifdef VET
 
@@ -2081,7 +2072,7 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 			result.title = strTmp;
 			//result.title = (*sInfo).title;
 			result.units = units.c_str();
-		
+
 			for(j=0; j<MEA_TIMES; j++)
 			{
 				if( (allvalue[0][j] != INVALID_VAL) && (allvalue[0][j] != INVALID_VAL_GW) )
@@ -2090,7 +2081,7 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 				}
 			}
             //hlx
-#ifdef VET  
+#ifdef VET
             j = 0;
 #else
 			for(j=0; j<CALC_MAX; j++)
@@ -2263,7 +2254,6 @@ GtkWidget* ViewReport::CreateObTable(int start, int end, int map_table[][CALC_MA
 			gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 			g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width",  wide[6], NULL);
 
-
 			renderer = gtk_cell_renderer_text_new();
 			column = gtk_tree_view_column_new_with_attributes(("EDD"), renderer, "text", EDCB_OB_COL, NULL);
 			gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
@@ -2342,10 +2332,10 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 	GtkWidget *hbox = gtk_hbox_new(FALSE, 2);
 	GtkListStore *store= gtk_list_store_new(N_GEN_COLS,
 			G_TYPE_BOOLEAN,
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
+			G_TYPE_STRING,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
 			G_TYPE_STRING);
 
 	GtkTreeModel *model = NULL;
@@ -2355,10 +2345,9 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 
 	gtk_tree_view_set_enable_search (GTK_TREE_VIEW (m_treeview_left), FALSE);
 	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (m_treeview_left), TRUE);
-	
+
 	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (m_treeview_left));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
-
 
 	if (model != NULL)
 	{
@@ -2367,10 +2356,10 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 
 	GtkListStore *store2= gtk_list_store_new(N_GEN_COLS,
 			G_TYPE_BOOLEAN,
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
+			G_TYPE_STRING,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
 			G_TYPE_STRING);
 
 	GtkTreeModel *model2 = NULL;
@@ -2383,12 +2372,11 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (m_treeview_right));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
 
-
 	if (model2 != NULL)
 	{
 		gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeview_right), model2);
 	}
-	
+
 	int rows = 0;
 	int rows_left = 0, rows_right = 0;
 	for(i=start; i<end; i++)
@@ -2396,14 +2384,13 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 		//clear data
 		for(m=0; m<MEA_MULTI; m++)
 		{
-			value[m] = INVALID_VAL;	
+			value[m] = INVALID_VAL;
 			for(n=0; n<MEA_TIMES; n++)
 				allvalue[m][n] = INVALID_VAL;
 		}
 		for(m=0; m<MEA_TIMES+1; m++)
 			result.data[m] = INVALID_VAL;
 
-	
 		ret = ptrRes->GetValue(i, value, allvalue, IN_REPORT_MEAN);
 		if(ret!=MEA_SUCCESS)
 			continue;
@@ -2421,7 +2408,7 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
             if(IsETypeInSection(i, section) != true)
                 continue;
         }
-  
+
         result.id = i;
         result.section = section;
         if((*sInfo).unitItem < UNIT_END)
@@ -2477,9 +2464,9 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 						//	PRINTF("T%dM%d=%.2f%s  ", j, k, allvalue[k][j], result.units);
 						result.data[j+1] = allvalue[k][j]*coeffi/scale;
 					}
-  
+
 				}
-				
+
 				//printf("test2:i = %d, title=%s, value = %.2f, v1 = %.2f, v2 = %.2f, v3 = %.2f\n",i, result.title, result.data[0], result.data[1], result.data[2], result.data[3]);
 				if(section == ORTHO_M)
 				{
@@ -2535,7 +2522,7 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 			if(rows > 2)
 			{
 				lab_right= create_label(tmp, 0, 30, NULL, NULL);
-				rows_right++;	
+				rows_right++;
 			}
 			else
 			{
@@ -2548,43 +2535,43 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 		{
 			switch(section)
 			{
-				case ABDO_M:	
+				case ABDO_M:
 					calc_start = ABD_CALC_START;
-					ptrCalcInfo = AbdoCalcInfoPtr;	
+					ptrCalcInfo = AbdoCalcInfoPtr;
 					break;
-				case ADULT_M:	
+				case ADULT_M:
 					calc_start = ADULT_CALC_START;
-					ptrCalcInfo = AdultCalcInfoPtr;	
+					ptrCalcInfo = AdultCalcInfoPtr;
 					break;
-				case UR_M:		
+				case UR_M:
 					calc_start = UR_CALC_START;
-					ptrCalcInfo = URCalcInfoPtr;	
+					ptrCalcInfo = URCalcInfoPtr;
 					break;
-				case GYN_M:		
+				case GYN_M:
 					calc_start = GYN_CALC_START;
-					ptrCalcInfo = GYNCalcInfoPtr;	
+					ptrCalcInfo = GYNCalcInfoPtr;
 					break;
-				case SP_M:		
+				case SP_M:
 					calc_start = SP_CALC_START;
-					ptrCalcInfo = SPCalcInfoPtr;	
+					ptrCalcInfo = SPCalcInfoPtr;
 					break;
 #ifndef EMP_322
-				case VS_M:		
+				case VS_M:
 					calc_start = VS_CALC_START;
-					ptrCalcInfo = VSCalcInfoPtr;	
+					ptrCalcInfo = VSCalcInfoPtr;
 					break;
 #endif
-                case FETAL_M:	
+                case FETAL_M:
 					calc_start = FETAL_CALC_START;
-					ptrCalcInfo = FetalCalcInfoPtr;	
+					ptrCalcInfo = FetalCalcInfoPtr;
 					break;
-				default:		
-					ptrCalcInfo = NULL;				
+				default:
+					ptrCalcInfo = NULL;
 					break;
 			}
-			
+
 			if(ptrCalcInfo == NULL) continue;
-			
+
 			for(j=0; j<CALC_MAX; j++)
 			{
 				if(map_table[i-map_start][j] == -1)
@@ -2621,7 +2608,7 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 				}
 			}
 		}
-		
+
 	}
 	if(rows_left > 0)
 	{
@@ -2662,7 +2649,7 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 		g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width",  wide[5], NULL);
 
 		gtk_cell_renderer_get_size(renderer, m_treeview_left, NULL, NULL, NULL, NULL, &row_height);
-		
+
 		if((section == ORTHO_M)&&((i < USER_END) && (i >= USER_START)))
 		{
 			vbox_left = gtk_vbox_new(FALSE, 2);
@@ -2678,7 +2665,7 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 		{
 			gtk_box_pack_start (GTK_BOX (hbox), m_treeview_left, FALSE, FALSE, 0);
 		}
-	   
+
 		if(rows_right > 0)
 		{
 			renderer = gtk_cell_renderer_toggle_new ();
@@ -2733,12 +2720,12 @@ GtkWidget* ViewReport::CreateGeneralTable(int section, int start, int end, int m
 	{
 		hbox = NULL;
 	}
-	
+
 	return GTK_WIDGET(hbox);
 }
 
 int ViewReport::AddResultToTree2(GtkWidget * treeview, char *title, char *value, int id, int row)
-{	
+{
 	bool fixed = GetCheckFromCalcArr(id, title);
    //printf("title = %s, id = %d, fixed = %s\n", title, id, fixed ? "True" : "False");
 
@@ -2748,7 +2735,7 @@ int ViewReport::AddResultToTree2(GtkWidget * treeview, char *title, char *value,
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
 					0, fixed,
 					1, title,
-					2, value,					
+					2, value,
 					-1);
 
 	SetIDToCalcArr(iter.stamp,  row, fixed, id, OB_M, title, value, NULL, NULL);
@@ -2756,7 +2743,7 @@ int ViewReport::AddResultToTree2(GtkWidget * treeview, char *title, char *value,
 }
 
 int ViewReport::AddResultToTree3(GtkWidget * treeview, char *title, char *value, char *sd, int id, int row)
-{	
+{
 	bool fixed = GetCheckFromCalcArr(id, title);
    //printf("title = %s, id = %d, fixed = %s\n", title, id, fixed ? "True" : "False");
 
@@ -2774,7 +2761,6 @@ int ViewReport::AddResultToTree3(GtkWidget * treeview, char *title, char *value,
 	return ++row;
 }
 
-
 void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data)
 {
 	guint x1 = 20, x2 = 40;
@@ -2785,7 +2771,7 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data)
 	gint rows = 0, id = 0;
 	GtkListStore *store= gtk_list_store_new(4,
 			G_TYPE_BOOLEAN,
-			G_TYPE_STRING, 
+			G_TYPE_STRING,
 			G_TYPE_STRING,
             G_TYPE_STRING);
 
@@ -2813,9 +2799,7 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data)
                 id = AVERRES_START_ID + i*2;
             sprintf(title, "%s", "AUA");
             sprintf(value, " %dw%dd", ((int)calc_val[0])/7, ((int)calc_val[0])%7);
-            rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
-
-
+            rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
 
             if(0 == i)
                 id = AVERRES_START_ID + 1;
@@ -2833,8 +2817,8 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data)
                 sprintf(value, "%d/%d/%d", ((int)calc_val[1])%100, ((int)calc_val[1])%10000/100, (int)calc_val[1]/10000);
             else
                 sprintf(value, "%d/%d/%d", ((int)calc_val[1])/10000, ((int)calc_val[1])%10000/100, (int)calc_val[1]%100);
-          
-            rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
+
+            rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
         }
     }
 
@@ -2846,19 +2830,19 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data)
         sprintf(title, "%s", "GA(LMP)");
         sprintf(value, "%dw%dd",  ((int)calc_val[0])/7, ((int)calc_val[0])%7);
         id = AVERRES_START_ID +4;
-        rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
+        rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
 
         char edcb[20];
         MeaCalcFun::CalcEDCB_LMP(info.ob.LMPDate.year, info.ob.LMPDate.month, info.ob.LMPDate.day, edcb);
         sprintf(title, "%s", "EDD(LMP)");
         sprintf(value, "%s",  edcb);
         id = AVERRES_START_ID +5;
-        rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
+        rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
 
     }
 
 	g_object_unref (model);
-	
+
 	if(rows > 0)
 	{
 		GtkCellRenderer *renderer;
@@ -2884,19 +2868,19 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data)
 		column = gtk_tree_view_column_new_with_attributes(("Value"), renderer, "text", 2, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 		g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width",  wide[2], NULL);
-	
+
 		renderer = gtk_cell_renderer_text_new();
 		column = gtk_tree_view_column_new_with_attributes((_("SD")), renderer, "text", 3, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 		g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width",  wide[3], NULL);
-	
+
         gtk_fixed_put(GTK_FIXED(fixed), treeview, x2, *y+h);
 		*y += (rows)*h + h + h/2;
 	}
 }
 #ifdef VET
-//添加肌腱 病灶面积 结果显示
-//hlx 
+//娣诲姞鑲岃叡 鐥呯伓闈㈢Н 缁撴灉鏄剧ず
+//hlx
 void ViewReport::AddTDRes(GtkWidget *fixed, guint *y, const char *title)
 {
     guint x1 = 120;
@@ -2969,13 +2953,12 @@ void ViewReport::AddTDRes(GtkWidget *fixed, guint *y, const char *title)
 }
 #endif
 
-
 void ViewReport::AddOBEfwTable(GtkWidget *fixed, guint *y, const char *labstr, int fetal)
 {
 	gint rows = 0, id = 0;
 	GtkListStore *store= gtk_list_store_new(4,
 			G_TYPE_BOOLEAN,
-			G_TYPE_STRING, 
+			G_TYPE_STRING,
 			G_TYPE_STRING,
             G_TYPE_STRING);
 
@@ -2996,7 +2979,7 @@ void ViewReport::AddOBEfwTable(GtkWidget *fixed, guint *y, const char *labstr, i
 	guint x1 = 20, x2 = 40;
 	int h = 30;
 	MeaResult *ptrRes = MeaResult::GetInstance();
-	const CalcResultInfo *EfwInfo[] = { &OBEfwHadlock1, &OBEfwHadlock2, &OBEfwHadlock3, &OBEfwHadlock4, 
+	const CalcResultInfo *EfwInfo[] = { &OBEfwHadlock1, &OBEfwHadlock2, &OBEfwHadlock3, &OBEfwHadlock4,
 										&OBEfwShepard, &OBEfwHansmenn, &OBEfwTokyo };
 	const char method[][20] = { "Hadlock1", "Hadlock2", "Hadlock3", "Hadlock4", "Shepard", "Hansmenn", "Tokyo" };
 
@@ -3021,14 +3004,14 @@ void ViewReport::AddOBEfwTable(GtkWidget *fixed, guint *y, const char *labstr, i
         MeasureMan::GetInstance()->GetMeasureUnit(coeffi, units,EfwInfo[i]->unitItem);
         sprintf(title, "%s%s%s%s", _("EFW"), "(", method[i], ")");
         sprintf(value, "%.2f%s", calc_val*coeffi, units.c_str());
-        sprintf(sd, "± %.2f%s", calc_val*0.1*coeffi, units.c_str());
+        sprintf(sd, "卤 %.2f%s", calc_val*0.1*coeffi, units.c_str());
         //sprintf(value, "%.2f%s", calc_val*1000, "g"); //units[EfwInfo[i]->unitItem]);
-        //sprintf(sd, "± %.2f%s", calc_val*1000*0.1, "g");
+        //sprintf(sd, "卤 %.2f%s", calc_val*1000*0.1, "g");
         rows = AddResultToTree3(treeview, title, value, sd, id, rows);
 	}
 
 	g_object_unref (model);
-	
+
 	if(rows > 0)
 	{
 		GtkCellRenderer *renderer;
@@ -3054,7 +3037,7 @@ void ViewReport::AddOBEfwTable(GtkWidget *fixed, guint *y, const char *labstr, i
 		column = gtk_tree_view_column_new_with_attributes(("Value"), renderer, "text", 2, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 		g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width",  wide[2], NULL);
-	
+
         renderer = gtk_cell_renderer_text_new();
 		column = gtk_tree_view_column_new_with_attributes((_("SD")), renderer, "text", 3, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
@@ -3069,7 +3052,7 @@ void ViewReport::AddTable(GtkWidget *fixed, guint *y, const char *title, int sec
 {
 	guint rows = 0;
 	guint x1 = 20;
-	guint x2 = 40; 
+	guint x2 = 40;
 	int h = 30;
 	int map_start;
 
@@ -3092,7 +3075,7 @@ void ViewReport::AddTable(GtkWidget *fixed, guint *y, const char *title, int sec
 #ifdef VET
         case TD_M:	    map_start = TD_MEA_START;	break;
         case ANOB_M:    map_start = ANOB_MEA_START;	break;
-#endif	
+#endif
     }
 
     if(m_TableUser == map_table)
@@ -3151,7 +3134,7 @@ void ViewReport::AddTable(GtkWidget *fixed, guint *y, const char *title, int sec
 			rows++;
 			valid = gtk_tree_model_iter_next(model, &iter);
 		}
-	
+
 		if(rows > 0)
 		{
 			gtk_fixed_put(GTK_FIXED(fixed), lab, x1, *y);
@@ -3239,7 +3222,7 @@ void ViewReport::UpdateGrowthCurve(int type)
 	}
 	for(int m=0; m<MEA_MULTI; m++)
 	{
-		value[m] = INVALID_VAL;	
+		value[m] = INVALID_VAL;
 		for(int n=0; n<MEA_TIMES; n++)
 			allvalue[m][n] = INVALID_VAL;
 	}
@@ -3283,15 +3266,15 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 {
 //	PRINTF("%s: StartDate=%d, MeasureNum 0=%d, 1=%d, GWDate=%d\n", __FUNCTION__, StartDate, MeasureNum[0], MeasureNum[1], GWDate);
 #if 1
-	//X轴代表天数，Y轴代表所测指标的长度
-	int i, j, x, y; 
+	//X杞翠唬琛ㄥぉ鏁帮紝Y杞翠唬琛ㄦ墍娴嬫寚鏍囩殑闀垮害
+	int i, j, x, y;
 	int FormerX = 0;
 	int FormerY = 0;
 	//X,Y轴均为280个象素，分成10格，起始坐标为(320,320)
 	volatile int Coordinate_Len=280, Coordinate_Start_X=320, Coordinate_Start_Y=320;
 	//	volatile int Table_data[280];
-	volatile int Length_X, Length_Y; 
-	//Unit_Len_X为X坐标上每格代表的数据长度，Unit_Len_X1为X坐标上每格的象素长度
+	volatile int Length_X, Length_Y;
+	//Unit_Len_X涓篨鍧愭爣涓婃瘡鏍间唬琛ㄧ殑鏁版嵁闀垮害锛孶nit_Len_X1涓篨鍧愭爣涓婃瘡鏍肩殑璞＄礌闀垮害
 	volatile int Unit_Len_X, Unit_Len_Y, Unit_Len_X1, Unit_Len_Y1;
 	volatile int StartNum_X, StartNum_Y;//坐标轴起始数据
 	volatile int DataNum = 0;
@@ -3309,7 +3292,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 		else
 			break;
 	}
-	//=============计算坐标轴数值范围，画坐标轴====================//	
+	//=============璁＄畻鍧愭爣杞存暟鍊艰寖鍥达紝鐢诲潗鏍囪酱====================//
 	Length_Y = ObTable[DataNum-1][2] - ObTable[0][0];
 	Length_X = DataNum;
 
@@ -3351,7 +3334,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 		draw_dash_line (m_pixmapGC, gc, GDK_COPY, Coordinate_Start_X+i*Unit_Len_X1-1, Coordinate_Start_Y-5, Coordinate_Start_X+i*Unit_Len_X1-1, Coordinate_Start_Y);
 		for(j=1;j<21;j++)
 		{
-			//坐标轴点
+			//鍧愭爣杞寸偣
 			gdk_draw_point (m_pixmapGC, gc, Coordinate_Start_X+i*Unit_Len_X1-1, Coordinate_Start_Y-j*Unit_Len_Y1/2);
 		}
 	}
@@ -3405,7 +3388,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 	pango_layout_set_text(layout, strtemp, strlen(strtemp));
 	gdk_draw_layout(m_pixmapGC, gc, Coordinate_Start_X-20, Coordinate_Start_Y-i*Unit_Len_Y1, layout);
 
-	for(i=0;i<DataNum;i++) //以下为画曲线，以上为画坐标 
+	for(i=0;i<DataNum;i++) //以下为画曲线，以上为画坐标
 	{
 		x = Coordinate_Start_X + (i+StartDate-StartNum_X)*Unit_Len_X1/Unit_Len_X;
 		y = Coordinate_Start_Y - (ObTable[i][1]-StartNum_Y)*Unit_Len_Y1/Unit_Len_Y;
@@ -3418,7 +3401,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 		FormerY = y;
 	}
 
-	for(i=0;i<DataNum;i++)//下限曲线
+	for(i=0;i<DataNum;i++)//涓嬮檺鏇茬嚎
 	{
 		x = Coordinate_Start_X + (i+StartDate-StartNum_X)*Unit_Len_X1/Unit_Len_X;
 		y = Coordinate_Start_Y - (ObTable[i][0]-StartNum_Y)*Unit_Len_Y1/Unit_Len_Y;
@@ -3436,7 +3419,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 		FormerY = y;
 	}
 
-	for(i=0;i<DataNum;i++)//上限曲线
+	for(i=0;i<DataNum;i++)//涓婇檺鏇茬嚎
 	{
 		x = Coordinate_Start_X + (i+StartDate-StartNum_X)*Unit_Len_X1/Unit_Len_X;
 		y = Coordinate_Start_Y - (ObTable[i][2]-StartNum_Y)*Unit_Len_Y1/Unit_Len_Y;
@@ -3447,15 +3430,14 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 
 		FormerX = x;
 		FormerY = y;
-	}	
-
+	}
 
 	//标测量值的坐标点和LMP和上下限曲线及横轴的坐标点
 	x = Coordinate_Start_X + (GWDate-StartNum_X)*Unit_Len_X1/Unit_Len_X;
 	y = Coordinate_Start_Y - (MeasureNum[0]-StartNum_Y)*Unit_Len_Y1/Unit_Len_Y;
 	gdk_gc_set_foreground(gc, g_blue);
 	if(MeasureNum[0]!=0  && GWDate!=0 )
-	{	
+	{
 		sprintf(strtemp, "%s 1 :", _("Fetus"));
 		pango_layout_set_text(layout, strtemp, strlen(strtemp));
 		gdk_draw_layout(m_pixmapGC, gc, 70, 80, layout);
@@ -3468,7 +3450,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 		pango_layout_set_text(layout, strtemp, strlen(strtemp));
 		gdk_draw_layout(m_pixmapGC, gc, 80, 100, layout);
 	//	printf("MeasureNum[0]= %d, StartNum_Y=%d, Length_Y=%d, GWDate=%d, StartDate=%d, DataNum=%d\n", MeasureNum[0], StartNum_Y, Length_Y, GWDate, StartDate, DataNum);
-		if(MeasureNum[0]>=StartNum_Y && MeasureNum[0]<StartNum_Y+Length_Y && 
+		if(MeasureNum[0]>=StartNum_Y && MeasureNum[0]<StartNum_Y+Length_Y &&
 				GWDate>=StartDate && GWDate<StartDate+DataNum)
 		{
 			sprintf(strtemp, "F1");
@@ -3496,7 +3478,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 			sprintf(strtemp, "%2dw%1dd, %1d.%1d%1dkg", GWDate/7,GWDate%7,MeasureNum[1]/1000,(MeasureNum[1]%1000)/100,(MeasureNum[1]%100)/10);
 		pango_layout_set_text(layout, strtemp, strlen(strtemp));
 		gdk_draw_layout(m_pixmapGC, gc, 80, 150, layout);
-		if(MeasureNum[1]>=StartNum_Y && MeasureNum[1]<StartNum_Y+Length_Y && 
+		if(MeasureNum[1]>=StartNum_Y && MeasureNum[1]<StartNum_Y+Length_Y &&
 				GWDate>=StartDate && GWDate<StartDate+DataNum)
 		{
 			sprintf(strtemp, "F2");
@@ -3506,7 +3488,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
 			gdk_gc_set_function(gc, GDK_COPY);
 			gdk_draw_line(m_pixmapGC, gc, Coordinate_Start_X+1, y, x, y);
 			gdk_draw_line(m_pixmapGC, gc, x, y, x, Coordinate_Start_Y-1);
-		}	
+		}
 	}
 
 	g_object_unref(layout);
@@ -3520,7 +3502,7 @@ void ViewReport::GrowthCurveChanged(GtkComboBox *combobox)
 	gtk_widget_queue_draw(m_drawingareaGC);
 }
 
-void ViewReport::GrowthCurveConfigure(GtkWidget *widget, GdkEventConfigure *event) 
+void ViewReport::GrowthCurveConfigure(GtkWidget *widget, GdkEventConfigure *event)
 {
 	if (m_pixmapGC){
 		gdk_pixmap_unref (m_pixmapGC);
@@ -3537,7 +3519,7 @@ void ViewReport::GrowthCurveConfigure(GtkWidget *widget, GdkEventConfigure *even
 	g_object_unref(gc);
 }
 
-void ViewReport::GrowthCurveExpose(GtkWidget *widget, GdkEventExpose *event) 
+void ViewReport::GrowthCurveExpose(GtkWidget *widget, GdkEventExpose *event)
 {
 	GdkGC *gc = gdk_gc_new(m_pixmapGC);
 	gdk_gc_set_foreground (gc, g_gray);
@@ -3571,7 +3553,7 @@ void ViewReport::GrowthCurveExpose(GtkWidget *widget, GdkEventExpose *event)
 		case 15:	DrawGrowthCurve (hl_jeanty1, 91, m_dataGC, gw, 0);		break;
 		case 16:	DrawGrowthCurve (EFW_hadlock1, 70, m_dataGC, gw, 1);	break;
 		case 17:	DrawGrowthCurve (EFW_hansmenn1, 70, m_dataGC, gw, 1);	break;
-		default:	
+		default:
 			break;
 	}
 	gdk_draw_pixmap (widget->window,
@@ -3585,19 +3567,19 @@ void ViewReport::GrowthCurveExpose(GtkWidget *widget, GdkEventExpose *event)
 void ViewReport::AddGrowthCurve(GtkWidget *fixed, guint *y)
 {
 	guint x1 = 20;
-	guint x2 = 80; 
+	guint x2 = 80;
 	guint h = 30;
 	GtkTreeIter iter;
 	GtkListStore *store;
 	GtkWidget *title;
 
-	gchar strGrowthCurve[18][25]= { {"GS-Rempen"}, 
+	gchar strGrowthCurve[18][25]= { {"GS-Rempen"},
 									{"CRL-Hadlock"}, {"CRL-Robinson"},	{"CRL-Hansmenn"},
-									{"BPD-Hadlock"}, {"BPD-Lasser"}, {"BPD-Merz"}, {"BPD-Rempen"}, 
+									{"BPD-Hadlock"}, {"BPD-Lasser"}, {"BPD-Merz"}, {"BPD-Rempen"},
 									{"HC-Merz"}, {"HC-Hadlock"},
-									{"AC-Hadlock"}, {"AC-Merz"}, 
+									{"AC-Hadlock"}, {"AC-Merz"},
 									{"FL-Hadlock"}, {"FL-Merz"}, {"FL-Jeanty"},
-									{"HL-Jeanty"}, 
+									{"HL-Jeanty"},
 									{"EFW-Hadlock"}, {"EFW-Hansmenn"} };
 
 	title = create_label(_("<i><b>Growth Curve</b></i>"), 0, h, g_white, NULL);
@@ -3614,7 +3596,7 @@ void ViewReport::AddGrowthCurve(GtkWidget *fixed, guint *y)
 	g_signal_connect (G_OBJECT(m_comboboxGC), "changed", G_CALLBACK(HandleGrowthCurveChanged), this);
 	gtk_fixed_put(GTK_FIXED(fixed), m_comboboxGC, 700, *y-5);
 	*y += h;
-	
+
 	m_drawingareaGC= gtk_drawing_area_new();
 	gtk_widget_set_size_request(m_drawingareaGC, 770, 350);
 	gtk_widget_modify_bg (m_drawingareaGC, GTK_STATE_NORMAL, g_white);
@@ -3622,7 +3604,7 @@ void ViewReport::AddGrowthCurve(GtkWidget *fixed, guint *y)
 	g_signal_connect (G_OBJECT(m_drawingareaGC), "expose_event", G_CALLBACK(HandleGrowthCurveExpose), this);
 	gtk_fixed_put(GTK_FIXED(fixed), m_drawingareaGC, x2, *y);
 
-	*y += 350; 
+	*y += 350;
 
 	UpdateGrowthCurve(0);
 }
@@ -3672,9 +3654,9 @@ void ViewReport::AddBiophysicalProfile(GtkWidget *fixed, guint *y)
 {
 	gint i;
 	guint x1 = 20;
-	guint x2 = 80; 
+	guint x2 = 80;
 	guint h = 30;
-	GtkWidget *formula; 
+	GtkWidget *formula;
 	GtkAdjustment *adj[5];
 
 	char str[9][50]= {N_("Formula: Vintzileos"), N_("FHR:"), N_("FM:"), N_("FBM:"), N_("FT:"), N_("PL:"), N_("AF:"), N_("Total:")};
@@ -3713,7 +3695,7 @@ void ViewReport::AddBiophysicalProfile(GtkWidget *fixed, guint *y)
 		g_signal_connect(G_OBJECT(spin), "value_changed", G_CALLBACK(HandleSpinValueChanged), this);
 		gtk_table_attach_defaults(GTK_TABLE(table), spin, 1, 2, i+1, i+2);
 	}
-	
+
 	for(i=0; i<7; i++)
 	{
 		m_entryDes[i] = gtk_entry_new();
@@ -3724,7 +3706,7 @@ void ViewReport::AddBiophysicalProfile(GtkWidget *fixed, guint *y)
 		gtk_table_attach_defaults(GTK_TABLE(table), m_entryDes[i], 2, 3, i+1, i+2);
 	}
 
-	GtkWidget *lab = create_label(_("Single Explain:    2-point:Normal  1-point:Slight Abnormal  0-point:Obvious Abnormal"), 
+	GtkWidget *lab = create_label(_("Single Explain:    2-point:Normal  1-point:Slight Abnormal  0-point:Obvious Abnormal"),
 			0, h, g_white, NULL);
 	gtk_misc_set_alignment(GTK_MISC(lab), 0.0, 0.5);
 	gtk_table_attach_defaults(GTK_TABLE(table), lab, 0, 3, 8, 9);
@@ -3787,7 +3769,7 @@ void ViewReport::AddPSAD(GtkWidget *fixed, guint *y)
 	gint rows = 0, id = 0;
 	GtkListStore *store= gtk_list_store_new(3,
 			G_TYPE_BOOLEAN,
-			G_TYPE_STRING, 
+			G_TYPE_STRING,
 			G_TYPE_STRING);
 
 	GtkTreeModel *model = GTK_TREE_MODEL (store);
@@ -3806,7 +3788,7 @@ void ViewReport::AddPSAD(GtkWidget *fixed, guint *y)
 
 	guint x1 = 20, x2 = 40;
 	int h = 30;
-	float calc_val[2]; 
+	float calc_val[2];
 	MeaResult *ptrRes = MeaResult::GetInstance();
 	ptrRes->CalcGetSPSA(calc_val[0], calc_val[1]);
 
@@ -3832,7 +3814,7 @@ void ViewReport::AddPSAD(GtkWidget *fixed, guint *y)
 	}
 
 	g_object_unref (model);
-	
+
 	if(rows > 0)
 	{
 		GtkCellRenderer *renderer;
@@ -3857,7 +3839,7 @@ void ViewReport::AddPSAD(GtkWidget *fixed, guint *y)
 		column = gtk_tree_view_column_new_with_attributes(("Value"), renderer, "text", 2, NULL);
 		gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 		g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width",  wide[2], NULL);
-		
+
 		gtk_fixed_put(GTK_FIXED(fixed), lab, x1, *y);
 		*y += h;
 		gtk_fixed_put(GTK_FIXED(fixed), treeview, x2, *y);
@@ -3931,13 +3913,13 @@ void ViewReport::InitTableData()
 	InitMapTable(m_TableOrtho, ORTHO_MEA_START, ORTHO_MEA_END, OrthoInfo);
 #ifdef VET
 //添加 动物超 TD
-//hlx 
+//hlx
 	for(i=0; i<TD_MEA_END-TD_MEA_START; i++)
 		for(j=0; j<CALC_MAX; j++)
 			m_TableTD[i][j] = -1;
 	InitMapTable(m_TableTD, TD_MEA_START, TD_MEA_END, TDInfo);
 //添加 动物超 ANOB
-//hlx 
+//hlx
 	for(i=0;i<ANOB_MEA_END-ANOB_MEA_START; i++)
 		for(j=0;j<CALC_MAX;j++)
 			m_TableAnOB[i][j] = -1;
@@ -4004,7 +3986,7 @@ GtkWidget* ViewReport::CreateNotePageAE()
 	PRINTF("Create Adult Note\n");
 
 	//Dimensions(2D)
-	AddTable(fixed, &y, _("<i><b>Dimensions(2D)</b></i>"), ADULT_M, ADULT_MEA_START, ADULT_AOR_DIAM, m_TableAdult); 
+	AddTable(fixed, &y, _("<i><b>Dimensions(2D)</b></i>"), ADULT_M, ADULT_MEA_START, ADULT_AOR_DIAM, m_TableAdult);
 	//Vessels(2D)
 	AddTable(fixed, &y, _("<i><b>Vessels(2D)</b></i>"), ADULT_M, ADULT_AOR_DIAM, ADULT_A2CD, m_TableAdult);
 	//EF&Volume(2D)
@@ -4043,51 +4025,51 @@ GtkWidget* ViewReport::CreateNotePageOB()
 
 	//Average result
 	AddAverRes(fixed, &y, "<i><b>Average</b></i>");
-	//Fetal 1 
+	//Fetal 1
 	//Advanced
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("Advanced"), _("(Fetus 1)"));
-	AddTable(fixed, &y, title, OB_M, OB_MEA_START, OB_AFI_LUQ, m_TableOb, 1); 
+	AddTable(fixed, &y, title, OB_M, OB_MEA_START, OB_AFI_LUQ, m_TableOb, 1);
 	//AFI&BPP
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("AFI"), _("(Fetus 1)"));
-	AddTable(fixed, &y, title, OB_M, OB_AFI_LUQ, OB_CRL, m_TableOb, 1); 
+	AddTable(fixed, &y, title, OB_M, OB_AFI_LUQ, OB_CRL, m_TableOb, 1);
 	//Early
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("Early"), _("(Fetus 1)"));
-	AddTable(fixed, &y, title, OB_M, OB_CRL, OB_RA_DIMEN, m_TableOb, 1); 
+	AddTable(fixed, &y, title, OB_M, OB_CRL, OB_RA_DIMEN, m_TableOb, 1);
 	//Fetal Heart
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("Fetal Heart"), _("(Fetus 1)"));
-	AddTable(fixed, &y, title, OB_M, OB_RA_DIMEN, OB_GS, m_TableOb, 1); 
+	AddTable(fixed, &y, title, OB_M, OB_RA_DIMEN, OB_GS, m_TableOb, 1);
 	//General
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("General"), _("(Fetus 1)"));
-	AddTable(fixed, &y, title, OB_M, OB_GS, OB_EAR, m_TableOb, 1); 
+	AddTable(fixed, &y, title, OB_M, OB_GS, OB_EAR, m_TableOb, 1);
 	//EFW
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("EFW"), _("(Fetus 1)"));
 	AddOBEfwTable(fixed, &y, title, 1);
 	//Other
 	sprintf(title, "<i><b><span fgcolor=\"#0000FF\">%s%s</span></b></i>", _("Other"), _("(Fetus 1)"));
-	AddTable(fixed, &y, title, OB_M, OB_EAR, OB_MEA_END, m_TableOb, 1); 
+	AddTable(fixed, &y, title, OB_M, OB_EAR, OB_MEA_END, m_TableOb, 1);
 
 	//Fetal 2
 	//Advanced
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("Advanced"), _("(Fetus 2)"));
-	AddTable(fixed, &y, title, OB_M, OB_MEA_START, OB_AFI_LUQ, m_TableOb, 2); 
+	AddTable(fixed, &y, title, OB_M, OB_MEA_START, OB_AFI_LUQ, m_TableOb, 2);
 	//AFI&BPP
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("AFI"), _("(Fetus 2)"));
-	AddTable(fixed, &y, title, OB_M, OB_AFI_LUQ, OB_CRL, m_TableOb, 2); 
+	AddTable(fixed, &y, title, OB_M, OB_AFI_LUQ, OB_CRL, m_TableOb, 2);
 	//Early
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("Early"), _("(Fetus 2)"));
-	AddTable(fixed, &y, title, OB_M, OB_CRL, OB_RA_DIMEN, m_TableOb, 2); 
+	AddTable(fixed, &y, title, OB_M, OB_CRL, OB_RA_DIMEN, m_TableOb, 2);
 	//Fetal Heart
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("Fetal Heart"), _("(Fetus 2)"));
-	AddTable(fixed, &y, title, OB_M, OB_RA_DIMEN, OB_GS, m_TableOb, 2); 
+	AddTable(fixed, &y, title, OB_M, OB_RA_DIMEN, OB_GS, m_TableOb, 2);
 	//General
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("General"), _("(Fetus 2)"));
-	AddTable(fixed, &y, title, OB_M, OB_GS, OB_EAR, m_TableOb, 2); 
+	AddTable(fixed, &y, title, OB_M, OB_GS, OB_EAR, m_TableOb, 2);
 	//EFW
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("EFW"), _("(Fetus 2)"));
 	AddOBEfwTable(fixed, &y, title, 2);
 	//Other
 	sprintf(title, "<i><b><span fgcolor=\"#00FFFF\">%s%s</span></b></i>", _("Other"), _("(Fetus 2)"));
-	AddTable(fixed, &y, title, OB_M, OB_EAR, OB_MEA_END, m_TableOb, 2); 
+	AddTable(fixed, &y, title, OB_M, OB_EAR, OB_MEA_END, m_TableOb, 2);
 
     //Growth Curve
 	y += 20;
@@ -4107,11 +4089,11 @@ GtkWidget* ViewReport::CreateNotePageGYN()
 	PRINTF("Create GYN Note\n");
 
 	//General
-	AddTable(fixed, &y, _("<i><b>General</b></i>"), GYN_M, GYN_MEA_START, GYN_L_FOLL1, m_TableGyn); 
+	AddTable(fixed, &y, _("<i><b>General</b></i>"), GYN_M, GYN_MEA_START, GYN_L_FOLL1, m_TableGyn);
 	//Fertility
-	AddTable(fixed, &y, _("<i><b>Fertility</b></i>"), GYN_M, GYN_L_FOLL1, GYN_FIBROID1, m_TableGyn); 
+	AddTable(fixed, &y, _("<i><b>Fertility</b></i>"), GYN_M, GYN_L_FOLL1, GYN_FIBROID1, m_TableGyn);
 	//Fibroid
-	AddTable(fixed, &y, _("<i><b>Fibroid</b></i>"), GYN_M, GYN_FIBROID1, GYN_MEA_END, m_TableGyn); 
+	AddTable(fixed, &y, _("<i><b>Fibroid</b></i>"), GYN_M, GYN_FIBROID1, GYN_MEA_END, m_TableGyn);
 	AddTable(fixed, &y,  _("<i><b>User</b></i>"), GYN_M, USER_START, USER_END, m_TableUser);
 	return fixed;
 }
@@ -4124,13 +4106,13 @@ GtkWidget* ViewReport::CreateNotePageSP()
 	PRINTF("Create SP Note\n");
 
 	//Breast
-	AddTable(fixed, &y, _("<i><b>Breast</b></i>"), SP_M, SP_MEA_START, SP_L_TESTIS_L, m_TableSp); 
+	AddTable(fixed, &y, _("<i><b>Breast</b></i>"), SP_M, SP_MEA_START, SP_L_TESTIS_L, m_TableSp);
 	//Testicle
-	AddTable(fixed, &y, _("<i><b>Testicle</b></i>"), SP_M, SP_L_TESTIS_L, SP_ISTHMUS_AP, m_TableSp); 
+	AddTable(fixed, &y, _("<i><b>Testicle</b></i>"), SP_M, SP_L_TESTIS_L, SP_ISTHMUS_AP, m_TableSp);
 	//Thyroid
-	AddTable(fixed, &y, _("<i><b>Thyroid</b></i>"), SP_M, SP_ISTHMUS_AP, SP_L_EYE_OA, m_TableSp); 
+	AddTable(fixed, &y, _("<i><b>Thyroid</b></i>"), SP_M, SP_ISTHMUS_AP, SP_L_EYE_OA, m_TableSp);
 	//Eye
-	AddTable(fixed, &y, _("<i><b>Eyeball</b></i>"), SP_M, SP_L_EYE_OA, SP_MEA_END, m_TableSp); 
+	AddTable(fixed, &y, _("<i><b>Eyeball</b></i>"), SP_M, SP_L_EYE_OA, SP_MEA_END, m_TableSp);
     AddTable(fixed, &y, _("<i><b>User</b></i>"), SP_M, USER_START, USER_END, m_TableUser);
 	return fixed;
 }
@@ -4144,11 +4126,11 @@ GtkWidget* ViewReport::CreateNotePageVES()
 	PRINTF("Create VES Note\n");
 
 	//Carotid
-	AddTable(fixed, &y, _("<i><b>Carotid</b></i>"), VS_M, VS_MEA_START, VS_L_CFA, m_TableVs); 
+	AddTable(fixed, &y, _("<i><b>Carotid</b></i>"), VS_M, VS_MEA_START, VS_L_CFA, m_TableVs);
 	//LE Art
-	AddTable(fixed, &y, _("<i><b>LE Art</b></i>"), VS_M, VS_L_CFA, VS_L_ANTECUBE, m_TableVs); 
+	AddTable(fixed, &y, _("<i><b>LE Art</b></i>"), VS_M, VS_L_CFA, VS_L_ANTECUBE, m_TableVs);
 	//UE Art
-	AddTable(fixed, &y, _("<i><b>UE Art</b></i>"), VS_M, VS_L_ANTECUBE, VS_MEA_END, m_TableVs); 
+	AddTable(fixed, &y, _("<i><b>UE Art</b></i>"), VS_M, VS_L_ANTECUBE, VS_MEA_END, m_TableVs);
  	AddTable(fixed, &y,  _("<i><b>User</b></i>"), VS_M, USER_START, USER_END, m_TableUser);
 	return fixed;
 }
@@ -4162,30 +4144,30 @@ GtkWidget* ViewReport::CreateNotePageFE()
 	PRINTF("Create Fetal Note\n");
 
 	//Dimen(2D)
-	AddTable(fixed, &y, _("<i><b>Dimen(2D)</b></i>"), FETAL_M, FETAL_MEA_START, FETAL_AOR_DIAM, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Dimen(2D)</b></i>"), FETAL_M, FETAL_MEA_START, FETAL_AOR_DIAM, m_TableFetal);
 	//Vessels(2D)
-	AddTable(fixed, &y, _("<i><b>Vessels(2D)</b></i>"), FETAL_M, FETAL_AOR_DIAM, FETAL_AO_AN_DIAM, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Vessels(2D)</b></i>"), FETAL_M, FETAL_AOR_DIAM, FETAL_AO_AN_DIAM, m_TableFetal);
 	//Valves(2D)
-	AddTable(fixed, &y, _("<i><b>Valves(2D)</b></i>"), FETAL_M, FETAL_AO_AN_DIAM, FETAL_RVAWD_MM, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Valves(2D)</b></i>"), FETAL_M, FETAL_AO_AN_DIAM, FETAL_RVAWD_MM, m_TableFetal);
 	//Dimen(M)
-	AddTable(fixed, &y, _("<i><b>Dimen(M)</b></i>"), FETAL_M, FETAL_RVAWD_MM, FETAL_AOR_DIAM_MM, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Dimen(M)</b></i>"), FETAL_M, FETAL_RVAWD_MM, FETAL_AOR_DIAM_MM, m_TableFetal);
 	//Vessels(M)
-	AddTable(fixed, &y, _("<i><b>Vessels(M)</b></i>"), FETAL_M, FETAL_AOR_DIAM_MM, FETAL_LV_ET_MM, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Vessels(M)</b></i>"), FETAL_M, FETAL_AOR_DIAM_MM, FETAL_LV_ET_MM, m_TableFetal);
 	//AV MV(M)
-	AddTable(fixed, &y, _("<i><b>AV &amp; MV(M)</b></i>"), FETAL_M, FETAL_LV_ET_MM, FETAL_LATE_DIAS_SLOPE_MM, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>AV &amp; MV(M)</b></i>"), FETAL_M, FETAL_LV_ET_MM, FETAL_LATE_DIAS_SLOPE_MM, m_TableFetal);
 	//PV TV(M)
-	AddTable(fixed, &y, _("<i><b>PV &amp; TV(M)</b></i>"), FETAL_M, FETAL_LATE_DIAS_SLOPE_MM, FETAL_PLACENTA, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>PV &amp; TV(M)</b></i>"), FETAL_M, FETAL_LATE_DIAS_SLOPE_MM, FETAL_PLACENTA, m_TableFetal);
 	//Utero Placenta(D)
-	AddTable(fixed, &y, _("<i><b>Utero &amp; Placenta(D)</b></i>"), FETAL_M, FETAL_PLACENTA, FETAL_FROAMEN_OVALE, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Utero &amp; Placenta(D)</b></i>"), FETAL_M, FETAL_PLACENTA, FETAL_FROAMEN_OVALE, m_TableFetal);
 	//Vessels(D)
-	AddTable(fixed, &y, _("<i><b>Vessels(D)</b></i>"), FETAL_M, FETAL_FROAMEN_OVALE, FETAL_LVOT_ACC_TIME, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>Vessels(D)</b></i>"), FETAL_M, FETAL_FROAMEN_OVALE, FETAL_LVOT_ACC_TIME, m_TableFetal);
 	//AV MV(D)
-	AddTable(fixed, &y, _("<i><b>AV &amp; MV(D)</b></i>"), FETAL_M, FETAL_LVOT_ACC_TIME, FETAL_RVOT_ACC_TIME, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>AV &amp; MV(D)</b></i>"), FETAL_M, FETAL_LVOT_ACC_TIME, FETAL_RVOT_ACC_TIME, m_TableFetal);
 	//PV TV(D)
-	AddTable(fixed, &y, _("<i><b>PV &amp; TV(D)</b></i>"), FETAL_M, FETAL_RVOT_ACC_TIME, FETAL_THORACIC_AO, m_TableFetal); 
-	//Peripheral Vasc(D) 
- 	
-	AddTable(fixed, &y, _("<i><b>Peripheral Vasc(D)</b></i>"), FETAL_M, FETAL_THORACIC_AO, FETAL_MEA_END, m_TableFetal); 
+	AddTable(fixed, &y, _("<i><b>PV &amp; TV(D)</b></i>"), FETAL_M, FETAL_RVOT_ACC_TIME, FETAL_THORACIC_AO, m_TableFetal);
+	//Peripheral Vasc(D)
+
+	AddTable(fixed, &y, _("<i><b>Peripheral Vasc(D)</b></i>"), FETAL_M, FETAL_THORACIC_AO, FETAL_MEA_END, m_TableFetal);
  	AddTable(fixed, &y,  _("<i><b>User</b></i>"), FETAL_M, USER_START, USER_END, m_TableUser);
 
 	return fixed;
@@ -4199,8 +4181,8 @@ GtkWidget* ViewReport::CreateNotePageTCD()
 
 	PRINTF("Create TCD Note\n");
 
-	AddTable(fixed, &y, " ", TCD_M, TCD_MEA_START, TCD_MEA_END, m_TableTcd); 
- 
+	AddTable(fixed, &y, " ", TCD_M, TCD_MEA_START, TCD_MEA_END, m_TableTcd);
+
  AddTable(fixed, &y,  _("<i><b>User</b></i>"), TCD_M, USER_START, USER_END, m_TableUser);
 
 	return fixed;
@@ -4213,14 +4195,14 @@ GtkWidget* ViewReport::CreateNotePageORT()
 
 	PRINTF("Create Ortho Note\n");
 
-	AddTable(fixed, &y, " ", ORTHO_M, ORTHO_MEA_START, ORTHO_MEA_END, m_TableOrtho); 
-    y += 30; 
+	AddTable(fixed, &y, " ", ORTHO_M, ORTHO_MEA_START, ORTHO_MEA_END, m_TableOrtho);
+    y += 30;
     AddTable(fixed, &y,  _("<i><b>User</b></i>"), ORTHO_M, USER_START, USER_END, m_TableUser);
 	return fixed;
 }
 #ifdef VET
 //添加 动物超 TD报告函数
-//hlx 
+//hlx
 GtkWidget* ViewReport::CreateNotePageTD()
 {
 	guint y = 30;
@@ -4248,7 +4230,7 @@ GtkWidget* ViewReport::CreateNotePageTD()
 
 #ifdef VET
 //添加 动物超 ANOB报告函数
-//hlx 
+//hlx
 GtkWidget* ViewReport::CreateNotePageAnOB()
 {
 	guint y = 30;
@@ -4257,7 +4239,7 @@ GtkWidget* ViewReport::CreateNotePageAnOB()
 	PRINTF("Create ANOB NOTE\n");
 
 	AddTable(fixed, &y, _("<i><b>Dog</b></i>"),	    ANOB_M,  ANOB_DOG_GSD,   ANOB_DOG_BD+1,      m_TableAnOB, 1);
-		//AddTable(fixed, &y, title, OB_M, OB_GS, OB_EAR, m_TableOb, 1); 
+		//AddTable(fixed, &y, title, OB_M, OB_GS, OB_EAR, m_TableOb, 1);
 	AddTable(fixed, &y, _("<i><b>Cat</b></i>"),	    ANOB_M,  ANOB_CAT_HD,    ANOB_CAT_BD+1,      m_TableAnOB, 1);
 	AddTable(fixed, &y, _("<i><b>Sheep</b></i>"),	ANOB_M,  ANOB_SHEEP_CRL, ANOB_SHEEP_CRL+1,   m_TableAnOB, 1);
 	AddTable(fixed, &y, _("<i><b>Swine</b></i>"),	ANOB_M,  ANOB_SWINE_HL,  ANOB_SWINE_SL+1,    m_TableAnOB, 1);

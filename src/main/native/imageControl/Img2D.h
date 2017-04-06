@@ -1,15 +1,15 @@
 #ifndef IMAGING2D_H
 #define IMAGING2D_H
 
-#include "ProbeMan.h"
-#include "ExamItem.h"
-#include "Calc2D.h"
+#include "probe/ProbeMan.h"
+#include "probe/ExamItem.h"
+#include "imageControl/Calc2D.h"
 #include "AbsUpdate2D.h"
 #include "Def.h"
-#include "DSCTypes.h"
-#include "DSC.h"
-#include <base/CalcTime.h>
-#include "ManRegister.h"
+#include <DSCTypes.h>
+#include <DSC.h>
+#include "base/CalcTime.h"
+#include "periDevice/ManRegister.h"
 
 /*
  * @brief class Img2D control the imging of 2D and M mode
@@ -17,11 +17,11 @@
 class Img2D
 {
 	public:
-		///> 
+		///>
 		~Img2D();
-		
+
 		static Img2D* GetInstance();
-		
+
 		static const int MAX_FOCUS = 4;// = Calc2D::FOC_MAX;
 		static const int MAX_LINE_DENSITY = 2;
 		static const string LINE_DENSITY_DISPLAY[MAX_LINE_DENSITY];
@@ -40,8 +40,8 @@ class Img2D
 		static const int MAX_AGC = 4;
 		static const int MAX_EDGE = 8;
 		static const int DYNAMIC_DATA_D[Calc2D::MAX_DYNAMIC_INDEX]; //display
-		static const int MAX_TSI = 4; 
-		static const string TSI_DISPLAY[MAX_TSI]; 
+		static const int MAX_TSI = 4;
+		static const string TSI_DISPLAY[MAX_TSI];
         static const int MAX_ANGLE = 8;
         static const int MAX_SPACE_COMPOUND = 4;
         static const int SPACE_COMPOUND_ANGLE[MAX_SPACE_COMPOUND];
@@ -56,10 +56,9 @@ class Img2D
         int m_tDepth;
         int m_stepDepth;
 
-
         char m_str[20];
 		///> general member
-		void SetCalc2D(Calc2D* calc); 
+		void SetCalc2D(Calc2D* calc);
 		void SetDsc(CDSC* dsc) { m_ptrDsc = dsc;}
 
 		//operation of 2D mode
@@ -79,7 +78,7 @@ class Img2D
         EKnobReturn ChangeDepth(EKnobOper oper);
         void ChangeTgc2D(int tgcY[8]);
         void ChangeGain2D(int gain);
-#ifdef TRANSDUCER   
+#ifdef TRANSDUCER
      void ChangeTransducer(int transducer);
 #endif
         EKnobReturn ChangeGain2D(EKnobOper oper);
@@ -98,7 +97,7 @@ class Img2D
         void RecoverLineDensity(); // index[0,1]
 		EKnobReturn ChangeEdgeEnhance(EKnobOper oper);
 		EKnobReturn ChangeSoundPower(EKnobOper oper);
-		EKnobReturn ChangeHarmonic(EKnobOper oper);		
+		EKnobReturn ChangeHarmonic(EKnobOper oper);
         EKnobReturn ChangeHarmonicStatus(EKnobOper oper);
         EKnobReturn ChangeD2HarmonicFreq(EKnobOper oper);
         //void SetMBP(int mbpIndex);
@@ -113,7 +112,6 @@ class Img2D
         void SetSteer(int& index);
         EKnobReturn ChangeTpView(EKnobOper oper);
         EKnobReturn ChangeEFVI(EKnobOper oper);
-
 
 		///>operation of M mode
 		void ResetMLine();
@@ -168,7 +166,7 @@ class Img2D
 
 		double GetScale2D(); ///<scale of 2D no matter in what format, and you can also get 2D scale in each place 2D image appers(for example PW mode) unit: mm/dot
 		void GetAllScale2D(double scale[4]);
-		double GetScaleMDepth(); //unit of scaleDepth: mm/dots; 
+		double GetScaleMDepth(); //unit of scaleDepth: mm/dots;
 		double GetScaleMTime(); //unit of scaleTime: second/line
 		double GetScaleAnatomicMTime(); //unit of scaleTime: second/line
 		double GetScale2DInImgHDot(); ///<未经格式变化、未经局部放大，以IMAGE_H点采样，当前深度下的原始比率尺。
@@ -179,7 +177,7 @@ class Img2D
         void CalcTgc(int gain, int tgcY[8], int section);
         void CalcTgcDigital(int gain, int section, int maxValue);
         void ExitSimult();
-		
+
 		void ChangeSeperateScale(int destIndex, int srcIndex);
         void InitSeperateScale(int srcIndex);
 		void UpdateSeperateScaleWhenUnfreeze(void);
@@ -194,7 +192,7 @@ class Img2D
 
         ///> call for snap's measure
         void SetScaleForSpecialMeasure(double scale2DAll[4], double scale2D, double scaleMDepth, double scaleMTime);
- 
+
         ///> call for measure when local zoom
         void SetScale2DZoomMeasure(double scale);
         void RestoreScale2DZoomMasure(void);
@@ -204,11 +202,9 @@ class Img2D
 
         int GetCompoundSpaceIndex(void) { return m_spaceCompoundIndexBak; }
         bool GetCompoundFreqCtrl(void) { return m_freqCompoundCtrlBak; } //m_freqCompoundCtrl; }
-      
-
 
         ///>
-        void UpdateAutoOptimize(bool on);        
+        void UpdateAutoOptimize(bool on);
         void ModeCwCtrl(bool on);
 
         ///> single aperture
@@ -231,22 +227,21 @@ class Img2D
         void ChangeHarmonicFreq(EKnobOper oper);
         int GetHarmonicFreqIndex() { return  (m_harmonicFreqIndex); }
         int GetFreqIndex() { return m_freqIndex; }
-        
+
         void UpdateGain();       //用来解决调节M增益后，进入CFM时，增益错误的问题
 		int GetScanAngleIndex()
 		{
 			return m_scanAngleIndex;
 		}
 
-
         private:
         Img2D();
-		
+
 		///> static const-2D
 		///> focus pos(percent of depth = *FocRange[*][*]/FocusDepth)
 		static const int FOC_DEPTH;///< value to calc focus position percent.
 		static const unsigned char ONE_FOC_POS[18][1];
-		static const unsigned char TWO_FOC_POS[11][2]; 
+		static const unsigned char TWO_FOC_POS[11][2];
 		static const unsigned char THREE_FOC_POS[8][3];
 		static const unsigned char FOUR_FOC_POS[6][4];
 #ifdef EMP_355
@@ -262,23 +257,22 @@ class Img2D
         static const int MAX_M_SPEED = 8;
         static const int MAX_HARMONIC_FREQ = 50;
 
-
-         ///> extended imaging 
+         ///> extended imaging
         static const int MAX_TP_VIEW = 2;
 
 		///> extern member
-		static Img2D* m_ptrInstance;		
-		
+		static Img2D* m_ptrInstance;
+
         Calc2D* m_ptrCalc;
         Calc2D::CalcPara m_calcPara;
         AbsUpdate2D* m_ptrUpdate;
-        DSCCONTROLATTRIBUTES* m_ptrDscPara;		
+        DSCCONTROLATTRIBUTES* m_ptrDscPara;
 
         //ImageAreaDraw *m_ptrImgDraw;
 
 		CDSC* m_ptrDsc;
         int m_transducer;
-		///> 2D mode 
+		///> 2D mode
 		int m_tgc[8]; ///< 8 tgc
 		int m_gain2D; /// 2D total gain
 		int m_lines; ///< max scan lines of current probe
@@ -303,7 +297,7 @@ class Img2D
 		bool m_harmonic; ///< harmonic control, TRUE = on, FALSE = off
         int m_harmonicFreqIndex; ///<index of harmonic freq
 		vector<int> m_vecHarFreqRange; ///< selectable harmonic freq, realFreq*20
-        int m_tsiIndex; ///< index of tissue synchronization imaging, 常规／肌肉／液体／脂肪 
+        int m_tsiIndex; ///< index of tissue synchronization imaging, 常规／肌肉／液体／脂肪
 		int m_mbpIndex; ///< index of multi-beam parallel imaging, 1/2/4
 		int m_mbpIndexBak; ///< index of multi-beam parallel imaging, 1/2/4
 		int m_agcIndex; ///< level of agc
@@ -335,11 +329,10 @@ class Img2D
         int m_tpViewIndex; ///< used in linear probe
         bool m_efviCtrl; ///< used in convex probe
 
-
         // measure when zoom
         bool m_zoomMeasureCtrl; ///<是否进入局部放大的测量状态
-        double m_zoomScale; ///<局部放大的倍率
-        double m_scale2DZoom[4]; ///<局部放大后的比例尺       
+        double m_zoomScale; ///<灞€閮ㄦ斁澶х殑鍊嶇巼
+        double m_scale2DZoom[4]; ///<灞€閮ㄦ斁澶у悗鐨勬瘮渚嬪昂
         int m_focIndexRange[2];
 
         // compound
@@ -373,7 +366,6 @@ class Img2D
         static float m_fc4;
         static float m_fc5;
         static int m_freqEmit;
-
 
 		///> fun
 		void InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptrParaItem);
@@ -429,5 +421,4 @@ class Img2D
         void DefaultIndexBandPassFilterBaseFreq(int probeindex, int freqindex);
 };
 
-
-#endif 
+#endif

@@ -1,10 +1,10 @@
-#include "KnobEvent.h"
-#include "KnobMenu.h"
-#include "KeyDef.h"
+#include "keyboard/KnobEvent.h"
+#include "display/KnobMenu.h"
+#include "keyboard/KeyDef.h"
 
 void CKnobEvent::KnobEvent(unsigned char keyValue, unsigned char offset)
 {
-	KnobMenu* ptrKnob = KnobMenu::GetInstance(); 
+	KnobMenu* ptrKnob = KnobMenu::GetInstance();
 
 	switch (keyValue)
 	{
@@ -31,7 +31,7 @@ void CKnobEvent::KnobEvent(unsigned char keyValue, unsigned char offset)
 void CKnobEvent::FEvent(unsigned char keyValue)
 {
 
-	KnobMenu* ptrKnob = KnobMenu::GetInstance(); 
+	KnobMenu* ptrKnob = KnobMenu::GetInstance();
 #if (defined(EMP_460) || defined(EMP_355))
 	switch (keyValue)
 	{

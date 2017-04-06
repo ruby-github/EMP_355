@@ -9,14 +9,14 @@
  * @author: zhanglei
  */
 
-#include "KnobM.h"
-#include "Img2D.h"
-#include "KnobMenu.h"
-#include "gui_global.h"
-#include "../imageProc/ImgProc2D.h"
-#include "../imageProc/ModeStatus.h"
-#include "../display/HintArea.h"
-#include "KeyFunc.h"
+#include "imageControl/KnobM.h"
+#include "imageControl/Img2D.h"
+#include "display/KnobMenu.h"
+#include "display/gui_global.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ModeStatus.h"
+#include "display/HintArea.h"
+#include "keyboard/KeyFunc.h"
 
 #if defined (EMP_322) || defined(EMP_313)
 KnobMenu::KnobItem KnobMMenu[6] = {
@@ -47,24 +47,24 @@ KnobMenu::KnobItem KnobMMenu[5] = {
     {_("【Chroma】"), "", MIN, MChgChroma, MPressChroma},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
-};	
+};
 KnobMenu::KnobItem KnobAnatomicMMenu[5] = {
 	{_("Freq."), "", MIN, MChgFreq, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
-};	
+};
 #endif
 
 void KnobMCreate()
 {
-    KnobMenu::GetInstance()->SetItem(KnobMMenu, sizeof(KnobMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::M);   
+    KnobMenu::GetInstance()->SetItem(KnobMMenu, sizeof(KnobMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::M);
 }
 
 void KnobAnatomicMCreate()
 {
-    KnobMenu::GetInstance()->SetItem(KnobAnatomicMMenu, sizeof(KnobAnatomicMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::ANATOMIC_M);   
+    KnobMenu::GetInstance()->SetItem(KnobAnatomicMMenu, sizeof(KnobAnatomicMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::ANATOMIC_M);
 }
 
 ///> knob menu need to be sync
@@ -85,7 +85,7 @@ void SyncKnobM(EKnobM type, const char* s, EKnobReturn status, bool draw)
 
 ///> callback function
 EKnobReturn MChgFreq(EKnobOper oper)
-{	
+{
 	EKnobReturn ret;
     bool status = Img2D::GetInstance()->GetStatusTHI();
     //printf("status:%d\n", status);
@@ -110,7 +110,6 @@ EKnobReturn MPressChgStatusTHI(void)
 
     return ret;
 }
-
 
 //emp5800 按键切换，改变M模式下的速度（0 --- 7）
 EKnobReturn MPressChgSpeed(void)
@@ -157,4 +156,3 @@ EKnobReturn MPressChgSoundPower(void)
     return ret;
 
 }
-

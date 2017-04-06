@@ -1,13 +1,13 @@
-#include "DicomServiceSetting.h"
-#include "gui_global.h"
-#include "gui_func.h"
+#include "sysMan/DicomServiceSetting.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <stdlib.h>
-#include "DCMMan.h"
-#include "SysDicomSetting.h"
-#include "ViewDialog.h"
-#include "ViewSystem.h"
+#include "periDevice/DCMMan.h"
+#include "sysMan/SysDicomSetting.h"
+#include "display/ViewDialog.h"
+#include "sysMan/ViewSystem.h"
 
 vector<string> m_group_device_service;
 
@@ -58,7 +58,7 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent)
    // gtk_notebook_set_tab_pos(GTK_NOTEBOOK (m_dicom_notebook),GTK_POS_UP);
     gtk_widget_show (m_service_notebook);
 
-    int service_notebook_page = 0; 
+    int service_notebook_page = 0;
 
     // create note storage
     fixed_storage = Create_note_storage();
@@ -67,7 +67,7 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent)
     label_storage = gtk_label_new (_("Storage"));
     gtk_widget_show (label_storage);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_service_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_service_notebook), service_notebook_page++), label_storage);
-    
+
   // create note worklist
     fixed_worklist = Create_note_worklist();
     gtk_container_add (GTK_CONTAINER (m_service_notebook), fixed_worklist);
@@ -84,8 +84,8 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent)
     label_mpps = gtk_label_new (_("MPPS"));
     gtk_widget_show (label_mpps);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_service_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_service_notebook), service_notebook_page++), label_mpps);
-    
-    // create note storage commitment 
+
+    // create note storage commitment
     fixed_storage_commitment = Create_note_storage_commitment();
     gtk_container_add (GTK_CONTAINER (m_service_notebook), fixed_storage_commitment);
   //  init_server_setting(NULL);
@@ -93,8 +93,8 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent)
     label_storage_commitment = gtk_label_new (_("Storage Commitment"));
     gtk_widget_show (label_storage_commitment);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_service_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_service_notebook), service_notebook_page++), label_storage_commitment);
- 
-// create note query/retrieve 
+
+// create note query/retrieve
     fixed_query_retrieve = Create_note_query_retrieve();
     gtk_container_add (GTK_CONTAINER (m_service_notebook), fixed_query_retrieve);
   //  init_server_setting(NULL);
@@ -188,13 +188,13 @@ GtkWidget* DicomServiceSetting::Create_note_storage(void)
     gtk_fixed_put (GTK_FIXED (fixed), m_combobox_device, 160, 18);
     gtk_widget_set_size_request (m_combobox_device, 110, 30);
     g_signal_connect(G_OBJECT(m_combobox_device),"changed",G_CALLBACK(HandStorageDeviceChanged),this);
-    
+
     label_name = gtk_label_new (_("<b>Service Name :</b>"));
     gtk_widget_show (label_name);
     gtk_fixed_put (GTK_FIXED (fixed), label_name, 2, 75);
     gtk_label_set_use_markup (GTK_LABEL (label_name), TRUE);
     gtk_widget_set_size_request (label_name, 160, 30);
-    
+
     m_entry_name = gtk_entry_new ();
     gtk_widget_show (m_entry_name);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_name, 160, 75);
@@ -207,14 +207,14 @@ GtkWidget* DicomServiceSetting::Create_note_storage(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_AE, 310-30, 20);
     gtk_label_set_use_markup (GTK_LABEL (label_AE), TRUE);
     gtk_widget_set_size_request (label_AE, 110, 30);
-    
+
     m_entry_AE = gtk_entry_new ();
     gtk_widget_show (m_entry_AE);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_AE, 430-40, 20);
     gtk_widget_set_size_request (m_entry_AE, 110, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_AE), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_AE), 9679);
-    
+
     label_port = gtk_label_new (_("<b>Port :</b>"));
     gtk_widget_show (label_port);
     gtk_fixed_put (GTK_FIXED (fixed), label_port, 310-30, 75);
@@ -276,7 +276,7 @@ GtkWidget* DicomServiceSetting::Create_note_storage(void)
     gtk_fixed_put (GTK_FIXED (fixed_list), button_storage_delete, 30, 170);
     gtk_widget_set_size_request (button_storage_delete, 105, 35);
     g_signal_connect(button_storage_delete, "clicked", G_CALLBACK(HandleButtonStorageDeleteClicked), this);
-    
+
     button_storage_default = gtk_button_new_with_mnemonic (_("Default"));
     gtk_widget_show (button_storage_default);
     gtk_fixed_put (GTK_FIXED (fixed_list), button_storage_default, 150, 170);
@@ -298,7 +298,7 @@ GtkWidget* DicomServiceSetting::Create_note_storage(void)
     gtk_fixed_put (GTK_FIXED (fixed_storage), m_checkbutton_report, 20+5, 410-15);
     gtk_widget_set_size_request (m_checkbutton_report, 250, 30);
     g_signal_connect(G_OBJECT(m_checkbutton_report), "toggled", G_CALLBACK(HandleSendReportToggled), this);
-    
+
     m_checkbutton_video = gtk_check_button_new_with_mnemonic (_("Allow Multiframe"));
     gtk_widget_show (m_checkbutton_video);
     gtk_fixed_put (GTK_FIXED (fixed_storage), m_checkbutton_video, 265+80-50, 410-15);
@@ -319,9 +319,7 @@ GtkWidget* DicomServiceSetting::Create_note_storage(void)
     for(int i=0;i<=5;i++)
         gtk_combo_box_append_text(GTK_COMBO_BOX (m_combobox_video_frames),frames[i]);
     gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_video_frames),0);
-    g_signal_connect(G_OBJECT(m_combobox_video_frames), "changed", G_CALLBACK(HandleComboVideoFrames), this); 
-
-
+    g_signal_connect(G_OBJECT(m_combobox_video_frames), "changed", G_CALLBACK(HandleComboVideoFrames), this);
 
     return fixed_storage;
 }
@@ -342,13 +340,12 @@ GtkWidget* DicomServiceSetting::Create_note_worklist(void)
 
     GtkWidget *frame_worklist_list;
     GtkWidget *label_worklist_list;
-    
+
     GtkWidget *fixed_list;
 
     GtkWidget *button_worklist_delete;
     GtkWidget *button_worklist_default;
     GtkWidget *button_worklist_connect;
-
 
     fixed_worklist = gtk_fixed_new ();
     gtk_widget_show (fixed_worklist);
@@ -374,19 +371,19 @@ GtkWidget* DicomServiceSetting::Create_note_worklist(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_worklist_device, 2, 20);
     gtk_label_set_use_markup (GTK_LABEL (label_worklist_device), TRUE);
     gtk_widget_set_size_request (label_worklist_device, 160, 30);
-    
+
     m_combobox_worklist_device = gtk_combo_box_new_text ();
     gtk_widget_show (m_combobox_worklist_device);
     gtk_fixed_put (GTK_FIXED (fixed), m_combobox_worklist_device, 160, 18);
     gtk_widget_set_size_request (m_combobox_worklist_device, 110, 30);
     g_signal_connect(G_OBJECT(m_combobox_worklist_device),"changed",G_CALLBACK(HandWorklistDeviceChanged),this);
-    
+
     label_worklist_name = gtk_label_new (_("<b>Service Name :</b>"));
     gtk_widget_show (label_worklist_name);
     gtk_fixed_put (GTK_FIXED (fixed), label_worklist_name, 2, 75);
     gtk_label_set_use_markup (GTK_LABEL (label_worklist_name), TRUE);
     gtk_widget_set_size_request (label_worklist_name, 160, 30);
-    
+
     m_entry_worklist_name = gtk_entry_new ();
     gtk_widget_show (m_entry_worklist_name);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_worklist_name, 160, 75);
@@ -399,14 +396,14 @@ GtkWidget* DicomServiceSetting::Create_note_worklist(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_worklist_AE, 310-30, 20);
     gtk_label_set_use_markup (GTK_LABEL (label_worklist_AE), TRUE);
     gtk_widget_set_size_request (label_worklist_AE, 110, 30);
-    
+
     m_entry_worklist_AE = gtk_entry_new ();
     gtk_widget_show (m_entry_worklist_AE);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_worklist_AE, 430-40, 20);
     gtk_widget_set_size_request (m_entry_worklist_AE, 110, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_worklist_AE), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_worklist_AE), 9679);
-    
+
     label_worklist_port = gtk_label_new (_("<b>Port :</b>"));
     gtk_widget_show (label_worklist_port);
     gtk_fixed_put (GTK_FIXED (fixed), label_worklist_port, 310-30, 75);
@@ -444,7 +441,7 @@ GtkWidget* DicomServiceSetting::Create_note_worklist(void)
     gtk_widget_show (label_worklist_list);
     gtk_frame_set_label_widget (GTK_FRAME (frame_worklist_list), label_worklist_list);
     gtk_label_set_use_markup (GTK_LABEL (label_worklist_list), TRUE);
- 
+
     fixed_list = gtk_fixed_new ();
     gtk_widget_show (fixed_list);
     gtk_container_add (GTK_CONTAINER (frame_worklist_list), fixed_list);
@@ -512,13 +509,12 @@ GtkWidget* DicomServiceSetting::Create_note_mpps(void)
 
     GtkWidget *frame_service_list;
     GtkWidget *label_service_list;
-    
+
     GtkWidget *fixed_list;
 
     GtkWidget *button_mpps_delete;
     GtkWidget *button_mpps_default;
     GtkWidget *button_mpps_connect;
-
 
     fixed_mpps = gtk_fixed_new ();
     gtk_widget_show (fixed_mpps);
@@ -556,7 +552,7 @@ GtkWidget* DicomServiceSetting::Create_note_mpps(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_mpps_name, 2, 75);
     gtk_label_set_use_markup (GTK_LABEL (label_mpps_name), TRUE);
     gtk_widget_set_size_request (label_mpps_name, 160, 30);
-    
+
     m_entry_mpps_name = gtk_entry_new ();
     gtk_widget_show (m_entry_mpps_name);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_mpps_name, 160, 75);
@@ -569,14 +565,14 @@ GtkWidget* DicomServiceSetting::Create_note_mpps(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_AE, 310-30, 20);
     gtk_label_set_use_markup (GTK_LABEL (label_AE), TRUE);
     gtk_widget_set_size_request (label_AE, 110, 30);
-    
+
     m_entry_mpps_AE = gtk_entry_new ();
     gtk_widget_show (m_entry_mpps_AE);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_mpps_AE, 430-40, 20);
     gtk_widget_set_size_request (m_entry_mpps_AE, 110, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_mpps_AE), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_mpps_AE), 9679);
-    
+
     label_port = gtk_label_new (_("<b>Port :</b>"));
     gtk_widget_show (label_port);
     gtk_fixed_put (GTK_FIXED (fixed), label_port, 310-30, 75);
@@ -613,7 +609,7 @@ GtkWidget* DicomServiceSetting::Create_note_mpps(void)
     gtk_widget_show (label_service_list);
     gtk_frame_set_label_widget (GTK_FRAME (frame_service_list), label_service_list);
     gtk_label_set_use_markup (GTK_LABEL (label_service_list), TRUE);
- 
+
     fixed_list = gtk_fixed_new ();
     gtk_widget_show (fixed_list);
     gtk_container_add (GTK_CONTAINER (frame_service_list), fixed_list);
@@ -674,13 +670,12 @@ GtkWidget* DicomServiceSetting::Create_note_storage_commitment(void)
 
     GtkWidget *frame_service_list;
     GtkWidget *label_service_list;
-    
+
     GtkWidget *fixed_list;
 
     GtkWidget *button_storage_commitment_delete;
     GtkWidget *button_storage_commitment_default;
     GtkWidget *button_storage_commitment_connect;
-
 
     fixed_storage_commitment = gtk_fixed_new ();
     gtk_widget_show (fixed_storage_commitment);
@@ -718,7 +713,7 @@ GtkWidget* DicomServiceSetting::Create_note_storage_commitment(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_name, 2, 75);
     gtk_label_set_use_markup (GTK_LABEL (label_name), TRUE);
     gtk_widget_set_size_request (label_name, 160, 30);
-    
+
     m_entry_storage_commitment_name = gtk_entry_new ();
     gtk_widget_show (m_entry_storage_commitment_name);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_storage_commitment_name, 160, 75);
@@ -731,14 +726,14 @@ GtkWidget* DicomServiceSetting::Create_note_storage_commitment(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_AE, 310-30, 20);
     gtk_label_set_use_markup (GTK_LABEL (label_AE), TRUE);
     gtk_widget_set_size_request (label_AE, 110, 30);
-    
+
     m_entry_storage_commitment_AE = gtk_entry_new ();
     gtk_widget_show (m_entry_storage_commitment_AE);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_storage_commitment_AE, 430-40, 20);
     gtk_widget_set_size_request (m_entry_storage_commitment_AE, 110, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_storage_commitment_AE), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_storage_commitment_AE), 9679);
-    
+
     label_port = gtk_label_new (_("<b>Port :</b>"));
     gtk_widget_show (label_port);
     gtk_fixed_put (GTK_FIXED (fixed), label_port, 310-30, 75);
@@ -775,7 +770,7 @@ GtkWidget* DicomServiceSetting::Create_note_storage_commitment(void)
     gtk_widget_show (label_service_list);
     gtk_frame_set_label_widget (GTK_FRAME (frame_service_list), label_service_list);
     gtk_label_set_use_markup (GTK_LABEL (label_service_list), TRUE);
- 
+
     fixed_list = gtk_fixed_new ();
     gtk_widget_show (fixed_list);
     gtk_container_add (GTK_CONTAINER (frame_service_list), fixed_list);
@@ -816,7 +811,6 @@ GtkWidget* DicomServiceSetting::Create_note_storage_commitment(void)
     gtk_widget_set_size_request (m_checkbutton_storage_commitment, 300+200, 30);
     g_signal_connect(G_OBJECT(m_checkbutton_storage_commitment), "toggled", G_CALLBACK(HandleStorageCommitmentToggled), this);
 
-
     return fixed_storage_commitment;
 }
 
@@ -836,13 +830,12 @@ GtkWidget* DicomServiceSetting::Create_note_query_retrieve(void)
 
     GtkWidget *frame_service_list;
     GtkWidget *label_service_list;
-    
+
     GtkWidget *fixed_list;
 
     GtkWidget *button_query_retrieve_delete;
     GtkWidget *button_query_retrieve_default;
     GtkWidget *button_query_retrieve_connect;
-
 
     fixed_query_retrieve = gtk_fixed_new ();
     gtk_widget_show (fixed_query_retrieve);
@@ -880,7 +873,7 @@ GtkWidget* DicomServiceSetting::Create_note_query_retrieve(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_query_retrieve_name, 2, 75);
     gtk_label_set_use_markup (GTK_LABEL (label_query_retrieve_name), TRUE);
     gtk_widget_set_size_request (label_query_retrieve_name, 160, 30);
-    
+
     m_entry_query_retrieve_name = gtk_entry_new ();
     gtk_widget_show (m_entry_query_retrieve_name);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_query_retrieve_name, 160, 75);
@@ -893,14 +886,14 @@ GtkWidget* DicomServiceSetting::Create_note_query_retrieve(void)
     gtk_fixed_put (GTK_FIXED (fixed), label_AE, 310-30, 20);
     gtk_label_set_use_markup (GTK_LABEL (label_AE), TRUE);
     gtk_widget_set_size_request (label_AE, 110, 30);
-    
+
     m_entry_query_retrieve_AE = gtk_entry_new ();
     gtk_widget_show (m_entry_query_retrieve_AE);
     gtk_fixed_put (GTK_FIXED (fixed), m_entry_query_retrieve_AE, 430-40, 20);
     gtk_widget_set_size_request (m_entry_query_retrieve_AE, 110, 30);
     gtk_entry_set_max_length (GTK_ENTRY (m_entry_query_retrieve_AE), 15);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_query_retrieve_AE), 9679);
-    
+
     label_port = gtk_label_new (_("<b>Port :</b>"));
     gtk_widget_show (label_port);
     gtk_fixed_put (GTK_FIXED (fixed), label_port, 310-30, 75);
@@ -937,7 +930,7 @@ GtkWidget* DicomServiceSetting::Create_note_query_retrieve(void)
     gtk_widget_show (label_service_list);
     gtk_frame_set_label_widget (GTK_FRAME (frame_service_list), label_service_list);
     gtk_label_set_use_markup (GTK_LABEL (label_service_list), TRUE);
- 
+
     fixed_list = gtk_fixed_new ();
     gtk_widget_show (fixed_list);
     gtk_container_add (GTK_CONTAINER (frame_service_list), fixed_list);
@@ -975,14 +968,13 @@ GtkWidget* DicomServiceSetting::Create_note_query_retrieve(void)
     return fixed_query_retrieve;
 }
 
-
 GtkWidget* DicomServiceSetting::create_service_treeview()
 {
     GtkWidget *treeview;
     GtkTreeModel *model = NULL;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
-    
+
     treeview = gtk_tree_view_new ();
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
 	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
@@ -996,7 +988,7 @@ GtkWidget* DicomServiceSetting::create_service_treeview()
     column = gtk_tree_view_column_new_with_attributes(_("Service Name"), renderer, "text", COL_SERVICE_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 200, NULL);
-    
+
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("AE Title"), renderer, "text", COL_AE_TITLE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
@@ -1006,7 +998,7 @@ GtkWidget* DicomServiceSetting::create_service_treeview()
     column = gtk_tree_view_column_new_with_attributes(_("Port"), renderer, "text", COL_PORT, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 100, NULL);
-    
+
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Default"), renderer, "text", COL_DEFAULT, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
@@ -1015,7 +1007,7 @@ GtkWidget* DicomServiceSetting::create_service_treeview()
     model = create_service_model();
     if (model != NULL)
 		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
-    g_object_unref (model); 
+    g_object_unref (model);
 
 	return treeview;
 }
@@ -1024,11 +1016,11 @@ GtkTreeModel* DicomServiceSetting::create_service_model()
 {
     GtkListStore *store;
 
-    store = gtk_list_store_new(NUM_COLS, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
-			G_TYPE_STRING, 
+    store = gtk_list_store_new(NUM_COLS,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
+			G_TYPE_STRING,
 			G_TYPE_STRING);
 
 	return GTK_TREE_MODEL (store);
@@ -1041,21 +1033,21 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
     char tmp_device[256];
     sprintf(tmp_port,"%d",port);
     sprintf(tmp_device,"%s",device.c_str());
-    
+
     if (isDefault)
         sprintf(tmp_isDefault,"%s",_("Yes"));
     else
         sprintf(tmp_isDefault,"%s"," ");
-  
+
     DicomServiceSetting *tmp;
     tmp = (DicomServiceSetting *)data;
-    
+
     //printf("---------GetSingleServiceAttribute:%s %d\n",device.c_str(),tmp->m_page_num);
     GtkTreeModel *model;
     GtkTreeIter iter;
     gboolean exist = FALSE;
     char *tmp_device1;
-    
+
     switch(tmp->m_page_num)
     {
         case 0:
@@ -1073,7 +1065,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                         //printf("Add failed\n");
                         return;
                     }
-                    exist = gtk_tree_model_iter_next(model, &iter); 
+                    exist = gtk_tree_model_iter_next(model, &iter);
                 }
                 gtk_list_store_append(GTK_LIST_STORE(model), &iter);
                 gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -1085,7 +1077,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                             -1);
 
                     gtk_tree_model_iter_next(model, &iter);
-            }   
+            }
 
             break;
         case 1:
@@ -1103,7 +1095,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                         //printf("Add failed\n");
                         return;
                     }
-                    exist = gtk_tree_model_iter_next(model, &iter); 
+                    exist = gtk_tree_model_iter_next(model, &iter);
                 }
                 gtk_list_store_append(GTK_LIST_STORE(model), &iter);
                 gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -1115,7 +1107,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                             -1);
 
                     gtk_tree_model_iter_next(model, &iter);
-            }   
+            }
             break;
         case 2:
             {
@@ -1132,7 +1124,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                         //printf("Add failed\n");
                         return;
                     }
-                    exist = gtk_tree_model_iter_next(model, &iter); 
+                    exist = gtk_tree_model_iter_next(model, &iter);
                 }
                 gtk_list_store_append(GTK_LIST_STORE(model), &iter);
                 gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -1144,7 +1136,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                             -1);
 
                     gtk_tree_model_iter_next(model, &iter);
-            }   
+            }
             break;
         case 3:
             {
@@ -1161,7 +1153,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                         //printf("Add failed\n");
                         return;
                     }
-                    exist = gtk_tree_model_iter_next(model, &iter); 
+                    exist = gtk_tree_model_iter_next(model, &iter);
                 }
                 gtk_list_store_append(GTK_LIST_STORE(model), &iter);
                 gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -1173,7 +1165,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                             -1);
 
                     gtk_tree_model_iter_next(model, &iter);
-            }   
+            }
             break;
         case 4:
             {
@@ -1190,7 +1182,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                         //printf("Add failed\n");
                         return;
                     }
-                    exist = gtk_tree_model_iter_next(model, &iter); 
+                    exist = gtk_tree_model_iter_next(model, &iter);
                 }
                 gtk_list_store_append(GTK_LIST_STORE(model), &iter);
                 gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -1202,7 +1194,7 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
                         -1);
 
                 gtk_tree_model_iter_next(model, &iter);
-            }   
+            }
             break;
 
         default:
@@ -1215,7 +1207,7 @@ void DicomServiceSetting::init_service_setting()
 {
     if (m_page_num == 1)
         init_worklist_setting();
-    gtk_notebook_set_current_page(GTK_NOTEBOOK (m_service_notebook),1);       
+    gtk_notebook_set_current_page(GTK_NOTEBOOK (m_service_notebook),1);
 }
 
 void DicomServiceSetting::init_storage_setting()
@@ -1232,7 +1224,7 @@ void DicomServiceSetting::init_storage_setting()
         char *path_string = gtk_tree_model_get_string_from_iter(model,&iter);
         int path_num = atoi(path_string);
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
         gtk_combo_box_remove_text (GTK_COMBO_BOX (m_combobox_device),path_num);
     }
 
@@ -1285,7 +1277,7 @@ void DicomServiceSetting::init_worklist_setting()
         char *path_string = gtk_tree_model_get_string_from_iter(model,&iter);
         int path_num = atoi(path_string);
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
         gtk_combo_box_remove_text (GTK_COMBO_BOX (m_combobox_worklist_device),path_num);
     }
 
@@ -1313,7 +1305,7 @@ void DicomServiceSetting::init_mpps_setting()
         char *path_string = gtk_tree_model_get_string_from_iter(model,&iter);
         int path_num = atoi(path_string);
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
         gtk_combo_box_remove_text (GTK_COMBO_BOX (m_combobox_mpps_device),path_num);
     }
 
@@ -1341,7 +1333,7 @@ void DicomServiceSetting::init_storage_commitment_setting()
         char *path_string = gtk_tree_model_get_string_from_iter(model,&iter);
         int path_num = atoi(path_string);
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
         gtk_combo_box_remove_text (GTK_COMBO_BOX (m_combobox_storage_commitment_device),path_num);
     }
 
@@ -1369,7 +1361,7 @@ void DicomServiceSetting::init_query_retrieve_setting()
         char *path_string = gtk_tree_model_get_string_from_iter(model,&iter);
         int path_num = atoi(path_string);
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
         gtk_combo_box_remove_text (GTK_COMBO_BOX (m_combobox_query_retrieve_device),path_num);
     }
 
@@ -1387,7 +1379,7 @@ void DicomServiceSetting::StorageDeviceChanged(GtkComboBox *combobox)
     if(device != NULL)
     {
         const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
-        char tmp_serviceName[256]="\0"; 
+        char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0')
         {
             sprintf(tmp_serviceName,"%s",device);
@@ -1407,8 +1399,8 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button)
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Device ,AE or Port is empty, please input!"),
                 NULL);
         return;
@@ -1426,8 +1418,6 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button)
     char device_tmp0[256];
     char *device_tmp1;
     sprintf(device_tmp0,"%s",device);
-
-    
 
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -1447,8 +1437,8 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button)
         if (strcmp(device_tmp0,device_tmp1)==0)
         {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                    ViewDialog::INFO, 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                    ViewDialog::INFO,
                     _("Add failed,device has been existed\n"),
                     NULL);
 
@@ -1456,12 +1446,12 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button)
             return;
         }
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddStorageService(device, tmp_serviceName, ae, atoi(port)))
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Add failed,device has been existed\n"),
                 NULL);
 
@@ -1476,7 +1466,7 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button)
             COL_PORT,port,
             -1);
    // m_group_device_service.push_back(device);
-    gtk_tree_model_iter_next(model, &iter); 
+    gtk_tree_model_iter_next(model, &iter);
     g_free(device);
 
 }
@@ -1512,7 +1502,7 @@ void DicomServiceSetting::ButtonStorageClearClicked(GtkButton *button)
 }
 
 void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button)
-{  
+{
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeIter iter0;
@@ -1523,7 +1513,7 @@ void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_storage));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_storage));
-    
+
     if(gtk_tree_selection_get_selected(selection,NULL,&iter))
     {
         exist = gtk_tree_model_get_iter_first(model, &iter0);
@@ -1533,7 +1523,7 @@ void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button)
                     COL_DEFAULT, " ",
                     -1);
 
-            exist = gtk_tree_model_iter_next(model, &iter0); 
+            exist = gtk_tree_model_iter_next(model, &iter0);
         }
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                 COL_DEFAULT, _("Yes"),
@@ -1547,8 +1537,8 @@ void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button)
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("No device is selected!"),
                 NULL);
     }
@@ -1556,7 +1546,7 @@ void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button)
 
 void DicomServiceSetting::ButtonStorageConnectClicked(GtkButton *button)
 {
-    
+
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
@@ -1569,18 +1559,18 @@ void DicomServiceSetting::ButtonStorageConnectClicked(GtkButton *button)
         gtk_tree_model_get(model,&iter,
                 COL_STORAGE_DEVICE,&device,
                 -1);
-        
+
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 _("Connect..."));
 
         g_timeout_add(2000, StorageConnectTimeout, this);
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("No device is selected!"),
                 NULL);
 
@@ -1590,7 +1580,7 @@ void DicomServiceSetting::ButtonStorageConnectClicked(GtkButton *button)
 gboolean DicomServiceSetting::StorageConnectTimeout(gpointer data)
 {
     DicomServiceSetting *pdata = (DicomServiceSetting *)data;
-    
+
     char info[256]= "\0";
     if(CDCMMan::GetMe()->TestLinkStorage(pdata->m_selectedDevice))
         {
@@ -1602,8 +1592,8 @@ gboolean DicomServiceSetting::StorageConnectTimeout(gpointer data)
             PRINTF("Dicom test link FAIL!!\n");
             sprintf(info, _("Connection test fails!"));
         }
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 info,
                 NULL);
 }
@@ -1637,7 +1627,7 @@ void DicomServiceSetting::WorklistDeviceChanged(GtkComboBox *combobox)
     if(device != NULL)
     {
         const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_worklist_name));
-        char tmp_serviceName[256]="\0"; 
+        char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0')
         {
             sprintf(tmp_serviceName,"%s",device);
@@ -1657,8 +1647,8 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button)
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Device ,AE or Port is empty, please input!"),
                 NULL);
         return;
@@ -1676,7 +1666,7 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button)
     char device_tmp0[256];
     char *device_tmp1;
     sprintf(device_tmp0,"%s",device);
-    
+
     GtkTreeModel *model;
     GtkTreeIter iter;
     gboolean exist = FALSE;
@@ -1695,8 +1685,8 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button)
         if (strcmp(device_tmp0,device_tmp1)==0)
         {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                    ViewDialog::INFO, 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                    ViewDialog::INFO,
                     _("Add failed,device has been existed\n"),
                     NULL);
 
@@ -1704,13 +1694,13 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button)
             return;
         }
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
     }
 
     if(!CDCMMan::GetMe()->AddWorklistService(device, tmp_serviceName, ae, atoi(port)))
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Add failed,device has been existed\n"),
                 NULL);
 
@@ -1726,7 +1716,7 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button)
             -1);
 
    // m_group_device_service.push_back(device);
-    gtk_tree_model_iter_next(model, &iter); 
+    gtk_tree_model_iter_next(model, &iter);
 
     g_free(device);
 }
@@ -1757,15 +1747,15 @@ void DicomServiceSetting::ButtonWorkListDeleteClicked(GtkButton *button)
         gtk_tree_model_get(model,&iter,
                 COL_STORAGE_DEVICE,&device,
                 -1);
-	
+
         CDCMMan::GetMe()->DeleteWorklistService(device);
         gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
     }
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -1792,7 +1782,7 @@ void DicomServiceSetting::ButtonWorkListDefaultClicked(GtkButton *button)
                     COL_DEFAULT, " ",
                     -1);
 
-            exist = gtk_tree_model_iter_next(model, &iter0); 
+            exist = gtk_tree_model_iter_next(model, &iter0);
         }
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                 COL_DEFAULT, _("Yes"),
@@ -1806,8 +1796,8 @@ void DicomServiceSetting::ButtonWorkListDefaultClicked(GtkButton *button)
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -1830,7 +1820,7 @@ void DicomServiceSetting::ButtonWorkListConnectClicked(GtkButton *button)
                 -1);
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 _("Connect..."));
 
         g_timeout_add(2000, WorklistConnectTimeout, this);
@@ -1838,8 +1828,8 @@ void DicomServiceSetting::ButtonWorkListConnectClicked(GtkButton *button)
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -1848,7 +1838,7 @@ void DicomServiceSetting::ButtonWorkListConnectClicked(GtkButton *button)
 gboolean DicomServiceSetting::WorklistConnectTimeout(gpointer data)
 {
     DicomServiceSetting *pdata = (DicomServiceSetting *)data;
-    
+
     char info[256]= "\0";
     if(CDCMMan::GetMe()->TestLinkWorklist(pdata->m_selectedDevice))
         {
@@ -1860,12 +1850,11 @@ gboolean DicomServiceSetting::WorklistConnectTimeout(gpointer data)
             PRINTF("Dicom test link FAIL!!\n");
             sprintf(info, _("Connection test fails!"));
         }
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 info,
                 NULL);
 }
-
 
 void DicomServiceSetting::ChkBtnAutoQueryToggled(GtkToggleButton *togglebutton)
 {
@@ -1894,7 +1883,7 @@ void DicomServiceSetting::MPPSDeviceChanged(GtkComboBox *combobox)
     if(device != NULL)
     {
         const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_mpps_name));
-        char tmp_serviceName[256]="\0"; 
+        char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0')
         {
             sprintf(tmp_serviceName,"%s",device);
@@ -1914,8 +1903,8 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button)
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Device ,AE or Port is empty, please input!"),
                 NULL);
         return;
@@ -1952,8 +1941,8 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button)
 
         if (strcmp(device_tmp0,device_tmp1)==0)
         {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                    ViewDialog::INFO, 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                    ViewDialog::INFO,
                     _("Add failed,device has been existed\n"),
                     NULL);
 
@@ -1961,12 +1950,12 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button)
             return;
         }
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddMPPSService(device, tmp_serviceName, ae, atoi(port)))
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Add failed,device has been existed\n"),
                 NULL);
 
@@ -1981,7 +1970,7 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button)
             COL_PORT,port,
             -1);
    // m_group_device_service.push_back(device);
-    gtk_tree_model_iter_next(model, &iter); 
+    gtk_tree_model_iter_next(model, &iter);
     g_free(device);
 
 }
@@ -2014,8 +2003,8 @@ void DicomServiceSetting::ButtonMPPSDeleteClicked(GtkButton *button)
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -2042,7 +2031,7 @@ void DicomServiceSetting::ButtonMPPSDefaultClicked(GtkButton *button)
                     COL_DEFAULT, " ",
                     -1);
 
-            exist = gtk_tree_model_iter_next(model, &iter0); 
+            exist = gtk_tree_model_iter_next(model, &iter0);
         }
 
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -2057,8 +2046,8 @@ void DicomServiceSetting::ButtonMPPSDefaultClicked(GtkButton *button)
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -2079,18 +2068,18 @@ void DicomServiceSetting::ButtonMPPSConnectClicked(GtkButton *button)
         gtk_tree_model_get(model,&iter,
                 COL_STORAGE_DEVICE,&device,
                 -1);
-        
+
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 _("Connect..."));
 
         g_timeout_add(2000, MPPSConnectTimeout, this);
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("No device is selected!"),
                 NULL);
     }
@@ -2100,7 +2089,7 @@ void DicomServiceSetting::ButtonMPPSConnectClicked(GtkButton *button)
 gboolean DicomServiceSetting::MPPSConnectTimeout(gpointer data)
 {
     DicomServiceSetting *pdata = (DicomServiceSetting *)data;
-    
+
     char info[256]= "\0";
     if(CDCMMan::GetMe()->TestLinkMPPS(pdata->m_selectedDevice))
         {
@@ -2112,12 +2101,11 @@ gboolean DicomServiceSetting::MPPSConnectTimeout(gpointer data)
             PRINTF("Dicom test link FAIL!!\n");
             sprintf(info, _("Connection test fails!"));
         }
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 info,
                 NULL);
 }
-
 
 void DicomServiceSetting::ChkBtnMPPSToggled(GtkToggleButton *togglebutton)
 {
@@ -2131,7 +2119,6 @@ void DicomServiceSetting::ChkBtnMPPSToggled(GtkToggleButton *togglebutton)
     SysDicomSetting sysDicomSetting;
     sysDicomSetting.SetMPPS(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(togglebutton)));
     sysDicomSetting.SyncFile();
-
 
      string device = CDCMMan::GetMe()->GetDefaultMPPSServiceDevice();
     if (device == "")
@@ -2148,7 +2135,7 @@ void DicomServiceSetting::StorageCommitmentDeviceChanged(GtkComboBox *combobox)
     if(device != NULL)
     {
         const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_storage_commitment_name));
-        char tmp_serviceName[256]="\0"; 
+        char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0')
         {
             sprintf(tmp_serviceName,"%s",device);
@@ -2168,8 +2155,8 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button)
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Device ,AE or Port is empty, please input!"),
                 NULL);
         return;
@@ -2207,8 +2194,8 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button)
         if (strcmp(device_tmp0,device_tmp1)==0)
         {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                    ViewDialog::INFO, 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                    ViewDialog::INFO,
                     _("Add failed,device has been existed\n"),
                     NULL);
 
@@ -2216,12 +2203,12 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button)
             return;
         }
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddStorageCommitService(device, tmp_serviceName, ae, atoi(port)))
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Add failed,device has been existed\n"),
                 NULL);
 
@@ -2236,7 +2223,7 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button)
             COL_PORT,port,
             -1);
    //m_group_device_service.push_back(device);
-    gtk_tree_model_iter_next(model, &iter); 
+    gtk_tree_model_iter_next(model, &iter);
     g_free(device);
 
 }
@@ -2269,8 +2256,8 @@ void DicomServiceSetting::ButtonStorageCommitmentDeleteClicked(GtkButton *button
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -2296,9 +2283,9 @@ void DicomServiceSetting::ButtonStorageCommitmentDefaultClicked(GtkButton *butto
                     COL_DEFAULT, " ",
                     -1);
 
-            exist = gtk_tree_model_iter_next(model, &iter0); 
+            exist = gtk_tree_model_iter_next(model, &iter0);
         }
-        
+
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                 COL_DEFAULT, _("Yes"),
                 -1);
@@ -2311,8 +2298,8 @@ void DicomServiceSetting::ButtonStorageCommitmentDefaultClicked(GtkButton *butto
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-            ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+            ViewDialog::INFO,
             _("No device is selected!"),
             NULL);
     }
@@ -2332,18 +2319,18 @@ void DicomServiceSetting::ButtonStorageCommitmentConnectClicked(GtkButton *butto
         gtk_tree_model_get(model,&iter,
                 COL_STORAGE_DEVICE,&device,
                 -1);
-        
+
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 _("Connect..."));
 
         g_timeout_add(2000, StorageCommitmentConnectTimeout, this);
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("No device is selected!"),
                 NULL);
     }
@@ -2352,7 +2339,7 @@ void DicomServiceSetting::ButtonStorageCommitmentConnectClicked(GtkButton *butto
 gboolean DicomServiceSetting::StorageCommitmentConnectTimeout(gpointer data)
 {
     DicomServiceSetting *pdata = (DicomServiceSetting *)data;
-    
+
     char info[256]= "\0";
     if(CDCMMan::GetMe()->TestLinkStorageCommit(pdata->m_selectedDevice))
         {
@@ -2364,8 +2351,8 @@ gboolean DicomServiceSetting::StorageCommitmentConnectTimeout(gpointer data)
             PRINTF("Dicom test link FAIL!!\n");
             sprintf(info, _("Connection test fails!"));
         }
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 info,
                 NULL);
 }
@@ -2391,7 +2378,7 @@ void DicomServiceSetting::QueryRetrieveDeviceChanged(GtkComboBox *combobox)
     if(device != NULL)
     {
         const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_query_retrieve_name));
-        char tmp_serviceName[256]="\0"; 
+        char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0')
         {
             sprintf(tmp_serviceName,"%s",device);
@@ -2411,8 +2398,8 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button)
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Device ,AE or Port is empty, please input!"),
                 NULL);
         return;
@@ -2430,8 +2417,6 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button)
     char device_tmp0[256];
     char *device_tmp1;
     sprintf(device_tmp0,"%s",device);
-
-    
 
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -2451,8 +2436,8 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button)
         if (strcmp(device_tmp0,device_tmp1)==0)
         {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                    ViewDialog::INFO, 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                    ViewDialog::INFO,
                     _("Add failed,device has been existed\n"),
                     NULL);
 
@@ -2460,12 +2445,12 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button)
             return;
         }
 
-        exist = gtk_tree_model_iter_next(model, &iter); 
+        exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddQueryRetrieveService(device, tmp_serviceName, ae, atoi(port)))
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("Add failed,device has been existed\n"),
                 NULL);
 
@@ -2480,7 +2465,7 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button)
             COL_PORT,port,
             -1);
    // m_group_device_service.push_back(device);
-    gtk_tree_model_iter_next(model, &iter); 
+    gtk_tree_model_iter_next(model, &iter);
     g_free(device);
 
 }
@@ -2527,7 +2512,7 @@ void DicomServiceSetting::ButtonQueryRetrieveDefaultClicked(GtkButton *button)
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_query_retrieve));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_query_retrieve));
-    
+
     if(gtk_tree_selection_get_selected(selection,NULL,&iter))
     {
         exist = gtk_tree_model_get_iter_first(model, &iter0);
@@ -2537,7 +2522,7 @@ void DicomServiceSetting::ButtonQueryRetrieveDefaultClicked(GtkButton *button)
                     COL_DEFAULT, " ",
                     -1);
 
-            exist = gtk_tree_model_iter_next(model, &iter0); 
+            exist = gtk_tree_model_iter_next(model, &iter0);
         }
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                 COL_DEFAULT, _("Yes"),
@@ -2551,8 +2536,8 @@ void DicomServiceSetting::ButtonQueryRetrieveDefaultClicked(GtkButton *button)
     else
     {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("No device is selected!"),
                 NULL);
     }
@@ -2561,7 +2546,7 @@ void DicomServiceSetting::ButtonQueryRetrieveDefaultClicked(GtkButton *button)
 
 void DicomServiceSetting::ButtonQueryRetrieveConnectClicked(GtkButton *button)
 {
-    
+
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
@@ -2574,18 +2559,18 @@ void DicomServiceSetting::ButtonQueryRetrieveConnectClicked(GtkButton *button)
         gtk_tree_model_get(model,&iter,
                 COL_STORAGE_DEVICE,&device,
                 -1);
-        
+
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 _("Connect..."));
 
         g_timeout_add(2000, QueryRetrieveConnectTimeout, this);
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 _("No device is selected!"),
                 NULL);
 
@@ -2596,7 +2581,7 @@ void DicomServiceSetting::ButtonQueryRetrieveConnectClicked(GtkButton *button)
 gboolean DicomServiceSetting::QueryRetrieveConnectTimeout(gpointer data)
 {
     DicomServiceSetting *pdata = (DicomServiceSetting *)data;
-    
+
     char info[256]= "\0";
     if(CDCMMan::GetMe()->TestLinkQueryRetrieve(pdata->m_selectedDevice))
         {
@@ -2608,8 +2593,8 @@ gboolean DicomServiceSetting::QueryRetrieveConnectTimeout(gpointer data)
             PRINTF("Dicom test link FAIL!!\n");
             sprintf(info, _("Connection test fails!"));
         }
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::INFO,
                 info,
                 NULL);
 }

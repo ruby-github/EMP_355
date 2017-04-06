@@ -1,4 +1,4 @@
-#include "CreateEmp.h"
+#include "patient/CreateEmp.h"
 #include <errno.h>
 
 bool CreateImageEmp(unsigned char* input, FILE* output, unsigned int width, unsigned int height)
@@ -63,7 +63,7 @@ bool CreateCineEmp(unsigned char* input[], FILE* output, unsigned int frames, un
 bool ReadCineEmp(FILE* input, unsigned char* buf, int SpecFrame, int width, int height)
 {
 	unsigned int frame_size = width * height * 3;
-	
+
 	if(fseek(input, frame_size*SpecFrame+8, SEEK_SET) < 0)
 	{
 		perror("fseek error:");

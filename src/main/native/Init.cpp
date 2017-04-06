@@ -1,53 +1,51 @@
-
 #include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
 #include "Init.h"
 #include "Def.h"
-#include "SysLog.h"
+#include "sysMan/SysLog.h"
 #include "VersionConfig.h"
-#include "Img2D.h"
-#include "Format2D.h"
-#include "ScanMode.h"
-#include "Replay.h"
-#include "ProbeMan.h"
-#include "ProbeSocket.h"
-#include "FreezeMode.h"
-#include "ExamItem.h"
+#include "imageControl/Img2D.h"
+#include "imageProc/Format2D.h"
+#include "imageProc/ScanMode.h"
+#include "imageProc/Replay.h"
+#include "probe/ProbeMan.h"
+#include "probe/ProbeSocket.h"
+#include "imageProc/FreezeMode.h"
+#include "probe/ExamItem.h"
 #include <gtk/gtk.h>
-#include "gui_global.h"
-#include "gui_func.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
 #include "ViewMain.h"
-#include "ViewReport.h"
-#include "ImageArea.h"
-#include "ProbeSelect.h"
-#include "ImgProc2D.h"
+#include "calcPeople/ViewReport.h"
+#include "display/ImageArea.h"
+#include "probe/ProbeSelect.h"
+#include "imageProc/ImgProc2D.h"
 #include <stdlib.h>
-#include "Database.h"
-#include "MeasureMan.h"
-#include "MeaCalcFun.h"
-#include "UserSelect.h"
-#include "DCMMan.h"
-#include "PeripheralMan.h"
-#include "./sysMan/UpgradeMan.h"
-#include "ScreenSaver.h"
-#include "./sysMan/SysGeneralSetting.h"
-#include "SysCalculateSetting.h"
-#include "SysMeasurementSetting.h"
-#include "../sysMan/SysOptions.h"
-#include "Authorize.h"
-#include "ViewSystem.h"
-#include "gui_func.h"
-#include "FpgaGeneral.h"
-#include "DCMRegister.h"
-#include  "UsbControl.h"
+#include "patient/Database.h"
+#include "measure/MeasureMan.h"
+#include "calcPeople/MeaCalcFun.h"
+#include "sysMan/UserSelect.h"
+#include "periDevice/DCMMan.h"
+#include "periDevice/PeripheralMan.h"
+#include "sysMan/UpgradeMan.h"
+#include "sysMan/ScreenSaver.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/SysCalculateSetting.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "sysMan/SysOptions.h"
+#include "periDevice/Authorize.h"
+#include "sysMan/ViewSystem.h"
+#include "imageControl/FpgaGeneral.h"
+#include "periDevice/DCMRegister.h"
+#include "imageControl/UsbControl.h"
 
 pthread_t pidInitTable;
 gboolean ReportInit = FALSE;
 bool g_authorizationOn = false;
 bool g_init = true;
-bool g_calcPwStatus = false; // false: 未进行包络计算； true: 包络计算完成
+bool g_calcPwStatus = false; // false: 鏈繘琛屽寘缁滆绠楋紱 true: 鍖呯粶璁＄畻瀹屾垚
 
 //for test
 using std::endl;
@@ -108,7 +106,7 @@ void Init::SystemInit(int argc, char *argv[])
         setenv("LANG", "ru_RU.UTF-8", 1);
 	    setenv("LANGUAGE", "ru_RU:ru", 1);
         //system("setxkbmap -layout ru");
-        
+
         sprintf(str_cmd, "setxkbmap -layout %s", "ru");
         _system_(str_cmd);
     }
@@ -242,7 +240,7 @@ void Init::ParaInit()
 	PRINTF("begin screen saver timer\n");
 	SysGeneralSetting sgs;
 	ScreenSaver::GetInstance()->SetPeriod(sgs.GetScreenProtect()*60);
-	
+
 	//ProbeMan::GetInstance()->WriteProbeManual();
 	//ExamItem item;
 	//item.GenerateDefaultImgOptimize();
@@ -255,9 +253,9 @@ void Init::ParaInit()
 void Init::ProbeCheck()
 {
 	FreezeMode* ptrFreeze = FreezeMode::GetInstance();
-	ptrFreeze->Freeze(); 
-   
-    //send 0 to fpga 
+	ptrFreeze->Freeze();
+
+    //send 0 to fpga
     INT32U addr;
     INT32U temp;
     addr = 55;
@@ -274,9 +272,9 @@ void Init::ProbeCheck()
     const char *userName;
     userName = exam.ReadDefaultUserSelect(&ini).c_str();
 
-   if ((strcmp(userName, "System Default") != 0) && (strcmp(userName, "Умолчан системы") != 0) && 
-            (strcmp(userName, "系统默认") != 0) && (strcmp(userName, "Domyślne Systemu") != 0)  &&
-            (strcmp(userName, "Par défaut du sys.") != 0) && (strcmp(userName, "Systemvorgabe") != 0) && (strcmp(userName, "Sistema por defecto") !=0))
+   if ((strcmp(userName, "System Default") != 0) && (strcmp(userName, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
+            (strcmp(userName, "绯荤粺榛樿") != 0) && (strcmp(userName, "Domy艣lne Systemu") != 0)  &&
+            (strcmp(userName, "Par d茅faut du sys.") != 0) && (strcmp(userName, "Systemvorgabe") != 0) && (strcmp(userName, "Sistema por defecto") !=0))
    {
        sprintf(user_configure, "%s%s%s", "userconfig/",userName, ".ini");
    }
@@ -307,13 +305,13 @@ void Init::ProbeCheck()
     //退出刚开机状态
     g_init = false;
 
-    // enable emit 
+    // enable emit
     // doing in the ProbeInit func
     //Img2D::GetInstance()->EnableEmit();
 
-    ///> tell usb begin read image	
+    ///> tell usb begin read image
     IoCtrl io;
-    io.BeginReadImage();	
+    io.BeginReadImage();
 }
 
 void Init::WriteLogHead()
@@ -358,5 +356,3 @@ void Init::CreatMainWindow()
     // ViewMeasureResult::GetInstance()->Create();
     // ViewMeasureResult::GetInstance()->Show();
 }
-
-

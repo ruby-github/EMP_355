@@ -3,15 +3,15 @@
  *
  *       Filename:  CalcSetting.h
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  10/29/2012 04:09:21 AM
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (), 
- *        Company:  
+ *         Author:  YOUR NAME (),
+ *        Company:
  *
  * =====================================================================================
  */
@@ -20,10 +20,10 @@
 #define __CALC_SETTING_H__
 
 #include <gtk/gtk.h>
-#include "MeasureDef.h"
-#include "FakeXEvent.h"
+#include "calcPeople/MeasureDef.h"
+#include "display/FakeXEvent.h"
 #include <vector>
-#include "ExamItem.h"
+#include "probe/ExamItem.h"
 
 #ifdef VET
 static const int EXAM_NUM = 9;
@@ -44,9 +44,8 @@ static const int MAX_METHOD = 17;
 struct CustomEtype
 {
    std::string name;
-   int etype; 
+   int etype;
 };
-
 
 struct CustomTypeAndMethod
 {
@@ -71,19 +70,19 @@ class CustomCalc:public FakeXEvent
         GtkWidget* CreateExportCalcSettingWin(GtkWidget *parent);
         GtkWidget* CreateCalcSettingWin(GtkWidget *parent);
         void DestroyWin(void);
-        
+
         void DelayDestroyWin(void);
         GtkWidget *GetWindow(){return m_window;}
         void SetProgressBar(double fraction);
         void ExportLoadInfoNotice(char *result);
         void ExportRightInfoNotice(char *result);
         void ExportErrorInfoNotice(char *result);
-        void HideOKAndCancelClicked(); 
-        void OKAndCancelClicked(); 
-        bool RenameCompare(char * name_copy); 
+        void HideOKAndCancelClicked();
+        void OKAndCancelClicked();
+        bool RenameCompare(char * name_copy);
         void ImportSuccess(void);
-        bool ImportCopy(int j); 
-        void ImportRenameCopy(string item_name); 
+        bool ImportCopy(int j);
+        void ImportRenameCopy(string item_name);
         void ButtonImportNameOK();
         void ImportWrite(string item_name, int &item_num);
     private:
@@ -94,10 +93,10 @@ class CustomCalc:public FakeXEvent
 		GtkWidget *label_type;
 		GtkWidget *label_method;
 		GtkWidget *m_window;
-		GtkWidget *fixed1; 
+		GtkWidget *fixed1;
 		GtkWidget *m_frame_new_notice;
 		GtkWidget *m_label_notice;
-		GtkWidget *fixed_new_notice; 
+		GtkWidget *fixed_new_notice;
 		GtkWidget *m_label_notice1;
 		GtkWidget *m_label_notice2;
         GtkWidget *m_label_notice3;
@@ -155,7 +154,6 @@ class CustomCalc:public FakeXEvent
         static void on_entry_focus_in(GtkEditable *editable, GdkEventFocus *event, CustomCalc *data)
         { data->EntryItemFocusIn(editable, event); }
 
-
         //signal handle
         gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
 
@@ -170,12 +168,10 @@ class CustomCalc:public FakeXEvent
 
 };
 
-
 enum {
     NAME_COLUMN,
     N_COLUMNS
 };
-
 
 class CalcSetting
 {
@@ -278,7 +274,6 @@ class CalcSetting
         void DepartmentCalcChanged(GtkComboBox *widget);
         static void HandleDepartmentCalcChanged(GtkComboBox *widget, CalcSetting *data) {data->DepartmentCalcChanged(widget); }
 
-
         static void HandleMeasureSequenceChanged(GtkComboBox *widget, CalcSetting *data) {data->MeasureSequenceChanged(widget); }
 
         static void HandleExamCalcChanged(GtkComboBox *widget, CalcSetting *data) {data->ExamCalcChanged(widget); }
@@ -303,7 +298,7 @@ class CalcSetting
         {
             if (data)
                 data->ButtonAddClicked(button);
-        }   
+        }
 
         static void HandleButtonBackOneClicked(GtkButton *button, CalcSetting *data)
         {

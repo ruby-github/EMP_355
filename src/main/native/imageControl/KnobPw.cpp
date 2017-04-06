@@ -9,17 +9,17 @@
  * @author: zhanglei
  */
 
-#include "KnobPw.h"
-#include "ImgPw.h"
-#include "Img2D.h"
-#include "KnobMenu.h"
-#include "gui_global.h"
-#include "Knob2D.h"
-#include "HintArea.h"
-#include "ModeStatus.h"
-#include "KeyFunc.h"
-#include "ScanMode.h"
-#include "../imageProc/GlobalClassMan.h"
+#include "imageControl/KnobPw.h"
+#include "imageControl/ImgPw.h"
+#include "imageControl/Img2D.h"
+#include "display/KnobMenu.h"
+#include "display/gui_global.h"
+#include "imageControl/Knob2D.h"
+#include "display/HintArea.h"
+#include "imageProc/ModeStatus.h"
+#include "keyboard/KeyFunc.h"
+#include "imageProc/ScanMode.h"
+#include "imageProc/GlobalClassMan.h"
 #if (defined(EMP_460) || defined(EMP_355))
 KnobMenu::KnobItem KnobPwMenu[15] = {
 	{_("SV Length"), "", MIN, PwChgSVLength, NULL},
@@ -27,7 +27,7 @@ KnobMenu::KnobItem KnobPwMenu[15] = {
 	{_("Scale"), "", MIN, PwChgScale, NULL},
 	{_("Baseline"), "", MIN, PwChgBaseline, NULL},
 	{_("Steer"), "", MIN, PwChgSteer, NULL},
-	
+
 	{_("Doppler Freq."), "", MIN, PwChgDopFreq, NULL},
 	{_("Wall Filter"), "", MIN, PwChgWallFilter, NULL},
 	{_("Spectrum Speed"), "", MIN, PwChgSpeed, NULL},
@@ -41,7 +41,7 @@ KnobMenu::KnobItem KnobPwMenu[15] = {
 	//{_("Log"), "", MIN, PwChgLog, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
-};	
+};
 #else
 KnobMenu::KnobItem KnobPwMenu[15] = {
 	{_("SV Length"), "", MIN, PwChgSVLength, NULL},
@@ -49,7 +49,7 @@ KnobMenu::KnobItem KnobPwMenu[15] = {
 	{_("Scale"), "", MIN, PwChgScale, NULL},
 	{_("Baseline"), "", MIN, PwChgBaseline, NULL},
 	{_("Steer"), "", MIN, PwChgSteer, NULL},
-	
+
 	{_("Doppler Freq."), "", MIN, PwChgDopFreq, NULL},
 	{_("Wall Filter"), "", MIN, PwChgWallFilter, NULL},
 	{_("Spectrum Speed"), "", MIN, PwChgSpeed, NULL},
@@ -63,18 +63,18 @@ KnobMenu::KnobItem KnobPwMenu[15] = {
 	//{_("Log"), "", MIN, PwChgLog, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
-};	
+};
 
 #endif
 
 void KnobPwCreate()
 {
-    KnobMenu::GetInstance()->SetItem(KnobPwMenu, sizeof(KnobPwMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::PW);  
+    KnobMenu::GetInstance()->SetItem(KnobPwMenu, sizeof(KnobPwMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::PW);
 }
 
 //sync
 void SyncKnobPw(EKnobPw type, const char* s, EKnobReturn status, bool draw)
-{	
+{
 	sprintf(KnobPwMenu[type].value, "%s", s);
 	KnobPwMenu[type].status = status;
     if (draw)
@@ -86,7 +86,7 @@ bool PwOperValid()
 {
 	ModeStatus s;
 	ScanMode::EScanMode mode = s.GetScanMode();
-    if ((ModeStatus::IsPWImgMode()) || (ModeStatus::IsColorPDIMode()))  
+    if ((ModeStatus::IsPWImgMode()) || (ModeStatus::IsColorPDIMode()))
         return TRUE;
     else
         return FALSE;
@@ -137,7 +137,7 @@ EKnobReturn PwChgScale(EKnobOper oper)
 		ModeStatus s;
 		ScanMode::EScanMode mode = s.GetScanMode();
 
-		if (mode == ScanMode::PW_SIMULT) 
+		if (mode == ScanMode::PW_SIMULT)
 			ret = ImgPw::GetInstance()->ChangeScaleSimult2(oper);
 		else if ((mode == ScanMode::PWCFM_SIMULT) || (mode == ScanMode::PWPDI_SIMULT))
 			ret = ImgPw::GetInstance()->ChangeScaleSimult3(oper);
@@ -207,7 +207,6 @@ EKnobReturn PwChgSteer(EKnobOper oper)
 	return ret;
 }
 
-
 EKnobReturn PwChgWallFilter(EKnobOper oper)
 {
 	if (PwOperValid() || CwOperValid())
@@ -218,7 +217,7 @@ EKnobReturn PwChgWallFilter(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
 }
 
 EKnobReturn PwChgDopFreq(EKnobOper oper)
@@ -245,7 +244,7 @@ EKnobReturn PwChgDopFreq(EKnobOper oper)
     }
     else if (ModeStatus::IsCWImgMode())
     {
-    
+
          HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
         return ERROR;
 
@@ -254,7 +253,7 @@ EKnobReturn PwChgDopFreq(EKnobOper oper)
     {
         HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
         return ERROR;
-    }	
+    }
 }
 
 EKnobReturn PwChgSpeed(EKnobOper oper)
@@ -267,7 +266,7 @@ EKnobReturn PwChgSpeed(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
 }
 
 EKnobReturn PwChgNoise(EKnobOper oper)
@@ -280,7 +279,7 @@ EKnobReturn PwChgNoise(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
 }
 EKnobReturn PwChgSimult(EKnobOper oper)
 {
@@ -294,7 +293,7 @@ EKnobReturn PwChgSimult(EKnobOper oper)
             if (oper == SUB)
                 return ScanMode::GetInstance()->EnterPwSimult(FALSE);
         }
-        else if (mode == ScanMode::PWCFM_SIMULT) 
+        else if (mode == ScanMode::PWCFM_SIMULT)
         {
             if (oper == SUB)
                 return ScanMode::GetInstance()->EnterPwCfmSimult(FALSE);
@@ -343,7 +342,7 @@ EKnobReturn PwChgSimult(EKnobOper oper)
                     return ScanMode::GetInstance()->EnterPwPdiSimult(TRUE);
             }
         }
-        else 
+        else
 		{
 			HintArea::GetInstance()->UpdateHint(_("[Simult]: Operation is invalid in current mode."), 1);
 			return ERROR;
@@ -353,7 +352,7 @@ EKnobReturn PwChgSimult(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
     return OK;
 }
 
@@ -367,7 +366,7 @@ EKnobReturn PwChgDynamicRange(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("[DynamicRange]: Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
 }
 
 EKnobReturn PwChgMap(EKnobOper oper)
@@ -380,7 +379,7 @@ EKnobReturn PwChgMap(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
 }
 
 EKnobReturn PwChgHPRF(EKnobOper oper)
@@ -428,6 +427,5 @@ EKnobReturn PwChgSoundFilter(EKnobOper oper)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Operation is invalid."), 1);
 		return ERROR;
-	}	
+	}
 }
-

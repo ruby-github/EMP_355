@@ -3,30 +3,30 @@
 #define MEASURE_M_H
 
 #include "AbsMeasure.h"
-#include "UpdateMeasure.h"
-#include "MeasureCalc.h"
-#include "MeasureDraw.h"
-#include "MeasureMan.h"
+#include "measure/UpdateMeasure.h"
+#include "measure/MeasureCalc.h"
+#include "measure/MeasureDraw.h"
+#include "measure/MeasureMan.h"
 
 class MMeasureTime: public AbsMeasure
 {
 public:
     MMeasureTime(const SingleItemInfo *ptrSingleItemInfo);
     ~MMeasureTime();
-    
+
     void Init();
     void PressLeft(POINT p);
     void PressRight(POINT p);
     void MouseMove(POINT p);
     void Change();
     void Esc();
-    
+
 private:
     MeasureCalc m_calc;
     MeasureDraw m_draw;
     UpdateMeasure m_update;
     MeasureMan * m_ptrMan;
-    
+
     int m_step;
     int m_method;
     bool m_isDraw;
@@ -43,7 +43,7 @@ class MMeasureVel: public AbsMeasure
 public:
     MMeasureVel(const SingleItemInfo *ptrSingleItemInfo);
     ~MMeasureVel();
-    
+
     void Init();
     void PressLeft(POINT p);
     void PressRight(POINT p);
@@ -72,7 +72,7 @@ class MMeasureDistSlope: public AbsMeasure
 public:
     MMeasureDistSlope(const MultiItemInfo *ptrMultiItemInfo);
     ~MMeasureDistSlope();
-    
+
     void Init();
     void PressLeft(POINT p);
     void PressRight(POINT p);
@@ -102,7 +102,7 @@ class MMeasureDepth: public AbsMeasure
 public:
     MMeasureDepth(const SingleItemInfo *ptrSingleItemInfo);
     ~MMeasureDepth();
-    
+
     void Init();
     void PressLeft(POINT p);
     void PressRight(POINT p);
@@ -130,7 +130,7 @@ class MMeasureHR: public AbsMeasure
 public:
     MMeasureHR();
     ~MMeasureHR() {};
-    
+
     void Init();
     void PressLeft(POINT p);
     void PressRight(POINT p);
@@ -151,7 +151,7 @@ private:
     double m_hr;
 };
 
-//射血分数测量－M模式Teicholz方法
+//灏勮鍒嗘暟娴嬮噺锛峂妯″紡Teicholz鏂规硶
 class MMeasureEFTei: public AbsMeasure
 {
     public:
@@ -182,10 +182,10 @@ class MMeasureEFTei: public AbsMeasure
 	POINT m_lvds_end;
 	POINT m_tempP;
 	POINT m_p1;
-	double m_lvdd;//左室舒张直径
-	double m_lvds;//左室收缩直径
-	double m_lvvd;//左室舒张体积
-	double m_lvvs;//左室收缩体积
+	double m_lvdd;//宸﹀鑸掑紶鐩村緞
+	double m_lvds;//宸﹀鏀剁缉鐩村緞
+	double m_lvvd;//宸﹀鑸掑紶浣撶Н
+	double m_lvvs;//宸﹀鏀剁缉浣撶Н
 	double m_ef;
 };
 
@@ -195,7 +195,7 @@ class MMeasureSlope: public AbsMeasure
 public:
     MMeasureSlope();
     ~MMeasureSlope() {};
-    
+
     void Init();
     void PressLeft(POINT p);
     void PressRight(POINT p);

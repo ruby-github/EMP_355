@@ -1,20 +1,19 @@
 #include <dirent.h>
 
-#include "gui_func.h"
-#include "gui_global.h"
-#include "FileMan.h"
-#include "KeyValueOpr.h"
-#include "KeyDef.h"
-#include "FakeXEvent.h"
-#include "PeripheralMan.h"
-#include "ViewDialog.h"
-#include "ViewArchive.h"
-#include "ViewArchiveImgMan.h"
-#include "ViewSystem.h"
-#include "ConfigToHost.h"
-#include "UserSelect.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "patient/FileMan.h"
 #include "keyboard/KeyValueOpr.h"
-#include "MenuCalcNew.h"
+#include "keyboard/KeyDef.h"
+#include "display/FakeXEvent.h"
+#include "periDevice/PeripheralMan.h"
+#include "display/ViewDialog.h"
+#include "patient/ViewArchive.h"
+#include "patient/ViewArchiveImgMan.h"
+#include "sysMan/ViewSystem.h"
+#include "sysMan/ConfigToHost.h"
+#include "sysMan/UserSelect.h"
+#include "calcPeople/MenuCalcNew.h"
 #include "keyboard/KeyBoard.h"
 
 extern int s_fdcom;
@@ -68,7 +67,6 @@ void ConfigToHost::CreateCalcImportWindow(GtkWindow *parent)
     gtk_fixed_put (GTK_FIXED (fixed), label_calc_notice, 20, 5);
     gtk_widget_set_size_request (label_calc_notice, 300, 30);
 
-
     swRoot = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (swRoot);
     gtk_fixed_put (GTK_FIXED (fixed), swRoot, 20, 40);
@@ -86,7 +84,7 @@ void ConfigToHost::CreateCalcImportWindow(GtkWindow *parent)
     modelRoot = create_calc_root_model();
     if (modelRoot != NULL)
         gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeRoot), modelRoot);
-    g_object_unref (modelRoot); 
+    g_object_unref (modelRoot);
 
  	m_chkbtnDel = gtk_check_button_new_with_mnemonic(_("Delete data from USB storage after import."));
 	gtk_fixed_put (GTK_FIXED (fixed), m_chkbtnDel, 20, 190);
@@ -189,7 +187,7 @@ void ConfigToHost::CreateWindow(GtkWindow *parent)
     modelRoot = create_root_model();
     if (modelRoot != NULL)
         gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeRoot), modelRoot);
-    g_object_unref (modelRoot); 
+    g_object_unref (modelRoot);
 
     swBranch = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (swBranch);
@@ -201,7 +199,7 @@ void ConfigToHost::CreateWindow(GtkWindow *parent)
     m_treeBranch = create_treeview(1);
     gtk_widget_show (m_treeBranch);
     gtk_container_add (GTK_CONTAINER (swBranch), m_treeBranch);
- 
+
     GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
     GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("OK"));
     btnOK = create_button_icon(labelOK, imageOK);
@@ -243,8 +241,6 @@ void ConfigToHost::DestroyWindow(void)
         m_listBranch = NULL;
     }
 
-  
-
     if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
@@ -282,11 +278,11 @@ static void progress_callback(goffset current, goffset total, gpointer data)
     //	PRINTF("prac = %f\n", prac);
     if(prac >= 0 && prac <= 1.0)
     {
-        gdk_threads_enter();	
+        gdk_threads_enter();
         ViewDialog::GetInstance()->SetProgressBar(prac);
         while(gtk_events_pending())
             gtk_main_iteration();
-        gdk_threads_leave();	
+        gdk_threads_leave();
     }
     else
         PRINTF("fraction out of range!\n");
@@ -327,7 +323,7 @@ static gboolean LoadSelectedCalcData()
 
     //list all string for test
     vector<string>::iterator ite = vec.begin();
-    total = vec.size() / 2; 
+    total = vec.size() / 2;
     while(ite < vec.end() && !cond)
     {
         //Update info
@@ -364,7 +360,7 @@ static gboolean LoadSelectedCalcData()
 
         GError *err = NULL;
         int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, cancellable, NULL, NULL, &err);
-    
+
         if(dest_other != NULL)
         {
             int ret_other = g_file_copy(src, dest_other, G_FILE_COPY_OVERWRITE, cancellable, progress_callback, NULL, &err);
@@ -412,7 +408,7 @@ static gboolean LoadSelectedCalcData()
         }
         ite++;
     }
-  
+
     if(!cond)
     {
         ConfigToHost::GetInstance()->DeleteUdiskFile();
@@ -430,12 +426,12 @@ static gboolean LoadSelectedCalcData()
         char userselectname1[256];
 
 #ifdef VET
-        sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini"); 
-        sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini"); 
+        sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
+        sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
 
 #else
-        sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini"); 
-        sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini"); 
+        sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+        sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
 #endif
         FileMan f;
         if(strcmp(username.c_str(), "System Default") == 0)
@@ -450,7 +446,7 @@ static gboolean LoadSelectedCalcData()
         }
 
         IniFile ini_add2(userselectname1);
-        IniFile *ptrIni_add2 = &ini_add2; 
+        IniFile *ptrIni_add2 = &ini_add2;
         int ItemAllNum;
         ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
 
@@ -477,7 +473,7 @@ static gboolean LoadSelectedCalcData()
                 {
                     bool rename_no = true;
                     IniFile ini_add1(path3);
-                    IniFile *ptrIni_add1 = &ini_add1; 
+                    IniFile *ptrIni_add1 = &ini_add1;
                     char CustomEtype[256];
                     sprintf(CustomEtype, "CustomEtype-%d",item_num);
                     string item_name = ptrIni_add1->ReadString(CustomEtype, "Name");
@@ -486,7 +482,7 @@ static gboolean LoadSelectedCalcData()
                     string department_in = ptrIni_add1->ReadString(CustomEtype, "Department");
 
                     IniFile ini_add4(userselectname1);
-                    IniFile *ptrIni_add4 = &ini_add4; 
+                    IniFile *ptrIni_add4 = &ini_add4;
                     vector<string> useritemgroup;
                     useritemgroup = ptrIni_add4->GetGroupName();
                     char src_group[256];
@@ -516,16 +512,16 @@ static gboolean LoadSelectedCalcData()
                                 char renametrans[256];
                                 strcpy(renametrans,  _("Item has existed, \nClicked Import will rename the item and continue, \nClicked Cancel will quit and continue!"));
                                 sprintf(rename , "%s %s", item_name.c_str(), renametrans);
-                                GtkWidget *dialog = gtk_dialog_new_with_buttons("Rename", 
-                                        GTK_WINDOW(ConfigToHost::GetInstance()->GetWindow()), 
+                                GtkWidget *dialog = gtk_dialog_new_with_buttons("Rename",
+                                        GTK_WINDOW(ConfigToHost::GetInstance()->GetWindow()),
                                         GTK_DIALOG_MODAL ,
-                                        GTK_STOCK_OK, GTK_RESPONSE_OK, 
+                                        GTK_STOCK_OK, GTK_RESPONSE_OK,
                                         GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
                                         NULL);
                                 gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
                                 GtkWidget *notice = gtk_label_new(rename);
-                                gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), notice); 
+                                gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), notice);
                                 gtk_widget_show_all(dialog);
 
                                 gint result = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -553,7 +549,7 @@ static gboolean LoadSelectedCalcData()
     else
     {
         ConfigToHost::GetInstance()->ExportErrorInfoNotice(result1);
-        ConfigToHost::GetInstance()->OKAndCancelClicked();  
+        ConfigToHost::GetInstance()->OKAndCancelClicked();
     }
 
     return FALSE;
@@ -570,9 +566,9 @@ static gboolean LoadSelectedData(gpointer data)
     vector<string> vec = ConfigToHost::GetInstance()->GetSelectedVec();
     if(!ptr->CheckUsbStorageState())
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 ViewDialog::ERROR,
-                _("No USB storage found!"), 
+                _("No USB storage found!"),
                 NULL);
         return FALSE;
     }
@@ -580,9 +576,9 @@ static gboolean LoadSelectedData(gpointer data)
     {
         if(!ptr->MountUsbStorage())
         {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                     ViewDialog::ERROR,
-                    _("Failed to mount USB storage!"), 
+                    _("Failed to mount USB storage!"),
                     NULL);
             return FALSE;
         }
@@ -591,7 +587,7 @@ static gboolean LoadSelectedData(gpointer data)
 
     //list all string for test
     vector<string>::iterator ite = vec.begin();
-    total = vec.size() / 2; 
+    total = vec.size() / 2;
     char usb_file_path[256];
     while(ite < vec.end() && !cond)
     {
@@ -640,7 +636,7 @@ static gboolean LoadSelectedData(gpointer data)
                 }
             }
             if (UserSelect::GetInstance()->username_unique_db(USERNAME_DB, name))
-            { 
+            {
                 UserSelect::GetInstance()->insert_username_db(USERNAME_DB, name);
                 ViewSystem::GetInstance()->ShowList(name);
                 int last =  UserSelect::GetInstance()->get_active_user();
@@ -661,7 +657,7 @@ static gboolean LoadSelectedData(gpointer data)
 
         GError *err = NULL;
         int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, cancellable, progress_callback, NULL, &err);
-    
+
         if(dest_other != NULL)
         {
             int ret_other = g_file_copy(src, dest_other, G_FILE_COPY_OVERWRITE, cancellable, progress_callback, NULL, &err);
@@ -718,17 +714,17 @@ static gboolean LoadSelectedData(gpointer data)
     if(!cond)
     {
         sprintf(result, _("Success to load data from USB storage."));
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 ViewDialog::INFO,
-                result, 
+                result,
                 NULL);
         ViewSystem::GetInstance()->UpdateUserItem();
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                 ViewDialog::INFO,
-                result, 
+                result,
                 NULL);
     }
 
@@ -750,8 +746,8 @@ void ConfigToHost::BtnOKClicked(GtkButton *button)
         g_timeout_add(1000, LoadSelectedData, NULL);
 
         PRINTF("Load From U disk!\n");
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), 
-                ViewDialog::PRG_CANCEL, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                ViewDialog::PRG_CANCEL,
                 _("Please wait, loading data from USB storage..."),
                 CancelLoadHost);
     }
@@ -768,14 +764,13 @@ void ConfigToHost::SetProgressBar(double fraction)
     gtk_widget_show(m_progress_bar);
 }
 
-
 void ConfigToHost::ExportRightInfoNotice(char *result)
 {
     gtk_label_set_text(GTK_LABEL(label_calc_notice1), (_(result)));
     gtk_label_set_line_wrap_mode(GTK_LABEL(label_calc_notice1), PANGO_WRAP_WORD);
     gtk_widget_hide (img_error);
     gtk_widget_hide (img_load);
-    gtk_widget_show(label_calc_notice1);   
+    gtk_widget_show(label_calc_notice1);
     gtk_widget_show(img_right);
 }
 
@@ -785,7 +780,7 @@ void ConfigToHost::ExportErrorInfoNotice(char *result)
     gtk_label_set_line_wrap_mode(GTK_LABEL(label_calc_notice1), PANGO_WRAP_WORD);
     gtk_widget_hide (img_right);
     gtk_widget_hide (img_load);
-    gtk_widget_show(label_calc_notice1);   
+    gtk_widget_show(label_calc_notice1);
     gtk_widget_show(img_error);
 }
 
@@ -795,7 +790,7 @@ void ConfigToHost::ExportLoadInfoNotice(char *result)
     gtk_label_set_line_wrap_mode(GTK_LABEL(label_calc_notice1), PANGO_WRAP_WORD);
     gtk_widget_hide (img_right);
     gtk_widget_hide (img_error);
-    gtk_widget_show(label_calc_notice1);   
+    gtk_widget_show(label_calc_notice1);
     gtk_widget_show(img_load);
 
 }
@@ -808,7 +803,7 @@ void ConfigToHost::DeleteUdiskFile()
     {
         FileMan f;
         char path4[256];
-        sprintf(path4, "%s%s%s%s", UDISK_DATA_PATH,"/", RootName, "/"); 
+        sprintf(path4, "%s%s%s%s", UDISK_DATA_PATH,"/", RootName, "/");
         PRINTF("PATH4=%s\n", path4);
         f.DelDirectory(path4);
     }
@@ -819,13 +814,12 @@ void ConfigToHost::BtnCalcImportOKClicked(GtkButton *button)
     //Copy the selected file to host
     if(GetAllCalcSelectPath())
     {
-        HideOKAndCancelClicked();  
+        HideOKAndCancelClicked();
         ExportLoadInfoNotice(_("Loading......"));
         //g_timeout_add(1000, LoadSelectedCalcData, NULL);
         LoadSelectedCalcData();
     }
 }
-
 
 void ConfigToHost::BtnCancelClicked(GtkButton *button)
 {
@@ -840,10 +834,10 @@ GtkWidget* ConfigToHost::create_treeview(gint type)
     GtkTreeViewColumn *col;
 
     treeview = gtk_tree_view_new ();
-    g_object_set(G_OBJECT(treeview), 
-            "enable-search", FALSE, 
-            "headers-visible", FALSE, 
-            "rules-hint", TRUE, 
+    g_object_set(G_OBJECT(treeview),
+            "enable-search", FALSE,
+            "headers-visible", FALSE,
+            "rules-hint", TRUE,
             NULL);
 
     render = gtk_cell_renderer_toggle_new();
@@ -866,10 +860,10 @@ GtkWidget* ConfigToHost::create_calc_treeview()
     GtkTreeViewColumn *col;
 
     treeview = gtk_tree_view_new ();
-    g_object_set(G_OBJECT(treeview), 
-            "enable-search", FALSE, 
-            "headers-visible", FALSE, 
-            "rules-hint", TRUE, 
+    g_object_set(G_OBJECT(treeview),
+            "enable-search", FALSE,
+            "headers-visible", FALSE,
+            "rules-hint", TRUE,
             NULL);
 
     render = gtk_cell_renderer_text_new();
@@ -919,7 +913,7 @@ void ConfigToHost::ToggleData(GtkCellRendererToggle *cell, gchar *path_str)
     gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
 
     /* do something with the value */
-    checked ^= 1; //按位异或
+    checked ^= 1; //鎸変綅寮傛垨
 
     /* set new value */
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);
@@ -1005,7 +999,6 @@ void ConfigToHost::UpdateCalcRootModel(void)
     closedir(dir);
 }
 
-
 void ConfigToHost::UpdateRootModel(void)
 {
     DIR *dir;
@@ -1079,7 +1072,7 @@ GtkTreeModel* ConfigToHost::LoadBranchModel(gchar *branch)
         if(g_file_test(tmpPath, G_FILE_TEST_IS_REGULAR))
         {
             //	if(fm.CompareSuffix(ent->d_name, "jpg")==0 || fm.CompareSuffix(ent->d_name, "bmp")==0 || fm.CompareSuffix(ent->d_name, "emp")==0 || fm.CompareSuffix(ent->d_name, "avi")==0 || fm.CompareSuffix(ent->d_name, "cine")==0)
-            if(fm.CompareSuffix(ent->d_name, "ini")==0) 
+            if(fm.CompareSuffix(ent->d_name, "ini")==0)
             {
                 //	PRINTF("	FILE: %s\n", ent->d_name);
                 gtk_list_store_append(store, &iter);
@@ -1132,7 +1125,6 @@ void ConfigToHost::RootCalcSelectionChanged(GtkTreeSelection *selection)
     }
 }
 
-
 void ConfigToHost::RootSelectionChanged(GtkTreeSelection *selection)
 {
     GtkTreeIter iter;
@@ -1181,12 +1173,12 @@ gboolean ConfigToHost::GetAllCalcSelectPath(void)
     char path[256];
     char path1[256];
 #ifdef VET
- sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/VetCalcSetting.ini"); 
-    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/VetCalcItemSetting.ini");  
+ sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/VetCalcSetting.ini");
+    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/VetCalcItemSetting.ini");
 
 #else
-    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/CalcSetting.ini"); 
-    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/CalcItemSetting.ini");  
+    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/CalcSetting.ini");
+    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/CalcItemSetting.ini");
 #endif
     m_vecPath.push_back(path);
     m_vecPath.push_back(path1);
@@ -1196,7 +1188,6 @@ gboolean ConfigToHost::GetAllCalcSelectPath(void)
     else
         return FALSE;
 }
-
 
 gboolean ConfigToHost::GetAllSelectPath(void)
 {

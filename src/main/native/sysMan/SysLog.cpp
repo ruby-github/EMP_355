@@ -2,7 +2,7 @@
  * 2009, 深圳恩普电子技术有限公司
  *
  * @file: SysLog.cpp
- * @brief: Print system info to file log/sys.log, and this file will be save when power off 
+ * @brief: Print system info to file log/sys.log, and this file will be save when power off
  * and clear when power on.
  *
  * version: V1.0
@@ -16,14 +16,13 @@
 #include <fstream>
 #include <time.h>
 #include <string>
-#include "SysLog.h"
+#include "sysMan/SysLog.h"
 
 using std::cout;
 using std::endl;
 using std::stringstream;
 using std::ofstream;
 using std::string;
-
 
 ///> init static variable
 class SysLog* SysLog::m_ptrInstance = NULL;

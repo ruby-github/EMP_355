@@ -6,25 +6,24 @@
  *
  * version: V1.0
  * date: 20010-1-19
- * @author: liudan 
+ * @author: liudan
  */
 
 #include <deque>
-#include "KnobReplay.h"
-#include "KnobMenu.h"
-#include "FreezeMode.h"
-#include "Replay.h"
+#include "imageProc/KnobReplay.h"
+#include "display/KnobMenu.h"
+#include "imageProc/FreezeMode.h"
+#include "imageProc/Replay.h"
 #include "Def.h"
-#include "gui_global.h"
-#include "VideoMan.h"
-#include "PeripheralMan.h"
-#include "SysOptions.h"
-#include "HintArea.h"
-#include "ViewDialog.h"
+#include "display/gui_global.h"
+#include "patient/VideoMan.h"
+#include "periDevice/PeripheralMan.h"
+#include "sysMan/SysOptions.h"
+#include "display/HintArea.h"
+#include "display/ViewDialog.h"
 #include "ViewMain.h"
-#include "ModeStatus.h"
-#include "ViewSuperuser.h"
-
+#include "imageProc/ModeStatus.h"
+#include "sysMan/ViewSuperuser.h"
 
 using std::deque;
 #if (defined (EMP_322) || defined(EMP_313))
@@ -39,7 +38,7 @@ KnobMenu::KnobItem KnobReplayMenu[6] = {
 	//{"", "", ERROR, NULL, NULL},
 	//{"", "", ERROR, NULL, NULL},
 	//{"", "", ERROR, NULL, NULL}
-};	
+};
 #elif (defined (EMP_460) || defined(EMP_355))
 KnobMenu::KnobItem KnobReplayMenu[5] = {
 	{N_("Replay"), "", MIN, ReplayChgSpeed, NULL},
@@ -51,7 +50,7 @@ KnobMenu::KnobItem KnobReplayMenu[5] = {
 	//{"", "", ERROR, NULL, NULL},
 	//{"", "", ERROR, NULL, NULL},
 	//{"", "", ERROR, NULL, NULL}
-};	
+};
 #else
 KnobMenu::KnobItem KnobReplayMenu[5] = {
 	{N_("Replay/Speed"), "", MIN, ReplayChgSpeed, ReplayChgCtrl},
@@ -78,7 +77,7 @@ KnobMenu::KnobItem DemoKnobReplayMenu[5] = {
 	{"", "", ERROR, NULL, NULL}
 };
 
-const char * Toggle_Replay[2] = 
+const char * Toggle_Replay[2] =
 {
     N_("OFF"),
     N_("ON")
@@ -88,12 +87,12 @@ void KnobReplayCreate()
 {
     if(ViewSuperuser::GetInstance()->GetDemoStatus())
     {
-    	KnobMenu::GetInstance()->SetItem(DemoKnobReplayMenu, sizeof(DemoKnobReplayMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::REPLAY); 
+    	KnobMenu::GetInstance()->SetItem(DemoKnobReplayMenu, sizeof(DemoKnobReplayMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::REPLAY);
     }
     else
     {
     	KnobReplayMenu[REPLAY_CINE].status = PRESS;
-    	KnobMenu::GetInstance()->SetItem(KnobReplayMenu, sizeof(KnobReplayMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::REPLAY); 
+    	KnobMenu::GetInstance()->SetItem(KnobReplayMenu, sizeof(KnobReplayMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::REPLAY);
     }
 }
 
@@ -104,7 +103,7 @@ void KnobCineCreate()
 
 //sync
 void SyncKnobReplay(EKnobReplay type, const char* s, EKnobReturn status, bool draw)
-{	
+{
     if(ViewSuperuser::GetInstance()->GetDemoStatus())
     {
         if(type == REPLAY_CTRL)

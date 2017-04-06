@@ -9,9 +9,9 @@
  * @author: zhanglei
  */
 
-#include "FormatCfm.h"
-#include "Format2D.h"
-#include "GlobalClassMan.h"
+#include "imageProc/FormatCfm.h"
+#include "imageProc/Format2D.h"
+#include "imageProc/GlobalClassMan.h"
 
 FormatCfm* FormatCfm::m_ptrInstance = NULL;
 
@@ -29,7 +29,7 @@ FormatCfm::FormatCfm()
 	m_ptrUpdate = ptrGcm->GetUpdateCfm();
 
 	m_ptrDsc = DscMan::GetInstance();
-	m_ptrDscPara = m_ptrDsc->GetDscPara(); 
+	m_ptrDscPara = m_ptrDsc->GetDscPara();
 
 	m_ptrReplay = Replay::GetInstance();
 	m_ptrImg = ImgCfm::GetInstance();
@@ -69,7 +69,7 @@ void FormatCfm::ChangeFormat(enum EFormatCfm format)
 	}
 
 	m_ptrImg->SetBoxStatus(false);
-		
+
 	///> update view
 	m_ptrUpdate->ChangeFormatCfm(m_format);
 }
@@ -95,7 +95,7 @@ int FormatCfm::SwitchBB(void)
     m_curB = Format2D::GetInstance()->SwitchBB();
 
     ///> update
-    m_ptrUpdate->ChangeCurrentImgBB(m_curB);    
+    m_ptrUpdate->ChangeCurrentImgBB(m_curB);
 
     return m_curB;
 }
@@ -119,4 +119,3 @@ FormatCfm::EFormatCfm FormatCfm::GetFormat()
     else
         return m_format;
 }
-

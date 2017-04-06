@@ -2,8 +2,8 @@
 #ifndef _BIOPSY_LINE_H_
 #define _BIOPSY_LINE_H_
 
-#include "ImageAreaDraw.h"
-#include "../include/Def.h"
+#include "display/ImageAreaDraw.h"
+#include "Def.h"
 
 class BiopsyLine {
 public:
@@ -69,6 +69,6 @@ private:
 
     int m_adjustAngle;
     int m_baseAngle;
-    
+
 };
 #endif

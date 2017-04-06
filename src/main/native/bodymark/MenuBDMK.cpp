@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gtk/gtk.h>
-#include "MenuBDMK.h"
+#include "bodymark/MenuBDMK.h"
 #include "Def.h"
-#include "gui_func.h"
-#include "gui_global.h"
-#include "BodyMark.h"
-#include "MultiFuncBodyMark.h"
-#include "ExamItem.h"
-#include "ProbeSelect.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "bodymark/BodyMark.h"
+#include "bodymark/MultiFuncBodyMark.h"
+#include "probe/ExamItem.h"
+#include "probe/ProbeSelect.h"
 
 #ifdef VET
 	#define BDMK_PATH "res/bdmk_vet"
@@ -17,15 +17,13 @@
 #else
 #define BDMK_PATH "res/bdmk_scaled"
 
-
-
 #if 0
 #if (defined(EMP_322) || defined(EMP_313))
 static const char* examItem[] = {N_("ABD"), N_("OB"), N_("GYN"), N_("UR"), N_("CAR"), N_("SP"), N_("ORT"), N_("EXTRA")};
 #else
 static const char* examItem[] = {N_("ABD"), N_("OB"), N_("GYN"), N_("UR"), N_("CAR"), N_("SP"), N_("VES"), N_("ORT"), N_("EXTRA")};
 #endif
-#endif 
+#endif
 
 #if (defined(EMP_322) || defined(EMP_313))
 static const char* examItem[] = {N_("Abdomen"), N_("Obstetrics"), N_("Gynecology"), N_("Urology"), N_("Cardiac"), N_("Small Part"), N_("Orthopedic"), N_("EXTRA")};
@@ -67,7 +65,7 @@ void MenuBDMK::Show(void)
 	guchar study;
 	ExamItem::EItem item = ProbeSelect::GetItemIndex();
 //	PRINTF("item = %d\n", (int)item);
-    
+
 #ifdef VET
 
     study = ANIMAL;
@@ -200,7 +198,7 @@ GtkWidget* MenuBDMK::Create(void)
     gtk_fixed_put (GTK_FIXED (m_fixed), hbox, 0, 535);
     gtk_widget_set_size_request (hbox, MENU_AREA_W, 30);
 
-	GtkWidget *labelLeft = create_label("◀", 0, 0, g_white, NULL);
+	GtkWidget *labelLeft = create_label("鈼€", 0, 0, g_white, NULL);
 	m_btnLeft = create_button(labelLeft, 60, 0, g_deep);
 	gtk_box_pack_start (GTK_BOX (hbox), m_btnLeft, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(m_btnLeft), "clicked", G_CALLBACK(HandleLeftClicked), this);
@@ -241,14 +239,14 @@ void MenuBDMK::SetPageValue(guint page, guint total_page)
 	}
 	else if(page > 1 && total_page > page)
 	{
-		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "◀");
+		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "鈼€");
 		gtk_button_set_label(GTK_BUTTON(m_btnRight), "▶");
 		gtk_widget_set_sensitive (m_btnLeft, TRUE);
 		gtk_widget_set_sensitive (m_btnRight, TRUE);
 	}
 	else if(page > 1 && total_page == page)
 	{
-		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "◀");
+		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "鈼€");
 		gtk_button_set_label(GTK_BUTTON(m_btnRight), "");
 		gtk_widget_set_sensitive (m_btnLeft, TRUE);
 		gtk_widget_set_sensitive (m_btnRight, FALSE);
@@ -266,8 +264,8 @@ gint MenuBDMK::GetFileNum(const char *file)
 {
 	int i;
 	char num[10];
-	int len = strlen(file);	
-	
+	int len = strlen(file);
+
 	memset(num, 0, strlen(num));
 	for(i=0; i<len; i++)
 	{
@@ -282,13 +280,13 @@ gint MenuBDMK::GetFileNum(const char *file)
 
 bool MenuBDMK::Sort(const string s1, const string s2)
 {
-	return atof(s1.c_str()) < atof(s2.c_str()); 
+	return atof(s1.c_str()) < atof(s2.c_str());
 }
 
 gint MenuBDMK::SortFileName(gconstpointer p1, gconstpointer p2)
 {
 	int a, b;
-	
+
 	a = GetFileNum((const char*)p1);
 	b = GetFileNum((const char*)p2);
 
@@ -309,7 +307,7 @@ void MenuBDMK::UpdateImage(const char* path, int page)
 		if(j >= MAX_IMAGE)
 			break;
 		filepath = g_build_filename(path, m_vecName[i].c_str(), NULL);
-		if(!g_file_test(filepath, G_FILE_TEST_IS_DIR))	
+		if(!g_file_test(filepath, G_FILE_TEST_IS_DIR))
 		{
 			image = gtk_image_new();
 			gtk_widget_show(image);
@@ -326,24 +324,23 @@ void MenuBDMK::ChangeBDMKStudy(guchar study)
 	gchar *path;
 	string str;
 	const gchar *name;
-	
+
 	//clear the list
 	m_vecName.clear();
-	
+
 	// hide all image displayed
 	HideAllButton();
-	
+
 	//read filename
-    
-    
+
 #ifdef VET
-    
+
     switch(study)
 
     {
         case ANIMAL:	path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
         case PART:	    path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Part", NULL);	    break;
-        default:	
+        default:
                         path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
 
     }
@@ -363,8 +360,8 @@ void MenuBDMK::ChangeBDMKStudy(guchar study)
 		case VES:	path = GetBdmkPath("VES");	break;
 		case ORT:	path = GetBdmkPath("ORT");	break;
 		case EXTRA:	path = GetBdmkPath("EXTRA");break;
-#endif	
-		default:	
+#endif
+		default:
 					path = GetBdmkPath("ABD");
 	}
 #endif
@@ -377,7 +374,7 @@ void MenuBDMK::ChangeBDMKStudy(guchar study)
 		g_free(path);
 		return;
 	}
-	
+
 	name = g_dir_read_name(m_dir);
 	if(!name)
 	{
@@ -404,7 +401,7 @@ void MenuBDMK::ChangeBDMKStudy(guchar study)
 
 	//sort list by filename
 	sort(m_vecName.begin(), m_vecName.end(), Sort);
-	
+
 	UpdateImage(path, m_pageCur);
 	g_free(path);
 }
@@ -433,7 +430,7 @@ void MenuBDMK::StudyChanged(GtkComboBox *combobox)
 	else if(!strcmp(str, _(examItem[8])))	study = EXTRA;
 #endif
     else	study = ABD;
-#endif 
+#endif
 
 	ChangeBDMKStudy(study);
 }
@@ -464,11 +461,11 @@ void MenuBDMK::BDMKClicked(GtkButton *button)
 #ifdef VET
     switch(m_study)
     {
-    
+
         case ANIMAL:	path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
-    
+
         case PART:	    path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Part", NULL);	    break;
-    
+
         default:
                         path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
     }
@@ -488,15 +485,15 @@ void MenuBDMK::BDMKClicked(GtkButton *button)
         case VES:	path = GetBdmkPath("VES");	break;
         case ORT:	path = GetBdmkPath("ORT");	break;
         case EXTRA:	path = GetBdmkPath("EXTRA");break;
-#endif	
-        default:	
+#endif
+        default:
                     path = GetBdmkPath("ABD");
 	}
 
 #endif
 
 	abspath = g_build_filename(path, m_vecName[no+(m_pageCur-1)*MAX_IMAGE].c_str(), NULL);
-	if(!g_file_test(abspath, G_FILE_TEST_IS_DIR))	
+	if(!g_file_test(abspath, G_FILE_TEST_IS_DIR))
 	{
 		m_pixbufSel = gdk_pixbuf_new_from_file(abspath, NULL);
 
@@ -535,7 +532,7 @@ void MenuBDMK::LeftClicked(GtkButton *button)
     {
         case ANIMAL:	path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
         case PART:	    path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Part", NULL);	    break;
-        default:	
+        default:
                         path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
     }
 #else
@@ -554,8 +551,8 @@ void MenuBDMK::LeftClicked(GtkButton *button)
         case VES:	path = GetBdmkPath("VES");	break;
         case ORT:	path = GetBdmkPath("ORT");	break;
         case EXTRA:	path = GetBdmkPath("EXTRA");break;
-#endif	
-        default:	
+#endif
+        default:
                     path = GetBdmkPath("ABD");
     }
 #endif
@@ -568,17 +565,17 @@ void MenuBDMK::RightClicked(GtkButton *button)
 {
 	m_pageCur ++;
 	SetPageValue(m_pageCur, (m_numTotal/MAX_IMAGE)+1);
-	
+
 	gchar *path;
 #ifdef VET
     switch(m_study)
     {
         case ANIMAL:	path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
         case PART:	    path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Part", NULL);	    break;
-        default:	
+        default:
                         path = g_build_filename(CFG_RES_PATH, BDMK_PATH, "Animal", NULL);	break;
     }
- 
+
 #else
 	switch(m_study)
 	{
@@ -596,12 +593,11 @@ void MenuBDMK::RightClicked(GtkButton *button)
         case ORT:	path = GetBdmkPath("ORT");	break;
         case EXTRA:	path = GetBdmkPath("EXTRA");break;
 #endif
-		default:	
+		default:
 					path = GetBdmkPath("ABD");
 	}
-#endif 
+#endif
 	HideAllButton();
 	UpdateImage(path, m_pageCur);
 	g_free(path);
 }
-

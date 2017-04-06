@@ -1,7 +1,7 @@
 /**
-* @brief Authorize.h：加密狗授权保护功能,只适用于SafeNet公司的Sentinel HASP
+* @brief Authorize.h锛氬姞瀵嗙嫍鎺堟潈淇濇姢鍔熻兘,鍙€傜敤浜嶴afeNet鍏徃鐨凷entinel HASP
 
-* @author: hehao 
+* @author: hehao
 * @version: v1.0
 * @data: 2012.10.25
 */
@@ -21,7 +21,7 @@ class CAuthorize
 		/*
 		 * 函数功能：验证key的有效性
 		 * 参数：
-		 *    feature：功能ID
+		 *    feature锛氬姛鑳絀D
 		 *  返回值:
 		 *    0:授权   -1:未找到设备   -2：过期  -3：未授权
 		 */

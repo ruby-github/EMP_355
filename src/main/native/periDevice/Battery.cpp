@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "Battery.h"
-#include "I2CCtrl.h"
-#include "CgosGpio.h"
+#include "periDevice/Battery.h"
+#include "periDevice/I2CCtrl.h"
+#include "periDevice/CgosGpio.h"
 #include "Def.h"
 
 int Battery::GetCapacity(void)
@@ -22,4 +22,3 @@ int Battery::GetCapacity(void)
     }
     return buffer;
 }
-

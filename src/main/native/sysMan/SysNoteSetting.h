@@ -1,16 +1,16 @@
 #ifndef __SYSNOTESETTING_H__
 #define __SYSNOTESETTING_H__
 
-#include "../base/IniFile.h"
+#include "base/IniFile.h"
 
 class SysNoteSetting
 {
 public:
-	
+
     SysNoteSetting();
     ~SysNoteSetting();
 
-    // param fontSize: 0-big 1-normal 2-small 
+    // param fontSize: 0-big 1-normal 2-small
     int GetFontSize(void);
     void SetFontSize(int fontSize);
 
@@ -18,10 +18,10 @@ public:
     int GetBodyMarkSize(void);
     void SetBodyMarkSize(int bodyMark);
 
-    // param fontColor: 
+    // param fontColor:
     int GetFontColor(void);
     void SetFontColor(int fontColor);
-    
+
     // param bodyMarkColor: 0-white, 1-gray, 2-red, 3-green, 4-yellow, 5-blue
     int GetBodyMarkColor(void);
     void SetBodyMarkColor(int bodyMarkColor);
@@ -33,5 +33,3 @@ private:
 };
 
 #endif
-
-

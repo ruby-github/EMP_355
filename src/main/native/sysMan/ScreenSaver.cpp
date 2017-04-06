@@ -2,16 +2,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "Def.h"
-#include "ScreenSaver.h"
-#include "FreezeMode.h"
-#include "SysGeneralSetting.h"
-#include "../imageProc/ModeStatus.h"
+#include "sysMan/ScreenSaver.h"
+#include "imageProc/FreezeMode.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "imageProc/ModeStatus.h"
 #include <X11/Xft/Xft.h>
-#include "ViewSystem.h"
-#include "MenuArea.h"
-#include "ViewSuperuser.h"
-#include "D4FuncMan.h"
-
+#include "sysMan/ViewSystem.h"
+#include "display/MenuArea.h"
+#include "sysMan/ViewSuperuser.h"
+#include "imageControl/D4FuncMan.h"
 
 ScreenSaver* ScreenSaver::m_ptrInstance = NULL;
 
@@ -88,7 +87,7 @@ void ScreenSaver::Reset()
 void ScreenSaver::EnterScreenSaver()
 {
 #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode())  // 如果当前3D/4D进程在运行，则不进入屏保
+    if (D4FuncMan::GetInstance()->Get4DMode())  // 濡傛灉褰撳墠3D/4D杩涚▼鍦ㄨ繍琛岋紝鍒欎笉杩涘叆灞忎繚
     {
         return;
     }
@@ -131,11 +130,11 @@ void ScreenSaver::ExitScreenSaver()
     //if (g_d4Mode)
     {
         int count;
-        int len = 2; 
+        int len = 2;
         unsigned char keyValue[3];
 
         keyValue[0] = SCREENSAVER;
-        
+
         count = write(g_uis4d_ri.GetFifoId(), keyValue, len);
         //printf("count=%d, len=%d,keyValue=%s.\n", count, len, keyValue);
 
@@ -143,7 +142,7 @@ void ScreenSaver::ExitScreenSaver()
         {
             perror("Failed to write FIFO: ");
             return;
-        }  
+        }
     }
 #endif
 }
@@ -170,9 +169,9 @@ void ScreenSaver::BlackScreen()
     wa.background_pixel = BlackPixel(m_dpy, screen);
 
     m_win = XCreateWindow(m_dpy, root, 0, 0, DisplayWidth(m_dpy, screen), DisplayHeight(m_dpy, screen),
-			  0, DefaultDepth(m_dpy, screen), CopyFromParent, DefaultVisual(m_dpy, screen), 
+			  0, DefaultDepth(m_dpy, screen), CopyFromParent, DefaultVisual(m_dpy, screen),
 			  CWOverrideRedirect | CWBackPixel, &wa);
-    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "black", &black, &dummy); 
+    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "black", &black, &dummy);
 	 pmap = XCreateBitmapFromData(m_dpy, m_win, curs, 8, 8);
     invisible = XCreatePixmapCursor(m_dpy, pmap, pmap, &black, &black, 0, 0);
     XDefineCursor(m_dpy, m_win, invisible);
@@ -194,7 +193,7 @@ void ScreenSaver::DrawHintMessage()
 	XColor fg;
 	GC gc;
 //	char *string = "Press any key to resume!";
-	char *string = "按任意键恢复!";
+	char *string = "鎸変换鎰忛敭鎭㈠!";
 
 	screen = DefaultScreen(m_dpy);
 	gc = XCreateGC(m_dpy, m_win, 0, &gcvalue);
@@ -265,8 +264,8 @@ void ScreenSaver::DrawHintMessage()
 	int j = rand() % (DisplayHeight(m_dpy, screen)-50);
 
 	XClearWindow(m_dpy, m_win);
-	XftDrawStringUtf8 (xftDraw, &xftColor, xftFont, 
-			i < 100 ? 100 : i, 
+	XftDrawStringUtf8 (xftDraw, &xftColor, xftFont,
+			i < 100 ? 100 : i,
 			j < 50 ? 50 : j,
 			(XftChar8 *)(_(string)), strlen (_(string)));
 //	PRINTF("random num %d %d\n", i, j);
@@ -277,7 +276,7 @@ void ScreenSaver::DrawHintMessage()
 }
 
 /*
- * 屏幕调节
+ * 灞忓箷璋冭妭
  */
 void ScreenSaver::BlackScreen2()
 {
@@ -301,9 +300,9 @@ void ScreenSaver::BlackScreen2()
     wa.background_pixel = BlackPixel(m_dpy, screen);
 
     m_win = XCreateWindow(m_dpy, root, 0, 0, DisplayWidth(m_dpy, screen), DisplayHeight(m_dpy, screen),
-			  0, DefaultDepth(m_dpy, screen), CopyFromParent, DefaultVisual(m_dpy, screen), 
+			  0, DefaultDepth(m_dpy, screen), CopyFromParent, DefaultVisual(m_dpy, screen),
 			  CWOverrideRedirect | CWBackPixel, &wa);
-    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "black", &black, &dummy); 
+    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "black", &black, &dummy);
 	 pmap = XCreateBitmapFromData(m_dpy, m_win, curs, 8, 8);
     invisible = XCreatePixmapCursor(m_dpy, pmap, pmap, &black, &black, 0, 0);
     XDefineCursor(m_dpy, m_win, invisible);
@@ -315,8 +314,8 @@ void ScreenSaver::BlackScreen2()
 	Colormap colormap;
     XColor white;
 	GC gc;
-   
-    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "white", &white, &dummy); 
+
+    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "white", &white, &dummy);
 	gc = XCreateGC(m_dpy, m_win, 0, &gcvalue);
     colormap = DefaultColormap(m_dpy, screen);
     XAllocColor(m_dpy, colormap, &white);
@@ -339,15 +338,14 @@ void ScreenSaver::BlackScreen2()
     }
     //printf("display(%d, %d)\n", DisplayWidth(m_dpy, screen), DisplayHeight(m_dpy, screen));
 	XFlush(m_dpy);
-    
+
     m_state = TRUE;
 }
-
 
 void ScreenSaver::EnterScreenSaver2()
 {
 #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode())  // 如果当前3D/4D进程在运行，则不进入屏保
+    if (D4FuncMan::GetInstance()->Get4DMode())  // 濡傛灉褰撳墠3D/4D杩涚▼鍦ㄨ繍琛岋紝鍒欎笉杩涘叆灞忎繚
     {
         return;
     }
@@ -371,7 +369,6 @@ void ScreenSaver::EnterScreenSaver2()
 	}
 }
 
-
 void ScreenSaver::BlackScreen3()
 {
     char curs[] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -394,9 +391,9 @@ void ScreenSaver::BlackScreen3()
     wa.background_pixel = BlackPixel(m_dpy, screen);
 
     m_win = XCreateWindow(m_dpy, root, 0, 0, DisplayWidth(m_dpy, screen), DisplayHeight(m_dpy, screen),
-			  0, DefaultDepth(m_dpy, screen), CopyFromParent, DefaultVisual(m_dpy, screen), 
+			  0, DefaultDepth(m_dpy, screen), CopyFromParent, DefaultVisual(m_dpy, screen),
 			  CWOverrideRedirect | CWBackPixel, &wa);
-    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "black", &black, &dummy); 
+    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "black", &black, &dummy);
 	 pmap = XCreateBitmapFromData(m_dpy, m_win, curs, 8, 8);
     invisible = XCreatePixmapCursor(m_dpy, pmap, pmap, &black, &black, 0, 0);
     XDefineCursor(m_dpy, m_win, invisible);
@@ -404,13 +401,12 @@ void ScreenSaver::BlackScreen3()
     XSync(m_dpy, False);
     XFreePixmap(m_dpy, pmap);
 
-
 	XGCValues gcvalue;
 	Colormap colormap;
     XColor white;
 	GC gc;
-   
-    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "white", &white, &dummy); 
+
+    XAllocNamedColor(m_dpy, DefaultColormap(m_dpy, screen), "white", &white, &dummy);
 	gc = XCreateGC(m_dpy, m_win, 0, &gcvalue);
     colormap = DefaultColormap(m_dpy, screen);
     XAllocColor(m_dpy, colormap, &white);
@@ -418,7 +414,7 @@ void ScreenSaver::BlackScreen3()
 
     //XDrawRectangle(m_dpy, m_win, gc, 0, 0, DisplayWidth(m_dpy, screen) - 1, DisplayHeight(m_dpy, screen) - 1);
     XDrawRectangle(m_dpy, m_win, gc, 0, 0, 1023, 767);
-    
+
     int  x = 0, y = 0, width = 50;
     for(x=10; x+width<1023;)
     {
@@ -435,11 +431,10 @@ void ScreenSaver::BlackScreen3()
     m_state = TRUE;
 }
 
-
 void ScreenSaver::EnterScreenSaver3()
 {
 #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode())  // 如果当前3D/4D进程在运行，则不进入屏保
+    if (D4FuncMan::GetInstance()->Get4DMode())  // 濡傛灉褰撳墠3D/4D杩涚▼鍦ㄨ繍琛岋紝鍒欎笉杩涘叆灞忎繚
     {
         return;
     }

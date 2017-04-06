@@ -1,50 +1,49 @@
-
 #include <cups/cups.h>
-#include <iostream> 
-#include "stdlib.h"
-#include "KeyFunc.h"
-#include "Img2D.h"
-#include "ImgPw.h"
-#include "ImgCfm.h"
-#include "GlobalClassMan.h"
-#include "MeasureFactory.h"
-#include "gui_func.h"
+#include <iostream>
+#include <stdlib.h>
+#include "keyboard/KeyFunc.h"
+#include "imageControl/Img2D.h"
+#include "imageControl/ImgPw.h"
+#include "imageControl/ImgCfm.h"
+#include "imageProc/GlobalClassMan.h"
+#include "measure/MeasureFactory.h"
+#include "display/gui_func.h"
 #include "ViewMain.h"
-#include "PatientInfo.h"
-#include "ImgMan.h"
-#include "LightDef.h"
-#include "ImageArea.h"
-#include "ViewDialog.h"
-#include "Arrow.h"
-#include "NoteArea.h"
-#include "MeasureMan.h"
-#include "Knob2D.h"
-#include "KnobM.h"
-#include "KnobPw.h"
-#include "KnobCfm.h"
-#include "ImgProc2D.h"
-#include "ImgProcM.h"
-#include "ImgProcPw.h"
-#include "ImgProcCfm.h"
-#include "KnobNone.h"
-#include "SysOptions.h"
-#include "ScanMode.h"
-#include "PeripheralMan.h"
-#include "HintArea.h"
-#include "DrawHistogram.h"
-#include "MenuReview.h"
-#include "MenuBiopsy.h"
-#include "MenuCalcNew.h"
-#include "ViewNewPat.h"
-#include "Zoom.h"
-#include "ViewReport.h"
-#include "CalcSetting.h"
-#include "DCMMan.h"
-#include "SysDicomSetting.h"
-#include "ViewWorkList.h"
-#include "SysGeneralSetting.h"
-#include "ViewSystem.h"
-#include "MenuMeasure.h"
+#include "patient/PatientInfo.h"
+#include "patient/ImgMan.h"
+#include "keyboard/LightDef.h"
+#include "display/ImageArea.h"
+#include "display/ViewDialog.h"
+#include "comment/Arrow.h"
+#include "comment/NoteArea.h"
+#include "measure/MeasureMan.h"
+#include "imageControl/Knob2D.h"
+#include "imageControl/KnobM.h"
+#include "imageControl/KnobPw.h"
+#include "imageControl/KnobCfm.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ImgProcM.h"
+#include "imageProc/ImgProcPw.h"
+#include "imageProc/ImgProcCfm.h"
+#include "display/KnobNone.h"
+#include "sysMan/SysOptions.h"
+#include "imageProc/ScanMode.h"
+#include "periDevice/PeripheralMan.h"
+#include "display/HintArea.h"
+#include "measure/DrawHistogram.h"
+#include "imageProc/MenuReview.h"
+#include "probe/MenuBiopsy.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "patient/ViewNewPat.h"
+#include "imageProc/Zoom.h"
+#include "calcPeople/ViewReport.h"
+#include "sysMan/CalcSetting.h"
+#include "periDevice/DCMMan.h"
+#include "sysMan/SysDicomSetting.h"
+#include "patient/ViewWorkList.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/ViewSystem.h"
+#include "measure/MenuMeasure.h"
 
 int g_count11 = 0;
 extern bool g_calcPwStatus;
@@ -152,7 +151,7 @@ bool KeyAutoOptimize::Execute()
 		Undo();
 	}
 
-	Img2D::GetInstance()->UpdateAutoOptimize(m_autoOn);    
+	Img2D::GetInstance()->UpdateAutoOptimize(m_autoOn);
 
 	return TRUE;
 }
@@ -162,7 +161,7 @@ void KeyAutoOptimize::AutoOff(void)
 	if (m_autoOn)
 	{
 		m_autoOn = FALSE;
-		Img2D::GetInstance()->UpdateAutoOptimize(m_autoOn);       
+		Img2D::GetInstance()->UpdateAutoOptimize(m_autoOn);
 	}
 }
 
@@ -228,15 +227,15 @@ void KeyAutoOptimize::ImgOptimize(ProbeSocket::ProbePara p, ExamItem::ParaItem i
 #ifndef EMP_322
 	// init pw
 	ImgPw* ptrImgPw = ImgPw::GetInstance();
-	ptrImgPw->InitProbeOptimize(&p, &i);	
+	ptrImgPw->InitProbeOptimize(&p, &i);
 	ImgProcPw::GetInstance()->InitOptimize(&(i.spectrum));
 
 	// init cfm
 	ImgCfm* ptrImgCfm = ImgCfm::GetInstance();
-	ptrImgCfm->InitProbeOptimize(&p, &i);	
+	ptrImgCfm->InitProbeOptimize(&p, &i);
 	ImgProcCfm::GetInstance()->InitOptimize(&(i.color));
 #endif
-	// 如果是M模式，则需要重新计算M增益，因为在PW InitProbeOptimize中PW增益覆盖了M增益
+	// 濡傛灉鏄疢妯″紡锛屽垯闇€瑕侀噸鏂拌绠桵澧炵泭锛屽洜涓哄湪PW InitProbeOptimize涓璓W澧炵泭瑕嗙洊浜哅澧炵泭
 	if (ModeStatus::IsMImgMode())
 	{
 		ptrImg2D->ReSendGainM();
@@ -291,7 +290,6 @@ void KeyAutoOptimize::BackupPara()
 #endif
 }
 
-
 ////////////////////////////////////////// [measure] //////////////////////////////////////
 bool KeyMeasure::Execute()
 {
@@ -331,7 +329,7 @@ bool KeyMeasure::Execute()
                 g_ptrAbsMeasure = NULL;
             }
 			//SetChangePointerMeasure();
-			m_ptrUpdate->EnterMeasure();  
+			m_ptrUpdate->EnterMeasure();
             //DarkFucusLight();
 #if defined (EMP_322)
             MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
@@ -363,7 +361,7 @@ bool KeyCalc::Execute()
 	}
 	else
 	{
-		if (g_menuReview.GetLimit() != 0) //note: pic read from archived and usb media can not calc 
+		if (g_menuReview.GetLimit() != 0) //note: pic read from archived and usb media can not calc
 		{
 			HintArea::GetInstance()->UpdateHint(_("[Calc]: Calc is disable in current image."), 2);
 		}
@@ -393,7 +391,7 @@ bool KeyCalc::Execute()
 ////////////////////////////////////////// [System] //////////////////////////////////////
 bool KeySystem::Execute(void)
 {
-#if 0   
+#if 0
     int i;
                 for (i = 0; i < 2000; i++)
                 {
@@ -433,13 +431,13 @@ bool KeySystem::Execute(void)
 bool KeyCursor::Execute()
 {
     MultiFuncFactory* ptr = MultiFuncFactory::GetInstance();
-    MultiFuncFactory::EMultiFunc type = ptr->GetMultiFuncType(); 
+    MultiFuncFactory::EMultiFunc type = ptr->GetMultiFuncType();
 
     if ((type != MultiFuncFactory::EFOV) && (type != MultiFuncFactory::NONE))
     {
        // ptr->Create(MultiFuncFactory::NONE);
 	   //---------2016.08.26--huyang---------------//
-		if(type== MultiFuncFactory::BIOPSY_VERIFY)  
+		if(type== MultiFuncFactory::BIOPSY_VERIFY)
 	   {
 		   ptr->Create(MultiFuncFactory::BIOPSY);
 		   SetSystemCursor(90,130);//	SetSystemCursor(90,100);
@@ -450,17 +448,17 @@ bool KeyCursor::Execute()
 	   }
 	   else
 	   {
-		   	if(type== MultiFuncFactory::BIOPSY)  
+		   	if(type== MultiFuncFactory::BIOPSY)
 		   {
                //---------------------------------//
           	   if(MenuArea::GetInstance()->GetMenuType()==MenuArea::BIOPSYVERIFY)
 	           {
-                  SetSystemCursor(90,155);//SetSystemCursor(90,130);//	
+                  SetSystemCursor(90,155);//SetSystemCursor(90,130);//
                   doBtnEvent(1, 1);//fake btn press
  	              doBtnEvent(1, 0);
 	           }
                //---------------------------------//
-				MultiFuncUndo();	   
+				MultiFuncUndo();
 		   }
 		   else
 		   {
@@ -470,10 +468,9 @@ bool KeyCursor::Execute()
 	   //--------------------------------------------------//
     }
 	else
-	{ 
+	{
 		MultiFuncUndo();
 	}
-
 
 	return TRUE;
 }
@@ -618,11 +615,11 @@ static gboolean DelayToSaveSnap(gpointer data)
 		g_menuReview.UpdateLabel();
 	}
 
-#if 0 
+#if 0
 	// update review menu
 	MenuArea* ptrMenu = MenuArea::GetInstance();
 	if (ptrMenu->GetMenuType() == MenuArea::REVIEW)
-		ptrMenu->ShowReviewMenu();    
+		ptrMenu->ShowReviewMenu();
 #endif
 
 	return FALSE;
@@ -633,7 +630,7 @@ static int SaveSnap(gpointer data)
 	//	PRINTF("SaveSnap file name: %s\n", (char*)data);
 
 	HintArea::GetInstance()->UpdateHint(_("Saving..."), 0);
-	
+
 	if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW)
 	{
 		g_menuReview.HideTooltips();
@@ -697,8 +694,8 @@ bool KeyReview::Execute()
 #if (defined (EMP_322) || defined(EMP_313))
 		g_keyInterface.CtrlLight(FALSE,LIGHT_READ);
 #endif
-	}	
-	else 
+	}
+	else
 	{
 		// freeze
 		if (!ModeStatus::IsFreezeMode())
@@ -708,7 +705,7 @@ bool KeyReview::Execute()
 		m_menuRead = TRUE; // must after ShowReviewMenu(HideAllMenu), be care of "HideMenuReview"
 #if (defined (EMP_322) || defined(EMP_313))
 		g_keyInterface.CtrlLight(TRUE,LIGHT_READ);
-#endif		
+#endif
 	}
 
 	return TRUE;
@@ -732,7 +729,7 @@ void KeyReview::ExitMenuReivew()
 		g_keyInterface.CtrlLight(m_menuRead,LIGHT_READ);
 #endif
 
-	}	
+	}
 }
 
 void KeyReview::SetDefaultIDAndPath()
@@ -789,7 +786,7 @@ bool KeyLocalZoom::Execute()
 {
     if (ExitLocalZoom())
     {
-        return TRUE; 
+        return TRUE;
 
     }
 
@@ -895,7 +892,6 @@ bool KeyLocalZoom::ExitLocalZoom()
         //redraw biopsyline
         g_menuBiopsy.UpdateBiopsyLine();
 
-
 		// redraw line according to mode
 		if ((flag == 1) || (flag == 3))
 			ImgCfm::GetInstance()->ReDrawBox();
@@ -955,8 +951,8 @@ void KeyDepth::DepthExe(EKnobOper oper)
 {
 	ModeStatus s;
 	int flag = 0;
-    ScanMode::EScanMode mode = ScanMode::GetInstance()->GetScanMode();	
-	
+    ScanMode::EScanMode mode = ScanMode::GetInstance()->GetScanMode();
+
 	if (s.IsColorMode())
 		flag = 1;
 	else if (s.IsSpectrumMode())
@@ -980,7 +976,6 @@ void KeyDepth::DepthExe(EKnobOper oper)
     g_menuBiopsy.ClearBiopsyLine();
     //prepare
     ImgCfm::GetInstance()->ChangeDepthBefore();
-
 
     //apply
     if (Img2D::GetInstance()->ChangeDepth(oper) != ERROR)
@@ -1023,7 +1018,7 @@ bool KeyDepth::Execute()
 		MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::DEPTH);
 	}
 
-	return TRUE;    
+	return TRUE;
 }
 
 ////////////////////////////////////////// [freq.] //////////////////////////////////////
@@ -1107,7 +1102,7 @@ bool KeyClearScreen::Execute()
     // if or not freeze
 	if (!ModeStatus::IsUnFreezeMode())
 	{
-		Replay::GetInstance()->DisplayReplayBar();		
+		Replay::GetInstance()->DisplayReplayBar();
 	}
 
 	return TRUE;
@@ -1134,7 +1129,7 @@ bool KeyClearScreen::UnFreezeExecute(bool update)
     // if or not freeze
 	if (!ModeStatus::IsUnFreezeMode())
 	{
-		Replay::GetInstance()->DisplayReplayBar();		
+		Replay::GetInstance()->DisplayReplayBar();
 	}
 
 	return TRUE;
@@ -1273,19 +1268,19 @@ int EndExam(gpointer data)
 		g_patientInfo.ClearAll();
         // clear desctiption and comment
         ViewReport::GetInstance()->ClearIndicationandComments();
-        //clear screen 
+        //clear screen
         KeyClearScreen kcs;
         kcs.Execute();
 
 		// update review menu
 		MenuArea* ptrMenu = MenuArea::GetInstance();
 		if (ptrMenu->GetMenuType() == MenuArea::REVIEW)
-			ptrMenu->ShowReviewMenu();    
+			ptrMenu->ShowReviewMenu();
 
 		if (GTK_IS_WIDGET(ViewNewPat::GetInstance()->GetWindow())) {
 			if (ViewNewPat::GetInstance()->GetClearStatus())
 				ViewNewPat::GetInstance()->ClearData();
-			else 
+			else
 				ViewNewPat::GetInstance()->ClearExamData();
 		}
 #ifndef VET
@@ -1301,11 +1296,11 @@ int EndExam(gpointer data)
                     GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
 
                     string year, mon, day, studyEndDate;
-                    ChangeDateFormatToString(Year, Month, Day, year, mon, day); 
+                    ChangeDateFormatToString(Year, Month, Day, year, mon, day);
                     studyEndDate = year+mon+day;
 
                     string hour, min, sec, studyEndTime;
-                    ChangeTimeFormatToString(Hour, Minute, Second, hour, min, sec); 
+                    ChangeTimeFormatToString(Hour, Minute, Second, hour, min, sec);
                     studyEndTime = hour + min + sec;
 
                     CDCMMan::GetMe()->EndMPPS(studyEndDate,studyEndTime);
@@ -1362,7 +1357,7 @@ int EndExam(gpointer data)
 
         if (GTK_IS_WIDGET(ViewNewPat::GetInstance()->GetWindow())) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), ViewDialog::ERROR, _(errmsg.c_str()), NULL);
-        } 
+        }
         else {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), ViewDialog::ERROR, _(errmsg.c_str()), OpenNewPatWindow, OpenNewPatWindow);
         }
@@ -1383,10 +1378,10 @@ bool KeyEndExam::Execute()
 bool KeyCenterLine::Execute()
 {
 	ModeStatus ms;
-	if (((ms.GetScanMode() == ScanMode::D2) && (ms.GetFormat2D() == Format2D::B)) 
+	if (((ms.GetScanMode() == ScanMode::D2) && (ms.GetFormat2D() == Format2D::B))
 			|| (((ms.GetScanMode() == ScanMode::CFM) || (ms.GetScanMode() == ScanMode::PDI)) && (ms.GetFormatCfm() == FormatCfm::B))
-            || (ms.GetScanMode() == ScanMode::PWCFM_INIT) //solve that the center line is cleaned int pwcmf_init mode. lhm 
-            || (ms.GetScanMode() == ScanMode::PW_INIT))//solve that the center line is cleaned int pw_init mode. lhm 
+            || (ms.GetScanMode() == ScanMode::PWCFM_INIT) //solve that the center line is cleaned int pwcmf_init mode. lhm
+            || (ms.GetScanMode() == ScanMode::PW_INIT))//solve that the center line is cleaned int pw_init mode. lhm
 	{
         SysOptions sys;
         ImageAreaDraw::GetInstance()->ClearCenterLine();
@@ -1408,7 +1403,7 @@ void KeyCenterLine::Clear()
 	ModeStatus ms;
 	SysOptions sys;
 
-	if (((ms.GetScanMode() == ScanMode::D2) && (ms.GetFormat2D() == Format2D::B)) 
+	if (((ms.GetScanMode() == ScanMode::D2) && (ms.GetFormat2D() == Format2D::B))
 			|| (((ms.GetScanMode() == ScanMode::CFM) || (ms.GetScanMode() == ScanMode::PDI)) && (ms.GetFormatCfm() == FormatCfm::B))) {
 		//if (sys.GetCenterLine() == 0)
 	    //	ImageAreaDraw::GetInstance()->ClearCenterLine();
@@ -1472,4 +1467,3 @@ void DarkFucusLight()
 	g_keyInterface.CtrlLight(FALSE,LIGHT_READ);
 #endif
 }
-

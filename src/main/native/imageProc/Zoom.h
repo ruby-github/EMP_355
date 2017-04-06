@@ -1,10 +1,10 @@
 #ifndef ZOOM_H
 #define ZOOM_H
 
-#include "DSCTypes.h"
-#include "DSC.h"
+#include <DSCTypes.h>
+#include <DSC.h>
 #include "AbsUpdate2D.h"
-#include  "DscMan.h"
+#include "imageProc/DscMan.h"
 
 class Zoom
 {
@@ -33,7 +33,7 @@ class Zoom
         bool ReSendLocalZoomInfo(void);
         bool GetLocalZoomStatus(void);
         void GetScanLineRange(int lineRange[2]);
-        void GetScanDotRange(int dotRange[2]); ///<相对于未放大前的图像位置
+        void GetScanDotRange(int dotRange[2]); ///<鐩稿浜庢湭鏀惧ぇ鍓嶇殑鍥惧儚浣嶇疆
         int GetScanDotBeginDepth(void);
         void GetLocalZoomScale(double &scale); ///<局部放大本身的倍率。
 		void ClearLocalZoom();
@@ -66,13 +66,13 @@ class Zoom
 		bool m_PIPCtrl;
 		int m_PIPScale;
 		POINT m_PIPPos;
-		
+
 		bool m_localCtrl;
 		int m_localLineBegin;
 		int m_localLineEnd;
 		int m_localDotBegin;
 		int m_localDotEnd;
-        double m_localScale;        
+        double m_localScale;
         guint m_timeout;
 
 		void SetGlobalInfo(POINT p, int scaleIndex);

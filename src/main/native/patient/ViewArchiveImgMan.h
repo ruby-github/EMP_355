@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <string>
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 #include "Def.h"
-#include "VideoMan.h"
+#include "patient/VideoMan.h"
 
 using std::vector;
 using std::string;
@@ -109,7 +109,7 @@ class ViewArchiveImgMan: public FakeXEvent
         GtkWidget *m_radiobutton_orignial;
         GtkWidget *m_scrolledwindow_auto;
         GtkWidget *m_scrolledwindow_orignial;
-		
+
 		GdkPixbuf *m_imgPixbuf;
 		GdkPixbuf *m_cinePixbuf;
 		unsigned char m_imgData[IMG_WIDTH * IMG_HEIGHT * 3];
@@ -139,7 +139,6 @@ class ViewArchiveImgMan: public FakeXEvent
 		bool m_statusReplay;
         int   m_reportNum;
         char m_archivePath[256];
-
 
 		void InitParameter(vector<string> examID, const char *selected);
 		GtkWidget* CreateReportArea(GtkWidget *fixed);
@@ -205,17 +204,17 @@ class ViewArchiveImgMan: public FakeXEvent
 		static void HandleComboTypeClicked(GtkComboBox *combobox, ViewArchiveImgMan* data) { data->ComboTypeClicked(combobox); }
 		static void HandleBtnReplayClicked(GtkButton *button, ViewArchiveImgMan* data) { data->BtnReplayClicked(button); }
 		static void HandleBtnPrintClicked(GtkButton *button, ViewArchiveImgMan* data) { data->BtnPrintClicked(button); }
-		static gboolean HandleDrawAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, ViewArchiveImgMan *data) 
+		static gboolean HandleDrawAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, ViewArchiveImgMan *data)
 		{
 			data->DrawAreaConfigure(widget, event);
 			return FALSE;
 		}
-		static gboolean HandleDrawAreaExpose(GtkWidget *widget, GdkEventExpose *event, ViewArchiveImgMan *data) 
+		static gboolean HandleDrawAreaExpose(GtkWidget *widget, GdkEventExpose *event, ViewArchiveImgMan *data)
 		{
 			data->DrawAreaExpose(widget, event);
 			return FALSE;
 		}
-        
+
         static void on_auto_radio_button_toggled(GtkToggleButton *togglebutton, ViewArchiveImgMan *data) { data->AutoRadioToggled(togglebutton); }
         static void on_orignial_radio_button_toggled(GtkToggleButton *togglebutton, ViewArchiveImgMan *data) { data->OrignialRadioToggled(togglebutton); }
         void AutoRadioToggled(GtkToggleButton *togglebutton);

@@ -9,18 +9,16 @@
  * date: 2012-7-10
  */
 
-
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-#include "CDrawIMT.h"
-#include "IMT.h"
+#include "measure/CDrawIMT.h"
+#include <IMT.h>
 #include "display/HintArea.h"
 #include "imageProc/ModeStatus.h"
 #include "imageProc/FreezeMode.h"
 
  using namespace std;
-
 
 CIMT *m_ptrImt = CIMT::GetInstance();
 
@@ -243,12 +241,12 @@ void CDrawIMT::UpdateIMT(void)
     imt_para.imt_min = 0.0;		        // IMT MIN
     imt_para.imt_std = 0.0;	           // IMT 标准差
     imt_para.imt_mean = 0.0;		  // IMT 平均值
-    imt_para.imt_length = 0.0;	     // IMT 测量长度
-    imt_para.imt_quality = 0.0;	 	// IMT 品质因子
+    imt_para.imt_length = 0.0;	     // IMT 娴嬮噺闀垮害
+    imt_para.imt_quality = 0.0;	 	// IMT 鍝佽川鍥犲瓙
 
      CIMT::GetInstance()->AnalyseData(imt_para, pRoi, pRoiPre, pIntima, pAdventitia, roi_w);
 
-    //显示结果
+    //鏄剧ず缁撴灉
     m_update.IMTResult(imt_para, m_attr, true);
 
 }
@@ -271,7 +269,6 @@ void CDrawIMT::ClearInAdventIMT(void)
         m_draw.DrawIMTAdvent(m_area_start, pAdventitia, roi_w*roi_h, FALSE);
     }
 }
-
 
 /**
  * function description: get up and down status
@@ -319,5 +316,3 @@ void CDrawIMT::SetInAdventIMTMem(void)
     pAdventitia = new unsigned int [roi_w*roi_h];
     memset(pAdventitia, 0, roi_w*roi_h*sizeof(unsigned int));
 }
-
-

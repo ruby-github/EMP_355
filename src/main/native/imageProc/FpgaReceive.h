@@ -1,18 +1,17 @@
 #ifndef __FPGARECEIVE_H__
 #define __FPGARECEIVE_H__
 
-#include "DefHal.h"
-#include "UsbControl.h"
+#include "imageControl/DefHal.h"
+#include "imageControl/UsbControl.h"
 #include "AbsFpgaReceive.h"
-#include "DSC.h"
-#include "ImgPw.h"
-#include "PcieControl.h"
+#include <DSC.h>
+#include "imageControl/ImgPw.h"
+#include "imageControl/PcieControl.h"
 
 class ScanMode;//declare class scanmode, 前置声明，用于定义指针。
 class FpgaReceive:public AbsFpgaReceive
 {
 	public:
-
 
 	/**
 	* @brief service routine only used to receive data from usb device
@@ -24,7 +23,7 @@ class FpgaReceive:public AbsFpgaReceive
 	void SetDsc(CDSC *ptrDsc);
 
 	private:
-#ifdef EMP_460		
+#ifdef EMP_460
 	static PcieControl* m_ptrUsb;
 #else
 	static EzUsb* m_ptrUsb;
@@ -39,7 +38,7 @@ class FpgaReceive:public AbsFpgaReceive
 	void DataM(unsigned char *data, int line);
 	unsigned char m_cfmData[160*3];
 	void InitDataCfm();
-    
+
 	CalcPw* m_ptrCalc;
 
 };

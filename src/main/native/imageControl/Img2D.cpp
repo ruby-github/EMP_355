@@ -8,19 +8,19 @@
  * date: 2009-5-9
  * @author: zhanglei
  */
-#include "SysGeneralSetting.h"
-#include "Img2D.h"
-#include "ImgPw.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "imageControl/Img2D.h"
+#include "imageControl/ImgPw.h"
 #include "Def.h"
-#include "ModeStatus.h"
-#include "GlobalClassMan.h"
-#include "BDSC.h"
-#include "HintArea.h"
-#include "../imageProc/Zoom.h"
-#include "../imageProc/DscMan.h"
-#include "unistd.h"
+#include "imageProc/ModeStatus.h"
+#include "imageProc/GlobalClassMan.h"
+#include <BDSC.h>
+#include "display/HintArea.h"
+#include "imageProc/Zoom.h"
+#include "imageProc/DscMan.h"
+#include <unistd.h>
 #include "ViewMain.h"
-#include "IoCtrl.h"
+#include "periDevice/IoCtrl.h"
 ///> /////////////////////////////////[static const]////////////////////////////
 
 ///> focus
@@ -28,12 +28,12 @@ const int Img2D::FOC_DEPTH = 220; ///< value to calc focus position percent.
 const int Img2D::FOC_POS_INDEX_MAX[MAX_FOCUS] = {18, 11, 8, 6};
 
 const unsigned char Img2D::ONE_FOC_POS[18][1] =
-{	
+{
 	{5},{10},{20},{30},{40},{50},{60},{70},{80},
 	{90},{100},{110},{120},{130},{140},{150},{160},{170}
 //    {90},{100},{110},{120},{130},{145},{160},{180},{200}
 };
-const unsigned char Img2D::TWO_FOC_POS[11][2] = 
+const unsigned char Img2D::TWO_FOC_POS[11][2] =
 {
 	{5,20},{10,20},{20,30},{30,40},{40,60},{50,70},
 	{60,90},{70,100},{80,120},{90,140},{100,170}
@@ -49,7 +49,7 @@ const unsigned char Img2D::FOUR_FOC_POS[6][4] =
 	{30,40,60,90},{40,60,90,140},{50,70,100,170}
 };
 
-///> image scale of depth 
+///> image scale of depth
 const int Img2D::IMG_SCALE[MAX_SCALE_INDEX] = {10, 11, 12, 14, 15, 17, 18, 20, 22, 23, 25, 27, 29, 30, 32, 33, 35, 37, 39, 40, 42, 45, 47, 50};
 //const int Img2D::IMG_SCALE[MAX_SCALE_INDEX] = {10, 12, 15, 18, 20, 23, 26, 30, 33, 36, 40, 8};
 const int Img2D::DYNAMIC_DATA_D[Calc2D::MAX_DYNAMIC_INDEX] = {30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160};
@@ -60,7 +60,7 @@ const int Img2D::MBP[MAX_MBP_INDEX] = {1, 2, 4};
 const int Img2D::FPGAMBP2D[MAX_LINE_DENSITY][MAX_MBP_INDEX] = {{2, 2, 4}, {1, 2, 2}};
 const int Img2D::FPGAMBPPw[MAX_LINE_DENSITY][MAX_MBP_INDEX] = {{1, 1, 1}, {1, 1, 1}};
 const int Img2D::FPGAMBPColor[MAX_LINE_DENSITY][MAX_MBP_INDEX] = {{4, 6, 6}, {2, 4, 6}};
-const string Img2D::TSI_DISPLAY[MAX_TSI] = {N_("Routine"), N_("Muscle"), N_("Liquid"), N_("Fat")}; 
+const string Img2D::TSI_DISPLAY[MAX_TSI] = {N_("Routine"), N_("Muscle"), N_("Liquid"), N_("Fat")};
 const string Img2D::LINE_DENSITY_DISPLAY[MAX_LINE_DENSITY] = {N_("Low"), N_("High")};
 //const int Img2D::SPACE_COMPOUND_ANGLE[MAX_SPACE_COMPOUND] = {0, 4, 7, 10}; //degree //解决深度调节到最大时第3级出现黑色三角形的问题
 const int Img2D::SPACE_COMPOUND_ANGLE[MAX_SPACE_COMPOUND] = {0, 3, 5, 8}; //degree
@@ -102,51 +102,51 @@ Img2D::Img2D()
 	m_ptrUpdate = ptrGcm->GetUpdate2D();
 
 	DscMan* ptrDscMan = DscMan::GetInstance();
-	m_ptrDscPara = ptrDscMan->GetDscPara();	
+	m_ptrDscPara = ptrDscMan->GetDscPara();
 
 	//m_ptrImgDraw = ImageAreaDraw::GetInstance();
 
 	m_ptrDsc = NULL;
 	m_ptrCalc = NULL;
     m_type = 'c';
-	m_ctGain2D.Begin();	
-	m_ctGainM.Begin();	
+	m_ctGain2D.Begin();
+	m_ctGainM.Begin();
 	m_tGain2D = m_tGainM = 0;
 
 	m_ctDepth.Begin();
 	m_tDepth = 0;
 	m_stepDepth = 0;
 
-	///> 2D mode 
+	///> 2D mode
 	int i;
-	for (i = 0; i < 8; i ++) 
+	for (i = 0; i < 8; i ++)
 		m_tgc[i] = 128;
 	m_gain2D = 98;
 	m_gainM = 100;
 	m_lines = 255;
 	m_freqRange[0] = 0;
-	m_freqRange[1] = 255; 
+	m_freqRange[1] = 255;
 	m_vecFreqRange.clear();
 	m_freqIndex = 0;
-	m_freq.emit = 70; 
-	m_freq.receive = 70; 
-	m_depthMax = 250; 
-	m_depth = 250; 
-	m_imgScaleIndex = 0; 
-	m_focSum = 1; 
-	m_focPosIndex = 0; 
+	m_freq.emit = 70;
+	m_freq.receive = 70;
+	m_depthMax = 250;
+	m_depth = 250;
+	m_imgScaleIndex = 0;
+	m_focSum = 1;
+	m_focPosIndex = 0;
 	for (i = 0; i < MAX_FOCUS; i ++)
 	{
 		m_focPos[i] = 0;
 	}
-	m_scanAngleIndex = 0; 
-	m_dynamicRangeIndex = 7; 
-	m_lineDensityIndex = 0; 
-	m_lineDensityIndexBak = 0; 
+	m_scanAngleIndex = 0;
+	m_dynamicRangeIndex = 7;
+	m_lineDensityIndex = 0;
+	m_lineDensityIndexBak = 0;
 	m_edgeEnhanceIndex = 0;
 	m_soundPowerIndex = 8;
-	m_harmonic = FALSE; 
-	m_tsiIndex = 0; ///< 常规
+	m_harmonic = FALSE;
+	m_tsiIndex = 0; ///< 甯歌
 	m_mbpIndex = 0;
 	m_mbpIndexBak = 0;
 	m_agcIndex = 0;
@@ -154,13 +154,13 @@ Img2D::Img2D()
     m_steerIndexbak = 3;
 
 	///> M mode
-	m_mLine = 0; 
-	m_mSpeedIndex = 0; 
+	m_mLine = 0;
+	m_mSpeedIndex = 0;
 
 	for (i = 0; i < 4; i ++)
 	{
 		m_scale2D[i] = 1.0;
-        m_scale2DZoom[i] = 1.0;    
+        m_scale2DZoom[i] = 1.0;
 	}
 
 	//efov
@@ -208,10 +208,10 @@ Img2D::~Img2D()
 
 void Img2D::SetCalc2D(Calc2D* calc)
 {
-	m_ptrCalc = calc; 
+	m_ptrCalc = calc;
 
 	m_calcPara.depthDots = IMG_H * Calc2D::INIT_SCALE;
-	m_calcPara.imgScaleIndexMax = MAX_SCALE_INDEX; 
+	m_calcPara.imgScaleIndexMax = MAX_SCALE_INDEX;
 	m_calcPara.angleIndexMax = MAX_ANGLE;
 	m_calcPara.soundSpeed = SOUND_SPEED;
 	m_calcPara.soundSpeedTsi = SOUND_SPEED;
@@ -222,7 +222,7 @@ void Img2D::SetCalc2D(Calc2D* calc)
     m_calcPara.efviCtrl = FALSE;
     m_calcPara.tpSteer = 0.0;
     m_calcPara.focSum = 1;
- 
+
     PRINTF("setcalc2D width = %d\n", m_calcPara.probeWidth);
 	m_calcPara.modeCw = FALSE;
 
@@ -230,7 +230,7 @@ void Img2D::SetCalc2D(Calc2D* calc)
 }
 
 /*
- * @brief call when probe or exam item is changed. Read probe para from class ProbeMan and 
+ * @brief call when probe or exam item is changed. Read probe para from class ProbeMan and
  *  read imging para from class ExamItem.
  *
  * @para ptrMan pointer pointed to class ProbeMan object
@@ -264,9 +264,9 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	else
 		ret = OK;
 	m_ptrUpdate->Freq(m_freq.receive, ret);
-    
+
     //sound power
-    m_soundPowerIndex = ptrParaItem->common.powerIndex;	
+    m_soundPowerIndex = ptrParaItem->common.powerIndex;
 #ifdef EMP_340
     if(!strcmp(ptrPara->model, "10L25J"))
     {
@@ -296,11 +296,11 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	// tgc
 	m_gain2D = ptrParaItem->d2.gain2D;
 	m_ptrUpdate->Gain2D(m_gain2D);
-	
+
 	// focus info
-	m_focSum = ptrParaItem->d2.focSum;	
+	m_focSum = ptrParaItem->d2.focSum;
 	m_calcPara.focSum = m_focSum;
-	m_focPosIndex = ptrParaItem->d2.focPosIndex;	
+	m_focPosIndex = ptrParaItem->d2.focPosIndex;
 	GetFocPos();
 	for (i = 0; i < MAX_FOCUS; i ++)
 	{
@@ -308,8 +308,8 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	}
 	m_ptrUpdate->FocInfo(m_focSum, m_focPos);
 
-    // scan angle,角度实际值需计算后才知道，因此在完成计算后显示。 
-    m_scanAngleIndex = ptrParaItem->d2.scanAngle;	
+    // scan angle,角度实际值需计算后才知道，因此在完成计算后显示。
+    m_scanAngleIndex = ptrParaItem->d2.scanAngle;
     if(m_scanAngleIndex <= 0)
         m_scanAngleIndex = 0;
     else if(m_scanAngleIndex >= (MAX_ANGLE -1))
@@ -318,7 +318,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
     m_calcPara.angleIndex = m_scanAngleIndex;
 
 	// dynamicRange
-	m_dynamicRangeIndex = ptrParaItem->d2.dynamicRange;	
+	m_dynamicRangeIndex = ptrParaItem->d2.dynamicRange;
 	if (m_dynamicRangeIndex == 0)
 		ret = MIN;
 	else if (m_dynamicRangeIndex == (Calc2D::MAX_DYNAMIC_INDEX - 1))
@@ -328,7 +328,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	m_ptrUpdate->DynamicRange(DYNAMIC_DATA_D[m_dynamicRangeIndex], ret);
 
 	// Line density
-	m_lineDensityIndex = ptrParaItem->d2.lineDensity;	
+	m_lineDensityIndex = ptrParaItem->d2.lineDensity;
 	m_calcPara.lineDensity = m_lineDensityIndex;
 	if (m_lineDensityIndex == 0)
 		ret = MIN;
@@ -339,7 +339,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	m_ptrUpdate->LineDensity(LINE_DENSITY_DISPLAY[m_lineDensityIndex].c_str(), ret);
 
     ///MBP
-    m_mbpIndex = ptrParaItem->common.MBP;	
+    m_mbpIndex = ptrParaItem->common.MBP;
     if (m_mbpIndex == 0)
         ret = MIN;
     else if (m_mbpIndex == (MAX_MBP_INDEX - 1))
@@ -357,7 +357,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 		ret = MIN;
 	else if (m_edgeEnhanceIndex == (MAX_EDGE - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 	m_ptrUpdate->EdgeEnhance(m_edgeEnhanceIndex, ret);
 
@@ -380,7 +380,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
     m_harmonic = ptrParaItem->d2.harmonic;
     m_calcPara.harmonic = m_harmonic;
     m_statusTHI = m_harmonic;
-    //status 
+    //status
     m_ptrUpdate->HarmonicStatus(m_harmonic, ret);
 
     if (!m_harmonic)
@@ -409,11 +409,11 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
     }
     else
         ret = OK;
-    
+
     ProbeSocket::ProbePara para;
     ProbeMan::GetInstance()->GetCurProbe(para);
-    for (i = 0; i < NUM_PROBE; i++) 
-    { 
+    for (i = 0; i < NUM_PROBE; i++)
+    {
         if(strcmp(para.model, PROBE_LIST[i].c_str()) == 0)
             m_curProbeIndex = i;
     }
@@ -425,7 +425,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 
         m_calcPara.freq.emit = m_freq.emit;
         m_calcPara.freq.receive = m_freq.receive;
-        
+
         //value
         m_ptrUpdate->HarmonicFreq(m_thiFreq[m_harmonicFreqIndex], ret);
     }
@@ -448,7 +448,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
     m_fc03 = float((ProbeSocket::BAND_PASS_FILTER_FC1[m_curProbeIndex][m_harmonicFreqIndex][2] + ProbeSocket::BAND_PASS_FILTER_FC2[m_curProbeIndex][m_harmonicFreqIndex][2]) / 20.0);
     m_fc04 = float((ProbeSocket::BAND_PASS_FILTER_FC1[m_curProbeIndex][m_harmonicFreqIndex][3] + ProbeSocket::BAND_PASS_FILTER_FC2[m_curProbeIndex][m_harmonicFreqIndex][3]) / 20.0);
     m_fc05 = float((ProbeSocket::BAND_PASS_FILTER_FC1[m_curProbeIndex][m_harmonicFreqIndex][4] + ProbeSocket::BAND_PASS_FILTER_FC2[m_curProbeIndex][m_harmonicFreqIndex][4]) / 20.0);
-#else 
+#else
     m_fc01 = float(ProbeSocket::BAND_PASS_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][0] / 10.0);
     m_fc02 = float(ProbeSocket::BAND_PASS_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][1] / 10.0);
     m_fc03 = float(ProbeSocket::BAND_PASS_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][2] / 10.0);
@@ -467,7 +467,6 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
         DefaultIndexBandPassFilter(m_curProbeIndex, m_harmonicFreqIndex);
     else
         DefaultIndexBandPassFilterBaseFreq(m_curProbeIndex, m_freqIndex);
-
 
     // tsi
     m_tsiIndex = ptrParaItem->d2.TSI;
@@ -506,7 +505,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
     SetCompoundFreq(m_freqCompoundCtrl);
 
     if(m_freqCompoundCtrl)
-        m_freqCompoundIndex=1; 
+        m_freqCompoundIndex=1;
     else
         m_freqCompoundIndex=0;
 
@@ -518,7 +517,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	m_steerIndexbak = ptrParaItem->d2.steerIndex; // index = 3, angle = 0;
 
     // if (m_steerIndex != 3)
-    if(m_spaceCompoundIndex != 0) 
+    if(m_spaceCompoundIndex != 0)
         m_steerIndex = 3; //开启了空间复合不允许偏转
     m_calcPara.steerAngle = STEER_ANGLE[m_steerIndex];
 
@@ -529,7 +528,6 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
 	else
 		ret = OK;
 	m_ptrUpdate->Steer(STEER_ANGLE[m_steerIndex], ret);
-
 
     // Tp-view
     m_tpViewIndex = 0;
@@ -562,9 +560,9 @@ void Img2D::InitProbe2D(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptr
 
 	PRINTF("begin init 2D\n");
 	int dots = IMG_H * Calc2D::INIT_SCALE;
-	m_calcPara.depthDots = dots;	
+	m_calcPara.depthDots = dots;
 	m_ptrDscPara->dcaSamplePoints = dots;
-	
+
 	///> set dsc para
 	m_ptrDscPara->dcaProbeWidth = ptrPara->width;
 	m_ptrDscPara->dcaProbeR = ptrPara->r;
@@ -587,7 +585,7 @@ void Img2D::InitProbe2D(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptr
 	//m_ptrUpdate->ProbePara(ptrPara->type, ptrPara->lines, ptrPara->width, ptrPara->r);
 
 	///> set class member参数初始化一部分来自读取的探头参数，一部分来自于用户选择的检查项目
-	m_freqRange[0] = ptrPara->freqRange[0]; 	
+	m_freqRange[0] = ptrPara->freqRange[0];
 	m_freqRange[1] = ptrPara->freqRange[1];
 	m_vecFreqRange = ptrPara->vecFreqRange;
 
@@ -620,11 +618,11 @@ void Img2D::InitProbe2D(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptr
         m_calcPara.probeLines = ptrPara->lines;
     }
         EKnobReturn ret = OK;
-        if (m_indexScanLines == 0) 
+        if (m_indexScanLines == 0)
             ret = MIN;
         else if (m_indexScanLines == (MAX_SCAN_LINES - 1))
             ret = MAX;
-        else 
+        else
             ret = OK;
 	///> draw
 	m_ptrUpdate->ScanLines(m_indexScanLines, ret);
@@ -636,7 +634,7 @@ void Img2D::InitProbe2D(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptr
 	m_calcPara.probeR = ptrPara->r;
 	m_calcPara.probeWidthPhase = ptrPara->widthPhase;
 	m_calcPara.depthMax = ptrPara->depth;
-    
+
     //set extendedAngle
 #ifdef EMP_355
     m_calcPara.extendedAngle = ptrPara->width + 1800;//1000;//8800  为了解决在腔体探头下打开EFVI功能时角度变成和凸阵探头的角度一样的问题。改成了在原来的物理宽度上加上18；不超过180即可。
@@ -685,31 +683,31 @@ void Img2D::InitProbeM(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptrP
 	m_calcPara.mSpeedIndex = m_mSpeedIndex;
 	m_ptrCalc->CalcMSpeed(); // used for update MSpeed
 	m_ptrUpdate->MSpeed(m_mSpeedIndex, MIN);
-	
-    InitProbeMOptimizePara(ptrPara, ptrParaItem);	
+
+    InitProbeMOptimizePara(ptrPara, ptrParaItem);
 	InitProbeCalcM();
 }
 
 void Img2D::GetCurPara(ExamItem::ParaItem* ptrParaItem)
 {
-	ptrParaItem->common.MBP = m_mbpIndex;	
-	ptrParaItem->common.powerIndex = m_soundPowerIndex;	
+	ptrParaItem->common.MBP = m_mbpIndex;
+	ptrParaItem->common.powerIndex = m_soundPowerIndex;
 	ptrParaItem->d2.freqIndex = m_freqIndex;
-	ptrParaItem->d2.imgScale = m_imgScaleIndex;	
-	ptrParaItem->d2.gain2D = m_gain2D;	
-	ptrParaItem->d2.focSum = m_focSum;	
-	ptrParaItem->d2.focPosIndex = m_focPosIndex;	
-	ptrParaItem->d2.scanAngle = m_scanAngleIndex;	
-	ptrParaItem->d2.dynamicRange = m_dynamicRangeIndex;	
-	ptrParaItem->d2.lineDensity = m_lineDensityIndex;	
-	ptrParaItem->d2.steerIndex = m_steerIndex;	
-	ptrParaItem->d2.AGC = m_agcIndex;	
-	ptrParaItem->d2.edgeEnhance = m_edgeEnhanceIndex;	
-	ptrParaItem->d2.harmonic = m_harmonic;	
-    ptrParaItem->d2.TSI = m_tsiIndex;	
+	ptrParaItem->d2.imgScale = m_imgScaleIndex;
+	ptrParaItem->d2.gain2D = m_gain2D;
+	ptrParaItem->d2.focSum = m_focSum;
+	ptrParaItem->d2.focPosIndex = m_focPosIndex;
+	ptrParaItem->d2.scanAngle = m_scanAngleIndex;
+	ptrParaItem->d2.dynamicRange = m_dynamicRangeIndex;
+	ptrParaItem->d2.lineDensity = m_lineDensityIndex;
+	ptrParaItem->d2.steerIndex = m_steerIndex;
+	ptrParaItem->d2.AGC = m_agcIndex;
+	ptrParaItem->d2.edgeEnhance = m_edgeEnhanceIndex;
+	ptrParaItem->d2.harmonic = m_harmonic;
+    ptrParaItem->d2.TSI = m_tsiIndex;
     if(m_gainM > 100)
         m_gainM = 100;
-    ptrParaItem->d2.gainM = m_gainM;	
+    ptrParaItem->d2.gainM = m_gainM;
     ptrParaItem->d2.spaceCompoundIndex=m_spaceCompoundIndexBak;
     ptrParaItem->d2.freqCompoundIndex=m_freqCompoundIndex;
     ptrParaItem->d2.thiFreqIndex = m_harmonicFreqIndex;
@@ -755,7 +753,7 @@ EKnobReturn Img2D::ChangeFreq(EKnobOper oper)
 				IoCtrl io;
                 io.Freeze();
                 usleep(50000);
-                ChangeHarmonicStatus(ROTATE); 
+                ChangeHarmonicStatus(ROTATE);
 				usleep(44000);
                 io.Unfreeze();
                 return (OK);
@@ -788,7 +786,7 @@ EKnobReturn Img2D::ChangeFreq(EKnobOper oper)
 	PRINTF("+++++++++++++++++++++++total size = %d, freq index = %d, emit = %d, receive = %d\n", size, m_freqIndex, m_freq.emit, m_freq.receive);
 
 	EKnobReturn ret = OK;
-	if (m_freqIndex == 0) 
+	if (m_freqIndex == 0)
 		ret = MIN;
 	else if (m_freqIndex == (size-1))
 	{
@@ -798,7 +796,7 @@ EKnobReturn Img2D::ChangeFreq(EKnobOper oper)
 		ret = MAX;
 #endif
 	}
-	else 
+	else
 		ret = OK;
 
 #if (defined(EMP_340) || defined(EMP_355))
@@ -822,7 +820,7 @@ EKnobReturn Img2D::ChangeFreq(EKnobOper oper)
         m_calcPara.power = soundPower;
 
         ///> calc focus pulse width
-        CalcFocPulse();			
+        CalcFocPulse();
 
         ///> draw
         ret = OK;
@@ -849,7 +847,7 @@ EKnobReturn Img2D::ChangeFreq(EKnobOper oper)
     // off harmonic when freq larger than 2.5MHz
     if ((m_freq.emit > MAX_HARMONIC_FREQ) && (m_harmonic))
     {
-        m_harmonic = FALSE; 
+        m_harmonic = FALSE;
         // send harmonic status to imging system
         m_calcPara.harmonic = m_harmonic;
         CalcFilter();
@@ -920,13 +918,13 @@ EKnobReturn Img2D::ChangeDepth(EKnobOper oper)
     }
 
 	m_imgScaleIndex = index;
-	
+
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_SCALE_INDEX - 1))
 		ret = MAX;
-    else 
+    else
         ret = OK;
 #if (defined(EMP_440)||defined(EMP_161)||defined(EMP_360))
     IoCtrl io;
@@ -938,7 +936,7 @@ EKnobReturn Img2D::ChangeDepth(EKnobOper oper)
     usleep(84000);
     io.Unfreeze();
 #endif
-    return (ret);	
+    return (ret);
 }
 
 /*
@@ -961,7 +959,7 @@ void Img2D::ChangeTransducer(int transducer)
     SysGeneralSetting *sysGel = new SysGeneralSetting;
     int press_adjust = sysGel->GetPressAjust();
     int Correctionvalue;
-    Correctionvalue = 100 + press_adjust; 
+    Correctionvalue = 100 + press_adjust;
 
     PRINTF("-----------correctionvalue=%d",Correctionvalue);
 
@@ -1056,14 +1054,14 @@ EKnobReturn Img2D::ChangeGain2D(EKnobOper oper)
 	m_ptrCalc->CalcTgcDigital(m_gain2D*MAX_GAIN_2D/100, 0, MAX_GAIN_2D);
 
 	EKnobReturn ret = OK;
-	if (gain == 0) 
+	if (gain == 0)
 		ret = MIN;
 	else if (gain == MAX_GAIN_2D)
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
-	return (ret);	
+	return (ret);
 }
 
 EKnobReturn Img2D::ChangeFocSum(EKnobOper oper)
@@ -1099,7 +1097,7 @@ EKnobReturn Img2D::ChangeFocSum(EKnobOper oper)
     {
         if(focSum < MAX_FOCUS)
             focSum += 1;
-        else 
+        else
             focSum = 1;
     }
     else
@@ -1120,14 +1118,14 @@ EKnobReturn Img2D::ChangeFocSum(EKnobOper oper)
 	m_ptrUpdate->FocInfo(m_focSum, m_focPos);
 
 	EKnobReturn ret = OK;
-	if (focSum == 1) 
+	if (focSum == 1)
 		ret = MIN;
 	else if (focSum == MAX_FOCUS)
 		ret = MAX;
-	else 
+	else
 		ret = OK;
-		
-	return (ret);	
+
+	return (ret);
 }
 
 bool Img2D::SetFocSum(int sum)
@@ -1151,7 +1149,6 @@ bool Img2D::SetFocSum(int sum)
 
     return TRUE;
 }
-
 
 EKnobReturn Img2D::ChangeFocPos(EKnobOper oper)
 {
@@ -1199,16 +1196,16 @@ EKnobReturn Img2D::ChangeFocPos(EKnobOper oper)
 	///> draw
     PRINTF("change focPos: range(%d, %d), current = %d, focPos = %dmm\n", indexB, indexE, m_focPosIndex, m_focPos[0]);
 	m_ptrUpdate->FocInfo(m_focSum, m_focPos);
-	
+
 	EKnobReturn ret = OK;
-	if (index == indexB) 
+	if (index == indexB)
 		ret = MIN;
 	else if (index == indexE)
 		ret = MAX;
-	else 
+	else
 		ret = OK;
-		
-	return (ret);	
+
+	return (ret);
 }
 
 bool Img2D::SetFocPos(int posIndex)
@@ -1221,8 +1218,8 @@ bool Img2D::SetFocPos(int posIndex)
 
 	///> draw
 	m_ptrUpdate->FocInfo(m_focSum, m_focPos);
-		
-	return (TRUE);	
+
+	return (TRUE);
 }
 
 EKnobReturn Img2D::SetScanAngle(int index)
@@ -1232,10 +1229,10 @@ EKnobReturn Img2D::SetScanAngle(int index)
     PRINTF("angleindex = %d %d\n", index, m_calcPara.angleIndex);
     m_ptrCalc->CalcScanRange();
 
-    ///> send to dsc 
+    ///> send to dsc
     SetDscScanLine();
 
-	///> draw 
+	///> draw
     return DisplayScanAngle();
 }
 
@@ -1252,7 +1249,7 @@ EKnobReturn Img2D::ChangeScanAngle(EKnobOper oper)
         {
             index += 1;
         }
-        else 
+        else
         {
             index = 0;
         }
@@ -1280,7 +1277,7 @@ EKnobReturn Img2D::ChangeScanAngle(EKnobOper oper)
             PRINTF("Img2D: scan angle reach min value!\n");
             return (MIN);
         }
-    }		
+    }
     else
     {
         return ERROR;
@@ -1345,7 +1342,7 @@ EKnobReturn Img2D::ChangeScanLines(EKnobOper oper)
         ImgCfm::GetInstance()->ClearBox();
     }
     // clear M image
-    if(ModeStatus::IsMMode()) 
+    if(ModeStatus::IsMMode())
     {
         ClearMLine();
     }
@@ -1364,13 +1361,13 @@ EKnobReturn Img2D::ChangeScanLines(EKnobOper oper)
     //ImgPw::GetInstance()->ResetSv();
     if(ModeStatus::IsColorMode())
     {
-        //show 2D menu 
+        //show 2D menu
         int menuIndex;
         MenuArea::GetInstance()->GetMenuIndex(menuIndex);
-        if(menuIndex == 0) 
+        if(menuIndex == 0)
             ImgCfm::GetInstance()->SetScanLines();
     }
-    
+
     //zoom
     if (MultiFuncFactory::GetInstance()->GetMultiFuncType() == MultiFuncFactory::LOCAL_ZOOM)
     {
@@ -1378,22 +1375,22 @@ EKnobReturn Img2D::ChangeScanLines(EKnobOper oper)
         Zoom::GetInstance()->RedrawLocalZoom();
     }
     //redraw m line
-    if(ModeStatus::IsMMode()) 
+    if(ModeStatus::IsMMode())
     {
         ResetMLine();
     }
 
     EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_SCAN_LINES - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
-	
+
 	///> draw
 	m_ptrUpdate->ScanLines(m_indexScanLines, ret);
-    
+
     return ret;
 }
 
@@ -1446,16 +1443,16 @@ EKnobReturn Img2D::ChangeDynamicRange(EKnobOper oper)
 	m_dynamicRangeIndex = index;
 
 	///> clac dynamic range
-	m_ptrCalc->CalcDynamicRange(index);	
+	m_ptrCalc->CalcDynamicRange(index);
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (Calc2D::MAX_DYNAMIC_INDEX - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
-	
+
 	///> draw
 	m_ptrUpdate->DynamicRange(DYNAMIC_DATA_D[index], ret);
 
@@ -1511,16 +1508,16 @@ EKnobReturn Img2D::ChangeLineDensity(EKnobOper oper)
 
     m_lineDensityIndex = index;
     EKnobReturn ret = OK;
-    if (index == 0) 
+    if (index == 0)
         ret = MIN;
     else if (index == (MAX_LINE_DENSITY - 1))
         ret = MAX;
-    else 
+    else
         ret = OK;
 
     LineDensity(m_lineDensityIndex, ret);
 
-    return (ret);				
+    return (ret);
 }
 
 //void Img2D::SetLineDensity(int index)
@@ -1531,11 +1528,11 @@ void Img2D::SetLineDensity(int index, bool update)
 	m_lineDensityIndexBak = m_lineDensityIndex;
 	m_lineDensityIndex = index;
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_LINE_DENSITY - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	LineDensity(m_lineDensityIndex, ret, update);
@@ -1547,16 +1544,15 @@ void Img2D::RecoverLineDensity()
 
 	m_lineDensityIndex = m_lineDensityIndexBak;
 	EKnobReturn ret = OK;
-	if (m_lineDensityIndex == 0) 
+	if (m_lineDensityIndex == 0)
 		ret = MIN;
 	else if (m_lineDensityIndex == (MAX_LINE_DENSITY - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	LineDensity(m_lineDensityIndex, ret, false);
 }
-
 
 EKnobReturn Img2D::ChangeEdgeEnhance(EKnobOper oper)
 {
@@ -1568,7 +1564,7 @@ EKnobReturn Img2D::ChangeEdgeEnhance(EKnobOper oper)
         {
             index += 1;
         }
-        else 
+        else
         {
             index = 0;
         }
@@ -1605,22 +1601,22 @@ EKnobReturn Img2D::ChangeEdgeEnhance(EKnobOper oper)
 
 	m_edgeEnhanceIndex = index;
 
-	///> calc edge enhance 
+	///> calc edge enhance
 	m_calcPara.edgeEnhance = m_edgeEnhanceIndex;
 	m_ptrDscPara->dca2DIPAttrs.ipaEdgeEhn = m_edgeEnhanceIndex;
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_EDGE - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	///> draw
 	m_ptrUpdate->EdgeEnhance(index, ret);
-		
-	return (ret);			
+
+	return (ret);
 }
 
 EKnobReturn Img2D::ChangeSoundPower(EKnobOper oper)
@@ -1633,7 +1629,7 @@ EKnobReturn Img2D::ChangeSoundPower(EKnobOper oper)
         {
             index ++;
         }
-        else 
+        else
         {
             index = 0;
         }
@@ -1661,36 +1657,36 @@ EKnobReturn Img2D::ChangeSoundPower(EKnobOper oper)
 			PRINTF("Img2D: edge enhancement reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
     else
     {
         return ERROR;
     }
-	
+
 	m_soundPowerIndex = index;
 
 	int soundPower = POWER_DATA[index];
 	m_calcPara.power = soundPower;
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_POWER_INDEX - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	bool isChange = FALSE;
 	///> calc focus pulse width
 	isChange = CalcFocPulse();
-	
+
 	///> draw
 	m_ptrUpdate->SoundPower(soundPower, ret);
-	
+
 	if (!isChange)
 		ChangeSoundPower(oper);
 
-	return (ret);	
+	return (ret);
 }
 
 EKnobReturn Img2D::ChangeHarmonic(EKnobOper oper)
@@ -1732,14 +1728,14 @@ EKnobReturn Img2D::ChangeHarmonic(EKnobOper oper)
 			PRINTF("Img2D: harmonic reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (on)
         {
 			on = FALSE;
         }
-		else 
+		else
         {
             on = TRUE;
 #if 0
@@ -1771,11 +1767,11 @@ EKnobReturn Img2D::ChangeHarmonic(EKnobOper oper)
         m_freq.receive = m_vecFreqRange[m_freqIndex].receive;
         int size = m_vecFreqRange.size();
 
-        if (m_freqIndex == 0) 
+        if (m_freqIndex == 0)
             ret = MIN;
         else if (m_freqIndex == (size-1))
             ret = MAX;
-        else 
+        else
             ret = OK;
 
         Freq(m_freq, ret);
@@ -1784,11 +1780,11 @@ EKnobReturn Img2D::ChangeHarmonic(EKnobOper oper)
     // send harmonic status to imging system
     m_calcPara.harmonic = on;
     CalcFilter();
-	if (!on) 
+	if (!on)
 		ret = MIN;
 	else if (on)
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	///> draw
@@ -1827,14 +1823,14 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
 			PRINTF("Img2D: Harmonic is off!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (on)
         {
 			on = FALSE;
         }
-		else 
+		else
         {
             on = TRUE;
         }
@@ -1888,14 +1884,14 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
         m_freq.emit = m_thiFreq[m_harmonicFreqIndex];
         m_freq.receive = m_thiFreq[m_harmonicFreqIndex];
         ret = OK;
-        
+
         m_freqEmit = m_freq.emit;
         HarmonicFreq(m_freq, ret);
 
         DefaultIndexBandPassFilter(m_curProbeIndex, m_harmonicFreqIndex);
         //m_ptrCalc->CalcFilterChangeDepth();
 		m_ptrCalc->CalcFilter();
-      
+
         // compound
         if (m_freqCompoundCtrl)
         {
@@ -1910,7 +1906,7 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
             m_ptrCalc->CalcFilterFreqCompound(2);
 
             m_calcPara.freq.emit = m_vecFreqRange[index].emit;
-            m_calcPara.freq.receive = m_vecFreqRange[index].receive;		
+            m_calcPara.freq.receive = m_vecFreqRange[index].receive;
         }
        // HarmonicFreq(m_thiFreq, ret);
         m_ptrUpdate->HarmonicFreq(m_thiFreq[m_harmonicFreqIndex], ret);
@@ -1926,7 +1922,7 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
             ret = MIN;
         else if (m_freqIndex == (size - 1))
             ret = MAX;
-        else 
+        else
             ret = OK;
 
         m_calcPara.freq.emit = m_freq.emit;
@@ -1964,7 +1960,6 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
 
         m_freqEmit = m_freq.emit;
 
-
         IoCtrl io;
         io.Freeze();
         usleep(90000);
@@ -1975,13 +1970,11 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
 
         m_ptrCalc->CalcFilter();
 
-
         // compound
         if (m_freqCompoundCtrl)
         {
             PRINTF("index = %d, pre = %d, next = %d\n", m_freqIndex, m_freqIndexPre, m_freqIndex);
             int index = m_freqIndex;
-
 
             m_calcPara.freq.emit = m_vecFreqRange[m_freqIndexPre].emit;
             m_calcPara.freq.receive = m_vecFreqRange[m_freqIndexPre].receive;
@@ -1992,23 +1985,22 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
             m_ptrCalc->CalcFilterFreqCompound(2);
 
             m_calcPara.freq.emit = m_vecFreqRange[index].emit;
-            m_calcPara.freq.receive = m_vecFreqRange[index].receive;		
+            m_calcPara.freq.receive = m_vecFreqRange[index].receive;
 
         }
 
         usleep(84000);
         io.Unfreeze();
 
-
         m_ptrUpdate->HarmonicFreq(m_thiFreq[m_harmonicFreqIndex], ret);
 
     }
 
-    if (!on) 
+    if (!on)
         ret = MIN;
 	else if (on)
         ret = MAX;
-    else 
+    else
         ret = OK;
 
 #endif
@@ -2021,9 +2013,9 @@ EKnobReturn Img2D::ChangeHarmonicStatus(EKnobOper oper)
 EKnobReturn Img2D::ChangeD2HarmonicFreq(EKnobOper oper)
 {
     int step = 1;
-    int size = m_thiFreqSum; 
+    int size = m_thiFreqSum;
     int index = m_harmonicFreqIndex;
-    
+
     if (oper == ADD)
     {
         if ((index + step) <= (size - 1))
@@ -2076,16 +2068,14 @@ EKnobReturn Img2D::ChangeD2HarmonicFreq(EKnobOper oper)
 	}
     else if (m_harmonicFreqIndex == (size-1))
         ret = MAX;
-    else 
+    else
         ret = OK;
 
-
-    m_freq.emit = m_thiFreq[index];//m_data; 
-    m_freq.receive = m_thiFreq[index];//m_data; 
+    m_freq.emit = m_thiFreq[index];//m_data;
+    m_freq.receive = m_thiFreq[index];//m_data;
 
     m_freqEmit = m_freq.emit;
-    
-    
+
     IoCtrl io;
     io.Freeze();
     usleep(70000);
@@ -2098,7 +2088,7 @@ EKnobReturn Img2D::ChangeD2HarmonicFreq(EKnobOper oper)
 		m_fc03 = float((ProbeSocket::BAND_PASS_FILTER_FC1[m_curProbeIndex][m_harmonicFreqIndex][2] + ProbeSocket::BAND_PASS_FILTER_FC2[m_curProbeIndex][m_harmonicFreqIndex][2]) / 20.0);
 		m_fc04 = float((ProbeSocket::BAND_PASS_FILTER_FC1[m_curProbeIndex][m_harmonicFreqIndex][3] + ProbeSocket::BAND_PASS_FILTER_FC2[m_curProbeIndex][m_harmonicFreqIndex][3]) / 20.0);
 		m_fc05 = float((ProbeSocket::BAND_PASS_FILTER_FC1[m_curProbeIndex][m_harmonicFreqIndex][4] + ProbeSocket::BAND_PASS_FILTER_FC2[m_curProbeIndex][m_harmonicFreqIndex][4]) / 20.0);
-#else 
+#else
 		m_fc01 = float(ProbeSocket::BAND_PASS_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][0] / 10.0);
 		m_fc02 = float(ProbeSocket::BAND_PASS_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][1] / 10.0);
 		m_fc03 = float(ProbeSocket::BAND_PASS_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][2] / 10.0);
@@ -2111,7 +2101,6 @@ EKnobReturn Img2D::ChangeD2HarmonicFreq(EKnobOper oper)
     m_fc3 = float(ProbeSocket::DYNAMIC_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][2] / 10.0);
     m_fc4 = float(ProbeSocket::DYNAMIC_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][3] / 10.0);
     m_fc5 = float(ProbeSocket::DYNAMIC_FILTER_FC[m_curProbeIndex][m_harmonicFreqIndex][4] / 10.0);
- 
 
     DefaultFreqBandPassFilter(m_curProbeIndex, m_harmonicFreqIndex);
     DefaultFreqDynamicFilter(m_curProbeIndex, m_harmonicFreqIndex);
@@ -2140,7 +2129,7 @@ EKnobReturn Img2D::ChangeMBP(EKnobOper oper)
         else
         {
             PRINTF("Img2D: MBP reach max value!\n");
-            index = 0;	
+            index = 0;
         }
     }
     else if (oper == SUB)
@@ -2154,7 +2143,7 @@ EKnobReturn Img2D::ChangeMBP(EKnobOper oper)
 			PRINTF("Img2D: MBP reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (index < (MAX_MBP_INDEX - 1))
@@ -2174,11 +2163,11 @@ EKnobReturn Img2D::ChangeMBP(EKnobOper oper)
 	m_ptrCalc->CalcMBP(MBP[m_mbpIndex]);
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_MBP_INDEX - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	//draw
@@ -2201,18 +2190,16 @@ void Img2D::SetMBP(int mbpIndex, bool update)
 	m_ptrUpdate->MBP(MBP[m_mbpIndex], OK);
 }
 
-
 void Img2D::RecoverMBP()
 {
 	m_mbpIndex = m_mbpIndexBak;
-	
+
 	m_calcPara.mbp = MBP[m_mbpIndex];
 	m_ptrCalc->CalcMBP(MBP[m_mbpIndex]);
 
 	//drap
 	//m_ptrUpdate->MBP(MBP[m_mbpIndex], OK);
 }
-
 
 /*
  * @brief if mbp is multi, set line density to high
@@ -2237,7 +2224,7 @@ EKnobReturn Img2D::ChangeTSI(EKnobOper oper)
 {
 	int index = m_tsiIndex;
 
-	///> change speed of sound 
+	///> change speed of sound
 	if (oper == ADD)
 	{
 		if (index < (MAX_TSI - 1))
@@ -2261,7 +2248,7 @@ EKnobReturn Img2D::ChangeTSI(EKnobOper oper)
 			PRINTF("Img2D: TSI reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (index < (MAX_TSI - 1))
@@ -2277,11 +2264,11 @@ EKnobReturn Img2D::ChangeTSI(EKnobOper oper)
 	m_tsiIndex = index;
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_TSI - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	Tsi(m_tsiIndex, ret);
@@ -2289,12 +2276,11 @@ EKnobReturn Img2D::ChangeTSI(EKnobOper oper)
 	return ret;
 }
 
-
 EKnobReturn Img2D::ChangeAGC(EKnobOper oper)
 {
 	int index = m_agcIndex;
 
-	///> change speed of sound 
+	///> change speed of sound
 	if (oper == ADD)
 	{
 		if (index < (MAX_AGC - 1))
@@ -2318,7 +2304,7 @@ EKnobReturn Img2D::ChangeAGC(EKnobOper oper)
 			PRINTF("Img2D: AGC reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
     else
     {
         return ERROR;
@@ -2329,17 +2315,17 @@ EKnobReturn Img2D::ChangeAGC(EKnobOper oper)
 	// deal with agc change
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_AGC - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
-	//draw 
+	//draw
 	m_ptrUpdate->Agc(index, ret);
-		
-	return (ret);		
+
+	return (ret);
 }
 
 EKnobReturn Img2D::ChangeSteer(EKnobOper oper)
@@ -2347,10 +2333,9 @@ EKnobReturn Img2D::ChangeSteer(EKnobOper oper)
     if (IsCompoundSpaceOn())
         SetCompoundSpace(0);
 
-
         int index = m_steerIndex;
 
-	///> change speed of sound 
+	///> change speed of sound
 	if (oper == ADD)
 	{
 		if (index < (MAX_STEER - 1))
@@ -2374,7 +2359,7 @@ EKnobReturn Img2D::ChangeSteer(EKnobOper oper)
 			PRINTF("Img2D: steer reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (index < (MAX_STEER - 1))
@@ -2391,20 +2376,20 @@ EKnobReturn Img2D::ChangeSteer(EKnobOper oper)
     m_steerIndexbak = m_steerIndex;
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_STEER - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	Steer(STEER_ANGLE[m_steerIndex],  ret);
-		
+
     if (!(IsCompoundSpaceOn()) && (GetSteer() == 0))
     {
         SetCompoundSpace(m_spaceCompoundIndexBak);
     }
-	return (ret);		
+	return (ret);
 }
 
 int Img2D::GetSteer()
@@ -2415,13 +2400,13 @@ int Img2D::GetSteer()
 void Img2D::SetSteer(int& index)
 {
     m_steerIndex = index;
-  
+
     EKnobReturn ret = OK;
-    if (index == 0) 
+    if (index == 0)
         ret = MIN;
     else if (index == (MAX_STEER - 1))
         ret = MAX;
-    else 
+    else
         ret = OK;
 
     Steer(STEER_ANGLE[m_steerIndex], ret);
@@ -2431,7 +2416,7 @@ EKnobReturn Img2D::ChangeTpView(EKnobOper oper)
 {
 	int index = m_tpViewIndex;
 
-	///> change speed of sound 
+	///> change speed of sound
 	if (oper == ADD)
 	{
 		if (index < (MAX_TP_VIEW - 1))
@@ -2455,7 +2440,7 @@ EKnobReturn Img2D::ChangeTpView(EKnobOper oper)
 			PRINTF("Img2D: tp view reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (index < (MAX_TP_VIEW - 1))
@@ -2476,12 +2461,12 @@ EKnobReturn Img2D::ChangeEFVI(EKnobOper oper)
 {
 	bool index = m_efviCtrl;
 
-	///> change speed of sound 
+	///> change speed of sound
 	if (oper == ADD)
 	{
 		if (!index)
 		{
-			index = TRUE; 
+			index = TRUE;
 		}
 		else
 		{
@@ -2500,11 +2485,11 @@ EKnobReturn Img2D::ChangeEFVI(EKnobOper oper)
 			PRINTF("Img2D: efvi reach min value!\n");
 			return (MIN);
 		}
-	}	
+	}
 	else if (oper == ROTATE)
 	{
 		if (index)
-			index = FALSE; 
+			index = FALSE;
 		else
 			index = TRUE;
 	}
@@ -2528,7 +2513,7 @@ void Img2D::ResetMLine()
     GetBMLineRange(scanRange);
 
 	m_mLine = (scanRange[0] + scanRange[1])/ 2;
-	
+
 	MLine(m_mLine);
 }
 
@@ -2561,7 +2546,7 @@ void Img2D::ChangeGainM(int gain)
 
 	///> calc tgc
 	m_ptrCalc->CalcTgc(m_gainM*MAX_GAIN_M/100, m_tgc, m_ptrUpdate, 1);
-    
+
 #ifdef EMP_430
     //2D and M have the same tgc digital in fpga 2014.04.05
 	//m_ptrCalc->CalcTgcDigital(m_gainM*MAX_GAIN_M/100, 0, MAX_GAIN_M);
@@ -2638,15 +2623,14 @@ EKnobReturn Img2D::ChangeGainM(EKnobOper oper)
 #endif
 
 	EKnobReturn ret = OK;
-	if (gain == 0) 
+	if (gain == 0)
 		ret = MIN;
 	else if (gain == 100)
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
-
-	return (ret);	
+	return (ret);
 }
 
 void Img2D::ReSendGainM(void)
@@ -2658,7 +2642,7 @@ void Img2D::ReSendGainM(void)
 
 /*
  * @brief change M line acording to oper
- * 
+ *
  * @oper operation, ADD or SUB
  *
  * @retval if M line is at the edge of range
@@ -2683,11 +2667,11 @@ bool Img2D::ChangeMLine(int offsetX, int offsetY)
 	m_mLine = line;
 	MLine(line);
 
-	return (TRUE);		
+	return (TRUE);
 }
 /*
  * @brief change M speed acording to oper
- * 
+ *
  * @oper operation, ADD or SUB
  *
  * @retval if M speed is at the edge of range
@@ -2733,7 +2717,7 @@ EKnobReturn Img2D::ChangeMSpeed(EKnobOper oper)
             PRINTF("Img2D:  M speed reach min value!\n");
             return (MIN);
         }
-    }	
+    }
     else
     {
         return ERROR;
@@ -2746,24 +2730,24 @@ EKnobReturn Img2D::ChangeMSpeed(EKnobOper oper)
 	m_ptrCalc->CalcMSpeed();
 
 	EKnobReturn ret = OK;
-	if (index == 0) 
+	if (index == 0)
 		ret = MIN;
 	else if (index == (MAX_M_SPEED - 1))
 		ret = MAX;
-	else 
+	else
 		ret = OK;
 
 	//draw
 	m_ptrUpdate->MSpeed(index, ret);
-		
-	return (ret);		
+
+	return (ret);
 }
-    
+
 EKnobReturn Img2D::ChangeCompoundSpace(void)
 {
    int index = m_spaceCompoundIndex;
    int steerIndex = 3; //0度
-    
+
     if (index < (MAX_SPACE_COMPOUND -1))
         index ++;
     else
@@ -2781,7 +2765,7 @@ EKnobReturn Img2D::ChangeCompoundSpace(void)
 
 	m_spaceCompoundIndex = index;
     m_spaceCompoundIndexBak = m_spaceCompoundIndex;
-   
+
     return SetCompoundSpace(index);
 }
 
@@ -2797,7 +2781,7 @@ EKnobReturn Img2D::ChangeCompoundFreq(void)
 	m_freqCompoundCtrlBak = m_freqCompoundCtrl;
 
     return SetCompoundFreq(m_freqCompoundCtrl);
-} 
+}
 
 EKnobReturn Img2D::ChangeCompoundSpace(EKnobOper oper)
 {
@@ -2827,8 +2811,8 @@ EKnobReturn Img2D::ChangeCompoundSpace(EKnobOper oper)
     {
         SetSteer(steerIndex);
     }
-    
-    // send steer again when close spacecompound 
+
+    // send steer again when close spacecompound
     if ((index == 0) && (m_steerIndexbak != 3))
     {
         SetSteer(m_steerIndexbak);
@@ -2868,18 +2852,18 @@ EKnobReturn Img2D::ChangeCompoundFreq(EKnobOper oper)
 
     m_freqCompoundCtrl = on;
     m_freqCompoundCtrlBak = m_freqCompoundCtrl;
- 
+
     if(m_freqCompoundCtrl)
-        m_freqCompoundIndex=1; 
+        m_freqCompoundIndex=1;
     else
         m_freqCompoundIndex=0;
-    
+
     return SetCompoundFreq(m_freqCompoundCtrl);
 }
 
 //EKnobReturn Img2D::SetCompoundSpace(int index)
 EKnobReturn Img2D::SetCompoundSpace(int index, bool draw)
-{   
+{
 	m_spaceCompoundIndexBakBak = m_spaceCompoundIndex;
     m_spaceCompoundIndex = index;
 
@@ -2901,15 +2885,14 @@ EKnobReturn Img2D::SetCompoundSpace(int index, bool draw)
 	{
 		m_ptrUpdate->CompoundSpace(index, ret);
 	}
-	
+
 	CompoundSpaceCtrl(m_calcPara.compoundSpaceCtrl);
 
     return ret;
 }
 
-
 EKnobReturn Img2D::RecoverCompoundSpace()
-{   
+{
 	m_spaceCompoundIndex = m_spaceCompoundIndexBakBak;
 
     m_calcPara.compoundAngle = SPACE_COMPOUND_ANGLE[m_spaceCompoundIndex];
@@ -2937,7 +2920,7 @@ EKnobReturn Img2D::SetCompoundFreq(bool on, bool draw)
 {
 	m_freqCompoundCtrlBakBak = m_freqCompoundCtrl;
     m_freqCompoundCtrl = on;
-    m_calcPara.compoundFreqCtrl = on;	
+    m_calcPara.compoundFreqCtrl = on;
 
     EKnobReturn ret;
     if (m_freqCompoundCtrl)
@@ -2955,13 +2938,12 @@ EKnobReturn Img2D::SetCompoundFreq(bool on, bool draw)
     return ret;
 }
 
-
 EKnobReturn Img2D::RecoverCompoundFreq()
 {
 #if 1
     m_freqCompoundCtrl = m_freqCompoundCtrlBakBak;
 
-    m_calcPara.compoundFreqCtrl = m_freqCompoundCtrl;	
+    m_calcPara.compoundFreqCtrl = m_freqCompoundCtrl;
 
     EKnobReturn ret;
     if (m_freqCompoundCtrl)
@@ -3013,13 +2995,13 @@ EKnobReturn Img2D::ChangePolarity(EKnobOper oper)
     }
 
     m_polarity = on;
-    EKnobReturn ret; 
+    EKnobReturn ret;
     if (m_polarity)
         ret = MAX;
     else
         ret = MIN;
     SetPolarity(m_polarity, ret);
-    
+
     return ret;
 }
 
@@ -3058,11 +3040,11 @@ void Img2D::GetDisplayScanRange(int scanRange[2])
 	FormatM::EFormatM formatM = s.GetFormatM();
 	FormatPw::EFormatPw formatPw = s.GetFormatPw();
     int tempRange[2];
-	
-	if (((ModeStatus::IsMImgMode()) && (formatM == FormatM::BM11_LR))  
+
+	if (((ModeStatus::IsMImgMode()) && (formatM == FormatM::BM11_LR))
 			 || ((ModeStatus::IsSpectrumImgMode() || ModeStatus::IsSpectrumColorImgMode()) && (formatPw == FormatPw::BP11_LR)))
 		m_ptrCalc->CalcDisplayScanRange(tempRange, IMG_W / 2);
-	else 
+	else
 		m_ptrCalc->CalcDisplayScanRange(tempRange, IMG_W);
 
     int mbp = MBP[m_mbpIndex];
@@ -3071,7 +3053,6 @@ void Img2D::GetDisplayScanRange(int scanRange[2])
     if ((tempRange[0] % mbp) != 0)
         scanRange[0] = (tempRange[0] / mbp + 1) * mbp;
 }
-
 
 /*
  * @brief get current scale of 2D image
@@ -3101,7 +3082,7 @@ double Img2D::GetScale2D()
 
 	FormatM::EFormatM formatM = s.GetFormatM();
 	FormatPw::EFormatPw formatPw = s.GetFormatPw();
-	
+
 	switch(mode)
 	{
 		case ScanMode::D2:
@@ -3115,7 +3096,7 @@ double Img2D::GetScale2D()
 
 		case ScanMode::M:
 		case ScanMode::ANATOMIC_M:
-			if (formatM == FormatM::BM11_UD) 
+			if (formatM == FormatM::BM11_UD)
 				scale = scale * 2;
 			else if(formatM == FormatM::BM21_UD)
 				scale = scale * 3 / 2;
@@ -3132,7 +3113,7 @@ double Img2D::GetScale2D()
 		case ScanMode::CW:
 		case ScanMode::CWCFM:
 		case ScanMode::CWPDI:
-			if (formatPw == FormatPw::BP11_UD) 
+			if (formatPw == FormatPw::BP11_UD)
 				scale = scale * 2;
 			else if(formatPw == FormatPw::BP21_UD)
 				scale = scale * 3 / 2;
@@ -3156,7 +3137,7 @@ double Img2D::GetScale2D()
 		case ScanMode::EFOV:
 			{
 				ScanMode::EFOVStatus status = ScanMode::GetInstance()->GetEFOVStatus();
-				if (status == ScanMode::VIEW || status == ScanMode::CAPTURE) 
+				if (status == ScanMode::VIEW || status == ScanMode::CAPTURE)
 					scale = scale * m_ptrDsc->GetEFOVScale();
 			}
 
@@ -3178,7 +3159,7 @@ double Img2D::GetScale2DInImgHDot()
 }
 
 /*
- *  @brief get all B scale 
+ *  @brief get all B scale
  *
  *  @para scale[4][out] scale[0]~scale[3] is 2D scale of each B, scale[1] is valid only in BB mode, scale[2], scale[3] is valid only in 4B mode
  */
@@ -3193,7 +3174,7 @@ void Img2D::GetAllScale2D(double scale[4])
         }
         return;
     }
-    
+
     // normal mode
 	int i;
 	ModeStatus s;
@@ -3202,12 +3183,12 @@ void Img2D::GetAllScale2D(double scale[4])
 	FormatCfm::EFormatCfm formatCfm = s.GetFormatCfm();
 
 	int correct = 1;
-		
+
 	if ((mode == ScanMode::D2) && (format2D  == Format2D::B4))
 		correct = 2;
 	else if (((mode == ScanMode::CFM) || (mode == ScanMode::PDI)) && (formatCfm == FormatCfm::B4))
 		correct = 2;
-	else 
+	else
 		correct = 1;
 
 	for (i = 0; i < 4; i ++)
@@ -3248,7 +3229,7 @@ double Img2D::GetScaleMDepth()
     }
 	FormatM::EFormatM formatM = s.GetFormatM();
 
-	if (formatM == FormatM::BM11_UD) 
+	if (formatM == FormatM::BM11_UD)
 		scale = scale * 2;
 	else if(formatM == FormatM::BM21_UD)
 		scale = scale * 3;
@@ -3335,7 +3316,7 @@ void Img2D::ExitSimult()
  */
 void Img2D::SetDepthDots(int dots)
 {
-	m_calcPara.depthDots = dots;	
+	m_calcPara.depthDots = dots;
 	m_ptrDscPara->dcaSamplePoints = dots;
 
 	if (m_ptrDsc != NULL)
@@ -3352,25 +3333,25 @@ void Img2D::SetDepthDots(int dots)
 }
 #endif
 /*
- * @brief change scale of different B image when real-time, set srcIndex's scale to destIndex's scale 
+ * @brief change scale of different B image when real-time, set srcIndex's scale to destIndex's scale
  *
  * @para destIndex scale index to be changed, range(0-3)
  * @para srcIndex scale index to be assigned to destIndex's scale, range(0-3)
  */
 void Img2D::ChangeSeperateScale(int destIndex, int srcIndex)
 {
-	m_scale2D[destIndex] = m_scale2D[srcIndex];	
+	m_scale2D[destIndex] = m_scale2D[srcIndex];
 
     if (m_zoomMeasureCtrl)
     {
-        m_scale2DZoom[destIndex] = m_scale2DZoom[srcIndex];	
+        m_scale2DZoom[destIndex] = m_scale2DZoom[srcIndex];
     }
 }
 
 void Img2D::InitSeperateScale(int srcIndex)
 {
     PRINTF("srcIndex = %d\n", srcIndex);
-    for (int i = 0; i < 4; ++i) 
+    for (int i = 0; i < 4; ++i)
     {
         m_scale2D[i] = m_scale2D[srcIndex];
         PRINTF("scale2D = %f\n", m_scale2D[i]);
@@ -3420,11 +3401,11 @@ void Img2D::InitProbeCalc2D()
     m_ptrCalc->CalcFreqCompoundCtrl(m_calcPara.compoundFreqCtrl);
 
 	///> calc sample
-	m_ptrCalc->CalcSample();	
-	
+	m_ptrCalc->CalcSample();
+
 	///> calc focus pulse width
 	CalcFocPulse();
-	
+
 	///> calc max_period(PRF)
 	m_ptrCalc->CalcMaxPeriod();
 
@@ -3443,13 +3424,13 @@ void Img2D::InitProbeCalc2D()
 
 	///> calc receive delay
 	m_ptrCalc->CalcReceiveDelay();
-	
+
 	///> calc scan angle
 	m_ptrCalc->CalcScanRange();
 	SetDscScanLine();
 
-	///> calc filter 
-	CalcFilter();	
+	///> calc filter
+	CalcFilter();
 
 	///> calc edge enhancement
 	//m_ptrCalc->CalcEdgeEnhance();
@@ -3474,7 +3455,7 @@ void Img2D::InitProbeCalc2D()
 	///> calc Tsi
 	///> calc steer
 	///> calc agc
-	
+
 	// init DSC
 	SetScale2D(m_ptrCalc->CalcScale2D());
 }
@@ -3485,7 +3466,7 @@ void Img2D::InitProbeCalcM()
 	m_ptrCalc->CalcMLine();
 
 	m_ptrCalc->CalcMSpeed();
-	
+
 	///> calc tgc
 	m_ptrCalc->CalcTgc(m_gainM*MAX_GAIN_M/100, m_tgc, m_ptrUpdate, 1);
 	m_ptrCalc->CalcTgcDigital(m_gainM*MAX_GAIN_M/100, 1, MAX_GAIN_M);
@@ -3496,7 +3477,7 @@ void Img2D::InitProbeCalcM()
  * @para freq pari of real freq*20  (emit-receive)
  */
 void Img2D::Freq(ProbeSocket::FreqPair freq, EKnobReturn ret)
-{		
+{
 	m_calcPara.freq.emit = freq.emit;
 	m_calcPara.freq.receive = freq.receive;
 	PRINTF("(((((((((((((((((((((Freq: emit = %d, receive = %d\n", m_calcPara.freq.emit, m_calcPara.freq.receive);
@@ -3534,7 +3515,7 @@ void Img2D::Depth(int scaleIndex)
 	m_calcPara.imgScaleIndex = scaleIndex;
 	m_calcPara.imgScale = IMG_SCALE[scaleIndex];
 	m_calcPara.depth = m_depth;
-	
+
 	///> scale
 	SetScale2D(m_ptrCalc->CalcScale2D());
 
@@ -3574,7 +3555,7 @@ void Img2D::Depth(int scaleIndex)
         ptrDscMan->ReadWriteUnlock();
     }
     m_ptrCalc->CalcExtendedImagingSample();
-    
+
     ///> filter
 #if (defined(EMP_360) || defined(EMP_161) || defined(EMP_440))
     CalcFilter();
@@ -3598,13 +3579,13 @@ void Img2D::Depth(int scaleIndex)
         m_ptrCalc->CalcFilterFreqCompound(2);
 
         m_calcPara.freq.emit = m_vecFreqRange[index].emit;
-        m_calcPara.freq.receive = m_vecFreqRange[index].receive;		
+        m_calcPara.freq.receive = m_vecFreqRange[index].receive;
     }
 #endif
 
     // clear replay data
     Update2D::SetCineRemoveImg(3);
-    Replay::GetInstance()->ClearCurReplayData(); 
+    Replay::GetInstance()->ClearCurReplayData();
 
 	//draw
 	m_ptrUpdate->Depth(m_depth);
@@ -3616,17 +3597,17 @@ void Img2D::Steer(int angle, EKnobReturn ret)
  * description: close change 2D steer
  * lihuamei 2012.07.04
  */
-    //set para 
+    //set para
     m_calcPara.tpViewCtrl = FALSE;
     m_calcPara.tpSteer = angle;  //steer for tp
     m_calcPara.steerAngle = angle; //steer for 2D
-    m_ptrDscPara->dcaTpView = 0; 
+    m_ptrDscPara->dcaTpView = 0;
     m_ptrDscPara->dcaSteer = m_calcPara.tpSteer;
-    
+
     //update dsc tpView status
     if (m_ptrDsc != NULL)
         m_ptrDsc->UpdateTpViewStatus();
-    
+
     //calc 2D
     m_ptrCalc->CalcExtendedImaging(m_calcPara.tpViewCtrl);
     m_ptrCalc->CalcEmitDelay();
@@ -3669,7 +3650,7 @@ void Img2D::GetFocPos()
 	{
 		case 1: //one focus
 			m_focPos[0] = depth * ONE_FOC_POS[index][0] / (float)FOC_DEPTH + 0.5;
-			for (i = 1; i < focMax; i ++) ///< set to 0 
+			for (i = 1; i < focMax; i ++) ///< set to 0
 			{
 				m_focPos[i] = 0;
 			}
@@ -3711,11 +3692,11 @@ void Img2D::GetFocPos()
 		default:
 			break;
 	}
-	
+
     // if out of range
     if (m_focPos[0] < 1)
         m_focPos[0] = 1;
-	for (i = 0; i < focMax; i ++) 
+	for (i = 0; i < focMax; i ++)
 	{
 		m_calcPara.focPos[i] = m_focPos[i];
 	}
@@ -3732,11 +3713,11 @@ void Img2D::MLine(int line)
 }
 
 /*
- * @brief set changed scale to current image 
+ * @brief set changed scale to current image
  */
 void Img2D::SetScale2D(double scale)
 {
-	// send to dsc 
+	// send to dsc
 	m_ptrDscPara->dcaScale = (float)scale;
 
 	if (m_ptrDsc != NULL)
@@ -3747,7 +3728,7 @@ void Img2D::SetScale2D(double scale)
 
 	//ModeStatus s;
 	//int curB = s.Get2DCurrentB();
-    /**解决切换探头刻度尺没有切换的问题**/
+    /**瑙ｅ喅鍒囨崲鎺㈠ご鍒诲害灏烘病鏈夊垏鎹㈢殑闂**/
     int curB = Format2D::GetInstance()->GetLastRealB();
     m_scale2D[curB] = scale;
     if (m_zoomMeasureCtrl)
@@ -3867,9 +3848,9 @@ void Img2D::PrintImgPara()
 void Img2D::PrintCalcPara()
 {
 	int i;
-	
+
 	PRINTF("======================PRINTF VARIABLE calc2D======================\n");
- 
+
     PRINTF("array = %d\n", m_calcPara.probeArray);
     PRINTF("lines = %d\n", m_calcPara.probeLines);
     PRINTF("width = %d\n", m_calcPara.probeWidth);
@@ -3896,15 +3877,15 @@ void Img2D::PrintCalcPara()
     PRINTF("harmonic = %d\n", m_calcPara.harmonic);
     PRINTF("mLine = %d\n", m_calcPara.mLine);
     PRINTF("mSpeed = %d\n", m_calcPara.mSpeedIndex);
-    
+
 }
 
 void Img2D::SetDscScanLine()
 {
 	int scanRange[2];
 	m_ptrCalc->GetScanRange(scanRange);
-	
-	///> send to dsc 
+
+	///> send to dsc
 	m_ptrDscPara->dcaCurMaxScanLines = m_lines;
 	m_ptrDscPara->dcaCurScanStart = scanRange[0];
 	m_ptrDscPara->dcaCurScanEnd = scanRange[1];
@@ -3919,11 +3900,11 @@ void Img2D::SetDscScanLine()
 void Img2D::SetScanLines(int index)
 {
     m_lines = SCAN_LINES_PHASE_PROBE[m_indexScanLines];
-    m_calcPara.probeLines = m_lines; 
-    
+    m_calcPara.probeLines = m_lines;
+
     m_ptrUpdate->ProbePara(m_type, m_calcPara.probeLines, m_calcPara.extendedAngle, m_calcPara.probeR);
 
-    ///> calc emit delay  
+    ///> calc emit delay
     m_ptrCalc->CalcEmitDelay();
 
     ///> calc receive delay
@@ -3942,16 +3923,16 @@ void Img2D::GetScanAngle(int& ScanAngle)
 EKnobReturn Img2D::DisplayScanAngle()
 {
 	EKnobReturn ret = OK;
-    if (m_scanAngleIndex == (MAX_ANGLE - 1)) 
+    if (m_scanAngleIndex == (MAX_ANGLE - 1))
         ret = MIN;
     else if (m_scanAngleIndex == 0)
         ret = MAX;
-    else 
+    else
         ret = OK;
 
 	int angle = m_ptrCalc->CalcRealScanAngle();
-	
-	///> draw 
+
+	///> draw
 	m_ptrUpdate->ScanAngle(angle, ret);
 	return ret;
 }
@@ -3964,9 +3945,9 @@ void Img2D::GetDisplayScanAngle(float& scanangle)
 void Img2D::Set2DTis(int scanAngleIndex, float focPos, int freq, int power, int depthIndex)
 {
 	float ti = m_ptrCalc->Get2DTis(scanAngleIndex, focPos, freq, power, depthIndex);
- 
+
     m_ptrUpdate->TIS(ti);
-	
+
 }
 
 int Img2D::GetOutputPower()
@@ -3991,12 +3972,12 @@ int Img2D::GetMBPIndex()
 
 int Img2D::GetMBPFpga2D(void)
 {
-	return FPGAMBP2D[m_lineDensityIndex][m_mbpIndex]; 
+	return FPGAMBP2D[m_lineDensityIndex][m_mbpIndex];
 }
 
 int Img2D::GetMBPFpgaColor(void)
 {
-	return FPGAMBPColor[m_lineDensityIndex][m_mbpIndex]; 
+	return FPGAMBPColor[m_lineDensityIndex][m_mbpIndex];
 }
 double Img2D::GetSoundSpeed()
 {
@@ -4060,10 +4041,10 @@ void Img2D::Enter2D()
 	m_ptrCalc->CalcTgcDigital(m_gain2D*MAX_GAIN_2D/100, 0, MAX_GAIN_2D);
 	///> calc focus pulse width
 	CalcFocPulse();
-   
+
     // re calc maxperiod, simult on to off
     m_ptrCalc->CalcMaxPeriod();
-    if ((m_type != 'P') && (m_type != 'p')) 
+    if ((m_type != 'P') && (m_type != 'p'))
     {
         if (!IsCompoundSpaceOn())
         {
@@ -4071,11 +4052,11 @@ void Img2D::Enter2D()
                 SetSteer(m_steerIndexbak);
             else
             {
-#ifndef EMP_355	
+#ifndef EMP_355
 				IoCtrl io;
                 io.Freeze();
                 usleep(55000);
-              
+
 #endif
                 SetCompoundSpace(m_spaceCompoundIndexBak);
 #ifndef EMP_355
@@ -4106,10 +4087,10 @@ void Img2D::CalcSampleAgain(void)
 
 /*
  * @brief revise probe type for dsc, because only "C", "L" type can be identification
- * 
+ *
  * @para type[in] real type of probe
  *
- * @retval revised probe type, valided to DSC 
+ * @retval revised probe type, valided to DSC
  */
 char Img2D::ReviseProbeType(char type)
 {
@@ -4123,12 +4104,12 @@ char Img2D::ReviseProbeType(char type)
 		case 'C':
 			probeType = 'C';
 			break;
-		
+
 		case 'n':
 		case 'N':
 			probeType = 'C';
 			break;
-		
+
 		case 'l':
 		case 'L':
 			probeType = 'L';
@@ -4294,17 +4275,17 @@ void Img2D::CompoundFreqCtrl(bool on)
             else if (index == (size - 1))// last
             {
                 indexPre = index - 1;
-                indexNext = index;	
+                indexNext = index;
             }
             else
             {
                 indexPre = index - 1;
-                indexNext = index + 1;			
+                indexNext = index + 1;
             }
         }
         m_freqIndexPre = indexPre;
         m_freqIndexNext = indexNext;
-		
+
 		// freq1 calc
 		m_calcPara.freq.emit = m_vecFreqRange[m_freqIndexPre].emit;
 		m_calcPara.freq.receive = m_vecFreqRange[m_freqIndexPre].receive;
@@ -4315,7 +4296,7 @@ void Img2D::CompoundFreqCtrl(bool on)
 		m_calcPara.freq.emit = m_vecFreqRange[m_freqIndexNext].emit;
 		m_calcPara.freq.receive = m_vecFreqRange[m_freqIndexNext].receive;
 		m_ptrCalc->CalcFocPulseFreqCompound(2);
-		m_ptrCalc->CalcFilterFreqCompound(2);	
+		m_ptrCalc->CalcFilterFreqCompound(2);
 
 		// freq compound coef
 		m_ptrCalc->CalcFreqCompoundCoef();
@@ -4323,11 +4304,11 @@ void Img2D::CompoundFreqCtrl(bool on)
 		// emit and receive calc
 		m_ptrCalc->CalcEmitDelay();
 		m_ptrCalc->CalcReceiveDelay();
-		m_ptrCalc->CalcReceiveDelayColor();	
-		
+		m_ptrCalc->CalcReceiveDelayColor();
+
 		// restore freq
 		m_calcPara.freq.emit = m_vecFreqRange[index].emit;
-		m_calcPara.freq.receive = m_vecFreqRange[index].receive;		
+		m_calcPara.freq.receive = m_vecFreqRange[index].receive;
 	}
 }
 
@@ -4353,7 +4334,7 @@ void Img2D::CalcFilter(void)
 		m_ptrCalc->CalcFilterFreqCompound(2);
 
 		m_calcPara.freq.emit = m_vecFreqRange[index].emit;
-		m_calcPara.freq.receive = m_vecFreqRange[index].receive;		
+		m_calcPara.freq.receive = m_vecFreqRange[index].receive;
     }
 }
 
@@ -4377,7 +4358,7 @@ bool Img2D::CalcFocPulse(void)
 		m_ptrCalc->CalcFocPulseFreqCompound(2);
 
 		m_calcPara.freq.emit = m_vecFreqRange[index].emit;
-		m_calcPara.freq.receive = m_vecFreqRange[index].receive;		
+		m_calcPara.freq.receive = m_vecFreqRange[index].receive;
     }
 
     return isChange;
@@ -4457,7 +4438,7 @@ void Img2D::GetFocPosIndexRange(int &indexB, int &indexE)
                         indexE = sumIndex-1 - i;
                         break;
                     }
-                }               
+                }
                 break;
 
             case 3:
@@ -4479,7 +4460,7 @@ void Img2D::GetFocPosIndexRange(int &indexB, int &indexE)
                         indexE = sumIndex-1 - i;
                         break;
                     }
-                }                 
+                }
                 break;
 
             case 4:
@@ -4501,7 +4482,7 @@ void Img2D::GetFocPosIndexRange(int &indexB, int &indexE)
                         indexE = sumIndex-1 - i;
                         break;
                     }
-                }                 
+                }
 
                 break;
 
@@ -4589,7 +4570,7 @@ EKnobReturn Img2D::TpView(int index)
 {
     EKnobReturn ret;
     ret = TpViewPara(index);
- 
+
     if (m_ptrDsc != NULL)
         m_ptrDsc->UpdateTpViewStatus();
 
@@ -4626,7 +4607,7 @@ EKnobReturn Img2D::EFVIViewPara(bool on)
     EKnobReturn ret;
     if (on)
         ret = MAX;
-    else 
+    else
         ret = MIN;
     m_ptrUpdate->EFVI(on, ret);
 	DisplayScanAngle();
@@ -4678,7 +4659,6 @@ void Img2D::UpdateDsc(void)
         Update2D::CopyImgDataToReplay();
     }
 }
-
 
 //test for changing channel num cw
 void Img2D::SendChannelCW(int num)
@@ -4853,7 +4833,6 @@ void Img2D::ChangeFreqBPFilter_test(EKnobOper oper, int segment)
                 break;
         }
     }
-
 
      switch(segment)
     {
@@ -5109,7 +5088,6 @@ void Img2D::DefaultIndexBandPassFilter(int probeindex, int thi)
     }
     m_ptrCalc->ChangeBPFilter(num);
 
-
 #elif EMP_360
     if(probeindex == 0)
     {//3.5CV
@@ -5236,7 +5214,7 @@ void Img2D::DefaultIndexBandPassFilter(int probeindex, int thi)
                 break;
         }
     }
-    //65C15D 
+    //65C15D
     else if(probeindex == 4)
     {
         switch(thi)
@@ -5732,18 +5710,18 @@ int* Img2D::GetTGCFor4D()
 
 // get gain from 4d by zjj 2015-1-26
 void Img2D::SetGainFrom4D(int gain)
-{  
+{
     m_gain2D = gain;
     m_ptrUpdate->Gain2D(m_gain2D);
 }
 
 void Img2D::SetTGCFrom4D(int *tgc)
-{    
+{
     ChangeTgc2D(tgc); // if not enter2D
-    //memcpy(m_tgc, tgc, 8*sizeof(int)); 
+    //memcpy(m_tgc, tgc, 8*sizeof(int));
 }
 
-// set 4d depth by zjj 2015-1-26 
+// set 4d depth by zjj 2015-1-26
 void Img2D::Set4DDepth(int depth_scale)
 {
     Depth(depth_scale);
@@ -5751,7 +5729,7 @@ void Img2D::Set4DDepth(int depth_scale)
 }
 
 void Img2D::UpdateGain()       //用来解决调节M增益后，进入CFM时，增益错误的问题
-{	
+{
 	m_ptrCalc->CalcTgc(m_gain2D*MAX_GAIN_2D/100, m_tgc, m_ptrUpdate, 0);
 	m_ptrCalc->CalcTgcDigital(m_gain2D*MAX_GAIN_2D/100, 0, MAX_GAIN_2D);
 

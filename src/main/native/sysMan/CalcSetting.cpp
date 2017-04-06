@@ -3,58 +3,58 @@
  *
  *       Filename:  CalcSetting.cpp
  *
- *    Description:  
+ *    Description:
  *
  *        Version:  1.0
  *        Created:  10/29/2012 04:09:16 AM
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  YOUR NAME (), 
- *        Company:  
+ *         Author:  YOUR NAME (),
+ *        Company:
  *
  * =====================================================================================
  */
 
 #include <dirent.h>
-#include "CalcSetting.h"
+#include "sysMan/CalcSetting.h"
 #include "Def.h"
-#include "gui_global.h"
-#include "gui_func.h"
-#include "KeyValueOpr.h"
-#include "KeyDef.h"
-#include "MeasureDef.h"
-#include "MeaCalcFun.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyDef.h"
+#include "calcPeople/MeasureDef.h"
+#include "calcPeople/MeaCalcFun.h"
 #include "ViewMain.h"
-#include "ViewDialog.h"
-#include "KeyFunc.h"
-#include "FileMan.h"
-#include "PeripheralMan.h"
-#include "MenuCalcNew.h"
-#include "ConfigToHost.h"
-#include "UserSelect.h"
-#include "TopArea.h"
-#include "MeasureMan.h"
+#include "display/ViewDialog.h"
+#include "keyboard/KeyFunc.h"
+#include "patient/FileMan.h"
+#include "periDevice/PeripheralMan.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "sysMan/ConfigToHost.h"
+#include "sysMan/UserSelect.h"
+#include "display/TopArea.h"
+#include "measure/MeasureMan.h"
 using std::vector;
 
 char export_name[256];
 #ifdef EMP_322
 const string section[SECTION_NUM]={
-    N_("Abdomen-General") , 
+    N_("Abdomen-General") ,
     N_("Gynecology") ,
-    N_("Obstetrics-General") , 
+    N_("Obstetrics-General") ,
     N_("Obstetrics-FetalHeart") ,
-    N_("Urology") , 
-    N_("Orthopedic") , 
-    N_("SmallPart-Glands") , 
-    N_("SmallPart-Thyroid") , 
-    N_("SmallPart-Eye") , 
+    N_("Urology") ,
+    N_("Orthopedic") ,
+    N_("SmallPart-Glands") ,
+    N_("SmallPart-Thyroid") ,
+    N_("SmallPart-Eye") ,
     N_("SmallPart-Testicle") ,
-    N_("Cardiac") , 
-    N_("Fetal Cardio")  
+    N_("Cardiac") ,
+    N_("Fetal Cardio")
 };
 
-const char* examType_calc[] = 
+const char* examType_calc[] =
 {
     N_("Adult Abdomen"),
     N_("Adult Liver"),
@@ -81,49 +81,49 @@ const char* examType_calc[] =
 #else
 #ifdef VET
 const string section[SECTION_NUM]={
-  N_("Abdomen-General") , 
-  N_("Abdomen-Arterial") , 
+  N_("Abdomen-General") ,
+  N_("Abdomen-Arterial") ,
   N_("Abdomen-Venous") ,
-  N_("Obstetrics-Dog") , 
-  N_("Obstetrics-Cat") , 
-  N_("Obstetrics-Sheep") , 
-  N_("Obstetrics-Swine") , 
-  N_("Obstetrics-Bovine") , 
-  N_("Obstetrics-Equine") , 
-  N_("Urology") , 
-  N_("Orthopedic") , 
-  N_("SmallPart-Glands") , 
-  N_("SmallPart-Thyroid") , 
-  N_("SmallPart-Eye") , 
+  N_("Obstetrics-Dog") ,
+  N_("Obstetrics-Cat") ,
+  N_("Obstetrics-Sheep") ,
+  N_("Obstetrics-Swine") ,
+  N_("Obstetrics-Bovine") ,
+  N_("Obstetrics-Equine") ,
+  N_("Urology") ,
+  N_("Orthopedic") ,
+  N_("SmallPart-Glands") ,
+  N_("SmallPart-Thyroid") ,
+  N_("SmallPart-Eye") ,
   N_("SmallPart-Testicle") ,
   N_("Vascular-LE") ,
   N_("Vascular-UE") ,
-  N_("Vascular-Carotid") , 
-  N_("Cardiac") , 
-  N_("Fetal Cardio") , 
+  N_("Vascular-Carotid") ,
+  N_("Cardiac") ,
+  N_("Fetal Cardio") ,
   N_("TCD"),
   N_("Tendon")
 };
 
 #else
 const string section[SECTION_NUM]={
-  N_("Abdomen-General") , 
-  N_("Abdomen-Arterial") , 
+  N_("Abdomen-General") ,
+  N_("Abdomen-Arterial") ,
   N_("Abdomen-Venous") ,
   N_("Gynecology") ,
-  N_("Obstetrics-General") , 
+  N_("Obstetrics-General") ,
   N_("Obstetrics-FetalHeart") ,
-  N_("Urology") , 
-  N_("Orthopedic") , 
-  N_("SmallPart-Glands") , 
-  N_("SmallPart-Thyroid") , 
-  N_("SmallPart-Eye") , 
+  N_("Urology") ,
+  N_("Orthopedic") ,
+  N_("SmallPart-Glands") ,
+  N_("SmallPart-Thyroid") ,
+  N_("SmallPart-Eye") ,
   N_("SmallPart-Testicle") ,
   N_("Vascular-LE") ,
   N_("Vascular-UE") ,
-  N_("Vascular-Carotid") , 
-  N_("Cardiac") , 
-  N_("Fetal Cardio") , 
+  N_("Vascular-Carotid") ,
+  N_("Cardiac") ,
+  N_("Fetal Cardio") ,
   N_("TCD")
 };
 #endif
@@ -153,9 +153,8 @@ GtkWidget* CalcSetting::GetWindow(void)
     return m_win_parent;
 }
 
-
 void CalcSetting::CreateDefineItem_calc(vector<string>& vecExamItem_calc)
-{  
+{
 
     char probelist[256];
     char useritem[256];
@@ -248,7 +247,6 @@ void CalcSetting::CreateDefaultItemList_Calc(char *department,vector<string>& ve
         vecItemCalc.push_back(item_name);
     }
 }
-
 
 int CalcSetting::ItemNameTransEtype(char *select_name)
 {
@@ -569,16 +567,15 @@ string CalcSetting::CustomItemTransName(int item_num)
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
     }
     IniFile ini(path);
-    IniFile *ptrIni = &ini; 
+    IniFile *ptrIni = &ini;
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d",item_num);
     string item_name = ptrIni->ReadString(CustomEtype, "Name");
     return item_name;
 }
 
-
 void CalcSetting::CreateItemList_Calc1(char *probe_exam,vector<string>& vecItemCalc1)
-{   
+{
     char path1[256];
     sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini1(path1);
@@ -622,7 +619,7 @@ void CalcSetting::CreateItemList_Calc1(char *probe_exam,vector<string>& vecItemC
 }
 
 void CalcSetting::CreateItemList_Calc2(char *probe_exam,vector<int>& vecItemCalc1)
-{   
+{
     char path1[256];
     sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini1(path1);
@@ -681,10 +678,10 @@ GtkTreeModel* CalcSetting::create_item_calc_model1()
     GtkTreeStore *store = gtk_tree_store_new(1,
             G_TYPE_STRING);
 
-    for (int i = 0; i<item_size; i++) 
+    for (int i = 0; i<item_size; i++)
     {
         gtk_tree_store_append(store, &iter, NULL);
-        gtk_tree_store_set(store, &iter, 
+        gtk_tree_store_set(store, &iter,
                 0,  _(vecItemCalc1[i].c_str()),
                 -1);
 next:
@@ -692,7 +689,6 @@ next:
     }
     return GTK_TREE_MODEL(store);
 }
-
 
 GtkTreeModel* CalcSetting::create_item_calc_model2()
 {
@@ -732,11 +728,11 @@ GtkTreeModel* CalcSetting::create_item_calc_model2()
     if(!vecItemCalc1.empty())
     {
 
-        for (int i = 0; i<item_size1; i++) 
+        for (int i = 0; i<item_size1; i++)
         {
             vector<string>::iterator pos;
             pos = find(vecItemCalc.begin(), vecItemCalc.end(), vecItemCalc1[i]);
-          
+
             if(pos != vecItemCalc.end())
             {
                 vecItemCalc.erase(pos);
@@ -745,8 +741,8 @@ GtkTreeModel* CalcSetting::create_item_calc_model2()
             {    //vecItemCalc.pop_back();
                // pos_num++;
             }
-        }  
-    } 
+        }
+    }
     if(vecItemCalc.empty())
         return NULL;
 
@@ -754,10 +750,10 @@ GtkTreeModel* CalcSetting::create_item_calc_model2()
     GtkTreeStore *store = gtk_tree_store_new(1,
             G_TYPE_STRING);
 
-    for (int i = 0; i<(item_size-pos_num); i++) 
+    for (int i = 0; i<(item_size-pos_num); i++)
     {
         gtk_tree_store_append(store, &iter, NULL);
-        gtk_tree_store_set(store, &iter, 
+        gtk_tree_store_set(store, &iter,
                 0,  _(vecItemCalc[i].c_str()),
                 -1);
 next:
@@ -768,7 +764,7 @@ next:
 }
 
 void CalcSetting::CreateItemList_Delete_Calc(char *select_name, char *department, vector<int>& vecDeleteCalc, IniFile *ini)
-{   
+{
 	IniFile *ptrIni= ini;
 	ExamItem examitem;
 
@@ -808,7 +804,7 @@ void CalcSetting::CreateItemList_Delete_Calc(char *select_name, char *department
 }
 
 void CalcSetting::CreateItemList_Delete_Calc1(char *select_name, string probe_exam,vector<int>& vecItemCalc1)
-{   
+{
 
     char path1[256];
     sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -849,7 +845,7 @@ void CalcSetting::CreateItemList_Delete_Calc1(char *select_name, string probe_ex
         {
             item_name = CustomItemTransName(item_num);
         }
-        
+
         if(strcmp(select_name, _(item_name.c_str()))!=0)
         {
             vecItemCalc1.push_back(item_num);
@@ -880,7 +876,6 @@ void CalcSetting::add_columns_calc1(GtkTreeView *treeview)
     gtk_tree_view_column_set_clickable (GTK_TREE_VIEW_COLUMN (column), TRUE);
 }
 
-
 void CalcSetting::ExamCalcChanged(GtkComboBox *widget)
 {
     ChangeModel2();
@@ -889,12 +884,12 @@ void CalcSetting::ExamCalcChanged(GtkComboBox *widget)
     gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_calc));
     if(!exam_type_name)
         return;
-   
+
     char exam_type[256];
     ExamItem exam;
     exam.TransItemName(exam_type_name, exam_type);
     int sequence = GetSequence(exam_type);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence_calc), sequence);   
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence_calc), sequence);
 }
 
 void CalcSetting::DepartmentCalcChanged(GtkComboBox *widget)
@@ -911,9 +906,9 @@ void CalcSetting::MeasureSequenceChanged(GtkComboBox *widget)
     char exam_type[256];
     ExamItem exam;
     exam.TransItemName(exam_type_name, exam_type);
-    
+
     int number = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sequence_calc));
-    
+
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini1(path);
@@ -929,11 +924,10 @@ void CalcSetting::MeasureSequenceChanged(GtkComboBox *widget)
         sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
     }
     IniFile ini(path1);
-    IniFile *ptrIni = &ini; 
+    IniFile *ptrIni = &ini;
     ptrIni->WriteInt(exam_type, "Sequence", number);
     ptrIni->SyncConfigFile();
 }
-
 
 void CalcSetting::ChangeModel2(void)
 {
@@ -944,7 +938,6 @@ void CalcSetting::ChangeModel2(void)
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_calc), model);
 
 }
-
 
 void CalcSetting::ChangeModel(void)
 {
@@ -980,7 +973,7 @@ void CalcSetting::ChangeExamBoxDelete(void)
         gtk_combo_box_remove_text(GTK_COMBO_BOX (m_combobox_exam_calc), i);
     }
 
-    for (int i = 0; i <exam_size; i++) 
+    for (int i = 0; i <exam_size; i++)
     {
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_calc), _(vecExamItem_calc[i].c_str()));
     }
@@ -998,7 +991,7 @@ void CalcSetting::ChangeModelAndLight(const char *name)
 
     GtkTreeSelection *selection;
     GtkTreeIter iter_tmp;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc)); 
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc));
     iter_tmp= InsertUniqueCalc(model, name);
     gtk_tree_selection_select_iter(selection, &iter_tmp);
 
@@ -1006,7 +999,6 @@ void CalcSetting::ChangeModelAndLight(const char *name)
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc), path_scroll, NULL, FALSE, 1.0, 1.0);
     gtk_tree_path_free (path_scroll);
 }
-
 
 GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
 {
@@ -1042,11 +1034,11 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     int exam_size(0);
     exam_size = vecExamItem_calc.size();
 
-    for (int i = 0; i <exam_size; i++) 
+    for (int i = 0; i <exam_size; i++)
 	{
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_calc), _(vecExamItem_calc[i].c_str()));
     }
-    for (int i = 0; i <exam_size; i++) 
+    for (int i = 0; i <exam_size; i++)
 	{
 		string curExamType;
 		TopArea::GetInstance()->GetCheckPart(curExamType);
@@ -1077,8 +1069,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_calc), 0);
     g_signal_connect(m_combobox_department_calc, "changed", G_CALLBACK(HandleDepartmentCalcChanged), this);
 
-
-
     scrolledwindow_item_calc = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (scrolledwindow_item_calc);
     gtk_fixed_put (GTK_FIXED (fixed_calc), scrolledwindow_item_calc, 15, 120);
@@ -1087,7 +1077,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
 
      GtkTreeModel *model = create_item_calc_model2();
       m_treeview_item_calc = gtk_tree_view_new_with_model(model);
-
 
     add_columns_calc(GTK_TREE_VIEW(m_treeview_item_calc));
 
@@ -1099,7 +1088,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     select = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc));
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
     gtk_widget_show (m_treeview_item_calc);
-
 
      GtkWidget *label_sequence_calc = gtk_label_new (_("Measure Sequence:"));
     gtk_misc_set_alignment (GTK_MISC(label_sequence_calc), 0, 0.5);
@@ -1130,14 +1118,12 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence_calc), sequence);
     g_signal_connect(m_combobox_sequence_calc, "changed", G_CALLBACK(HandleMeasureSequenceChanged), this);
 
-
     GtkWidget *label_department_calc_select = gtk_label_new (_("Selected Items:"));
     gtk_misc_set_alignment (GTK_MISC(label_department_calc_select), 0, 0.5);
     gtk_label_set_use_markup (GTK_LABEL (label_department_calc_select), TRUE);
     gtk_widget_show (label_department_calc_select);
     gtk_fixed_put (GTK_FIXED (fixed_calc), label_department_calc_select, 400, 40);
     gtk_widget_set_size_request (label_department_calc_select, 150, 30);
-
 
     scrolledwindow_item_calc1 = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (scrolledwindow_item_calc1);
@@ -1158,7 +1144,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
     gtk_widget_show (m_treeview_item_calc1);
 
-
     m_button_select_one = gtk_button_new_with_mnemonic (">");
     gtk_widget_show (m_button_select_one);
     gtk_fixed_put (GTK_FIXED (fixed_calc), m_button_select_one, 290, 120);
@@ -1170,7 +1155,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     gtk_fixed_put (GTK_FIXED (fixed_calc), m_button_select_all, 290, 170);
     gtk_widget_set_size_request (m_button_select_all, 80, 30);
     g_signal_connect(m_button_select_all, "clicked", G_CALLBACK(HandleButtonSelectAllCalcClicked), this);
-
 
     m_button_calc_delete = gtk_button_new_with_mnemonic ("<");
     gtk_widget_show (m_button_calc_delete);
@@ -1196,7 +1180,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     gtk_widget_set_size_request (m_button_calc_delete_select, 80, 30);
     g_signal_connect(m_button_calc_delete_select, "clicked", G_CALLBACK(HandleButtonDeleteSelectClicked), this);
 
-
     m_button_calc_up = gtk_button_new_with_mnemonic (_("Up"));
     gtk_widget_show (m_button_calc_up);
     gtk_fixed_put (GTK_FIXED (fixed_calc), m_button_calc_up, 680, 170);
@@ -1208,7 +1191,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent)
     gtk_fixed_put (GTK_FIXED (fixed_calc), m_button_calc_down, 680, 220);
     gtk_widget_set_size_request (m_button_calc_down, 80, 30);
     g_signal_connect(m_button_calc_down, "clicked", G_CALLBACK(HandleButtonDownClicked), this);
-
 
     m_button_calc_export = gtk_button_new_with_mnemonic (_("Export"));
     gtk_widget_show (m_button_calc_export);
@@ -1271,7 +1253,7 @@ GtkTreeIter CalcSetting::InsertUniqueCalc(GtkTreeModel *model, const char *str)
     GtkTreeIter tmp_iter;
     char *strtmp = NULL;
     gboolean has_node = gtk_tree_model_get_iter_first(model, &tmp_iter);
-    while (has_node == TRUE) 
+    while (has_node == TRUE)
     {
         gtk_tree_model_get(model, &tmp_iter, 0, &strtmp, -1);
         if (strcmp(strtmp, str) == 0)
@@ -1281,7 +1263,6 @@ GtkTreeIter CalcSetting::InsertUniqueCalc(GtkTreeModel *model, const char *str)
     }
     return tmp_iter;
 }
-
 
 int DefaultCalc(gpointer data)
 {
@@ -1305,7 +1286,7 @@ void CalcSetting::ClearAllCalc()
 {
     MeasureMan::GetInstance()->ClearAllValue();
     g_menuCalc.ClearAllData();
-    //clear screen 
+    //clear screen
     KeyClearScreen kcs;
     kcs.Execute();
     g_menuCalc.ChangeAllCalcItems();
@@ -1317,12 +1298,12 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button)
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc)); 
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR, 
-                _("Please select a item before move!"), NULL); 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+                _("Please select a item before move!"), NULL);
         return;
     }
 
@@ -1350,22 +1331,22 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button)
                 GtkTreeModel *model_tmp;
                 GtkTreeSelection *selection;
                 GtkTreeIter iter_tmp;
-                selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1)); 
+                selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1));
                 model_tmp= gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
                  //高亮要插入的词条，并更新滚动条
                 iter_tmp= InsertUniqueCalc(model_tmp, select_name);
                 gtk_tree_selection_select_iter(selection, &iter_tmp);
-            
+
                 GtkTreePath *path_scroll = gtk_tree_model_get_path(model_tmp, &iter_tmp);
                 gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path_scroll, NULL, FALSE, 1.0, 1.0);
                 gtk_tree_path_free (path_scroll);
-                
+
                 ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::INFO, _(" Item has existed. Please select item again!"), NULL);
                 return;
             }
         }
     }
-  
+
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini1(path);
@@ -1381,11 +1362,11 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button)
         sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
     }
     IniFile ini(path1);
-    IniFile *ptrIni = &ini; 
+    IniFile *ptrIni = &ini;
     int number;
     char SelectNum[256];
     number = ptrIni->ReadInt(exam_type, "Number");
-    
+
     sprintf(SelectNum, "Calc%d",number+1);
     int select_num = ItemNameTransEtype(select_name);
 	if (select_num == -1)
@@ -1393,17 +1374,17 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button)
 		PRINTF("Fail to ItemNameTransEtype, not exist the etype!\n");
 		return;
 	}
-   
+
     ptrIni->WriteInt(exam_type, SelectNum, select_num);
     ptrIni->WriteInt(exam_type, "Number", number+1);
     ptrIni->SyncConfigFile();
 
     GtkTreeModel *new_model1 = create_item_calc_model1();
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_calc1), new_model1);
-    //高亮插入的词条，并更新滚动条
+    //楂樹寒鎻掑叆鐨勮瘝鏉★紝骞舵洿鏂版粴鍔ㄦ潯
     GtkTreeSelection *new_selection;
     GtkTreeIter iter_new;
-    new_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1)); 
+    new_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1));
     iter_new= InsertUniqueCalc(new_model1, select_name);
     gtk_tree_selection_select_iter(new_selection, &iter_new);
 
@@ -1411,7 +1392,7 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button)
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path_scroll, NULL, TRUE, 1.0, 1.0);
     gtk_tree_path_free (path_scroll);
 
-    //更新departent列表
+    //鏇存柊departent鍒楄〃
     GtkTreeStore *calculate_store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc)));
     gtk_tree_store_remove(calculate_store, &iter);
 
@@ -1419,9 +1400,8 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button)
         g_menuCalc.ChangeExamItem(exam_type);
 }
 
-
 void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button)
-{    
+{
     gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_calc));
 
     if(!exam_type_name)
@@ -1434,14 +1414,14 @@ void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button)
 		PRINTF("=========== tree view department items is empty!\n");
 		return;
 	}
-    
+
     char exam_type[256];
     ExamItem exam;
     exam.TransItemName(exam_type_name, exam_type);
       char path11[256];
     sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini11(path11);
-  
+
     string username;
     username = exam.ReadDefaultUserSelect(&ini11);
     char path[256];
@@ -1454,10 +1434,10 @@ void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button)
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
     }
     IniFile ini(path);
-    IniFile *ptrIni = &ini; 
-    
+    IniFile *ptrIni = &ini;
+
     int Num = ptrIni->ReadInt(exam_type, "Number");
-    
+
     vector<string> vecSelect_Calc;
     vecSelect_Calc.clear();
     CreateItemList_Calc1(exam_type, vecSelect_Calc);
@@ -1485,12 +1465,11 @@ void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button)
     {
         sprintf(path12, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
     }
-   
 
     IniFile new_ini(path12);
     IniFile *new_ptrIni= &new_ini;
     int number = new_ptrIni->ReadInt(department_name, "Number");
-    
+
     for(int i=1;i<=number;i++)
     {
     int writeCalc=1;
@@ -1514,7 +1493,7 @@ void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button)
                 }
             }
         }
-        
+
         if(writeCalc)
         {
             char CalcNum[256];
@@ -1525,13 +1504,13 @@ void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button)
     }
     ptrIni->WriteInt(exam_type, "Number", Num);
     ptrIni->SyncConfigFile();
-    
+
     //更新Exam Item和 Department 列表
     ChangeModel2();
-	
+
 	if (g_menuCalc.GetExamItem() == exam_type)
 		g_menuCalc.ChangeExamItem(exam_type);
-   
+
 }
 
 void CalcSetting::ButtonBackOneClicked(GtkButton *button)
@@ -1539,12 +1518,12 @@ void CalcSetting::ButtonBackOneClicked(GtkButton *button)
  GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1)); 
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR, 
-                _("Please select a item before move!"), NULL); 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+                _("Please select a item before move!"), NULL);
         return;
     }
   GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -1575,11 +1554,11 @@ void CalcSetting::ButtonBackOneClicked(GtkButton *button)
             sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
         }
         IniFile ini(path1);
-        IniFile *ptrIni_calc = &ini; 
+        IniFile *ptrIni_calc = &ini;
 
      vector<int> vecDelete_Calc;
     vecDelete_Calc.clear();
-    CreateItemList_Delete_Calc1(select_name, exam_type, vecDelete_Calc); 
+    CreateItemList_Delete_Calc1(select_name, exam_type, vecDelete_Calc);
 
     int item_length(0);
     item_length = vecDelete_Calc.size();
@@ -1594,7 +1573,7 @@ void CalcSetting::ButtonBackOneClicked(GtkButton *button)
         sprintf(CalcNumber, "Calc%d", i+1);
         ptrIni_calc->WriteInt(exam_type, CalcNumber, vecDelete_Calc[i]);
     }
-    
+
     ptrIni_calc->WriteInt(exam_type, "Number", item_length);
 	ptrIni_calc->WriteInt(exam_type, "Sequence", squence_copy);
     ptrIni_calc->SyncConfigFile();
@@ -1611,7 +1590,6 @@ void CalcSetting::ButtonBackOneClicked(GtkButton *button)
 	if (g_menuCalc.GetExamItem() == exam_type)
 		g_menuCalc.ChangeExamItem(exam_type);
 }
-
 
 void CalcSetting::ButtonBackAllClicked(GtkButton *button)
 {
@@ -1638,7 +1616,7 @@ void CalcSetting::ButtonBackAllClicked(GtkButton *button)
 		sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
 	}
 	IniFile ini(path1);
-	IniFile *ptrIni = &ini; 
+	IniFile *ptrIni = &ini;
 
 	int squence_copy;
 	squence_copy= ptrIni->ReadInt(exam_type, "Sequence");
@@ -1649,25 +1627,24 @@ void CalcSetting::ButtonBackAllClicked(GtkButton *button)
 	ptrIni->WriteInt(exam_type, "Sequence", squence_copy);
 	ptrIni->SyncConfigFile();
 
-	//更新列表
+	//鏇存柊鍒楄〃
 	ChangeModel2();
 
 	if (g_menuCalc.GetExamItem() == exam_type)
 		g_menuCalc.ChangeExamItem(exam_type);
 }
 
-
 void CalcSetting::DeleteItem(void)
 {
-   
+
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc)); 
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
                 _("Please select a item before delete!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -1718,11 +1695,11 @@ void CalcSetting::DeleteItem(void)
 
     IniFile new_ini(path1);
     IniFile *ptrIni_calc= &new_ini;
- 
+
      vector<int> vecDeleteCalc;
     vecDeleteCalc.clear();
     CreateItemList_Delete_Calc(select_name, department,vecDeleteCalc, ptrIni_calc);
-    
+
     int item_length(0);
     item_length = vecDeleteCalc.size();
     ptrIni_calc->RemoveGroup(department);
@@ -1734,7 +1711,7 @@ void CalcSetting::DeleteItem(void)
         sprintf(CalcNumber, "Calc%d", i+1);
         ptrIni_calc->WriteInt(department, CalcNumber, vecDeleteCalc[i]);
     }
-    
+
     ptrIni_calc->WriteInt(department, "Number", item_length);
     ptrIni_calc->SyncConfigFile();
 
@@ -1754,11 +1731,11 @@ void CalcSetting::DeleteItem(void)
             sprintf(path_exam, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
         }
         IniFile ini(path_exam);
-        IniFile *ptrIni_calc1 = &ini; 
+        IniFile *ptrIni_calc1 = &ini;
 
 		vector<int> vecDelete_Select;
 		vecDelete_Select.clear();
-		CreateItemList_Delete_Calc1(select_name, exam_type, vecDelete_Select); 
+		CreateItemList_Delete_Calc1(select_name, exam_type, vecDelete_Select);
 
 		int item_length(0);
 		item_length = vecDelete_Select.size();
@@ -1779,13 +1756,13 @@ void CalcSetting::DeleteItem(void)
 		ptrIni_calc1->SyncConfigFile();
     }
 
-    //同时删除自定义的配置字段
+    //鍚屾椂鍒犻櫎鑷畾涔夌殑閰嶇疆瀛楁
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d", select_num);
 	ptrIni_calc->RemoveGroup(CustomEtype);
 	ptrIni_calc->SyncConfigFile();
 
-	//更新Exam Item 和Departmen 列表
+	//鏇存柊Exam Item 鍜孌epartmen 鍒楄〃
 	ChangeModel2();
     ClearAllCalc();
 }
@@ -1801,7 +1778,6 @@ void CalcSetting::ButtonDeleteSelectClicked(GtkButton *button)
     else
         DeleteItem();;
 
-
 }
 
 void CalcSetting::ButtonDownClicked(GtkButton *button)
@@ -1809,12 +1785,12 @@ void CalcSetting::ButtonDownClicked(GtkButton *button)
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1)); 
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR, 
-                _("Please select a item before down!"), NULL); 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+                _("Please select a item before down!"), NULL);
         return;
     }
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -1827,11 +1803,10 @@ void CalcSetting::ButtonDownClicked(GtkButton *button)
     exam.TransItemName(exam_type_name, exam_type);
     vector<int> vecDelete_Calc;
     vecDelete_Calc.clear();
-    CreateItemList_Calc2(exam_type, vecDelete_Calc); 
+    CreateItemList_Calc2(exam_type, vecDelete_Calc);
 
     int item_length(0);
     item_length = vecDelete_Calc.size();
-
 
     int path_total = item_length-1;
     if(path_num != path_total)
@@ -1852,7 +1827,7 @@ void CalcSetting::ButtonDownClicked(GtkButton *button)
             sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
         }
         IniFile ini(path1);
-        IniFile *ptrIni_calc = &ini; 
+        IniFile *ptrIni_calc = &ini;
 
 		int squence_copy;
 		squence_copy= ptrIni_calc->ReadInt(exam_type, "Sequence");
@@ -1884,9 +1859,9 @@ void CalcSetting::ButtonDownClicked(GtkButton *button)
         gtk_tree_path_next(path);
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE);
         if(item_length-path_num >2)
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 1.0, 1.0);//移动后的选中词条置底
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 1.0, 1.0);//绉诲姩鍚庣殑閫変腑璇嶆潯缃簳
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//保证在最下端的词条移动后能够正常显示
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//淇濊瘉鍦ㄦ渶涓嬬鐨勮瘝鏉＄Щ鍔ㄥ悗鑳藉姝ｅ父鏄剧ず
         gtk_tree_path_free (path);
     }
 
@@ -1899,11 +1874,11 @@ void CalcSetting::ButtonUpClicked(GtkButton *button)
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1)); 
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
                 _("Please select a item before up!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -1915,7 +1890,6 @@ void CalcSetting::ButtonUpClicked(GtkButton *button)
     if(path_num == 0)
         return;
 
-
     gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_calc));
     char exam_type[256];
     ExamItem exam;
@@ -1923,11 +1897,10 @@ void CalcSetting::ButtonUpClicked(GtkButton *button)
 
     vector<int> vecDelete_Calc;
     vecDelete_Calc.clear();
-    CreateItemList_Calc2(exam_type, vecDelete_Calc); 
+    CreateItemList_Calc2(exam_type, vecDelete_Calc);
 
     int item_length(0);
     item_length = vecDelete_Calc.size();
-
 
     char path11[256];
     sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -1944,7 +1917,7 @@ void CalcSetting::ButtonUpClicked(GtkButton *button)
         sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
     }
     IniFile ini(path1);
-    IniFile *ptrIni_calc = &ini; 
+    IniFile *ptrIni_calc = &ini;
 
 	int squence_copy;
 	squence_copy= ptrIni_calc->ReadInt(exam_type, "Sequence");
@@ -1972,9 +1945,9 @@ void CalcSetting::ButtonUpClicked(GtkButton *button)
     {
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE);
         if(item_length-path_num >12)
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 0.0, 1.0);// 移动后选中词条置顶
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 0.0, 1.0);// 绉诲姩鍚庨€変腑璇嶆潯缃《
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//保证在最上端的词条移动时能够正确显示
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//淇濊瘉鍦ㄦ渶涓婄鐨勮瘝鏉＄Щ鍔ㄦ椂鑳藉姝ｇ‘鏄剧ず
     }
     gtk_tree_path_free (path);
 
@@ -2010,20 +1983,15 @@ gboolean CalcSetting::GetSelectPath(void)
 
     }
 
-
-
     m_vecPath.push_back(path);
     m_vecPath.push_back(path3);
-
 
     if(!m_vecPath.empty())
         return TRUE;
     else
         return FALSE;
 
-
 }
-
 
 static GCancellable* cancellable = NULL;
 
@@ -2033,7 +2001,6 @@ static void progress_callback(goffset current, goffset total, gpointer data)
         return;
 
 }
-
 
 static gboolean LoadData(gpointer data)
 {
@@ -2119,7 +2086,6 @@ static gboolean LoadData(gpointer data)
         ite++;
     }
 
-    
     //Handle result
     if(!cond)
     {
@@ -2149,18 +2115,18 @@ static gboolean LoadData(gpointer data)
         if(strcmp(username.c_str(), "System Default") == 0)
         {
 #ifdef VET
-            sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "VetDSCalcSetting.ini"); 
-            sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","VetDSCalcItemSetting.ini");  
+            sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "VetDSCalcSetting.ini");
+            sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","VetDSCalcItemSetting.ini");
 
 #else
-            sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "DSCalcSetting.ini"); 
-            sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","DSCalcItemSetting.ini");  
+            sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "DSCalcSetting.ini");
+            sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","DSCalcItemSetting.ini");
 #endif
         }
         else
         {
-            sprintf(userselectname, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/",username.c_str(),".ini");  
-            sprintf(userselectname1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/",username.c_str(),".ini");  
+            sprintf(userselectname, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/",username.c_str(),".ini");
+            sprintf(userselectname1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/",username.c_str(),".ini");
         }
 
         char exam_type[256];
@@ -2193,37 +2159,36 @@ static gboolean LoadData(gpointer data)
         f.CopyFile(userselectname, path4);
         f.CopyFile(userselectname1, path5);
 
-        sprintf(userselectname2, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting"); 
-        sprintf(userselectname3, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting");  
+        sprintf(userselectname2, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting");
+        sprintf(userselectname3, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting");
         f.DelDirectory(userselectname2);
         f.DelDirectory(userselectname3);
-
 
         ptr->UmountUsbStorage();
         gdk_threads_enter();
         CustomCalc::GetInstance()->SetProgressBar(0.2);
         while(gtk_events_pending())
             gtk_main_iteration();
-        gdk_threads_leave();	
+        gdk_threads_leave();
         usleep(100000);
         gdk_threads_enter();
         CustomCalc::GetInstance()->SetProgressBar(0.4);
         while(gtk_events_pending())
             gtk_main_iteration();
-        gdk_threads_leave();	
+        gdk_threads_leave();
         usleep(100000);
         gdk_threads_enter();
         CustomCalc::GetInstance()->SetProgressBar(0.6);
         while(gtk_events_pending())
             gtk_main_iteration();
-        gdk_threads_leave();	
+        gdk_threads_leave();
 
         usleep(100000);
         gdk_threads_enter();
         CustomCalc::GetInstance()->SetProgressBar(0.8);
         while(gtk_events_pending())
             gtk_main_iteration();
-        gdk_threads_leave();	
+        gdk_threads_leave();
 
         usleep(100000);
         CustomCalc::GetInstance()-> ExportRightInfoNotice(_("Success to export to USB storage."));
@@ -2232,14 +2197,14 @@ static gboolean LoadData(gpointer data)
         CustomCalc::GetInstance()->SetProgressBar(1.0);
         while(gtk_events_pending())
             gtk_main_iteration();
-        gdk_threads_leave();	
+        gdk_threads_leave();
 
         usleep(1000000);
-        CustomCalc::GetInstance()->OKAndCancelClicked();  
+        CustomCalc::GetInstance()->OKAndCancelClicked();
         CustomCalc::GetInstance()-> DelayDestroyWin();
     }else
     {
-        CustomCalc::GetInstance()->OKAndCancelClicked();  
+        CustomCalc::GetInstance()->OKAndCancelClicked();
         CustomCalc::GetInstance()-> ExportErrorInfoNotice(result);
     }
 
@@ -2263,9 +2228,9 @@ void CalcSetting::ButtonImportClicked(GtkButton *button)
 
     if(!ptr->CheckUsbStorageState())
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()),
                 ViewDialog::ERROR,
-                _("No USB storage found!"), 
+                _("No USB storage found!"),
                 NULL);
         return ;
     }
@@ -2273,9 +2238,9 @@ void CalcSetting::ButtonImportClicked(GtkButton *button)
     {
         if(!ptr->MountUsbStorage())
         {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()), 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()),
                     ViewDialog::ERROR,
-                    _("Failed to mount USB storage!"), 
+                    _("Failed to mount USB storage!"),
                     NULL);
             return ;
         }
@@ -2324,7 +2289,7 @@ void CalcSetting::UpdateAllCalc()
     sprintf(userselectname3, "%s%s", CFG_RES_PATH, DEFAULT_CALC_ITEM_FILE );
     f.CopyFile(userselectname3, path3);
 
-    //更新Exam Item 和Departmen 列表
+    //鏇存柊Exam Item 鍜孌epartmen 鍒楄〃
     ChangeModel2();
     ClearAllCalc();
 }
@@ -2339,10 +2304,9 @@ void CalcSetting::ButtonDefaultClicked(GtkButton *button)
     }
     else
     {
-        UpdateAllCalc();   
+        UpdateAllCalc();
     }
 }
-
 
 void CalcSetting::ButtonAddClicked(GtkButton *button)
 {
@@ -2355,7 +2319,6 @@ void CalcSetting::ButtonAddClicked(GtkButton *button)
     else
        AddItem();
 }
-
 
 //获得exam_type检查部位下所有测量项的item，push到vector中
 void CalcSetting::GetCalcListEtype(char *exam_type, vector<int> & vecItemCalc)
@@ -2393,7 +2356,7 @@ void CalcSetting::GetCalcListEtype(char *exam_type, vector<int> & vecItemCalc)
     }
 }
 
-//获得exam_type检查部位下的测量项总数
+//鑾峰緱exam_type妫€鏌ラ儴浣嶄笅鐨勬祴閲忛」鎬绘暟
 int CalcSetting::GetCalcListNum(char *exam_type)
 {
     char path1[256];
@@ -2441,11 +2404,10 @@ int CalcSetting::GetMeasureSequence(const char *exam_type)
 
 }
 
-
 /*
- *int Etype: 自定义的测量Etype
- *int measure_type: 通过Etype，需要得到的测量方式
- *string calc_name: 通过Etype，需要得到的自定义测量的名称
+ *int Etype: 鑷畾涔夌殑娴嬮噺Etype
+ *int measure_type: 閫氳繃Etype锛岄渶瑕佸緱鍒扮殑娴嬮噺鏂瑰紡
+ *string calc_name: 閫氳繃Etype锛岄渶瑕佸緱鍒扮殑鑷畾涔夋祴閲忕殑鍚嶇О
  */
 void CalcSetting::GetCustomCalcMeasure(int Etype, int &measure_type, string &calc_name)
 {
@@ -2465,7 +2427,7 @@ void CalcSetting::GetCustomCalcMeasure(int Etype, int &measure_type, string &cal
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
     }
     IniFile ini(path);
-    IniFile *ptrIni = &ini; 
+    IniFile *ptrIni = &ini;
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d",Etype);
     measure_type=ptrIni->ReadInt(CustomEtype, "Method");
@@ -2491,7 +2453,7 @@ int CalcSetting::GetCalcMaxEtype()
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
     }
     IniFile ini(path);
-    IniFile *ptrIni = &ini; 
+    IniFile *ptrIni = &ini;
     return ptrIni->ReadInt("MaxNumber", "Number");
 }
 
@@ -2514,12 +2476,11 @@ void CalcSetting::GetDepartmentForCustomMeasure(int Etype, string &department)
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
     }
     IniFile ini(path);
-    IniFile *ptrIni = &ini; 
+    IniFile *ptrIni = &ini;
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d",Etype-BASIC_MEA_END);
     department=ptrIni->ReadString(CustomEtype, "Department");
 }
-
 
 static char type_null[][20]=
 {
@@ -2540,14 +2501,14 @@ static char method_name[][20]=
     {N_("Profile")},
     {N_("Histogram")},
     {N_("Time")},
-    {N_("Slope")}, 
-    {N_("Vel")}, 
-    {N_("HR")}, 
-    {N_("Acceleration")}, 
+    {N_("Slope")},
+    {N_("Vel")},
+    {N_("HR")},
+    {N_("Acceleration")},
     {N_("PG Mean")}
 };
 
-const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] = 
+const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] =
 {
     {0, N_("Dist-Dot"), DIST_DOT},
     {0, N_("Dist-Line"), DIST_LINE},
@@ -2600,7 +2561,7 @@ const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] =
 
 /*
 
-const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] = 
+const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] =
 {
     {0, N_("DIST_DOT"), DIST_DOT},
     {0, N_("DIST_LINE"), DIST_LINE},
@@ -2663,7 +2624,7 @@ const char *custom_method[][6]=
     {"PGMEAN"}
 };
 
-const CustomEtype CustomEtypeArray[ETYPE_NUM] = 
+const CustomEtype CustomEtypeArray[ETYPE_NUM] =
 {
     {"DIST_DOT",DIST_DOT},
     {"DIST_LINE",DIST_LINE},
@@ -2831,12 +2792,11 @@ GtkWidget* CustomCalc::CreateExportCalcSettingWin(GtkWidget *parent)
     gtk_widget_hide (img_error);
     gtk_widget_hide (img_load);
     m_window = window_calc_export;
-     g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this); 
+     g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
      g_keyInterface.Push(this);
      SetSystemCursorToCenter();
      return window_calc_export;
 }
-
 
 GtkWidget* CustomCalc::CreateCalcSettingWin(GtkWidget *parent)
 {
@@ -2866,8 +2826,7 @@ GtkWidget* CustomCalc::CreateCalcSettingWin(GtkWidget *parent)
     gtk_widget_show (fixed1);
     gtk_container_add (GTK_CONTAINER (window_calc_add), fixed1);
 
-
-    label_name = gtk_label_new (_("Item:")); 
+    label_name = gtk_label_new (_("Item:"));
     gtk_widget_show (label_name);
     gtk_fixed_put (GTK_FIXED (fixed1), label_name, 8, 24);
     gtk_widget_set_size_request (label_name, 120, 30);
@@ -2895,9 +2854,7 @@ GtkWidget* CustomCalc::CreateCalcSettingWin(GtkWidget *parent)
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_type), _(method_name[i]));
     }
 	gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_type), 0);
-    g_signal_connect(m_combobox_type, "changed", G_CALLBACK(HandleComboboxTypeChanged), this); 
-
-
+    g_signal_connect(m_combobox_type, "changed", G_CALLBACK(HandleComboboxTypeChanged), this);
 
     label_method = gtk_label_new (_("Method:"));
     gtk_widget_show (label_method);
@@ -2911,7 +2868,7 @@ GtkWidget* CustomCalc::CreateCalcSettingWin(GtkWidget *parent)
 
     for(int i=0;i<ETYPE_NUM;i++)
     {
-        if(0 == CustomEtypeArray[i].type) 
+        if(0 == CustomEtypeArray[i].type)
         {
             gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(CustomEtypeArray[i].name.c_str()));
         }
@@ -2977,7 +2934,7 @@ GtkWidget* CustomCalc::CreateCalcSettingWin(GtkWidget *parent)
 
     gtk_widget_show_all(window_calc_add);
     m_window = window_calc_add;
-    g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this); 
+    g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
 
     g_keyInterface.Push(this);
     SetSystemCursorToCenter();
@@ -2991,7 +2948,7 @@ void CustomCalc::ComboboxTypeChanged(GtkComboBox *combobox)
     int active = gtk_combo_box_get_active(GTK_COMBO_BOX(combobox));
     if (active ==-1)
         return ;
-   
+
 	int i = 0;
 	for(i = 5; i >= 0; i--)
 		gtk_combo_box_remove_text(GTK_COMBO_BOX(m_combobox_method), i);
@@ -3006,7 +2963,7 @@ void CustomCalc::ComboboxTypeChanged(GtkComboBox *combobox)
 
   for(int i=0;i<ETYPE_NUM;i++)
     {
-        if(active == CustomEtypeArray[i].type) 
+        if(active == CustomEtypeArray[i].type)
         {
             gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(CustomEtypeArray[i].name.c_str()));
         }
@@ -3032,12 +2989,10 @@ void CustomCalc::EntryItemFocusIn(GtkEditable *editable, GdkEventFocus *event)
     }
 }
 
-
 void CustomCalc::ButtonCancelClicked(GtkButton *button)
 {
     DestroyWin();
 }
-
 
 void CustomCalc::HideOKAndCancelClicked()
 {
@@ -3062,14 +3017,13 @@ void CustomCalc::SetProgressBar(double fraction)
     gtk_widget_show(m_progress_bar);
 }
 
-
 void CustomCalc::ExportRightInfoNotice(char *result)
 {
     gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
     gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
     gtk_widget_hide (img_error);
     gtk_widget_hide (img_load);
-    gtk_widget_show(m_label_notice);   
+    gtk_widget_show(m_label_notice);
     gtk_widget_show(img_right);
 }
 
@@ -3079,7 +3033,7 @@ void CustomCalc::ExportErrorInfoNotice(char *result)
     gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
     gtk_widget_hide (img_right);
     gtk_widget_hide (img_load);
-    gtk_widget_show(m_label_notice);   
+    gtk_widget_show(m_label_notice);
     gtk_widget_show(img_error);
 }
 
@@ -3089,7 +3043,7 @@ void CustomCalc::ExportLoadInfoNotice(char *result)
     gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
     gtk_widget_hide (img_right);
     gtk_widget_hide (img_error);
-    gtk_widget_show(m_label_notice);   
+    gtk_widget_show(m_label_notice);
     gtk_widget_show(img_load);
 
 }
@@ -3116,7 +3070,7 @@ bool CustomCalc::RenameCompare(char * name_copy)
     }
 
     IniFile ini_add4(userselectname1);
-    IniFile *ptrIni_add4 = &ini_add4; 
+    IniFile *ptrIni_add4 = &ini_add4;
     vector<string> useritemgroup;
     useritemgroup = ptrIni_add4->GetGroupName();
     char src_group[256];
@@ -3142,7 +3096,7 @@ bool CustomCalc::RenameCompare(char * name_copy)
             }
             if(strcmp(item_name1.c_str(),name_copy) == 0)
             {
-                return false; 
+                return false;
 
             }
         }
@@ -3163,11 +3117,11 @@ void CustomCalc::ImportWrite(string item_name, int &item_num)
     char userselectname[256];
     char userselectname1[256];
 #ifdef VET
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini"); 
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini"); 
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
 #else
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini"); 
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini"); 
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
 #endif
     FileMan f;
     if(strcmp(username.c_str(), "System Default") == 0)
@@ -3182,13 +3136,13 @@ void CustomCalc::ImportWrite(string item_name, int &item_num)
     }
 
     IniFile ini_add2(userselectname1);
-    IniFile *ptrIni_add2 = &ini_add2; 
+    IniFile *ptrIni_add2 = &ini_add2;
     int ItemAllNum;
     ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
     int ItemDeleteNum=ptrIni_add2->ReadInt("Delete", "Number");
 
     IniFile ini_add1(path3);
-    IniFile *ptrIni_add1 = &ini_add1; 
+    IniFile *ptrIni_add1 = &ini_add1;
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d",item_num);
     int method_index = ptrIni_add1->ReadInt(CustomEtype, "Method");
@@ -3215,7 +3169,7 @@ void CustomCalc::ImportWrite(string item_name, int &item_num)
         ptrIni_add2->SyncConfigFile();
         ItemAllNum = item_num1;
         item_num =item_num1;
-    } 
+    }
     else
     {
         char CustomEtype1[256];
@@ -3254,12 +3208,12 @@ void CustomCalc::ImportRenameCopy(string item_name)
     char userselectname[256];
     char userselectname1[256];
 #ifdef VET
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini"); 
-sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini"); 
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
+sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
 
 #else
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini"); 
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini"); 
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
 #endif
     FileMan f;
     if(strcmp(username.c_str(), "System Default") == 0)
@@ -3274,13 +3228,13 @@ sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
     }
 
     IniFile ini_add2(userselectname1);
-    IniFile *ptrIni_add2 = &ini_add2; 
+    IniFile *ptrIni_add2 = &ini_add2;
 	int ItemAllNum;
 	ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
 	int ItemDeleteNum=ptrIni_add2->ReadInt("Delete", "Number");
 
 	IniFile ini_add1(path3);
-	IniFile *ptrIni_add1 = &ini_add1; 
+	IniFile *ptrIni_add1 = &ini_add1;
 	char CustomEtype[256];
 	sprintf(CustomEtype, "CustomEtype-%d",item_num_exist);
     int method_index = ptrIni_add1->ReadInt(CustomEtype, "Method");
@@ -3307,7 +3261,7 @@ sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
         ptrIni_add2->SyncConfigFile();
         ItemAllNum = item_num1;
         item_num_exist =item_num1;
-    } 
+    }
     else
     {
         char CustomEtype1[256];
@@ -3363,7 +3317,7 @@ void CustomCalc::ImportSuccess(void)
     strcpy(exam_name, CalcSetting::GetInstance()->GetExamName());
     exam.TransItemName(exam_name, exam_type);
     IniFile ini_add3(userselectname);
-    IniFile *ptrIni_add3 = &ini_add3; 
+    IniFile *ptrIni_add3 = &ini_add3;
     ptrIni_add3->RemoveGroup(exam_type);
     ptrIni_add3->SyncConfigFile();
     int item_length(0);
@@ -3378,22 +3332,18 @@ void CustomCalc::ImportSuccess(void)
     ptrIni_add3->SyncConfigFile();
 
     char userselectname2[256];
-    sprintf(userselectname2, "%s", CALC_TMP_DATA_PATH); 
+    sprintf(userselectname2, "%s", CALC_TMP_DATA_PATH);
    FileMan f;
 
    f.DelDirectory(userselectname2);
 
-
-
    usleep(100000);
-  
+
    ConfigToHost::GetInstance()->ExportRightInfoNotice(_("Success to import from USB storage."));
 
-
-   ConfigToHost::GetInstance()->OKAndCancelClicked();  
+   ConfigToHost::GetInstance()->OKAndCancelClicked();
 
    g_timeout_add(1000, Destroy, NULL);
-
 
    usleep(400000);
    CalcSetting::GetInstance()->ChangeModel2();
@@ -3422,7 +3372,7 @@ void CustomCalc::ButtonImportNameOK()
             sprintf(name_copy, "%s(1)", item_name.c_str());
         }
     }
-    item_name = name_copy; 
+    item_name = name_copy;
 
     ImportRenameCopy(item_name);
 }
@@ -3456,8 +3406,7 @@ void CustomCalc::ButtonExportNameOKClicked(GtkButton *button)
     }
     UserSelect::GetInstance()->create_udisk_data_dir();//addec by LL
 
-
-    int tmp=0; 
+    int tmp=0;
     struct dirent *ent;
     char udisk_path[256];
     sprintf(udisk_path, "%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH);
@@ -3478,15 +3427,13 @@ void CustomCalc::ButtonExportNameOKClicked(GtkButton *button)
     if(tmp)
         return;
 
-
     if(CalcSetting::GetInstance()->GetSelectPath())
     {
-        HideOKAndCancelClicked();  
+        HideOKAndCancelClicked();
         CustomCalc::GetInstance()-> ExportLoadInfoNotice(_("Loading......"));
         g_timeout_add(1000, LoadData, NULL);
     }
 }
-
 
 void CustomCalc::ButtonOKClicked(GtkButton *button)
 {
@@ -3504,7 +3451,7 @@ void CustomCalc::ButtonOKClicked(GtkButton *button)
     int index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method));
 	if (index == -1)
 	{
-		ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, 
+		ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
                     _("Please select measure method!"), NULL);
 		return;
 	}
@@ -3525,9 +3472,7 @@ void CustomCalc::ButtonOKClicked(GtkButton *button)
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
     }
     IniFile ini(path);
-    IniFile *ptrIni = &ini; 
-   
-
+    IniFile *ptrIni = &ini;
 
     vector<string> useritemgroup;
     useritemgroup = ptrIni->GetGroupName();
@@ -3563,22 +3508,22 @@ void CustomCalc::ButtonOKClicked(GtkButton *button)
         }
 
     }
-    
+
     int ItemDeleteNum=ptrIni->ReadInt("Delete", "Number");
 
     int ItemAllNum;
     ItemAllNum=ptrIni->ReadInt("MaxNumber", "Number");
     if((ItemDeleteNum==0)&&(ItemAllNum >= (USER_START -BASIC_MEA_END + MAX_USER_CALC_NUM)))
     {
-          ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, 
-                    _("The defined items have reached the maximum!"), NULL); 
+          ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
+                    _("The defined items have reached the maximum!"), NULL);
             return;
     }
-    
+
     int type_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_type));
     if (type_index == -1)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
                 _("Please select measure type!"), NULL);
         return;
     }
@@ -3633,7 +3578,7 @@ void CustomCalc::ButtonOKClicked(GtkButton *button)
         ptrIni->WriteString(CustomEtype, "Department", department);
         ptrIni->SyncConfigFile();
         ItemAllNum = item_num;
-    } 
+    }
     else
     {
         NewNumber = true;
@@ -3661,7 +3606,6 @@ void CustomCalc::ButtonOKClicked(GtkButton *button)
     CalcSetting::GetInstance()->ClearAllCalc();
 }
 
-
 void CustomCalc::DestroyWin(void)
 {
     if (GTK_IS_WIDGET(m_window))
@@ -3683,7 +3627,6 @@ void CustomCalc::DelayDestroyWin(void)
             SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
     }
 }
-
 
 gboolean CustomCalc::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
 {

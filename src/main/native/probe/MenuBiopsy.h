@@ -3,9 +3,9 @@
 #define _MENU_BIOPSY_H_
 
 #include "Def.h"
-#include "CusSpin.h"
-#include "BiopsyLine.h"
-#include "ImageAreaDraw.h"
+#include "display/CusSpin.h"
+#include "probe/BiopsyLine.h"
+#include "display/ImageAreaDraw.h"
 
 #define WIDTH_BIOPSY_MENU  175 //220
 #define HEIGHT_BIOPSY_MENU 635
@@ -25,7 +25,7 @@ public:
     void Hide(void);
     void Show(void);
     GtkWidget * Create(void);
-    
+
     void UpdateLabel(void);
 	//---------------------------------------------------//
 	void SetBiopsyBracketTypeLabel(string bioBracketType);
@@ -44,14 +44,14 @@ public:
 	void CloseBiopsyLine(void);//2016.09.18
 	//--------------------------------------------------//
 public:
-   static  bool m_isDraw; 
+   static  bool m_isDraw;
    static bool m_isDoubleLine;
 private:
     BiopsyLine * m_ptrBiopsy;
     ImageAreaDraw *m_ptrImgDraw;
 
     GtkWidget *m_vboxBiopsy;
-	GtkWidget *m_labelBioBracketType;      
+	GtkWidget *m_labelBioBracketType;
    // GtkWidget *m_menuBiopsy;
 //	GtkWidget *m_menuBarBiopsy;
 

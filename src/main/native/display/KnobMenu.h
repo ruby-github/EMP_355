@@ -7,13 +7,13 @@
 
 #include <gtk/gtk.h>
 #include "Def.h"
-#include "ManRegister.h"
+#include "periDevice/ManRegister.h"
 
 class KnobMenu
 {
 public:
     ~KnobMenu(){ if (m_ptrInstance != NULL) delete m_ptrInstance; }
-	
+
 	typedef EKnobReturn (*pKnobFunc)(EKnobOper);
 	typedef EKnobReturn (*pKnobFuncPress)(void);
 	struct KnobItem{
@@ -42,14 +42,13 @@ public:
     void Knob3_Screw(int cw);
     void Knob4_Screw(int cw);
     void Knob5_Screw(int cw);
-	
+
 	void Knob1_Press(void);
     void Knob2_Press(void);
     void Knob3_Press(void);
     void Knob4_Press(void);
     void Knob5_Press(void);
     void Knob6_Press(void);
-
 
 private:
     KnobMenu();
@@ -102,6 +101,5 @@ private:
 // 	{ data->KnobPress_5(widget, event); return FALSE; }
 
 };
-
 
 #endif

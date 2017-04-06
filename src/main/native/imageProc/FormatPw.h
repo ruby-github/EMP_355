@@ -1,11 +1,11 @@
 #ifndef FORMAT_PW_H
 #define FORMAT_PW_H
 
-#include "ImgPw.h"
+#include "imageControl/ImgPw.h"
 #include "AbsUpdatePw.h"
-#include "Replay.h"
-#include "DSCTypes.h"
-#include "DscMan.h"
+#include "imageProc/Replay.h"
+#include <DSCTypes.h>
+#include "imageProc/DscMan.h"
 
 /*
  * @brief change M display format or switch current image in all format except M_TOTAL
@@ -34,7 +34,7 @@ class FormatPw
 
 		DscMan* m_ptrDsc;
 		DSCCONTROLATTRIBUTES* m_ptrDscPara;
-		
+
 		AbsUpdatePw* m_ptrUpdate;
 		ImgPw* m_ptrImg;
 		Replay* m_ptrReplay;

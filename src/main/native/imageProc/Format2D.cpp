@@ -9,13 +9,12 @@
  * @author: zhanglei
  */
 
-#include "Format2D.h"
+#include "imageProc/Format2D.h"
 #include "Def.h"
-#include "ModeStatus.h"
-#include "GlobalClassMan.h"
-#include "KeyFunc.h"
-#include "ImgProc2D.h"
-#include "../keyboard/KeyFunc.h"
+#include "imageProc/ModeStatus.h"
+#include "imageProc/GlobalClassMan.h"
+#include "keyboard/KeyFunc.h"
+#include "imageProc/ImgProc2D.h"
 
 Format2D* Format2D::m_ptrInstance = NULL;
 
@@ -33,15 +32,15 @@ Format2D::Format2D()
 	m_ptrUpdate = ptrGcm->GetUpdate2D();
 
 	m_ptrDsc = DscMan::GetInstance();
-	m_ptrDscPara = m_ptrDsc->GetDscPara(); 
+	m_ptrDscPara = m_ptrDsc->GetDscPara();
 
 	m_ptrImg = Img2D::GetInstance();
 	m_ptrReplay = Replay::GetInstance();
 
-	m_format = B; 
-	m_formatSnap = B; 
-	m_curB = 0; 
-	m_curRealB = m_curB; 
+	m_format = B;
+	m_formatSnap = B;
+	m_curB = 0;
+	m_curRealB = m_curB;
 }
 Format2D::~Format2D()
 {
@@ -60,7 +59,7 @@ int Format2D::ChangeFormat(enum EFormat2D format)
 {
     PRINTF("--------change format B begin\n");
 	m_format = format;
-    
+
     // exit zoom
     MultiFuncFactory::EMultiFunc type = MultiFuncFactory::GetInstance()->GetMultiFuncType();
     if ((type == MultiFuncFactory::LOCAL_ZOOM) || (type == MultiFuncFactory::GLOBAL_ZOOM) || (type == MultiFuncFactory::PIP_ZOOM))
@@ -122,7 +121,6 @@ int Format2D::ChangeFormat(enum EFormat2D format)
 	return m_curB;
 }
 
-
 /*
  * @brief switch current image in BB format
  * @para left[in] true-left, false-right
@@ -143,28 +141,28 @@ bool Format2D::SwitchBB(bool left, int &current)
 
     switch (m_curB) {
         case 0:// left
-            m_curB = 1; 
+            m_curB = 1;
             //scale
             if (unfreeze) {
                 m_ptrImg->ChangeSeperateScale(1, 0);
                 m_curRealB = m_curB;
-            } 
+            }
             break;
 
     case 1:
-        m_curB = 0; 
+        m_curB = 0;
 
         //scale
         if (unfreeze) {
             m_ptrImg->ChangeSeperateScale(0, 1);
             m_curRealB = m_curB;
-        } 
+        }
         break;
 
     default:
         break;
     }
-   
+
     //send dsc
     m_ptrDsc->GetWriteLock();
     m_ptrDscPara->dcaBBFlag = m_curB;
@@ -195,29 +193,29 @@ int Format2D::SwitchBB(void)
 
     switch (m_curB) {
         case 0:// left
-            m_curB = 1; 
+            m_curB = 1;
 
             //scale
             if (unfreeze) {
                 m_ptrImg->ChangeSeperateScale(1, 0);
                 m_curRealB = m_curB;
-            } 
+            }
             break;
 
     case 1:
-        m_curB = 0; 
+        m_curB = 0;
 
         //scale
         if (unfreeze) {
             m_ptrImg->ChangeSeperateScale(0, 1);
             m_curRealB = m_curB;
-        } 
+        }
         break;
 
     default:
         break;
     }
-    
+
     //send dsc
     m_ptrDsc->GetWriteLock();
     m_ptrDscPara->dcaBBFlag = m_curB;
@@ -234,7 +232,7 @@ int Format2D::SwitchBB(void)
 
     ///> update
     m_ptrUpdate->ChangeCurrentImgBB(m_curB);
-    
+
     return TRUE;
 
 }
@@ -256,8 +254,8 @@ int Format2D::SwitchB4()
 	switch (m_curB)
 	{
 		case 0:
-			m_curB = 1; 
-            
+			m_curB = 1;
+
             if (unfreeze)
             {
                 m_ptrImg->ChangeSeperateScale(1, 0);
@@ -266,7 +264,7 @@ int Format2D::SwitchB4()
 			break;
 
 		case 1:
-			m_curB = 2; 
+			m_curB = 2;
 
 			if (unfreeze)
             {
@@ -276,7 +274,7 @@ int Format2D::SwitchB4()
 			break;
 
 		case 2:
-			m_curB = 3; 
+			m_curB = 3;
 			if (unfreeze)
             {
 				m_ptrImg->ChangeSeperateScale(3, 2);
@@ -285,8 +283,8 @@ int Format2D::SwitchB4()
 			break;
 
 		case 3:
-			m_curB = 0; 
-			
+			m_curB = 0;
+
 			if (unfreeze)
             {
 				m_ptrImg->ChangeSeperateScale(0, 3);
@@ -301,7 +299,7 @@ int Format2D::SwitchB4()
     //send to dsc
     m_ptrDsc->GetWriteLock();
     m_ptrDscPara->dcaB4Flag = m_curB;
-	
+
     DscMan::GetInstance()->GetDsc()->UpdateB4Flag();
     m_ptrDsc->ReadWriteUnlock();
 

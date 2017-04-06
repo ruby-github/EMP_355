@@ -1,4 +1,4 @@
-#include "SysBiopsySetting.h"
+#include "sysMan/SysBiopsySetting.h"
 #include "base/IniFile.h"
 #include "Def.h"
 

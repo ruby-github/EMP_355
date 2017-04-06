@@ -80,8 +80,6 @@
             <compilerEndOption>-Wall -ggdb3 -DEMP_355 -DREPORTPICS_6 -D_IPP_PRIVATE_STRUCTURES</compilerEndOption>
             <compilerEndOption>-Ithirdparty/include -Ithirdparty/include/hal</compilerEndOption>
 
-            <compilerEndOption>-Isrc/main/native/base -Isrc/main/native/calcPeople -Isrc/main/native/display -Isrc/main/native/imageProc -Isrc/main/native/measure -Isrc/main/native/patient -Isrc/main/native/probe -Isrc/main/native/bodymark -Isrc/main/native/comment -Isrc/main/native/imageControl -Isrc/main/native/keyboard -Isrc/main/native/periDevice -Isrc/main/native/sysMan</compilerEndOption>
-
             <!-- pkg-config - -cflags dbus-glib-1 goocanvas opencv -->
             <compilerEndOption>-pthread -I/usr/include/dbus-1.0 -I/usr/lib/i386-linux-gnu/dbus-1.0/include -I/usr/include/glib-2.0 -I/usr/lib/i386-linux-gnu/glib-2.0/include -I/usr/include/gtk-2.0 -I/usr/include/cairo -I/usr/lib/i386-linux-gnu/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/opencv -I/usr/include/goocanvas-1.0</compilerEndOption>
           </compilerEndOptions>

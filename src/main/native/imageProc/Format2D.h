@@ -2,10 +2,10 @@
 #define FORMAT_2D_H
 
 #include "AbsUpdate2D.h"
-#include "Img2D.h"
-#include "Replay.h"
-#include "DSCTypes.h"
-#include "DscMan.h"
+#include "imageControl/Img2D.h"
+#include "imageProc/Replay.h"
+#include <DSCTypes.h>
+#include "imageProc/DscMan.h"
 
 /*
  * @brief change 2d display format or switch current image in BB/4B format
@@ -30,10 +30,10 @@ class Format2D
 
         // special measure
         void SetFormatForSnap(EFormat2D format) { m_formatSnap = format; }
-	
+
 	private:
 		Format2D();
-		
+
 		static Format2D* m_ptrInstance;
 
 		DscMan* m_ptrDsc;

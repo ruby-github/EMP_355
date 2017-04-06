@@ -10,14 +10,13 @@
  * @author: zhanglei
  */
 
-#include "Calc2DPhase.h"
+#include "imageControl/Calc2DPhase.h"
 #include "Def.h"
-#include "ModeStatus.h"
-#include "ScanMode.h"
-#include "ProbeSocket.h"
-#include "Img2D.h"
-#include "TopArea.h"
-
+#include "imageProc/ModeStatus.h"
+#include "imageProc/ScanMode.h"
+#include "probe/ProbeSocket.h"
+#include "imageControl/Img2D.h"
+#include "display/TopArea.h"
 
 const int Calc2DPhase::EMIT_CH_NUM_P[20] =	{8,10, 12, 14, 18, 32, 64,	64, 64,	64,	64,	64,	64,	64,	64,	64,	64,	64,	64,	64};
 
@@ -52,7 +51,7 @@ void Calc2DPhase::CalcEmitDelay()
         PEmitDelayPw((float)m_calcPara->focPos[0], EMIT_CH_NUM_P, size);
     else
     {
-      
+
         int i;
         for (i = 0; i < focSum; i ++)
         {
@@ -97,7 +96,7 @@ void Calc2DPhase::CalcReceiveAperture()
 }
 
 void Calc2DPhase::CalcDefaultDemodFd()
-{ 
+{
     int count = 0;
     if(!m_calcPara->harmonic)
     {
@@ -128,7 +127,7 @@ void Calc2DPhase::CalcFilterBandPass(int order)
     int harmonicIndex = Img2D::GetInstance()->GetHarmonicFreqIndex();
     int probeIndex = 0;
     string probe_type = TopArea::GetInstance()->GetProbeType();
-    for (int i = 0; i < NUM_PROBE; ++i) 
+    for (int i = 0; i < NUM_PROBE; ++i)
     {
         if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0)
             probeIndex = i;
@@ -142,7 +141,6 @@ void Calc2DPhase::CalcFilterBandPass(int order)
     bool harmonic = m_calcPara->harmonic;
     float fd_harmonic[5];
 
-   
     if(m_calcPara->harmonic)
     {
         depth[0] = 50;
@@ -159,7 +157,7 @@ void Calc2DPhase::CalcFilterBandPass(int order)
         depth[3] = 200;
         depth[4] = 250;
     }
-   
+
  #if (defined(EMP_340) || defined(EMP_430) || defined(EMP_360) || defined(EMP_161) || defined(EMP_355) || defined(EMP_322) || defined(EMP_440))
     float fc_bandpass_filter1[5], fc_bandpass_filter2[5];
     if(m_calcPara->harmonic)
@@ -167,7 +165,7 @@ void Calc2DPhase::CalcFilterBandPass(int order)
         for(int i = 0; i < 5; i++)
 		{
             fc_bandpass_filter1[i] = float(ProbeSocket::BAND_PASS_FILTER_FC1[probeIndex][harmonicIndex][i] / 10.0);
-            fc_bandpass_filter2[i] = float(ProbeSocket::BAND_PASS_FILTER_FC2[probeIndex][harmonicIndex][i] / 10.0);	
+            fc_bandpass_filter2[i] = float(ProbeSocket::BAND_PASS_FILTER_FC2[probeIndex][harmonicIndex][i] / 10.0);
 			//printf("-phase--%d---THI---w1 = %.2f, w2 = %.2f\n", i, fc_bandpass_filter1[i], fc_bandpass_filter2[i]);
 		}
     }
@@ -177,9 +175,9 @@ void Calc2DPhase::CalcFilterBandPass(int order)
 		{
             fc_bandpass_filter1[i] = float(ProbeSocket::BAND_PASS_FILTER_FC1_BASE_FREQ[probeIndex][freqIndex][i] / 10.0);
             fc_bandpass_filter2[i] = float(ProbeSocket::BAND_PASS_FILTER_FC2_BASE_FREQ[probeIndex][freqIndex][i] / 10.0);
-			//printf("-phase--%d-----w1 = %.2f, w2 = %.2f\n", i, fc_bandpass_filter1[i], fc_bandpass_filter2[i]);			
+			//printf("-phase--%d-----w1 = %.2f, w2 = %.2f\n", i, fc_bandpass_filter1[i], fc_bandpass_filter2[i]);
 		}
-    }   
+    }
 
 	BandPassFilterSelect_test(fc_bandpass_filter1, fc_bandpass_filter2, depth, order);
 
@@ -197,7 +195,7 @@ void Calc2DPhase::CalcFilterBandPass(int order)
     }
     BandPassFilterSelect_test(fc_bandpass_filter, depth, order);
 #endif
-	
+
 }
 
 void Calc2DPhase::CalcDynamicFilter(int order)
@@ -207,7 +205,7 @@ void Calc2DPhase::CalcDynamicFilter(int order)
     int harmonicIndex = Img2D::GetInstance()->GetHarmonicFreqIndex();
     int freqIndex = Img2D::GetInstance()->GetFreqIndex();
     string probe_type = TopArea::GetInstance()->GetProbeType();
-    for (int i = 0; i < NUM_PROBE; ++i) 
+    for (int i = 0; i < NUM_PROBE; ++i)
     {
         if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0)
             probeIndex = i;
@@ -246,12 +244,12 @@ void Calc2DPhase::CalcDynamicFilter(int order)
         for(int i = 0; i < 5; i++)
 		{
 			fc_dynamic_filter[i] = float(ProbeSocket::DYNAMIC_FILTER_FC_BASE_FREQ[probeIndex][freqIndex][i] / 10.0);
-			//printf("-phase--%d---low pass filter = %.2f\n", i, fc_dynamic_filter[i]);	
+			//printf("-phase--%d---low pass filter = %.2f\n", i, fc_dynamic_filter[i]);
 		}
     }
 
     DynamicFilter_test(fc_dynamic_filter, depth, order);
-}    
+}
 
 void Calc2DPhase::CalcDynamicDemod(int order)
 {
@@ -261,14 +259,14 @@ void Calc2DPhase::CalcDynamicDemod(int order)
     float fd[5];
     bool harmonic = m_calcPara->harmonic;
     float fd_harmonic[5];
-#if 0 
+#if 0
     fd_harmonic[0] = float(freq / 10.0);
     fd_harmonic[1] = float(freq / 10.0);
     fd_harmonic[2] = float(freq / 10.0);
     fd_harmonic[3] = float(freq / 10.0);
     fd_harmonic[4] = float(freq / 10.0);
 #endif
-   
+
     if(harmonic)
     {
         depth[0] = 50;
@@ -393,19 +391,19 @@ void Calc2DPhase::CalcDynamicDemod(int order)
 
 	// 30P16A---G70
  #if (defined(EMP_340) || defined(EMP_430) || defined(EMP_360) || defined(EMP_161) || defined(EMP_355) || defined(EMP_322) || defined(EMP_440))
-	int freqIndex = Img2D::GetInstance()->GetFreqIndex();   
+	int freqIndex = Img2D::GetInstance()->GetFreqIndex();
 	int harmonicIndex = Img2D::GetInstance()->GetHarmonicFreqIndex();
 	int probeIndex = 0;
 	int i;
     string probe_type = TopArea::GetInstance()->GetProbeType();
-    for (i = 0; i < NUM_PROBE; ++i) 
+    for (i = 0; i < NUM_PROBE; ++i)
     {
         if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0)
             probeIndex = i;
 	}
-    
+
 	for (i = 0; i < 5; i++)
-	{            
+	{
 		fd[i] = float((ProbeSocket::BAND_PASS_FILTER_FC1_BASE_FREQ[probeIndex][freqIndex][i] + ProbeSocket::BAND_PASS_FILTER_FC2_BASE_FREQ[probeIndex][freqIndex][i]) / 20.0);
 		fd_harmonic[i] = float((ProbeSocket::BAND_PASS_FILTER_FC1[probeIndex][harmonicIndex][i] + ProbeSocket::BAND_PASS_FILTER_FC2[probeIndex][harmonicIndex][i]) / 20.0);
 		//printf("-phase--%d---demod freq basic = %.2f, THI= %.2f\n", i, fd[i], fd_harmonic[i]);
@@ -427,5 +425,3 @@ void Calc2DPhase::CalcDynamicDemod(int order)
             DynamicDemodFreqCompound(fd, depth, TRUE, order);
     }
 }
-
-

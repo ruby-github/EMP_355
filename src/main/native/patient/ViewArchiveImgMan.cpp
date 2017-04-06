@@ -12,25 +12,25 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include "ViewArchiveImgMan.h"
-#include "gui_global.h"
-#include "KeyValueOpr.h"
-#include "gui_func.h"
-#include "KeyDef.h"
+#include "patient/ViewArchiveImgMan.h"
+#include "display/gui_global.h"
+#include "keyboard/KeyValueOpr.h"
+#include "display/gui_func.h"
+#include "keyboard/KeyDef.h"
 #include "ViewMain.h"
-#include "Database.h"
-#include "PatientInfo.h"
-#include "ImgMan.h"
-#include "Replay.h"
-#include "FreezeMode.h"
-#include "ViewReport.h"
-#include "ViewArchive.h"
-#include "ViewPrintPreview.h"
-#include "MenuReview.h"
-#include "KeyFunc.h"
-#include "Usblp.h"
+#include "patient/Database.h"
+#include "patient/PatientInfo.h"
+#include "patient/ImgMan.h"
+#include "imageProc/Replay.h"
+#include "imageProc/FreezeMode.h"
+#include "calcPeople/ViewReport.h"
+#include "patient/ViewArchive.h"
+#include "periDevice/ViewPrintPreview.h"
+#include "imageProc/MenuReview.h"
+#include "keyboard/KeyFunc.h"
+#include "periDevice/Usblp.h"
 #include "sysMan/SysGeneralSetting.h"
-#include "AviEncDecH264.h"
+#include "patient/AviEncDecH264.h"
 
 // global
 static gboolean TimerReviewCineAuto(gpointer data)
@@ -54,7 +54,6 @@ static gboolean ExitWindow(gpointer data)
     tmp->DestroyWindow();
     return FALSE;
 }
-
 
 ///< class
 ViewArchiveImgMan* ViewArchiveImgMan::m_ptrInstance = NULL;
@@ -202,7 +201,6 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 	else
 		m_isUdisk = FALSE;
 
-
 	InitParameter(examID, selected);
 
 	// main window
@@ -229,7 +227,7 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 
 	fixedPat = gtk_fixed_new ();
 	gtk_container_add (GTK_CONTAINER (alignment), fixedPat);
-  
+
 	hboxPatSel = gtk_hbox_new (TRUE, 0);
 	gtk_fixed_put (GTK_FIXED (fixedPat), hboxPatSel, 0, 0);
 	gtk_widget_set_size_request (hboxPatSel, 70, 35);
@@ -246,7 +244,7 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 	g_signal_connect(G_OBJECT(btnNextPat), "clicked", G_CALLBACK(HandleBtnNextPatClicked), this);
 
 	image = gtk_image_new_from_stock ("gtk-go-forward", GTK_ICON_SIZE_BUTTON);
-	gtk_container_add (GTK_CONTAINER (btnNextPat), image);	 
+	gtk_container_add (GTK_CONTAINER (btnNextPat), image);
 
 	hboxPatInfo = gtk_hbox_new (TRUE, 0);
 	gtk_fixed_put (GTK_FIXED (fixedPat), hboxPatInfo, 145, 0);
@@ -267,7 +265,6 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 	gtk_misc_set_alignment (GTK_MISC (m_labSpecies), 0, 0.5);
 #endif
 
-
 	m_labSex = gtk_label_new ("");
 	gtk_box_pack_start (GTK_BOX (hboxPatInfo), m_labSex, FALSE, TRUE, 0);
 	gtk_misc_set_alignment (GTK_MISC (m_labSex), 0, 0.5);
@@ -278,7 +275,7 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 
 	m_labExamNum = gtk_label_new ("");
 	gtk_box_pack_start (GTK_BOX (hboxPatInfo), m_labExamNum, FALSE, FALSE, 0);
-	gtk_misc_set_alignment (GTK_MISC (m_labExamNum), 0, 0.5);	
+	gtk_misc_set_alignment (GTK_MISC (m_labExamNum), 0, 0.5);
 
 	vseparatorPat = gtk_vseparator_new ();
 	gtk_fixed_put (GTK_FIXED (fixedPat), vseparatorPat, 65, 0);
@@ -301,12 +298,12 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 #endif
 	//labelPatSel = gtk_label_new (_("<b>Patient</b>"));
 	gtk_frame_set_label_widget (GTK_FRAME (framePatSel), labelPatSel);
-	gtk_label_set_use_markup (GTK_LABEL (labelPatSel), TRUE);	
+	gtk_label_set_use_markup (GTK_LABEL (labelPatSel), TRUE);
 
-	// File Select 
+	// File Select
 	frameFile = gtk_frame_new (NULL);
 	gtk_fixed_put (GTK_FIXED (fixed), frameFile, 20, 5);
-	gtk_widget_set_size_request (frameFile, 145, 60); 
+	gtk_widget_set_size_request (frameFile, 145, 60);
 	gtk_frame_set_shadow_type (GTK_FRAME (frameFile), GTK_SHADOW_IN);
 
 	alignment = gtk_alignment_new (0, 0.5, 0.9, 1);
@@ -329,12 +326,12 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 		gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboType), _("Report"));
 		gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboType), _("Info."));
 	}
-	gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboType), m_fileType);	
+	gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboType), m_fileType);
 	g_signal_connect(GTK_COMBO_BOX(m_comboType), "changed", G_CALLBACK(HandleComboTypeClicked), this);
 
 	// fixed contenct
 	m_fixedReport = CreateReportArea(fixed);
-	
+
 	// fixed report
 	m_fixedContent = CreateImgArea(fixed);
 
@@ -347,7 +344,7 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
     else
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_auto), TRUE);
 
-	// show 
+	// show
 	g_keyInterface.Push(this);
 	gtk_widget_show_all(m_window);
     HideAllFixed();
@@ -359,7 +356,7 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
     else if(m_fileType == CINE)
     {
         gtk_widget_show_all(m_fixedContent);
-        gtk_widget_hide(m_btnShow);  
+        gtk_widget_hide(m_btnShow);
         gtk_fixed_move(GTK_FIXED(m_fixedContent), m_hboxFunc, 734+120+10, 643);
         gtk_widget_queue_draw(m_drawArea);
         UpdateSnap();
@@ -369,8 +366,8 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
     {
         gtk_widget_show_all(m_fixedReport);
         gtk_fixed_move(GTK_FIXED(m_fixedContent), m_hboxFunc, 734, 643);
-  
-/*    
+
+/*
       SysGeneralSetting sysGeneralSetting;
       if(sysGeneralSetting.GetPrintViewMode())
       {
@@ -400,7 +397,6 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 	UpdateCurPat(m_vecExamID[m_curPat], m_curPat, m_vecExamID.size());
 //	DisplayCineMenu(FALSE);
 	PRINTF("end of ViewArchiveImgMan: create window\n");
-
 
 	if(selected)
 	{
@@ -440,7 +436,7 @@ void ViewArchiveImgMan::CreateWindow(vector<string> examID, const char *selected
 
 void ViewArchiveImgMan::AutoRadioToggled(GtkToggleButton *togglebutton)
 {
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_auto))) 
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_auto)))
     {
         SysGeneralSetting sysGeneralSetting;
         sysGeneralSetting.SetPrintViewMode(0);
@@ -454,13 +450,13 @@ void ViewArchiveImgMan::AutoRadioToggled(GtkToggleButton *togglebutton)
         }
         if(GTK_IS_WIDGET(m_scrolledwindow_auto))
             gtk_widget_show_all(m_scrolledwindow_auto);
-    } 
+    }
 
 }
 
 void ViewArchiveImgMan::OrignialRadioToggled(GtkToggleButton *togglebutton)
 {
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_orignial))) 
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_orignial)))
     {
         SysGeneralSetting sysGeneralSetting;
         sysGeneralSetting.SetPrintViewMode(1);
@@ -474,7 +470,7 @@ void ViewArchiveImgMan::OrignialRadioToggled(GtkToggleButton *togglebutton)
         }
         if(GTK_IS_WIDGET(m_scrolledwindow_orignial))
             gtk_widget_show_all (m_scrolledwindow_orignial);
-    } 
+    }
 }
 
 GtkWidget* ViewArchiveImgMan::CreateReportArea(GtkWidget *fixed)
@@ -519,7 +515,7 @@ GtkWidget* ViewArchiveImgMan::CreateReportArea(GtkWidget *fixed)
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_orignial), radiobutton_printview_group);
     radiobutton_printview_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_orignial));
     g_signal_connect((gpointer)m_radiobutton_orignial, "toggled", G_CALLBACK (on_orignial_radio_button_toggled), this);
-  
+
 	hboxReportFunc = gtk_hbox_new (TRUE, 10);
 	gtk_fixed_put (GTK_FIXED (fixedReport), hboxReportFunc, 734, 608);
 	gtk_widget_set_size_request (hboxReportFunc, 250, 60);
@@ -581,12 +577,12 @@ GtkWidget* ViewArchiveImgMan::CreateImgArea(GtkWidget *fixed)
 			gtk_table_attach_defaults(GTK_TABLE(tableImg), m_vbox[i*SNAP_COL+j], j, j+1, i, i+1);
 		}
 	}
-	
+
 	hboxImgSel = gtk_hbox_new (TRUE, 0);
 	gtk_fixed_put(GTK_FIXED(fixedImg), hboxImgSel, 0, 653);
 	gtk_widget_set_size_request (hboxImgSel, 140, 30);
 
-	btnLastImg = gtk_button_new_with_mnemonic ("◀");
+	btnLastImg = gtk_button_new_with_mnemonic ("鈼€");
 	gtk_box_pack_start (GTK_BOX (hboxImgSel), btnLastImg, FALSE, TRUE, 0);
 	g_signal_connect(G_OBJECT(btnLastImg), "clicked", G_CALLBACK(HandleBtnLastImgPageClicked), this);
 
@@ -619,7 +615,7 @@ GtkWidget* ViewArchiveImgMan::CreateImgArea(GtkWidget *fixed)
 	gtk_box_pack_start (GTK_BOX (m_hboxCineReplay), m_progressBar, FALSE, FALSE, 0);
 	gtk_widget_set_size_request (m_progressBar, 150, 20);
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (m_progressBar), 0.0);
-	gtk_progress_bar_set_text (GTK_PROGRESS_BAR (m_progressBar), "0/0");	
+	gtk_progress_bar_set_text (GTK_PROGRESS_BAR (m_progressBar), "0/0");
 
 	// function button region 2
 	m_hboxFunc = gtk_hbox_new(TRUE, 10);
@@ -627,7 +623,7 @@ GtkWidget* ViewArchiveImgMan::CreateImgArea(GtkWidget *fixed)
 //	gtk_widget_set_size_request(m_hboxFunc, 380, 45);
 	gtk_widget_set_size_request(m_hboxFunc, -1, 45);
 
-	//show current 
+	//show current
 	image = gtk_image_new_from_stock("gtk-yes", GTK_ICON_SIZE_BUTTON);
 	GtkWidget *label = gtk_label_new_with_mnemonic (_("Slide Show"));
 	m_btnShow = create_button_icon(label, image);
@@ -1165,7 +1161,6 @@ GtkWidget* ViewArchiveImgMan::CreatePatInfoArea(GtkWidget *fixed)
 #else
 	gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 1), labTabOB);
 #endif
-	
 
 	//
 	GtkWidget *fixedTabCard = gtk_fixed_new ();
@@ -1187,7 +1182,7 @@ GtkWidget* ViewArchiveImgMan::CreatePatInfoArea(GtkWidget *fixed)
 	gtk_table_attach (GTK_TABLE (tableCar1), label65, 0, 1, 1, 2,
 			(GtkAttachOptions) (GTK_FILL),
 			(GtkAttachOptions) (0), 0, 0);
-	
+
 	m_labEntryCarHR = gtk_label_new ("");
 	gtk_table_attach (GTK_TABLE (tableCar1), m_labEntryCarHR, 1, 2, 0, 1,
 			(GtkAttachOptions) (GTK_FILL),
@@ -1362,7 +1357,7 @@ GtkWidget* ViewArchiveImgMan::CreateItem(GtkWidget **button, GtkWidget **checkBu
 	*button = gtk_button_new ();
 	gtk_box_pack_start (GTK_BOX (vbox), *button, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(*button), "clicked", G_CALLBACK(HandleSnapImgClicked), this);
-	gtk_button_set_relief (GTK_BUTTON (*button), GTK_RELIEF_NONE);	
+	gtk_button_set_relief (GTK_BUTTON (*button), GTK_RELIEF_NONE);
 	g_object_set_data(G_OBJECT(*button), "id", id);
 
 #if 0
@@ -1370,7 +1365,7 @@ GtkWidget* ViewArchiveImgMan::CreateItem(GtkWidget **button, GtkWidget **checkBu
 	gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
 	*checkButton = gtk_check_button_new_with_mnemonic ("");
-	gtk_box_pack_start (GTK_BOX (hbox), *checkButton, FALSE, FALSE, 0);	
+	gtk_box_pack_start (GTK_BOX (hbox), *checkButton, FALSE, FALSE, 0);
 	g_signal_connect(GTK_OBJECT(*checkButton), "clicked", G_CALLBACK(HandleCheckBtnClicked), this);
 	g_object_set_data(G_OBJECT(*checkButton), "id", id);
 #endif
@@ -1380,7 +1375,7 @@ GtkWidget* ViewArchiveImgMan::CreateItem(GtkWidget **button, GtkWidget **checkBu
 
 /*
  * @brief get patient info according examID, and then update patient info and statistic info
- * 
+ *
  * @para examID[in] examNum of current patient(string)
  * @para curPat[in] index of current patient, start from 0
  * @para totalPat[in] total quantity of patient, start from 1
@@ -1457,11 +1452,11 @@ void ViewArchiveImgMan::UpdateCurPat(string examID, int curPat, int totalPat)
 	// update image area(display snap)
 	int size = m_vecFileName.size();
 	int temp = size / (SNAP_COL * SNAP_ROW);
-	m_maxImgPage = (size % (SNAP_COL * SNAP_ROW)) == 0? temp : (temp+1); 	
+	m_maxImgPage = (size % (SNAP_COL * SNAP_ROW)) == 0? temp : (temp+1);
 	m_curImgPage =  0;
 	size = m_vecCineName.size();
 	temp = size / (SNAP_COL * SNAP_ROW);
-	m_maxCinePage = (size % (SNAP_COL * SNAP_ROW)) == 0? temp : (temp+1); 
+	m_maxCinePage = (size % (SNAP_COL * SNAP_ROW)) == 0? temp : (temp+1);
 	m_curCinePage = 0;
 
 	UpdateSnap();
@@ -1470,7 +1465,7 @@ void ViewArchiveImgMan::UpdateCurPat(string examID, int curPat, int totalPat)
     {
         // update report
         UpdateReport(examID);
-        
+
         // update patient info
         UpdatePatInfo(examID);
 	}
@@ -1481,23 +1476,23 @@ void ViewArchiveImgMan::UpdateCurPat(string examID, int curPat, int totalPat)
  */
 void ViewArchiveImgMan::UpdateReport(string examID)
 {
-    if(m_scrolledwindow_orignial) 
+    if(m_scrolledwindow_orignial)
     {
         gtk_widget_destroy(GTK_WIDGET(m_scrolledwindow_orignial));
         m_scrolledwindow_orignial = NULL;
     }
-    if(m_scrolledwindow_auto) 
+    if(m_scrolledwindow_auto)
     {
         gtk_widget_destroy(GTK_WIDGET(m_scrolledwindow_auto));
         m_scrolledwindow_auto = NULL;
     }
-    
+
     m_scrolledwindow_auto = CreateReport(examID, 0);
     m_scrolledwindow_orignial= CreateReport(examID, 1);
-    
+
     SysGeneralSetting sysGeneralSetting;
     int mode = sysGeneralSetting.GetPrintViewMode();
-    
+
     if(mode)
     {
         gtk_widget_hide_all(m_scrolledwindow_auto);
@@ -1505,9 +1500,9 @@ void ViewArchiveImgMan::UpdateReport(string examID)
     }
     else
     {
-        gtk_widget_hide_all(m_scrolledwindow_orignial); 
+        gtk_widget_hide_all(m_scrolledwindow_orignial);
         gtk_widget_show_all(m_scrolledwindow_auto);
-    }     
+    }
 }
 
 GtkWidget* ViewArchiveImgMan::CreateReport(string examID, int mode)
@@ -1518,7 +1513,7 @@ GtkWidget* ViewArchiveImgMan::CreateReport(string examID, int mode)
     char reportName[256];
     char *reportPath  = NULL;
     int i = atoi(examID.c_str());
-        
+
     GtkWidget *scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_SHADOW_IN);
@@ -1568,8 +1563,8 @@ GtkWidget* ViewArchiveImgMan::CreateReport(string examID, int mode)
                     {
                         GdkPixbuf *scale_pixbuf = gdk_pixbuf_scale_simple(pixbuf, width, height, GDK_INTERP_BILINEAR);
                         GtkWidget *print_image = gtk_image_new_from_pixbuf(scale_pixbuf);
-                        gtk_fixed_put(GTK_FIXED(fixed), print_image, (980-width)/2, (height + grap_y)*i);   
-                        g_object_unref(scale_pixbuf);  
+                        gtk_fixed_put(GTK_FIXED(fixed), print_image, (980-width)/2, (height + grap_y)*i);
+                        g_object_unref(scale_pixbuf);
                         g_object_unref(pixbuf);
                     }
                 }
@@ -1605,7 +1600,7 @@ void ViewArchiveImgMan::UpdateImg(void)
 	int size = m_vecFileName.size();
 	ImgMan::ImgItem imgItem;
 	GtkWidget *image;
-	GdkPixbuf *pixbuf = NULL;	
+	GdkPixbuf *pixbuf = NULL;
 	gchar buf[20];
 
 	// display current page info
@@ -1662,8 +1657,8 @@ void ViewArchiveImgMan::UpdateCine(void)
 	int size = m_vecCineName.size();
 	VideoMan::VideoItem videoItem;
 	GtkWidget *image;
-	GdkPixbuf *pixbuf = NULL;	
-	GdkPixbuf *pixbuf_new = NULL;	
+	GdkPixbuf *pixbuf = NULL;
+	GdkPixbuf *pixbuf_new = NULL;
 	gchar buf[20];
 
 	// display current page info
@@ -1674,7 +1669,7 @@ void ViewArchiveImgMan::UpdateCine(void)
 	gtk_label_set_text(GTK_LABEL(m_labImgPage), buf);
 
 	HideAllBtn();
-	
+
 	if (size == 0)
 		return;
 
@@ -1687,10 +1682,10 @@ void ViewArchiveImgMan::UpdateCine(void)
 			break;
 		PRINTF("current page cine : %s\n", m_vecCineName[i].c_str());
 		VideoMan::GetInstance()->ReadVideoInfo(m_vecCineName[i].c_str(), &videoItem);
-		pixbuf = gdk_pixbuf_new_from_data(videoItem.data, 
+		pixbuf = gdk_pixbuf_new_from_data(videoItem.data,
 				GDK_COLORSPACE_RGB, FALSE, 8,
 				videoItem.width, videoItem.height,
-				videoItem.width * 3, 
+				videoItem.width * 3,
 				NULL, NULL);
 
 		pixbuf_new = gdk_pixbuf_scale_simple(pixbuf, CINE_SNAP_W, CINE_SNAP_H, GDK_INTERP_BILINEAR);
@@ -1723,8 +1718,7 @@ void ViewArchiveImgMan::UpdatePatInfo(string examID)
 	string strTemp;
 	char buf[100];
 	PatientInfo::Info info;
-	Database db;	
-
+	Database db;
 
 SysGeneralSetting sgs;
 int lang=sgs.GetLanguage();
@@ -1746,17 +1740,16 @@ int lang=sgs.GetLanguage();
 	    strTemp = info.p.name.last + info.p.name.mid + info.p.name.first;
     else    //englist
 	    strTemp = info.p.name.first + info.p.name.mid + info.p.name.last;
-    
+
 	gtk_label_set_text(GTK_LABEL(m_labEntryName), strTemp.c_str());
 #endif
-
 
 	//strTemp = info.p.name.first + info.p.name.mid + info.p.name.last;
 	//gtk_label_set_text(GTK_LABEL(m_labEntryName), strTemp.c_str());
 
 	gtk_label_set_text(GTK_LABEL(m_labEntryExamID), info.e.examNum.c_str());
 	gtk_label_set_text(GTK_LABEL(m_labEntryPatID), info.p.id.c_str());
-	
+
 	GenAgeStr(info.p.age, info.p.ageUnit, strTemp);
 	gtk_label_set_text(GTK_LABEL(m_labEntryAge), strTemp.c_str());
 
@@ -1792,7 +1785,7 @@ int lang=sgs.GetLanguage();
 
 	if (info.e.BSA*100 >= 0)
 	{
-		sprintf(buf, "%.2fm²", info.e.BSA);
+		sprintf(buf, "%.2fm虏", info.e.BSA);
 		gtk_label_set_text(GTK_LABEL(m_labEntryGenBSA), buf);
 	}
 
@@ -1889,7 +1882,7 @@ void ViewArchiveImgMan::DisplaySelectedCine(int i)
 }
 
 /*
- * @brief display large image, full path name "fileName", in draw area 
+ * @brief display large image, full path name "fileName", in draw area
  *
  * @para fileName[in] file name with full path
  */
@@ -1904,13 +1897,13 @@ void ViewArchiveImgMan::DisplayImage(string fileName)
 		g_object_unref(m_imgPixbuf);
 		m_imgPixbuf = NULL;
 	}
-	m_imgPixbuf = gdk_pixbuf_scale_simple(imgItem.pixbuf, IMG_WIDTH, IMG_HEIGHT, GDK_INTERP_BILINEAR); 
+	m_imgPixbuf = gdk_pixbuf_scale_simple(imgItem.pixbuf, IMG_WIDTH, IMG_HEIGHT, GDK_INTERP_BILINEAR);
 	g_object_unref(imgItem.pixbuf);
 	gtk_widget_queue_draw(m_drawArea);
 }
 
 /*
- * @brief display cine's first large image, full path name "cineName", in draw area 
+ * @brief display cine's first large image, full path name "cineName", in draw area
  *
  * @para cineName[in] file name with full path
  */
@@ -2067,7 +2060,7 @@ void ViewArchiveImgMan::GetCinesName(string examID, vector<string> &vec)
 				//get file name by directory name
 				vec_tmp.clear();
 
-                if(strcmp(ent->d_name, "3D")==0) // for 3D4D cine 
+                if(strcmp(ent->d_name, "3D")==0) // for 3D4D cine
                 {
                     if(VideoMan::GetInstance()->LoadVideo(absPath, &vec_tmp) != 0)
                     {
@@ -2118,7 +2111,6 @@ void ViewArchiveImgMan::ReadCineToReplay(VideoMan::VideoItem *videoItem)
 	Replay::GetInstance()->EnterReadCine();
 	Replay::GetInstance()->SetUpdateFrameFunc(DrawImgData);
 
-
     if (videoItem->format == VideoMan::AVI)
     {
         ReadAviData(videoItem->path, NULL,  videoItem->frames, videoItem->width, videoItem->height, VideoMan::SaveReplay);
@@ -2152,10 +2144,10 @@ void ViewArchiveImgMan::ReadCineToReplay(VideoMan::VideoItem *videoItem)
             Replay::GetInstance()->AddOneCineImg(image);
         }
 
-	fclose(fd);	
+	fclose(fd);
     }
 	// prepare for replay
-	Replay::GetInstance()->PrepareForReplay();	
+	Replay::GetInstance()->PrepareForReplay();
 }
 
 void ViewArchiveImgMan::DisplayCineMenu(bool yes)
@@ -2165,7 +2157,6 @@ void ViewArchiveImgMan::DisplayCineMenu(bool yes)
 	else
 		gtk_widget_hide_all(m_hboxCineReplay);
 }
-
 
 /*
  * @brief update cine info in cine menu(progress bar and label)
@@ -2198,7 +2189,7 @@ void ViewArchiveImgMan::EnterCine(void)
 
 		// start timer
 		guint interval = 1000 / (float)m_fps; // unit: 1/1000 s
-		//guint interval = 100; 
+		//guint interval = 100;
 
         if (m_timer > 0)
         {
@@ -2208,7 +2199,7 @@ void ViewArchiveImgMan::EnterCine(void)
             }
             m_timer = 0;
         }
-        
+
         m_timer = g_timeout_add(interval, TimerReviewCineAuto, NULL);
 	}
 }
@@ -2299,7 +2290,7 @@ void ViewArchiveImgMan::BtniShowClicked(GtkButton* button)
 		g_menuReview.SetImgPath((const char*) SLIDE_PATH);
 		g_menuReview.SetLimit(2);
 	}
- 
+
 	km.Execute();
 }
 
@@ -2316,8 +2307,8 @@ void ViewArchiveImgMan::BtnDeleteClicked(GtkButton* button)
 		{
 			if (m_vecFileSel[i])
 			{
-				ptrName = m_vecFileName[i].c_str();	
-				ImgMan::GetInstance()->DeleteSnap(ptrName); 
+				ptrName = m_vecFileName[i].c_str();
+				ImgMan::GetInstance()->DeleteSnap(ptrName);
 			}
 		}
 	}
@@ -2330,7 +2321,7 @@ void ViewArchiveImgMan::BtnDeleteClicked(GtkButton* button)
 			PRINTF("SIZE = %d\n", size);
 			if (m_vecCineSel[i])
 			{
-				ptrName = m_vecCineName[i].c_str();	
+				ptrName = m_vecCineName[i].c_str();
 				PRINTF("delete %d is select, name = %s\n", i, m_vecCineName[i].c_str());
 				VideoMan::GetInstance()->DeleteVideo(ptrName);
 			}
@@ -2430,7 +2421,7 @@ void ViewArchiveImgMan::BtnLastPatClicked(GtkButton* button)
 
 	m_curPat --;
 	UpdateCurPat(m_vecExamID[m_curPat], m_curPat, size);
-	
+
 	// exit cine if it is on
 	ExitCine();
 }
@@ -2537,7 +2528,7 @@ void ViewArchiveImgMan::BtnSnapImgClicked(GtkButton* button)
 		//get button pressed
 		id += m_curImgPage * (SNAP_COL * SNAP_ROW);
 
-		// display large image 
+		// display large image
 		DisplayImage(m_vecFileName[id]);
 	}
 	else if (m_fileType == CINE)
@@ -2547,7 +2538,7 @@ void ViewArchiveImgMan::BtnSnapImgClicked(GtkButton* button)
 		//get button pressed
 		id += m_curCinePage * (SNAP_COL * SNAP_ROW);
 
-		// display large image 
+		// display large image
 		memset(m_cineData, 0, CINE_HEIGHT * CINE_WIDTH * 3); //清除图像去数据，防止Tips隐藏时刷新图像
 		DrawLoadingInfo();
 		g_timeout_add(50, HandlerDisplayCine, (char*)(m_vecCineName[id].c_str()));
@@ -2570,7 +2561,7 @@ void ViewArchiveImgMan::ChkBtnClicked(GtkButton* button)
 	}
 	else if (m_fileType == CINE)
 	{
-		id += m_curCinePage * (SNAP_COL * SNAP_ROW);		
+		id += m_curCinePage * (SNAP_COL * SNAP_ROW);
 
 		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button)))
 			m_vecCineSel[id] = TRUE;
@@ -2588,7 +2579,7 @@ void ViewArchiveImgMan::ComboTypeClicked(GtkComboBox *combobox)
 	index = gtk_combo_box_get_active(GTK_COMBO_BOX(combobox));
 	if (index == -1)
 		return;
-	
+
 	//exit cine
 	ExitCine();
 
@@ -2682,9 +2673,9 @@ void ViewArchiveImgMan::BtnPrintClicked(GtkButton* button)
 
 void ViewArchiveImgMan::DrawLoadingInfo()
 {
-	gdk_draw_rectangle(m_drawArea->window, 
+	gdk_draw_rectangle(m_drawArea->window,
 			m_drawArea->style->black_gc,
-			TRUE, 
+			TRUE,
 			0, 0,
 			m_drawArea->allocation.width,
 			m_drawArea->allocation.height);
@@ -2710,14 +2701,14 @@ void ViewArchiveImgMan::DrawLoadingInfo()
 void ViewArchiveImgMan::DrawAreaConfigure(GtkWidget *widget, GdkEventConfigure *event)
 {
 	memset(m_imgData, 0, IMG_HEIGHT * IMG_WIDTH * 3);
-    m_imgPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_imgData, 
+    m_imgPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_imgData,
 					   GDK_COLORSPACE_RGB, FALSE, 8,
 					   IMG_WIDTH, IMG_HEIGHT,
 					   IMG_WIDTH * 3,
 					   NULL, NULL);
 
 	memset(m_cineData, 0, CINE_HEIGHT * CINE_WIDTH * 3);
-	m_cinePixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_cineData, 
+	m_cinePixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_cineData,
 					   GDK_COLORSPACE_RGB, FALSE, 8,
 					   CINE_WIDTH, CINE_HEIGHT,
 					   CINE_WIDTH * 3,
@@ -2729,12 +2720,12 @@ void ViewArchiveImgMan::DrawAreaExpose(GtkWidget *widget, GdkEventExpose *event)
     {
         char reportName[256];
         sprintf(reportName, "%sreport_page%d.png", m_archivePath, i+1);
-        if(access(reportName, F_OK) == 0) 
+        if(access(reportName, F_OK) == 0)
         {
             if (widget == m_imagePage[i])
             {
-                cairo_t *cr;  
-                cr = gdk_cairo_create(widget->window);  
+                cairo_t *cr;
+                cr = gdk_cairo_create(widget->window);
                 cairo_surface_t *image = cairo_image_surface_create_from_png(reportName);
                 if(image)
                 {
@@ -2756,7 +2747,7 @@ void ViewArchiveImgMan::DrawAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 	{
 		if (m_imgPixbuf != NULL)
 		{
-			gdk_draw_pixbuf(widget->window, 
+			gdk_draw_pixbuf(widget->window,
 					widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
 					m_imgPixbuf,
 					0, 0,
@@ -2768,16 +2759,16 @@ void ViewArchiveImgMan::DrawAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 	}
 	else if (m_fileType == CINE)
 	{
-		gdk_draw_rectangle(widget->window, 
+		gdk_draw_rectangle(widget->window,
 				widget->style->black_gc,
-				TRUE, 
+				TRUE,
 				0, 0,
 				widget->allocation.width,
 				widget->allocation.height);
 
 		if (m_cinePixbuf != NULL)
 		{
-			gdk_draw_pixbuf(widget->window, 
+			gdk_draw_pixbuf(widget->window,
 					widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
 					m_cinePixbuf,
 					0, 0,
@@ -2788,4 +2779,3 @@ void ViewArchiveImgMan::DrawAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 		}
 	}
 }
-

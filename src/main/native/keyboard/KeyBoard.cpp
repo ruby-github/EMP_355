@@ -2,7 +2,7 @@
  *
  * 2009, 深圳市恩普电子技术有限公司
  *
- *@file:	kbd_interface.c 
+ *@file:	kbd_interface.c
  *@brief:	The interface of keyboard that used in color ultrasound diagnosing system
  *
  *version:	V1.0
@@ -10,7 +10,7 @@
  *author:	sunxubin   hehao
  *
  ***************************************/
-#include "KeyValueOpr.h"
+#include "keyboard/KeyValueOpr.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +27,7 @@
 #include <gtk/gtk.h>
 #include <errno.h>
 #include <termios.h>
-#include  <syslog.h>
+#include <syslog.h>
 
 extern bool g_authorizationOn;
 extern GIOChannel *keyboard_channel;
@@ -40,8 +40,8 @@ static char * GetPtty(const pportinfo_t pportinfo)
     switch(pportinfo->tty)
     {
         case '0':
-	        sprintf(ptty, "/dev/ttyS0");		
-            //sprintf(ptty, "/dev/ttyUSB0");	
+	        sprintf(ptty, "/dev/ttyS0");
+            //sprintf(ptty, "/dev/ttyUSB0");
             break;
 
         case '1':
@@ -50,13 +50,12 @@ static char * GetPtty(const pportinfo_t pportinfo)
 
         case '2':
             sprintf(ptty, "/dev/ttyS2");
-            break;	
+            break;
     }
 	PRINTF ("tty case:%d",pportinfo->tty);
     PRINTF("ptty=%s\n", ptty);
     return ptty;
 }
-
 
 static int convbaud(unsigned int baudrate)
 {
@@ -110,7 +109,7 @@ int PortSet(int fdcom, const pportinfo_t pportinfo)
 
 	case '2':
 	    termios_new.c_cflag |= IXON | IXOFF | IXANY;
-	    break;	
+	    break;
     }
 
     termios_new.c_cflag &= ~CSIZE;
@@ -130,7 +129,7 @@ int PortSet(int fdcom, const pportinfo_t pportinfo)
 
 	default:
 	    termios_new.c_cflag |= CS8;
-	    break;	
+	    break;
     }
 
     parity = pportinfo->parity;
@@ -223,12 +222,12 @@ int PortSend(int fdcom, unsigned char * data, int datalen)
 
 int PortRecv(int fdcom, unsigned char *data, int datalen, struct timeval timeout)
 {
-    int len = 0; 
+    int len = 0;
     int fs_sel;
-    fd_set	fs_read;	
+    fd_set	fs_read;
 
     FD_ZERO(&fs_read);
-    FD_SET(fdcom, &fs_read);	
+    FD_SET(fdcom, &fs_read);
 
     errno = 0;
     fs_sel = select(fdcom+1, &fs_read, NULL, NULL, &timeout);
@@ -255,12 +254,12 @@ int KbdHandShake(int fdcom)
 	int recvlen = 0;
 	int sendlen;
 	unsigned char init_comm = 0x4b;					//0x4b = 'K'
-	
+
 	sendlen = PortSend(fdcom, &init_comm, 1);
-	
+
 	timeout.tv_sec = 0;			// timeout = 5 second.
 	timeout.tv_usec = 2000;
-	
+
 	int i;
 	for( i=0; i<10; i++)
 	{
@@ -310,7 +309,7 @@ int KbdHandShake(int fdcom)
 	sendlen = PortSend(fdcom, &init_comm, 1);
 
 	count = 1;
-	timeout.tv_sec = 0;		
+	timeout.tv_sec = 0;
 	timeout.tv_usec = 20000;
 	recvlen = PortRecv(fdcom, recvbuf, count, timeout);
 
@@ -327,7 +326,7 @@ int KbdHandShake(int fdcom)
         sendlen = PortSend(fdcom, &init_comm, 1);
 
         count = 1;
-        timeout.tv_sec = 0;		
+        timeout.tv_sec = 0;
         timeout.tv_usec = 20000;
         recvlen = PortRecv(fdcom, recvbuf, count, timeout);
 
@@ -411,9 +410,9 @@ int KbdHandShake(int fdcom)
 }
 
 /******************************
- *键盘串口监视
+ *閿洏涓插彛鐩戣
  *fdcom:	串口设备号
- *pKeyInterface:	KeyValueOpr对象指针
+ *pKeyInterface:	KeyValueOpr瀵硅薄鎸囬拡
  *****************************/
 void UartOversee( int fdcom, void *pKeyInterface)
 {
@@ -421,4 +420,3 @@ void UartOversee( int fdcom, void *pKeyInterface)
     keyboard_channel = g_io_channel_unix_new(fdcom);
     input_handle = g_io_add_watch_full(keyboard_channel, G_PRIORITY_DEFAULT, G_IO_IN, GetKeyValue, pKeyInterface, 0);
 }
-

@@ -1,6 +1,6 @@
 #include <string>
 #include "Def.h"
-#include "SysMeasurementSetting.h"
+#include "sysMan/SysMeasurementSetting.h"
 
 using std::string;
 
@@ -8,7 +8,7 @@ TraceItem g_traceCalcItem;
 
 void GetTraceItem(struct TraceItem &calcItem)
 {
-	calcItem= g_traceCalcItem; 
+	calcItem= g_traceCalcItem;
 }
 
 SysMeasurementSetting::SysMeasurementSetting()
@@ -30,7 +30,7 @@ int SysMeasurementSetting::GetMeasureResult(void)
 {
     return ptrIni->ReadInt("MeasurementSetting", "MeasureResult");
 }
- 
+
 int SysMeasurementSetting::GetMeasureLineDisplay(void)
 {
     return ptrIni->ReadInt("MeasurementSetting", "MeasureLineDisplay");
@@ -169,7 +169,7 @@ void SysMeasurementSetting::SetMeasureLineDisplay(int measureLineDisplay)
 
 void SysMeasurementSetting::SetMeasureSequence(int measureSequence)
 {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureSequence", measureSequence);    
+    ptrIni->WriteInt("MeasurementSetting", "MeasureSequence", measureSequence);
 }
 
 void SysMeasurementSetting::SetMeasureCursorSize(int measureCursor)
@@ -247,7 +247,6 @@ void SysMeasurementSetting::SetHeartBeatCycle(int cycle)
 {
     ptrIni->WriteInt("MeasurementSetting", "HeartBeatCycle", cycle);
 }
-
 
 void SysMeasurementSetting::SetUnitDist(int unit)
 {

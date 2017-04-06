@@ -1,5 +1,5 @@
-#include "ImageArea.h"
-#include "DrawHistogram.h"
+#include "display/ImageArea.h"
+#include "measure/DrawHistogram.h"
 
 #define HISTOGRAM_START_X (IMAGE_W-256)
 #define HISTOGRAM_START_Y (IMAGE_H-5)
@@ -19,7 +19,7 @@ DrawHistogram::DrawHistogram()
 }
 
 DrawHistogram::~DrawHistogram()
-{	
+{
     	if (m_ptrInstance != NULL)
 		delete m_ptrInstance;
 }
@@ -79,10 +79,10 @@ void DrawHistogram::DrawCoorOrigin(void)
 {
     GdkGC *gc = m_ptrImg->NewHistogramDC(g_white, GDK_COPY);
 
-    const POINT coor_origin={0, 150+1};//坐标原点
+    const POINT coor_origin={0, 150+1};//鍧愭爣鍘熺偣
     POINT tmp1, tmp2;
 
-    //画坐标系
+    //鐢诲潗鏍囩郴
     tmp1.x = coor_origin.x + 256;
     tmp1.y = coor_origin.y;
     tmp2.x = coor_origin.x;
@@ -106,7 +106,7 @@ void DrawHistogram::DrawCoorOrigin(void)
 
 void DrawHistogram::ClearHistogramData(void)
 {
-    int i;	
+    int i;
 
     for (i=0; i<256; i++)
         m_sum[i]=0;
@@ -116,11 +116,11 @@ void DrawHistogram::ClearHistogramImage(void)
 {
     GdkGC *gc = m_ptrImg->NewHistogramDC(g_white, GDK_XOR);
 
-    const POINT coor_origin={1, 150};//坐标原点
+    const POINT coor_origin={1, 150};//鍧愭爣鍘熺偣
     POINT tmp1, tmp2;
     int temp;
     int i;
-	
+
     for (i=0; i<256; i++) {
         temp = (int)m_sum[i];
         if (temp != 0) {
@@ -142,7 +142,7 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p)
 	unsigned char color;
 	unsigned char *field_p;
 	float base;
-	const POINT coor_origin={1, 150};//坐标原点
+	const POINT coor_origin={1, 150};//鍧愭爣鍘熺偣
 	POINT tmp1, tmp2;
 	int temp;
 
@@ -161,7 +161,6 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p)
 		}
 	}
 
-
 	for (i=0; i<256; i++)
 		m_sum[i]=0;
 
@@ -178,11 +177,11 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p)
 		{
 			color = (unsigned char)(0.2989*(*field_p) + 0.587*(*(field_p+1)) + 0.1141*(*(field_p+2)));//彩色直方图公式
 			m_sum[color]++;
-			field_p += BYTES_DOT;	
+			field_p += BYTES_DOT;
 		}
 		field_p += (IMG_W - width) * BYTES_DOT;
 	}
-	
+
 	int m;
 	for (i=0; i<256; i++)
 	{
@@ -199,8 +198,6 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p)
 	else
 		base = 150.0;
 
-
-
 	for (i=0; i<256; i++)
 	{
 		temp = (int)(m_sum[i]*base);
@@ -214,6 +211,6 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p)
 		}
 		m_sum[i] = temp;
 	}
-        
+
         g_object_unref(gc);
 }

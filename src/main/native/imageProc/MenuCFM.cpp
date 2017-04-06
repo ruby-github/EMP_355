@@ -1,16 +1,16 @@
 #include <gtk/gtk.h>
-#include "MenuCFM.h"
-#include "Menu2D.h"
-#include "gui_func.h"
-#include "gui_global.h"
+#include "imageProc/MenuCFM.h"
+#include "imageProc/Menu2D.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
 #include "Def.h"
-#include "ImgProcCfm.h"
-#include "ImgCfm.h"
-#include "ScanMode.h"
-#include "FreezeMode.h"
-#include "ModeStatus.h"
-#include "../display/ImageAreaDraw.h"
-#include "../keyboard/MultiFuncFactory.h"
+#include "imageProc/ImgProcCfm.h"
+#include "imageControl/ImgCfm.h"
+#include "imageProc/ScanMode.h"
+#include "imageProc/FreezeMode.h"
+#include "imageProc/ModeStatus.h"
+#include "display/ImageAreaDraw.h"
+#include "keyboard/MultiFuncFactory.h"
 
 MenuCFM g_menuCFM;
 
@@ -33,7 +33,7 @@ void MenuCFM::Hide(void)
 
 void MenuCFM::Show(void)
 {
-    //再此赋值，目的是切换到cfm模式下的时候阈值和彩色抑制不可操作
+    //鍐嶆璧嬪€硷紝鐩殑鏄垏鎹㈠埌cfm妯″紡涓嬬殑鏃跺€欓槇鍊煎拰褰╄壊鎶戝埗涓嶅彲鎿嶄綔
     spin_threshold.SetItem(&item_threshold);
     spin_reject.SetItem(&item_reject);
 
@@ -81,8 +81,8 @@ void MenuCFM::Sensitive(bool on)
 GtkWidget* MenuCFM::Create(void)
 {
     m_table = gtk_table_new(20, 8, TRUE);
-	
-    // Background Hide 
+
+    // Background Hide
     m_labelBghide = create_label("", 0, 0, g_lightGray, NULL);
     m_check_btn_bghide = gtk_check_button_new();
     gtk_container_add(GTK_CONTAINER(m_check_btn_bghide), m_labelBghide);
@@ -100,7 +100,7 @@ GtkWidget* MenuCFM::Create(void)
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btnBC), FALSE);
     gtk_widget_show(m_btnBC);
 
-    // Color Hide 
+    // Color Hide
     m_labelColorhide = create_label("", 0, 0, g_lightGray, NULL);
     m_btnColorhide = create_button(m_labelColorhide, 0, 0, g_deep);
     gtk_widget_modify_bg(m_btnColorhide, GTK_STATE_INSENSITIVE, g_deepGray);
@@ -345,5 +345,3 @@ void MenuCFM::ChgArtifact(EKnobOper oper)
 {
 	ImgProcCfm::GetInstance()->ChangeArtifact(oper);
 }
-
-

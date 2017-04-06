@@ -1,7 +1,7 @@
 #ifndef _VIEW_TEMPLET_H_
 #define _VIEW_TEMPLET_H_
 
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 #include <sqlite3.h>
 
 #define TEMPLET_EN_DB "./res/glossary_en.db"
@@ -17,7 +17,6 @@ public:
     void DestroyWindow(void);
     bool DefaultFactory(void);
  void tree_auto_scroll(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path, gpointer user_data);
-    
 
 private:
     ViewTemplet();
@@ -35,7 +34,7 @@ private:
 
     GtkWidget *m_window;
     GtkWidget *m_treeView;
-    int m_flagDepth;//复制时结点的深度标志
+    int m_flagDepth;//澶嶅埗鏃剁粨鐐圭殑娣卞害鏍囧織
     // char m_copyNode[4][maxNodeLen];//复制结点时所选结点的值(f1-f4)
     // char m_parentNode[maxNodeLen];//复制时所选结点的父结点
 
@@ -82,7 +81,7 @@ private:
 // signal connect
 static void HandleTempletBtnClicked(GtkWidget *widget, GdkEventButton *event, ViewTemplet *data) { data->BtnTempletClicked(widget, event); }
   static bool HandleTempletExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path, ViewTemplet *data)
-    { 
+    {
         return data->TempletTestRowExpandBefore(treeview, iter, path);
     }
 

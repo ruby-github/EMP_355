@@ -24,7 +24,7 @@ void ShowEFOVPrepare(void);
     bool GetMenuVisible() { return m_menuVisbible; }
     void SwitchMenu(EMenuType type);
     EMenuType GetNotebookType(void);
-    
+
     GtkWidget* Create(void);
 	void ShowMenu(void);
 	void HideMenu(void);
@@ -61,7 +61,7 @@ private:
     GtkWidget *m_fixedMenu;
     GtkWidget *m_labelSub;
     GtkWidget *m_btnExit;
-    
+
     GtkWidget *m_noteBook;
     GtkWidget *m_label2D;
     GtkWidget *m_labelM;
@@ -74,7 +74,7 @@ private:
     void MainMenuClk(GtkButton *button);
     void NotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
 //signal connect
-    static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, MenuArea *data) 
+    static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, MenuArea *data)
 	{ data->NotebookChanged(notebook, page, page_num); }
 
     void HideAllOtherMenu(void);

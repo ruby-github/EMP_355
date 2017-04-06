@@ -1,7 +1,6 @@
 #include <stdio.h>
-#include "CalcTime.h"
+#include "base/CalcTime.h"
 #include "Def.h"
-
 
 /*
  * @brief begin statistic time
@@ -48,4 +47,3 @@ float CalcTime::End()
 	m_start = m_end;
 	return timeUse;
 }
-

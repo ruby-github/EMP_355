@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <iostream>
-#include "MonitorControl.h"
-#include "I2CCtrl.h"
-#include "CgosGpio.h"
+#include "periDevice/MonitorControl.h"
+#include "periDevice/I2CCtrl.h"
+#include "periDevice/CgosGpio.h"
 
 using namespace std;
 
@@ -77,7 +77,7 @@ int MonitorControl::AutoBalance(void)
     return 0;
 }
 
-//巨峰///////////
+//宸ㄥ嘲///////////
 int MonitorControl::DisplayWrite(unsigned char reg, unsigned char value)
 {
     unsigned char buffer[2] = { reg, value };
@@ -99,7 +99,7 @@ int MonitorControl::DisplayWrite(unsigned char reg, unsigned char value)
     }
 }
 
-///睿显//////////
+///鐫挎樉//////////
 int MonitorControl::DisplayWrite1(unsigned char reg)
 {
     unsigned char buffer[2] = { reg,reg };
@@ -110,4 +110,3 @@ int MonitorControl::DisplayWrite1(unsigned char reg)
 
     return i2c.I2CWrite(VIDEO_ADDR1, 1, buffer);
 }
-

@@ -1,5 +1,5 @@
 #include "Def.h"
-#include "SysOptions.h"
+#include "sysMan/SysOptions.h"
 
 SysOptions::SysOptions()
 {

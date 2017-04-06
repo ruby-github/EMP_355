@@ -1,7 +1,7 @@
 #ifndef CALC_2D_PHASE_H
 #define CALC_2D_PHASE_H
 
-#include "Calc2DConvex.h"
+#include "imageControl/Calc2DConvex.h"
 
 class Calc2DPhase: public Calc2DConvex
 {
@@ -24,11 +24,10 @@ class Calc2DPhase: public Calc2DConvex
     protected:
 		void CalcFilterBandPass(int order);
         void CalcDynamicFilter(int order);
-		void CalcDynamicDemod(int order);        
+		void CalcDynamicDemod(int order);
 
     private:
 		static const int EMIT_CH_NUM_P[20]; ///< control calculating emit delay
 
 };
 #endif
-

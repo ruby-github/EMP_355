@@ -1,7 +1,7 @@
-#include  "Zoom.h"
-#include  "GlobalClassMan.h"
-#include  "HintArea.h"
-#include "ImgProc2D.h"
+#include "imageProc/Zoom.h"
+#include "imageProc/GlobalClassMan.h"
+#include "display/HintArea.h"
+#include "imageProc/ImgProc2D.h"
 
 Zoom* Zoom::m_ptrInstance = NULL;
 const double Zoom::GLOBAL_SCALE[MAX_GLOBAL_SCALE] = {1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};
@@ -29,7 +29,7 @@ Zoom::Zoom()
 	m_localLineEnd = 140;
 	m_localDotBegin = IMG_H/2 - 120;
 	m_localDotEnd = IMG_H/2 + 120;
-    m_localScale = 1.0;    
+    m_localScale = 1.0;
     m_timeout = 0;
 }
 Zoom::~Zoom()
@@ -133,7 +133,7 @@ bool Zoom::GlobalZoomScroll(int offsetX, int offsetY)
 		m_globalPos.x = IMG_W - m_globalOffsetX;
 	else if (m_globalPos.x < m_globalOffsetX)
 		m_globalPos.x = m_globalOffsetX;
-	
+
 	// y
 	m_globalPos.y += stepy;
 	if (m_globalPos.y > (IMG_H - m_globalOffsetY))
@@ -144,7 +144,7 @@ bool Zoom::GlobalZoomScroll(int offsetX, int offsetY)
 	m_ptrDscMan->GetWriteLock();
 	SetGlobalPos(m_globalPos);
 	m_ptrDscMan->ReadWriteUnlock();
-	return TRUE;	
+	return TRUE;
 }
 
 void Zoom::GetGlobalZoomInfo(double &scale, int &offsetInOriginal)
@@ -220,15 +220,15 @@ bool Zoom::PIPZoomScale(EKnobOper oper)
 	m_ptrDscMan->GetWriteLock();
 	SetPIPInfo(m_PIPPos, m_PIPScale);
 	m_ptrDscMan->ReadWriteUnlock();
-	return TRUE;	
+	return TRUE;
 }
 
 gboolean Zoom::HandleSetPos(gpointer data)
 {
     Zoom *pClass = (Zoom *)data;
     POINT *p = &pClass->m_PIPPos;
-    pClass->m_ptrDscMan->GetWriteLock(); 
-    pClass->SetPIPPos(*p); 
+    pClass->m_ptrDscMan->GetWriteLock();
+    pClass->SetPIPPos(*p);
 	pClass->m_ptrDscMan->ReadWriteUnlock();
     pClass->m_timeout = 0;
     return FALSE;
@@ -257,14 +257,14 @@ bool Zoom::PIPZoomPos(int offsetX, int offsetY)
 		m_PIPPos.y = 0;
 
     m_ptrUpdate->PIPMagnifier(m_PIPPos);
-    
+
 #ifdef EMP_355
     if (m_timeout == 0)
         m_timeout = g_timeout_add(200, HandleSetPos, this);
 #else
     HandleSetPos((gpointer)this);
 #endif
-    return TRUE;		
+    return TRUE;
 }
 
 // local zoom
@@ -315,7 +315,7 @@ void Zoom::LocalZoomCtrl(bool on)
 
         //printf("localLineBegin: %d End:%d, dotBegin:%d dotEnd:%d\n", m_localLineBegin, m_localLineEnd, m_localDotBegin, m_localDotEnd);
 		// enter in local zoom measure status
-		Img2D::GetInstance()->SetScale2DZoomMeasure(m_localScale); 
+		Img2D::GetInstance()->SetScale2DZoomMeasure(m_localScale);
 		m_localCtrl = TRUE;
 
 		//clear zoom box  and redraw scale, focus
@@ -342,7 +342,7 @@ void Zoom::LocalZoomCtrl(bool on)
 
 		if (m_ptrDsc != NULL)
 		{
-			m_ptrDsc->UpdateScale();// need for exit local zoo 偏转的情况下不能进入localzoomm
+			m_ptrDsc->UpdateScale();// need for exit local zoo 鍋忚浆鐨勬儏鍐典笅涓嶈兘杩涘叆localzoomm
 		}
 		if (m_ptrDsc != NULL)
 		{
@@ -351,9 +351,9 @@ void Zoom::LocalZoomCtrl(bool on)
 		m_ptrDscMan->ReadWriteUnlock();
 
 		// exit local zoom measure status
-		Img2D::GetInstance()->RestoreScale2DZoomMasure(); 
+		Img2D::GetInstance()->RestoreScale2DZoomMasure();
 
-		if (!m_localCtrl)	
+		if (!m_localCtrl)
 			m_ptrUpdate->ClearLocalZoomBox();
 		m_localCtrl = FALSE;
 
@@ -389,7 +389,7 @@ bool Zoom::LocalZoomBoxPos(int offsetX, int offsetY)
 		m_ptrUpdate->LocalZoomBox(m_localLineBegin, m_localLineEnd, m_localDotBegin, m_localDotEnd);
 	}
 
-	return TRUE;	
+	return TRUE;
 }
 #if 0
 bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOverturn)
@@ -443,7 +443,7 @@ bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOv
 
 		m_ptrUpdate->LocalZoomBox(m_localLineBegin, m_localLineEnd, m_localDotBegin, m_localDotEnd);
 	}
-	return TRUE;		
+	return TRUE;
 }
 #endif
 bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOverturn)
@@ -499,7 +499,7 @@ bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOv
 		m_ptrUpdate->LocalZoomBox(m_localLineBegin, m_localLineEnd, m_localDotBegin, m_localDotEnd);
 	}
 
-	return TRUE;		
+	return TRUE;
 }
 
 bool Zoom::ReSendLocalZoomInfo(void)
@@ -540,13 +540,13 @@ void Zoom::GetLocalZoomScale(double &scale)
 
 void Zoom::ClearLocalZoom()
 {
-    //clear zoom box 
+    //clear zoom box
     m_ptrUpdate->ClearLocalZoomBox();
 }
 
 void Zoom::RedrawLocalZoom()
 {
-    //draw zoom box 
+    //draw zoom box
 	m_ptrUpdate->LocalZoomBox(m_localLineBegin, m_localLineEnd, m_localDotBegin, m_localDotEnd);
 }
 
@@ -582,8 +582,8 @@ void Zoom::SetGlobalPos(POINT p)
 void Zoom::SetPIPInfo(POINT p, int scaleIndex)
 {
 	RECT r;
-	
-	// dsc 
+
+	// dsc
     if (m_ptrDsc != NULL)
     {
         r = m_ptrDsc->SetPIPZoomState(p, PIP_SCALE[scaleIndex]);
@@ -603,8 +603,8 @@ void Zoom::SetPIPInfo(POINT p, int scaleIndex)
 void Zoom::SetPIPPos(POINT p)
 {
 	RECT r;
-printf("P1.X = %d, p1.y = %d\n", p.x, p.y);	
-	// dsc 
+printf("P1.X = %d, p1.y = %d\n", p.x, p.y);
+	// dsc
     if (m_ptrDsc != NULL)
     {
         r = m_ptrDsc->SetPIPZoomState(p, PIP_SCALE[m_PIPScale]);
@@ -625,7 +625,7 @@ void Zoom::SetLocalInfo(int lineBegin, int lineEnd, int dotBegin, int dotEnd)
 	int scanRange[2];
 	Img2D::GetInstance()->GetScanRange(scanRange);
 	float scaleLine = (scanRange[1] - scanRange[0] + 1) / (float)dLine;
-	float scaleDot =  IMG_H / (float)dDot; 
+	float scaleDot =  IMG_H / (float)dDot;
 
     m_localScale = (scaleLine < scaleDot)? scaleLine:scaleDot;
 
@@ -638,4 +638,3 @@ void Zoom::SetLocalInfo(int lineBegin, int lineEnd, int dotBegin, int dotEnd)
 	// draw
 	m_ptrUpdate->LocalZoomBox(lineBegin, lineEnd, dotBegin, dotEnd);
 }
-

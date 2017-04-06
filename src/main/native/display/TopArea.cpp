@@ -2,11 +2,11 @@
 #include <time.h>
 
 #include "Def.h"
-#include "TopArea.h"
-#include "gui_func.h"
-#include "gui_global.h"
-#include "../sysMan/SysGeneralSetting.h"
-#include "ProbeMan.h"
+#include "display/TopArea.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "probe/ProbeMan.h"
 using std::string;
 
 TopArea* TopArea::m_ptrInstance = NULL;
@@ -28,7 +28,7 @@ TopArea::TopArea(void)
 #ifdef VET
     sprintf(m_hospital, " ");
 #endif
-    
+
 	m_depth = 0;
     m_MI = 0.0;
     m_TIS = 0.0;
@@ -40,9 +40,9 @@ TopArea::TopArea(void)
 }
 
 TopArea::~TopArea()
-{ 
-    if (m_ptrInstance != NULL) 
-    	delete m_ptrInstance; 
+{
+    if (m_ptrInstance != NULL)
+    	delete m_ptrInstance;
 }
 
 void TopArea::DrawLogo(void)
@@ -259,7 +259,7 @@ void TopArea::DrawDateTime(void)
     struct tm *now_tm;
     char buf[50];
     char buf_week[10];
-    
+
 // Get Time
     time(&now);
     now_tm = localtime(&now);
@@ -304,8 +304,8 @@ void TopArea::DrawDateTime(void)
             break;
     }
     //ClearArea(TOP_AREA_W-180, 5, 180, 17);
-    //ClearArea(TOP_AREA_W-180, 5, 192, 35);//解决中英文切换，刷新时间和日期不全的问题
-    ClearArea(TOP_AREA_P4+15, 5, TOP_AREA_W-TOP_AREA_P4, 35);//解决中英文切换，刷新时间和日期不全的问题
+    //ClearArea(TOP_AREA_W-180, 5, 192, 35);//瑙ｅ喅涓嫳鏂囧垏鎹紝鍒锋柊鏃堕棿鍜屾棩鏈熶笉鍏ㄧ殑闂
+    ClearArea(TOP_AREA_P4+15, 5, TOP_AREA_W-TOP_AREA_P4, 35);//瑙ｅ喅涓嫳鏂囧垏鎹紝鍒锋柊鏃堕棿鍜屾棩鏈熶笉鍏ㄧ殑闂
     DrawString(buf, TOP_AREA_P4+15, 5, g_white, NULL);
 }
 
@@ -323,7 +323,7 @@ gboolean UpdateDateTime(gpointer data)
 {
 	TopArea *tmp;
 	tmp = (TopArea *)data;
-	tmp->DrawDateTime(); 
+	tmp->DrawDateTime();
 	return TRUE;
 }
 
@@ -400,7 +400,7 @@ void TopArea::DrawString(const char *str, int x, int y, GdkColor *color, PangoFo
     pango_layout_get_pixel_size(layout, &width, &height);
     gdk_gc_set_foreground(gc, g_black);
     gdk_draw_rectangle(m_pixmapTop, gc, TRUE, x, y, width, height);
-	
+
     gdk_gc_set_foreground(gc, color);
     gdk_draw_layout(m_pixmapTop, gc, x, y, layout);
 
@@ -415,7 +415,7 @@ void TopArea::SetReadImg(bool status)
     m_inReadImg = status;
 
 	GdkGC *gc = gdk_gc_new(m_pixmapTop);
-	if (status) 
+	if (status)
 	{
 		gdk_draw_drawable(m_pixmapTopBak,
 				gc,
@@ -424,8 +424,8 @@ void TopArea::SetReadImg(bool status)
 				0, 0,
 				TOP_AREA_W, TOP_AREA_H);
 		DelTimeOut();
-	} 
-	else 
+	}
+	else
 	{
 		gdk_draw_drawable(m_pixmapTop,
 				gc,

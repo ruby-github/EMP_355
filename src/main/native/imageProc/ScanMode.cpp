@@ -2,38 +2,36 @@
  * 2009, 深圳恩普电子技术有限公司
  *
  * @file: ScanMode.cpp
- * @brief: control scan mode 
+ * @brief: control scan mode
  *
  * version: V1.0
  * date: 2009-5-27
  * @author: zhanglei
  */
 
-
-#include "ScanMode.h"
-#include "FpgaCtrl2D.h"
+#include "imageProc/ScanMode.h"
+#include "imageControl/FpgaCtrl2D.h"
 #include "Def.h"
-#include "GlobalClassMan.h"
-#include "DscMan.h"
-#include "LightDef.h"
-#include "KeyFunc.h"
-#include "ImgProcM.h"
-#include "ImgProc2D.h"
-#include "ImgProcPw.h"
+#include "imageProc/GlobalClassMan.h"
+#include "imageProc/DscMan.h"
+#include "keyboard/LightDef.h"
+#include "keyboard/KeyFunc.h"
+#include "imageProc/ImgProcM.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ImgProcPw.h"
 #include "measure/DrawHistogram.h"
-#include "ViewIcon.h"
-#include "Zoom.h"
-#include "UIS4DReceiveInterface.h"
-#include "D4FuncMan.h"
+#include "display/ViewIcon.h"
+#include "imageProc/Zoom.h"
+#include <UIS4DReceiveInterface.h>
+#include "imageControl/D4FuncMan.h"
 #include "display/ViewDialog.h"
 #include "sysMan/ViewSystem.h"
 #include "ViewMain.h"
 #include "sysMan/SysOptions.h"
-#include "LightDef.h"
 #include "keyboard/KeyValueOpr.h"
 #include "imageControl/UsbControl.h"
-#include "MenuCalcNew.h"
-#include "MenuMeasure.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "measure/MenuMeasure.h"
 extern bool g_init;
 extern int s_fdcom;
 ScanMode* ScanMode::m_ptrInstance = NULL;
@@ -75,8 +73,8 @@ ScanMode::ScanMode()
 	m_workMode = 0;
 	m_packetSize = 0;
 	m_pulseNum = 0;
-	
-	m_pwCurImg = 0; 
+
+	m_pwCurImg = 0;
     m_isSpecialMeasure = FALSE;
 
     m_pulseNumTmp = 4;
@@ -119,7 +117,7 @@ void ScanMode::Enter2D()
 	///> update 2d image view
 	m_ptrUpdate2D->Enter2DMode();
 
-	///> control light 
+	///> control light
 #if not defined (EMP_322)
 #if not defined (EMP_313)
 	DarkAllModeLight();
@@ -152,13 +150,13 @@ void ScanMode::EnterM()
 
     // set rotate to 0
     ImgProc2D::GetInstance()->SetRotate(0, MIN);
-	
+
 	///> reset bm line
-	m_ptrImg2D->ResetMLine();	
+	m_ptrImg2D->ResetMLine();
 	m_ptrUpdate2D->EnterMMode();
 #if not defined (EMP_322)
 #if not defined (EMP_313)
-	///> control light 
+	///> control light
 	DarkAllModeLight();
 	g_keyInterface.CtrlLight(TRUE, LIGHT_M);
 #endif
@@ -182,9 +180,9 @@ void ScanMode::UpdateBM()
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::M);
 
-	// set format to UD11 
+	// set format to UD11
 	//m_ptrFormatM->ChangeFormat(FormatM::BM11_LR); //only for test
-	///> set format to M 
+	///> set format to M
     SysOptions sysoption;
     int format = sysoption.GetDisplayFormatM();
     FormatM::GetInstance()->ChangeFormat(FormatM::EFormatM(format));
@@ -211,11 +209,11 @@ void ScanMode::UpdateM()
 	SetScanMode(m_scanMode);
 
 	m_ptrImg2D->EnterM();
-	
+
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::M);
 
-    ///> set format to M 
+    ///> set format to M
 	//m_ptrFormatM->ChangeFormat(FormatM::M_TOTAL); //only for test
     SysOptions sysoption;
     int format = sysoption.GetDisplayFormatM();
@@ -239,7 +237,7 @@ void ScanMode::EnterPw()
 	Enter2D();
 
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::PW_INIT);
-	
+
 	///> set scan mode
 	m_scanMode = PW_INIT;
 	SetScanMode(m_scanMode);
@@ -256,7 +254,7 @@ void ScanMode::EnterPw()
 	m_ptrImgPw->ReSendSv();
 	m_ptrUpdatePw->EnterPwMode();
 
-	///> control light 
+	///> control light
 	DarkAllModeLight();
 #if not defined (EMP_322)
 #if not defined (EMP_313)
@@ -276,12 +274,12 @@ void ScanMode::UpdatePw()
 	m_ptrDscPara->dcaCFMIsDirection = 1;
 	SetScanMode(D2);
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::PW);
-	
+
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::PW);
 
 	usleep(500000);
-	
+
 	// send mode to fpga
 	m_scanMode = PW;
 	SetScanMode(m_scanMode);
@@ -291,7 +289,7 @@ void ScanMode::UpdatePw()
 	// set pw is real
 	m_pwCurImg = 2;
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
-	
+
     m_ptrImgPw->EnterPw();
 
 	// set format to UD11 a
@@ -302,11 +300,11 @@ void ScanMode::UpdatePw()
 
     // update
     m_ptrUpdatePw->UpdatePwMode();
-       
+
     // clear histogram
     if (DrawHistogram::GetInstance()->GetOnOff())
         DrawHistogram::GetInstance()->SetOnOff(0);
-	
+
 	///> change tis
 	ChangeTis();
 
@@ -327,11 +325,11 @@ int ScanMode::SwitchPw()
 	{
 		//enter pw mode
 		SetScanMode(PW);
-		
+
 		// send to dsc
 		m_pwCurImg = 2;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
-		
+
 		ImgPw::GetInstance()->OnPwImgCtrl(TRUE);
 
 	}
@@ -345,11 +343,11 @@ int ScanMode::SwitchPw()
 		m_pwCurImg = 1;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	}
-	
+
     ///> replay region
     if (m_pwCurImg == 1)
         m_ptrReplay->SwitchArea(1, unfreeze);
-    else 
+    else
         m_ptrReplay->SwitchArea(0, unfreeze);
     if (!unfreeze)
     {
@@ -376,7 +374,6 @@ void ScanMode::EnterCfm()
 
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::CFM);
 
-
 	// set to CFM mode
 	m_scanMode = CFM;
 	SetScanMode(m_scanMode);
@@ -385,19 +382,19 @@ void ScanMode::EnterCfm()
     ImgProc2D::GetInstance()->SetRotate(0, MIN);
     m_ptrImgPw->SetBalanceStatus(FALSE);
     m_ptrImgCfm->SetBalanceStatus(FALSE);
-	
+
 	// clear screen
 	KeyClearScreen kcs;
 	kcs.Execute();
 
-    ///> set format to 
+    ///> set format to
 	m_ptrImgCfm->EnterCfm();
 	m_ptrFormatCfm->ChangeFormat(FormatCfm::B);
 
 	///> update 2d image view
 	m_ptrUpdateCfm->EnterCfm();
 
-	///> control light 
+	///> control light
 	DarkAllModeLight();
 #if not defined (EMP_322)
 #if not defined (EMP_313)
@@ -429,29 +426,29 @@ void ScanMode::EnterPdi()
     if (ImgPw::GetInstance()->GetSimut3Status())
         ImgPw::GetInstance()->ChangeSimult3(FALSE);
 
-    ///> exit rotate 
+    ///> exit rotate
     ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::CFM);
-    
+
     // enter PDI mode
 	m_scanMode = PDI;
 	SetScanMode(m_scanMode);
 
     m_ptrImgPw->SetBalanceStatus(FALSE);
     m_ptrImgCfm->SetBalanceStatus(FALSE);
-	
+
 	///> set format to B
 	m_ptrImgCfm->EnterPdi();
 	m_ptrFormatCfm->ChangeFormat(FormatCfm::B);
 
 	KeyClearScreen kcs;
 	kcs.Execute();
-	
+
 	///> update 2d image view
 	m_ptrUpdateCfm->EnterPdi();
 
-	///> control light 
+	///> control light
 	DarkAllModeLight();
 #if not defined (EMP_322)
 #if not defined (EMP_313)
@@ -468,7 +465,6 @@ void ScanMode::EnterPdi()
 		FreezeMode::GetInstance()->PressUnFreeze();
 }
 
-
 /*
  * @brief enter scan mode pw+cfm from cfm mode
  */
@@ -481,7 +477,7 @@ void ScanMode::EnterPwCfmFromCfm()
 		FreezeMode::GetInstance()->PressUnFreeze();
 
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::PWCFM_INIT);
-	
+
 	// set work mode
 	m_scanMode = PWCFM_INIT;
 	SetScanMode(m_scanMode);
@@ -491,11 +487,11 @@ void ScanMode::EnterPwCfmFromCfm()
 	///> display sv
 	m_ptrImgPw->SetSpectrumModeCW(FALSE);
 	m_ptrImgPw->ResetSvAccordingColor();
-	
-    // update
-	m_ptrUpdatePw->EnterPwCfmFromCfm();		
 
-	///> control light 
+    // update
+	m_ptrUpdatePw->EnterPwCfmFromCfm();
+
+	///> control light
 	DarkAllModeLight();
 #if not defined (EMP_322)
 #if not defined (EMP_313)
@@ -519,17 +515,17 @@ void ScanMode::UpdatePwCfmFromInit()
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::PWCFM);
 
-	// wait data needed by one frame cfm 
+	// wait data needed by one frame cfm
 	usleep(700000);
 	///> send work mode
 	m_scanMode = PWCFM;
-	
+
 	// set pw is real
 	m_pwCurImg = 2;
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	SetScanMode(PW); //pwcfm mode and pw is real
-	
-	// set format to UD11 
+
+	// set format to UD11
 	m_ptrImgPw->EnterPw();
 //	m_ptrFormatPw->ChangeFormat(FormatPw::BP11_UD); //only for test
 
@@ -546,7 +542,7 @@ void ScanMode::UpdatePwCfmFromInit()
 
 	// update
 	m_ptrUpdatePw->UpdatePwCfmMode();
-    
+
     // clear histogram
     if (DrawHistogram::GetInstance()->GetOnOff())
         DrawHistogram::GetInstance()->SetOnOff(0);
@@ -562,7 +558,7 @@ int ScanMode::SwitchPwCfm()
 	{
 		//enter pw mode
 		SetScanMode(PW);
-		
+
 		// send to dsc
 		m_pwCurImg = 2;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
@@ -576,11 +572,11 @@ int ScanMode::SwitchPwCfm()
 		m_pwCurImg = 1;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	}
-    
+
     ///> replay region
     if (m_pwCurImg == 1)
         m_ptrReplay->SwitchArea(1, unfreeze);
-    else 
+    else
         m_ptrReplay->SwitchArea(0, unfreeze);
     if (!unfreeze)
     {
@@ -590,7 +586,7 @@ int ScanMode::SwitchPwCfm()
 
 	///> change tis
 	ChangeTis();
-	
+
 	return m_pwCurImg;
 }
 
@@ -606,7 +602,7 @@ void ScanMode::EnterPwPdiFromPdi()
 		FreezeMode::GetInstance()->PressUnFreeze();
 
     m_ptrMultiFuncFactory->Create(MultiFuncFactory::PWPDI_INIT);
-	
+
 	///> send work mode
 	m_scanMode = PWPDI_INIT;
 	SetScanMode(m_scanMode);
@@ -616,11 +612,11 @@ void ScanMode::EnterPwPdiFromPdi()
 	///> display box
 	m_ptrImgPw->SetSpectrumModeCW(FALSE);
 	m_ptrImgPw->ResetSvAccordingColor();
-	
-    // update
-	m_ptrUpdatePw->EnterPwPdiFromPdi();		
 
-	///> control light 
+    // update
+	m_ptrUpdatePw->EnterPwPdiFromPdi();
+
+	///> control light
 	DarkAllModeLight();
 #if not defined (EMP_322)
 #if not defined (EMP_313)
@@ -641,7 +637,7 @@ void ScanMode::UpdatePwPdiFromInit()
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::PWCFM);
 
-	// wait data needed by one frame pdi 
+	// wait data needed by one frame pdi
 	usleep(700000);
 	///> send work mode
 	m_scanMode = PWPDI;
@@ -651,7 +647,7 @@ void ScanMode::UpdatePwPdiFromInit()
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	SetScanMode(PW); // pw+cfm mode and pw is real
 
-	// set format to UD11 
+	// set format to UD11
 	m_ptrImgPw->EnterPw();
 //	m_ptrFormatPw->ChangeFormat(FormatPw::BP11_UD); //only for test
 		// set format to UD11 a
@@ -664,7 +660,7 @@ void ScanMode::UpdatePwPdiFromInit()
 	ChangeTis();
 
 	// update
-	m_ptrUpdatePw->UpdatePwPdiMode();		
+	m_ptrUpdatePw->UpdatePwPdiMode();
 
     // clear histogram
     if (DrawHistogram::GetInstance()->GetOnOff())
@@ -681,7 +677,7 @@ int ScanMode::SwitchPwPdi()
 	{
 		//enter pw mode
 		SetScanMode(PW);
-		
+
 		// send to dsc
 		m_pwCurImg = 2;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
@@ -695,13 +691,13 @@ int ScanMode::SwitchPwPdi()
 		m_pwCurImg = 1;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	}
-	
+
     ///> replay region
     if (m_pwCurImg == 1)
         m_ptrReplay->SwitchArea(1, unfreeze);
-    else 
+    else
         m_ptrReplay->SwitchArea(0, unfreeze);
-    
+
     if (!unfreeze)
     {
         m_ptrReplay->PrepareForReplay();
@@ -803,7 +799,7 @@ void ScanMode::EnterCw()
 	Enter2D();
 
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::CW_INIT);
-	
+
 	///> set scan mode
 	m_scanMode = CW_INIT;
 	SetScanMode(m_scanMode);
@@ -822,7 +818,7 @@ void ScanMode::EnterCw()
 
 #ifndef EMP_322
 #ifndef EMP_313
-    ///> control light 
+    ///> control light
     DarkAllModeLight();
     g_keyInterface.CtrlLight(TRUE, LIGHT_CW);
 #endif
@@ -839,12 +835,12 @@ void ScanMode::UpdateCw()
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	SetScanMode(D2);
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::CW);
-	
+
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::PW);
 
 	usleep(500000);
-	
+
 	// send mode to fpga
 	m_scanMode = CW;
 	SetScanMode(m_scanMode);
@@ -854,14 +850,14 @@ void ScanMode::UpdateCw()
 	// set Cw is real
 	m_pwCurImg = 2;
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
-	
-	// set format to UD11 
+
+	// set format to UD11
 	m_ptrImgPw->EnterCw();
 	//m_ptrFormatPw->ChangeFormat(FormatPw::BP11_UD); //only for test
     SysOptions sysoption;
     int format = sysoption.GetDisplayFormatPW();
     FormatPw::GetInstance()->ChangeFormat(FormatPw::EFormatPw(format));
-	
+
     // update
 	//m_ptrUpdatePw->UpdateCwMode();
 	m_ptrUpdatePw->UpdatePwMode();
@@ -870,10 +866,8 @@ void ScanMode::UpdateCw()
     if (DrawHistogram::GetInstance()->GetOnOff())
         DrawHistogram::GetInstance()->SetOnOff(0);
 
-
 	///> change tis
 	ChangeTis();
-
 
 	// unfreeze
 	ModeStatus s;
@@ -905,16 +899,16 @@ int ScanMode::SwitchCw()
 
         // enter B mode
         SetScanMode(D2);
-	
+
         // send to dsc
 		m_pwCurImg = 1;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	}
-	
+
     ///> replay region
     if (m_pwCurImg == 1)
         m_ptrReplay->SwitchArea(1, unfreeze);
-    else 
+    else
         m_ptrReplay->SwitchArea(0, unfreeze);
 
     if (!unfreeze)
@@ -940,7 +934,7 @@ void ScanMode::EnterCwCfmFromCfm()
 		FreezeMode::GetInstance()->PressUnFreeze();
 
     m_ptrMultiFuncFactory->Create(MultiFuncFactory::CWCFM_INIT);
-	
+
 	// set work mode
 	m_scanMode = CWCFM_INIT;
 	SetScanMode(m_scanMode);
@@ -950,12 +944,12 @@ void ScanMode::EnterCwCfmFromCfm()
 	///> display sv
 	m_ptrImgPw->SetSpectrumModeCW(TRUE);
 	m_ptrImgPw->ResetSvAccordingColor();
-	
-    // update
-//	m_ptrUpdatePw->EnterPwCfmFromCfm();		
-	m_ptrUpdatePw->EnterCwCfmFromCfm();		
 
-	///> control light 
+    // update
+//	m_ptrUpdatePw->EnterPwCfmFromCfm();
+	m_ptrUpdatePw->EnterCwCfmFromCfm();
+
+	///> control light
 #ifndef EMP_322
 #ifndef EMP_313
 	DarkAllModeLight();
@@ -979,17 +973,17 @@ void ScanMode::UpdateCwCfmFromInit()
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::PWCFM);
 
-	// wait data needed by one frame cfm 
+	// wait data needed by one frame cfm
 	usleep(700000);
 	///> send work mode
 	m_scanMode = CWCFM;
-	
+
 	// set pw is real
 	m_pwCurImg = 2;
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	SetScanMode(CW); //pwcfm mode and pw is real
 
-	// set format to UD11 
+	// set format to UD11
 	m_ptrImgPw->EnterCw();
 //	m_ptrFormatPw->ChangeFormat(FormatPw::BP11_UD); //only for test
 	// set format to UD11 a
@@ -1000,13 +994,11 @@ void ScanMode::UpdateCwCfmFromInit()
 
 	///> change tis
 	ChangeTis();
-	
-       
 
 	// update
 	m_ptrUpdatePw->UpdatePwCfmMode();
 	//m_ptrUpdatePw->UpdateCwCfmMode();
-    
+
     // clear histogram
     if (DrawHistogram::GetInstance()->GetOnOff())
         DrawHistogram::GetInstance()->SetOnOff(0);
@@ -1022,11 +1014,11 @@ int ScanMode::SwitchCwCfm()
 	{
 		//enter cw mode
 		SetScanMode(CW);
-       
+
         m_ptrImgPw->EnterCw();
 
         //ImgPw::GetInstance()->OnCwImgCtrl(TRUE);
-		
+
 		// send to dsc
 		m_pwCurImg = 2;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
@@ -1042,11 +1034,11 @@ int ScanMode::SwitchCwCfm()
 		m_pwCurImg = 1;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	}
-    
+
     ///> replay region
     if (m_pwCurImg == 1)
         m_ptrReplay->SwitchArea(1, unfreeze);
-    else 
+    else
         m_ptrReplay->SwitchArea(0, unfreeze);
     if (!unfreeze)
     {
@@ -1056,7 +1048,7 @@ int ScanMode::SwitchCwCfm()
 
 	///> change tis
 	ChangeTis();
-	
+
 	return m_pwCurImg;
 }
 
@@ -1072,7 +1064,7 @@ void ScanMode::EnterCwPdiFromPdi()
 		FreezeMode::GetInstance()->PressUnFreeze();
 
     m_ptrMultiFuncFactory->Create(MultiFuncFactory::CWPDI_INIT);
-	
+
 	///> send work mode
 	m_scanMode = CWPDI_INIT;
 	SetScanMode(m_scanMode);
@@ -1082,12 +1074,12 @@ void ScanMode::EnterCwPdiFromPdi()
 	///> display box
 	m_ptrImgPw->SetSpectrumModeCW(TRUE);
 	m_ptrImgPw->ResetSvAccordingColor();
-	
-    // update
-	m_ptrUpdatePw->EnterPwPdiFromPdi();		
-	//m_ptrUpdatePw->EnterCwPdiFromPdi();		
 
-	///> control light 
+    // update
+	m_ptrUpdatePw->EnterPwPdiFromPdi();
+	//m_ptrUpdatePw->EnterCwPdiFromPdi();
+
+	///> control light
 #ifndef EMP_322
 #ifndef EMP_313
 	DarkAllModeLight();
@@ -1108,7 +1100,7 @@ void ScanMode::UpdateCwPdiFromInit()
 	// create Dsc Object
 	DscMan::GetInstance()->CreateDscObj(DscMan::PWCFM);
 
-	// wait data needed by one frame pdi 
+	// wait data needed by one frame pdi
 	usleep(700000);
 	///> send work mode
 	m_scanMode = CWPDI;
@@ -1118,7 +1110,7 @@ void ScanMode::UpdateCwPdiFromInit()
 	m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	SetScanMode(CW); // cw+cfm mode and cw is real
 
-	// set format to UD11 
+	// set format to UD11
 	m_ptrImgPw->EnterCw();
 //	m_ptrFormatPw->ChangeFormat(FormatPw::BP11_UD); //only for test
 		// set format to UD11 a
@@ -1131,8 +1123,8 @@ void ScanMode::UpdateCwPdiFromInit()
 	ChangeTis();
 
 	// update
-	m_ptrUpdatePw->UpdatePwPdiMode();		
-	//m_ptrUpdatePw->UpdateCwPdiMode();		
+	m_ptrUpdatePw->UpdatePwPdiMode();
+	//m_ptrUpdatePw->UpdateCwPdiMode();
 
     // clear histogram
     if (DrawHistogram::GetInstance()->GetOnOff())
@@ -1150,9 +1142,8 @@ int ScanMode::SwitchCwPdi()
 	{
 		//enter cw mode
         SetScanMode(CW);
-      
-        m_ptrImgPw->EnterCw();
 
+        m_ptrImgPw->EnterCw();
 
         //ImgPw::GetInstance()->OnCwImgCtrl(TRUE);
 
@@ -1170,13 +1161,13 @@ int ScanMode::SwitchCwPdi()
 		m_pwCurImg = 1;
 		m_ptrDscPara->dcaPWFlag = m_pwCurImg;
 	}
-	
+
     ///> replay region
     if (m_pwCurImg == 1)
         m_ptrReplay->SwitchArea(1, unfreeze);
-    else 
+    else
         m_ptrReplay->SwitchArea(0, unfreeze);
-    
+
     if (!unfreeze)
     {
         m_ptrReplay->PrepareForReplay();
@@ -1202,13 +1193,13 @@ void ScanMode::EnterCfmVs2D()
 	SetScanMode(m_scanMode);
 
 	// create Dsc Object
-	DscMan::GetInstance()->CreateDscObj(DscMan::CFMVS2D);	
-	
+	DscMan::GetInstance()->CreateDscObj(DscMan::CFMVS2D);
+
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::CFM);
 
-	///> update 
+	///> update
 	m_ptrUpdateCfm->EnterCfmVs2D();
-    
+
 	// unfreeze
 	ModeStatus s;
 	FreezeMode::EFreezeMode freeze = s.GetFreezeMode();
@@ -1230,11 +1221,11 @@ void ScanMode::EnterPdiVs2D()
 	SetScanMode(m_scanMode);
 
 	// create Dsc Object
-	DscMan::GetInstance()->CreateDscObj(DscMan::CFMVS2D);	
-	
+	DscMan::GetInstance()->CreateDscObj(DscMan::CFMVS2D);
+
 	m_ptrMultiFuncFactory->Create(MultiFuncFactory::CFM);
 
-	///> update 
+	///> update
 	m_ptrUpdateCfm->EnterCfmVs2D();
 
 	// unfreeze
@@ -1253,11 +1244,11 @@ void ScanMode::EnterAnatomicM()
 	SetScanMode(m_scanMode);
 
 	// set mode to anatomic
-	ImgProcM::GetInstance()->AnatomicMInit(); // something init, 
+	ImgProcM::GetInstance()->AnatomicMInit(); // something init,
 
 	MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::ANATOMIC_M);
 
-	// update screen 
+	// update screen
 	m_ptrUpdate2D->EnterAnatomicM();
 
 	// unfreeze
@@ -1279,7 +1270,7 @@ void ScanMode::EnterHPRF(bool on)
     {
         ///> send pulse number
         m_pulseNum =  10;//30;
-        m_fpgaCtrl2D.SendPWPulseNum(m_pulseNum);        
+        m_fpgaCtrl2D.SendPWPulseNum(m_pulseNum);
     }
 }
 
@@ -1329,7 +1320,7 @@ void ScanMode::EnterEFOVPrepare(void)
     kcs.Execute();
 
 	m_ptrUpdate2D->EnterEFOVPrepare();
-        
+
         m_ptrReplay->ClearCurReplayData();
 	ViewIcon::GetInstance()->Replay(FALSE);
 }
@@ -1432,7 +1423,7 @@ ScanMode::EFOVStatus ScanMode::GetEFOVStatus()
 static void D4QuitCallback(int flag)
 {
     D4FuncMan::GetInstance()->Exit4D();
-	usleep(1000);// 保证信号忽略是在子进程结束后
+	usleep(1000);// 淇濊瘉淇″彿蹇界暐鏄湪瀛愯繘绋嬬粨鏉熷悗
 	signal(SIGCHLD, SIG_IGN);
 }
 
@@ -1444,7 +1435,7 @@ void ScanMode::Enter4D()
     //if no probe exist, exit
     if(!ProbeMan::GetInstance()->IsProbeExist())
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
                 ViewDialog::ERROR,
                 _("Failed to Enter 3D/4D mode!\nNo Probe was found."),
                 NULL);
@@ -1452,7 +1443,7 @@ void ScanMode::Enter4D()
     }
 
 	Enter2D(); // if Review
-    
+
     //focus: set foc sum to 1 when foc sum lager than 1
     if (m_ptrImg2D->GetFocSum() > 1)
     {
@@ -1470,7 +1461,7 @@ void ScanMode::Enter4D()
     {
         Img2D::GetInstance()->Set4DDepth(14);
     }
-    //set scan angle to 61 
+    //set scan angle to 61
     Img2D::GetInstance()->SetScanAngle(1); //0表示最大角度，因此这个给1
 
     // send para prepare
@@ -1498,12 +1489,12 @@ void ScanMode::Enter4D()
     Para.ezusb_id = EzUsb::GetInstance()->GetCurEzUsbId();
     g_source_remove(input_handle);
 
-    // -----------shut down 09001 keyboard----------------- 
+    // -----------shut down 09001 keyboard-----------------
     g_io_channel_unref(keyboard_channel);
 
     if (keyboard_channel) {
         GError *err = 0;
-        if (G_IO_STATUS_NORMAL != 
+        if (G_IO_STATUS_NORMAL !=
                 g_io_channel_shutdown(keyboard_channel, true, &err))
         {
             PRINTF("ERROR: %s, %s\n", __PRETTY_FUNCTION__, err->message);
@@ -1512,8 +1503,8 @@ void ScanMode::Enter4D()
         keyboard_channel = 0;
     }
     close(s_fdcom);
-    // -----------shut down 09001 keyboard----------------- 
-	
+    // -----------shut down 09001 keyboard-----------------
+
     pid_t pid = -1;
 
 	struct sigaction d4_quit;
@@ -1536,14 +1527,14 @@ void ScanMode::Enter4D()
     }
     else if (pid == -1)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
                 ViewDialog::ERROR,
                 _("Failed to Enter 3D/4D mode!\nThe process cannot be created."),
                 NULL);
         return;
     }
     else
-    { 
+    {
 		D4FuncMan::GetInstance()->Set4DMode(true);
 
 		int status;
@@ -1554,7 +1545,7 @@ void ScanMode::Enter4D()
 void ScanMode::GetSpecialMeasurePara(SpecialMeasurePara *para)
 {
 	para->mode = GetScanMode();
-	para->format2D = m_ptrFormat2D->GetFormat(); 
+	para->format2D = m_ptrFormat2D->GetFormat();
 	para->formatCfm = m_ptrFormatCfm->GetFormat();
 	para->formatPw = m_ptrFormatPw->GetFormat();
 	para->formatM = m_ptrFormatM->GetFormat();
@@ -1627,7 +1618,7 @@ void ScanMode::SetScanMode(EScanMode mode)
     }
 
     //send trigger= false and cwmode =false and calc emit delay to fpga.
-  if ((m_preScanMode == CW || m_preScanMode==CWCFM || m_preScanMode == CWPDI) && (mode != CW || mode != CWCFM || mode != CWPDI)) 
+  if ((m_preScanMode == CW || m_preScanMode==CWCFM || m_preScanMode == CWPDI) && (mode != CW || mode != CWCFM || mode != CWPDI))
     {
         ImgPw::GetInstance()->OnCwImgCtrl(FALSE);
         m_ptrImg2D->ModeCwCtrl(FALSE);
@@ -1651,7 +1642,7 @@ void ScanMode::SetScanMode(EScanMode mode)
             m_ptrImg2D->SetSteer(index);
     }
 
-    // control auto trace and zuto calc 
+    // control auto trace and zuto calc
     AbsUpdatePw* ptrUpdate = GlobalClassMan::GetInstance()->GetUpdatePw();
     ImgProcPw *ptrProcPw = ImgProcPw::GetInstance();
     if (ModeStatus::IsSpectrumImgMode() || ModeStatus::IsSpectrumColorImgMode())
@@ -1673,8 +1664,8 @@ void ScanMode::SetScanMode(EScanMode mode)
     //open doppler sound just in pw mode
 #ifdef EMP_430
     if (((mode == ScanMode::PW) || (mode == ScanMode::CW) || (mode == ScanMode::PWCFM) || (mode == ScanMode::PWPDI)
-                || (mode == ScanMode::CWCFM) || (mode == ScanMode::CWPDI) || (mode == ScanMode::PW_SIMULT) 
-                || (mode == ScanMode::PWCFM_SIMULT) || (mode == ScanMode::PWPDI_SIMULT)) 
+                || (mode == ScanMode::CWCFM) || (mode == ScanMode::CWPDI) || (mode == ScanMode::PW_SIMULT)
+                || (mode == ScanMode::PWCFM_SIMULT) || (mode == ScanMode::PWPDI_SIMULT))
        )
         ImgPw::GetInstance()->ChangeDopplerSoundStatus(true);
     else
@@ -1689,7 +1680,7 @@ void ScanMode::SetScanMode(EScanMode mode)
         usleep(50000);
     }
 #endif
- 
+
     switch(mode)
     {
         case D2:
@@ -1761,10 +1752,10 @@ void ScanMode::SetScanMode(EScanMode mode)
                 m_pulseNum = 4;//3; //linear =  6;//4;	//6//12;//10;
             }
             else if ((strcmp(type, "65L40E") == 0) || (strcmp(type, "65C10E") == 0) || (strcmp(type, "65C15D") == 0))
-                m_pulseNum = 4; //6; 
+                m_pulseNum = 4; //6;
             else
                 m_pulseNum = 4;
-            
+
             m_fpgaCtrl2D.SendCFMPulseNum(m_pulseNum);
             break;
 
@@ -1780,7 +1771,7 @@ void ScanMode::SetScanMode(EScanMode mode)
                 m_pulseNum = 3; //linear =  6;//4;	//6//12;//10;
             }
             else if ((strcmp(type, "65L40E") == 0) || (strcmp(type, "65C10E") == 0) || (strcmp(type, "65C15D") == 0))
-                m_pulseNum = 6; 
+                m_pulseNum = 6;
             else
                 m_pulseNum = 4;
 
@@ -1930,10 +1921,10 @@ void ScanMode::SetScanMode(EScanMode mode)
         ProbeMan::GetInstance()->ActiveHV(TRUE);
     }
 #endif
- 
+
 #if 0
-    if ((m_preScanMode == CW || m_preScanMode==CWCFM || m_preScanMode == CWPDI) 
-            && (mode != CW && mode != CWCFM && mode != CWPDI)) 
+    if ((m_preScanMode == CW || m_preScanMode==CWCFM || m_preScanMode == CWPDI)
+            && (mode != CW && mode != CWCFM && mode != CWPDI))
     {
         ImgPw::GetInstance()->OnCwImgCtrl(FALSE);
     }
@@ -1955,7 +1946,7 @@ void ScanMode::DarkAllModeLight()
 		g_keyInterface.CtrlLight(FALSE, LIGHT_D2);
 		g_keyInterface.CtrlLight(FALSE, LIGHT_M);
         g_keyInterface.CtrlLight(FALSE, LIGHT_BM);
-        g_keyInterface.CtrlLight(FALSE, LIGHT_BB); 
+        g_keyInterface.CtrlLight(FALSE, LIGHT_BB);
 #else
         if(g_keyInterface.IsLighten(LIGHT_D2))
             g_keyInterface.CtrlLight(FALSE, LIGHT_D2);
@@ -1988,7 +1979,7 @@ void ScanMode::ChangePulseNum(EKnobOper oper)
         if((m_pulseNumTmp - step) >= 1)
             m_pulseNumTmp -= step;
     }
-    
+
     m_fpgaCtrl2D.SendCFMPulseNum(m_pulseNumTmp);
     //printf("m_pulseNumTmp:%d\n", m_pulseNumTmp);
     ImgCfm::GetInstance()->UpdateHint();
@@ -2039,7 +2030,7 @@ void ScanMode::SetMScanMode()
                 ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
                 ///> reset bm line
-                m_ptrImg2D->ResetMLine();	
+                m_ptrImg2D->ResetMLine();
                 m_ptrUpdate2D->EnterMMode();
 
                 m_ptrMultiFuncFactory->Create(MultiFuncFactory::M);
@@ -2060,7 +2051,7 @@ void ScanMode::SetMScanMode()
                 ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
                 ///> reset bm line
-                m_ptrImg2D->ResetMLine();	
+                m_ptrImg2D->ResetMLine();
                 m_ptrUpdate2D->EnterMMode();
 
                 m_ptrMultiFuncFactory->Create(MultiFuncFactory::M);
@@ -2084,7 +2075,7 @@ void ScanMode::SetMScanMode()
                 ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
                 ///> reset bm line
-                m_ptrImg2D->ResetMLine();	
+                m_ptrImg2D->ResetMLine();
                 m_ptrUpdate2D->EnterMMode();
 
                 m_ptrMultiFuncFactory->Create(MultiFuncFactory::M);
@@ -2111,7 +2102,7 @@ void ScanMode::SetMScanMode()
                 ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
                 ///> reset bm line
-                m_ptrImg2D->ResetMLine();	
+                m_ptrImg2D->ResetMLine();
                 m_ptrUpdate2D->EnterMMode();
 
                 m_ptrMultiFuncFactory->Create(MultiFuncFactory::M);
@@ -2141,7 +2132,7 @@ void ScanMode::SetMScanMode()
                 ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
                 ///> reset bm line
-                m_ptrImg2D->ResetMLine();	
+                m_ptrImg2D->ResetMLine();
                 m_ptrUpdate2D->EnterMMode();
 
                 m_ptrMultiFuncFactory->Create(MultiFuncFactory::M);
@@ -2155,7 +2146,7 @@ void ScanMode::SetMScanMode()
                 // create Dsc Object
                 DscMan::GetInstance()->CreateDscObj(DscMan::M);
 
-                ///> set format to M 
+                ///> set format to M
                 //m_ptrFormatM->ChangeFormat(FormatM::M_TOTAL); //only for test
                 SysOptions sysoption;
                 int format = sysoption.GetDisplayFormatM();
@@ -2185,7 +2176,7 @@ void ScanMode::SetMScanMode()
                 ImgProc2D::GetInstance()->SetRotate(0, MIN);
 
                 ///> reset bm line
-                m_ptrImg2D->ResetMLine();	
+                m_ptrImg2D->ResetMLine();
                 m_ptrUpdate2D->EnterMMode();
 
                 m_ptrMultiFuncFactory->Create(MultiFuncFactory::M);
@@ -2199,7 +2190,7 @@ void ScanMode::SetMScanMode()
                 // create Dsc Object
                 DscMan::GetInstance()->CreateDscObj(DscMan::M);
 
-                ///> set format to M 
+                ///> set format to M
                 //m_ptrFormatM->ChangeFormat(FormatM::M_TOTAL); //only for test
                 SysOptions sysoption;
                 int format = sysoption.GetDisplayFormatM();

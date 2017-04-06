@@ -1,7 +1,7 @@
 #ifndef CALC_2D_TINY_CONVEX_H
 #define CALC_2D_TINY_CONVEX_H
 
-#include "Calc2DConvex.h"
+#include "imageControl/Calc2DConvex.h"
 
 class Calc2DTinyConvex: public Calc2DConvex
 {
@@ -10,7 +10,7 @@ class Calc2DTinyConvex: public Calc2DConvex
 		~Calc2DTinyConvex();
 
         void CalcDefaultDemodFd();
-		virtual void CalcEmitDelay(); 
+		virtual void CalcEmitDelay();
 		virtual void CalcFocPos();
 		virtual void CalcFilter();
 		virtual void CalcFilterFreqCompound(int order);
@@ -24,4 +24,3 @@ class Calc2DTinyConvex: public Calc2DConvex
 		static const int EMIT_CH_NUM[20]; ///< control calculating emit delay
 };
 #endif
-

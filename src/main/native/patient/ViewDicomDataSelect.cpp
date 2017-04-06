@@ -1,27 +1,24 @@
 #include <dirent.h>
-#include "gui_func.h"
-#include "gui_global.h"
-#include "ViewDicomDataSelect.h"
-#include "KeyValueOpr.h"
-#include "KeyDef.h"
-#include "FileMan.h"
-#include "DCMMan.h"
-#include "ViewQueryRetrieve.h"
-#include "ViewDialog.h"
-#include "PatientInfo.h"
-#include "ViewReport.h"
-#include "gui_global.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "patient/ViewDicomDataSelect.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyDef.h"
+#include "patient/FileMan.h"
+#include "periDevice/DCMMan.h"
+#include "patient/ViewQueryRetrieve.h"
+#include "display/ViewDialog.h"
+#include "patient/PatientInfo.h"
+#include "calcPeople/ViewReport.h"
 #include <glib.h>
 #include <glib/gstdio.h>
-#include "gui_func.h"
-#include "PeripheralMan.h"
-#include "ImgMan.h"
-#include "Database.h"
-#include "VideoMan.h"
-#include "SysOptions.h"
-#include "ViewPrintPreview.h"
-#include "Replay.h"
-
+#include "periDevice/PeripheralMan.h"
+#include "patient/ImgMan.h"
+#include "patient/Database.h"
+#include "patient/VideoMan.h"
+#include "sysMan/SysOptions.h"
+#include "periDevice/ViewPrintPreview.h"
+#include "imageProc/Replay.h"
 
 ViewDicomDataSelect* ViewDicomDataSelect::m_ptrInstance = NULL;
 
@@ -87,7 +84,7 @@ void ViewDicomDataSelect::CreateWindow(GtkWindow *parent)
 	gtk_widget_set_size_request (dataSrc, 200+45, 300+20);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (dataSrc), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (dataSrc), GTK_SHADOW_IN);
-    
+
     GtkTreeModel *modelRoot = create_root_model();
     m_treeSrc = gtk_tree_view_new_with_model (modelRoot);
     g_object_unref (modelRoot);
@@ -120,7 +117,7 @@ void ViewDicomDataSelect::CreateWindow(GtkWindow *parent)
     gtk_fixed_put (GTK_FIXED (fixed), m_button_import, 250+40, 410);
     //gtk_widget_set_size_request (m_button_import, 100, 35);
     g_signal_connect(m_button_import, "clicked", G_CALLBACK(HandleButtonImportClicked), this);
-    
+
     label_cancel = gtk_label_new_with_mnemonic (_("Exit"));
     image_cancel = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
 	button_cancel = create_button_icon(label_cancel, image_cancel);
@@ -136,7 +133,7 @@ void ViewDicomDataSelect::CreateWindow(GtkWindow *parent)
 }
 
 void ViewDicomDataSelect::UpdateDicomDirList(void)
-{ 
+{
     string destDirStorageMedia = UDISK_PATH;
     EDCMReturnStatus status = CDCMMan::GetMe()->BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
     if(status == DCMSUCCESS)
@@ -184,13 +181,13 @@ void ViewDicomDataSelect::UpdateDicomDirList(void)
                                     0,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].levelName.c_str(),
                                     1,k,
                                     -1);
-                            gtk_tree_model_iter_next(model, &iter_branch1); 
+                            gtk_tree_model_iter_next(model, &iter_branch1);
                         }
                     }
-                    gtk_tree_model_iter_next(model, &iter_branch0); 
+                    gtk_tree_model_iter_next(model, &iter_branch0);
                 }
             }
-            gtk_tree_model_iter_next(model, &iter); 
+            gtk_tree_model_iter_next(model, &iter);
         }
     }
 }
@@ -215,7 +212,7 @@ GtkTreeModel* ViewDicomDataSelect::create_root_model()
 {
 	GtkTreeIter iter;
     GtkTreeStore *store = gtk_tree_store_new(2, G_TYPE_STRING,G_TYPE_INT);
-#if 0    
+#if 0
     string destDirStorageMedia = UDISK_PATH;
     EDCMReturnStatus status = CDCMMan::GetMe()->BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
     int size = vecStudyLevel.size();
@@ -254,7 +251,7 @@ GtkTreeModel* ViewDicomDataSelect::create_root_model()
             }
         }
 #endif
-        gtk_tree_model_iter_next(model, &iter); 
+        gtk_tree_model_iter_next(model, &iter);
     }
 #endif
     return GTK_TREE_MODEL (store);
@@ -280,11 +277,11 @@ GtkWidget* ViewDicomDataSelect::create_treeview_list()
     column = gtk_tree_view_column_new_with_attributes(_("Value"), renderer, "text", COL_VALUE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 450, NULL);
-    
+
     model = create_model_list();
     if (model != NULL)
 		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
-    g_object_unref (model); 
+    g_object_unref (model);
 
 	return treeview;
 }
@@ -293,8 +290,8 @@ GtkTreeModel* ViewDicomDataSelect::create_model_list()
 {
     GtkListStore *store;
 
-    store = gtk_list_store_new(NUM_COL, 
-			G_TYPE_STRING, 
+    store = gtk_list_store_new(NUM_COL,
+			G_TYPE_STRING,
 			G_TYPE_STRING);
 
 	return GTK_TREE_MODEL (store);
@@ -374,7 +371,7 @@ void ViewDicomDataSelect::InsertInfo1(int index)
             COL_QUALITY,_("Patient ID"),
             COL_VALUE,vecStudyLevel[index].patientID.c_str(),
             -1);
-    
+
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
             COL_QUALITY,_("Exam Date"),
@@ -395,7 +392,7 @@ void ViewDicomDataSelect::InsertInfo1(int index)
             COL_QUALITY,_("Description"),
             COL_VALUE,vecStudyLevel[index].studyDescription.c_str(),
             -1);
- 
+
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
             COL_QUALITY,_("Instance UID"),
@@ -414,7 +411,7 @@ void ViewDicomDataSelect::InsertInfo2(int index1,int index2)
             COL_QUALITY,_("type"),
             COL_VALUE,vecStudyLevel[index1].vecSeriesLevel[index2].type.c_str(),
             -1);
-    gtk_tree_model_iter_next(model, &iter); 
+    gtk_tree_model_iter_next(model, &iter);
 }
 
 void ViewDicomDataSelect::InsertInfo3(int index1,int index2,int index3)
@@ -459,7 +456,7 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
     info.p.name.last = lastName;
     info.p.name.first = firstName;
     info.p.name.mid = midName;
-    
+
     if(element.stPatientSex.c_str() !=NULL)
     {
         string sex = element.stPatientSex;
@@ -534,8 +531,6 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
     strcpy(weightT,element.stPatientWeight.c_str());
     DotToCommaLocaleNumeric(weightT, sizeof(weightT));
 
-
-
     if(sizeT!= 0)
         info.e.height =(int)(atof(sizeT)*100);
     else
@@ -574,7 +569,7 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
         char exam_hour[100] = "\0";
         char exam_minute[100] = "\0";
         char exam_second[100] = "\0";
-        
+
         sprintf(exam_hour,"%c%c",studyTime[0],studyTime[1]);
         sprintf(exam_minute,"%c%c",studyTime[2],studyTime[3]);
         sprintf(exam_second,"%c%c",studyTime[4],studyTime[5]);
@@ -591,7 +586,6 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
 	ViewQueryRetrieve::ChangePersonNameFormatForShow(element.stStudyDoctor, info.e.examDoctor);
     info.e.comment = element.stStudyDescription;
     info.e.reportDoctor = "";
-
 
     //ob
     info.ob.LMPDate.year = 0;
@@ -615,9 +609,9 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
 
     //URO
     info.uro.PSA = 0;
-    
+
     m_ptrInstance->m_info = info;
-    m_ptrInstance->m_studyNo= element.stStudyNo; 
+    m_ptrInstance->m_studyNo= element.stStudyNo;
 
     Database db;
     db.GetExamIDCurrent(info.e.examNum);
@@ -642,7 +636,7 @@ void ViewDicomDataSelect::CreateExamDir(int examNum)
 		{
 			perror("rmdir fail!");
 			PRINTF("delete folder of store path 0 error\n");
-			g_free(path);	
+			g_free(path);
 			return;
 		}
 	}
@@ -651,7 +645,7 @@ void ViewDicomDataSelect::CreateExamDir(int examNum)
 	{
 		PRINTF("create folder of store path %d error\n", examNum);
 	}
-	
+
 	g_free(path);
 
 }
@@ -659,7 +653,7 @@ void ViewDicomDataSelect::CreateExamDir(int examNum)
 string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned char *pImageBuf, unsigned long bufLen)
 {
     m_ptrInstance->CreateExamDir(m_ptrInstance->m_studyNo);
-    
+
     time_t at;
     at = time(&at);
 
@@ -766,9 +760,8 @@ string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned 
         m_ptrInstance->m_info.e.examType = "Hip Joint";
     else if(strcmp(part.c_str(),"BREAST") ==0)
         m_ptrInstance->m_info.e.examType = "Mammary Glands";
-    else 
+    else
         m_ptrInstance->m_info.e.examType = "Abdomen";
-
 
     string imgFileName = (string)fileName;
     free(fileName);
@@ -785,13 +778,13 @@ void ViewDicomDataSelect::GetDCMSRElement(DCMSRELEMENT element)
 
 void ViewDicomDataSelect::ImportStudy(void)
 {
-#if 1 
+#if 1
     PeripheralMan *ptr = PeripheralMan::GetInstance();
     if(!ptr->CheckUsbStorageState())
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
                 ViewDialog::ERROR,
-                _("No USB storage found!"), 
+                _("No USB storage found!"),
                 NULL);
         return;
     }
@@ -799,9 +792,9 @@ void ViewDicomDataSelect::ImportStudy(void)
     {
         if(!ptr->MountUsbStorage())
         {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()), 
+            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
                     ViewDialog::ERROR,
-                    _("Failed to mount USB storage!"), 
+                    _("Failed to mount USB storage!"),
                     NULL);
             return;
         }
@@ -840,8 +833,8 @@ void ViewDicomDataSelect::ImportStudy(void)
         ViewReport::GetInstance()->ClearIndicationandComments();
 
         ViewDialog::GetInstance()->Destroy();
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("Import data successfully!"),
                 NULL);
         //printf("Send Successfully\n");
@@ -849,44 +842,44 @@ void ViewDicomDataSelect::ImportStudy(void)
     }
     else if(status == DCMSTUDYEXISTED)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("Study Info has existed!"),
                 NULL);
     }
     else if (status == DCMNOENOUGHSPACE)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("No enough space!"),
                 NULL);
     }
 
     else if (status == DCMNONEXISTDICOMDIR)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("DICOMDIR is not existed!"),
                 NULL);
     }
     else if (status == DCMNONENTIREDICOMDIR)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("File has lost in DICOMDIR !"),
                 NULL);
     }
     else if (status == DCMIMPORTFAILURE)
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("Import data unsuccessfully!"),
                 NULL);
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
-                ViewDialog::INFO, 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                ViewDialog::INFO,
                 _("Import data unsuccessfully!"),
                 NULL);
     }
@@ -905,14 +898,14 @@ void ViewDicomDataSelect::ButtonImportClicked(GtkButton *button)
         g_timeout_add(100, ImportStudyForDicom, this);
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                 ViewDialog::PROGRESS,
-                NULL, 
+                NULL,
                 NULL);
     }
     else
     {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), 
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                 ViewDialog::ERROR,
-                _("No record is selected!"), 
+                _("No record is selected!"),
                 NULL);
         return;
 

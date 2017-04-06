@@ -1,12 +1,12 @@
 #ifndef __SYSDICOMSETTING_H__
 #define __SYSDICOMSETTING_H__
 
-#include "IniFile.h"
+#include "base/IniFile.h"
 
 class SysDicomSetting
 {
 public:
-	
+
     SysDicomSetting();
     ~SysDicomSetting();
 
@@ -48,5 +48,3 @@ private:
 };
 
 #endif
-
-

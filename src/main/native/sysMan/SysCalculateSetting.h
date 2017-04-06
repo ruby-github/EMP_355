@@ -1,7 +1,7 @@
 #ifndef __SYSCALCULATESETTING_H__
 #define __SYSCALCULATESETTING_H__
 
-#include "../base/IniFile.h"
+#include "base/IniFile.h"
 
 struct OBSetting{
     int cer;
@@ -26,7 +26,7 @@ extern OBSetting g_obSetting;
 class SysCalculateSetting
 {
 public:
-	
+
     SysCalculateSetting();
     ~SysCalculateSetting();
 

@@ -1,22 +1,21 @@
 #ifndef __MEACALCFUN_H_
 #define __MEACALCFUN_H_
 
-#include "MeaResult.h"
-#include "gui_global.h"
+#include "calcPeople/MeaResult.h"
+#include "display/gui_global.h"
 
-
-/***************************计算函数**********************************/
+/***************************璁＄畻鍑芥暟**********************************/
 class MeaCalcFun{
-	
+
 public:
 		static int DoNothing(float data[], float *result, int state, int item, int save);
-    
+
 		static int CalcGW_LMP(unsigned int LMP_Y, unsigned int LMP_M, unsigned int LMP_D);
 		static int CalcGW_Ovul(unsigned int LMP_Y, unsigned int LMP_M, unsigned int LMP_D);
 		static void CalcEDCB_LMP(unsigned int LMP_Y, unsigned int LMP_M, unsigned int LMP_D, char* retval);
 		static void CalcEDCB_Ovul(unsigned int LMP_Y, unsigned int LMP_M, unsigned int LMP_D, char* retval);
 
-		//产科
+		//浜х
 		static int CalcGWMan(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
 		static int EDCBCalc(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
 		static int EFWCalc(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
@@ -24,7 +23,7 @@ public:
 		static int SectionCalc(CalcInfoTmp *calcInfo, float data[], int item, int save, int *calcPosi, const int parPosi);
 		static void InitCustomTable();
 		static bool SaveCustomTable();
-#ifdef VET	
+#ifdef VET
         static int CalcGWManVet(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
 #endif
 	private:
@@ -45,7 +44,7 @@ public:
 		static int EDCBFormula(const int gpLen, int gw, int *EDCB);
 		static int EFWGetData(const int item, const int state, const int method, float data[]);
 		static int CalcGetValue(const float currValue, float value[][MEA_MULTI], const int allItem[], const int currItem, const int itemNums, const int state);
-	
+
 		static int CalcGetPar(CalcInfoTmp *calcInfo, const float currValue[], float value[][MEA_MULTI], const int currItem, const int parPosi, const int state);
 		static float CalcFormula(CalcInfoTmp *calcInfo, float value[][MEA_MULTI]);
 		static int FindSection(int item, int *section);
@@ -55,9 +54,8 @@ public:
    		static void CalcEDCB(unsigned int start_year, unsigned int start_month, unsigned int start_day, int dop, char* retval);
 };
 
-
 enum EOBGwMethod{
-	GW_START, CER_START, CER_GOLDSTEIN = CER_START, CER_USER, 
+	GW_START, CER_START, CER_GOLDSTEIN = CER_START, CER_USER,
 	HL_START, HL_JEANTY = HL_START, HL_USER,
 	BPD_START, BPD_HADLOCK = BPD_START, BPD_MERZ, BPD_LASSER, BPD_REMPEN, BPD_TOKYO, BPD_USER,
 	FL_START, FL_HADLOCK = FL_START, FL_MERZ, FL_JEANTY, FL_TOKYO, FL_USER,
@@ -75,7 +73,7 @@ enum EOBGwMethod{
 	ULNA_START, ULNA_JEANTY = ULNA_START, ULNA_USER,
     FTA_START, FTA_OSAKA = FTA_START, FTA_USER,
 
-	GW_END 
+	GW_END
 };
 
 enum EOBEfwMethod{
@@ -95,7 +93,7 @@ const titleUnitInfo AlEdvInfo[] = {{"LVAd", CM2}, {"LVLd", CM}, {"EDV", CM3}, {"
 const titleUnitInfo AlEsvInfo[] = {{"LVAs", CM2}, {"LVLs", CM}, {"ESV", CM3}, {"\0", NOUNIT}};//AL ESV
 const titleUnitInfo SlopeMInfo[] = {{"Dist", CM}, {"Slope", CMS}, {"\0", NOUNIT}};//DIST_SLOPE_M
 const titleUnitInfo P12tInfo[] = {{"Vmax", CMS}, {"P1/2t", SEC}, {"Slope", CMS2}, {"\0", NOUNIT}};//P12T
-const titleUnitInfo HipInfo[] = {{"α", ANG}, {"β", ANG}, {"\0", NOUNIT}};//HIP
+const titleUnitInfo HipInfo[] = {{"伪", ANG}, {"尾", ANG}, {"\0", NOUNIT}};//HIP
 const titleUnitInfo SacInfo[] = {{"Diam1", CM}, {"Diam2", CM},{"Diam3", CM},{"mean Diam",CM}, {"\0", NOUNIT}};//Sac
 
 /******************************Basic Measure**************************************/
@@ -105,7 +103,7 @@ const MultiItemInfo BasicMultiInfo[] = {
 	{D_HR, D_HR_MULTI, HR_D, "\0", HrInfo, NULL },
 	{D_PGMAX, D_PGMAX_MULTI, PGMAX, "\0", PgmaxInfo, NULL },
 	{D_RI, D_RI_MULTI, RI, "\0", RiInfo, NULL },
-	{D_SD, D_SD_MULTI, SD, "\0", SdInfo, NULL },//转义字符
+	{D_SD, D_SD_MULTI, SD, "\0", SdInfo, NULL },//杞箟瀛楃
 	{D2_RATIO_ANGLE, D2_RATIO_ANGLE_MULTI, RATIO_ANGLE, "\0", RationAngleInfo, NULL },
 };
 
@@ -156,7 +154,6 @@ const SingleItemInfo BasicInfo[] = {
     { D2_IMT_BELOW, IMT_BELOW, N_("IMT-Below"),UNIT_END, NULL},
 };
 #endif
-
 
 /******************************Abdo Measure**************************************/
 const CalcResultInfo AbdoGBVol = {ABD_GB_VOL, {ABD_GALLBLAD_L, ABD_GALLBLAD_W, ABD_GALLBLAD_H, NO_PAR, NO_PAR}, "GB Vol", CM3, MeaCalcFun::SectionCalc, NULL};
@@ -213,7 +210,7 @@ const SingleItemInfo AbdoInfo[] = {
 
 const PtrOfCalcInfo AbdoCalcInfoPtr[ABD_CALC_END - ABD_CALC_START] = {
 	{ABD_GB_VOL, &AbdoGBVol},
-	{ABD_CALC_SPLEEN_VOL, &AbdoSpleenVol}, 
+	{ABD_CALC_SPLEEN_VOL, &AbdoSpleenVol},
 	{ABD_PANC_VOL, &AbdoPancreasVol}
 };
 
@@ -239,7 +236,6 @@ const MultiItemInfo AbdoMultiInfo[] = {
 	{ABD_IMV, ABD_IMV_MULTI, PSED, "IMV", PsEdInfo, NULL },
 	{ABD_SMV, ABD_SMV_MULTI, PSED, "SMV", PsEdInfo, NULL },
 };
-
 
 /******************************Adult Measure**************************************/
 const CalcResultInfo AdultCI2DCubed = {ADULT_CI_2DCUBED, {ADULT_CO_2DCUBED, NO_PAR, NO_PAR, NO_PAR, NO_PAR}, "CI(Cubed)", LMINM2, MeaCalcFun::SectionCalc, NULL};
@@ -391,7 +387,6 @@ const CalcInfoArray AdultMVRadiusCalc = {&AdultMVPISA, NULL};
 const CalcInfoArray AdultMRRadiusCalc = {&AdultMRPISA, NULL};
 const CalcInfoArray AdultTVRadiusCalc = {&AdultTVPISA, NULL};
 
-
 const CalcInfoArray AdultTVPeakECalc = {&AdultTVEA, NULL};
 const CalcInfoArray AdultTVPeakACalc = {&AdultTVEA, NULL};
 const CalcInfoArray AdultPulmDiasCalc = {&AdultPulmSD, NULL};
@@ -409,76 +404,76 @@ const CalcInfoArray AdultLVdALCalc = {&AdultSVAL, &AdultEFAL, NULL};
 const CalcInfoArray AdultLVsALCalc = {&AdultSVAL, &AdultEFAL, NULL};
 
 const PtrOfCalcInfo AdultCalcInfoPtr[ADULT_CALC_END - ADULT_CALC_START] = {
-	{ADULT_EDV_2DCUBED, &AdultEDV2DCubed}, 
-	{ADULT_EDV_2DTEICH, &AdultEDV2DTeich}, 
-	{ADULT_EDV_MMCUBED, &AdultEDVMMCubed}, 
-	{ADULT_EDV_MMTEICH, &AdultEDVMMTeich}, 
-	{ADULT_ESV_2DCUBED, &AdultESV2DCubed}, 
-	{ADULT_ESV_2DTEICH, &AdultESV2DTeich}, 
-	{ADULT_ESV_MMCUBED, &AdultESVMMCubed}, 
-	{ADULT_ESV_MMTEICH, &AdultESVMMTeich}, 
-	{ADULT_SV_2DCUBED, &AdultSV2DCubed}, 
-	{ADULT_SV_2DTEICH, &AdultSV2DTeich}, 
+	{ADULT_EDV_2DCUBED, &AdultEDV2DCubed},
+	{ADULT_EDV_2DTEICH, &AdultEDV2DTeich},
+	{ADULT_EDV_MMCUBED, &AdultEDVMMCubed},
+	{ADULT_EDV_MMTEICH, &AdultEDVMMTeich},
+	{ADULT_ESV_2DCUBED, &AdultESV2DCubed},
+	{ADULT_ESV_2DTEICH, &AdultESV2DTeich},
+	{ADULT_ESV_MMCUBED, &AdultESVMMCubed},
+	{ADULT_ESV_MMTEICH, &AdultESVMMTeich},
+	{ADULT_SV_2DCUBED, &AdultSV2DCubed},
+	{ADULT_SV_2DTEICH, &AdultSV2DTeich},
 	{ADULT_SV_MMCUBED, &AdultSVMMCubed},
-	{ADULT_SV_MMTEICH, &AdultSVMMTeich}, 
-	{ADULT_SV_A2C, &AdultSVA2C}, 
-	{ADULT_SV_A4C, &AdultSVA4C}, 
-	{ADULT_SV_AL, &AdultSVAL}, 
-	{ADULT_SI_2DCUBED, &AdultSI2DCubed}, 
-	{ADULT_SI_2DTEICH, &AdultSI2DTeich}, 
-	{ADULT_SI_MMCUBED, &AdultSIMMCubed}, 
-	{ADULT_SI_MMTEICH, &AdultSIMMTeich}, 
-	{ADULT_SI_A2C, &AdultSIA2C}, 
-	{ADULT_SI_A4C, &AdultSIA4C}, 
-	{ADULT_SI_AL, &AdultSIAL}, 
-	{ADULT_CO_2DCUBED, &AdultCO2DCubed}, 
-	{ADULT_CO_2DTEICH, &AdultCO2DTeich}, 
-	{ADULT_CO_MMCUBED, &AdultCOMMCubed}, 
-	{ADULT_CO_MMTEICH, &AdultCOMMTeich}, 
-	{ADULT_CO_A2C, &AdultCOA2C}, 
-	{ADULT_CO_A4C, &AdultCOA4C}, 
+	{ADULT_SV_MMTEICH, &AdultSVMMTeich},
+	{ADULT_SV_A2C, &AdultSVA2C},
+	{ADULT_SV_A4C, &AdultSVA4C},
+	{ADULT_SV_AL, &AdultSVAL},
+	{ADULT_SI_2DCUBED, &AdultSI2DCubed},
+	{ADULT_SI_2DTEICH, &AdultSI2DTeich},
+	{ADULT_SI_MMCUBED, &AdultSIMMCubed},
+	{ADULT_SI_MMTEICH, &AdultSIMMTeich},
+	{ADULT_SI_A2C, &AdultSIA2C},
+	{ADULT_SI_A4C, &AdultSIA4C},
+	{ADULT_SI_AL, &AdultSIAL},
+	{ADULT_CO_2DCUBED, &AdultCO2DCubed},
+	{ADULT_CO_2DTEICH, &AdultCO2DTeich},
+	{ADULT_CO_MMCUBED, &AdultCOMMCubed},
+	{ADULT_CO_MMTEICH, &AdultCOMMTeich},
+	{ADULT_CO_A2C, &AdultCOA2C},
+	{ADULT_CO_A4C, &AdultCOA4C},
 	{ADULT_CO_AL, &AdultCOAL},
-	{ADULT_CI_2DCUBED, &AdultCI2DCubed}, 
-	{ADULT_CI_2DTEICH, &AdultCI2DTeich}, 
-	{ADULT_CI_MMCUBED, &AdultCIMMCubed}, 
-	{ADULT_CI_MMTEICH, &AdultCIMMTeich}, 
-	{ADULT_CI_A2C, &AdultCIA2C}, 
-	{ADULT_CI_A4C, &AdultCIA4C}, 
-	{ADULT_CI_AL, &AdultCIAL}, 
-	{ADULT_EF_2DCUBED, &AdultEF2DCubed}, 
-	{ADULT_EF_2DTEICH, &AdultEF2DTeich}, 
-	{ADULT_EF_MMCUBED, &AdultEFMMCubed}, 
-	{ADULT_EF_MMTEICH, &AdultEFMMTeich}, 
-	{ADULT_EF_A2C, &AdultEFA2C}, 
-	{ADULT_EF_A4C, &AdultEFA4C}, 
-	{ADULT_EF_AL, &AdultEFAL}, 
-	{ADULT_FS, &AdultFS}, 
-	{ADULT_FS_MM, &AdultFSMM}, 
-	{ADULT_IVS_PER, &AdultIVSPer}, 
-	{ADULT_IVS_PER_MM, &AdultIVSPerMM}, 
-	{ADULT_IVS_LVPW_RATIO, &AdultIVSLVPW}, 
-	{ADULT_IVS_LVPW_RATIO_MM, &AdultIVSLVPWMM}, 
-	{ADULT_LA_AO_RATIO, &AdultLAAO}, 
-	{ADULT_LA_AO_RATIO_MM, &AdultLAAOMM}, 
+	{ADULT_CI_2DCUBED, &AdultCI2DCubed},
+	{ADULT_CI_2DTEICH, &AdultCI2DTeich},
+	{ADULT_CI_MMCUBED, &AdultCIMMCubed},
+	{ADULT_CI_MMTEICH, &AdultCIMMTeich},
+	{ADULT_CI_A2C, &AdultCIA2C},
+	{ADULT_CI_A4C, &AdultCIA4C},
+	{ADULT_CI_AL, &AdultCIAL},
+	{ADULT_EF_2DCUBED, &AdultEF2DCubed},
+	{ADULT_EF_2DTEICH, &AdultEF2DTeich},
+	{ADULT_EF_MMCUBED, &AdultEFMMCubed},
+	{ADULT_EF_MMTEICH, &AdultEFMMTeich},
+	{ADULT_EF_A2C, &AdultEFA2C},
+	{ADULT_EF_A4C, &AdultEFA4C},
+	{ADULT_EF_AL, &AdultEFAL},
+	{ADULT_FS, &AdultFS},
+	{ADULT_FS_MM, &AdultFSMM},
+	{ADULT_IVS_PER, &AdultIVSPer},
+	{ADULT_IVS_PER_MM, &AdultIVSPerMM},
+	{ADULT_IVS_LVPW_RATIO, &AdultIVSLVPW},
+	{ADULT_IVS_LVPW_RATIO_MM, &AdultIVSLVPWMM},
+	{ADULT_LA_AO_RATIO, &AdultLAAO},
+	{ADULT_LA_AO_RATIO_MM, &AdultLAAOMM},
 	{ADULT_LVMASS, &AdultLVMass},
-	{ADULT_LVMASS_INDEX, &AdultLVMassIndexCubed}, 
-	{ADULT_LVOT_AREA, &AdultLVOTArea}, 
-    {ADULT_RVOT_AREA, &AdultRVOTArea}, 
+	{ADULT_LVMASS_INDEX, &AdultLVMassIndexCubed},
+	{ADULT_LVOT_AREA, &AdultLVOTArea},
+    {ADULT_RVOT_AREA, &AdultRVOTArea},
     {ADULT_TV_AREA, &AdultTVArea},
     {ADULT_AI_PISA, &AdultAIPISA},
     {ADULT_MV_PISA, &AdultMVPISA},
     {ADULT_MR_PISA, &AdultMRPISA},
     {ADULT_TV_PISA, &AdultTVPISA},
     {ADULT_AVA_VMAX, &AdultAVAVmax},
-	{ADULT_PVA_VMAX, &AdultPVAVmax}, 
-	{ADULT_MVA_P12T, &AdultMVAP12t}, 
-	{ADULT_MV_EA_RATIO, &AdultMVEA}, 
-	{ADULT_TV_EA_RATIO, &AdultTVEA}, 
-	{ADULT_LVPW_PER, &AdultLVPWPer}, 
-	{ADULT_LVPW_PER_MM, &AdultLVPWPerMM}, 
-	{ADULT_LV_PEP_ET_RATIO, &AdultLVPEPET}, 
-	{ADULT_RV_PEP_ET_RATIO, &AdultRVPEPET}, 
-	{ADULT_PULM_SD_RATIO, &AdultPulmSD}, 
+	{ADULT_PVA_VMAX, &AdultPVAVmax},
+	{ADULT_MVA_P12T, &AdultMVAP12t},
+	{ADULT_MV_EA_RATIO, &AdultMVEA},
+	{ADULT_TV_EA_RATIO, &AdultTVEA},
+	{ADULT_LVPW_PER, &AdultLVPWPer},
+	{ADULT_LVPW_PER_MM, &AdultLVPWPerMM},
+	{ADULT_LV_PEP_ET_RATIO, &AdultLVPEPET},
+	{ADULT_RV_PEP_ET_RATIO, &AdultRVPEPET},
+	{ADULT_PULM_SD_RATIO, &AdultPulmSD},
 	{ADULT_TEI_INDEX, &AdultTeiIndex},
 };
 
@@ -596,7 +591,7 @@ const SingleItemInfo AdultInfo[] = {
 	{ADULT_LVOT_ACC_T, TIME_D, N_("LVOT Accel Time(D)"), SEC, NULL},
 	{ADULT_LVOT_VMAX, PGMAX, N_("LVOT Vmax(D)"), ADULT_LVOT_VMAX_MULTI, &AdultLvotVmaxCalc},
 	{ADULT_AI_ACC_T, TIME_D, N_("AI Accel Time(D)"), SEC, NULL},
-	{ADULT_AI_P12T, P12T, N_("AI P1/2t(D)"), ADULT_AI_P12T_MULTI, NULL},//压力降半时间，实际上要显示Vmax, P1/2t, Slope
+	{ADULT_AI_P12T, P12T, N_("AI P1/2t(D)"), ADULT_AI_P12T_MULTI, NULL},//鍘嬪姏闄嶅崐鏃堕棿锛屽疄闄呬笂瑕佹樉绀篤max, P1/2t, Slope
 	{ADULT_AI_DEC_SLOPE, SLOPE_D, N_("AI Dec Slope(D)"), CMS2, NULL},
     //	{ADULT_AI_ALIAS_V, DIALOG_BOX, "AI Alias Vel", CMS, NULL},//弹出对话框，选择测量或输入
     {ADULT_AI_VMAX, PGMAX, N_("AI Vmax(D)"), ADULT_AI_VMAX_MULTI, NULL},
@@ -605,7 +600,7 @@ const SingleItemInfo AdultInfo[] = {
     {ADULT_HR_AV, HR_D, N_("HR-AV(D)"), ADULT_HR_AV_MULTI, NULL},
     //D Mitral Valve
     {ADULT_HR_MV, HR_D, N_("HR-MV(D)"), ADULT_HR_MV_MULTI, NULL},
-	{ADULT_MV_P12T, P12T, N_("MV P1/2t(D)"), ADULT_MV_P12T_MULTI, &AdultMVP12tCalc},//压力降半时间，实际上要显示Vmax, P1/2t, Slope
+	{ADULT_MV_P12T, P12T, N_("MV P1/2t(D)"), ADULT_MV_P12T_MULTI, &AdultMVP12tCalc},//鍘嬪姏闄嶅崐鏃堕棿锛屽疄闄呬笂瑕佹樉绀篤max, P1/2t, Slope
 //	{ADULT_MV_ALIAS_V, VEL_D, "MV Alias Vel", CM, NULL},//弹出对话框，选择测量或输入
 	{ADULT_MV_PEAK_E_V, PGMAX, N_("MV Peak E Vel(D)"), ADULT_MV_PEAK_E_V_MULTI, &AdultMVPeakECalc},//测量速度和压力阶差
 	{ADULT_MV_PEAK_A_V, PGMAX, N_("MV Peak A Vel(D)"), ADULT_MV_PEAK_A_V_MULTI, &AdultMVPeakECalc},//测量速度和压力阶差
@@ -615,8 +610,8 @@ const SingleItemInfo AdultInfo[] = {
 	{ADULT_MV_DEC_SLOPE, SLOPE_D, N_("MV Decel Slope(D)"), CMS2, NULL},
 	{ADULT_IVCT, TIME_D, N_("IVCT(D)"), SEC, &AdultIVCTCalc},
 	{ADULT_MV_ACC_T, TIME_D, N_("MV Accel Time(D)"), SEC, NULL},
-	{ADULT_MV_VMAX, VEL_D, N_("MV Vmax(D)"), CMS, NULL},//仅速度测量
-	{ADULT_MR_VMAX, VEL_D, N_("MR Vmax(D)"), CMS, NULL},//仅速度测量
+	{ADULT_MV_VMAX, VEL_D, N_("MV Vmax(D)"), CMS, NULL},//浠呴€熷害娴嬮噺
+	{ADULT_MR_VMAX, VEL_D, N_("MR Vmax(D)"), CMS, NULL},//浠呴€熷害娴嬮噺
 //	{ADULT_MR_ALIAS_V, VEL_D, "MR Alias Vel", CM, NULL},//弹出对话框，选择测量或输入
 	//D Pulmonic Valve
 	{ADULT_HR_TV, HR_D, N_("HR-TV(D)"), ADULT_HR_TV_MULTI, NULL},
@@ -742,61 +737,61 @@ const CalcInfoArray OBRvDimenCalc = {&OBLvRv, NULL};
 const CalcInfoArray OBFTACalc = {&OBFTAGW,&OBFTAEDCB, NULL}; //12.05
 
 const PtrOfCalcInfo OBCalcInfoPtr[OB_CALC_END - OB_CALC_START] = {
-	{OB_CER_GW, &OBCerGW}, 
-	{OB_CER_EDCB, &OBCerEDCB}, 
-	{OB_HL_GW, &OBHLGW}, 
-	{OB_HL_EDCB, &OBHLEDCB}, 
-	{OB_BPD_GW, &OBBPDGW}, 
-	{OB_BPD_EDCB, &OBBPDEDCB}, 
-	{OB_FL_GW, &OBFLGW}, 
-	{OB_FL_EDCB, &OBFLEDCB}, 
-	{OB_OOD_GW, &OBOODGW}, 
-	{OB_OOD_EDCB, &OBOODEDCB}, 
-	{OB_TIBIA_GW, &OBTibiaGW}, 
-	{OB_TIBIA_EDCB, &OBTibiaEDCB}, 
-	{OB_TTD_GW, &OBTTDGW}, 
-	{OB_TTD_EDCB, &OBTTDEDCB}, 
-	{OB_ULNA_GW, &OBUlnaGW}, 
-	{OB_ULNA_EDCB, &OBUlnaEDCB}, 
-	{OB_CRL_GW, &OBCRLGW}, 
-	{OB_CRL_EDCB, &OBCRLEDCB}, 
-	{OB_GS_GW, &OBGSGW}, 
-	{OB_GS_EDCB, &OBGSEDCB}, 
-	{OB_AC_GW, &OBACGW}, 
-	{OB_AC_EDCB, &OBACEDCB}, 
-	{OB_HC_GW, &OBHCGW}, 
-	{OB_HC_EDCB, &OBHCEDCB}, 
-	{OB_TAD_GW, &OBTADGW}, 
-	{OB_TAD_EDCB, &OBTADEDCB}, 
-	{OB_APAD_GW, &OBAPADGW}, 
-	{OB_APAD_EDCB, &OBAPADEDCB}, 
-	{OB_THD_GW, &OBTHDGW}, 
-	{OB_THD_EDCB, &OBTHDEDCB}, 
-	{OB_OFD_GW, &OBOFDGW}, 
-	{OB_OFD_EDCB, &OBOFDEDCB}, 
-	{OB_EFW_HADLOCK1, &OBEfwHadlock1}, 
-	{OB_EFW_HADLOCK2, &OBEfwHadlock2}, 
-	{OB_EFW_HADLOCK3, &OBEfwHadlock3}, 
-	{OB_EFW_HADLOCK4, &OBEfwHadlock4}, 
-	{OB_EFW_SHEPARD, &OBEfwShepard}, 
-	{OB_EFW_HANSMAN, &OBEfwHansmenn}, 
-	{OB_EFW_TOKYO, &OBEfwTokyo}, 
-	{OB_CALC_AFI, &OBAFI}, 
-	{OB_CALC_L_OV_VOL, &OBLOvVol}, 
-	{OB_CALC_R_OV_VOL, &OBROvVol}, 
-	//{OB_MEAN_SAC, &OBMeanSac}, 
-	{OB_AO_PA_RATIO, &OBAoPa}, 
-	{OB_HRTC_THRC_RATIO, &OBHrtCThrC}, 
-	{OB_LA_AO_RTAIO, &OBLaAo}, 
-	{OB_LA_RA_RATIO, &OBLaRa}, 
-	{OB_LV_RV_RATIO, &OBLvRv}, 
-	{OB_HC_AC_RATIO, &OBHCAC}, 
-	{OB_FL_BPD_RATIO, &OBFLBPD}, 
-	{OB_FL_AC_RATIO, &OBFLAC}, 
-	{OB_BPDA, &OBBPDa}, 
+	{OB_CER_GW, &OBCerGW},
+	{OB_CER_EDCB, &OBCerEDCB},
+	{OB_HL_GW, &OBHLGW},
+	{OB_HL_EDCB, &OBHLEDCB},
+	{OB_BPD_GW, &OBBPDGW},
+	{OB_BPD_EDCB, &OBBPDEDCB},
+	{OB_FL_GW, &OBFLGW},
+	{OB_FL_EDCB, &OBFLEDCB},
+	{OB_OOD_GW, &OBOODGW},
+	{OB_OOD_EDCB, &OBOODEDCB},
+	{OB_TIBIA_GW, &OBTibiaGW},
+	{OB_TIBIA_EDCB, &OBTibiaEDCB},
+	{OB_TTD_GW, &OBTTDGW},
+	{OB_TTD_EDCB, &OBTTDEDCB},
+	{OB_ULNA_GW, &OBUlnaGW},
+	{OB_ULNA_EDCB, &OBUlnaEDCB},
+	{OB_CRL_GW, &OBCRLGW},
+	{OB_CRL_EDCB, &OBCRLEDCB},
+	{OB_GS_GW, &OBGSGW},
+	{OB_GS_EDCB, &OBGSEDCB},
+	{OB_AC_GW, &OBACGW},
+	{OB_AC_EDCB, &OBACEDCB},
+	{OB_HC_GW, &OBHCGW},
+	{OB_HC_EDCB, &OBHCEDCB},
+	{OB_TAD_GW, &OBTADGW},
+	{OB_TAD_EDCB, &OBTADEDCB},
+	{OB_APAD_GW, &OBAPADGW},
+	{OB_APAD_EDCB, &OBAPADEDCB},
+	{OB_THD_GW, &OBTHDGW},
+	{OB_THD_EDCB, &OBTHDEDCB},
+	{OB_OFD_GW, &OBOFDGW},
+	{OB_OFD_EDCB, &OBOFDEDCB},
+	{OB_EFW_HADLOCK1, &OBEfwHadlock1},
+	{OB_EFW_HADLOCK2, &OBEfwHadlock2},
+	{OB_EFW_HADLOCK3, &OBEfwHadlock3},
+	{OB_EFW_HADLOCK4, &OBEfwHadlock4},
+	{OB_EFW_SHEPARD, &OBEfwShepard},
+	{OB_EFW_HANSMAN, &OBEfwHansmenn},
+	{OB_EFW_TOKYO, &OBEfwTokyo},
+	{OB_CALC_AFI, &OBAFI},
+	{OB_CALC_L_OV_VOL, &OBLOvVol},
+	{OB_CALC_R_OV_VOL, &OBROvVol},
+	//{OB_MEAN_SAC, &OBMeanSac},
+	{OB_AO_PA_RATIO, &OBAoPa},
+	{OB_HRTC_THRC_RATIO, &OBHrtCThrC},
+	{OB_LA_AO_RTAIO, &OBLaAo},
+	{OB_LA_RA_RATIO, &OBLaRa},
+	{OB_LV_RV_RATIO, &OBLvRv},
+	{OB_HC_AC_RATIO, &OBHCAC},
+	{OB_FL_BPD_RATIO, &OBFLBPD},
+	{OB_FL_AC_RATIO, &OBFLAC},
+	{OB_BPDA, &OBBPDa},
 	{OB_CI, &OBCI},
-    {OB_FTA_GW, &OBFTAGW}, //12.05 
-    {OB_FTA_EDCB, &OBFTAEDCB}, //12.05 
+    {OB_FTA_GW, &OBFTAGW}, //12.05
+    {OB_FTA_EDCB, &OBFTAEDCB}, //12.05
 };
 
 const MultiItemInfo OBMultiInfo[] = {
@@ -814,7 +809,7 @@ const MultiItemInfo OBMultiInfo[] = {
 };
 
 const SingleItemInfo OBInfo[] = {
-    {OB_CER, DIST_DOT, N_("CER"), CM, &OBCerCalc}, 
+    {OB_CER, DIST_DOT, N_("CER"), CM, &OBCerCalc},
     {OB_CIST_MAG, DIST_DOT, N_("Cist Magna"), CM, NULL},
     {OB_OOD, DIST_DOT, N_("OOD"), CM, &OBOODCalc},
     {OB_TIBIA, DIST_DOT, N_("Tibia"), CM, &OBTibiaCalc},
@@ -870,8 +865,8 @@ const SingleItemInfo OBInfo[] = {
 	{OB_LV_LEN, DIST_DOT, N_("LV Length"), CM, NULL},
 	{OB_LV_WIDTH, DIST_DOT, N_("LV Width"), CM, NULL},
 	{OB_LVOT_DIAM, DIST_DOT, N_("LVOT Diam"), CM, NULL},
-	{OB_HA_2D, AREA_ELLIPSE, N_("Heart Area"), CM2, &OBHrtCThrCCalc},//椭圆面积
-	{OB_HRTC_2D, PERI_ELLIPSE, N_("Heart Circ"), CM, &OBHrtCThrCCalc},//椭圆周长
+	{OB_HA_2D, AREA_ELLIPSE, N_("Heart Area"), CM2, &OBHrtCThrCCalc},//妞渾闈㈢Н
+	{OB_HRTC_2D, PERI_ELLIPSE, N_("Heart Circ"), CM, &OBHrtCThrCCalc},//妞渾鍛ㄩ暱
 	{OB_HR, HR_M, N_("Heart Rate"), BPM, NULL},
 	{OB_THC, PERI_ELLIPSE, N_("ThrC"), CM, &OBHrtCThrCCalc},//胸周长
 	{OB_AOR_DIAM, DIST_DOT, N_("AoR Diam"), CM, &OBAoRDiamCalc},
@@ -889,20 +884,20 @@ const SingleItemInfo OBInfo[] = {
 	{OB_MPA_DIAM, DIST_DOT, N_("MPA Diam(2D)"), CM, &OBMPADiamCalc},
 #ifdef EMP_322
 #else
-    {OB_THORACIC_AO, RI, N_("Thoracic Ao"), OB_THORACIC_AO_MULTI, NULL},//胸主动脉
+    {OB_THORACIC_AO, RI, N_("Thoracic Ao"), OB_THORACIC_AO_MULTI, NULL},//鑳镐富鍔ㄨ剦
 #endif
     {OB_GS, DIST_DOT, N_("GS"), CM, &OBGSCalc},
     {OB_BPD, DIST_DOT, N_("BPD"), CM, &OBBPDCalc},
-    {OB_AC, PERI_ELLIPSE, N_("AC"), CM, &OBACCalc},//周长
-    {OB_HC, PERI_ELLIPSE, N_("HC"), CM, &OBHCCalc},//周长
+    {OB_AC, PERI_ELLIPSE, N_("AC"), CM, &OBACCalc},//鍛ㄩ暱
+    {OB_HC, PERI_ELLIPSE, N_("HC"), CM, &OBHCCalc},//鍛ㄩ暱
     {OB_HL, DIST_DOT, N_("HL"), CM, &OBHLCalc},
     {OB_FL, DIST_DOT, N_("FL"), CM,  &OBFLCalc},
     {OB_TAD, DIST_DOT,N_( "TAD"), CM, &OBTADCalc},
     {OB_APAD, DIST_DOT, N_("APAD"), CM, &OBAPADCalc},
     {OB_THD, DIST_DOT, N_("THD"), CM, &OBTHDCalc},
 	{OB_OFD, DIST_DOT, N_("OFD"), CM, &OBOFDCalc},
-	{OB_FTA, AREA_ELLIPSE, N_("FTA"), CM2, &OBFTACalc},//面积测量12.05
-	//{OB_FTA, DIST_DOT, N_("FTA"), CM, NULL},//面积测量
+	{OB_FTA, AREA_ELLIPSE, N_("FTA"), CM2, &OBFTACalc},//闈㈢Н娴嬮噺12.05
+	//{OB_FTA, DIST_DOT, N_("FTA"), CM, NULL},//闈㈢Н娴嬮噺
 	{OB_EAR, DIST_DOT, N_("Ear"), CM, NULL},
 	{OB_ORIBIT1, DIST_DOT, N_("Orbit1"), CM, NULL},
 	{OB_ORIBIT2, DIST_DOT, N_("Orbit2"), CM, NULL},
@@ -911,10 +906,10 @@ const SingleItemInfo OBInfo[] = {
 	{OB_NASAL, DIST_DOT, N_("Nasal"), CM, NULL},
 	{OB_CLAVICLE, DIST_DOT, N_("Clavicle"), CM, NULL},
 	{OB_M_PHALANX5, DIST_DOT, N_("M Phalanx 5"), CM, NULL},
-	{OB_L_FOOT_L, DIST_DOT, N_("L Foot L"), CM, NULL},//关于脚的测量忘了
-	{OB_L_FOOT_A, ANGLE_3DOT, N_("L Foot A"), ANG, NULL},//关于脚的测量忘了
-	{OB_R_FOOT_L, DIST_DOT, N_("R Foot L"), CM, NULL},//关于脚的测量忘了
-	{OB_R_FOOT_A, ANGLE_3DOT, N_("R Foot A"), ANG, NULL},//关于脚的测量忘了
+	{OB_L_FOOT_L, DIST_DOT, N_("L Foot L"), CM, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
+	{OB_L_FOOT_A, ANGLE_3DOT, N_("L Foot A"), ANG, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
+	{OB_R_FOOT_L, DIST_DOT, N_("R Foot L"), CM, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
+	{OB_R_FOOT_A, ANGLE_3DOT, N_("R Foot A"), ANG, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
 	{OB_BLADDER_AP, DIST_DOT, N_("Bladder AP"), CM, NULL},
 	{OB_BLADDER_L, DIST_DOT, N_("Bladder L"), CM, NULL},
 	{OB_BLADDER_TR, DIST_DOT, N_("Bladder Tr"), CM, NULL},
@@ -935,8 +930,8 @@ const SingleItemInfo OBInfo[] = {
 	{OB_R_LUNG_DIAM, DIST_DOT, N_("R Lung Diam"), CM, NULL},
 #ifdef EMP_322
 #else
-    {OB_L_UTERINE_A, RI, N_("L Uterine A"), OB_L_UTERINE_A_MULTI, NULL},//子宫动脉，没写清测啥
-	{OB_R_UTERINE_A, RI, N_("R Uterine A"), OB_R_UTERINE_A_MULTI, NULL},//子宫动脉，没写清测啥
+    {OB_L_UTERINE_A, RI, N_("L Uterine A"), OB_L_UTERINE_A_MULTI, NULL},//瀛愬鍔ㄨ剦锛屾病鍐欐竻娴嬪暐
+	{OB_R_UTERINE_A, RI, N_("R Uterine A"), OB_R_UTERINE_A_MULTI, NULL},//瀛愬鍔ㄨ剦锛屾病鍐欐竻娴嬪暐
 #endif
     {OB_PELVIS_AP, DIST_DOT, N_("Pelvis AP"), CM, NULL},
 	{OB_PELVIS_L, DIST_DOT, N_("Pelvis L"), CM, NULL},
@@ -947,7 +942,6 @@ const SingleItemInfo OBInfo[] = {
 const SingleItemInfo EFWInfo[] = {
 	{ OB_EFW_NEW, MEA_TYPE_END, N_("EFW"), UNIT_END, NULL}
 };
-
 
 /******************************GYN Measure**************************************/
 //const CalcResultInfo GYNBladderVol = {GYN_CALC_BLADDER_VOL, "Bladder Vol", CM3, MeaCalcFun::GallBladderVolCalc};
@@ -1028,40 +1022,40 @@ const CalcInfoArray GYNFIBROID10Calc = {&GYNFIBROID10Vol, NULL};
 */
 
 const PtrOfCalcInfo GYNCalcInfoPtr[GYN_CALC_END - GYN_CALC_START] = {
-	{GYN_CALC_BLADDER_VOL, &GYNBladderVol}, 
-	{GYN_CALC_PV_BLADDER_VOL, &GYNPVBladderVol}, 
-	{GYN_CALC_L_OV_VOL, &GYNLOvVol}, 
-	{GYN_CALC_R_OV_VOL, &GYNROvVol}, 
-	{GYN_CALC_UTERUS_VOL, &GYNUterusVol}, 
-	{GYN_L_FOLL1_VOL, &GYNLFOLL1Vol}, 
-	{GYN_L_FOLL2_VOL, &GYNLFOLL2Vol}, 
-	{GYN_L_FOLL3_VOL, &GYNLFOLL3Vol}, 
-	{GYN_L_FOLL4_VOL, &GYNLFOLL4Vol}, 
-	{GYN_L_FOLL5_VOL, &GYNLFOLL5Vol}, 
-	{GYN_L_FOLL6_VOL, &GYNLFOLL6Vol}, 
-	{GYN_L_FOLL7_VOL, &GYNLFOLL7Vol}, 
-	{GYN_L_FOLL8_VOL, &GYNLFOLL8Vol}, 
-	{GYN_L_FOLL9_VOL, &GYNLFOLL9Vol}, 
-	{GYN_L_FOLL10_VOL, &GYNLFOLL10Vol}, 
-	{GYN_R_FOLL1_VOL, &GYNRFOLL1Vol}, 
-	{GYN_R_FOLL2_VOL, &GYNRFOLL2Vol}, 
-	{GYN_R_FOLL3_VOL, &GYNRFOLL3Vol}, 
-	{GYN_R_FOLL4_VOL, &GYNRFOLL4Vol}, 
-	{GYN_R_FOLL5_VOL, &GYNRFOLL5Vol}, 
-	{GYN_R_FOLL6_VOL, &GYNRFOLL6Vol}, 
-	{GYN_R_FOLL7_VOL, &GYNRFOLL7Vol}, 
-	{GYN_R_FOLL8_VOL, &GYNRFOLL8Vol}, 
-	{GYN_R_FOLL9_VOL, &GYNRFOLL9Vol}, 
-	{GYN_R_FOLL10_VOL, &GYNRFOLL10Vol}, 
-/*	{GYN_FIBROID1_VOL, &GYNFIBROID1Vol}, 
-	{GYN_FIBROID2_VOL, &GYNFIBROID2Vol}, 
-	{GYN_FIBROID3_VOL, &GYNFIBROID3Vol}, 
-	{GYN_FIBROID4_VOL, &GYNFIBROID4Vol}, 
-	{GYN_FIBROID5_VOL, &GYNFIBROID5Vol}, 
-	{GYN_FIBROID6_VOL, &GYNFIBROID6Vol}, 
-	{GYN_FIBROID7_VOL, &GYNFIBROID7Vol}, 
-	{GYN_FIBROID8_VOL, &GYNFIBROID8Vol}, 
-	{GYN_FIBROID9_VOL, &GYNFIBROID9Vol}, 
+	{GYN_CALC_BLADDER_VOL, &GYNBladderVol},
+	{GYN_CALC_PV_BLADDER_VOL, &GYNPVBladderVol},
+	{GYN_CALC_L_OV_VOL, &GYNLOvVol},
+	{GYN_CALC_R_OV_VOL, &GYNROvVol},
+	{GYN_CALC_UTERUS_VOL, &GYNUterusVol},
+	{GYN_L_FOLL1_VOL, &GYNLFOLL1Vol},
+	{GYN_L_FOLL2_VOL, &GYNLFOLL2Vol},
+	{GYN_L_FOLL3_VOL, &GYNLFOLL3Vol},
+	{GYN_L_FOLL4_VOL, &GYNLFOLL4Vol},
+	{GYN_L_FOLL5_VOL, &GYNLFOLL5Vol},
+	{GYN_L_FOLL6_VOL, &GYNLFOLL6Vol},
+	{GYN_L_FOLL7_VOL, &GYNLFOLL7Vol},
+	{GYN_L_FOLL8_VOL, &GYNLFOLL8Vol},
+	{GYN_L_FOLL9_VOL, &GYNLFOLL9Vol},
+	{GYN_L_FOLL10_VOL, &GYNLFOLL10Vol},
+	{GYN_R_FOLL1_VOL, &GYNRFOLL1Vol},
+	{GYN_R_FOLL2_VOL, &GYNRFOLL2Vol},
+	{GYN_R_FOLL3_VOL, &GYNRFOLL3Vol},
+	{GYN_R_FOLL4_VOL, &GYNRFOLL4Vol},
+	{GYN_R_FOLL5_VOL, &GYNRFOLL5Vol},
+	{GYN_R_FOLL6_VOL, &GYNRFOLL6Vol},
+	{GYN_R_FOLL7_VOL, &GYNRFOLL7Vol},
+	{GYN_R_FOLL8_VOL, &GYNRFOLL8Vol},
+	{GYN_R_FOLL9_VOL, &GYNRFOLL9Vol},
+	{GYN_R_FOLL10_VOL, &GYNRFOLL10Vol},
+/*	{GYN_FIBROID1_VOL, &GYNFIBROID1Vol},
+	{GYN_FIBROID2_VOL, &GYNFIBROID2Vol},
+	{GYN_FIBROID3_VOL, &GYNFIBROID3Vol},
+	{GYN_FIBROID4_VOL, &GYNFIBROID4Vol},
+	{GYN_FIBROID5_VOL, &GYNFIBROID5Vol},
+	{GYN_FIBROID6_VOL, &GYNFIBROID6Vol},
+	{GYN_FIBROID7_VOL, &GYNFIBROID7Vol},
+	{GYN_FIBROID8_VOL, &GYNFIBROID8Vol},
+	{GYN_FIBROID9_VOL, &GYNFIBROID9Vol},
 	{GYN_FIBROID10_VOL, &GYNFIBROID10Vol}
 */
 };
@@ -1150,7 +1144,6 @@ const SingleItemInfo GYNInfo[] = {
 	{GYN_FIBROID10, DIST_DOT, N_("Fibroid10"), CM, NULL},
 };
 
-
 /******************************UR Measure**************************************/
 const CalcResultInfo  URBladderVol = {UR_CALC_BLADDER_VOL, {UR_BLADDER_L, UR_BLADDER_W, UR_BLADDER_H, NO_PAR, NO_PAR}, "Bladder Vol", CM3, MeaCalcFun::SectionCalc, NULL};
 const CalcResultInfo  URPVBladderVol = {UR_CALC_PV_BLADDER_VOL, {UR_PV_BLADDER_L, UR_PV_BLADDER_W, UR_PV_BLADDER_H, NO_PAR, NO_PAR}, "PV Bladder Vol", CM3, MeaCalcFun::SectionCalc, NULL};
@@ -1165,10 +1158,10 @@ const CalcInfoArray URLKidVolCalc = {&URLKidVol, NULL};
 const CalcInfoArray URRKidVolCalc = {&URRKidVol, NULL};
 
 const PtrOfCalcInfo URCalcInfoPtr[UR_CALC_END - UR_CALC_START] = {
-	{UR_CALC_BLADDER_VOL, &URBladderVol}, 
-	{UR_CALC_PV_BLADDER_VOL, &URPVBladderVol}, 
+	{UR_CALC_BLADDER_VOL, &URBladderVol},
+	{UR_CALC_PV_BLADDER_VOL, &URPVBladderVol},
 	{UR_CALC_PROSTATE_VOL, &URProstateVol},
-	{UR_CALC_L_KID_VOL, &URLKidVol}, 
+	{UR_CALC_L_KID_VOL, &URLKidVol},
 	{UR_CALC_R_KID_VOL, &URRKidVol}
 };
 
@@ -1950,9 +1943,9 @@ const SingleItemInfo FetalInfo[] = {
 	{FETAL_IVC_DIAM, DIST_DOT, N_("IVC Diam(2D)"), CM, NULL},
 	//Fetal 2D Valves
 	{FETAL_AO_AN_DIAM, DIST_DOT, N_("Ao Annul Diam(2D)"), CM, NULL},
-	{FETAL_AO_AN_CIRC, PERI_TRACK, N_("Ao Annul Circ(2D)"), CM, NULL},//轨迹法测周长
+	{FETAL_AO_AN_CIRC, PERI_TRACK, N_("Ao Annul Circ(2D)"), CM, NULL},//杞ㄨ抗娉曟祴鍛ㄩ暱
 	{FETAL_MV_AN_DIAM, DIST_DOT, N_("MV Annul Diam(2D)"), CM, NULL},
-	{FETAL_MV_AN_CIRC, PERI_TRACK, N_("MV Annul Circ(2D)"), CM, NULL},//轨迹法测周长
+	{FETAL_MV_AN_CIRC, PERI_TRACK, N_("MV Annul Circ(2D)"), CM, NULL},//杞ㄨ抗娉曟祴鍛ㄩ暱
 	{FETAL_PV_AN_DIAM, DIST_DOT, N_("PV Annul Diam(2D)"), CM, NULL},
 	{FETAL_TV_AN_DIAM, DIST_DOT, N_("TV Annul Diam(2D)"), CM, NULL},
 	//Fetal M Dimen
@@ -2001,16 +1994,16 @@ const SingleItemInfo FetalInfo[] = {
 	{FETAL_TV_EF_SLOPE_MM, SLOPE, N_("TV E-F Slope(M)"), CMS, NULL},//仅显示斜率
 	{FETAL_TV_AC_INTERVAL_MM, TIME_M, N_("TV A-C Interval(M)"), SEC, NULL},
 	//Fetal D Utero and Placenta
-	{FETAL_PLACENTA, SD, N_("Placenta(D)"), FETAL_PLACENTA_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_UM_A, SD, N_("Umbilical A(D)"), FETAL_UM_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_UM_V, VEL_D, N_("Umbilical V(D)"), CMS, NULL},//仅测速度
-	{FETAL_L_UT_A, SD, N_("L Uterine A(D)"), FETAL_L_UT_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_R_UT_A, SD, N_("R Uterine A(D)"), FETAL_R_UT_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_L_OV_A, SD, N_("L Ovarian A(D)"), FETAL_L_OV_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_R_OV_A, SD, N_("R Ovarian A(D)"), FETAL_R_OV_A_MULTI, NULL},//测PS, ED, RI, S/D
+	{FETAL_PLACENTA, SD, N_("Placenta(D)"), FETAL_PLACENTA_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_UM_A, SD, N_("Umbilical A(D)"), FETAL_UM_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_UM_V, VEL_D, N_("Umbilical V(D)"), CMS, NULL},//浠呮祴閫熷害
+	{FETAL_L_UT_A, SD, N_("L Uterine A(D)"), FETAL_L_UT_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_R_UT_A, SD, N_("R Uterine A(D)"), FETAL_R_UT_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_L_OV_A, SD, N_("L Ovarian A(D)"), FETAL_L_OV_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_R_OV_A, SD, N_("R Ovarian A(D)"), FETAL_R_OV_A_MULTI, NULL},//娴婸S, ED, RI, S/D
 	//Fetal D Vessels
 	{FETAL_FROAMEN_OVALE, PGMAX, N_("Foramen Ovale(D)"), FETAL_FROAMEN_OVALE_MULTI, NULL},
-	{FETAL_DUCT_ART, SD, N_("Duct Art(D)"), FETAL_DUCT_ART_MULTI, NULL},//测PS, ED, RI, S/D
+	{FETAL_DUCT_ART, SD, N_("Duct Art(D)"), FETAL_DUCT_ART_MULTI, NULL},//娴婸S, ED, RI, S/D
 	{FETAL_L_COR_A, PGMAX, N_("L Coronary A(D)"), FETAL_L_COR_A_MULTI, NULL},
 	{FETAL_R_COR_A, PGMAX, N_("R Coronary A(D)"), FETAL_R_COR_A_MULTI, NULL},
 	{FETAL_AOR, PGMAX, N_("AoR(D)"), FETAL_AOR_MULTI, NULL},
@@ -2021,9 +2014,9 @@ const SingleItemInfo FetalInfo[] = {
 	{FETAL_MPA, PGMAX, N_("MPA(D)"), FETAL_MPA_MULTI, NULL},
 	{FETAL_LPA, PGMAX, N_("LPA(D)"), FETAL_LPA_MULTI, NULL},
 	{FETAL_RPA, PGMAX, N_("RPA(D)"), FETAL_RPA_MULTI, NULL},
-//	{FETAL_PULM_V, PGMAX, N_("Pulm V"), FETAL_PULM_V_MULTI, NULL},//仅速度测量
-	{FETAL_PULM_V, VEL_D, N_("Pulm V(D)"), CMS, NULL},//仅速度测量
-	{FETAL_DUCT_VEN, SD, N_("Duct Ven(D)"), FETAL_DUCT_VEN_MULTI, NULL},//测PS, ED, RI, S/D
+//	{FETAL_PULM_V, PGMAX, N_("Pulm V"), FETAL_PULM_V_MULTI, NULL},//浠呴€熷害娴嬮噺
+	{FETAL_PULM_V, VEL_D, N_("Pulm V(D)"), CMS, NULL},//浠呴€熷害娴嬮噺
+	{FETAL_DUCT_VEN, SD, N_("Duct Ven(D)"), FETAL_DUCT_VEN_MULTI, NULL},//娴婸S, ED, RI, S/D
 	//Fetal D AV and MV
 	{FETAL_LVOT_ACC_TIME, TIME_D, N_("LVOT Acc Time(D)"), SEC, NULL},
 	{FETAL_LVOT_VMAX, PGMAX, N_("LVOT Vmax(D)"), FETAL_LVOT_VMAX_MULTI, NULL},
@@ -2054,18 +2047,18 @@ const SingleItemInfo FetalInfo[] = {
 	{FETAL_TR_VMAX, PGMAX, N_("TR Vmax(D)"), FETAL_TR_VMAX_MULTI, NULL},
 	{FETAL_HR_TV, HR_D, N_("HR-TV(D)"), FETAL_HR_TV_MULTI, NULL},
 	//Fetal D Peripheral Vasc
-	{FETAL_THORACIC_AO, SD, N_("Thoracic Ao(D)"), FETAL_THORACIC_AO_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_L_RENAL_A, SD, N_("L Renal A(D)"), FETAL_L_RENAL_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_R_RENAL_A, SD, N_("R Renal A(D)"), FETAL_R_RENAL_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_HEPATIC_A, SD, N_("Hepatic A(D)"), FETAL_HEPATIC_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_HEPATIC_V, SD, N_("Hepatic V(D)"), FETAL_HEPATIC_V_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_SPLENIC_A, SD, N_("Splenic A(D)"), FETAL_SPLENIC_A_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_L_MCA, SD, N_("L MCA(D)"), FETAL_L_MCA_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_R_MCA, SD, N_("R MCA(D)"), FETAL_R_MCA_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_L_ICA, SD, N_("L ICA(D)"), FETAL_L_ICA_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_R_ICA, SD, N_("R ICA(D)"), FETAL_R_ICA_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_SVC, SD, N_("SVC(D)"), FETAL_SVC_MULTI, NULL},//测PS, ED, RI, S/D
-	{FETAL_IVC, SD, N_("IVC(D)"), FETAL_IVC_MULTI, NULL}//测PS, ED, RI, S/D
+	{FETAL_THORACIC_AO, SD, N_("Thoracic Ao(D)"), FETAL_THORACIC_AO_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_L_RENAL_A, SD, N_("L Renal A(D)"), FETAL_L_RENAL_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_R_RENAL_A, SD, N_("R Renal A(D)"), FETAL_R_RENAL_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_HEPATIC_A, SD, N_("Hepatic A(D)"), FETAL_HEPATIC_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_HEPATIC_V, SD, N_("Hepatic V(D)"), FETAL_HEPATIC_V_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_SPLENIC_A, SD, N_("Splenic A(D)"), FETAL_SPLENIC_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_L_MCA, SD, N_("L MCA(D)"), FETAL_L_MCA_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_R_MCA, SD, N_("R MCA(D)"), FETAL_R_MCA_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_L_ICA, SD, N_("L ICA(D)"), FETAL_L_ICA_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_R_ICA, SD, N_("R ICA(D)"), FETAL_R_ICA_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_SVC, SD, N_("SVC(D)"), FETAL_SVC_MULTI, NULL},//娴婸S, ED, RI, S/D
+	{FETAL_IVC, SD, N_("IVC(D)"), FETAL_IVC_MULTI, NULL}//娴婸S, ED, RI, S/D
 };
 
 const MultiItemInfo FetalMultiInfo[] = {
@@ -2134,396 +2127,396 @@ const PtrOfCalcInfo VSCalcInfoPtr[VS_CALC_END - VS_CALC_START] = {
 
 const SingleItemInfo VSInfo[] = {
 	{VS_L_CCA, PSED, N_("L CCA"), VS_L_CCA_MULTI, &VSLIcaCcaCalc},
-	{VS_R_CCA, PSED, N_("R CCA"), VS_R_CCA_MULTI, &VSRIcaCcaCalc},  
-	{VS_L_DIST_CCA, PSED, N_("L Dist CCA"), VS_L_DIST_CCA_MULTI, NULL},  
-	{VS_R_DIST_CCA, PSED, N_("R Dist CCA"), VS_R_DIST_CCA_MULTI, NULL},  
-	{VS_L_MID_CCA, PSED, N_("L Mid CCA"), VS_L_MID_CCA_MULTI, NULL},  
-	{VS_R_MID_CCA, PSED, N_("R Mid CCA"), VS_R_MID_CCA_MULTI, NULL},  
-	{VS_L_PROX_CCA, PSED, N_("L Prox CCA"), VS_L_PROX_CCA_MULTI, NULL},  
-	{VS_R_PROX_CCA, PSED, N_("R Prox CCA"), VS_R_PROX_CCA_MULTI, NULL},  
+	{VS_R_CCA, PSED, N_("R CCA"), VS_R_CCA_MULTI, &VSRIcaCcaCalc},
+	{VS_L_DIST_CCA, PSED, N_("L Dist CCA"), VS_L_DIST_CCA_MULTI, NULL},
+	{VS_R_DIST_CCA, PSED, N_("R Dist CCA"), VS_R_DIST_CCA_MULTI, NULL},
+	{VS_L_MID_CCA, PSED, N_("L Mid CCA"), VS_L_MID_CCA_MULTI, NULL},
+	{VS_R_MID_CCA, PSED, N_("R Mid CCA"), VS_R_MID_CCA_MULTI, NULL},
+	{VS_L_PROX_CCA, PSED, N_("L Prox CCA"), VS_L_PROX_CCA_MULTI, NULL},
+	{VS_R_PROX_CCA, PSED, N_("R Prox CCA"), VS_R_PROX_CCA_MULTI, NULL},
 	{VS_L_ICA, PSED, N_("L ICA"), VS_L_ICA_MULTI, &VSLIcaCcaCalc},
-	{VS_R_ICA, PSED, N_("R ICA"), VS_R_ICA_MULTI, &VSRIcaCcaCalc},  
-	{VS_L_DIST_ICA, PSED, N_("L Dist ICA"), VS_L_DIST_ICA_MULTI, NULL},  
-	{VS_R_DIST_ICA, PSED, N_("R Dist ICA"), VS_R_DIST_ICA_MULTI, NULL},  
-	{VS_L_MID_ICA, PSED, N_("L Mid ICA"), VS_L_MID_ICA_MULTI, NULL},  
-	{VS_R_MID_ICA, PSED, N_("R Mid ICA"), VS_R_MID_ICA_MULTI, NULL},  
-	{VS_L_PROX_ICA, PSED, N_("L Prox ICA"), VS_L_PROX_ICA_MULTI, NULL},  
-	{VS_R_PROX_ICA, PSED, N_("R Prox ICA"), VS_R_PROX_ICA_MULTI, NULL},  
-	{VS_L_DIST_LSV, PSED, N_("L Dist LSV"), VS_L_DIST_LSV_MULTI, NULL},  
-	{VS_R_DIST_LSV, PSED, N_("R Dist LSV"), VS_R_DIST_LSV_MULTI, NULL},  
-	{VS_L_MID_LSV, PSED, N_("L Mid LSV"), VS_L_MID_LSV_MULTI, NULL},  
-	{VS_R_MID_LSV, PSED, N_("R Mid LSV"), VS_R_MID_LSV_MULTI, NULL},  
-	{VS_L_PROX_LSV, PSED, N_("L Prox LSV"), VS_L_PROX_LSV_MULTI, NULL},  
-	{VS_R_PROX_LSV, PSED, N_("R Prox LSV"), VS_R_PROX_LSV_MULTI, NULL},  
-	{VS_L_DIST_CEPH_V, PSED, N_("L Dist Ceph V"), VS_L_DIST_CEPH_V_MULTI, NULL},  
-	{VS_R_DIST_CEPH_V, PSED, N_("R Dist Ceph V"), VS_R_DIST_CEPH_V_MULTI, NULL},  
-	{VS_L_MID_CEPH_V, PSED, N_("L Mid Ceph V"), VS_L_MID_CEPH_V_MULTI, NULL},  
-	{VS_R_MID_CEPH_V, PSED, N_("R Mid Ceph V"), VS_R_MID_CEPH_V_MULTI, NULL},  
-	{VS_L_PROX_CEPH_V, PSED, N_("L Prox Ceph V"), VS_L_PROX_CEPH_V_MULTI, NULL},  
-	{VS_R_PROX_CEPH_V, PSED, N_("R Prox Ceph V"), VS_R_PROX_CEPH_V_MULTI, NULL},  
-	{VS_L_PROX_ECA, PSED, N_("L Prox ECA"), VS_L_PROX_ECA_MULTI, NULL},  
-	{VS_R_PROX_ECA, PSED, N_("R Prox ECA"), VS_R_PROX_ECA_MULTI, NULL},  
-	{VS_L_BRACHIOCEPH_A, PSED, N_("L Brachioceph A"), VS_L_BRACHIOCEPH_A_MULTI, NULL},  
-	{VS_R_BRACHIOCEPH_A, PSED, N_("R Brachioceph A"), VS_R_BRACHIOCEPH_A_MULTI, NULL},  
-	{VS_L_BRACHIOCEPH_V, PSED, N_("L Brachioceph V"), VS_L_BRACHIOCEPH_V_MULTI, NULL},  
-	{VS_R_BRACHIOCEPH_V, PSED, N_("R Brachioceph V"), VS_R_BRACHIOCEPH_V_MULTI, NULL},  
-	{VS_L_BULB, PSED, N_("L Bulb"), VS_L_BULB_MULTI, NULL},  
-	{VS_R_BULB, PSED, N_("R Bulb"), VS_R_BULB_MULTI, NULL},  
-	{VS_L_VERTEBRAL_A, PSED, N_("L Vertebral A"), VS_L_VERTEBRAL_A_MULTI, NULL},  
-	{VS_R_VERTEBRAL_A, PSED, N_("R Vertebral A"), VS_R_VERTEBRAL_A_MULTI, NULL},  
-	{VS_L_IJV, PSED, N_("L IJV"), VS_L_IJV_MULTI, NULL},  
-	{VS_R_IJV, PSED, N_("R IJV"), VS_R_IJV_MULTI, NULL}, 
-    {VS_L_MID_SCL_A, PSED, N_("L Mid SCL A"), VS_L_MID_SCL_A_MULTI, NULL},  
-	{VS_R_MID_SCL_A, PSED, N_("R Mid SCL A"), VS_R_MID_SCL_A_MULTI, NULL},  
-	{VS_L_PROX_SCL_A, PSED, N_("L Prox SCL A"), VS_L_PROX_SCL_A_MULTI, NULL},  
-	{VS_R_PROX_SCL_A, PSED, N_("R Prox SCL A"), VS_R_PROX_SCL_A_MULTI, NULL},  
-	{VS_L_MID_SCL_V, PSED, N_("L Mid SCL V"), VS_L_MID_SCL_V_MULTI, NULL},  
-	{VS_R_MID_SCL_V, PSED, N_("R Mid SCL V"), VS_R_MID_SCL_V_MULTI, NULL},  
-	{VS_L_PROX_SCL_V, PSED, N_("L Prox SCL V"), VS_L_PROX_SCL_V_MULTI, NULL},  
+	{VS_R_ICA, PSED, N_("R ICA"), VS_R_ICA_MULTI, &VSRIcaCcaCalc},
+	{VS_L_DIST_ICA, PSED, N_("L Dist ICA"), VS_L_DIST_ICA_MULTI, NULL},
+	{VS_R_DIST_ICA, PSED, N_("R Dist ICA"), VS_R_DIST_ICA_MULTI, NULL},
+	{VS_L_MID_ICA, PSED, N_("L Mid ICA"), VS_L_MID_ICA_MULTI, NULL},
+	{VS_R_MID_ICA, PSED, N_("R Mid ICA"), VS_R_MID_ICA_MULTI, NULL},
+	{VS_L_PROX_ICA, PSED, N_("L Prox ICA"), VS_L_PROX_ICA_MULTI, NULL},
+	{VS_R_PROX_ICA, PSED, N_("R Prox ICA"), VS_R_PROX_ICA_MULTI, NULL},
+	{VS_L_DIST_LSV, PSED, N_("L Dist LSV"), VS_L_DIST_LSV_MULTI, NULL},
+	{VS_R_DIST_LSV, PSED, N_("R Dist LSV"), VS_R_DIST_LSV_MULTI, NULL},
+	{VS_L_MID_LSV, PSED, N_("L Mid LSV"), VS_L_MID_LSV_MULTI, NULL},
+	{VS_R_MID_LSV, PSED, N_("R Mid LSV"), VS_R_MID_LSV_MULTI, NULL},
+	{VS_L_PROX_LSV, PSED, N_("L Prox LSV"), VS_L_PROX_LSV_MULTI, NULL},
+	{VS_R_PROX_LSV, PSED, N_("R Prox LSV"), VS_R_PROX_LSV_MULTI, NULL},
+	{VS_L_DIST_CEPH_V, PSED, N_("L Dist Ceph V"), VS_L_DIST_CEPH_V_MULTI, NULL},
+	{VS_R_DIST_CEPH_V, PSED, N_("R Dist Ceph V"), VS_R_DIST_CEPH_V_MULTI, NULL},
+	{VS_L_MID_CEPH_V, PSED, N_("L Mid Ceph V"), VS_L_MID_CEPH_V_MULTI, NULL},
+	{VS_R_MID_CEPH_V, PSED, N_("R Mid Ceph V"), VS_R_MID_CEPH_V_MULTI, NULL},
+	{VS_L_PROX_CEPH_V, PSED, N_("L Prox Ceph V"), VS_L_PROX_CEPH_V_MULTI, NULL},
+	{VS_R_PROX_CEPH_V, PSED, N_("R Prox Ceph V"), VS_R_PROX_CEPH_V_MULTI, NULL},
+	{VS_L_PROX_ECA, PSED, N_("L Prox ECA"), VS_L_PROX_ECA_MULTI, NULL},
+	{VS_R_PROX_ECA, PSED, N_("R Prox ECA"), VS_R_PROX_ECA_MULTI, NULL},
+	{VS_L_BRACHIOCEPH_A, PSED, N_("L Brachioceph A"), VS_L_BRACHIOCEPH_A_MULTI, NULL},
+	{VS_R_BRACHIOCEPH_A, PSED, N_("R Brachioceph A"), VS_R_BRACHIOCEPH_A_MULTI, NULL},
+	{VS_L_BRACHIOCEPH_V, PSED, N_("L Brachioceph V"), VS_L_BRACHIOCEPH_V_MULTI, NULL},
+	{VS_R_BRACHIOCEPH_V, PSED, N_("R Brachioceph V"), VS_R_BRACHIOCEPH_V_MULTI, NULL},
+	{VS_L_BULB, PSED, N_("L Bulb"), VS_L_BULB_MULTI, NULL},
+	{VS_R_BULB, PSED, N_("R Bulb"), VS_R_BULB_MULTI, NULL},
+	{VS_L_VERTEBRAL_A, PSED, N_("L Vertebral A"), VS_L_VERTEBRAL_A_MULTI, NULL},
+	{VS_R_VERTEBRAL_A, PSED, N_("R Vertebral A"), VS_R_VERTEBRAL_A_MULTI, NULL},
+	{VS_L_IJV, PSED, N_("L IJV"), VS_L_IJV_MULTI, NULL},
+	{VS_R_IJV, PSED, N_("R IJV"), VS_R_IJV_MULTI, NULL},
+    {VS_L_MID_SCL_A, PSED, N_("L Mid SCL A"), VS_L_MID_SCL_A_MULTI, NULL},
+	{VS_R_MID_SCL_A, PSED, N_("R Mid SCL A"), VS_R_MID_SCL_A_MULTI, NULL},
+	{VS_L_PROX_SCL_A, PSED, N_("L Prox SCL A"), VS_L_PROX_SCL_A_MULTI, NULL},
+	{VS_R_PROX_SCL_A, PSED, N_("R Prox SCL A"), VS_R_PROX_SCL_A_MULTI, NULL},
+	{VS_L_MID_SCL_V, PSED, N_("L Mid SCL V"), VS_L_MID_SCL_V_MULTI, NULL},
+	{VS_R_MID_SCL_V, PSED, N_("R Mid SCL V"), VS_R_MID_SCL_V_MULTI, NULL},
+	{VS_L_PROX_SCL_V, PSED, N_("L Prox SCL V"), VS_L_PROX_SCL_V_MULTI, NULL},
 	{VS_R_PROX_SCL_V, PSED, N_("R Prox SCL V"), VS_R_PROX_SCL_V_MULTI, NULL},
-	{VS_L_CFA, RI, N_("L CFA"), VS_L_CFA_MULTI, NULL},  
-	{VS_R_CFA, RI, N_("R CFA"), VS_R_CFA_MULTI, NULL},  
-	{VS_L_CFV, PSED, N_("L CFV"), VS_L_CFV_MULTI, NULL},  
-	{VS_R_CFV, PSED, N_("R CFV"), VS_R_CFV_MULTI, NULL},  
-	{VS_L_COM_ILIAC_A, RI, N_("L Com Iliac A"), VS_L_COM_ILIAC_A_MULTI, NULL},  
-	{VS_R_COM_ILIAC_A, RI, N_("R Com Iliac A"), VS_R_COM_ILIAC_A_MULTI, NULL},  
-	{VS_L_COM_ILIAC_V, PSED, N_("L Com Iliac V"), VS_L_COM_ILIAC_V_MULTI, NULL},  
-	{VS_R_COM_ILIAC_V, PSED, N_("R Com Iliac V"), VS_R_COM_ILIAC_V_MULTI, NULL},  
-	{VS_L_DIST_ATA, RI, N_("L Dist ATA"), VS_L_DIST_ATA_MULTI, NULL},  
-	{VS_R_DIST_ATA, RI, N_("R Dist ATA"), VS_R_DIST_ATA_MULTI, NULL},  
-	{VS_L_MID_ATA, RI, N_("L Mid ATA"), VS_L_MID_ATA_MULTI, NULL},  
-	{VS_R_MID_ATA, RI, N_("R Mid ATA"), VS_R_MID_ATA_MULTI, NULL},  
-	{VS_L_PROX_ATA, RI, N_("L Prox ATA"), VS_L_PROX_ATA_MULTI, NULL},  
-	{VS_R_PROX_ATA, RI, N_("R Prox ATA"), VS_R_PROX_ATA_MULTI, NULL},  
-	{VS_L_DIST_ATV, PSED, N_("L Dist ATV"), VS_L_DIST_ATV_MULTI, NULL},  
-	{VS_R_DIST_ATV, PSED, N_("R Dist ATV"), VS_R_DIST_ATV_MULTI, NULL},  
-	{VS_L_MID_ATV, PSED, N_("L Mid ATV"), VS_L_MID_ATV_MULTI, NULL},  
-	{VS_R_MID_ATV, PSED, N_("R Mid ATV"), VS_R_MID_ATV_MULTI, NULL},  
-	{VS_L_PROX_ATV, PSED, N_("L Prox ATV"), VS_L_PROX_ATV_MULTI, NULL},  
-	{VS_R_PROX_ATV, PSED, N_("R Prox ATV"), VS_R_PROX_ATV_MULTI, NULL},  
-	{VS_L_DIST_GSV_CALF, PSED, N_("L Dist GSV Calf"), VS_L_DIST_GSV_CALF_MULTI, NULL},  
-	{VS_R_DIST_GSV_CALF, PSED, N_("R Dist GSV Calf"), VS_R_DIST_GSV_CALF_MULTI, NULL},  
-	{VS_L_MID_GSV_CALF, PSED, N_("L Mid GSV Calf"), VS_L_MID_GSV_CALF_MULTI, NULL},  
-	{VS_R_MID_GSV_CALF, PSED, N_("R Mid GSV Calf"), VS_R_MID_GSV_CALF_MULTI, NULL},  
-	{VS_L_PROX_GSV_CALF, PSED, N_("L Prox GSV Calf"), VS_L_PROX_GSV_CALF_MULTI, NULL},  
-	{VS_R_PROX_GSV_CALF, PSED, N_("R Prox GSV Calf"), VS_R_PROX_GSV_CALF_MULTI, NULL},  
-	{VS_L_DIST_GSV_THIGH, PSED, N_("L Dist GSV Thigh"), VS_L_DIST_GSV_THIGH_MULTI, NULL},  
-	{VS_R_DIST_GSV_THIGH, PSED, N_("R Dist GSV Thigh"), VS_R_DIST_GSV_THIGH_MULTI, NULL},  
-	{VS_L_MID_GSV_THIGH, PSED, N_("L Mid GSV Thigh"), VS_L_MID_GSV_THIGH_MULTI, NULL},  
-	{VS_R_MID_GSV_THIGH, PSED, N_("R Mid GSV Thigh"), VS_R_MID_GSV_THIGH_MULTI, NULL},  
-	{VS_L_PROX_GSV_THIGH, PSED, N_("L Prox GSV Thigh"), VS_L_PROX_GSV_THIGH_MULTI, NULL},  
-	{VS_R_PROX_GSV_THIGH, PSED, N_("R Prox GSV Thigh"), VS_R_PROX_GSV_THIGH_MULTI, NULL},  
-	{VS_L_DIST_PERO_A, RI, N_("L Dist Pero A"), VS_L_DIST_PERO_A_MULTI, NULL},  
-	{VS_R_DIST_PERO_A, RI, N_("R Dist Pero A"), VS_R_DIST_PERO_A_MULTI, NULL},  
-	{VS_L_MID_PERO_A, RI, N_("L Mid Pero A"), VS_L_MID_PERO_A_MULTI, NULL},  
-	{VS_R_MID_PERO_A, RI, N_("R Mid Pero A"), VS_R_MID_PERO_A_MULTI, NULL},  
-	{VS_L_PROX_PERO_A, RI, N_("L Prox Pero A"), VS_L_PROX_PERO_A_MULTI, NULL},  
-	{VS_R_PROX_PERO_A, RI, N_("R Prox Pero A"), VS_R_PROX_PERO_A_MULTI, NULL},  
-	{VS_L_DIST_PERO_V, PSED, N_("L Dist Pero V"), VS_L_DIST_PERO_V_MULTI, NULL},  
-	{VS_R_DIST_PERO_V, PSED, N_("R Dist Pero V"), VS_R_DIST_PERO_V_MULTI, NULL},  
-	{VS_L_MID_PERO_V, PSED, N_("L Mid Pero V"), VS_L_MID_PERO_V_MULTI, NULL},  
-	{VS_R_MID_PERO_V, PSED, N_("R Mid Pero V"), VS_R_MID_PERO_V_MULTI, NULL},  
-	{VS_L_PROX_PERO_V, PSED, N_("L Prox Pero V"), VS_L_PROX_PERO_V_MULTI, NULL},  
-	{VS_R_PROX_PERO_V, PSED, N_("R Prox Pero V"), VS_R_PROX_PERO_V_MULTI, NULL},  
-	{VS_L_DIST_POP_A, RI, N_("L Dist Pop A"), VS_L_DIST_POP_A_MULTI, NULL},  
-	{VS_R_DIST_POP_A, RI, N_("R Dist Pop A"), VS_R_DIST_POP_A_MULTI, NULL},  
-	{VS_L_MID_POP_A, RI, N_("L Mid Pop A"), VS_L_MID_POP_A_MULTI, NULL},  
-	{VS_R_MID_POP_A, RI, N_("R Mid Pop A"), VS_R_MID_POP_A_MULTI, NULL},  
-	{VS_L_PROX_POP_A, RI, N_("L Prox Pop A"), VS_L_PROX_POP_A_MULTI, NULL},  
-	{VS_R_PROX_POP_A, RI, N_("R Prox Pop A"), VS_R_PROX_POP_A_MULTI, NULL},  
-	{VS_L_DIST_POP_V, PSED, N_("L Dist Pop V"), VS_L_DIST_POP_V_MULTI, NULL},  
-	{VS_R_DIST_POP_V, PSED, N_("R Dist Pop V"), VS_R_DIST_POP_V_MULTI, NULL},  
-	{VS_L_MID_POP_V, PSED, N_("L Mid Pop V"), VS_L_MID_POP_V_MULTI, NULL},  
-	{VS_R_MID_POP_V, PSED, N_("R Mid Pop V"), VS_R_MID_POP_V_MULTI, NULL},  
-	{VS_L_PROX_POP_V, PSED, N_("L Prox Pop V"), VS_L_PROX_POP_V_MULTI, NULL},  
-	{VS_R_PROX_POP_V, PSED, N_("R Prox Pop V"), VS_R_PROX_POP_V_MULTI, NULL},  
-	{VS_L_DIST_PTA, RI, N_("L Dist PTA"), VS_L_DIST_PTA_MULTI, NULL},  
-	{VS_R_DIST_PTA, RI, N_("R Dist PTA"), VS_R_DIST_PTA_MULTI, NULL},  
-	{VS_L_MID_PTA, RI, N_("L Mid PTA"), VS_L_MID_PTA_MULTI, NULL},  
-	{VS_R_MID_PTA, RI, N_("R Mid PTA"), VS_R_MID_PTA_MULTI, NULL},  
-	{VS_L_PROX_PTA, RI, N_("L Prox PTA"), VS_L_PROX_PTA_MULTI, NULL},  
-	{VS_R_PROX_PTA, RI, N_("R Prox PTA"), VS_R_PROX_PTA_MULTI, NULL},  
-	{VS_L_DIST_PTV, PSED, N_("L Dist PTV"), VS_L_DIST_PTV_MULTI, NULL},  
-	{VS_R_DIST_PTV, PSED, N_("R Dist PTV"), VS_R_DIST_PTV_MULTI, NULL},  
-	{VS_L_MID_PTV, PSED, N_("L Mid PTV"), VS_L_MID_PTV_MULTI, NULL},  
-	{VS_R_MID_PTV, PSED, N_("R Mid PTV"), VS_R_MID_PTV_MULTI, NULL},  
-	{VS_L_PROX_PTV, PSED, N_("L Prox PTV"), VS_L_PROX_PTV_MULTI, NULL},  
-	{VS_R_PROX_PTV, PSED, N_("R Prox PTV"), VS_R_PROX_PTV_MULTI, NULL},  
-	{VS_L_DIST_SFA, RI, N_("L Dist SFA"), VS_L_DIST_SFA_MULTI, NULL},  
-	{VS_R_DIST_SFA, RI, N_("R Dist SFA"), VS_R_DIST_SFA_MULTI, NULL},  
-	{VS_L_MID_SFA, RI, N_("L Mid SFA"), VS_L_MID_SFA_MULTI, NULL},  
-	{VS_R_MID_SFA, RI, N_("R Mid SFA"), VS_R_MID_SFA_MULTI, NULL},  
-	{VS_L_PROX_SFA, RI, N_("L Prox SFA"), VS_L_PROX_SFA_MULTI, NULL},  
-	{VS_R_PROX_SFA, RI, N_("R Prox SFA"), VS_R_PROX_SFA_MULTI, NULL},  
-	{VS_L_DIST_SFV, PSED, N_("L Dist SFV"), VS_L_DIST_SFV_MULTI, NULL},  
-	{VS_R_DIST_SFV, PSED, N_("R Dist SFV"), VS_R_DIST_SFV_MULTI, NULL},  
-	{VS_L_MID_SFV, PSED, N_("L Mid SFV"), VS_L_MID_SFV_MULTI, NULL},  
-	{VS_R_MID_SFV, PSED, N_("R Mid SFV"), VS_R_MID_SFV_MULTI, NULL},  
-	{VS_L_PROX_SFV, PSED, N_("L Prox SFV"), VS_L_PROX_SFV_MULTI, NULL},  
-	{VS_R_PROX_SFV, PSED, N_("R Prox SFV"), VS_R_PROX_SFV_MULTI, NULL},  
-	{VS_L_DOR_PEDIS, RI, N_("L Dor Pedis"), VS_L_DOR_PEDIS_MULTI, NULL},  
-	{VS_R_DOR_PEDIS, RI, N_("R Dor Pedis"), VS_R_DOR_PEDIS_MULTI, NULL},  
-	{VS_L_EXT_ILIAC_A, RI, N_("L Ext Iliac A"), VS_L_EXT_ILIAC_A_MULTI, NULL},  
-	{VS_R_EXT_ILIAC_A, RI, N_("R Ext Iliac A"), VS_R_EXT_ILIAC_A_MULTI, NULL},  
-	{VS_L_EXT_ILIAC_V, PSED, N_("L Ext Iliac V"), VS_L_EXT_ILIAC_V_MULTI, NULL},  
-	{VS_R_EXT_ILIAC_V, PSED, N_("R Ext Iliac V"), VS_R_EXT_ILIAC_V_MULTI, NULL},  
-	{VS_L_INT_ILIAC_A, RI, N_("L Int Iliac A"), VS_L_INT_ILIAC_A_MULTI, NULL},  
-	{VS_R_INT_ILIAC_A, RI, N_("R Int Iliac A"), VS_R_INT_ILIAC_A_MULTI, NULL},  
-	{VS_L_INT_ILIAC_V, PSED, N_("L Int Iliac V"), VS_L_INT_ILIAC_V_MULTI, NULL},  
-	{VS_R_INT_ILIAC_V, PSED, N_("R Int Iliac V"), VS_R_INT_ILIAC_V_MULTI, NULL},  
-	{VS_L_LAT_SURAL_V, PSED, N_("L Lat Sural V"), VS_L_LAT_SURAL_V_MULTI, NULL},  
-	{VS_R_LAT_SURAL_V, PSED, N_("R Lat Sural V"), VS_R_LAT_SURAL_V_MULTI, NULL},  
-	{VS_L_PROX_PFA, RI, N_("L Prox PFA"), VS_L_PROX_PFA_MULTI, NULL},  
-	{VS_R_PROX_PFA, RI, N_("R Prox PFA"), VS_R_PROX_PFA_MULTI, NULL},  
-	{VS_L_SFJ, PSED, N_("L SFJ"), VS_L_SFJ_MULTI, NULL},  
-	{VS_R_SFJ, PSED, N_("R SFJ"), VS_R_SFJ_MULTI, NULL},  
-	{VS_L_ANTECUBE, RI, N_("L Antecube"), VS_L_ANTECUBE_MULTI, NULL},  
-	{VS_R_ANTECUBE, RI, N_("R Antecube"), VS_R_ANTECUBE_MULTI, NULL},  
-	{VS_L_AX_A, RI, N_("L Ax A"), VS_L_AX_A_MULTI, NULL},  
-	{VS_R_AX_A, RI, N_("R Ax A"), VS_R_AX_A_MULTI, NULL},  
-	{VS_L_AX_V, PSED, N_("L Ax V"), VS_L_AX_V_MULTI, NULL},  
-	{VS_R_AX_V, PSED, N_("R Ax V"), VS_R_AX_V_MULTI, NULL},  
-	{VS_L_DIST_BASILIC_V, PSED, N_("L Dist Basilic V"), VS_L_DIST_BASILIC_V_MULTI, NULL},  
-	{VS_R_DIST_BASILIC_V, PSED, N_("R Dist Basilic V"), VS_R_DIST_BASILIC_V_MULTI, NULL},  
-	{VS_L_MID_BASILIC_V, PSED, N_("L Mid Basilic V"), VS_L_MID_BASILIC_V_MULTI, NULL},  
-	{VS_R_MID_BASILIC_V, PSED, N_("R Mid Basilic V"), VS_R_MID_BASILIC_V_MULTI, NULL},  
-	{VS_L_PROX_BASILIC_V, PSED, N_("L Prox Basilic V"), VS_L_PROX_BASILIC_V_MULTI, NULL},  
-	{VS_R_PROX_BASILIC_V, PSED, N_("R Prox Basilic V"), VS_R_PROX_BASILIC_V_MULTI, NULL},  
-	{VS_L_DIST_BRACH_A, RI, N_("L Dist Brach A"), VS_L_DIST_BRACH_A_MULTI, NULL},  
-	{VS_R_DIST_BRACH_A, RI, N_("R Dist Brach A"), VS_R_DIST_BRACH_A_MULTI, NULL},  
-	{VS_L_PROX_BRACH_A, RI, N_("L Prox Brach A"), VS_L_PROX_BRACH_A_MULTI, NULL},  
-	{VS_R_PROX_BRACH_A, RI, N_("R Prox Brach A"), VS_R_PROX_BRACH_A_MULTI, NULL},  
-	{VS_L_DIST_BRACH_V, RI, N_("L Dist Brach V"), VS_L_DIST_BRACH_V_MULTI, NULL},  
-	{VS_R_DIST_BRACH_V, RI, N_("R Dist Brach V"), VS_R_DIST_BRACH_V_MULTI, NULL},  
-	{VS_L_PROX_BRACH_V, RI, N_("L Prox Brach V"), VS_L_PROX_BRACH_V_MULTI, NULL},  
-	{VS_R_PROX_BRACH_V, RI, N_("R Prox Brach V"), VS_R_PROX_BRACH_V_MULTI, NULL},  
-	{VS_L_DIST_RAD_A, RI, N_("L Dist Rad A"), VS_L_DIST_RAD_A_MULTI, NULL},  
-	{VS_R_DIST_RAD_A, RI, N_("R Dist Rad A"), VS_R_DIST_RAD_A_MULTI, NULL},  
-	{VS_L_MID_RAD_A, RI, N_("L Mid Rad A"), VS_L_MID_RAD_A_MULTI, NULL},  
-	{VS_R_MID_RAD_A, RI, N_("R Mid Rad A"), VS_R_MID_RAD_A_MULTI, NULL},  
-	{VS_L_PROX_RAD_A, RI, N_("L Prox Rad A"), VS_L_PROX_RAD_A_MULTI, NULL},  
-	{VS_R_PROX_RAD_A, RI, N_("R Prox Rad A"), VS_R_PROX_RAD_A_MULTI, NULL},  
-	{VS_L_DIST_RAD_V, PSED, N_("L Dist Rad V"), VS_L_DIST_RAD_V_MULTI, NULL},  
-	{VS_R_DIST_RAD_V, PSED, N_("R Dist Rad V"), VS_R_DIST_RAD_V_MULTI, NULL},  
-	{VS_L_MID_RAD_V, PSED, N_("L Mid Rad V"), VS_L_MID_RAD_V_MULTI, NULL},  
-	{VS_R_MID_RAD_V, PSED, N_("R Mid Rad V"), VS_R_MID_RAD_V_MULTI, NULL},  
-	{VS_L_PROX_RAD_V, PSED, N_("L Prox Rad V"), VS_L_PROX_RAD_V_MULTI, NULL},  
-	{VS_R_PROX_RAD_V, PSED, N_("R Prox Rad V"), VS_R_PROX_RAD_V_MULTI, NULL},  
-	{VS_L_DIST_ULNAR_A, RI, N_("L Dist Ulnar A"), VS_L_DIST_ULNAR_A_MULTI, NULL},  
-	{VS_R_DIST_ULNAR_A, RI, N_("R Dist Ulnar A"), VS_R_DIST_ULNAR_A_MULTI, NULL},  
-	{VS_L_MID_ULNAR_A, RI, N_("L Mid Ulnar A"), VS_L_MID_ULNAR_A_MULTI, NULL},  
-	{VS_R_MID_ULNAR_A, RI, N_("R Mid Ulnar A"), VS_R_MID_ULNAR_A_MULTI, NULL},  
-	{VS_L_PROX_ULNAR_A, RI, N_("L Prox Ulnar A"), VS_L_PROX_ULNAR_A_MULTI, NULL},  
-	{VS_R_PROX_ULNAR_A, RI, N_("R Prox Ulnar A"), VS_R_PROX_ULNAR_A_MULTI, NULL},  
-	{VS_L_DIST_ULNAR_V, PSED, N_("L Dist Ulnar V"), VS_L_DIST_ULNAR_V_MULTI, NULL},  
-	{VS_R_DIST_ULNAR_V, PSED, N_("R Dist Ulnar V"), VS_R_DIST_ULNAR_V_MULTI, NULL},  
-	{VS_L_MID_ULNAR_V, PSED, N_("L Mid Ulnar V"), VS_L_MID_ULNAR_V_MULTI, NULL},  
-	{VS_R_MID_ULNAR_V, PSED, N_("R Mid Ulnar V"), VS_R_MID_ULNAR_V_MULTI, NULL},  
-	{VS_L_PROX_ULNAR_V, PSED, N_("L Prox Ulnar V"), VS_L_PROX_ULNAR_V_MULTI, NULL},  
-	{VS_R_PROX_ULNAR_V, PSED, N_("R Prox Ulnar V"), VS_R_PROX_ULNAR_V_MULTI, NULL},  
-//	{VS_L_MID_SCL_A, PSED, "L Mid SCL A", VS_L_MID_SCL_A_MULTI, NULL},  
-//	{VS_R_MID_SCL_A, PSED, "R Mid SCL A", VS_R_MID_SCL_A_MULTI, NULL},  
-//	{VS_L_PROX_SCL_A, PSED, "L Prox SCL A", VS_L_PROX_SCL_A_MULTI, NULL},  
-//	{VS_R_PROX_SCL_A, PSED, "R Prox SCL A", VS_R_PROX_SCL_A_MULTI, NULL},  
-//	{VS_L_MID_SCL_V, PSED, "L Mid SCL V", VS_L_MID_SCL_V_MULTI, NULL},  
-//	{VS_R_MID_SCL_V, PSED, "R Mid SCL V", VS_R_MID_SCL_V_MULTI, NULL},  
-//	{VS_L_PROX_SCL_V, PSED, "L Prox SCL V", VS_L_PROX_SCL_V_MULTI, NULL},  
+	{VS_L_CFA, RI, N_("L CFA"), VS_L_CFA_MULTI, NULL},
+	{VS_R_CFA, RI, N_("R CFA"), VS_R_CFA_MULTI, NULL},
+	{VS_L_CFV, PSED, N_("L CFV"), VS_L_CFV_MULTI, NULL},
+	{VS_R_CFV, PSED, N_("R CFV"), VS_R_CFV_MULTI, NULL},
+	{VS_L_COM_ILIAC_A, RI, N_("L Com Iliac A"), VS_L_COM_ILIAC_A_MULTI, NULL},
+	{VS_R_COM_ILIAC_A, RI, N_("R Com Iliac A"), VS_R_COM_ILIAC_A_MULTI, NULL},
+	{VS_L_COM_ILIAC_V, PSED, N_("L Com Iliac V"), VS_L_COM_ILIAC_V_MULTI, NULL},
+	{VS_R_COM_ILIAC_V, PSED, N_("R Com Iliac V"), VS_R_COM_ILIAC_V_MULTI, NULL},
+	{VS_L_DIST_ATA, RI, N_("L Dist ATA"), VS_L_DIST_ATA_MULTI, NULL},
+	{VS_R_DIST_ATA, RI, N_("R Dist ATA"), VS_R_DIST_ATA_MULTI, NULL},
+	{VS_L_MID_ATA, RI, N_("L Mid ATA"), VS_L_MID_ATA_MULTI, NULL},
+	{VS_R_MID_ATA, RI, N_("R Mid ATA"), VS_R_MID_ATA_MULTI, NULL},
+	{VS_L_PROX_ATA, RI, N_("L Prox ATA"), VS_L_PROX_ATA_MULTI, NULL},
+	{VS_R_PROX_ATA, RI, N_("R Prox ATA"), VS_R_PROX_ATA_MULTI, NULL},
+	{VS_L_DIST_ATV, PSED, N_("L Dist ATV"), VS_L_DIST_ATV_MULTI, NULL},
+	{VS_R_DIST_ATV, PSED, N_("R Dist ATV"), VS_R_DIST_ATV_MULTI, NULL},
+	{VS_L_MID_ATV, PSED, N_("L Mid ATV"), VS_L_MID_ATV_MULTI, NULL},
+	{VS_R_MID_ATV, PSED, N_("R Mid ATV"), VS_R_MID_ATV_MULTI, NULL},
+	{VS_L_PROX_ATV, PSED, N_("L Prox ATV"), VS_L_PROX_ATV_MULTI, NULL},
+	{VS_R_PROX_ATV, PSED, N_("R Prox ATV"), VS_R_PROX_ATV_MULTI, NULL},
+	{VS_L_DIST_GSV_CALF, PSED, N_("L Dist GSV Calf"), VS_L_DIST_GSV_CALF_MULTI, NULL},
+	{VS_R_DIST_GSV_CALF, PSED, N_("R Dist GSV Calf"), VS_R_DIST_GSV_CALF_MULTI, NULL},
+	{VS_L_MID_GSV_CALF, PSED, N_("L Mid GSV Calf"), VS_L_MID_GSV_CALF_MULTI, NULL},
+	{VS_R_MID_GSV_CALF, PSED, N_("R Mid GSV Calf"), VS_R_MID_GSV_CALF_MULTI, NULL},
+	{VS_L_PROX_GSV_CALF, PSED, N_("L Prox GSV Calf"), VS_L_PROX_GSV_CALF_MULTI, NULL},
+	{VS_R_PROX_GSV_CALF, PSED, N_("R Prox GSV Calf"), VS_R_PROX_GSV_CALF_MULTI, NULL},
+	{VS_L_DIST_GSV_THIGH, PSED, N_("L Dist GSV Thigh"), VS_L_DIST_GSV_THIGH_MULTI, NULL},
+	{VS_R_DIST_GSV_THIGH, PSED, N_("R Dist GSV Thigh"), VS_R_DIST_GSV_THIGH_MULTI, NULL},
+	{VS_L_MID_GSV_THIGH, PSED, N_("L Mid GSV Thigh"), VS_L_MID_GSV_THIGH_MULTI, NULL},
+	{VS_R_MID_GSV_THIGH, PSED, N_("R Mid GSV Thigh"), VS_R_MID_GSV_THIGH_MULTI, NULL},
+	{VS_L_PROX_GSV_THIGH, PSED, N_("L Prox GSV Thigh"), VS_L_PROX_GSV_THIGH_MULTI, NULL},
+	{VS_R_PROX_GSV_THIGH, PSED, N_("R Prox GSV Thigh"), VS_R_PROX_GSV_THIGH_MULTI, NULL},
+	{VS_L_DIST_PERO_A, RI, N_("L Dist Pero A"), VS_L_DIST_PERO_A_MULTI, NULL},
+	{VS_R_DIST_PERO_A, RI, N_("R Dist Pero A"), VS_R_DIST_PERO_A_MULTI, NULL},
+	{VS_L_MID_PERO_A, RI, N_("L Mid Pero A"), VS_L_MID_PERO_A_MULTI, NULL},
+	{VS_R_MID_PERO_A, RI, N_("R Mid Pero A"), VS_R_MID_PERO_A_MULTI, NULL},
+	{VS_L_PROX_PERO_A, RI, N_("L Prox Pero A"), VS_L_PROX_PERO_A_MULTI, NULL},
+	{VS_R_PROX_PERO_A, RI, N_("R Prox Pero A"), VS_R_PROX_PERO_A_MULTI, NULL},
+	{VS_L_DIST_PERO_V, PSED, N_("L Dist Pero V"), VS_L_DIST_PERO_V_MULTI, NULL},
+	{VS_R_DIST_PERO_V, PSED, N_("R Dist Pero V"), VS_R_DIST_PERO_V_MULTI, NULL},
+	{VS_L_MID_PERO_V, PSED, N_("L Mid Pero V"), VS_L_MID_PERO_V_MULTI, NULL},
+	{VS_R_MID_PERO_V, PSED, N_("R Mid Pero V"), VS_R_MID_PERO_V_MULTI, NULL},
+	{VS_L_PROX_PERO_V, PSED, N_("L Prox Pero V"), VS_L_PROX_PERO_V_MULTI, NULL},
+	{VS_R_PROX_PERO_V, PSED, N_("R Prox Pero V"), VS_R_PROX_PERO_V_MULTI, NULL},
+	{VS_L_DIST_POP_A, RI, N_("L Dist Pop A"), VS_L_DIST_POP_A_MULTI, NULL},
+	{VS_R_DIST_POP_A, RI, N_("R Dist Pop A"), VS_R_DIST_POP_A_MULTI, NULL},
+	{VS_L_MID_POP_A, RI, N_("L Mid Pop A"), VS_L_MID_POP_A_MULTI, NULL},
+	{VS_R_MID_POP_A, RI, N_("R Mid Pop A"), VS_R_MID_POP_A_MULTI, NULL},
+	{VS_L_PROX_POP_A, RI, N_("L Prox Pop A"), VS_L_PROX_POP_A_MULTI, NULL},
+	{VS_R_PROX_POP_A, RI, N_("R Prox Pop A"), VS_R_PROX_POP_A_MULTI, NULL},
+	{VS_L_DIST_POP_V, PSED, N_("L Dist Pop V"), VS_L_DIST_POP_V_MULTI, NULL},
+	{VS_R_DIST_POP_V, PSED, N_("R Dist Pop V"), VS_R_DIST_POP_V_MULTI, NULL},
+	{VS_L_MID_POP_V, PSED, N_("L Mid Pop V"), VS_L_MID_POP_V_MULTI, NULL},
+	{VS_R_MID_POP_V, PSED, N_("R Mid Pop V"), VS_R_MID_POP_V_MULTI, NULL},
+	{VS_L_PROX_POP_V, PSED, N_("L Prox Pop V"), VS_L_PROX_POP_V_MULTI, NULL},
+	{VS_R_PROX_POP_V, PSED, N_("R Prox Pop V"), VS_R_PROX_POP_V_MULTI, NULL},
+	{VS_L_DIST_PTA, RI, N_("L Dist PTA"), VS_L_DIST_PTA_MULTI, NULL},
+	{VS_R_DIST_PTA, RI, N_("R Dist PTA"), VS_R_DIST_PTA_MULTI, NULL},
+	{VS_L_MID_PTA, RI, N_("L Mid PTA"), VS_L_MID_PTA_MULTI, NULL},
+	{VS_R_MID_PTA, RI, N_("R Mid PTA"), VS_R_MID_PTA_MULTI, NULL},
+	{VS_L_PROX_PTA, RI, N_("L Prox PTA"), VS_L_PROX_PTA_MULTI, NULL},
+	{VS_R_PROX_PTA, RI, N_("R Prox PTA"), VS_R_PROX_PTA_MULTI, NULL},
+	{VS_L_DIST_PTV, PSED, N_("L Dist PTV"), VS_L_DIST_PTV_MULTI, NULL},
+	{VS_R_DIST_PTV, PSED, N_("R Dist PTV"), VS_R_DIST_PTV_MULTI, NULL},
+	{VS_L_MID_PTV, PSED, N_("L Mid PTV"), VS_L_MID_PTV_MULTI, NULL},
+	{VS_R_MID_PTV, PSED, N_("R Mid PTV"), VS_R_MID_PTV_MULTI, NULL},
+	{VS_L_PROX_PTV, PSED, N_("L Prox PTV"), VS_L_PROX_PTV_MULTI, NULL},
+	{VS_R_PROX_PTV, PSED, N_("R Prox PTV"), VS_R_PROX_PTV_MULTI, NULL},
+	{VS_L_DIST_SFA, RI, N_("L Dist SFA"), VS_L_DIST_SFA_MULTI, NULL},
+	{VS_R_DIST_SFA, RI, N_("R Dist SFA"), VS_R_DIST_SFA_MULTI, NULL},
+	{VS_L_MID_SFA, RI, N_("L Mid SFA"), VS_L_MID_SFA_MULTI, NULL},
+	{VS_R_MID_SFA, RI, N_("R Mid SFA"), VS_R_MID_SFA_MULTI, NULL},
+	{VS_L_PROX_SFA, RI, N_("L Prox SFA"), VS_L_PROX_SFA_MULTI, NULL},
+	{VS_R_PROX_SFA, RI, N_("R Prox SFA"), VS_R_PROX_SFA_MULTI, NULL},
+	{VS_L_DIST_SFV, PSED, N_("L Dist SFV"), VS_L_DIST_SFV_MULTI, NULL},
+	{VS_R_DIST_SFV, PSED, N_("R Dist SFV"), VS_R_DIST_SFV_MULTI, NULL},
+	{VS_L_MID_SFV, PSED, N_("L Mid SFV"), VS_L_MID_SFV_MULTI, NULL},
+	{VS_R_MID_SFV, PSED, N_("R Mid SFV"), VS_R_MID_SFV_MULTI, NULL},
+	{VS_L_PROX_SFV, PSED, N_("L Prox SFV"), VS_L_PROX_SFV_MULTI, NULL},
+	{VS_R_PROX_SFV, PSED, N_("R Prox SFV"), VS_R_PROX_SFV_MULTI, NULL},
+	{VS_L_DOR_PEDIS, RI, N_("L Dor Pedis"), VS_L_DOR_PEDIS_MULTI, NULL},
+	{VS_R_DOR_PEDIS, RI, N_("R Dor Pedis"), VS_R_DOR_PEDIS_MULTI, NULL},
+	{VS_L_EXT_ILIAC_A, RI, N_("L Ext Iliac A"), VS_L_EXT_ILIAC_A_MULTI, NULL},
+	{VS_R_EXT_ILIAC_A, RI, N_("R Ext Iliac A"), VS_R_EXT_ILIAC_A_MULTI, NULL},
+	{VS_L_EXT_ILIAC_V, PSED, N_("L Ext Iliac V"), VS_L_EXT_ILIAC_V_MULTI, NULL},
+	{VS_R_EXT_ILIAC_V, PSED, N_("R Ext Iliac V"), VS_R_EXT_ILIAC_V_MULTI, NULL},
+	{VS_L_INT_ILIAC_A, RI, N_("L Int Iliac A"), VS_L_INT_ILIAC_A_MULTI, NULL},
+	{VS_R_INT_ILIAC_A, RI, N_("R Int Iliac A"), VS_R_INT_ILIAC_A_MULTI, NULL},
+	{VS_L_INT_ILIAC_V, PSED, N_("L Int Iliac V"), VS_L_INT_ILIAC_V_MULTI, NULL},
+	{VS_R_INT_ILIAC_V, PSED, N_("R Int Iliac V"), VS_R_INT_ILIAC_V_MULTI, NULL},
+	{VS_L_LAT_SURAL_V, PSED, N_("L Lat Sural V"), VS_L_LAT_SURAL_V_MULTI, NULL},
+	{VS_R_LAT_SURAL_V, PSED, N_("R Lat Sural V"), VS_R_LAT_SURAL_V_MULTI, NULL},
+	{VS_L_PROX_PFA, RI, N_("L Prox PFA"), VS_L_PROX_PFA_MULTI, NULL},
+	{VS_R_PROX_PFA, RI, N_("R Prox PFA"), VS_R_PROX_PFA_MULTI, NULL},
+	{VS_L_SFJ, PSED, N_("L SFJ"), VS_L_SFJ_MULTI, NULL},
+	{VS_R_SFJ, PSED, N_("R SFJ"), VS_R_SFJ_MULTI, NULL},
+	{VS_L_ANTECUBE, RI, N_("L Antecube"), VS_L_ANTECUBE_MULTI, NULL},
+	{VS_R_ANTECUBE, RI, N_("R Antecube"), VS_R_ANTECUBE_MULTI, NULL},
+	{VS_L_AX_A, RI, N_("L Ax A"), VS_L_AX_A_MULTI, NULL},
+	{VS_R_AX_A, RI, N_("R Ax A"), VS_R_AX_A_MULTI, NULL},
+	{VS_L_AX_V, PSED, N_("L Ax V"), VS_L_AX_V_MULTI, NULL},
+	{VS_R_AX_V, PSED, N_("R Ax V"), VS_R_AX_V_MULTI, NULL},
+	{VS_L_DIST_BASILIC_V, PSED, N_("L Dist Basilic V"), VS_L_DIST_BASILIC_V_MULTI, NULL},
+	{VS_R_DIST_BASILIC_V, PSED, N_("R Dist Basilic V"), VS_R_DIST_BASILIC_V_MULTI, NULL},
+	{VS_L_MID_BASILIC_V, PSED, N_("L Mid Basilic V"), VS_L_MID_BASILIC_V_MULTI, NULL},
+	{VS_R_MID_BASILIC_V, PSED, N_("R Mid Basilic V"), VS_R_MID_BASILIC_V_MULTI, NULL},
+	{VS_L_PROX_BASILIC_V, PSED, N_("L Prox Basilic V"), VS_L_PROX_BASILIC_V_MULTI, NULL},
+	{VS_R_PROX_BASILIC_V, PSED, N_("R Prox Basilic V"), VS_R_PROX_BASILIC_V_MULTI, NULL},
+	{VS_L_DIST_BRACH_A, RI, N_("L Dist Brach A"), VS_L_DIST_BRACH_A_MULTI, NULL},
+	{VS_R_DIST_BRACH_A, RI, N_("R Dist Brach A"), VS_R_DIST_BRACH_A_MULTI, NULL},
+	{VS_L_PROX_BRACH_A, RI, N_("L Prox Brach A"), VS_L_PROX_BRACH_A_MULTI, NULL},
+	{VS_R_PROX_BRACH_A, RI, N_("R Prox Brach A"), VS_R_PROX_BRACH_A_MULTI, NULL},
+	{VS_L_DIST_BRACH_V, RI, N_("L Dist Brach V"), VS_L_DIST_BRACH_V_MULTI, NULL},
+	{VS_R_DIST_BRACH_V, RI, N_("R Dist Brach V"), VS_R_DIST_BRACH_V_MULTI, NULL},
+	{VS_L_PROX_BRACH_V, RI, N_("L Prox Brach V"), VS_L_PROX_BRACH_V_MULTI, NULL},
+	{VS_R_PROX_BRACH_V, RI, N_("R Prox Brach V"), VS_R_PROX_BRACH_V_MULTI, NULL},
+	{VS_L_DIST_RAD_A, RI, N_("L Dist Rad A"), VS_L_DIST_RAD_A_MULTI, NULL},
+	{VS_R_DIST_RAD_A, RI, N_("R Dist Rad A"), VS_R_DIST_RAD_A_MULTI, NULL},
+	{VS_L_MID_RAD_A, RI, N_("L Mid Rad A"), VS_L_MID_RAD_A_MULTI, NULL},
+	{VS_R_MID_RAD_A, RI, N_("R Mid Rad A"), VS_R_MID_RAD_A_MULTI, NULL},
+	{VS_L_PROX_RAD_A, RI, N_("L Prox Rad A"), VS_L_PROX_RAD_A_MULTI, NULL},
+	{VS_R_PROX_RAD_A, RI, N_("R Prox Rad A"), VS_R_PROX_RAD_A_MULTI, NULL},
+	{VS_L_DIST_RAD_V, PSED, N_("L Dist Rad V"), VS_L_DIST_RAD_V_MULTI, NULL},
+	{VS_R_DIST_RAD_V, PSED, N_("R Dist Rad V"), VS_R_DIST_RAD_V_MULTI, NULL},
+	{VS_L_MID_RAD_V, PSED, N_("L Mid Rad V"), VS_L_MID_RAD_V_MULTI, NULL},
+	{VS_R_MID_RAD_V, PSED, N_("R Mid Rad V"), VS_R_MID_RAD_V_MULTI, NULL},
+	{VS_L_PROX_RAD_V, PSED, N_("L Prox Rad V"), VS_L_PROX_RAD_V_MULTI, NULL},
+	{VS_R_PROX_RAD_V, PSED, N_("R Prox Rad V"), VS_R_PROX_RAD_V_MULTI, NULL},
+	{VS_L_DIST_ULNAR_A, RI, N_("L Dist Ulnar A"), VS_L_DIST_ULNAR_A_MULTI, NULL},
+	{VS_R_DIST_ULNAR_A, RI, N_("R Dist Ulnar A"), VS_R_DIST_ULNAR_A_MULTI, NULL},
+	{VS_L_MID_ULNAR_A, RI, N_("L Mid Ulnar A"), VS_L_MID_ULNAR_A_MULTI, NULL},
+	{VS_R_MID_ULNAR_A, RI, N_("R Mid Ulnar A"), VS_R_MID_ULNAR_A_MULTI, NULL},
+	{VS_L_PROX_ULNAR_A, RI, N_("L Prox Ulnar A"), VS_L_PROX_ULNAR_A_MULTI, NULL},
+	{VS_R_PROX_ULNAR_A, RI, N_("R Prox Ulnar A"), VS_R_PROX_ULNAR_A_MULTI, NULL},
+	{VS_L_DIST_ULNAR_V, PSED, N_("L Dist Ulnar V"), VS_L_DIST_ULNAR_V_MULTI, NULL},
+	{VS_R_DIST_ULNAR_V, PSED, N_("R Dist Ulnar V"), VS_R_DIST_ULNAR_V_MULTI, NULL},
+	{VS_L_MID_ULNAR_V, PSED, N_("L Mid Ulnar V"), VS_L_MID_ULNAR_V_MULTI, NULL},
+	{VS_R_MID_ULNAR_V, PSED, N_("R Mid Ulnar V"), VS_R_MID_ULNAR_V_MULTI, NULL},
+	{VS_L_PROX_ULNAR_V, PSED, N_("L Prox Ulnar V"), VS_L_PROX_ULNAR_V_MULTI, NULL},
+	{VS_R_PROX_ULNAR_V, PSED, N_("R Prox Ulnar V"), VS_R_PROX_ULNAR_V_MULTI, NULL},
+//	{VS_L_MID_SCL_A, PSED, "L Mid SCL A", VS_L_MID_SCL_A_MULTI, NULL},
+//	{VS_R_MID_SCL_A, PSED, "R Mid SCL A", VS_R_MID_SCL_A_MULTI, NULL},
+//	{VS_L_PROX_SCL_A, PSED, "L Prox SCL A", VS_L_PROX_SCL_A_MULTI, NULL},
+//	{VS_R_PROX_SCL_A, PSED, "R Prox SCL A", VS_R_PROX_SCL_A_MULTI, NULL},
+//	{VS_L_MID_SCL_V, PSED, "L Mid SCL V", VS_L_MID_SCL_V_MULTI, NULL},
+//	{VS_R_MID_SCL_V, PSED, "R Mid SCL V", VS_R_MID_SCL_V_MULTI, NULL},
+//	{VS_L_PROX_SCL_V, PSED, "L Prox SCL V", VS_L_PROX_SCL_V_MULTI, NULL},
 //	{VS_R_PROX_SCL_V, PSED, "R Prox SCL V", VS_R_PROX_SCL_V_MULTI, NULL},
 };
 
 /*
- *VS和TCD是以有多项测量的测量项为主的科别，在VSMultiInfo和TCDMultiInfo中，如果某项是单项测量，
- *则titleUnit[MEA_MULTI-1].unitItem存储此单项测量的枚举号，程序根据此枚举号寻找它在VSInfo中的位置
+ *VS鍜孴CD鏄互鏈夊椤规祴閲忕殑娴嬮噺椤逛负涓荤殑绉戝埆锛屽湪VSMultiInfo鍜孴CDMultiInfo涓紝濡傛灉鏌愰」鏄崟椤规祴閲忥紝
+ *鍒檛itleUnit[MEA_MULTI-1].unitItem瀛樺偍姝ゅ崟椤规祴閲忕殑鏋氫妇鍙凤紝绋嬪簭鏍规嵁姝ゆ灇涓惧彿瀵绘壘瀹冨湪VSInfo涓殑浣嶇疆
  * */
 const MultiItemInfo VSMultiInfo[] = {
 	{VS_L_CCA, VS_L_CCA_MULTI, PSED, "L CCA", PsEdInfo, &VSLIcaCcaCalc},
-	{VS_R_CCA, VS_R_CCA_MULTI, PSED, "R CCA", PsEdInfo, &VSRIcaCcaCalc},  
-	{VS_L_DIST_CCA, VS_L_DIST_CCA_MULTI, PSED, "L Dist CCA", PsEdInfo, NULL},  
-	{VS_R_DIST_CCA, VS_R_DIST_CCA_MULTI, PSED, "R Dist CCA", PsEdInfo, NULL},  
-	{VS_L_MID_CCA, VS_L_MID_CCA_MULTI, PSED, "L Mid CCA", PsEdInfo, NULL},  
-	{VS_R_MID_CCA, VS_R_MID_CCA_MULTI, PSED, "R Mid CCA", PsEdInfo, NULL},  
-	{VS_L_PROX_CCA, VS_L_PROX_CCA_MULTI, PSED, "L Prox CCA", PsEdInfo, NULL},  
-	{VS_R_PROX_CCA, VS_R_PROX_CCA_MULTI, PSED, "R Prox CCA", PsEdInfo, NULL},  
-	{VS_L_ICA, VS_L_ICA_MULTI, PSED, "L ICA", PsEdInfo,  &VSLIcaCcaCalc},  //所有ICA的测量文档上写的都是Vel测量，实际上动脉不应该只测一个速度，在纸质资料上漏写了，所以误认为只有速度测量
-	{VS_R_ICA, VS_R_ICA_MULTI, PSED, "R ICA", PsEdInfo, &VSRIcaCcaCalc},  
-	{VS_L_DIST_ICA, VS_L_DIST_ICA_MULTI, PSED, "L Dist ICA", PsEdInfo, NULL},  
-	{VS_R_DIST_ICA, VS_R_DIST_ICA_MULTI, PSED, "R Dist ICA", PsEdInfo, NULL},  
-	{VS_L_MID_ICA, VS_L_MID_ICA_MULTI, PSED, "L Mid ICA", PsEdInfo, NULL},  
-	{VS_R_MID_ICA, VS_R_MID_ICA_MULTI, PSED, "R Mid ICA", PsEdInfo, NULL},  
-	{VS_L_PROX_ICA, VS_L_PROX_ICA_MULTI, PSED, "L Prox ICA", PsEdInfo, NULL},  
-	{VS_R_PROX_ICA, VS_R_PROX_ICA_MULTI, PSED, "R Prox ICA", PsEdInfo, NULL},  
-	{VS_L_DIST_LSV, VS_L_DIST_LSV_MULTI, PSED, "L Dist LSV", PsEdInfo, NULL},  
-	{VS_R_DIST_LSV, VS_R_DIST_LSV_MULTI, PSED, "R Dist LSV", PsEdInfo, NULL},  
-	{VS_L_MID_LSV, VS_L_MID_LSV_MULTI, PSED, "L Mid LSV", PsEdInfo, NULL},  
-	{VS_R_MID_LSV, VS_R_MID_LSV_MULTI, PSED, "R Mid LSV", PsEdInfo, NULL},  
-	{VS_L_PROX_LSV, VS_L_PROX_LSV_MULTI, PSED, "L Prox LSV", PsEdInfo, NULL},  
-	{VS_R_PROX_LSV, VS_R_PROX_LSV_MULTI, PSED, "R Prox LSV", PsEdInfo, NULL},  
-	{VS_L_DIST_CEPH_V, VS_L_DIST_CEPH_V_MULTI, PSED, "L Dist Ceph V", PsEdInfo, NULL},  
-	{VS_R_DIST_CEPH_V, VS_R_DIST_CEPH_V_MULTI, PSED, "R Dist Ceph V", PsEdInfo, NULL},  
-	{VS_L_MID_CEPH_V, VS_L_MID_CEPH_V_MULTI, PSED, "L Mid Ceph V", PsEdInfo, NULL},  
-	{VS_R_MID_CEPH_V, VS_R_MID_CEPH_V_MULTI, PSED, "R Mid Ceph V", PsEdInfo, NULL},  
-	{VS_L_PROX_CEPH_V, VS_L_PROX_CEPH_V_MULTI, PSED, "L Prox Ceph V", PsEdInfo, NULL},  
-	{VS_R_PROX_CEPH_V, VS_R_PROX_CEPH_V_MULTI, PSED, "R Prox Ceph V", PsEdInfo, NULL},  
-	{VS_L_PROX_ECA, VS_L_PROX_ECA_MULTI, PSED, "L Prox ECA", PsEdInfo, NULL},  
-	{VS_R_PROX_ECA, VS_R_PROX_ECA_MULTI, PSED, "R Prox ECA", PsEdInfo, NULL},  
-	{VS_L_BRACHIOCEPH_A, VS_L_BRACHIOCEPH_A_MULTI, PSED, "L Brachioceph A", PsEdInfo, NULL},  
-	{VS_R_BRACHIOCEPH_A, VS_R_BRACHIOCEPH_A_MULTI, PSED, "R Brachioceph A", PsEdInfo, NULL},  
-	{VS_L_BRACHIOCEPH_V, VS_L_BRACHIOCEPH_V_MULTI, PSED, "L Brachioceph V", PsEdInfo, NULL},  
-	{VS_R_BRACHIOCEPH_V, VS_R_BRACHIOCEPH_V_MULTI, PSED, "R Brachioceph V", PsEdInfo, NULL},  
-	{VS_L_BULB, VS_L_BULB_MULTI, PSED, "L Bulb", PsEdInfo, NULL},  
-	{VS_R_BULB, VS_R_BULB_MULTI, PSED, "R Bulb", PsEdInfo, NULL},  
-	{VS_L_VERTEBRAL_A, VS_L_VERTEBRAL_A_MULTI, PSED, "L Vertebral A", PsEdInfo, NULL},  
-	{VS_R_VERTEBRAL_A, VS_R_VERTEBRAL_A_MULTI, PSED, "R Vertebral A", PsEdInfo, NULL},  
-	{VS_L_IJV, VS_L_IJV_MULTI, PSED, "L IJV", PsEdInfo, NULL},  
-	{VS_R_IJV, VS_R_IJV_MULTI, PSED, "R IJV", PsEdInfo, NULL},  
-	{VS_L_CFA, VS_L_CFA_MULTI, RI, "L CFA", RiInfo, NULL},  
-	{VS_R_CFA, VS_R_CFA_MULTI, RI, "R CFA", RiInfo, NULL},  
-	{VS_L_CFV, VS_L_CFV_MULTI, PSED, "L CFV", PsEdInfo, NULL},  
-	{VS_R_CFV, VS_R_CFV_MULTI, PSED, "R CFV", PsEdInfo, NULL},  
-	{VS_L_COM_ILIAC_A, VS_L_COM_ILIAC_A_MULTI, RI, "L Com Iliac A", RiInfo, NULL},  
-	{VS_R_COM_ILIAC_A, VS_R_COM_ILIAC_A_MULTI, RI, "R Com Iliac A", RiInfo, NULL},  
-	{VS_L_COM_ILIAC_V, VS_L_COM_ILIAC_V_MULTI, PSED, "L Com Iliac V", PsEdInfo, NULL},  
-	{VS_R_COM_ILIAC_V, VS_R_COM_ILIAC_V_MULTI, PSED, "R Com Iliac V", PsEdInfo, NULL},  
-	{VS_L_DIST_ATA, VS_L_DIST_ATA_MULTI, RI, "L Dist ATA", RiInfo, NULL},  
-	{VS_R_DIST_ATA, VS_R_DIST_ATA_MULTI, RI, "R Dist ATA", RiInfo, NULL},  
-	{VS_L_MID_ATA, VS_L_MID_ATA_MULTI, RI, "L Mid ATA", RiInfo, NULL},  
-	{VS_R_MID_ATA, VS_R_MID_ATA_MULTI, RI, "R Mid ATA", RiInfo, NULL},  
-	{VS_L_PROX_ATA, VS_L_PROX_ATA_MULTI, RI, "L Prox ATA", RiInfo, NULL},  
-	{VS_R_PROX_ATA, VS_R_PROX_ATA_MULTI, RI, "R Prox ATA", RiInfo, NULL},  
-	{VS_L_DIST_ATV, VS_L_DIST_ATV_MULTI, PSED, "L Dist ATV", PsEdInfo, NULL},  
-	{VS_R_DIST_ATV, VS_R_DIST_ATV_MULTI, PSED, "R Dist ATV", PsEdInfo, NULL},  
-	{VS_L_MID_ATV, VS_L_MID_ATV_MULTI, PSED, "L Mid ATV", PsEdInfo, NULL},  
-	{VS_R_MID_ATV, VS_R_MID_ATV_MULTI, PSED, "R Mid ATV", PsEdInfo, NULL},  
-	{VS_L_PROX_ATV, VS_L_PROX_ATV_MULTI, PSED, "L Prox ATV", PsEdInfo, NULL},  
-	{VS_R_PROX_ATV, VS_R_PROX_ATV_MULTI, PSED, "R Prox ATV", PsEdInfo, NULL},  
-	{VS_L_DIST_GSV_CALF, VS_L_DIST_GSV_CALF_MULTI, PSED, "L Dist GSV Calf", PsEdInfo, NULL},  
-	{VS_R_DIST_GSV_CALF, VS_R_DIST_GSV_CALF_MULTI, PSED, "R Dist GSV Calf", PsEdInfo, NULL},  
-	{VS_L_MID_GSV_CALF, VS_L_MID_GSV_CALF_MULTI, PSED, "L Mid GSV Calf", PsEdInfo, NULL},  
-	{VS_R_MID_GSV_CALF, VS_R_MID_GSV_CALF_MULTI, PSED, "R Mid GSV Calf", PsEdInfo, NULL},  
-	{VS_L_PROX_GSV_CALF, VS_L_PROX_GSV_CALF_MULTI, PSED, "L Prox GSV Calf", PsEdInfo, NULL},  
-	{VS_R_PROX_GSV_CALF, VS_R_PROX_GSV_CALF_MULTI, PSED, "R Prox GSV Calf", PsEdInfo, NULL},  
-	{VS_L_DIST_GSV_THIGH, VS_L_DIST_GSV_THIGH_MULTI, PSED, "L Dist GSV Thigh", PsEdInfo, NULL},  
-	{VS_R_DIST_GSV_THIGH, VS_R_DIST_GSV_THIGH_MULTI, PSED, "R Dist GSV Thigh", PsEdInfo, NULL},  
-	{VS_L_MID_GSV_THIGH, VS_L_MID_GSV_THIGH_MULTI, PSED, "L Mid GSV Thigh", PsEdInfo, NULL},  
-	{VS_R_MID_GSV_THIGH, VS_R_MID_GSV_THIGH_MULTI, PSED, "R Mid GSV Thigh", PsEdInfo, NULL},  
-	{VS_L_PROX_GSV_THIGH, VS_L_PROX_GSV_THIGH_MULTI, PSED, "L Prox GSV Thigh", PsEdInfo, NULL},  
-	{VS_R_PROX_GSV_THIGH, VS_R_PROX_GSV_THIGH_MULTI, PSED, "R Prox GSV Thigh", PsEdInfo, NULL},  
-	{VS_L_DIST_PERO_A, VS_L_DIST_PERO_A_MULTI, RI, "L Dist Pero A", RiInfo, NULL},  
-	{VS_R_DIST_PERO_A, VS_R_DIST_PERO_A_MULTI, RI, "R Dist Pero A", RiInfo, NULL},  
-	{VS_L_MID_PERO_A, VS_L_MID_PERO_A_MULTI, RI, "L Mid Pero A", RiInfo, NULL},  
-	{VS_R_MID_PERO_A, VS_R_MID_PERO_A_MULTI, RI, "R Mid Pero A", RiInfo, NULL},  
-	{VS_L_PROX_PERO_A, VS_L_PROX_PERO_A_MULTI, RI, "L Prox Pero A", RiInfo, NULL},  
-	{VS_R_PROX_PERO_A, VS_R_PROX_PERO_A_MULTI, RI, "R Prox Pero A", RiInfo, NULL},  
-	{VS_L_DIST_PERO_V, VS_L_DIST_PERO_V_MULTI, PSED, "L Dist Pero V", PsEdInfo, NULL},  
-	{VS_R_DIST_PERO_V, VS_R_DIST_PERO_V_MULTI, PSED, "R Dist Pero V", PsEdInfo, NULL},  
-	{VS_L_MID_PERO_V, VS_L_MID_PERO_V_MULTI, PSED, "L Mid Pero V", PsEdInfo, NULL},  
-	{VS_R_MID_PERO_V, VS_R_MID_PERO_V_MULTI, PSED, "R Mid Pero V", PsEdInfo, NULL},  
-	{VS_L_PROX_PERO_V, VS_L_PROX_PERO_V_MULTI, PSED, "L Prox Pero V", PsEdInfo, NULL},  
-	{VS_R_PROX_PERO_V, VS_R_PROX_PERO_V_MULTI, PSED, "R Prox Pero V", PsEdInfo, NULL},  
-	{VS_L_DIST_POP_A, VS_L_DIST_POP_A_MULTI, RI, "L Dist Pop A", RiInfo, NULL},  
-	{VS_R_DIST_POP_A, VS_R_DIST_POP_A_MULTI, RI, "R Dist Pop A", RiInfo, NULL},  
-	{VS_L_MID_POP_A, VS_L_MID_POP_A_MULTI, RI, "L Mid Pop A", RiInfo, NULL},  
-	{VS_R_MID_POP_A, VS_R_MID_POP_A_MULTI, RI, "R Mid Pop A", RiInfo, NULL},  
-	{VS_L_PROX_POP_A, VS_L_PROX_POP_A_MULTI, RI, "L Prox Pop A", RiInfo, NULL},  
-	{VS_R_PROX_POP_A, VS_R_PROX_POP_A_MULTI, RI, "R Prox Pop A", RiInfo, NULL},  
-	{VS_L_DIST_POP_V, VS_L_DIST_POP_V_MULTI, PSED, "L Dist Pop V", PsEdInfo, NULL},  
-	{VS_R_DIST_POP_V, VS_R_DIST_POP_V_MULTI, PSED, "R Dist Pop V", PsEdInfo, NULL},  
-	{VS_L_MID_POP_V, VS_L_MID_POP_V_MULTI, PSED, "L Mid Pop V", PsEdInfo, NULL},  
-	{VS_R_MID_POP_V, VS_R_MID_POP_V_MULTI, PSED, "R Mid Pop V", PsEdInfo, NULL},  
-	{VS_L_PROX_POP_V, VS_L_PROX_POP_V_MULTI, PSED, "L Prox Pop V", PsEdInfo, NULL},  
-	{VS_R_PROX_POP_V, VS_R_PROX_POP_V_MULTI, PSED, "R Prox Pop V", PsEdInfo, NULL},  
-	{VS_L_DIST_PTA, VS_L_DIST_PTA_MULTI, RI, "L Dist PTA", RiInfo, NULL},  
-	{VS_R_DIST_PTA, VS_R_DIST_PTA_MULTI, RI, "R Dist PTA", RiInfo, NULL},  
-	{VS_L_MID_PTA, VS_L_MID_PTA_MULTI, RI, "L Mid PTA", RiInfo, NULL},  
-	{VS_R_MID_PTA, VS_R_MID_PTA_MULTI, RI, "R Mid PTA", RiInfo, NULL},  
-	{VS_L_PROX_PTA, VS_L_PROX_PTA_MULTI, RI, "L Prox PTA", RiInfo, NULL},  
-	{VS_R_PROX_PTA, VS_R_PROX_PTA_MULTI, RI, "R Prox PTA", RiInfo, NULL},  
-	{VS_L_DIST_PTV, VS_L_DIST_PTV_MULTI, PSED, "L Dist PTV", PsEdInfo, NULL},  
-	{VS_R_DIST_PTV, VS_R_DIST_PTV_MULTI, PSED, "R Dist PTV", PsEdInfo, NULL},  
-	{VS_L_MID_PTV, VS_L_MID_PTV_MULTI, PSED, "L Mid PTV", PsEdInfo, NULL},  
-	{VS_R_MID_PTV, VS_R_MID_PTV_MULTI, PSED, "R Mid PTV", PsEdInfo, NULL},  
-	{VS_L_PROX_PTV, VS_L_PROX_PTV_MULTI, PSED, "L Prox PTV", PsEdInfo, NULL},  
-	{VS_R_PROX_PTV, VS_R_PROX_PTV_MULTI, PSED, "R Prox PTV", PsEdInfo, NULL},  
-	{VS_L_DIST_SFA, VS_L_DIST_SFA_MULTI, RI, "L Dist SFA", RiInfo, NULL},  
-	{VS_R_DIST_SFA, VS_R_DIST_SFA_MULTI, RI, "R Dist SFA", RiInfo, NULL},  
-	{VS_L_MID_SFA, VS_L_MID_SFA_MULTI, RI, "L Mid SFA", RiInfo, NULL},  
-	{VS_R_MID_SFA, VS_R_MID_SFA_MULTI, RI, "R Mid SFA", RiInfo, NULL},  
-	{VS_L_PROX_SFA, VS_L_PROX_SFA_MULTI, RI, "L Prox SFA", RiInfo, NULL},  
-	{VS_R_PROX_SFA, VS_R_PROX_SFA_MULTI, RI, "R Prox SFA", RiInfo, NULL},  
-	{VS_L_DIST_SFV, VS_L_DIST_SFV_MULTI, PSED, "L Dist SFV", PsEdInfo, NULL},  
-	{VS_R_DIST_SFV, VS_R_DIST_SFV_MULTI, PSED, "R Dist SFV", PsEdInfo, NULL},  
-	{VS_L_MID_SFV, VS_L_MID_SFV_MULTI, PSED, "L Mid SFV", PsEdInfo, NULL},  
-	{VS_R_MID_SFV, VS_R_MID_SFV_MULTI, PSED, "R Mid SFV", PsEdInfo, NULL},  
-	{VS_L_PROX_SFV, VS_L_PROX_SFV_MULTI, PSED, "L Prox SFV", PsEdInfo, NULL},  
-	{VS_R_PROX_SFV, VS_R_PROX_SFV_MULTI, PSED, "R Prox SFV", PsEdInfo, NULL},  
-	{VS_L_DOR_PEDIS, VS_L_DOR_PEDIS_MULTI, RI, "L Dor Pedis", RiInfo, NULL},  
-	{VS_R_DOR_PEDIS, VS_R_DOR_PEDIS_MULTI, RI, "R Dor Pedis", RiInfo, NULL},  
-	{VS_L_EXT_ILIAC_A, VS_L_EXT_ILIAC_A_MULTI, RI, "L Ext Iliac A", RiInfo, NULL},  
-	{VS_R_EXT_ILIAC_A, VS_R_EXT_ILIAC_A_MULTI, RI, "R Ext Iliac A", RiInfo, NULL},  
-	{VS_L_EXT_ILIAC_V, VS_L_EXT_ILIAC_V_MULTI, PSED, "L Ext Iliac V", PsEdInfo, NULL},  
-	{VS_R_EXT_ILIAC_V, VS_R_EXT_ILIAC_V_MULTI, PSED, "R Ext Iliac V", PsEdInfo, NULL},  
-	{VS_L_INT_ILIAC_A, VS_L_INT_ILIAC_A_MULTI, RI, "L Int Iliac A", RiInfo, NULL},  
-	{VS_R_INT_ILIAC_A, VS_R_INT_ILIAC_A_MULTI, RI, "R Int Iliac A", RiInfo, NULL},  
-	{VS_L_INT_ILIAC_V, VS_L_INT_ILIAC_V_MULTI, PSED, "L Int Iliac V", PsEdInfo, NULL},  
-	{VS_R_INT_ILIAC_V, VS_R_INT_ILIAC_V_MULTI, PSED, "R Int Iliac V", PsEdInfo, NULL},  
-	{VS_L_LAT_SURAL_V, VS_L_LAT_SURAL_V_MULTI, PSED, "L Lat Sural V", PsEdInfo, NULL},  
-	{VS_R_LAT_SURAL_V, VS_R_LAT_SURAL_V_MULTI, PSED, "R Lat Sural V", PsEdInfo, NULL},  
-	{VS_L_PROX_PFA, VS_L_PROX_PFA_MULTI, RI, "L Prox PFA", RiInfo, NULL},  
-	{VS_R_PROX_PFA, VS_R_PROX_PFA_MULTI, RI, "R Prox PFA", RiInfo, NULL},  
-	{VS_L_SFJ, VS_L_SFJ_MULTI, PSED, "L SFJ", PsEdInfo, NULL},  
-	{VS_R_SFJ, VS_R_SFJ_MULTI, PSED, "R SFJ", PsEdInfo, NULL},  
-	{VS_L_ANTECUBE, VS_L_ANTECUBE_MULTI, RI, "L Antecube", RiInfo, NULL},  
-	{VS_R_ANTECUBE, VS_R_ANTECUBE_MULTI, RI, "R Antecube", RiInfo, NULL},  
-	{VS_L_AX_A, VS_L_AX_A_MULTI, RI, "L Ax A", RiInfo, NULL},  
-	{VS_R_AX_A, VS_R_AX_A_MULTI, RI, "R Ax A", RiInfo, NULL},  
-	{VS_L_AX_V, VS_L_AX_V_MULTI, PSED, "L Ax V", PsEdInfo, NULL},  
-	{VS_R_AX_V, VS_R_AX_V_MULTI, PSED, "R Ax V", PsEdInfo, NULL},  
-	{VS_L_DIST_BASILIC_V, VS_L_DIST_BASILIC_V_MULTI, PSED, "L Dist Basilic V", PsEdInfo, NULL},  
-	{VS_R_DIST_BASILIC_V, VS_R_DIST_BASILIC_V_MULTI, PSED, "R Dist Basilic V", PsEdInfo, NULL},  
-	{VS_L_MID_BASILIC_V, VS_L_MID_BASILIC_V_MULTI, PSED, "L Mid Basilic V", PsEdInfo, NULL},  
-	{VS_R_MID_BASILIC_V, VS_R_MID_BASILIC_V_MULTI, PSED, "R Mid Basilic V", PsEdInfo, NULL},  
-	{VS_L_PROX_BASILIC_V, VS_L_PROX_BASILIC_V_MULTI, PSED, "L Prox Basilic V", PsEdInfo, NULL},  
-	{VS_R_PROX_BASILIC_V, VS_R_PROX_BASILIC_V_MULTI, PSED, "R Prox Basilic V", PsEdInfo, NULL},  
-	{VS_L_DIST_BRACH_A, VS_L_DIST_BRACH_A_MULTI, RI, "L Dist Brach A", RiInfo, NULL},  
-	{VS_R_DIST_BRACH_A, VS_R_DIST_BRACH_A_MULTI, RI, "R Dist Brach A", RiInfo, NULL},  
-	{VS_L_PROX_BRACH_A, VS_L_PROX_BRACH_A_MULTI, RI, "L Prox Brach A", RiInfo, NULL},  
-	{VS_R_PROX_BRACH_A, VS_R_PROX_BRACH_A_MULTI, RI, "R Prox Brach A", RiInfo, NULL},  
-	{VS_L_DIST_BRACH_V, VS_L_DIST_BRACH_V_MULTI, RI, "L Dist Brach V", RiInfo, NULL},  
-	{VS_R_DIST_BRACH_V, VS_R_DIST_BRACH_V_MULTI, RI, "R Dist Brach V", RiInfo, NULL},  
-	{VS_L_PROX_BRACH_V, VS_L_PROX_BRACH_V_MULTI, RI, "L Prox Brach V", RiInfo, NULL},  
-	{VS_R_PROX_BRACH_V, VS_R_PROX_BRACH_V_MULTI, RI, "R Prox Brach V", RiInfo, NULL},  
-	{VS_L_DIST_RAD_A, VS_L_DIST_RAD_A_MULTI, RI, "L Dist Rad A", RiInfo, NULL},  
-	{VS_R_DIST_RAD_A, VS_R_DIST_RAD_A_MULTI, RI, "R Dist Rad A", RiInfo, NULL},  
-	{VS_L_MID_RAD_A, VS_L_MID_RAD_A_MULTI, RI, "L Mid Rad A", RiInfo, NULL},  
-	{VS_R_MID_RAD_A, VS_R_MID_RAD_A_MULTI, RI, "R Mid Rad A", RiInfo, NULL},  
-	{VS_L_PROX_RAD_A, VS_L_PROX_RAD_A_MULTI, RI, "L Prox Rad A", RiInfo, NULL},  
-	{VS_R_PROX_RAD_A, VS_R_PROX_RAD_A_MULTI, RI, "R Prox Rad A", RiInfo, NULL},  
-	{VS_L_DIST_RAD_V, VS_L_DIST_RAD_V_MULTI, PSED, "L Dist Rad V", PsEdInfo, NULL},  
-	{VS_R_DIST_RAD_V, VS_R_DIST_RAD_V_MULTI, PSED, "R Dist Rad V", PsEdInfo, NULL},  
-	{VS_L_MID_RAD_V, VS_L_MID_RAD_V_MULTI, PSED, "L Mid Rad V", PsEdInfo, NULL},  
-	{VS_R_MID_RAD_V, VS_R_MID_RAD_V_MULTI, PSED, "R Mid Rad V", PsEdInfo, NULL},  
-	{VS_L_PROX_RAD_V, VS_L_PROX_RAD_V_MULTI, PSED, "L Prox Rad V", PsEdInfo, NULL},  
-	{VS_R_PROX_RAD_V, VS_R_PROX_RAD_V_MULTI, PSED, "R Prox Rad V", PsEdInfo, NULL},  
-	{VS_L_DIST_ULNAR_A, VS_L_DIST_ULNAR_A_MULTI, RI, "L Dist Ulnar A", RiInfo, NULL},  
-	{VS_R_DIST_ULNAR_A, VS_R_DIST_ULNAR_A_MULTI, RI, "R Dist Ulnar A", RiInfo, NULL},  
-	{VS_L_MID_ULNAR_A, VS_L_MID_ULNAR_A_MULTI, RI, "L Mid Ulnar A", RiInfo, NULL},  
-	{VS_R_MID_ULNAR_A, VS_R_MID_ULNAR_A_MULTI, RI, "R Mid Ulnar A", RiInfo, NULL},  
-	{VS_L_PROX_ULNAR_A, VS_L_PROX_ULNAR_A_MULTI, RI, "L Prox Ulnar A", RiInfo, NULL},  
-	{VS_R_PROX_ULNAR_A, VS_R_PROX_ULNAR_A_MULTI, RI, "R Prox Ulnar A", RiInfo, NULL},  
-	{VS_L_DIST_ULNAR_V, VS_L_DIST_ULNAR_V_MULTI, PSED, "L Dist Ulnar V", PsEdInfo, NULL},  
-	{VS_R_DIST_ULNAR_V, VS_R_DIST_ULNAR_V_MULTI, PSED, "R Dist Ulnar V", PsEdInfo, NULL},  
-	{VS_L_MID_ULNAR_V, VS_L_MID_ULNAR_V_MULTI, PSED, "L Mid Ulnar V", PsEdInfo, NULL},  
-	{VS_R_MID_ULNAR_V, VS_R_MID_ULNAR_V_MULTI, PSED, "R Mid Ulnar V", PsEdInfo, NULL},  
-	{VS_L_PROX_ULNAR_V, VS_L_PROX_ULNAR_V_MULTI, PSED, "L Prox Ulnar V", PsEdInfo, NULL},  
-	{VS_R_PROX_ULNAR_V, VS_R_PROX_ULNAR_V_MULTI, PSED, "R Prox Ulnar V", PsEdInfo, NULL},  
-	{VS_L_MID_SCL_A, VS_L_MID_SCL_A_MULTI, PSED, "L Mid SCL A", PsEdInfo, NULL},  
-	{VS_R_MID_SCL_A, VS_R_MID_SCL_A_MULTI, PSED, "R Mid SCL A", PsEdInfo, NULL},  
-	{VS_L_PROX_SCL_A, VS_L_PROX_SCL_A_MULTI, PSED, "L Prox SCL A", PsEdInfo, NULL},  
-	{VS_R_PROX_SCL_A, VS_R_PROX_SCL_A_MULTI, PSED, "R Prox SCL A", PsEdInfo, NULL},  
-	{VS_L_MID_SCL_V, VS_L_MID_SCL_V_MULTI, PSED, "L Mid SCL V", PsEdInfo, NULL},  
-	{VS_R_MID_SCL_V, VS_R_MID_SCL_V_MULTI, PSED, "R Mid SCL V", PsEdInfo, NULL},  
-	{VS_L_PROX_SCL_V, VS_L_PROX_SCL_V_MULTI, PSED, "L Prox SCL V", PsEdInfo, NULL},  
-	{VS_R_PROX_SCL_V, VS_R_PROX_SCL_V_MULTI, PSED, "R Prox SCL V", PsEdInfo, NULL}, 
+	{VS_R_CCA, VS_R_CCA_MULTI, PSED, "R CCA", PsEdInfo, &VSRIcaCcaCalc},
+	{VS_L_DIST_CCA, VS_L_DIST_CCA_MULTI, PSED, "L Dist CCA", PsEdInfo, NULL},
+	{VS_R_DIST_CCA, VS_R_DIST_CCA_MULTI, PSED, "R Dist CCA", PsEdInfo, NULL},
+	{VS_L_MID_CCA, VS_L_MID_CCA_MULTI, PSED, "L Mid CCA", PsEdInfo, NULL},
+	{VS_R_MID_CCA, VS_R_MID_CCA_MULTI, PSED, "R Mid CCA", PsEdInfo, NULL},
+	{VS_L_PROX_CCA, VS_L_PROX_CCA_MULTI, PSED, "L Prox CCA", PsEdInfo, NULL},
+	{VS_R_PROX_CCA, VS_R_PROX_CCA_MULTI, PSED, "R Prox CCA", PsEdInfo, NULL},
+	{VS_L_ICA, VS_L_ICA_MULTI, PSED, "L ICA", PsEdInfo,  &VSLIcaCcaCalc},  //鎵€鏈塈CA鐨勬祴閲忔枃妗ｄ笂鍐欑殑閮芥槸Vel娴嬮噺锛屽疄闄呬笂鍔ㄨ剦涓嶅簲璇ュ彧娴嬩竴涓€熷害锛屽湪绾歌川璧勬枡涓婃紡鍐欎簡锛屾墍浠ヨ璁や负鍙湁閫熷害娴嬮噺
+	{VS_R_ICA, VS_R_ICA_MULTI, PSED, "R ICA", PsEdInfo, &VSRIcaCcaCalc},
+	{VS_L_DIST_ICA, VS_L_DIST_ICA_MULTI, PSED, "L Dist ICA", PsEdInfo, NULL},
+	{VS_R_DIST_ICA, VS_R_DIST_ICA_MULTI, PSED, "R Dist ICA", PsEdInfo, NULL},
+	{VS_L_MID_ICA, VS_L_MID_ICA_MULTI, PSED, "L Mid ICA", PsEdInfo, NULL},
+	{VS_R_MID_ICA, VS_R_MID_ICA_MULTI, PSED, "R Mid ICA", PsEdInfo, NULL},
+	{VS_L_PROX_ICA, VS_L_PROX_ICA_MULTI, PSED, "L Prox ICA", PsEdInfo, NULL},
+	{VS_R_PROX_ICA, VS_R_PROX_ICA_MULTI, PSED, "R Prox ICA", PsEdInfo, NULL},
+	{VS_L_DIST_LSV, VS_L_DIST_LSV_MULTI, PSED, "L Dist LSV", PsEdInfo, NULL},
+	{VS_R_DIST_LSV, VS_R_DIST_LSV_MULTI, PSED, "R Dist LSV", PsEdInfo, NULL},
+	{VS_L_MID_LSV, VS_L_MID_LSV_MULTI, PSED, "L Mid LSV", PsEdInfo, NULL},
+	{VS_R_MID_LSV, VS_R_MID_LSV_MULTI, PSED, "R Mid LSV", PsEdInfo, NULL},
+	{VS_L_PROX_LSV, VS_L_PROX_LSV_MULTI, PSED, "L Prox LSV", PsEdInfo, NULL},
+	{VS_R_PROX_LSV, VS_R_PROX_LSV_MULTI, PSED, "R Prox LSV", PsEdInfo, NULL},
+	{VS_L_DIST_CEPH_V, VS_L_DIST_CEPH_V_MULTI, PSED, "L Dist Ceph V", PsEdInfo, NULL},
+	{VS_R_DIST_CEPH_V, VS_R_DIST_CEPH_V_MULTI, PSED, "R Dist Ceph V", PsEdInfo, NULL},
+	{VS_L_MID_CEPH_V, VS_L_MID_CEPH_V_MULTI, PSED, "L Mid Ceph V", PsEdInfo, NULL},
+	{VS_R_MID_CEPH_V, VS_R_MID_CEPH_V_MULTI, PSED, "R Mid Ceph V", PsEdInfo, NULL},
+	{VS_L_PROX_CEPH_V, VS_L_PROX_CEPH_V_MULTI, PSED, "L Prox Ceph V", PsEdInfo, NULL},
+	{VS_R_PROX_CEPH_V, VS_R_PROX_CEPH_V_MULTI, PSED, "R Prox Ceph V", PsEdInfo, NULL},
+	{VS_L_PROX_ECA, VS_L_PROX_ECA_MULTI, PSED, "L Prox ECA", PsEdInfo, NULL},
+	{VS_R_PROX_ECA, VS_R_PROX_ECA_MULTI, PSED, "R Prox ECA", PsEdInfo, NULL},
+	{VS_L_BRACHIOCEPH_A, VS_L_BRACHIOCEPH_A_MULTI, PSED, "L Brachioceph A", PsEdInfo, NULL},
+	{VS_R_BRACHIOCEPH_A, VS_R_BRACHIOCEPH_A_MULTI, PSED, "R Brachioceph A", PsEdInfo, NULL},
+	{VS_L_BRACHIOCEPH_V, VS_L_BRACHIOCEPH_V_MULTI, PSED, "L Brachioceph V", PsEdInfo, NULL},
+	{VS_R_BRACHIOCEPH_V, VS_R_BRACHIOCEPH_V_MULTI, PSED, "R Brachioceph V", PsEdInfo, NULL},
+	{VS_L_BULB, VS_L_BULB_MULTI, PSED, "L Bulb", PsEdInfo, NULL},
+	{VS_R_BULB, VS_R_BULB_MULTI, PSED, "R Bulb", PsEdInfo, NULL},
+	{VS_L_VERTEBRAL_A, VS_L_VERTEBRAL_A_MULTI, PSED, "L Vertebral A", PsEdInfo, NULL},
+	{VS_R_VERTEBRAL_A, VS_R_VERTEBRAL_A_MULTI, PSED, "R Vertebral A", PsEdInfo, NULL},
+	{VS_L_IJV, VS_L_IJV_MULTI, PSED, "L IJV", PsEdInfo, NULL},
+	{VS_R_IJV, VS_R_IJV_MULTI, PSED, "R IJV", PsEdInfo, NULL},
+	{VS_L_CFA, VS_L_CFA_MULTI, RI, "L CFA", RiInfo, NULL},
+	{VS_R_CFA, VS_R_CFA_MULTI, RI, "R CFA", RiInfo, NULL},
+	{VS_L_CFV, VS_L_CFV_MULTI, PSED, "L CFV", PsEdInfo, NULL},
+	{VS_R_CFV, VS_R_CFV_MULTI, PSED, "R CFV", PsEdInfo, NULL},
+	{VS_L_COM_ILIAC_A, VS_L_COM_ILIAC_A_MULTI, RI, "L Com Iliac A", RiInfo, NULL},
+	{VS_R_COM_ILIAC_A, VS_R_COM_ILIAC_A_MULTI, RI, "R Com Iliac A", RiInfo, NULL},
+	{VS_L_COM_ILIAC_V, VS_L_COM_ILIAC_V_MULTI, PSED, "L Com Iliac V", PsEdInfo, NULL},
+	{VS_R_COM_ILIAC_V, VS_R_COM_ILIAC_V_MULTI, PSED, "R Com Iliac V", PsEdInfo, NULL},
+	{VS_L_DIST_ATA, VS_L_DIST_ATA_MULTI, RI, "L Dist ATA", RiInfo, NULL},
+	{VS_R_DIST_ATA, VS_R_DIST_ATA_MULTI, RI, "R Dist ATA", RiInfo, NULL},
+	{VS_L_MID_ATA, VS_L_MID_ATA_MULTI, RI, "L Mid ATA", RiInfo, NULL},
+	{VS_R_MID_ATA, VS_R_MID_ATA_MULTI, RI, "R Mid ATA", RiInfo, NULL},
+	{VS_L_PROX_ATA, VS_L_PROX_ATA_MULTI, RI, "L Prox ATA", RiInfo, NULL},
+	{VS_R_PROX_ATA, VS_R_PROX_ATA_MULTI, RI, "R Prox ATA", RiInfo, NULL},
+	{VS_L_DIST_ATV, VS_L_DIST_ATV_MULTI, PSED, "L Dist ATV", PsEdInfo, NULL},
+	{VS_R_DIST_ATV, VS_R_DIST_ATV_MULTI, PSED, "R Dist ATV", PsEdInfo, NULL},
+	{VS_L_MID_ATV, VS_L_MID_ATV_MULTI, PSED, "L Mid ATV", PsEdInfo, NULL},
+	{VS_R_MID_ATV, VS_R_MID_ATV_MULTI, PSED, "R Mid ATV", PsEdInfo, NULL},
+	{VS_L_PROX_ATV, VS_L_PROX_ATV_MULTI, PSED, "L Prox ATV", PsEdInfo, NULL},
+	{VS_R_PROX_ATV, VS_R_PROX_ATV_MULTI, PSED, "R Prox ATV", PsEdInfo, NULL},
+	{VS_L_DIST_GSV_CALF, VS_L_DIST_GSV_CALF_MULTI, PSED, "L Dist GSV Calf", PsEdInfo, NULL},
+	{VS_R_DIST_GSV_CALF, VS_R_DIST_GSV_CALF_MULTI, PSED, "R Dist GSV Calf", PsEdInfo, NULL},
+	{VS_L_MID_GSV_CALF, VS_L_MID_GSV_CALF_MULTI, PSED, "L Mid GSV Calf", PsEdInfo, NULL},
+	{VS_R_MID_GSV_CALF, VS_R_MID_GSV_CALF_MULTI, PSED, "R Mid GSV Calf", PsEdInfo, NULL},
+	{VS_L_PROX_GSV_CALF, VS_L_PROX_GSV_CALF_MULTI, PSED, "L Prox GSV Calf", PsEdInfo, NULL},
+	{VS_R_PROX_GSV_CALF, VS_R_PROX_GSV_CALF_MULTI, PSED, "R Prox GSV Calf", PsEdInfo, NULL},
+	{VS_L_DIST_GSV_THIGH, VS_L_DIST_GSV_THIGH_MULTI, PSED, "L Dist GSV Thigh", PsEdInfo, NULL},
+	{VS_R_DIST_GSV_THIGH, VS_R_DIST_GSV_THIGH_MULTI, PSED, "R Dist GSV Thigh", PsEdInfo, NULL},
+	{VS_L_MID_GSV_THIGH, VS_L_MID_GSV_THIGH_MULTI, PSED, "L Mid GSV Thigh", PsEdInfo, NULL},
+	{VS_R_MID_GSV_THIGH, VS_R_MID_GSV_THIGH_MULTI, PSED, "R Mid GSV Thigh", PsEdInfo, NULL},
+	{VS_L_PROX_GSV_THIGH, VS_L_PROX_GSV_THIGH_MULTI, PSED, "L Prox GSV Thigh", PsEdInfo, NULL},
+	{VS_R_PROX_GSV_THIGH, VS_R_PROX_GSV_THIGH_MULTI, PSED, "R Prox GSV Thigh", PsEdInfo, NULL},
+	{VS_L_DIST_PERO_A, VS_L_DIST_PERO_A_MULTI, RI, "L Dist Pero A", RiInfo, NULL},
+	{VS_R_DIST_PERO_A, VS_R_DIST_PERO_A_MULTI, RI, "R Dist Pero A", RiInfo, NULL},
+	{VS_L_MID_PERO_A, VS_L_MID_PERO_A_MULTI, RI, "L Mid Pero A", RiInfo, NULL},
+	{VS_R_MID_PERO_A, VS_R_MID_PERO_A_MULTI, RI, "R Mid Pero A", RiInfo, NULL},
+	{VS_L_PROX_PERO_A, VS_L_PROX_PERO_A_MULTI, RI, "L Prox Pero A", RiInfo, NULL},
+	{VS_R_PROX_PERO_A, VS_R_PROX_PERO_A_MULTI, RI, "R Prox Pero A", RiInfo, NULL},
+	{VS_L_DIST_PERO_V, VS_L_DIST_PERO_V_MULTI, PSED, "L Dist Pero V", PsEdInfo, NULL},
+	{VS_R_DIST_PERO_V, VS_R_DIST_PERO_V_MULTI, PSED, "R Dist Pero V", PsEdInfo, NULL},
+	{VS_L_MID_PERO_V, VS_L_MID_PERO_V_MULTI, PSED, "L Mid Pero V", PsEdInfo, NULL},
+	{VS_R_MID_PERO_V, VS_R_MID_PERO_V_MULTI, PSED, "R Mid Pero V", PsEdInfo, NULL},
+	{VS_L_PROX_PERO_V, VS_L_PROX_PERO_V_MULTI, PSED, "L Prox Pero V", PsEdInfo, NULL},
+	{VS_R_PROX_PERO_V, VS_R_PROX_PERO_V_MULTI, PSED, "R Prox Pero V", PsEdInfo, NULL},
+	{VS_L_DIST_POP_A, VS_L_DIST_POP_A_MULTI, RI, "L Dist Pop A", RiInfo, NULL},
+	{VS_R_DIST_POP_A, VS_R_DIST_POP_A_MULTI, RI, "R Dist Pop A", RiInfo, NULL},
+	{VS_L_MID_POP_A, VS_L_MID_POP_A_MULTI, RI, "L Mid Pop A", RiInfo, NULL},
+	{VS_R_MID_POP_A, VS_R_MID_POP_A_MULTI, RI, "R Mid Pop A", RiInfo, NULL},
+	{VS_L_PROX_POP_A, VS_L_PROX_POP_A_MULTI, RI, "L Prox Pop A", RiInfo, NULL},
+	{VS_R_PROX_POP_A, VS_R_PROX_POP_A_MULTI, RI, "R Prox Pop A", RiInfo, NULL},
+	{VS_L_DIST_POP_V, VS_L_DIST_POP_V_MULTI, PSED, "L Dist Pop V", PsEdInfo, NULL},
+	{VS_R_DIST_POP_V, VS_R_DIST_POP_V_MULTI, PSED, "R Dist Pop V", PsEdInfo, NULL},
+	{VS_L_MID_POP_V, VS_L_MID_POP_V_MULTI, PSED, "L Mid Pop V", PsEdInfo, NULL},
+	{VS_R_MID_POP_V, VS_R_MID_POP_V_MULTI, PSED, "R Mid Pop V", PsEdInfo, NULL},
+	{VS_L_PROX_POP_V, VS_L_PROX_POP_V_MULTI, PSED, "L Prox Pop V", PsEdInfo, NULL},
+	{VS_R_PROX_POP_V, VS_R_PROX_POP_V_MULTI, PSED, "R Prox Pop V", PsEdInfo, NULL},
+	{VS_L_DIST_PTA, VS_L_DIST_PTA_MULTI, RI, "L Dist PTA", RiInfo, NULL},
+	{VS_R_DIST_PTA, VS_R_DIST_PTA_MULTI, RI, "R Dist PTA", RiInfo, NULL},
+	{VS_L_MID_PTA, VS_L_MID_PTA_MULTI, RI, "L Mid PTA", RiInfo, NULL},
+	{VS_R_MID_PTA, VS_R_MID_PTA_MULTI, RI, "R Mid PTA", RiInfo, NULL},
+	{VS_L_PROX_PTA, VS_L_PROX_PTA_MULTI, RI, "L Prox PTA", RiInfo, NULL},
+	{VS_R_PROX_PTA, VS_R_PROX_PTA_MULTI, RI, "R Prox PTA", RiInfo, NULL},
+	{VS_L_DIST_PTV, VS_L_DIST_PTV_MULTI, PSED, "L Dist PTV", PsEdInfo, NULL},
+	{VS_R_DIST_PTV, VS_R_DIST_PTV_MULTI, PSED, "R Dist PTV", PsEdInfo, NULL},
+	{VS_L_MID_PTV, VS_L_MID_PTV_MULTI, PSED, "L Mid PTV", PsEdInfo, NULL},
+	{VS_R_MID_PTV, VS_R_MID_PTV_MULTI, PSED, "R Mid PTV", PsEdInfo, NULL},
+	{VS_L_PROX_PTV, VS_L_PROX_PTV_MULTI, PSED, "L Prox PTV", PsEdInfo, NULL},
+	{VS_R_PROX_PTV, VS_R_PROX_PTV_MULTI, PSED, "R Prox PTV", PsEdInfo, NULL},
+	{VS_L_DIST_SFA, VS_L_DIST_SFA_MULTI, RI, "L Dist SFA", RiInfo, NULL},
+	{VS_R_DIST_SFA, VS_R_DIST_SFA_MULTI, RI, "R Dist SFA", RiInfo, NULL},
+	{VS_L_MID_SFA, VS_L_MID_SFA_MULTI, RI, "L Mid SFA", RiInfo, NULL},
+	{VS_R_MID_SFA, VS_R_MID_SFA_MULTI, RI, "R Mid SFA", RiInfo, NULL},
+	{VS_L_PROX_SFA, VS_L_PROX_SFA_MULTI, RI, "L Prox SFA", RiInfo, NULL},
+	{VS_R_PROX_SFA, VS_R_PROX_SFA_MULTI, RI, "R Prox SFA", RiInfo, NULL},
+	{VS_L_DIST_SFV, VS_L_DIST_SFV_MULTI, PSED, "L Dist SFV", PsEdInfo, NULL},
+	{VS_R_DIST_SFV, VS_R_DIST_SFV_MULTI, PSED, "R Dist SFV", PsEdInfo, NULL},
+	{VS_L_MID_SFV, VS_L_MID_SFV_MULTI, PSED, "L Mid SFV", PsEdInfo, NULL},
+	{VS_R_MID_SFV, VS_R_MID_SFV_MULTI, PSED, "R Mid SFV", PsEdInfo, NULL},
+	{VS_L_PROX_SFV, VS_L_PROX_SFV_MULTI, PSED, "L Prox SFV", PsEdInfo, NULL},
+	{VS_R_PROX_SFV, VS_R_PROX_SFV_MULTI, PSED, "R Prox SFV", PsEdInfo, NULL},
+	{VS_L_DOR_PEDIS, VS_L_DOR_PEDIS_MULTI, RI, "L Dor Pedis", RiInfo, NULL},
+	{VS_R_DOR_PEDIS, VS_R_DOR_PEDIS_MULTI, RI, "R Dor Pedis", RiInfo, NULL},
+	{VS_L_EXT_ILIAC_A, VS_L_EXT_ILIAC_A_MULTI, RI, "L Ext Iliac A", RiInfo, NULL},
+	{VS_R_EXT_ILIAC_A, VS_R_EXT_ILIAC_A_MULTI, RI, "R Ext Iliac A", RiInfo, NULL},
+	{VS_L_EXT_ILIAC_V, VS_L_EXT_ILIAC_V_MULTI, PSED, "L Ext Iliac V", PsEdInfo, NULL},
+	{VS_R_EXT_ILIAC_V, VS_R_EXT_ILIAC_V_MULTI, PSED, "R Ext Iliac V", PsEdInfo, NULL},
+	{VS_L_INT_ILIAC_A, VS_L_INT_ILIAC_A_MULTI, RI, "L Int Iliac A", RiInfo, NULL},
+	{VS_R_INT_ILIAC_A, VS_R_INT_ILIAC_A_MULTI, RI, "R Int Iliac A", RiInfo, NULL},
+	{VS_L_INT_ILIAC_V, VS_L_INT_ILIAC_V_MULTI, PSED, "L Int Iliac V", PsEdInfo, NULL},
+	{VS_R_INT_ILIAC_V, VS_R_INT_ILIAC_V_MULTI, PSED, "R Int Iliac V", PsEdInfo, NULL},
+	{VS_L_LAT_SURAL_V, VS_L_LAT_SURAL_V_MULTI, PSED, "L Lat Sural V", PsEdInfo, NULL},
+	{VS_R_LAT_SURAL_V, VS_R_LAT_SURAL_V_MULTI, PSED, "R Lat Sural V", PsEdInfo, NULL},
+	{VS_L_PROX_PFA, VS_L_PROX_PFA_MULTI, RI, "L Prox PFA", RiInfo, NULL},
+	{VS_R_PROX_PFA, VS_R_PROX_PFA_MULTI, RI, "R Prox PFA", RiInfo, NULL},
+	{VS_L_SFJ, VS_L_SFJ_MULTI, PSED, "L SFJ", PsEdInfo, NULL},
+	{VS_R_SFJ, VS_R_SFJ_MULTI, PSED, "R SFJ", PsEdInfo, NULL},
+	{VS_L_ANTECUBE, VS_L_ANTECUBE_MULTI, RI, "L Antecube", RiInfo, NULL},
+	{VS_R_ANTECUBE, VS_R_ANTECUBE_MULTI, RI, "R Antecube", RiInfo, NULL},
+	{VS_L_AX_A, VS_L_AX_A_MULTI, RI, "L Ax A", RiInfo, NULL},
+	{VS_R_AX_A, VS_R_AX_A_MULTI, RI, "R Ax A", RiInfo, NULL},
+	{VS_L_AX_V, VS_L_AX_V_MULTI, PSED, "L Ax V", PsEdInfo, NULL},
+	{VS_R_AX_V, VS_R_AX_V_MULTI, PSED, "R Ax V", PsEdInfo, NULL},
+	{VS_L_DIST_BASILIC_V, VS_L_DIST_BASILIC_V_MULTI, PSED, "L Dist Basilic V", PsEdInfo, NULL},
+	{VS_R_DIST_BASILIC_V, VS_R_DIST_BASILIC_V_MULTI, PSED, "R Dist Basilic V", PsEdInfo, NULL},
+	{VS_L_MID_BASILIC_V, VS_L_MID_BASILIC_V_MULTI, PSED, "L Mid Basilic V", PsEdInfo, NULL},
+	{VS_R_MID_BASILIC_V, VS_R_MID_BASILIC_V_MULTI, PSED, "R Mid Basilic V", PsEdInfo, NULL},
+	{VS_L_PROX_BASILIC_V, VS_L_PROX_BASILIC_V_MULTI, PSED, "L Prox Basilic V", PsEdInfo, NULL},
+	{VS_R_PROX_BASILIC_V, VS_R_PROX_BASILIC_V_MULTI, PSED, "R Prox Basilic V", PsEdInfo, NULL},
+	{VS_L_DIST_BRACH_A, VS_L_DIST_BRACH_A_MULTI, RI, "L Dist Brach A", RiInfo, NULL},
+	{VS_R_DIST_BRACH_A, VS_R_DIST_BRACH_A_MULTI, RI, "R Dist Brach A", RiInfo, NULL},
+	{VS_L_PROX_BRACH_A, VS_L_PROX_BRACH_A_MULTI, RI, "L Prox Brach A", RiInfo, NULL},
+	{VS_R_PROX_BRACH_A, VS_R_PROX_BRACH_A_MULTI, RI, "R Prox Brach A", RiInfo, NULL},
+	{VS_L_DIST_BRACH_V, VS_L_DIST_BRACH_V_MULTI, RI, "L Dist Brach V", RiInfo, NULL},
+	{VS_R_DIST_BRACH_V, VS_R_DIST_BRACH_V_MULTI, RI, "R Dist Brach V", RiInfo, NULL},
+	{VS_L_PROX_BRACH_V, VS_L_PROX_BRACH_V_MULTI, RI, "L Prox Brach V", RiInfo, NULL},
+	{VS_R_PROX_BRACH_V, VS_R_PROX_BRACH_V_MULTI, RI, "R Prox Brach V", RiInfo, NULL},
+	{VS_L_DIST_RAD_A, VS_L_DIST_RAD_A_MULTI, RI, "L Dist Rad A", RiInfo, NULL},
+	{VS_R_DIST_RAD_A, VS_R_DIST_RAD_A_MULTI, RI, "R Dist Rad A", RiInfo, NULL},
+	{VS_L_MID_RAD_A, VS_L_MID_RAD_A_MULTI, RI, "L Mid Rad A", RiInfo, NULL},
+	{VS_R_MID_RAD_A, VS_R_MID_RAD_A_MULTI, RI, "R Mid Rad A", RiInfo, NULL},
+	{VS_L_PROX_RAD_A, VS_L_PROX_RAD_A_MULTI, RI, "L Prox Rad A", RiInfo, NULL},
+	{VS_R_PROX_RAD_A, VS_R_PROX_RAD_A_MULTI, RI, "R Prox Rad A", RiInfo, NULL},
+	{VS_L_DIST_RAD_V, VS_L_DIST_RAD_V_MULTI, PSED, "L Dist Rad V", PsEdInfo, NULL},
+	{VS_R_DIST_RAD_V, VS_R_DIST_RAD_V_MULTI, PSED, "R Dist Rad V", PsEdInfo, NULL},
+	{VS_L_MID_RAD_V, VS_L_MID_RAD_V_MULTI, PSED, "L Mid Rad V", PsEdInfo, NULL},
+	{VS_R_MID_RAD_V, VS_R_MID_RAD_V_MULTI, PSED, "R Mid Rad V", PsEdInfo, NULL},
+	{VS_L_PROX_RAD_V, VS_L_PROX_RAD_V_MULTI, PSED, "L Prox Rad V", PsEdInfo, NULL},
+	{VS_R_PROX_RAD_V, VS_R_PROX_RAD_V_MULTI, PSED, "R Prox Rad V", PsEdInfo, NULL},
+	{VS_L_DIST_ULNAR_A, VS_L_DIST_ULNAR_A_MULTI, RI, "L Dist Ulnar A", RiInfo, NULL},
+	{VS_R_DIST_ULNAR_A, VS_R_DIST_ULNAR_A_MULTI, RI, "R Dist Ulnar A", RiInfo, NULL},
+	{VS_L_MID_ULNAR_A, VS_L_MID_ULNAR_A_MULTI, RI, "L Mid Ulnar A", RiInfo, NULL},
+	{VS_R_MID_ULNAR_A, VS_R_MID_ULNAR_A_MULTI, RI, "R Mid Ulnar A", RiInfo, NULL},
+	{VS_L_PROX_ULNAR_A, VS_L_PROX_ULNAR_A_MULTI, RI, "L Prox Ulnar A", RiInfo, NULL},
+	{VS_R_PROX_ULNAR_A, VS_R_PROX_ULNAR_A_MULTI, RI, "R Prox Ulnar A", RiInfo, NULL},
+	{VS_L_DIST_ULNAR_V, VS_L_DIST_ULNAR_V_MULTI, PSED, "L Dist Ulnar V", PsEdInfo, NULL},
+	{VS_R_DIST_ULNAR_V, VS_R_DIST_ULNAR_V_MULTI, PSED, "R Dist Ulnar V", PsEdInfo, NULL},
+	{VS_L_MID_ULNAR_V, VS_L_MID_ULNAR_V_MULTI, PSED, "L Mid Ulnar V", PsEdInfo, NULL},
+	{VS_R_MID_ULNAR_V, VS_R_MID_ULNAR_V_MULTI, PSED, "R Mid Ulnar V", PsEdInfo, NULL},
+	{VS_L_PROX_ULNAR_V, VS_L_PROX_ULNAR_V_MULTI, PSED, "L Prox Ulnar V", PsEdInfo, NULL},
+	{VS_R_PROX_ULNAR_V, VS_R_PROX_ULNAR_V_MULTI, PSED, "R Prox Ulnar V", PsEdInfo, NULL},
+	{VS_L_MID_SCL_A, VS_L_MID_SCL_A_MULTI, PSED, "L Mid SCL A", PsEdInfo, NULL},
+	{VS_R_MID_SCL_A, VS_R_MID_SCL_A_MULTI, PSED, "R Mid SCL A", PsEdInfo, NULL},
+	{VS_L_PROX_SCL_A, VS_L_PROX_SCL_A_MULTI, PSED, "L Prox SCL A", PsEdInfo, NULL},
+	{VS_R_PROX_SCL_A, VS_R_PROX_SCL_A_MULTI, PSED, "R Prox SCL A", PsEdInfo, NULL},
+	{VS_L_MID_SCL_V, VS_L_MID_SCL_V_MULTI, PSED, "L Mid SCL V", PsEdInfo, NULL},
+	{VS_R_MID_SCL_V, VS_R_MID_SCL_V_MULTI, PSED, "R Mid SCL V", PsEdInfo, NULL},
+	{VS_L_PROX_SCL_V, VS_L_PROX_SCL_V_MULTI, PSED, "L Prox SCL V", PsEdInfo, NULL},
+	{VS_R_PROX_SCL_V, VS_R_PROX_SCL_V_MULTI, PSED, "R Prox SCL V", PsEdInfo, NULL},
 };
 
 /******************************TCD Measure*************************/
@@ -2623,7 +2616,7 @@ const SingleItemInfo TDInfo[] = {
 	{TD_LES9_AREA1, AREA_TRACK, N_("Lesion9 Area 1"), CM2, NULL},
 	{TD_LES9_AREA2, AREA_TRACK, N_("Lesion9 Area 2"), CM2, NULL},
 	{TD_LES9_AREA3, AREA_TRACK, N_("Lesion9 Area 3"), CM2, NULL},
-//Lesion10	
+//Lesion10
 	{TD_LES10_AREA,  AREA_TRACK, N_("Lesion10 Area"),   CM2, NULL},
 	{TD_LES10_AREA1, AREA_TRACK, N_("Lesion10 Area 1"), CM2, NULL},
 	{TD_LES10_AREA2, AREA_TRACK, N_("Lesion10 Area 2"), CM2, NULL},
@@ -2633,7 +2626,6 @@ const SingleItemInfo TDInfo[] = {
 	{TD_LES11_AREA1, AREA_TRACK, N_("Lesion11 Area 1"), CM2, NULL},
 	{TD_LES11_AREA2, AREA_TRACK, N_("Lesion11 Area 2"), CM2, NULL},
 	{TD_LES11_AREA3, AREA_TRACK, N_("Lesion11 Area 3"), CM2, NULL},
-
 
 };
 const MultiItemInfo TDMultiInfo[] = {
@@ -2645,7 +2637,7 @@ const MultiItemInfo TDMultiInfo[] = {
 	{TD_AREA_RATIO5,  TD_LESION5_AREA_MULTI,  AREA_TRACK, "Lesion 5",  AreaInfo, NULL},
 	{TD_AREA_RATIO6,  TD_LESION6_AREA_MULTI,  AREA_TRACK, "Lesion 6",  AreaInfo, NULL},
 	{TD_AREA_RATIO7,  TD_LESION7_AREA_MULTI,  AREA_TRACK, "Lesion 7",  AreaInfo, NULL},
-	{TD_AREA_RATIO8,  TD_LESION8_AREA_MULTI,  AREA_TRACK, "Lesion 8",  AreaInfo, NULL},	
+	{TD_AREA_RATIO8,  TD_LESION8_AREA_MULTI,  AREA_TRACK, "Lesion 8",  AreaInfo, NULL},
 	{TD_AREA_RATIO9,  TD_LESION9_AREA_MULTI,  AREA_TRACK, "Lesion 9",  AreaInfo, NULL},
 	{TD_AREA_RATIO10, TD_LESION10_AREA_MULTI, AREA_TRACK, "Lesion 10", AreaInfo, NULL},
 	{TD_AREA_RATIO11, TD_LESION11_AREA_MULTI, AREA_TRACK, "Lesion 11", AreaInfo, NULL},
@@ -2737,7 +2729,7 @@ const PtrOfCalcInfo AnOBCalcInfoPtr[ANOB_CALC_END - ANOB_CALC_START] = {
 
 	{ANOB_SHEEP_CRL_GW, &AnOBSheepCRLGW},
 	{ANOB_SHEEP_CRL_EDCB, &AnOBSheepCRLEDCB},
-	
+
 	{ANOB_SWINE_SL_GW, &AnOBSwineSLGW},
 	{ANOB_SWINE_SL_EDCB, &AnOBSwineSLEDCB},
 	{ANOB_SWINE_HL_GW, &AnOBSwineHLGW},
@@ -2755,7 +2747,7 @@ const PtrOfCalcInfo AnOBCalcInfoPtr[ANOB_CALC_END - ANOB_CALC_START] = {
 	{ANOB_BOVINE_BTD_EDCB, &AnOBBovineBTDEDCB},
 	{ANOB_BOVINE_BUD_GW, &AnOBBovineBUDGW},
 	{ANOB_BOVINE_BUD_EDCB, &AnOBBovineBUDEDCB},
-	
+
 	{ANOB_EQUINE_GSD_GW, &AnOBEquineGSDGW},
 	{ANOB_EQUINE_GSD_EDCB, &AnOBEquineGSDEDCB},
 	{ANOB_EQUINE_ERD_GW, &AnOBEquineERDGW},
@@ -2766,7 +2758,7 @@ const PtrOfCalcInfo AnOBCalcInfoPtr[ANOB_CALC_END - ANOB_CALC_START] = {
 	{ANOB_EQUINE_EED_EDCB, &AnOBEquineEEDEDCB},
 };
 
-//添加 动物超 产科 
+//添加 动物超 产科
 //hlx 12.23
 const SingleItemInfo AnOBInfo[] = {
 	//dog

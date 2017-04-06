@@ -2,10 +2,10 @@
 #ifndef MENU_MEASURE_H
 #define MENU_MEASURE_H
 
-#include "MenuTree.h"
-#include "ExamItem.h"
-#include "ScanMode.h"
-#include "MeasureDef.h"
+#include "display/MenuTree.h"
+#include "probe/ExamItem.h"
+#include "imageProc/ScanMode.h"
+#include "calcPeople/MeasureDef.h"
 class MenuMeasure {
 public:
     MenuMeasure(void);
@@ -24,7 +24,6 @@ public:
     void CompleteCurrentMeasure();
     string GetExamItem(void) { return m_examItem; }
 
-
 private:
     void UpdateCurrentExamItemMeasureItems(string item);
     void UpdateCurrentScanModeMeasureItems(ScanMode::EScanMode mode);
@@ -34,7 +33,7 @@ private:
     EMeasureMode GetMeasureModeFromMeasureType(int measureType);
     int GetUnitItemFromMeasureType(int measureType);
 
-    vector<GUIMenuNew> m_vecAllMeasureItem; 
+    vector<GUIMenuNew> m_vecAllMeasureItem;
     vector<GUIMenuNew> m_vecCurExamItemMeasureItem;
     vector<GUIMenuNew> m_vecCurScanModeMeasureItem;
     int m_sizeDefaultItems;

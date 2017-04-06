@@ -4,11 +4,11 @@
 
 #include <gtk/gtk.h>
 #include "Def.h"
-#include "../display/ImageArea.h"
-#include "gui_global.h"
-#include "gui_func.h"
-#include "ModeStatus.h"
-#include "../sysMan/SysMeasurementSetting.h"
+#include "display/ImageArea.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
+#include "imageProc/ModeStatus.h"
+#include "sysMan/SysMeasurementSetting.h"
 
 class MeasureDraw
 {
@@ -61,10 +61,10 @@ public:
     void ClearPwCycle(int begin, int end);
     void PwCycle(int begin, int end);
 
-    void DrawIMTBox(POINT p1, POINT p2, bool draw);//hlx 
+    void DrawIMTBox(POINT p1, POINT p2, bool draw);//hlx
     void DrawIMTIntima(POINT start, unsigned int *pIntima, int count, bool draw);
     void DrawIMTAdvent(POINT start, unsigned int *pAdventitia, int count, bool draw);
-	
+
 	void DrawAngleArc(POINT center, POINT left, POINT right, bool isCur=TRUE, EDrawMode mode=XOR);
 	void DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode = XOR);
 	void ChangeOrderNumber(void);

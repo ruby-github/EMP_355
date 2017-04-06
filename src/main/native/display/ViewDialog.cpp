@@ -1,11 +1,11 @@
 #include <gtk/gtk.h>
 #include "Def.h"
-#include "ViewDialog.h"
-#include "KeyValueOpr.h"
-#include "gui_global.h"
-#include "gui_func.h"
+#include "display/ViewDialog.h"
+#include "keyboard/KeyValueOpr.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
 #include "ViewMain.h"
-#include "KeyDef.h"
+#include "keyboard/KeyDef.h"
 
 ViewDialog* ViewDialog::m_ptrInstance = NULL;
 
@@ -26,8 +26,8 @@ ViewDialog::ViewDialog(void)
 
 ViewDialog::~ViewDialog(void)
 {
-    if (m_ptrInstance != NULL) 
-	delete m_ptrInstance; 
+    if (m_ptrInstance != NULL)
+	delete m_ptrInstance;
 }
 
 void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, pFuncDialog ptrFunc, pFuncDialog ptrFuncCancel)
@@ -178,7 +178,7 @@ bool ViewDialog::Exist(void)
 {
     if (m_window != NULL && GTK_IS_WINDOW(m_window))
         return true;
-    else 
+    else
         return false;
 }
 
@@ -242,7 +242,7 @@ void ViewDialog::BtnOkClicked(GtkButton *button)
 		sprintf(name, "%s", gtk_entry_get_text(GTK_ENTRY(m_entry)));
 
 		Destroy();
-		
+
 		if(strlen(name)>0)
 		{
 			if (m_ptrFunc)
@@ -253,7 +253,7 @@ void ViewDialog::BtnOkClicked(GtkButton *button)
 	{
         Destroy();
         g_timeout_add(50, HandleFun, this); // 为了解决结束检查时出现白框的问题
-#if 0 
+#if 0
 		if (m_ptrFunc)
 			(*m_ptrFunc)(NULL);
 #endif
@@ -288,7 +288,7 @@ void ViewDialog::BtnPrgCancelClicked(GtkButton *button)
 void ViewDialog::EntryInsertText(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position)
 {
     gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));
-	
+
     if (g_ascii_ispunct(*new_text) || (old_text_length + new_text_length > gtk_entry_get_max_length(GTK_ENTRY(editable)))) {
         gtk_signal_emit_stop(GTK_OBJECT(editable), g_signal_lookup("insert-text", GTK_TYPE_EDITABLE));
     }
@@ -315,7 +315,6 @@ void ViewDialog::SetProgressBar(double fraction)
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_progress_bar), text_buf);
 }
 
-
 ViewHintDialog* ViewHintDialog::m_ptrInstance = NULL;
 
 ViewHintDialog* ViewHintDialog::GetInstance()
@@ -332,8 +331,8 @@ ViewHintDialog::ViewHintDialog(void)
 
 ViewHintDialog::~ViewHintDialog(void)
 {
-    if (m_ptrInstance != NULL) 
-	delete m_ptrInstance; 
+    if (m_ptrInstance != NULL)
+	delete m_ptrInstance;
 }
 
 void ViewHintDialog::Create(GtkWindow *parent, const char *info)
@@ -377,7 +376,7 @@ bool ViewHintDialog::Exist(void)
 {
     if (m_window != NULL && GTK_IS_WINDOW(m_window))
         return true;
-    else 
+    else
         return false;
 }
 

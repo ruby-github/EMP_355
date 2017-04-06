@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
-#include "BiopsyMan.h"
-#include "ProbeSocket.h"
-#include "ProbeMan.h"
+#include "probe/BiopsyMan.h"
+#include "probe/ProbeSocket.h"
+#include "probe/ProbeMan.h"
 
 BiopsyMan* BiopsyMan::m_ptrInstance = NULL;
 
@@ -101,7 +101,7 @@ void BiopsyMan::SetCurBioBracketType(string bioBracketType)
 	}
 	m_curBioBracketType=bioBracketType;
 }
-	
+
 string BiopsyMan::GetCurBioAngleType(void)
 {
 	return m_curBioAngleType;
@@ -179,4 +179,3 @@ void BiopsyMan::SetCurBioBracketAndAngleTypeOfProbeChanged(void)
     m_curBioBracketType=strBioType;
     m_curBioAngleType=GetDefaultAngleTypeOfCurBioBracket();
 }
-

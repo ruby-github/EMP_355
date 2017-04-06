@@ -5,16 +5,16 @@
 #include <string>
 #include "Def.h"
 #include "AbsMeasure.h"
-#include "UpdateMeasure.h"
-#include "MeasureCalc.h"
-#include "MeasureDraw.h"
-#include "MeasureMan.h"
-#include "ModeStatus.h"
+#include "measure/UpdateMeasure.h"
+#include "measure/MeasureCalc.h"
+#include "measure/MeasureDraw.h"
+#include "measure/MeasureMan.h"
+#include "imageProc/ModeStatus.h"
 
 using std::string;
 
-///>两点法测距离
-//>深度方向上测距离
+///>涓ょ偣娉曟祴璺濈
+//>娣卞害鏂瑰悜涓婃祴璺濈
 class D2MeasureDistDot: public AbsMeasure
 {
     public:
@@ -44,7 +44,7 @@ class D2MeasureDistDot: public AbsMeasure
 	int m_2DRotate;
 };
 
-//两线法测距离
+//涓ょ嚎娉曟祴璺濈
 class D2MeasureDistLine: public AbsMeasure
 {
     public:
@@ -69,8 +69,8 @@ class D2MeasureDistLine: public AbsMeasure
 	POINT m_tempP;
 	POINT m_p1;
 
-	POINT m_p11;//测量范围左上顶点坐标
-	POINT m_p22;//测量范围右下顶点坐标
+	POINT m_p11;//娴嬮噺鑼冨洿宸︿笂椤剁偣鍧愭爣
+	POINT m_p22;//娴嬮噺鑼冨洿鍙充笅椤剁偣鍧愭爣
 	//两线的端点
 	POINT m_line1_start;
 	POINT m_line1_end;
@@ -84,7 +84,7 @@ class D2MeasureDistLine: public AbsMeasure
 
 };
 
-//轨迹法测长度
+//杞ㄨ抗娉曟祴闀垮害
 class D2MeasureLengthTrack: public AbsMeasure
 {
     public:
@@ -101,8 +101,8 @@ class D2MeasureLengthTrack: public AbsMeasure
 
     private:
 	double m_length;
-	vector<POINT> m_track;//存储轨迹用于擦除  
-	vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘  
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -116,7 +116,6 @@ class D2MeasureLengthTrack: public AbsMeasure
 	POINT m_p1;
 	int m_item;
 	const SingleItemInfo *m_itemInfo;
-
 
 	const unsigned char MOUSE_INTERVAL;
 	unsigned char m_mouse_count;
@@ -137,7 +136,7 @@ class D2MeasureLengthDot: public AbsMeasure
 
     private:
 	double m_length;
-	vector<POINT> m_dot;//存储描点位置用于擦除   
+	vector<POINT> m_dot;//瀛樺偍鎻忕偣浣嶇疆鐢ㄤ簬鎿﹂櫎
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -146,7 +145,6 @@ class D2MeasureLengthDot: public AbsMeasure
 
     int m_item;
 	const SingleItemInfo *m_itemInfo;
-
 
 	int m_step; ///< current status(step)
 	bool m_isDraw;
@@ -171,8 +169,8 @@ class D2MeasureAreaTrack: public AbsMeasure
     private:
 	double m_area;
 	double m_perimeter;
-	vector<POINT> m_track;//存储轨迹用于擦除  
-	vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘  
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -208,8 +206,8 @@ class D2MeasureSimpson: public AbsMeasure
 	int DiamLine(POINT lenStart, POINT lenEnd, int lenEndPosi, bool isCur);
 
     private:
-	vector<POINT> m_track;//存储轨迹用于擦除  
-	vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘  
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -255,8 +253,8 @@ class D2MeasureAL: public AbsMeasure
 	void Esc();
 
     private:
-	vector<POINT> m_track;//存储轨迹用于擦除  
-	vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘  
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -282,7 +280,6 @@ class D2MeasureAL: public AbsMeasure
 	unsigned char m_mouse_count;
 };
 
-
 class D2MeasureAreaDot: public AbsMeasure
 {
     public:
@@ -299,7 +296,7 @@ class D2MeasureAreaDot: public AbsMeasure
     private:
 	double m_area;
 	double m_perimeter;
-	vector<POINT> m_dot;//存储描点位置用于擦除   
+	vector<POINT> m_dot;//瀛樺偍鎻忕偣浣嶇疆鐢ㄤ簬鎿﹂櫎
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -308,7 +305,6 @@ class D2MeasureAreaDot: public AbsMeasure
 
     int m_item;
 	const SingleItemInfo *m_itemInfo;
-
 
 	int m_step; ///< current status(step)
 	bool m_isDraw;
@@ -367,7 +363,7 @@ class D2MeasureAreaRec: public AbsMeasure
 	MeasureDraw m_draw;
 	UpdateMeasure m_update;
 	MeasureMan* m_ptrMan;
-    
+
     int m_item;
 	const SingleItemInfo *m_itemInfo;
 
@@ -487,7 +483,7 @@ class D2MeasureVolEllipse1: public AbsMeasure
 	POINT m_l_start;	//长轴起始点
 	POINT m_l_end;		//长轴终止点
 	POINT m_s_start;	//短轴起始点
-	double  m_SA_P;		//轴长
+	double  m_SA_P;		//杞撮暱
 //	int m_method;
 
 //	void CalcResult(void);
@@ -523,7 +519,7 @@ class D2MeasureVolEllipse2: public AbsMeasure
 	POINT m_l_start;	//长轴起始点
 	POINT m_l_end;		//长轴终止点
 	POINT m_s_start;	//短轴起始点
-	double  m_SA_P;		//轴长
+	double  m_SA_P;		//杞撮暱
 	double m_area;
 	double m_dist;
 	double m_vol;
@@ -648,9 +644,9 @@ class D2MeasureHip: public AbsMeasure
 	POINT m_bl_p1, m_bl_p2;
 	POINT m_rl_p1, m_rl_p2;
 	POINT m_il_p1, m_il_p2;
-	double m_theta; 
-	double m_alpha;//α
-	double m_beta;//β
+	double m_theta;
+	double m_alpha;//伪
+	double m_beta;//尾
 	struct Record{
 		POINT point;
 		double angle;
@@ -687,7 +683,7 @@ class D2MeasureDepthDist: public AbsMeasure
 	int m_method;
 };
 
-//两点法距离狭窄比
+//涓ょ偣娉曡窛绂荤嫮绐勬瘮
 class D2MeasureRatioDistDot: public AbsMeasure
 {
     public:
@@ -724,7 +720,7 @@ class D2MeasureRatioDistDot: public AbsMeasure
 	int m_method;
 };
 
-//距离周长比例测量
+//璺濈鍛ㄩ暱姣斾緥娴嬮噺
 class D2MeasureRatioDistPeri: public AbsMeasure
 {
     public:
@@ -745,7 +741,6 @@ class D2MeasureRatioDistPeri: public AbsMeasure
 	MeasureMan* m_ptrMan;
     int m_item;
 	const SingleItemInfo *m_itemInfo;
-
 
 	int m_step; ///< current status(step)
 	bool m_isDraw;
@@ -782,8 +777,8 @@ class D2MeasureRatioAreaTrack: public AbsMeasure
 	double m_area1;
 	double m_area2;
 	double m_ratio;
-	vector<POINT> Track1;//存储轨迹用于擦除  
-	vector<POINT> Track2;//存储轨迹用于擦除  
+	vector<POINT> Track1;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> Track2;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -827,7 +822,6 @@ class D2MeasureRatioArea: public AbsMeasure
     int m_item;
 	const SingleItemInfo *m_itemInfo;
 
-
 	int m_step; ///< current status(step)
 	bool m_isDraw;
 	POINT m_tempP;
@@ -846,7 +840,6 @@ class D2MeasureRatioArea: public AbsMeasure
 	double m_ratio;
 	int m_method;
 };
-
 
 class D2MeasureRatioAngle: public AbsMeasure
 {
@@ -916,13 +909,13 @@ class DrawHistogram
     public:
 	DrawHistogram();
 	~DrawHistogram();
-	
+
 	static void SetArea(POINT area_start, POINT area_end);
 	static void HistogramDraw(unsigned char *image_p);
-	
+
     private:
-	static POINT m_area_start; 
-	static POINT m_area_end; 
+	static POINT m_area_start;
+	static POINT m_area_end;
 	static int m_sum[256];
 	static MeasureDraw m_draw;
 };
@@ -957,7 +950,6 @@ class D2MeasureProfile: public AbsMeasure
 
 POINT CycleVertex( POINT p1, POINT p2 );
 
-
 class D2MeasureIMT: public AbsMeasure
 {
         public:
@@ -976,7 +968,6 @@ class D2MeasureIMT: public AbsMeasure
 	UpdateMeasure m_update;
 	MeasureMan* m_ptrMan;
 
- 
     int m_step; ///< current status(step)
     bool m_isDraw;
     bool m_ImtStatus;
@@ -993,7 +984,7 @@ class D2MeasureIMT: public AbsMeasure
 
     static int roi_width;
     static int roi_height;
-    POINT start; 
+    POINT start;
     POINT end;
 };
 #endif

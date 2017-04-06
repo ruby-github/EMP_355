@@ -13,7 +13,7 @@
 #define KEY_ESC 0x0E
 
 #if defined(K24C)
-#define KEY_DUAL 0x81 //双B
+#define KEY_DUAL 0x81 //鍙孊
 #define KEY_QUAD 0x82 //4B
 #define KEY_DEPTH 0x85
 #define KEY_LOCALZOOM 0xDA
@@ -41,7 +41,7 @@
 #elif (defined(EMP_460) || defined(EMP_355))
 #define KNOB_GAIN 0x0B
 #define KEY_FOCUS 0xAB
-#define KEY_DUAL 0x81 
+#define KEY_DUAL 0x81
 #define KEY_QUAD 0x82 //4B
 #define KEY_F1ADD 0xB1
 #define KEY_F1SUB 0xB2
@@ -84,7 +84,6 @@
 #define KEY_AUTOADJUST      0xF2
 #define KEY_AUTOBALANCE     0xF1
 
-
 #elif defined(EMP_322)
 #define KEY_F6 0xE6
 #define KEY_4D 0XD0
@@ -120,14 +119,14 @@
 #elif defined(EMP_313)
 #define KEY_BB 0x81
 #define KEY_BM 0x82
-#define KEY_REVIEW 0x8E //读取
-#define KEY_ARCHIVE 0xBD   //快存
-#define KEY_ENDEXAM 0x91 //存储
-//#define KEY_ENDEXAM 0xF9 //存储
-#define KEY_SAVE 0xF9 //打印
-//#define KEY_SAVE 0x91 //打印
+#define KEY_REVIEW 0x8E //璇诲彇
+#define KEY_ARCHIVE 0xBD   //蹇瓨
+#define KEY_ENDEXAM 0x91 //瀛樺偍
+//#define KEY_ENDEXAM 0xF9 //瀛樺偍
+#define KEY_SAVE 0xF9 //鎵撳嵃
+//#define KEY_SAVE 0x91 //鎵撳嵃
 #define KEY_CURSOR 0xB0 //Distance
-#define KEY_LOCALZOOM 0x8C 
+#define KEY_LOCALZOOM 0x8C
 #define KEY_DEPTH 0x85
 #define KEY_FOCUS 0xAB
 #define KEY_FREQ 0xA8
@@ -191,13 +190,13 @@
 #define KEY_F5 0xE5
 //#define KEY_P1 0xD5
 //#define KEY_P2 0xD6
-#define KEY_PWRADD 0xDD 
-#define KEY_PWRSUB 0xDE 
+#define KEY_PWRADD 0xDD
+#define KEY_PWRSUB 0xDE
 #define KEY_MBP 0xE9
 
 #if (defined(EMP_460) || defined(EMP_355))
 #define KEY_SHIFT_CTRL 0xF0 //CTRL_SPACE
-#define KEY_VOLUMEADD 0xDC      
+#define KEY_VOLUMEADD 0xDC
 #define KEY_VOLUMESUB 0xDB
 
 #else
@@ -241,7 +240,7 @@
 //Superuser
 
 #define KEY_S 0x73
-#define KEY_SUPER_E 0x65 
+#define KEY_SUPER_E 0x65
 #define KEY_SUPER_M 0x6D
 #define KEY_SUPER_P 0x70
 #define KEY_SUPER_R 0x72

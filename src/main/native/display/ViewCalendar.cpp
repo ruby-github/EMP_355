@@ -2,11 +2,10 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "KeyValueOpr.h"
-#include "ViewCalendar.h"
-#include "ViewArchive.h"
-#include "gui_global.h"
-
+#include "keyboard/KeyValueOpr.h"
+#include "display/ViewCalendar.h"
+#include "patient/ViewArchive.h"
+#include "display/gui_global.h"
 
 ViewCalendar* ViewCalendar::m_ptrInstance = NULL;
 
@@ -33,7 +32,7 @@ GtkWidget* ViewCalendar::GetWindow(void)
 {
     if (GTK_IS_WIDGET(m_window))
         return m_window;
-    else 
+    else
         return NULL;
 }
 
@@ -49,10 +48,10 @@ void ViewCalendar::CreateWindow(GtkWidget *parent, CalendarType flag, AbsCalenda
 	gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_MOUSE);
 	gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
 	gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-	gtk_window_set_transient_for(GTK_WINDOW (m_window), GTK_WINDOW(parent)); 
-	g_signal_connect (G_OBJECT (m_window), 
-			"destroy", 
-			G_CALLBACK (HandleDestroyEvent), 
+	gtk_window_set_transient_for(GTK_WINDOW (m_window), GTK_WINDOW(parent));
+	g_signal_connect (G_OBJECT (m_window),
+			"destroy",
+			G_CALLBACK (HandleDestroyEvent),
 			this);
 
 	GtkWidget *vbox = gtk_vbox_new (FALSE, 2);
@@ -61,7 +60,7 @@ void ViewCalendar::CreateWindow(GtkWidget *parent, CalendarType flag, AbsCalenda
 	m_calendar = gtk_calendar_new();
 	gtk_box_pack_start (GTK_BOX (vbox), m_calendar, FALSE, FALSE, 0);
 //	gtk_container_add (GTK_CONTAINER (m_window), m_calendar);
-	g_signal_connect (G_OBJECT (m_calendar), 
+	g_signal_connect (G_OBJECT (m_calendar),
 			"day-selected-double-click",
 		    G_CALLBACK (HandleCalendarDaySelectedDoubleClick),
 		    this);

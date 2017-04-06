@@ -1,17 +1,17 @@
-#include "MeasureFactory.h"
-#include "Measure2D.h"
-#include "MeasureM.h"
-#include "MeasureD.h"
-#include "MeaCalcFun.h"
-#include "MeaResult.h"
-#include "MeaFactoryMainSingle.h"
-#include "ViewCalcDialog.h"
-#include "ImgProcPw.h"
+#include "measure/MeasureFactory.h"
+#include "measure/Measure2D.h"
+#include "measure/MeasureM.h"
+#include "measure/MeasureD.h"
+#include "calcPeople/MeaCalcFun.h"
+#include "calcPeople/MeaResult.h"
+#include "calcPeople/MeaFactoryMainSingle.h"
+#include "display/ViewCalcDialog.h"
+#include "imageProc/ImgProcPw.h"
 #include <stdio.h>
-#include "../display/HintArea.h"
-#include "SysMeasurementSetting.h"
-#include "DrawHistogram.h"
-#include "MenuCalcNew.h"
+#include "display/HintArea.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "measure/DrawHistogram.h"
+#include "calcPeople/MenuCalcNew.h"
 
 MeaFactoryMainSingle* MeaFactoryMainSingle::m_ptrInstance = NULL;
 
@@ -47,7 +47,7 @@ int MeaFactoryMainSingle::SectionItem(int item, int *itemStart, const SingleItem
 		*ptrMultiItemInfo = AbdoMultiInfo;
 		*itemStart = ABD_MEA_START;
 		return ABDO_M;
-	}	
+	}
 	else if ((item >= ADULT_MEA_START)&&(item < ADULT_MEA_END))
 	{
 		*ptrSingleItemInfo = AdultInfo;
@@ -147,33 +147,32 @@ int MeaFactoryMainSingle::SectionItem(int item, int *itemStart, const SingleItem
 #endif
 }
 
-#include <stdio.h>
 AbsMeasure* MeaFactoryMainSingle::Create(int type)
 {
 	unsigned int parError = 0;
 	MeaResult *ptrMeaResult;
 	int offsetS, offsetM;
 
-	if(g_ptrAbsMeasure != NULL) 
+	if(g_ptrAbsMeasure != NULL)
 	{
 		delete g_ptrAbsMeasure;
 		g_ptrAbsMeasure = NULL;
 	}
-	
-	//自动计算打开时，禁止测量
+
+	//鑷姩璁＄畻鎵撳紑鏃讹紝绂佹娴嬮噺
 	bool autoCalc = ImgProcPw::GetInstance()->GetAutoCalc();
 	if  (autoCalc)
 	{
 		HintArea::GetInstance()->UpdateHint(_("Please turn off auto calc!"), 1);
 		return g_ptrAbsMeasure;
 	}
-	
+
 	MeasureFactory::EMeasureMode currMeaMode;
 	currMeaMode = MeasureFactory::GetInstance()->JudgeMode();
 
 	m_type = type;
 	ptrMeaResult = MeaResult::GetInstance();
-//检查所选择测量的模式和当前扫描模式是否相符	
+//妫€鏌ユ墍閫夋嫨娴嬮噺鐨勬ā寮忓拰褰撳墠鎵弿妯″紡鏄惁鐩哥
 	ModeStatus s;
 //	int mode = s.GetScanMode();
 
@@ -213,7 +212,7 @@ AbsMeasure* MeaFactoryMainSingle::Create(int type)
 }
 
 unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSingleItemInfo, MeasureFactory::EMeasureMode currMeaMode)
-{	
+{
     unsigned int parError = 0;
 	switch (ptrSingleItemInfo->meaType)
 	{
@@ -231,7 +230,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
-        
+
         case LENGTH_TRACK:
             if ((currMeaMode == MeasureFactory::MEA_2D) || (currMeaMode == MeasureFactory::MEA_2D_M) || (currMeaMode == MeasureFactory::MEA_2D_PW))
                 g_ptrAbsMeasure = new D2MeasureLengthTrack(ptrSingleItemInfo);
@@ -273,7 +272,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
-#if 0        
+#if 0
         case AREA_ELLIPSE:
 			if ((currMeaMode == MeasureFactory::MEA_2D) || (currMeaMode == MeasureFactory::MEA_2D_M) || (currMeaMode == MeasureFactory::MEA_2D_PW))
 				g_ptrAbsMeasure = new D2MeasureVolEllipse1(ptrSingleItemInfo);
@@ -287,7 +286,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
-		
+
 		case PERI_ELLIPSE:
 		case AREA_ELLIPSE:
 		case VOL_ELLIPSE1:
@@ -379,7 +378,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 			else
 				g_ptrAbsMeasure = NULL;
 			break;
-#if 0      
+#if 0
         case DEPTH_DIST:
 			if ((currMeaMode == MeasureFactory::MEA_M) || (currMeaMode == MeasureFactory::MEA_2D_M))
 				g_ptrAbsMeasure = new D2MeasureDistDot(ptrSingleItemInfo);
@@ -387,7 +386,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 				g_ptrAbsMeasure = NULL;
 			break;
 #endif
-	
+
         case EF:
 			if ((currMeaMode == MeasureFactory::MEA_M) || (currMeaMode == MeasureFactory::MEA_2D_M))
 				g_ptrAbsMeasure = new MMeasureEFTei(ptrSingleItemInfo);
@@ -420,7 +419,6 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 				g_ptrAbsMeasure = NULL;
 			break;
 
-	
 		case TIME_M:
 		case HR_M:
 			if ((currMeaMode == MeasureFactory::MEA_M) || (currMeaMode == MeasureFactory::MEA_2D_M))
@@ -445,7 +443,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
 			break;
 
         case MEASURE_TRACK:
-            {          
+            {
                 SysMeasurementSetting sys;
                 int manualMethod;
 
@@ -454,7 +452,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
                     manualMethod = sys.GetTraceMethod();
                     if (manualMethod == 1)
                     {
-                        g_ptrAbsMeasure = new DMeasureManualTrack();         
+                        g_ptrAbsMeasure = new DMeasureManualTrack();
                     }
                     else if (manualMethod == 0)
                     {
@@ -471,7 +469,7 @@ unsigned int MeaFactoryMainSingle::NewSingleMeasure(const SingleItemInfo *ptrSin
                         }
                     }
                 }
-                else 
+                else
                     g_ptrAbsMeasure = NULL;
             }
 			break;

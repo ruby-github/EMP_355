@@ -1,15 +1,14 @@
-#include "gtk/gtk.h"
-#include "gui_func.h"
-#include "gui_global.h"
-#include "BiopsyLine.h"
-#include "MenuBiopsy.h"
-#include "ProbeSocket.h"
-#include "ProbeMan.h"
-#include "../sysMan/SysBiopsySetting.h"
-#include "../display/HintArea.h"
-#include "../display/gui_global.h"
-#include "SysNoteSetting.h"
-#include "BiopsyMan.h"
+#include <gtk/gtk.h>
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "probe/BiopsyLine.h"
+#include "probe/MenuBiopsy.h"
+#include "probe/ProbeSocket.h"
+#include "probe/ProbeMan.h"
+#include "sysMan/SysBiopsySetting.h"
+#include "display/HintArea.h"
+#include "sysMan/SysNoteSetting.h"
+#include "probe/BiopsyMan.h"
 
 BiopsyLine* BiopsyLine::m_ptrInstance = NULL;
 
@@ -72,7 +71,7 @@ bool BiopsyLine::Create(void)
    // InitBiopsy();
     if (g_menuBiopsy.GetDrawStatus())
         Draw();
-    
+
     return true;
 }
 
@@ -205,7 +204,7 @@ void BiopsyLine::SetDefault(void)
 
 void BiopsyLine::InitBiopsy(void)
 {
-    const unsigned int maxAngle = m_baseAngle + m_adjustAngle; 
+    const unsigned int maxAngle = m_baseAngle + m_adjustAngle;
     unsigned int minAngle = 0;
     if (( m_baseAngle - m_adjustAngle) < 0)
     {
@@ -225,7 +224,7 @@ void BiopsyLine::InitBiopsy(void)
 	ret = MAX;
     else if (m_biopY == minAngle)
 	ret = MIN;
-    else 
+    else
 	ret = OK;
     sprintf(str, "%d", valueAngle);
    // g_menuBiopsy.UpdateAngle(str, ret);
@@ -234,11 +233,11 @@ void BiopsyLine::InitBiopsy(void)
 	ret = MAX;
     else if (m_biopX == minPos)
 	ret = MIN;
-    else 
+    else
 	ret = OK;
     sprintf(str, "%d", valuePos);
    // g_menuBiopsy.UpdatePosition(str, ret);
-    
+
 }
 
 void BiopsyLine::AngleChange(EKnobOper oper)
@@ -251,7 +250,7 @@ void BiopsyLine::AngleChange(EKnobOper oper)
     {
 		min = 0;
     }
-    else 
+    else
     {
         min = m_baseAngle - m_adjustAngle;
     }*/
@@ -259,7 +258,7 @@ void BiopsyLine::AngleChange(EKnobOper oper)
 	int max=80;//88//90---------max angle
 	int min=1;//0-------------min angle
 	float m_Angle=0;
-    
+
     float m_Angle1=0;
     float m_Angle2=0;
 
@@ -293,7 +292,7 @@ void BiopsyLine::AngleChange(EKnobOper oper)
     else if (oper == SUB && Angle > min)
     {
         --Angle;
-        m_Angle = Angle * PI/180; 
+        m_Angle = Angle * PI/180;
         //------------------------------------------//
          m_biopAngle1=Angle - 5;
          m_biopAngle2=Angle + 5;
@@ -330,7 +329,7 @@ void BiopsyLine::PositionChange(int offsetX)
     int max=m_baseVal_x+25;
     int min=m_baseVal_x-25;
 
-    if(min<0)//防止为m_biopx < 0
+    if(min<0)//闃叉涓簃_biopx < 0
     {
         min=0;
     }
@@ -362,7 +361,7 @@ void BiopsyLine::PositionChange(int offsetX)
         m_biopY1 = m_biopX1 / tan(angleTmp1);
 		m_biopY2 = m_biopX2 / tan(angleTmp2);
     }
-    
+
     Draw();
 }
 
@@ -383,7 +382,7 @@ void BiopsyLine::AngleSwitch(void) //2016.08.08
 {
 	Angle=BiopsyMan::GetInstance()->GetCurBioAngleValue();
 	m_biopX=BiopsyMan::GetInstance()->GetBioXOfCurBioBracketAngleType();
-    
+
     m_biopX1=m_biopX;
 	m_biopX2=m_biopX;
 
@@ -418,5 +417,3 @@ void BiopsyLine::BiopsyLine::ClearDoubleLine(void)
 {
     m_ptrImgDraw->ClearBiopsyDoubleLine();
 }
-
-

@@ -1,4 +1,4 @@
-#include "CreateBitmap.h"
+#include "patient/CreateBitmap.h"
 #include <errno.h>
 
 #pragma pack(1)
@@ -66,7 +66,7 @@ bool CreateBitmap24(unsigned char* input, int fd_output, unsigned int width, uns
 	for(i=0; i<height; i++)
 		for(j=0; j<width; j++)
 			for(n=0; n<3; n++)
-				*(data+(height-i-1)*width*3+j*3+n) = *(input+(i*3*width+j*3+(2-n)));	//上下颠倒，BGR格式
+				*(data+(height-i-1)*width*3+j*3+n) = *(input+(i*3*width+j*3+(2-n)));	//涓婁笅棰犲€掞紝BGR鏍煎紡
 
 	if(write(fd_output, data, ImgSize)==-1)
 	{
@@ -81,13 +81,13 @@ bool ReadBitmap24(const char* path, unsigned char* buf, int width, int height)
 {
 	FILE *fs = fopen(path, "rb");
 	unsigned int size = width * height * 3;
-	
+
 	if(!fs)
 	{
 		perror("fopen error:");
 		return false;
 	}
-	
+
 	if(fseek(fs, 14+sizeof(BITMAPINFOHEADER), SEEK_SET) < 0)
 	{
 		perror("fseek error:");

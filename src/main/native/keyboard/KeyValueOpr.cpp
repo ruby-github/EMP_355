@@ -9,7 +9,7 @@
  *date:		2009-5-19
  *author:	sunxubin
  ***********************************/
-#include "KeyValueOpr.h"
+#include "keyboard/KeyValueOpr.h"
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
@@ -19,9 +19,9 @@
 #include <syslog.h>
 #include <pthread.h>
 #include <gtk/gtk.h>
-#include "ScreenSaver.h"
-#include "KeyDef.h"
-#include "Img2D.h"
+#include "sysMan/ScreenSaver.h"
+#include "keyboard/KeyDef.h"
+#include "imageControl/Img2D.h"
 
 using namespace std;
 
@@ -53,9 +53,9 @@ void KeyValueOpr::ListLighten() //for debug
 
 /*****************************
  * @brief 检查灯点亮或熄灭
- * 
+ *
  * @para lightValue light value to be check
- * @retval on true-亮灯, false-灭灯
+ * @retval on true-浜伅, false-鐏伅
  * **************************/
 bool KeyValueOpr::IsLighten(unsigned char lightValue)
 {
@@ -70,7 +70,7 @@ bool KeyValueOpr::IsLighten(unsigned char lightValue)
 }
 
 /*****************************
- * @brief 在容器中记录点亮的灯
+ * @brief 鍦ㄥ鍣ㄤ腑璁板綍鐐逛寒鐨勭伅
  * **************************/
 void KeyValueOpr::AddLighten(unsigned char lightValue)
 {
@@ -93,8 +93,8 @@ void KeyValueOpr::RemoveLighten(unsigned char lightValue)
 
 /*****************************
  * @brief 控制灯,点亮或熄灭
- * 
- * @para on true-亮灯, false-灭灯
+ *
+ * @para on true-浜伅, false-鐏伅
  * @para lightValue light value to be control
  * **************************/
 void KeyValueOpr::CtrlLight(bool on, unsigned char lightValue )
@@ -198,8 +198,8 @@ void KeyValueOpr::SendKeyValue( unsigned char *keyValue )
     switch(keyValue[0])
     {
         ///接收到TGC发送给vector底窗口即主窗口
-        case 0x07:		
-            if ((keyValue[2]>=0xA1)&&(keyValue[2]<=0xA9))		
+        case 0x07:
+            if ((keyValue[2]>=0xA1)&&(keyValue[2]<=0xA9))
                {
 #ifdef TRANSDUCER
                    WinOprStack[0]->SliderEvent(keyValue[1], keyValue[2]);
@@ -209,13 +209,13 @@ void KeyValueOpr::SendKeyValue( unsigned char *keyValue )
                         Img2D::GetInstance()->ChangeTransducer(Transducer);
                    }
 
-#else					
+#else
  					WinOprStack[0]->SliderEvent(keyValue[1], keyValue[2]);
 #endif
                }
             break;
 
-            //接收到其他发送给vector顶窗口即当前活动窗口
+            //鎺ユ敹鍒板叾浠栧彂閫佺粰vector椤剁獥鍙ｅ嵆褰撳墠娲诲姩绐楀彛
         case 0x0:
             WinOprStack[total-1]->KeyEvent(keyValue[1]);
             break;
@@ -276,7 +276,7 @@ void KeyValueOpr::SendKeyValue( unsigned char *keyValue )
 }
 
 /***************************
- *interface: KeyValueOpr对象指针
+ *interface: KeyValueOpr瀵硅薄鎸囬拡
  *fdcom:	 串口设备号
  * ***********************/
 gboolean GetKeyValue(GIOChannel *source, GIOCondition condition, gpointer data)
@@ -287,10 +287,10 @@ gboolean GetKeyValue(GIOChannel *source, GIOCondition condition, gpointer data)
 	int lenTotal = 0;
 	unsigned char recvbuf[3];
 	KeyValueOpr *pKeyInterface;
-	
+
 	timeout.tv_sec = 5;			// timeout = 5 second.
 	timeout.tv_usec = 0;
-	
+
 	for( i=0; i<3; i++ )
 	{
 		recvbuf[i] = 0;
@@ -338,20 +338,20 @@ gboolean GetKeyValue(GIOChannel *source, GIOCondition condition, gpointer data)
 	return TRUE;
 }
 
-//设置键盘串口并对串口进行监视
+//璁剧疆閿洏涓插彛骞跺涓插彛杩涜鐩戣
 void *KeyboardOversee( void *pKeyInterface, bool isHandShake)
 {
 	portinfo_t portinfo = { '0', 19200, '8', '0', '0', '0', '0', '0', '1', 0 };
 
-	s_fdcom = PortOpen( &portinfo ); 
+	s_fdcom = PortOpen( &portinfo );
 	if(s_fdcom < 0)
 	{
-		exit(EXIT_FAILURE);	
+		exit(EXIT_FAILURE);
 	}
 
 	PRINTF("s_fdcom= %d\n", s_fdcom );
 
-	PortSet( s_fdcom, &portinfo );//键盘串口设置
+	PortSet( s_fdcom, &portinfo );//閿洏涓插彛璁剧疆
 	PRINTF( "set serial port success" );
 
 	if (isHandShake)
@@ -362,9 +362,9 @@ void *KeyboardOversee( void *pKeyInterface, bool isHandShake)
 		}
 	}
 
-	//键盘监视
+	//閿洏鐩戣
 	UartOversee( s_fdcom, pKeyInterface );
-	
+
 	return NULL;
 }
 
@@ -379,9 +379,8 @@ void KeyboardSound(bool value)
     unsigned char soundValue;
     if (value)
 	soundValue = KEY_SOUND_ON;
-    else 
+    else
 	soundValue = KEY_SOUND_OFF;
-	
+
     PortSend(s_fdcom, &soundValue, 1);
 }
-

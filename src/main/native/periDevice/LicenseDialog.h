@@ -1,7 +1,7 @@
 /**
 * @brief LicenseDialog.h : create a license dialog, offer the information of authorization to user.
 
-* @author: hehao 
+* @author: hehao
 * @version: v1.0
 * @data: 2012.10.25
 */
@@ -9,7 +9,7 @@
 #ifndef LICENSEDIALOG_H
 #define LICENSEDIALOG_H
 #include <gtk/gtk.h>
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 
 class CLicenseDialog : FakeXEvent
 {

@@ -4,8 +4,8 @@
 
 #include <string>
 #include <deque>
-#include "MeasureDef.h"
-#include "IMT.h"
+#include "calcPeople/MeasureDef.h"
+#include <IMT.h>
 #include "Def.h"
 
 using std::string;
@@ -36,14 +36,14 @@ public:
     void ClearMeasure(void);
     void AddResult(string result, int cursorType=0, int colorConfirm=2); // for test
     int GetResultCount(void);
-   
+
     ///< 2D
     void CatHighCalc(const CalcResultInfo *calcInfo, int *calcOrder, float dataMea[], char buf[], int meaLen);
     void GenDisplaySingle(const SingleItemInfo *info, float data[], ResultAttr& attr, bool inMeasure, int unit_coeffi);
     void GenDisplayMulti(const MultiItemInfo *info, float dataMea[], ResultAttr& attr, bool inMeasure, int unit_coeffi[]);
     void D2Hip(double angle1, double angle2, ResultAttr& attr, bool inMeasure=true);
 
-    void D2Dist(double length, ResultAttr& attr, bool inMeasure); 
+    void D2Dist(double length, ResultAttr& attr, bool inMeasure);
 
     void D2LenTrack(double length, ResultAttr& attr, bool inMeasure=true);
     //    void D2AreaTrack(double perimeter, double area, ResultAttr& attr, bool inMeasure=true);

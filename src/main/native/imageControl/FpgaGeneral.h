@@ -1,13 +1,13 @@
 #ifndef CFPAGGENERAL_H
 #define CFPGAGENERAL_H
-#include "UsbControl.h"
+#include "imageControl/UsbControl.h"
 
 typedef unsigned long int U32, *PU32;
 
 #define  ADREFTYPE 0			//ADC 参考电压类型， 1： 外部参考， 0： 内部参考
-#define	TESTLVDSCHADDR		63		
-#define  AdcCtrlAddr		44		//ADC 寄存器地址写入的FPGA地址
-#define  AdcCtrlData		45		//ADC 寄存器数据写入的FPGA地址
+#define	TESTLVDSCHADDR		63
+#define  AdcCtrlAddr		44		//ADC 瀵勫瓨鍣ㄥ湴鍧€鍐欏叆鐨凢PGA鍦板潃
+#define  AdcCtrlData		45		//ADC 瀵勫瓨鍣ㄦ暟鎹啓鍏ョ殑FPGA鍦板潃
 #define COMAddrFPGAAddrA	58
 #define COMDataFPGAAddrA    59
 
@@ -24,7 +24,7 @@ class CFpgaGeneral
  		  void AD5805ControlInit(void);
         void RunChip(void);
         void ResetControl(void);
-        void PowerOff(void); //断电
+        void PowerOff(void); //鏂數
         void Ready(void);
         void Update(void);
         void SetIndex(void);
@@ -33,7 +33,7 @@ class CFpgaGeneral
         void AD9273_TestIO(bool TYPE);
         void AD9273_TestChNo(U32 ChipNo, U32 ChNoInChip);
         void ProbeSocketSel(U32 SocketNo);
-      
+
         void AD9273_Test(unsigned char regaddr, unsigned char data);
         //void AD_PowerDown(void);
         //void AD_StandBy(void);
@@ -53,4 +53,3 @@ class CFpgaGeneral
 
 };
 #endif
-

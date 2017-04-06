@@ -3,15 +3,14 @@
 
 #include <string>
 #include <vector>
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 #include "AbsCalendarOpr.h"
-#include "FileMan.h"
-#include "MeaResult.h"
-#include "DCMDef.h"
+#include "patient/FileMan.h"
+#include "calcPeople/MeaResult.h"
+#include "periDevice/DCMDef.h"
 
 using std::string;
 using std::vector;
-
 
 //ADD BY JHUANG BEGIN
 typedef struct CalcNode
@@ -22,7 +21,7 @@ typedef struct CalcNode
     char title[256];
     char value[256];
     char gw[256];
-    char edcb[256];    
+    char edcb[256];
     int row;
     int stamp;
     struct CalcNode *next;
@@ -82,13 +81,13 @@ public:
     void InitTableData(void);
     void ClearIndicationandComments(void);
 
-#if 1 //add by jhuang 
+#if 1 //add by jhuang
     int GetCountFromCalcArr(void);
     bool GetItemFromCalcArr(int seq, CalcNode_t *result);
     void DefaultCalcArr(void);
     int SearchIDFromCalcArr(int stamp, int row);
     bool SetCheckToCalcArr(int id, char *title, bool fixed);
-#endif 
+#endif
 
 private:
     ViewReport();
@@ -111,14 +110,14 @@ private:
     bool IsETypeInSection(int etype, int Section);
 	int GetSectionForDepartment(const char *department);
 #ifdef VET
-//hlx 
+//hlx
 		int m_TableTD[TD_MEA_END-TD_MEA_START][CALC_MAX];
-//hlx 
+//hlx
 		int m_TableAnOB[ANOB_MEA_END-ANOB_MEA_START][CALC_MAX];
 #endif
     static const int SNAP_W = 100;
     static const int SNAP_H = 80;
-//hlx 
+//hlx
 #ifdef VET
 		enum{
 			NB_ABD,
@@ -134,7 +133,7 @@ private:
 			NB_TD
 		};
 #else
-		
+
 #if (defined(EMP_322) || defined(EMP_313))
 enum{
         NB_ABD,
@@ -197,7 +196,6 @@ enum{
     GtkWidget *m_treeview_left, *m_treeview_right, *m_treeview_ob; //add by huangj
     GtkWidget *m_window, *m_notebook, *m_fixed, *m_frameImage, *m_frameEdit, *m_swEdit;
 
-
 #ifdef VET
 		GtkWidget *m_entryAnimalName;
 		GtkWidget *m_entryOwnerName;
@@ -205,15 +203,11 @@ enum{
 #endif
     GtkWidget *m_entryHos, *m_entryName, *m_entryID, *m_entrySID, *m_entryDate, *m_entryStudy, *m_entryItem, *m_entryUDr, *m_entryRDr, *m_entrySex, *m_entryAge;
     GtkWidget *m_viewportABD, *m_viewportUR, *m_viewportAE, *m_viewportOB, *m_viewportGYN, *m_viewportSP, *m_viewportFE, *m_viewportORT;
-//hlx 
+//hlx
 	GtkWidget *m_viewportTD;
 	GtkWidget *m_viewportAnOB;
 
-
-
     GtkWidget *m_btnTransfer;
-
-
 
 #if not defined(EMP_322)
 #if not defined(EMP_313)
@@ -275,7 +269,6 @@ enum{
 		gint AddResultToTree( GtkWidget *treeview, ResultTable result, bool side, gint rows);
 		gint AddResultToObTree(GtkWidget *treeview, ResultObTable result, int fetal, int row);
 
-
         DCMSRELEMENT GetSRElement();
         string GetExamDoctor();
         string GetHospitalName();
@@ -283,14 +276,14 @@ enum{
 #if 1 //add by jhuang
         void ShowMeasureData(guint page_num);
         void ShowAllCalcArr(void);
-        int AddResultToTree2( GtkWidget *treeview, char *title, char *value, int id, int row); 
-        int AddResultToTree3( GtkWidget *treeview, char *title, char *value, char *sd, int id, int row); 
+        int AddResultToTree2( GtkWidget *treeview, char *title, char *value, int id, int row);
+        int AddResultToTree3( GtkWidget *treeview, char *title, char *value, char *sd, int id, int row);
         void SetIDToCalcArr(int stamp, int row, bool fixed, int id, int section, const char *title, const char *value, const char *gw, const char *edcb);
         bool GetCheckFromCalcArr(int id, const char *title);
-#endif 
+#endif
         void AddAverRes(GtkWidget *fixed, guint *y, const char *title);
 
-//Ìí¼Ó hlx 
+//脤铆录脫 hlx
 
 	void AddTDRes(GtkWidget *fixed, guint *y, const char *title);
         void AddOBEfwTable(GtkWidget *fixed, guint *y, const char *title, int fetal=FETAL_BY_SET);
@@ -313,9 +306,9 @@ enum{
 		void GrowthCurveChanged(GtkComboBox *combobox);
 		void SpinValueChanged(GtkSpinButton *spin);
 
-		static gboolean HandleGrowthCurveConfigure(GtkWidget *widget, GdkEventConfigure *event, ViewReport *data) 
+		static gboolean HandleGrowthCurveConfigure(GtkWidget *widget, GdkEventConfigure *event, ViewReport *data)
 		{ data->GrowthCurveConfigure(widget, event); return FALSE;}
-		static gboolean HandleGrowthCurveExpose(GtkWidget *widget, GdkEventExpose *event, ViewReport *data) 
+		static gboolean HandleGrowthCurveExpose(GtkWidget *widget, GdkEventExpose *event, ViewReport *data)
 		{ data->GrowthCurveExpose(widget, event); return FALSE;}
 		static void HandleGrowthCurveChanged(GtkComboBox *combobox, ViewReport *data) { data->GrowthCurveChanged(combobox); }
 		static void HandleSpinValueChanged(GtkSpinButton *spin, ViewReport *data) { data->SpinValueChanged(spin); }
@@ -330,14 +323,13 @@ enum{
 		GtkWidget* CreateNotePageFE(void);
 		GtkWidget* CreateNotePageTCD(void);
 		GtkWidget* CreateNotePageORT(void);
-       
+
 #ifdef VET
 //hlx
 		GtkWidget* CreateNotePageTD(void);
-//hlx 
+//hlx
 		GtkWidget* CreateNotePageAnOB(void);
 #endif
-
 
 		GtkWidget* CreateSW2NB(GtkWidget *notebook, gint num, const char *title);
 
@@ -368,37 +360,37 @@ enum{
         void TextCommentInsert(GtkTextBuffer *textbuffer, GtkTextIter *location, gchar *text, gint len);
 
 		// signal connect
-		static void HandleBtnAddImageClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnAddImageClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnAddImageClicked(button); }
-		static void HandleChkBtnImageClicked(GtkButton *button, ViewReport *data) 
+		static void HandleChkBtnImageClicked(GtkButton *button, ViewReport *data)
 		{ data->ChkBtnImageClicked(button); }
-		static void HandleBtnAddOKClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnAddOKClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnAddOKClicked(button); }
-		static void HandleBtnAddCancelClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnAddCancelClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnAddCancelClicked(button); }
-		static void HandleBtnEditOKClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnEditOKClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnEditOKClicked(button); }
-		static void HandleBtnEditCancelClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnEditCancelClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnEditCancelClicked(button); }
-		static void HandleBtnEditClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnEditClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnEditClicked(button); }
-	//	static void HandleBtnExportClicked(GtkButton *button, ViewReport *data) 
+	//	static void HandleBtnExportClicked(GtkButton *button, ViewReport *data)
 	//	{ data->BtnExportClicked(button); }
-		static void HandleBtnPrintClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnPrintClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnPrintClicked(button); }
-	//	static void HandleBtnSaveClicked(GtkButton *button, ViewReport *data) 
+	//	static void HandleBtnSaveClicked(GtkButton *button, ViewReport *data)
 	//	{ data->BtnSaveClicked(button); }
-		static void HandleBtnExitClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnExitClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnExitClicked(button); }
-		static void HandleEventBoxCalendarPress(GtkWidget *widget, GdkEventButton *event, ViewReport *data) 
+		static void HandleEventBoxCalendarPress(GtkWidget *widget, GdkEventButton *event, ViewReport *data)
 		{ data->EventBoxCalendarPress(widget, event); }
-		static void HandleBtnTransferClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnTransferClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnTransferClicked(button); }
-		static void HandleBtnClearIndicationClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnClearIndicationClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnClearIndicationClicked(button); }
-		static void HandleBtnClearCommentsClicked(GtkButton *button, ViewReport *data) 
+		static void HandleBtnClearCommentsClicked(GtkButton *button, ViewReport *data)
 		{ data->BtnClearCommentsClicked(button); }
-		static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, ViewReport *data) 
+		static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, ViewReport *data)
 		{ data->NotebookChanged(notebook, page, page_num); }
 		static void HandleTextIndicationInsert(GtkTextBuffer *textbuffer, GtkTextIter *location, gchar *text, gint len, ViewReport *data)
 		{ data->TextIndicationInsert(textbuffer, location, text, len); }

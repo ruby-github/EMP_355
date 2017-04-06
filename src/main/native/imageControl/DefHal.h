@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <math.h>
-#include <Def.h>
+#include "Def.h"
 
 //typedef
 typedef int INT32;
@@ -29,6 +29,6 @@ const int SUCCESS=1; // sucess when exit
 const int ERR_OP=0;// open or operation error
 const int ERR_RANGE=-2;// input if out of range
 const int ERR_MALLOC=-3;// malloc or map error
-const int ERR_SYSCALL=-4;// system call error	
+const int ERR_SYSCALL=-4;// system call error
 
 #endif

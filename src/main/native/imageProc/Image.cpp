@@ -10,7 +10,7 @@
  */
 
 #include <string.h>
-#include "Image.h"
+#include "imageProc/Image.h"
 #include "Def.h"
 
 Image::Image(unsigned int* ptrImgSrc, AutoTracePara para)
@@ -24,7 +24,7 @@ Image::Image(unsigned int* ptrImgSrc, AutoTracePara para)
 	}
     m_tracePara = para;
 }
-		
+
 Image::Image(const Image &obj)
 {
 	m_ptrImg = new unsigned int[SIZE];

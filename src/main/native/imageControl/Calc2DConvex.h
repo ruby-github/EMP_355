@@ -1,7 +1,7 @@
 #ifndef CALC_2D_CONVEX_H
 #define CALC_2D_CONVEX_H
 
-#include "Calc2D.h"
+#include "imageControl/Calc2D.h"
 
 class Calc2DConvex: public Calc2D
 {
@@ -19,11 +19,11 @@ class Calc2DConvex: public Calc2D
 		void CalcWeightingEmit(int pulseWidth);
 		void CalcWeightingEmitColor(int pulseWidth);
 
-	protected:	
+	protected:
 		void CalcFilterBandPass(int order);
         void CalcDynamicFilter(int order);
 		void CalcDynamicDemod(int order);
-	
+
 	private:
 		static float TIS_CFM_BASIC[2][11][11]; ///< color doppler freq--focus pos's level--prf
 		static float TIS_CFM_POWER[10];
@@ -36,4 +36,3 @@ class Calc2DConvex: public Calc2D
 
 };
 #endif
-

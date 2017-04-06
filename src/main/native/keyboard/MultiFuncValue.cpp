@@ -8,25 +8,25 @@
  * date: 2010-9-27
  * @author: zhanglei
  */
-#include "MultiFuncValue.h"
-#include "MultiFuncMode.h"
-#include "ModeStatus.h"
-#include "Img2D.h"
-#include "MultiFuncArrow.h"
-#include "KeyValueOpr.h"
-#include "KeyFunc.h"
-#include "ImgProc2D.h"
-#include "ImgProcM.h"
-#include "Zoom.h"
-#include "MenuBiopsy.h"
+#include "keyboard/MultiFuncValue.h"
+#include "keyboard/MultiFuncMode.h"
+#include "imageProc/ModeStatus.h"
+#include "imageControl/Img2D.h"
+#include "comment/MultiFuncArrow.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyFunc.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ImgProcM.h"
+#include "imageProc/Zoom.h"
+#include "probe/MenuBiopsy.h"
 #include "ViewMain.h"
 
 ///> private
 ///> focus
-void MultiFuncFocus::Value(EKnobOper opr) 
+void MultiFuncFocus::Value(EKnobOper opr)
 {
     Img2D* ptrImg = Img2D::GetInstance();
-    if (ptrImg->IsCompoundSpaceOn() || ptrImg->IsCompoundFreqOn() || Zoom::GetInstance()->GetLocalZoomStatus() || ptrImg->GetTpViewStatus() || ptrImg->GetEFVIStatus()) 
+    if (ptrImg->IsCompoundSpaceOn() || ptrImg->IsCompoundFreqOn() || Zoom::GetInstance()->GetLocalZoomStatus() || ptrImg->GetTpViewStatus() || ptrImg->GetEFVIStatus())
         return;
 
 	Img2D::GetInstance()->ChangeFocSum(opr);
@@ -42,7 +42,7 @@ void MultiFuncFocus::Mouse(int offsetX, int offsetY)
 		Img2D::GetInstance()->ChangeFocPos(SUB);
 	else if (offsetY < 0)
 		Img2D::GetInstance()->ChangeFocPos(ADD);
-	
+
 	// change tis
 	ChangeTis();
 }
@@ -66,12 +66,11 @@ void MultiFuncFocus::KeyDown()
 }
 
 //Depth
-void MultiFuncDepth::Value(EKnobOper opr) 
+void MultiFuncDepth::Value(EKnobOper opr)
 {
     ModeStatus s;
     int flag = 0;
-    ScanMode::EScanMode mode = ScanMode::GetInstance()->GetScanMode();	
-
+    ScanMode::EScanMode mode = ScanMode::GetInstance()->GetScanMode();
 
     if (s.IsColorMode())
         flag = 1;
@@ -94,12 +93,12 @@ void MultiFuncDepth::Value(EKnobOper opr)
 #if 0
   if (mode == ScanMode::D2 )
     {
-        Img2D::GetInstance()->ChangeDepth(opr); 
+        Img2D::GetInstance()->ChangeDepth(opr);
     }
     else
     {
         //prepare
-        
+
         ImgCfm::GetInstance()->ChangeDepthBefore();
 
         //apply
@@ -173,7 +172,7 @@ void MultiFuncLocalZoom::Update()
 void MultiFuncLocalZoom::Mouse(int offsetX, int offsetY)
 {
 	OverturnMouseOpr(offsetX, offsetY);
-	
+
 	if (m_changeSize) // change size
 	{
 		bool lrStatus = ImgProc2D::GetInstance()->GetLRStatus();
@@ -420,7 +419,7 @@ void MultiFuncGrayTrans::KeyUp()
 	int offsetX = 0;
 	int offsetY = 1;
 
-	Mouse(offsetX, offsetY);	
+	Mouse(offsetX, offsetY);
 }
 void MultiFuncGrayTrans::KeyDown()
 {
@@ -482,7 +481,7 @@ void MultiFuncBiopsyVerify::MultiFuncBiopsyVerify::Undo()
 	BiopsyLine::GetInstance()->InitPara();
 	BiopsyLine::GetInstance()->Draw();
 	//----------------------------------------------------------//
-	
+
 }
 void MultiFuncBiopsyVerify::Do()
 {
@@ -544,7 +543,7 @@ void MultiFuncBiopsyVerify::KeyDown()
 
 void MultiFuncBiopsy::Mouse(int offsetX, int offsetY)
 {
-	fakeXMotionEventMenuBiopsy(offsetX,offsetY); 
+	fakeXMotionEventMenuBiopsy(offsetX,offsetY);
 }
 void MultiFuncBiopsy::Undo()
 {
@@ -569,4 +568,3 @@ void MultiFuncBiopsy::Do()
 	}
 
 }*/
-

@@ -4,10 +4,10 @@
 #include <vector>
 #include <list>
 #include <string>
-#include "IniFile.h"
-#include "FileMan.h"
-#include "ScanMode.h"
-#include "DCMMan.h"
+#include "base/IniFile.h"
+#include "patient/FileMan.h"
+#include "imageProc/ScanMode.h"
+#include "periDevice/DCMMan.h"
 
 using std::vector;
 using std::list;
@@ -23,14 +23,14 @@ class ImgMan: public FileMan
 		enum ImgNameMode{MANUAL, AUTO};
 
 		struct ImgItem
-		{	
+		{
 			///> basic info for saving to file
-			//char path[256];	///< the image file name (only use for get the file path when read snap and the file format is bmp or jpeg) 
+			//char path[256];	///< the image file name (only use for get the file path when read snap and the file format is bmp or jpeg)
 			GdkPixbuf *pixbuf;	///< output para: pixbuf when read snap, and you must free it
 			unsigned char *data;	///< intput para: image data
 			///> extend info for config file
-			int width;	///< width of image 
-			int height;	///< height of image 
+			int width;	///< width of image
+			int height;	///< height of image
 
 			ScanMode::SpecialMeasurePara para;
 		};
@@ -80,9 +80,8 @@ class ImgMan: public FileMan
 		int m_Storage;	///< storage type
 		int m_NameMode;	///< name mode
 	//	int m_TotalSnap;	///< total image saved
-	//	int m_CurSnap;		///< current num 
+	//	int m_CurSnap;		///< current num
         string m_imgFileName;
 };
 
 #endif //__IMGMAN_H__
-

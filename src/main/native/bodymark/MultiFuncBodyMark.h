@@ -2,10 +2,10 @@
 #define MULTI_FUNC_BODYMARK_H
 
 #include <gtk/gtk.h>
-#include "KnobEvent.h"
-#include "FakeXEvent.h"
+#include "keyboard/KnobEvent.h"
+#include "display/FakeXEvent.h"
 #include "AbsMultiFunc.h"
-#include "BodyMark.h"
+#include "bodymark/BodyMark.h"
 
 class MultiFuncBodyMark: public FakeXEvent, public AbsMultiFunc
 {
@@ -50,8 +50,8 @@ class MultiFuncBodyMark: public FakeXEvent, public AbsMultiFunc
 		void UndoMoveBodyMark();
 		void Esc();
 		void Hide(); // hide bodymark
-		bool Clicked(); 
-		bool DClicked(); 
+		bool Clicked();
+		bool DClicked();
 
 		void AddNewBodyMark(GdkPixbuf* pixbuf);
 		void BeginMoveProbeMark();

@@ -1,30 +1,29 @@
-
-#include "DscMan.h"
-#include "BDSC.h"
-#include "BBDSC.h"
-#include "B4DSC.h"
-#include "MDSC.h"
-#include "PWDSC.h"
-#include "CFMDSC.h"
-#include "CFMBBDSC.h"
-#include "CFMB4DSC.h"
-#include "PWCFMDSC.h"
-#include "CFMVS2DDSC.h"
-#include "CMMDSC.h"
-#include "CFMDSC_Rate.h"
-#include "CFMBBDSC_Rate.h"
-#include "CFMB4DSC_Rate.h"
-#include "CFMVS2DDSC_Rate.h"
-#include "PWCFMDSC_Rate.h"
-#include "CFMDSC_R.h"
-#include "CFMBBDSC_R.h"
-#include "CFMB4DSC_R.h"
-#include "CFMVS2DDSC_R.h"
-#include "PWCFMDSC_R.h"
-#include "EFOVDSC.h"
-#include "Img2D.h"
-#include "Zoom.h"
-#include "ImgCfm.h"
+#include "imageProc/DscMan.h"
+#include <BDSC.h>
+#include <BBDSC.h>
+#include <B4DSC.h>
+#include <MDSC.h>
+#include <PWDSC.h>
+#include <CFMDSC.h>
+#include <CFMBBDSC.h>
+#include <CFMB4DSC.h>
+#include <PWCFMDSC.h>
+#include <CFMVS2DDSC.h>
+#include <CMMDSC.h>
+#include <CFMDSC_Rate.h>
+#include <CFMBBDSC_Rate.h>
+#include <CFMB4DSC_Rate.h>
+#include <CFMVS2DDSC_Rate.h>
+#include <PWCFMDSC_Rate.h>
+#include <CFMDSC_R.h>
+#include <CFMBBDSC_R.h>
+#include <CFMB4DSC_R.h>
+#include <CFMVS2DDSC_R.h>
+#include <PWCFMDSC_R.h>
+#include <EFOVDSC.h>
+#include "imageControl/Img2D.h"
+#include "imageProc/Zoom.h"
+#include "imageControl/ImgCfm.h"
 
 DscMan* DscMan::m_ptrInstance = NULL;
 
@@ -37,10 +36,10 @@ DscMan::DscMan()
 	if (pthread_mutex_init(&m_pthreadLock, NULL) == 0)
 	{
 		PRINTF("pthread mutex lock create ok\n");
-		m_lockIsCreate = TRUE;	
+		m_lockIsCreate = TRUE;
 	}
 	else
-		m_lockIsCreate = FALSE;	
+		m_lockIsCreate = FALSE;
 #ifdef EMP_355
 	pthread_mutex_init(&m_pthreadLock1, NULL);
 	pthread_mutex_init(&m_pthreadLock2, NULL);
@@ -49,10 +48,10 @@ DscMan::DscMan()
 	if (pthread_mutex_init(&m_replayLock, NULL) == 0)
 	{
 		PRINTF("replay mutex lock create ok\n");
-		m_replayLockIsCreate = TRUE;	
+		m_replayLockIsCreate = TRUE;
 	}
 	else
-		m_replayLockIsCreate= FALSE;	
+		m_replayLockIsCreate= FALSE;
 
 #ifdef EMP_355
     m_receive = new CReceive(&m_ptrDsc, m_pthreadLock, m_pthreadLock1);
@@ -90,7 +89,7 @@ void DscMan::SendDataToDsc(const unsigned char *pData)
 {
 	if((m_ptrInstance != NULL) && (m_ptrDsc != NULL))
 	{
-#ifndef EMP_355 
+#ifndef EMP_355
 		GetWriteLock();
 		m_ptrDsc->GetUSBDatas(pData);//数据由何好处理，一次发送512，分16次发完一包
 		ReadWriteUnlock();
@@ -99,7 +98,7 @@ void DscMan::SendDataToDsc(const unsigned char *pData)
         m_receive->ReceiveData(pData);
 		pthread_mutex_unlock(&m_pthreadLock2);
 #endif
-	}	
+	}
 }
 
 CDSC* DscMan::CreateDscObj(EDSCObj type)
@@ -177,7 +176,7 @@ CDSC* DscMan::CreateDscObj(EDSCObj type)
 #endif
 			m_ptrDsc = CCFMB4DSC_R::Create(m_dscPara, m_ptrFuncUpdateFrame);
 			break;
-		
+
 		case PWCFM:
 #ifdef EMP_355
             m_receive->SetScanMode(CReceive::MODE_PWCFM);
@@ -188,7 +187,7 @@ CDSC* DscMan::CreateDscObj(EDSCObj type)
 		case CFMVS2D:
 #ifdef EMP_355
             m_receive->SetScanMode(CReceive::MODE_CFM);
-#endif		
+#endif
 			m_ptrDsc = CCFMVS2DDSC_R::Create(m_dscPara, m_ptrFuncUpdateFrame);
 			break;
 
@@ -210,7 +209,7 @@ CDSC* DscMan::CreateDscObj(EDSCObj type)
 #endif
 			m_ptrDsc = CEFOVDSC::Create(m_dscPara, m_ptrFuncUpdateFrame);
 			break;
-		
+
 		default:
 			break;
 	}
@@ -240,7 +239,7 @@ void DscMan::InitDscPara()
 	m_dscPara.dcaCurScanEnd = 255;
 	m_dscPara.dcaSamplePoints = 200;//440;
 	m_dscPara.dcaScale = 0.54;
-	m_dscPara.dcaSteer = 0;//degree    
+	m_dscPara.dcaSteer = 0;//degree
 	m_dscPara.dcaTpView = 0;
 	m_dscPara.dcaProbeR = 50;
 	m_dscPara.dcaProbeType = 'C';
@@ -269,10 +268,10 @@ void DscMan::InitDscPara()
 	}
 
 	// CFM
-	m_dscPara.dcaCFMScanLStart = 50;		
-	m_dscPara.dcaCFMScanLEnd = 100;		
-	m_dscPara.dcaCFMSampPtStart = 10;		
-	m_dscPara.dcaCFMSampPtEnd = 159;	
+	m_dscPara.dcaCFMScanLStart = 50;
+	m_dscPara.dcaCFMScanLEnd = 100;
+	m_dscPara.dcaCFMSampPtStart = 10;
+	m_dscPara.dcaCFMSampPtEnd = 159;
 	m_dscPara.dcaCFMLDensity = 1;
 	m_dscPara.dcaCFMSteer = 0;
 	m_dscPara.dcaCFMBaseline = 128;
@@ -283,18 +282,18 @@ void DscMan::InitDscPara()
 		m_dscPara.dcaCFMPalette[i].rgbtGreen = i;
 		m_dscPara.dcaCFMPalette[i].rgbtBlue = i;
 	}
-	m_dscPara.dcaCFMIPAttrs.ipaThreshold = 0;	
-	m_dscPara.dcaCFMIPAttrs.ipaFrameAver = 32;	
-	m_dscPara.dcaCFMIPAttrs.ipaHideBackground = false;	
+	m_dscPara.dcaCFMIPAttrs.ipaThreshold = 0;
+	m_dscPara.dcaCFMIPAttrs.ipaFrameAver = 32;
+	m_dscPara.dcaCFMIPAttrs.ipaHideBackground = false;
 	m_dscPara.dcaCFMIPAttrs.ipaArtifact = 1;
 
 	// PW
 	m_dscPara.dcaPWSamplePoints = 256;//128; ///< pw orginal data size
-	m_dscPara.dcaPWStartPosAxisY = 0;	
-	m_dscPara.dcaPWSpeed = 2;//8;		
-	m_dscPara.dcaPWFlag = 0;		
-	m_dscPara.dcaPWDisplayFormat = 1;		
-	m_dscPara.dcaPWIPAttrs.ipaUDOverturn = FALSE;		
+	m_dscPara.dcaPWStartPosAxisY = 0;
+	m_dscPara.dcaPWSpeed = 2;//8;
+	m_dscPara.dcaPWFlag = 0;
+	m_dscPara.dcaPWDisplayFormat = 1;
+	m_dscPara.dcaPWIPAttrs.ipaUDOverturn = FALSE;
 	m_dscPara.dcaPWIPAttrs.ipaTrace.status = FALSE;
 	m_dscPara.dcaPWIPAttrs.ipaTrace.type = 0;
 	m_dscPara.dcaPWIPAttrs.ipaTrace.direction = 0;
@@ -304,9 +303,8 @@ void DscMan::InitDscPara()
 	m_dscPara.dcaPWIPAttrs.ipaTrace.fs = 10;
 
 	// M
-	m_dscPara.dcaMSpeed = 2;		
-	m_dscPara.dcaMDisplayFormat = 0;	
-	m_dscPara.dcaMIPAttrs.ipaSmooth = 0;	
-	m_dscPara.dcaMIPAttrs.ipaEnhance = 0;	
+	m_dscPara.dcaMSpeed = 2;
+	m_dscPara.dcaMDisplayFormat = 0;
+	m_dscPara.dcaMIPAttrs.ipaSmooth = 0;
+	m_dscPara.dcaMIPAttrs.ipaEnhance = 0;
 }
-

@@ -1,15 +1,15 @@
 #ifndef __SYSUSERDEFINEDKEY_H__
 #define __SYSUSERDEFINEDKEY_H__
 
-#include "../base/IniFile.h"
+#include "base/IniFile.h"
 
 class SysUserDefinedKey
 {
 public:
-	
+
     SysUserDefinedKey();
     ~SysUserDefinedKey();
-#if 0  
+#if 0
     void SetFuncGain(int func);
     int GetFuncGain(void);
 

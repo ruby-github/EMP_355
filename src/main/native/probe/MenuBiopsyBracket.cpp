@@ -1,12 +1,11 @@
 #include <gtk/gtk.h>
-#include "MenuBiopsyBracket.h"	
-#include "gui_func.h"
-#include "gui_global.h"
-#include "MenuArea.h"
-#include "BiopsyMan.h"
-#include "MenuBiopsy.h"
-#include "HintArea.h"
-
+#include "probe/MenuBiopsyBracket.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "display/MenuArea.h"
+#include "probe/BiopsyMan.h"
+#include "probe/MenuBiopsy.h"
+#include "display/HintArea.h"
 
 MenuBiopsyBracket g_menuBiopsyBracket;
 
@@ -57,7 +56,7 @@ void MenuBiopsyBracket::Show(void)
 	doBtnEvent(1, 1);//fake btn press
 	doBtnEvent(1, 0);//fake btn unpress
 	SetMenuBiopsyCursorYRange(110,160);//SetMenuBiopsyCursorYRange(110,150);//2016.08.26
-	
+
 	ModeStatus ms;
     if (ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B) && ms.IsUnFreezeMode())
     {
@@ -98,7 +97,6 @@ void MenuBiopsyBracket::UpdateMenuBiopsyBracket(void)
 	}
 	m_vecMenuItem.clear();
 
-
 	vector<string> vecBracket=BiopsyMan::GetInstance()->GetBioBracketTypesOfCurProbe();
 
 	int size2=vecBracket.size();
@@ -115,6 +113,3 @@ void MenuBiopsyBracket::UpdateMenuBiopsyBracket(void)
 
 	}
 }
-
-
-

@@ -1,13 +1,13 @@
 #include <gtk/gtk.h>
-#include "MenuSystem.h"
-#include "gui_global.h"
-#include "gui_func.h"
-#include "MenuArea.h"
-#include "ViewSystem.h"
-#include "ModeStatus.h"
-#include "FreezeMode.h"
-#include "KeyFunc.h"
- 
+#include "sysMan/MenuSystem.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
+#include "display/MenuArea.h"
+#include "sysMan/ViewSystem.h"
+#include "imageProc/ModeStatus.h"
+#include "imageProc/FreezeMode.h"
+#include "keyboard/KeyFunc.h"
+
 MenuSystem g_menuSystem;
 
 MenuSystem::MenuSystem(void)
@@ -33,13 +33,13 @@ GtkWidget* MenuSystem::Create(void)
     gtk_container_add(GTK_CONTAINER(btn_biopsy), m_labelBiopsy);
     gtk_table_attach_defaults(GTK_TABLE(m_table), btn_biopsy, 0, 1, 1, 2);
 
-    // 穿刺功能暂时屏蔽(2900pluss,配有穿刺线探头）打开功能
+    // 绌垮埡鍔熻兘鏆傛椂灞忚斀(2900pluss,閰嶆湁绌垮埡绾挎帰澶达級鎵撳紑鍔熻兘
     //gtk_widget_modify_bg(btn_biopsy, GTK_STATE_INSENSITIVE, g_deep);
    // gtk_widget_set_sensitive(btn_biopsy, FALSE);
 
     g_signal_connect(btn_biopsy, "clicked", G_CALLBACK(HandleBtnBiopsy), this);
 //    gtk_button_set_focus_on_click(GTK_BUTTON(btn_biopsy), FALSE);
-    
+
     UpdateLabel();
     gtk_widget_set_usize(m_table, WIDTH_SYSTEM_MENU, HEIGHT_SYSTEM_MENU);
     return m_table;
@@ -65,7 +65,7 @@ void MenuSystem::BtnGeneral(GtkButton *button)
 {
     if (ModeStatus::IsAutoReplayMode())
         FreezeMode::GetInstance()->ChangeAutoReplay();
-    else if (ModeStatus::IsUnFreezeMode())	
+    else if (ModeStatus::IsUnFreezeMode())
 		FreezeMode::GetInstance()->PressFreeze();
 
     ViewSystem::GetInstance()->CreateWindow();

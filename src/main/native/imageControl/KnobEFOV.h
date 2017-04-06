@@ -26,5 +26,4 @@ EKnobReturn KnobEFOVPressChgRotate(void);
 EKnobReturn KnobEFOVPressChgZoom(void);
 EKnobReturn KnobEFOVPressChgROISize(void);
 
-
 #endif /* _KNOBEFOV_H_ */

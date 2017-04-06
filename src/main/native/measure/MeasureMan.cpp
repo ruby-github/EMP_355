@@ -1,13 +1,12 @@
-
 #include <iostream>
-#include "MeasureMan.h"
-#include "MeaCalcFun.h"
-#include "MeasureFactory.h"
-#include "../sysMan/SysMeasurementSetting.h"
-#include "MenuArea.h"
-#include "MenuCalcNew.h"
-#include "ImageAreaDraw.h"
-#include "MenuMeasure.h"
+#include "measure/MeasureMan.h"
+#include "calcPeople/MeaCalcFun.h"
+#include "measure/MeasureFactory.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "display/MenuArea.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "display/ImageAreaDraw.h"
+#include "measure/MenuMeasure.h"
 
 using namespace std;
 
@@ -124,7 +123,6 @@ void MeasureMan::AddNew(EMeaType measureType, int cursorType ,vector<POINT> vec,
 	m_draw.ChangeOrderNumber();
 }
 
-
 using namespace std;
 
 void MeasureMan::ClearPwTraceUnFreeze()
@@ -133,7 +131,7 @@ void MeasureMan::ClearPwTraceUnFreeze()
     vector<MeasureInfo> vecInfo;
     int k;
     bool flag = false;
-    //clear trace 
+    //clear trace
     if(size > 0)
     {
         for(int i = 0; i <= size - 1; i++)
@@ -142,7 +140,7 @@ void MeasureMan::ClearPwTraceUnFreeze()
             {
                 EraseMeasureLine(m_deq[i]);
                 //printf("curType:%d\n", m_deq[i].cursorType);
-                ImageArea::GetInstance()->ClearTrace(); 
+                ImageArea::GetInstance()->ClearTrace();
                 k = i;
                 flag = true;
                 break;
@@ -156,7 +154,7 @@ void MeasureMan::ClearPwTraceUnFreeze()
             for(int i = size - 1; i > k; i--)
             {
                 vecInfo.push_back(m_deq[i]);
-                m_deq.pop_back();    
+                m_deq.pop_back();
             }
 
             if(m_deq.size() > 0)
@@ -175,7 +173,7 @@ void MeasureMan::ClearPwTraceUnFreeze()
         else
         {
             if(m_pwAdjust)
-            {	
+            {
                 m_update.ClearPwResultUnFreeze(m_orderNumBak);
                 m_pwAdjust = false;
             }
@@ -199,7 +197,7 @@ void MeasureMan::ClearLast()
 		// erase measure line
 		EraseMeasureLine(m_deq[size - 1]);
 		m_draw.SetOrderNumber(m_deq[size - 1].orderNumber);
-       
+
         m_orderNumBak = m_deq[size - 1].orderNumber;
         // erase data
 		m_deq.pop_back();
@@ -207,7 +205,7 @@ void MeasureMan::ClearLast()
         {
 			m_draw.SetOrderNumber(1);
         }
-	}	
+	}
 }
 
 void MeasureMan::ClearFirst()
@@ -222,7 +220,7 @@ void MeasureMan::ClearFirst()
 	{
 		// erase measure line
 		EraseMeasureLine(m_deq[0]);
-    
+
 		// erase data
 		m_deq.pop_front();
 	}
@@ -494,7 +492,7 @@ void MeasureMan::EraseMeasureLine(MeasureInfo info)
 			EraseDist(info);
 			break;
 
-		case VEL_M://M模式
+		case VEL_M://M妯″紡
 			info.meaType = VEL_M;
 			EraseDist(info);
 			break;
@@ -602,7 +600,7 @@ void MeasureMan::EraseDist(MeasureInfo info)
 	m_draw.DrawDotLine(p1, p2, FALSE);
 }
 
-void MeasureMan::EraseDist2Line(MeasureInfo info)//两线法测距离
+void MeasureMan::EraseDist2Line(MeasureInfo info)//涓ょ嚎娉曟祴璺濈
 {
 	m_draw.SetCursorType(info.cursorType);
 	m_draw.SetCursorSize(info.cursorSize);
@@ -692,7 +690,6 @@ void MeasureMan::EraseTrack(MeasureInfo info)
 		m_draw.DrawTraceLine(info.vecPoint[0], info.vecPoint[vec_size - 1], FALSE);
 }
 
-
 void MeasureMan::EraseSimpson(MeasureInfo info)
 {
 	unsigned int track_size, i;
@@ -773,7 +770,7 @@ void MeasureMan::EraseAL(MeasureInfo info)
    int i;
    const int diamNum = 20;
    double diamCenterX, diamCenterY;
-   double lenSlope;//LV Length线的斜率
+   double lenSlope;//LV Length绾跨殑鏂滅巼
    double diamSlope;//直径的斜率
    int trackSize;
    int tempPosi1, tempPosi2;
@@ -930,7 +927,7 @@ void MeasureMan::EraseEllipse(MeasureInfo info)
 		return;
 
 	m_draw.SetCursorType(info.cursorType);
-	m_draw.SetCursorSize(info.cursorSize);	
+	m_draw.SetCursorSize(info.cursorSize);
 	m_draw.SetConfirmColor(info.confirmColor);
 
 	p1 = info.vecPoint[0];
@@ -1275,7 +1272,7 @@ void MeasureMan::EraseVelD(MeasureInfo info)
 
     if(info.vecPoint.empty())
         return;
-	
+
     int size = info.vecPoint.size();
     if((info.meaType == INTEGRAL_TRACK) && (size < 2))
         return;
@@ -1383,7 +1380,7 @@ void MeasureMan::EraseTrace(MeasureInfo info)
 	vec_size = info.vecPoint.size();
 
 	if (vec_size > 2)
-		vec_size = vec_size - 2;//除去ps和ed占的长度
+		vec_size = vec_size - 2;//闄ゅ幓ps鍜宔d鍗犵殑闀垮害
 	else
 		return;
 
@@ -1398,7 +1395,7 @@ void MeasureMan::EraseTrace(MeasureInfo info)
 	edP = info.vecPoint[vec_size + 1];
 
 	// clear measure line
-	if ((info.meaType == MEASURE_TRACK) || (info.meaType == PI_D))//非半自动描迹
+	if ((info.meaType == MEASURE_TRACK) || (info.meaType == PI_D))//闈炲崐鑷姩鎻忚抗
 	{
         m_draw.SetCursorType(m_draw.GetCursorType());
         m_draw.DrawCursor(p1, FALSE);
@@ -1415,7 +1412,7 @@ void MeasureMan::EraseTrace(MeasureInfo info)
 	size_t i;
 	if (info.meaType == MEASURE_TRACK_AUTO)
 	{
-		for (i = 1; i < vec_size-1; ++i) {//提取原始的描迹（把端点分离处理）
+		for (i = 1; i < vec_size-1; ++i) {//鎻愬彇鍘熷鐨勬弿杩癸紙鎶婄鐐瑰垎绂诲鐞嗭級
 			vec.push_back(info.vecPoint[i]);
 		}
 		m_draw.PwTrace(vec, XOR);
@@ -1439,7 +1436,7 @@ void MeasureMan::EraseTrace(MeasureInfo info)
 }
 
 //保存软件包测量结果
-//item:本测量项的枚举号
+//item:鏈祴閲忛」鐨勬灇涓惧彿
 //void MeasureMan::SetMeasureResult(const float data1, const float data2, const float data3, const float data4, const int item, const int valueNums)
 void MeasureMan::SetMeasureResult(float value[MEA_MULTI], const int item, const int valueNums)
 {
@@ -1455,7 +1452,7 @@ const char* MeasureMan::GetMeasureTitle(int item)
     else if ((item>=ABD_MEA_START) && (item<ABD_MEA_END))
 	{
 		return AbdoInfo[item-ABD_MEA_START].title;
-	}		
+	}
 	else if ((item>=UR_MEA_START) && (item<UR_MEA_END))
 	{
 		return URInfo[item-UR_MEA_START].title;
@@ -1529,7 +1526,7 @@ void MeasureMan::GetMeasureString(int item, const SingleItemInfo **ptrSingleItem
 		itemMultiStart = (int)ABD_MULTI_START;
 		ptrSingleItemStart = AbdoInfo;
 		ptrMultiItemStart = AbdoMultiInfo;
-	}		
+	}
 	else if ((item>=UR_MEA_START) && (item<UR_MEA_END))
 	{
 		itemStart = (int)UR_MEA_START;
@@ -1593,7 +1590,7 @@ void MeasureMan::GetMeasureString(int item, const SingleItemInfo **ptrSingleItem
 		ptrSingleItemStart = OrthoInfo;
 		ptrMultiItemStart = OrthoMultiInfo;
 	}
-#if 0   
+#if 0
     else if ((item>=0) && (item< ABD_MEA_START))
 	{
        		itemStart = 0;
@@ -1604,7 +1601,7 @@ void MeasureMan::GetMeasureString(int item, const SingleItemInfo **ptrSingleItem
 #endif
 #ifdef VET
 //添加 动物超 TD
-//hlx 12.20	
+//hlx 12.20
 	else if ((item>=TD_MEA_START)&&(item<TD_MEA_END))
 	{
 		itemStart = (int)TD_MEA_START;
@@ -1652,7 +1649,6 @@ void MeasureMan::ClearAllValue(void)
     m_ptrMeaResult->ClearAllValue();
 }
 
-
 void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
 {
     SysMeasurementSetting sysMeasure;
@@ -1660,14 +1656,14 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
     {
         int unit = sysMeasure.GetUnitDist();
         if(unit)
-        { 
+        {
             units = CustomUnitArray[0].unit2;
-            coeffi = 10.0; 
+            coeffi = 10.0;
         }
         else
         {
             units = CustomUnitArray[0].unit1;
-            coeffi = 1.0; 
+            coeffi = 1.0;
         }
     }
     else if(unit == CM2)
@@ -1681,8 +1677,8 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
         else
         {
             units = CustomUnitArray[3].unit1;
-            coeffi = 1.0; 
-        } 
+            coeffi = 1.0;
+        }
     }
     else if(unit == CM3)
     {
@@ -1695,7 +1691,7 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
         else
         {
             units = CustomUnitArray[4].unit1;
-            coeffi = 1.0; 
+            coeffi = 1.0;
         }
     }
     else if(unit ==SEC)
@@ -1709,7 +1705,7 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
         else
         {
             units = CustomUnitArray[5].unit1;
-            coeffi = 1.0; 
+            coeffi = 1.0;
         }
     }
     else if(unit == CMS)
@@ -1718,7 +1714,7 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
         if(unit == 0)
         {
             units = CustomUnitArray[1].unit1;
-            coeffi = 1.0; 
+            coeffi = 1.0;
         }
         else if(unit == 1)
         {
@@ -1737,7 +1733,7 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
         if(unit == 0)
         {
             units = CustomUnitArray[2].unit1;
-            coeffi = 1.0; 
+            coeffi = 1.0;
         }
         else if(unit == 1)
         {
@@ -1754,20 +1750,20 @@ void MeasureMan::GetMeasureUnit(float& coeffi, string& units, int unit)
     {
         int unit = sysMeasure.GetUnitEfw();
         if(unit)
-        {   
+        {
             units = CustomUnitArray[7].unit2;
             coeffi = 1000.0;
-        } 
+        }
         else
         {
             units = CustomUnitArray[7].unit1;
-            coeffi = 1.0; 
+            coeffi = 1.0;
         }
     }
     else
     {
         units = CustomUnitArray[unit].unit1;
-        coeffi = 1.0; 
+        coeffi = 1.0;
     }
 }
 
@@ -1784,7 +1780,7 @@ void MeasureMan::SingleMeaDataMan(const float meaData, const SingleItemInfo *ite
     {
 		value[0] = meaData;
 		for (i=1; i<MEA_MULTI; i++) value[i] = INVALID_VAL;
-		SetMeasureResult(value, itemInfo->item, MEA_SINGLE);//科别测量保存测量结果
+		SetMeasureResult(value, itemInfo->item, MEA_SINGLE);//绉戝埆娴嬮噺淇濆瓨娴嬮噺缁撴灉
 	}
 
 	multiMethInfo = (CalcInfoArray *)(itemInfo->ptrCalcInfo);
@@ -1818,7 +1814,7 @@ void MeasureMan::MultiMeaDataMan(float meaData[MEA_MULTI], const MultiItemInfo *
 
 	if (saveR == SAVE)
 	{
-		SetMeasureResult(meaData, itemInfo->multiItem, MEA_MULTI);//科别测量保存测量结果
+		SetMeasureResult(meaData, itemInfo->multiItem, MEA_MULTI);//绉戝埆娴嬮噺淇濆瓨娴嬮噺缁撴灉
 	}
 
 	multiMethInfo = (CalcInfoArray *)itemInfo->ptrCalcInfo;
@@ -1870,7 +1866,7 @@ void MeasureMan::EraseMeasureOrderNumber(MeasureInfo info)
 		case ANGLE_2LINE:
 		case SLOPE:
 		case DIST_SLOPE_M:
-		case VEL_M://M模式
+		case VEL_M://M妯″紡
 		case VEL_D:
 		case PI_D:
 		case MEASURE_TRACK:
@@ -1889,12 +1885,10 @@ void MeasureMan::EraseMeasureOrderNumber(MeasureInfo info)
 			m_draw.DrawOrderNumberForErase(info.vecPoint[5], info.orderNumber, info.confirmColor);
 			break;
 
-
 		case VOL_ELLIPSE2:
 			m_draw.DrawOrderNumberForErase(info.vecPoint[4], info.orderNumber, info.confirmColor);
 			m_draw.DrawOrderNumberForErase(info.vecPoint[2], info.orderNumber, info.confirmColor);
 			break;
-
 
 		case RATIO_DIST_DOT:
 		case EF:
@@ -1945,5 +1939,3 @@ void MeasureMan::ClearAllMeasureOrderNumber()
 		}
 	}
 }
-
-

@@ -1,14 +1,14 @@
-#include "Database.h"
+#include "patient/Database.h"
 #include "Def.h"
 #include <unistd.h>
 #include <sstream>
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
-#include "../display/gui_func.h"
-#include "gui_global.h"
-#include "../sysMan/SysGeneralSetting.h"
-#include "ViewSystem.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/ViewSystem.h"
 
 using std::ostringstream;
 using std::string;
@@ -57,7 +57,6 @@ bool Database::CreateTable(void)
                                     PRIMARY KEY (ID)\
                                     )";
 #else
-
 
 	const char *sql_pat_info = "CREATE TABLE patient_info(\
                ID VARCHAR(50) NOT NULL,\
@@ -186,67 +185,67 @@ bool Database::ArchivePat(PatientInfo::Info &info, string &errorMsg)
 
     if (GetPatIDExist(info.p.id.c_str()).empty()) {
 #ifdef VET
-        streamPat << "INSERT INTO patient_info VALUES('" 
-            << info.p.id << "', '" 
-            << info.p.animal_name << "', '" 
-            << info.p.owner_name << "', '" 
-            << info.p.species << "', '" 
-            << info.p.sex << "', '" 
-            << year <<"', '" 
-            << month << "', '" 
-            << day << "', '" 
+        streamPat << "INSERT INTO patient_info VALUES('"
+            << info.p.id << "', '"
+            << info.p.animal_name << "', '"
+            << info.p.owner_name << "', '"
+            << info.p.species << "', '"
+            << info.p.sex << "', '"
+            << year <<"', '"
+            << month << "', '"
+            << day << "', '"
             << info.p.age << "', '"
             << info.p.ageUnit << "', '"
-            << info.p.telephone << "', '" 
-            << info.p.address << "', '" 
+            << info.p.telephone << "', '"
+            << info.p.address << "', '"
             << info.p.comment << "');";
 #else
-	streamPat << "INSERT INTO patient_info VALUES('" 
-		  << info.p.id << "', '" 
-		  << info.p.name.last << "', '" 
-		  << info.p.name.first << "', '" 
-		  << info.p.name.mid << "', '" 
-		  << info.p.sex << "', '" 
-		  << year <<"', '" 
-		  << month << "', '" 
-		  << day << "', '" 
+	streamPat << "INSERT INTO patient_info VALUES('"
+		  << info.p.id << "', '"
+		  << info.p.name.last << "', '"
+		  << info.p.name.first << "', '"
+		  << info.p.name.mid << "', '"
+		  << info.p.sex << "', '"
+		  << year <<"', '"
+		  << month << "', '"
+		  << day << "', '"
           << info.p.age << "', '"
           << info.p.ageUnit << "', '"
-		  << info.p.telephone << "', '" 
-		  << info.p.address << "', '" 
+		  << info.p.telephone << "', '"
+		  << info.p.address << "', '"
 		  << info.p.comment << "');";
    #endif
  }
  else
  {
 #ifdef VET
-        streamPat << "UPDATE patient_info SET " 
-            << "AnimalName = '" << info.p.animal_name << "', " 
-            << "OwnerName = '" << info.p.owner_name << "', " 
-            << "Species = '" << info.p.species << "', " 
-            << "Sex = '" << info.p.sex << "', " 
-            << "BirthYear = '" << year <<"', " 
-            << "BirthMonth = '" << month << "', " 
-            << "BirthDay = '" << day << "', " 
+        streamPat << "UPDATE patient_info SET "
+            << "AnimalName = '" << info.p.animal_name << "', "
+            << "OwnerName = '" << info.p.owner_name << "', "
+            << "Species = '" << info.p.species << "', "
+            << "Sex = '" << info.p.sex << "', "
+            << "BirthYear = '" << year <<"', "
+            << "BirthMonth = '" << month << "', "
+            << "BirthDay = '" << day << "', "
             << "Age = '" << info.p.age << "', "
             << "AgeUnit = '" << info.p.ageUnit << "', "
-            << "Telephone = '" << info.p.telephone << "', " 
-            << "Address = '" << info.p.address << "', " 
+            << "Telephone = '" << info.p.telephone << "', "
+            << "Address = '" << info.p.address << "', "
             << "Comment = '" << info.p.comment << "'"
             << "WHERE ID = '" << info.p.id << "';";
 #else
-	streamPat << "UPDATE patient_info SET " 
-		  << "LastName = '" << info.p.name.last << "', " 
-		  << "FirstName = '" << info.p.name.first << "', " 
-		  << "MidName = '" << info.p.name.mid << "', " 
-		  << "Sex = '" << info.p.sex << "', " 
-		  << "BirthYear = '" << year <<"', " 
-		  << "BirthMonth = '" << month << "', " 
-		  << "BirthDay = '" << day << "', " 
+	streamPat << "UPDATE patient_info SET "
+		  << "LastName = '" << info.p.name.last << "', "
+		  << "FirstName = '" << info.p.name.first << "', "
+		  << "MidName = '" << info.p.name.mid << "', "
+		  << "Sex = '" << info.p.sex << "', "
+		  << "BirthYear = '" << year <<"', "
+		  << "BirthMonth = '" << month << "', "
+		  << "BirthDay = '" << day << "', "
           << "Age = '" << info.p.age << "', "
           << "AgeUnit = '" << info.p.ageUnit << "', "
-		  << "Telephone = '" << info.p.telephone << "', " 
-		  << "Address = '" << info.p.address << "', " 
+		  << "Telephone = '" << info.p.telephone << "', "
+		  << "Address = '" << info.p.address << "', "
 		  << "Comment = '" << info.p.comment << "'"
 		  << "WHERE ID = '" << info.p.id << "';";
 #endif
@@ -266,7 +265,7 @@ bool Database::ArchivePat(PatientInfo::Info &info, string &errorMsg)
     ChangeDateFormatToString(info.e.examDate.year, info.e.examDate.month, info.e.examDate.day, year, month, day);
     string line=info.e.comment;
     streamExam << "INSERT INTO exam_info VALUES('"
-	       << info.p.id << "', " 
+	       << info.p.id << "', "
 	       << "NULL, '"
 	       << info.e.examType << "', '"
 	       << year << "', '"
@@ -352,20 +351,19 @@ bool Database::ArchivePat(PatientInfo::Info &info, string &errorMsg)
     return TRUE;
 }
 
-
 // Sqlite3 basic invocation sequence:
-// 1, sqlite3_prepare  编译sql语句
-// 2, sqlite3_bind_*   使用sql参数时，用于将sql参数绑定到sql语句
-// 3, sqlite3_step     用来执行编译后的sql语句
+// 1, sqlite3_prepare  缂栬瘧sql璇彞
+// 2, sqlite3_bind_*   浣跨敤sql鍙傛暟鏃讹紝鐢ㄤ簬灏唖ql鍙傛暟缁戝畾鍒皊ql璇彞
+// 3, sqlite3_step     鐢ㄦ潵鎵ц缂栬瘧鍚庣殑sql璇彞
 // 4, sqlite3_column_* 用于从查询的结果中获取数据
-// 5, sqlite3_finalize 用来释放sqlite3_stmt对象
+// 5, sqlite3_finalize 鐢ㄦ潵閲婃斁sqlite3_stmt瀵硅薄
 
 /*
 void Database::Testdb(void)
 {
     sqlite3_stmt *stmt=NULL;
     string sql = "SELECT ID, LastName, FirstName, MidName FROM patient_info ORDER BY ID";
-    
+
     if (sqlite3_prepare(m_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
 	PRINTF("%s\n", sqlite3_errmsg(m_db));
 	return ;
@@ -399,7 +397,7 @@ void Database::TestBinddb(char *id)
 	    PRINTF("%s\n", sqlite3_column_text(stmt, i));
 	}
     }
-    sqlite3_finalize(stmt);    
+    sqlite3_finalize(stmt);
 }
 */
 
@@ -412,7 +410,7 @@ void Database::GetPatExamInfo(const char *examID, PatientInfo::Info &info)
     string sql = "SELECT ID, AnimalName, OwnerName, Species, Sex, BirthYear, BirthMonth, BirthDay, Age, AgeUnit, Telephone, Address, Height, Weight, BSA, LMPYear, LMPMonth, LMPDay, OvulateYear, OvulateMonth, OvulateDay, PregCount, abnormalPregCount, FetusCount, DeliveryCount, MiscarryCount, HR, PressureHigh, PressureLow, PSA, ExamDr, ReportDr, ExamComment FROM patient_info, exam_info WHERE patient_info.ID = exam_info.PatID AND exam_info.ExamID = ?";
 #else
     string sql = "SELECT ID, LastName, FirstName, MidName, Sex, BirthYear, BirthMonth, BirthDay, Age, AgeUnit, Telephone, Address, Height, Weight, BSA, LMPYear, LMPMonth, LMPDay, OvulateYear, OvulateMonth, OvulateDay, PregCount, abnormalPregCount, FetusCount, DeliveryCount, MiscarryCount, HR, PressureHigh, PressureLow, PSA, ExamDr, ReportDr, ExamComment FROM patient_info, exam_info WHERE patient_info.ID = exam_info.PatID AND exam_info.ExamID = ?";
-#endif 
+#endif
     if (sqlite3_prepare(m_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
 	PRINTF("%s\n", sqlite3_errmsg(m_db));
 	return ;
@@ -541,7 +539,7 @@ void Database::GetPatExamInfo(const char *examID, PatientInfo::Info &info)
 	if (strcmp(sqlite3_column_name(stmt, col), "ExamComment") == 0)
 	    info.e.comment.assign((const char *)sqlite3_column_text(stmt, col));
     }
-    sqlite3_finalize(stmt);    
+    sqlite3_finalize(stmt);
 }
 
 // DESCRIPTION: 通过传入的检查号examID来填充PatientInfo::Info结构体
@@ -593,7 +591,6 @@ void Database::GetPatInfo(const char *patID, PatientInfo::Patient &pat_info)
         ++col;
 #endif
 
-
 	if(strcmp(sqlite3_column_name(stmt, col), "Sex") == 0)
 	    pat_info.sex = sqlite3_column_int(stmt, col);
         ++col;
@@ -621,11 +618,11 @@ void Database::GetPatInfo(const char *patID, PatientInfo::Patient &pat_info)
 	if (strcmp(sqlite3_column_name(stmt, col), "Comment") == 0)
 	    pat_info.comment.assign((const char *)sqlite3_column_text(stmt, col));
     }
-    sqlite3_finalize(stmt);    
+    sqlite3_finalize(stmt);
 }
 
 // DESCRIPTION: 查找数据库中ID号是否存在
-// RETURN: 存在返回查找的string类型的ID，不存在返回空string
+// RETURN: 瀛樺湪杩斿洖鏌ユ壘鐨剆tring绫诲瀷鐨処D锛屼笉瀛樺湪杩斿洖绌簊tring
 string Database::GetPatIDExist(const char *id)
 {
     sqlite3_stmt *stmt=NULL;
@@ -650,8 +647,8 @@ string Database::GetPatIDExist(const char *id)
     return exist_id;
 }
 
-// DESCRIPTION: 查找数据库中是否存在医生姓名doc_name
-// RETURN: 存在返回true
+// DESCRIPTION: 鏌ユ壘鏁版嵁搴撲腑鏄惁瀛樺湪鍖荤敓濮撳悕doc_name
+// RETURN: 瀛樺湪杩斿洖true
 bool Database::GetDoctorExist(const char *doc_name)
 {
     sqlite3_stmt *stmt=NULL;
@@ -682,12 +679,12 @@ bool Database::GetDoctorExist(const char *doc_name)
         return false;
 }
 
-// 国际化姓名和日期格式的Sql语句
+// 鍥介檯鍖栧鍚嶅拰鏃ユ湡鏍煎紡鐨凷ql璇彞
 void Database::GetFormatForSQL(string &name, string &birthdate, string &examdate)
 {
     if (m_langCN)
         name = "LastName || FirstName AS Name";
-    else 
+    else
         name = "FirstName || ' ' || MidName || ' ' || LastName AS Name";
 
     switch (m_dateFormat) {
@@ -782,7 +779,6 @@ bool Database::NewPatSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& 
         ++col;
 #endif
 
-	
 	if (strcmp(sqlite3_column_name(stmt, col), "Sex") == 0) {
 	    int sex = sqlite3_column_int(stmt, col);
             GetSexString(sex, tmp.gender);
@@ -838,7 +834,7 @@ bool Database::DoctorSearch(vector<string> *result)
     return true;
 }
 #ifdef VET
-//添加VET 主人名名字的获取
+//娣诲姞VET 涓讳汉鍚嶅悕瀛楃殑鑾峰彇
 bool Database::OwnerNameSearch(vector<string> *result)
 {
     sqlite3_stmt *stmt=NULL;
@@ -982,7 +978,7 @@ bool Database::ArchiveSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>&
 	       << "AND patient_info.ID LIKE '" << term.id << "' "
 	       << "AND Name LIKE '" << term.totalName << "' "
 	       << "AND patient_info.Sex LIKE '" << term.gender << "' "
-			//<< "AND BirthDate >= '" << birthBegin << "' " << "AND BirthDate <= '" << birthEnd << "' " 
+			//<< "AND BirthDate >= '" << birthBegin << "' " << "AND BirthDate <= '" << birthEnd << "' "
            << "AND patient_info.Age LIKE '" << term.age << "' "
            << "AND patient_info.AgeUnit LIKE '" << term.ageUnit << "' "
          //<< "AND ExamDate >= '" << examBegin << "' " << "AND ExamDate <= '" << examEnd << "' " //2012.09.04
@@ -995,7 +991,7 @@ bool Database::ArchiveSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>&
     	PRINTF("%s\n", sqlite3_errmsg(m_db));
     	return false;
     }
- 
+
     // get search result
     result.clear();
     while (sqlite3_step(stmt) != SQLITE_DONE) {
@@ -1025,7 +1021,7 @@ bool Database::ArchiveSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>&
             int sex = sqlite3_column_int(stmt, col);
             GetSexString(sex, tmp.gender);
         }
- 
+
         ++col;
 
         if (strcmp(sqlite3_column_name(stmt, col), "BirthDate") == 0)
@@ -1037,7 +1033,7 @@ bool Database::ArchiveSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>&
             strDate = (const char*)sqlite3_column_text(stmt, col);
             string strDateTemp(strDate);
             StrtoStr(strDateTemp,strD);
-            iTmp = atoi(strD.c_str());   
+            iTmp = atoi(strD.c_str());
         }
         ++col;
 
@@ -1064,7 +1060,7 @@ bool Database::ArchiveSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>&
             GenAgeStr(age, ageUnit, tmp.age);
             result.push_back(tmp);
         }
-	
+
     }
     sqlite3_finalize(stmt);
 #endif
@@ -1075,12 +1071,12 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
 {
     sqlite3_stmt *stmt;
     ostringstream ostream;
-    string sql;	
+    string sql;
     string strDate;
     string strD;
     int iTmpSt,iTmpEd,iTmp;
 
-    // get range of exam date 
+    // get range of exam date
     string dateBegin;
     string dateBeginTmp;
     string year = term.examDateStartYear;
@@ -1111,7 +1107,7 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
         << "FROM patient_info, exam_info "
         << "WHERE patient_info.ID = exam_info.PatId "
         //<< "AND ExamDate >= '" << dateBegin << "' AND ExamDate <= '" << dateEnd << "' "
-       // << "ORDER BY ExamID"; 
+       // << "ORDER BY ExamID";
         << "ORDER BY ID";
 #else
      ostream << "SELECT ID, "
@@ -1120,7 +1116,7 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
          << sql_examdate << ", ExamID, ExamType, Age, AgeUnit "
          << "FROM patient_info, exam_info "
          << "WHERE patient_info.ID = exam_info.PatId "
-         //<< "AND ExamDate >= '" << dateBegin << "' AND ExamDate <= '" << dateEnd << "' " //2012.08.21lihuamei 为了解决快速搜索在日月年的格式下搜索出现的问题
+         //<< "AND ExamDate >= '" << dateBegin << "' AND ExamDate <= '" << dateEnd << "' " //2012.08.21lihuamei 涓轰簡瑙ｅ喅蹇€熸悳绱㈠湪鏃ユ湀骞寸殑鏍煎紡涓嬫悳绱㈠嚭鐜扮殑闂
           << "ORDER BY ID";
 #endif
      sql = ostream.str();
@@ -1141,10 +1137,10 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
         if (strcmp(sqlite3_column_name(stmt, col), "AnimalName") == 0)
             temp.animal_name.assign((const char *)sqlite3_column_text(stmt, col));
         ++col;
-      
+
         if (strcmp(sqlite3_column_name(stmt, col), "OwnerName") == 0)
             temp.owner_name.assign((const char *)sqlite3_column_text(stmt, col));
-       
+
         ++col;
         if (strcmp(sqlite3_column_name(stmt, col), "Species") == 0) {
             int index = sqlite3_column_int(stmt, col);
@@ -1158,12 +1154,12 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
            // temp.name = name;
         ++col;
 #endif
-      
+
         if (strcmp(sqlite3_column_name(stmt, col), "Sex") == 0) {
             int sex = sqlite3_column_int(stmt, col);
             GetSexString(sex, temp.gender);
         }
- 
+
         ++col;
 
         if (strcmp(sqlite3_column_name(stmt, col), "BirthDate") == 0)
@@ -1175,7 +1171,7 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
             strDate = (const char*)sqlite3_column_text(stmt, col);
             string strDateTemp(strDate);
             StrtoStr(strDateTemp,strD);
-            iTmp = atoi(strD.c_str());   
+            iTmp = atoi(strD.c_str());
         }
         ++col;
 
@@ -1204,7 +1200,7 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
         }
     }
     sqlite3_finalize(stmt);
-  
+
     return true;
 }
 
@@ -1212,7 +1208,7 @@ bool Database::AllInfoSearch(string examID, PatientInfo::Info &result)
 {
     sqlite3_stmt *stmt;
     ostringstream ostream;
-    string sql;	
+    string sql;
 
 #ifdef VET
     ostream << "SELECT ID, AnimalName, OwnerName, Species, Sex, BirthYear, BirthMonth, BirthDay, Age, AgeUnit, Telephone, Address, Comment, "
@@ -1267,7 +1263,7 @@ bool Database::AllInfoSearch(string examID, PatientInfo::Info &result)
             result.p.name.mid = (const char*)sqlite3_column_text(stmt, col);
         col++;
 #endif
-      
+
         if (strcmp(sqlite3_column_name(stmt, col), "Sex") == 0)
             result.p.sex = sqlite3_column_int(stmt, col);
         col++;
@@ -1395,7 +1391,7 @@ bool Database::AllInfoSearch(string examID, PatientInfo::Info &result)
         return false;
     }
     sqlite3_finalize(stmt);
-	
+
     return true;
 
 }
@@ -1416,7 +1412,7 @@ bool Database::CommonSearch(string examID, NewPatSearchResult &result)
         << "AND exam_info.ExamID = '" << examID << "' "
         << "ORDER BY ID";
 #else
- 
+
     streamTerm << "SELECT ID, "
                << sql_name << ", Sex, "
                << sql_birthdate << ", "
@@ -1454,7 +1450,7 @@ bool Database::CommonSearch(string examID, NewPatSearchResult &result)
         if (strcmp(sqlite3_column_name(stmt, col), "Name") == 0)
             result.name.assign((const char *)sqlite3_column_text(stmt, col));
         ++col;
-#endif      
+#endif
         if (strcmp(sqlite3_column_name(stmt, col), "Sex") == 0) {
             int sex = sqlite3_column_int(stmt, col);
             GetSexString(sex, result.gender);
@@ -1473,7 +1469,7 @@ bool Database::CommonSearch(string examID, NewPatSearchResult &result)
             //strDate = (const char*)sqlite3_column_text(stmt, col);
             //string strDateTemp(strDate);
             //StrtoStr(strDateTemp,strD);
-            //iTmp = atoi(strD.c_str());   
+            //iTmp = atoi(strD.c_str());
         }
         ++col;
 
@@ -1502,8 +1498,6 @@ bool Database::CommonSearch(string examID, NewPatSearchResult &result)
             result.push_back(temp);
         }
 
-
-
     if (strcmp(sqlite3_column_name(stmt, 2), "Sex") == 0) {
             int sex = sqlite3_column_int(stmt, 2);
             GetSexString(sex, result.gender);
@@ -1520,7 +1514,7 @@ bool Database::CommonSearch(string examID, NewPatSearchResult &result)
         int age = 0;
         int ageUnit = 0;
 	if (strcmp(sqlite3_column_name(stmt, 7), "Age") == 0)
-            age = sqlite3_column_int(stmt, 7);	
+            age = sqlite3_column_int(stmt, 7);
 	if (strcmp(sqlite3_column_name(stmt, 8), "AgeUnit") == 0)
             ageUnit = sqlite3_column_int(stmt, 8);
         GenAgeStr(age, ageUnit, result.age);
@@ -1624,7 +1618,7 @@ void Database::GetBirthRange(string age, string ageUnit, string &birthBegin, str
 			g_date_subtract_years(beginDate, iAge+1);
 			g_date_subtract_years(endDate, iAge);
 			break;
-		
+
 		case 1: //月
 			g_date_subtract_months(beginDate, iAge+1);
 			g_date_subtract_months(endDate, iAge);
@@ -1649,9 +1643,8 @@ void Database::GetBirthRange(string age, string ageUnit, string &birthBegin, str
 	mon = (int)g_date_get_month(endDate);
 	day = (int)g_date_get_day(endDate);
 	GetDateString(year, mon, day, birthEnd);
-	
+
 	g_date_free(curDate);
 	g_date_free(beginDate);
 	g_date_free(endDate);
 }
-

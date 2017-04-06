@@ -9,7 +9,7 @@
  * @date 2007-1-9
  * @version 0.2
  */
- 
+
 #ifndef INI_FILE_H
 #define INI_FILE_H
 
@@ -34,7 +34,7 @@ public:
     void WriteInt(const char *group, const char *key, const int value);
     void WriteDouble(const char *group, const char *key, const double value);
     void WriteDoubleList(const char *group, const char *key, double value[], int length);
-    
+
     void RemoveString(const char *group, const char *key);
     void RemoveGroup(const gchar *group);
   vector <string> GetItemGroup(void);
@@ -48,5 +48,4 @@ private:
     std::string m_fileName;
 };
 
-#endif 
-
+#endif

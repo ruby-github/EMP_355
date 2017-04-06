@@ -3,8 +3,8 @@
 
 #include <string>
 #include <vector>
-#include "ProbeSocket.h"
-#include "IniFile.h"
+#include "probe/ProbeSocket.h"
+#include "base/IniFile.h"
 
 using std::string;
 using std::vector;
@@ -56,7 +56,7 @@ class ProbeMan
         int GetDefaultProbeSocket() { return m_defaultSocket; }
         void WriteDefaultProbe(const char *probeModel, IniFile* ptrIni);
         void VerifyProbeName(const char *fromType, char *toType);
-    
+
     private:
 		ProbeMan();
         string ReadDefaultProbe(IniFile* ptrIni);
@@ -71,5 +71,4 @@ class ProbeMan
         int m_defaultSocket;
 };
 
-
-#endif 
+#endif

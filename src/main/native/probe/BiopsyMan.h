@@ -1,8 +1,8 @@
 #ifndef _BIOPSYMAN_H_
 #define _BIOPSYMAN_H_
 
-#include "BiopsySetting.h"
-#include "DefaultBiopsySetting.h"
+#include "probe/BiopsySetting.h"
+#include "probe/DefaultBiopsySetting.h"
 using namespace std;
 
 class BiopsyMan
@@ -16,12 +16,12 @@ public:
 	vector<string> GetBioBracketTypesOfCurProbe(void);
     vector<string> GetBioAngleTypesOfDefaultBioBracket(void);
 	vector<string> GetBioAngleTypesOfcurBioBracket(void);
-	
+
 	int GetBioBracketTypeNumOfCurProbe(void);//2016.08.31
 
 	string GetCurBioBracketType(void);
 	void SetCurBioBracketType(string bioBracketType);
-	
+
 	string GetCurBioAngleType(void);
 	void SetCurBioAngleType(string angleType);
 
@@ -62,4 +62,4 @@ private:
 
 };
 
-#endif 
+#endif

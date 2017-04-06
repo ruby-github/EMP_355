@@ -19,19 +19,19 @@
 #include <cups/language.h>
 #include <cups/ppd.h>
 
-#include "Printdefaults.h"
-#include "Printlib.h"
-#include "Printfunctions.h"
-#include "Printgeneral.h"
-#include "Printmain.h"
-#include "Printtab.h"
-#include "Printhpgl2.h"
-#include "Printimage.h"
-#include "Printoutput.h"
-#include "Printppd.h"
-#include "Printtext.h"
-#include "PrintScreen.h"
-#include "ViewDialog.h"
+#include "periDevice/Printdefaults.h"
+#include "periDevice/Printlib.h"
+#include "periDevice/Printfunctions.h"
+#include "periDevice/Printgeneral.h"
+#include "periDevice/Printmain.h"
+#include "periDevice/Printtab.h"
+#include "periDevice/Printhpgl2.h"
+#include "periDevice/Printimage.h"
+#include "periDevice/Printoutput.h"
+#include "periDevice/Printppd.h"
+#include "periDevice/Printtext.h"
+#include "periDevice/PrintScreen.h"
+#include "display/ViewDialog.h"
 GtkWidget *Printfunctions::button_inst_save = NULL;
 GtkWidget *Printfunctions::button_inst_remove = NULL;
 GtkWidget *Printfunctions::instwin = NULL;
@@ -861,7 +861,7 @@ int Printfunctions::SaveOptions(char *printername, int onlyglobal)
 
 	if(onlyglobal == 0) {
 		strncat(printpath, iprintername, (size_t)MAXPATH);
-        
+
 		file = fopen(printpath, "wr");
 		if(file == (FILE*)NULL)
 		{
@@ -1616,7 +1616,6 @@ void Printfunctions::ButtonWinEntryChange(GtkWidget *widget)
 {
 	InstWinEntryChanged(widget);
 }
-
 
 bool Printfunctions::PrinterforPC(void)
 {}

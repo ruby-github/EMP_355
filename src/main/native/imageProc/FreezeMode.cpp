@@ -10,24 +10,24 @@
  */
 
 #include "Def.h"
-#include "LightDef.h"
-#include "FreezeMode.h"
-#include "IoCtrl.h"
-#include "GlobalClassMan.h"
-#include "KeyFunc.h"
-#include "ViewIcon.h"
-#include "Img2D.h"
-#include "../display/MenuArea.h"
-#include "Menu2D.h"
-#include "MenuM.h"
-#include "MenuCFM.h"
-#include "MenuPW.h"
-#include "../sysMan/SysGeneralSetting.h"
-#include "../display/TopArea.h"
-#include "../probe/ProbeSelect.h"
+#include "keyboard/LightDef.h"
+#include "imageProc/FreezeMode.h"
+#include "periDevice/IoCtrl.h"
+#include "imageProc/GlobalClassMan.h"
+#include "keyboard/KeyFunc.h"
+#include "display/ViewIcon.h"
+#include "imageControl/Img2D.h"
+#include "display/MenuArea.h"
+#include "imageProc/Menu2D.h"
+#include "imageProc/MenuM.h"
+#include "imageProc/MenuCFM.h"
+#include "imageProc/MenuPW.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "display/TopArea.h"
+#include "probe/ProbeSelect.h"
 #include "ViewMain.h"
-#include "../patient/PatientInfo.h"
-#include "ViewSystem.h"
+#include "patient/PatientInfo.h"
+#include "sysMan/ViewSystem.h"
 
 FreezeMode* FreezeMode::m_ptrInstance = NULL;
 
@@ -136,7 +136,7 @@ EKnobReturn FreezeMode::ChangeAutoReplay()
 		m_ptrReplay->AutoReplayEnd();
 	}
 
-	return (PRESS);	
+	return (PRESS);
 }
 
 void FreezeMode::EnterAutoReplayView()
@@ -174,13 +174,13 @@ void FreezeMode::EnterReplayMode()
 {
 	///> prepare for replay
 	MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::REPLAY);
-	m_ptrReplay->PrepareForReplay();	
+	m_ptrReplay->PrepareForReplay();
 }
 
 void FreezeMode::ExitReplayMode()
 {
 	// clear current image's replay images
-	m_ptrReplay->PrepareForEndReplay();	
+	m_ptrReplay->PrepareForEndReplay();
 	MultiFuncUndo();
 }
 void FreezeMode::ExitAutoReplay()
@@ -210,8 +210,8 @@ void FreezeMode::Freeze()
 	///> send to imaging system
 	IoCtrl io;
 	io.Freeze();
-    ImgPw::GetInstance()->OnCwImgCtrl(FALSE); //控制CW图像的实时与冻结。 
-	
+    ImgPw::GetInstance()->OnCwImgCtrl(FALSE); //控制CW图像的实时与冻结。
+
 	// update icon
 	ViewIcon::GetInstance()->Replay(TRUE);
     Update2D::SetCineRemoveImg(3);
@@ -245,11 +245,11 @@ void FreezeMode::UnFreeze()
                 int date_format = sys.GetDateFormat();
                 sys.GetHospital(m_hospitalname);
                 UpdateHospitalandpart(date_format, m_hospitalname.c_str());
-                system_save = false; 
-            } 
+                system_save = false;
+            }
             review_pic = false;
         }
-        ImgPw::GetInstance()->OnCwImgCtrl(TRUE); //控制CW图像的实时与冻结。 
+        ImgPw::GetInstance()->OnCwImgCtrl(TRUE); //控制CW图像的实时与冻结。
 
         // update
         ViewIcon::GetInstance()->Replay(FALSE);
@@ -259,13 +259,13 @@ void FreezeMode::UnFreeze()
 }
 void FreezeMode::UpdateHospitalandpart(int date_format, const char *hospital_name)
 {
-	
+
 		TopArea::GetInstance()->SetDateFormat(date_format);
 
     g_patientInfo.UpdateTopArea();
 
 	TopArea::GetInstance()->UpdateHospitalName(hospital_name);
-  
+
 	ExamItem exam;
     char str_path[256];
     sprintf(str_path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -273,7 +273,7 @@ void FreezeMode::UpdateHospitalandpart(int date_format, const char *hospital_nam
     bool userFlag = exam.ReadUserItemFlag(&ini);
     string userItemName = exam.ReadDefaultProbeDefaultItemName(&ini);
     if(userFlag)
-    { 
+    {
         TopArea::GetInstance()->UpdateCheckPart(_(userItemName.c_str()));
     }
     else
@@ -297,7 +297,6 @@ void FreezeMode::UpdateHospitalandpart(int date_format, const char *hospital_nam
     }
 }
 
-
 void FreezeMode::FreezeEFOV()
 {
 	if (ScanMode::GetInstance()->GetEFOVStatus() != ScanMode::CAPTURE)
@@ -319,11 +318,11 @@ void FreezeMode::UnFreezeEFOV()
 	///> darken freeze lamp
 	m_freezeMode = UNFREEZE;
 	g_keyInterface.CtrlLight(FALSE, LIGHT_FREEZE);
-	
+
 	///> send to imaging system
 	IoCtrl io;
 	io.Unfreeze();
-	
+
 	Replay::GetInstance()->EFOVAutoReviewEnd();
 	ScanMode::GetInstance()->EnterEFOVPrepare();
 }

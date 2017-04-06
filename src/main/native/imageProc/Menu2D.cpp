@@ -1,18 +1,18 @@
 #include <gtk/gtk.h>
-#include "Menu2D.h"
-#include "gui_func.h"
-#include "gui_global.h"
-#include "Img2D.h"
-#include "Measure2D.h"
-#include "ImgProc2D.h"
-#include "MultiFuncFactory.h"
-#include "HintArea.h"
-#include "../keyboard/KeyFunc.h"
-#include "MeasureFactory.h"
-#include "CDrawIMT.h"
-#include "ViewReport.h"
-#include "ViewArchive.h"
-#include "ViewSystem.h"
+#include "imageProc/Menu2D.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "imageControl/Img2D.h"
+#include "measure/Measure2D.h"
+#include "imageProc/ImgProc2D.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "display/HintArea.h"
+#include "keyboard/KeyFunc.h"
+#include "measure/MeasureFactory.h"
+#include "measure/CDrawIMT.h"
+#include "calcPeople/ViewReport.h"
+#include "patient/ViewArchive.h"
+#include "sysMan/ViewSystem.h"
 
 Menu2D g_menu2D;
 
@@ -37,7 +37,7 @@ void Menu2D::Show(void)
 {
 	gtk_widget_show_all(m_table);
 
-    if (ModeStatus::IsSpectrumColorMode()) 
+    if (ModeStatus::IsSpectrumColorMode())
     {
         gtk_widget_hide(m_btn4B);
     }
@@ -95,7 +95,7 @@ GtkWidget* Menu2D::Create(void)
     GtkWidget *table_frame = spin_frame.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_frame, 0, 1, 4, 5);
     spin_frame.Show();
-	
+
     // line aver. 1-4
     spin_line.SetItem(&item_line);
     GtkWidget *table_line = spin_line.Create();
@@ -162,7 +162,7 @@ GtkWidget* Menu2D::Create(void)
     //g_signal_connect(btn_4B, "clicked", G_CALLBACK(HandleBtn4B), this);
     //gtk_button_set_focus_on_click(GTK_BUTTON(btn_4B), FALSE);
 #else
-    // 4B 
+    // 4B
 #ifndef EMP_355
     m_label4B = create_label("", 0, 0, g_lightGray, NULL);
     m_btn4B = create_button(m_label4B, 0, 0, g_deep);
@@ -171,7 +171,7 @@ GtkWidget* Menu2D::Create(void)
     g_signal_connect(m_btn4B, "clicked", G_CALLBACK(HandleBtn4B), this);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btn4B), FALSE);
 #endif
-#endif 
+#endif
 
     // EFOV
 #ifdef EMP_3410
@@ -275,7 +275,7 @@ void Menu2D::ChkNoiseReject(GtkButton *button)
 }
 
 void Menu2D::BtnTrans(GtkButton *button)
-{    
+{
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::GRAY_TRANS);
 }
 
@@ -301,7 +301,7 @@ void Menu2D::BtnGlobalZoom(GtkButton *button)
         HintArea::GetInstance()->UpdateHint(_("[Global Zoom]: Only valid in B mode and UnFreeze status."), 1);
 #else
         HintArea::GetInstance()->UpdateHint(_("[Global Zoom]: Only valid in 2D B mode and UnFreeze status."), 1);
-#endif 
+#endif
     }
 }
 
@@ -337,27 +337,27 @@ void Menu2D::Btn4B(GtkButton *button)
         {
             Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
             if (format != Format2D::B4)
-                Format2D::GetInstance()->ChangeFormat(Format2D::B4);	
-            else 
-                Format2D::GetInstance()->SwitchB4();	
+                Format2D::GetInstance()->ChangeFormat(Format2D::B4);
+            else
+                Format2D::GetInstance()->SwitchB4();
         }
         else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
         {
             FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
             if (format != FormatCfm::B4)
-                FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+                FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
             else
                 FormatCfm::GetInstance()->SwitchB4();
         }
         else if (mode == ScanMode::CFM_VS_2D)
         {
             ScanMode::GetInstance()->EnterCfm();
-            FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+            FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
         }
         else if (mode == ScanMode::PDI_VS_2D)
         {
             ScanMode::GetInstance()->EnterPdi();
-            FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+            FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
         }
     }
 }
@@ -372,11 +372,11 @@ void Menu2D::ChgRotate(EKnobOper oper)
             HintArea::GetInstance()->UpdateHint(_("[Rotate]: Invalid when IMTMeasure is open."), 1);
         else
             ImgProc2D::GetInstance()->ChangeRotate(oper);
-#endif 
+#endif
         ImgProc2D::GetInstance()->ChangeRotate(oper);
     }
     else
-    { 
+    {
 #if (defined(EMP_322) || defined(EMP_313))
         HintArea::GetInstance()->UpdateHint(_("[Rotate]: Only valid in B mode."), 1);
 #else
@@ -435,4 +435,3 @@ void Menu2D::BtnEnterEFOV(GtkButton *button)
         //HintArea::GetInstance()->UpdateHint(_("[eView]: Only valid when probe type is linear and unfreeze status."), 1);
     }
  }
-

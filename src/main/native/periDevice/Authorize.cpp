@@ -4,13 +4,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "hasp_api.h"
-#include "Authorize.h"
-#include "gui_func.h"
-#include "./sysMan/SysGeneralSetting.h"
-#include "LicenseDialog.h"
-#include "gui_global.h"
-#include "./sysMan/ViewSystem.h"
+#include <hasp_api.h>
+#include "periDevice/Authorize.h"
+#include "display/gui_func.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "periDevice/LicenseDialog.h"
+#include "display/gui_global.h"
+#include "sysMan/ViewSystem.h"
 //using namespace std;
 /*
 unsigned char vendor_code[] =
@@ -55,7 +55,7 @@ CAuthorize::CAuthorize() : m_timeoutIdUkey(0)
 {
 }
 
-CAuthorize::~CAuthorize() 
+CAuthorize::~CAuthorize()
 {
 }
 
@@ -97,7 +97,7 @@ void CAuthorize::Excute(int argc, char *argv[])
 			setenv("LANG", "es_ES.UTF-8", 1);
 			setenv("LANGUAGE", "es_ES:ES", 1);
 		}
-	
+
 		else if (FR == index_lang)
 		{
 			setenv("LANG", "fr_FR.UTF-8", 1);
@@ -145,10 +145,10 @@ void CAuthorize::AddTimeout()
 gboolean CAuthorize::CallbackUKey(gpointer data)
 {
 	CAuthorize *pClass = (CAuthorize *)data;
-	
+
     SysGeneralSetting sysGS;
     int index_fid = sysGS.GetFID();
-    
+
     int status = pClass->CheckAuthorize(index_fid);
 
     //int status = pClass->CheckAuthorize(FEATURE);
@@ -174,7 +174,7 @@ gboolean CAuthorize::CallbackUKey(gpointer data)
 /*
  * 函数功能：验证key的有效性
  * 参数：
- *    feature：功能ID
+ *    feature锛氬姛鑳絀D
  *  返回值:
  *    0:授权   -1:未找到设备   -2：过期  -3：未授权
  */
@@ -183,7 +183,7 @@ int CAuthorize::CheckAuthorize(unsigned int feature)
     hasp_handle_t handle = HASP_INVALID_HANDLE_VALUE;
     hasp_status_t status;
 
-    // 与锁建立会话
+    // 涓庨攣寤虹珛浼氳瘽
     status = hasp_login(feature, (hasp_vendor_code_t *)vendor_code, &handle);
 
 	switch (status)
@@ -261,4 +261,3 @@ int CAuthorize::CheckAuthorize(unsigned int feature)
 
 	return -3;
 }
-

@@ -1,29 +1,29 @@
 #include <gtk/gtk.h>
-#include "ImgPw.h"
-#include "FormatPw.h"
-#include "MenuPW.h"
-#include "CusSpin.h"
-#include "gui_func.h"
-#include "gui_global.h"
+#include "imageControl/ImgPw.h"
+#include "imageProc/FormatPw.h"
+#include "imageProc/MenuPW.h"
+#include "display/CusSpin.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
 #include "Def.h"
-#include "ImgProcPw.h"
-#include "ImageAreaDraw.h"
-#include "ModeStatus.h"
-#include "../measure/UpdateMeasure.h"
-#include "../display/HintArea.h"
-#include "../sysMan/SysMeasurementSetting.h"
-#include "../keyboard/KeyFunc.h"
-#include "SysOptions.h"
-#include "SysGeneralSetting.h"
+#include "imageProc/ImgProcPw.h"
+#include "display/ImageAreaDraw.h"
+#include "imageProc/ModeStatus.h"
+#include "measure/UpdateMeasure.h"
+#include "display/HintArea.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "keyboard/KeyFunc.h"
+#include "sysMan/SysOptions.h"
+#include "sysMan/SysGeneralSetting.h"
 //#include "UpdateMeasure.h"
-#include "MeasureCalc.h"
-#include "MeasureMan.h"
+#include "measure/MeasureCalc.h"
+#include "measure/MeasureMan.h"
 
 /***
- * 如果在同一个容器中添加相同的两个Widgets。此时对两个中的任意一个进行了操作切换之后都只会刷新最先加入容器中的widget
+ * 濡傛灉鍦ㄥ悓涓€涓鍣ㄤ腑娣诲姞鐩稿悓鐨勪袱涓猈idgets銆傛鏃跺涓や釜涓殑浠绘剰涓€涓繘琛屼簡鎿嶄綔鍒囨崲涔嬪悗閮藉彧浼氬埛鏂版渶鍏堝姞鍏ュ鍣ㄤ腑鐨剋idget
  * g_menuPW and g_menuCW 是相同的两个全局变量。
  * 增加到菜单上去的时候却要分成两页，此时对CW的操作不会刷新。
- * 产生的bug是见bugFree 1377 and 1378
+ * 浜х敓鐨刡ug鏄bugFree 1377 and 1378
  * lhm 2013.10.27
  ***/
 MenuPW g_menuPW;
@@ -113,7 +113,6 @@ void MenuPW::UpdateDirectionModel(GtkTreeModel *model)
     gtk_tree_model_iter_next(model, &iter);
     gtk_list_store_set(store, &iter, 0, _("both"), -1);
 }
-
 
 GtkTreeModel *MenuPW::CreateThresholdModel()
 {
@@ -264,7 +263,6 @@ void MenuPW::Show(void)
         ImgProcPw::GetInstance()->SetAutoCalc(TRUE);
     }
 
-
     SysGeneralSetting sysGeneralSetting;
     int index_direction = sysGeneralSetting.GetDirection();
     gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboDirection), index_direction);
@@ -332,14 +330,14 @@ GtkWidget* MenuPW::Create(void)
     g_signal_connect(m_chkBtnAutoTrace, "clicked", G_CALLBACK(HandleChkAutoTrace), this);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_chkBtnAutoTrace), FALSE);
     gtk_widget_hide(m_chkBtnAutoTrace);
-	
+
 	// Fast Angle
     m_labelAngle = create_label("", 0, 0, g_lightGray, NULL);
     m_btn_angle = create_button(m_labelAngle, 0, 0, g_deep);
 	gtk_widget_modify_bg(m_btn_angle, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_btn_angle, 0, 6, 4, 5);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btn_angle), FALSE);
-	
+
     GtkWidget *label_angleSub = create_label("-", 0, 0, g_lightGray, NULL);
     m_btn_angleSub = create_button(label_angleSub, 0, 0, g_deep);
 	gtk_widget_modify_bg(m_btn_angleSub, GTK_STATE_INSENSITIVE, g_deepGray);
@@ -375,7 +373,7 @@ GtkWidget* MenuPW::Create(void)
 
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_comboScale, 5, 8, 6, 7);
     g_signal_connect(m_comboScale, "changed", G_CALLBACK(HandleComboScaleChanged), this);
-	
+
     // Auto Trace-Type
     m_labelTraceType = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_tracetype= create_button(m_labelTraceType, 0, 0, g_deep);
@@ -399,7 +397,7 @@ GtkWidget* MenuPW::Create(void)
     m_comboDirection = create_combobox(0, 0, "text", m_modelDirection);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_comboDirection, 5, 8, 8, 9);
     g_signal_connect(m_comboDirection, "changed", G_CALLBACK(HandleComboDirectionChanged), this);
-	
+
     // Auto Trace-Threshold
     m_labelThreshold = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_threshold = create_button(m_labelThreshold, 0, 0, g_deep);
@@ -411,7 +409,7 @@ GtkWidget* MenuPW::Create(void)
     m_comboThreshold = create_combobox(0, 0, "text", m_modelThreshold);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_comboThreshold, 5, 8, 9, 10);
     g_signal_connect(m_comboThreshold, "changed", G_CALLBACK(HandleComboThresholdChanged), this);
-	
+
     // Auto Trace-Smooth
     m_labelSmooth = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_smooth = create_button(m_labelSmooth, 0, 0, g_deep);
@@ -424,7 +422,7 @@ GtkWidget* MenuPW::Create(void)
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_comboSmooth, 5, 8, 10, 11);
     gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboSmooth), 1);
     g_signal_connect(m_comboSmooth, "changed", G_CALLBACK(HandleComboSmoothChanged), this);
-	
+
     // Display Format
     m_frameFormat = gtk_frame_new("");
     gtk_frame_set_label_align(GTK_FRAME(m_frameFormat), 0.5, 0.5);
@@ -445,7 +443,7 @@ GtkWidget* MenuPW::Create(void)
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format1, 0, 1, 0, 1);
     g_signal_connect(btn_format1, "clicked", G_CALLBACK(HandleBtnFormat1), this);
     gtk_button_set_focus_on_click(GTK_BUTTON(btn_format1), FALSE);
-	
+
     sprintf(path, "%s/%s", CFG_RES_PATH, "res/btn_format/2.jpg");
     GtkWidget *image2 = gtk_image_new_from_file(path);
     GtkWidget *btn_format2 = create_button(NULL, 0, 0, g_deep);
@@ -481,7 +479,7 @@ GtkWidget* MenuPW::Create(void)
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format5, 1, 2, 1, 2);
     g_signal_connect(btn_format5, "clicked", G_CALLBACK(HandleBtnFormat5), this);
     gtk_button_set_focus_on_click(GTK_BUTTON(btn_format5), FALSE);
-	
+
     UpdateLabel();
 
     return m_table;
@@ -538,7 +536,7 @@ void MenuPW::ChgTimeRes(EKnobOper oper)
 void MenuPW::ChkAutoTraceClicked(GtkToggleButton *togglebutton)
 {
     gboolean value = gtk_toggle_button_get_active(togglebutton);
-      
+
     // if (!value) {
     //     UpdateMeasure update;
     //     update.ClearLast();
@@ -577,7 +575,7 @@ void MenuPW::ChkAutoCalcClicked(GtkToggleButton *togglebutton)
     {
         ImgProcPw::GetInstance()->SetAutoCalc(value);
 
-        //测量增加到测量管理中
+        //娴嬮噺澧炲姞鍒版祴閲忕鐞嗕腑
         if(g_calcPwStatus)
         {
             update.ClearLast();
@@ -607,7 +605,7 @@ void MenuPW::BtnAngleSubClicked(GtkButton *button)
 void MenuPW::BtnAngleAddClicked(GtkButton *button)
 {
 	ImgPw::GetInstance()->ChangeCorrectAngleFast(ADD);
-}	
+}
 
 void MenuPW::BtnFormat1Clicked(GtkButton *button)
 {
@@ -618,7 +616,7 @@ void MenuPW::BtnFormat1Clicked(GtkButton *button)
             FormatPw::GetInstance()->ChangeFormat(FormatPw::P_TOTAL);
             WriteFormatPw(FormatPw::P_TOTAL);
         }
-        else 
+        else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
     }
     else
@@ -636,7 +634,7 @@ void MenuPW::BtnFormat2Clicked(GtkButton *button)
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP11_UD);
             WriteFormatPw(FormatPw::BP11_UD);
         }
-        else 
+        else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
     }
     else
@@ -654,7 +652,7 @@ void MenuPW::BtnFormat3Clicked(GtkButton *button)
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP21_UD);
             WriteFormatPw(FormatPw::BP21_UD);
         }
-        else 
+        else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
     }
     else
@@ -672,7 +670,7 @@ void MenuPW::BtnFormat4Clicked(GtkButton *button)
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP12_UD);
             WriteFormatPw(FormatPw::BP12_UD);
         }
-        else 
+        else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
     }
     else
@@ -690,7 +688,7 @@ void MenuPW::BtnFormat5Clicked(GtkButton *button)
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP11_LR);
             WriteFormatPw(FormatPw::BP11_LR);
         }
-        else 
+        else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is disable in current mode."), 2);
     }
     else
@@ -753,7 +751,7 @@ bool MenuPW::StatusChangeFormat()
 	ScanMode::EScanMode mode = modeStatus.GetScanMode();
 	if ((mode == ScanMode::PW) || (mode == ScanMode::PWCFM) || (mode == ScanMode::PWPDI) || (mode == ScanMode::PW_SIMULT)
 			|| (mode == ScanMode::PWCFM_SIMULT) || (mode == ScanMode::PWPDI_SIMULT)
-            || (mode == ScanMode::CW) || (mode == ScanMode::CWCFM) || (mode == ScanMode::CWPDI) ) 
+            || (mode == ScanMode::CW) || (mode == ScanMode::CWCFM) || (mode == ScanMode::CWPDI) )
 		return TRUE;
 	else
 		return FALSE;

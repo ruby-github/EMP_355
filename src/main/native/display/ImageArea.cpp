@@ -1,25 +1,25 @@
-#include "ImageArea.h"
+#include "display/ImageArea.h"
 #include "ViewMain.h"
 #include <math.h>
-#include "../imageProc/Replay.h"
-#include "../imageProc/MenuReview.h"
-#include "ImageAreaPara.h"
-#include "MeasureFactory.h"
-#include "DrawHistogram.h"
-#include "ImageAreaDraw.h"
-#include "../imageProc/ImgProcPw.h"
-#include "../imageProc/ImgProc2D.h"
+#include "imageProc/Replay.h"
+#include "imageProc/MenuReview.h"
+#include "display/ImageAreaPara.h"
+#include "measure/MeasureFactory.h"
+#include "measure/DrawHistogram.h"
+#include "display/ImageAreaDraw.h"
+#include "imageProc/ImgProcPw.h"
+#include "imageProc/ImgProc2D.h"
 #include <pango-1.0/pango/pangoft2.h>
-#include "ImageMix.h"
-#include "DSCTypes.h"
-#include "../base/CalcTime.h"
-#include "../measure/CDrawIMT.h"
-#include "../sysMan/SysMeasurementSetting.h"
-#include "../keyboard/KeyDef.h"
-#include "SysGeneralSetting.h"
-#include "ViewSystem.h"
+#include <ImageMix.h>
+#include <DSCTypes.h>
+#include "base/CalcTime.h"
+#include "measure/CDrawIMT.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "keyboard/KeyDef.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/ViewSystem.h"
 namespace {
-	//	const int MeasureResult_H = 17;	// 测量结果每行高度(像素)
+	//	const int MeasureResult_H = 17;	// 娴嬮噺缁撴灉姣忚楂樺害(鍍忕礌)
 	const int kHistogramWidth = 256+2;
 	const int kHistogramHeight = 150+2;
 	const int kHistogramX = IMAGE_X + IMAGE_W - kHistogramWidth;
@@ -663,7 +663,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 #endif
 
 					if (MultiFuncFactory::GetInstance()->GetMultiFuncType() == MultiFuncFactory::LOCAL_ZOOM) {
-						// imageSymbol叠加(symbol -> m_bitsReplayMix)
+						// imageSymbol鍙犲姞(symbol -> m_bitsReplayMix)
 						unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
 						pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
 						widthSrc1 = IMG_AREA_W;
@@ -720,7 +720,6 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 						0, 0,
 						IMG_AREA_W, IMG_AREA_H,
 						GDK_RGB_DITHER_NORMAL, 0, 0);
-
 
 				gdk_draw_pixbuf(widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
@@ -788,7 +787,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 				roiHeightSrc = m_symbolArea.h;
 				ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
 
-				// imageSpectra叠加
+				// imageSpectra鍙犲姞
 				if (ModeStatus::IsMImgMode() || ModeStatus::IsAnatomicMode() || ModeStatus::IsPWImgMode() || ModeStatus::IsCWImgMode()) {
 					unsigned char* spectraData = (unsigned char *)m_imageSpectra->imageData;
 					pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*m_spectraArea.y*IMG_BPP + m_spectraArea.x*IMG_BPP);
@@ -802,7 +801,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 					ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
 				}
 
-				// preBox叠加(box -> m_bitsMix)
+				// preBox鍙犲姞(box -> m_bitsMix)
 				if (ModeStatus::IsColorMode()) {
 					unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
 					pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
@@ -878,7 +877,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 				roiHeightSrc = IMAGE_H;
 				ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
 
-				// 绘制叠加完成后的数据
+				// 缁樺埗鍙犲姞瀹屾垚鍚庣殑鏁版嵁
 				gdk_draw_pixbuf(widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
 						m_mixPixbuf,
@@ -950,7 +949,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 	}
 
 #if 0
-	// 绘制PixmapArea
+	// 缁樺埗PixmapArea
 	gdk_draw_drawable(widget->window,
 			gc,
 			m_pixmapArea,
@@ -983,7 +982,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 			IMAGE_W, IMAGE_H);
 	//   }
 
-	// 绘制测量结果
+	// 缁樺埗娴嬮噺缁撴灉
 	gdk_gc_set_function(gc, GDK_COPY);
 	vector<MeasurePos>::iterator iter;
 	for (iter = m_meaResultPos.begin(); iter != m_meaResultPos.end(); ++iter) {
@@ -1952,7 +1951,6 @@ void ImageArea::DrawProbeMark(int x, int y, guint direction, guint directionMax,
 	//printf("1-4t: (%d, %d),(%d, %d),(%d, %d),(%d, %d)\n", t1_x, t1_y, t2_x, t2_y, t3_x, t3_y, t4_x, t4_y);
 	//printf("5-8t: (%d, %d),(%d, %d),(%d, %d),(%d, %d)\n", t5_x, t5_y, t6_x, t6_y, t7_x, t7_y, t8_x, t8_y);
 
-
 	// draw probe mark
 	//gdk_draw_line(m_pixmapBDMK[index], gc, t1_x, t1_y, t2_x, t2_y);
 	//gdk_draw_line(m_pixmapBDMK[index], gc, t3_x, t3_y, t4_x, t4_y);
@@ -1966,7 +1964,6 @@ void ImageArea::DrawProbeMark(int x, int y, guint direction, guint directionMax,
 	//gdk_draw_line(m_pixmapBDMK[index], gc, t7_x, t7_y, t8_x, t8_y);
 	gdk_draw_line(m_pixmapBDMK[index], gc, t5_x, t5_y, t7_x, t7_y);
 	//gdk_draw_line(m_pixmapBDMK[index], gc, t6_x, t6_y, t8_x, t8_y);
-
 
 	g_object_unref(gc);
 	UpdateImgArea();
@@ -2061,7 +2058,6 @@ void ImageArea::DrawMeaCursor(GdkFunction mode, int type, int size, const GdkCol
 	UpdateImgArea();
 }
 
-
 GdkGC* ImageArea::NewMeasureGC(GdkColor *color, GdkFunction mode)
 {
 	GdkGC *gc = gdk_gc_new(m_pixmapArea);
@@ -2151,7 +2147,6 @@ void ImageArea::DrawMeasureResult(const char *result, int pos, int lines, int cu
     if (update)
         UpdateImgArea();
 }
-
 
 void ImageArea::DrawStringFps(const char *str, int x, int y, const GdkColor* const color)
 {
@@ -2440,7 +2435,6 @@ void ImageArea::DrawString(const char *str, int x, int y, const GdkColor* const 
 	g_object_unref(PFM);
 	g_object_unref(context);
 }
-
 
 void ImageArea::HideBodyMark(void)
 {
@@ -2749,7 +2743,6 @@ void ImageArea::DrawArrowHollow(int x, int y, guint direction, guint directionMa
 	UpdateImgArea();
 }
 
-
 // @brief draw arrow with direction, size, color
 // @para x,y the center coordinate
 // @para direction(enum DIRECTION) value:0~23
@@ -2867,7 +2860,6 @@ void ImageArea::DrawTransducerResult(int x, int y, int width, int height, int Tr
     imgAttr.area = ImageArea::PARA;
     imgAttr.mode.gdkMode = GDK_XOR;
 
-
     int heightdiv=height/5;
 
     int i;
@@ -2932,7 +2924,6 @@ void ImageArea::DrawBiopsyLine(GdkFunction mode, const GdkColor* const color, in
         {
             x = x1 + (int)((float)dist_x * (float)count / (float)length);
             y = y1 + (int)((float)dist_y * (float)count / (float)length);
-
 
             gdk_draw_point(m_pixmapPwTrace, gc, x,   y);
             gdk_draw_point(m_pixmapPwTrace, gc, x+1, y);

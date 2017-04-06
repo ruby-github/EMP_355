@@ -3,7 +3,6 @@
 
 #include "Def.h"
 
-
 class AbsMultiFunc
 {
 	public:
@@ -21,4 +20,3 @@ class AbsMultiFunc
 };
 
 #endif
-

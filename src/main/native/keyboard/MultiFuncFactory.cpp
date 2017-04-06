@@ -1,10 +1,9 @@
-
-#include "MultiFuncFactory.h"
-#include "MultiFuncMode.h"
-#include "MultiFuncValue.h"
-#include "MultiFuncBodyMark.h"
-#include  "ViewMain.h"
-#include  "MultiFuncArrow.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "keyboard/MultiFuncMode.h"
+#include "keyboard/MultiFuncValue.h"
+#include "bodymark/MultiFuncBodyMark.h"
+#include "ViewMain.h"
+#include "comment/MultiFuncArrow.h"
 
 MultiFuncFactory* MultiFuncFactory::m_ptrInstance = NULL;
 AbsMultiFunc* MultiFuncFactory::m_ptrMulti = NULL;
@@ -72,12 +71,12 @@ AbsMultiFunc* MultiFuncFactory::Create(EMultiFunc type)
 			InvisibleCursor(TRUE);
 			m_ptrMulti = new MultiFuncPIPZoom;
 			break;
-		
+
 		case MEASURE:
 			InvisibleCursor(TRUE);
 			m_ptrMulti = new MultiFuncMeasure;
 			break;
-	
+
         case CALC:
 			InvisibleCursor(TRUE);
 			//m_ptrMulti = new MultiFuncCalc;
@@ -152,7 +151,7 @@ AbsMultiFunc* MultiFuncFactory::Create(EMultiFunc type)
 			InvisibleCursor(TRUE);
 			m_ptrMulti = new MultiFuncPwCfm;
 			break;
-	
+
 		case PWPDI_INIT:
 			InvisibleCursor(TRUE);
 			m_ptrMulti = new MultiFuncPwPdiInit;
@@ -197,7 +196,7 @@ AbsMultiFunc* MultiFuncFactory::Create(EMultiFunc type)
 			InvisibleCursor(TRUE);
 			m_ptrMulti = new MultiFuncCwCfm;
 			break;
-	
+
 		case CWPDI_INIT:
 			InvisibleCursor(TRUE);
 			m_ptrMulti = new MultiFuncCwPdiInit;
@@ -227,7 +226,7 @@ AbsMultiFunc* MultiFuncFactory::Create(EMultiFunc type)
 void MultiFuncUndo()
 {
 	ModeStatus ms;
-	MultiFuncFactory::EMultiFunc type;	
+	MultiFuncFactory::EMultiFunc type;
 	//----------2016.08.22---------------------------//
 	if(MenuArea::GetInstance()->GetMenuType()==MenuArea::BIOPSYVERIFY)
 	{
@@ -323,7 +322,7 @@ void MultiFuncUndo()
 				break;
 		}
 	}
-	else 
+	else
 	{
 		if (Replay::GetInstance()->GetReadSnapStatus())
 			type = MultiFuncFactory::NONE;
@@ -332,5 +331,3 @@ void MultiFuncUndo()
 	}
 	MultiFuncFactory::GetInstance()->Create(type);
 }
-
-

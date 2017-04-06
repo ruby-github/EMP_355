@@ -3,10 +3,10 @@
 
 #include "Def.h"
 #include "AbsMeasure.h"
-#include "UpdateMeasure.h"
-#include "MeasureCalc.h"
-#include "MeasureDraw.h"
-#include "MeasureMan.h"
+#include "measure/UpdateMeasure.h"
+#include "measure/MeasureCalc.h"
+#include "measure/MeasureDraw.h"
+#include "measure/MeasureMan.h"
 //轨迹法手动描迹
 class DMeasureManualTrack: public AbsMeasure
 {
@@ -34,8 +34,8 @@ class DMeasureManualTrack: public AbsMeasure
 	POINT m_psP;
 	POINT m_edP;
 
-	vector<POINT> m_track;//存储轨迹用于擦除  
-	vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘  
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -74,7 +74,7 @@ class DMeasureManualDot: public AbsMeasure
 	double m_pi;
 	int m_hr;
 	POINT m_psTmp;
-	vector<POINT> m_dot;//存储描点位置用于擦除   
+	vector<POINT> m_dot;//瀛樺偍鎻忕偣浣嶇疆鐢ㄤ簬鎿﹂櫎
 	POINT m_psP;
 	POINT m_edP;
 
@@ -106,7 +106,7 @@ class DMeasureManualAuto: public AbsMeasure
     private:
 	POINT m_startP;
 	POINT m_endP;
-	vector<POINT> m_track;//存储轨迹用于擦除
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
 	POINT m_psP;
 	POINT m_edP;
     POINT m_cursor;
@@ -127,7 +127,6 @@ class DMeasureManualAuto: public AbsMeasure
     void SemiAutoCalc();//半自动
 };
 
-
 class DMeasureIntegralTrack: public AbsMeasure
 {
     public:
@@ -144,7 +143,7 @@ class DMeasureIntegralTrack: public AbsMeasure
     private:
 	double m_integral_area;
 	double m_perimeter;
-	vector<POINT> m_track;//存储轨迹用于擦除  
+	vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;
@@ -163,9 +162,6 @@ class DMeasureIntegralTrack: public AbsMeasure
 	const unsigned char MOUSE_INTERVAL;
 	unsigned char m_mouse_count;
 };
-
-
-
 
 /*
  * @brief measure velocity in doppler mode
@@ -421,7 +417,6 @@ class DMeasureAccel :public AbsMeasure
 		const SingleItemInfo *m_itemInfo;
 };
 
-
 /*
  * @brief measure P1/2t in doppler mode
  */
@@ -452,17 +447,16 @@ class DMeasureP12t :public AbsMeasure
 		double m_p12t;
 		int m_item;
 		const MultiItemInfo *m_itemInfo;
-		
+
     void Result(int saveR, UpdateMeasure::ResultAttr& attr);
 };
 
-
 /*
  * @brief measure PI(pulse index) in doppler mode
- * >method = 0: PI测量
- * >method = 1: PG mean测量
+ * >method = 0: PI娴嬮噺
+ * >method = 1: PG mean娴嬮噺
  */
-class DMeasurePI :public AbsMeasure//应该再加入鼠标反向运动时自动往前擦除轨迹线
+class DMeasurePI :public AbsMeasure//搴旇鍐嶅姞鍏ラ紶鏍囧弽鍚戣繍鍔ㄦ椂鑷姩寰€鍓嶆摝闄よ建杩圭嚎
 {
 	public:
 		DMeasurePI(int method,const SingleItemInfo *ptrSingleItemInfo);
@@ -489,7 +483,7 @@ class DMeasurePI :public AbsMeasure//应该再加入鼠标反向运动时自动�
 		bool m_isDraw;
 		POINT m_tempP;
 		vector<POINT> m_vec;
-        vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘  
+        vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
         POINT m_psP;
 		POINT m_edP;
 		double m_ps;

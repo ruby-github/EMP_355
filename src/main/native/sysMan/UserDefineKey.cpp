@@ -2,29 +2,28 @@
  * 2009, 深圳恩普电子技术有限公司
  *
  * @file: UserDefineKey
- * @brief: manage userDefine key, realize key p1 and p2 functin acording to system setting 
+ * @brief: manage userDefine key, realize key p1 and p2 functin acording to system setting
  *
  * version: V1.0
  * date: 2010-5-28
  * @author: zhanglei
  */
 
-#include "UserDefineKey.h"
-#include "gui_global.h"
+#include "sysMan/UserDefineKey.h"
+#include "display/gui_global.h"
 #include "Def.h"
-#include "Img2D.h"
-#include "ImgPw.h"
-#include "KnobReplay.h"
-#include "Knob2D.h"
-#include "ModeStatus.h"
-#include "HintArea.h"
-#include "Menu2D.h"
-#include "SysUserDefinedKey.h"
-#include "PrintScreen.h"
-#include "../imageControl/Knob2D.h"
-#include "../sysMan/ViewSystem.h"
-#include "../display/MenuArea.h"
-#include "../keyboard/KeyFunc.h" //2016.09.07
+#include "imageControl/Img2D.h"
+#include "imageControl/ImgPw.h"
+#include "imageProc/KnobReplay.h"
+#include "imageControl/Knob2D.h"
+#include "imageProc/ModeStatus.h"
+#include "display/HintArea.h"
+#include "imageProc/Menu2D.h"
+#include "sysMan/SysUserDefinedKey.h"
+#include "periDevice/PrintScreen.h"
+#include "sysMan/ViewSystem.h"
+#include "display/MenuArea.h"
+#include "keyboard/KeyFunc.h" //2016.09.07
 
 #if defined(EMP_322)
 const string UserDefineKey::KeyFunctionList[MAX_KEY] = {
@@ -97,8 +96,8 @@ void UserDefineKey::PressKeyP2(void)
         ModeStatus ms;
         if (ms.GetFreezeMode() == FreezeMode::UNFREEZE)
             FreezeMode::GetInstance()->PressFreeze();
-        
-        PrintScreen ps;  
+
+        PrintScreen ps;
         ps.PrintP2();
     }
     else
@@ -115,8 +114,8 @@ void UserDefineKey::PressKeyP3(void)
         ModeStatus ms;
         if (ms.GetFreezeMode() == FreezeMode::UNFREEZE)
             FreezeMode::GetInstance()->PressFreeze();
-        
-        PrintScreen ps;  
+
+        PrintScreen ps;
         ps.PrintP3();
     }
     else
@@ -206,11 +205,11 @@ void UserDefineKey::FactoryCreate(EKeyFunc type)
             {
                 if (ModeStatus::IsAutoReplayMode())
                     FreezeMode::GetInstance()->ChangeAutoReplay();
-                else if (ModeStatus::IsUnFreezeMode())	
+                else if (ModeStatus::IsUnFreezeMode())
                     FreezeMode::GetInstance()->PressFreeze();
 
                 ViewSystem::GetInstance()->CreateWindow();
-#ifndef EMP_355        //按自定义键进入systemsetting时，保持冻结
+#ifndef EMP_355        //鎸夎嚜瀹氫箟閿繘鍏ystemsetting鏃讹紝淇濇寔鍐荤粨
                 FreezeMode::GetInstance()->PressUnFreeze();
 #endif
             }

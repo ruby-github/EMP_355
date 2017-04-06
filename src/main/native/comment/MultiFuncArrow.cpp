@@ -1,8 +1,8 @@
-	/**
+/**
  * @brief MultiFuncArrow.cpp: implementation for the MultiFuncArrow class.
  *
- * MultiFuncArrow handle all events of arrow operation, include 
- * delete cancel move and so on. MultiFuncArrow derive from 
+ * MultiFuncArrow handle all events of arrow operation, include
+ * delete cancel move and so on. MultiFuncArrow derive from
  * class CAbsUpdateArrow KnobEvent and AbsMultiFunc.
  *
  * emperor
@@ -11,23 +11,21 @@
  * @date: 2009-9-6
  */
 
-#include "../keyboard/MultiFuncValue.h"
-#include "../keyboard/KeyValueOpr.h"
-#include "MultiFuncArrow.h"
+#include "keyboard/MultiFuncValue.h"
+#include "keyboard/KeyValueOpr.h"
+#include "comment/MultiFuncArrow.h"
 #include "ViewMain.h"
-#include "../display/ImageArea.h"
-#include "../keyboard/KeyDef.h"
-#include "MultiFuncArrow.h"
-#include "KnobNone.h"
-#include "Arrow.h"
-
+#include "display/ImageArea.h"
+#include "keyboard/KeyDef.h"
+#include "display/KnobNone.h"
+#include "comment/Arrow.h"
 
 MultiFuncArrow * MultiFuncArrow::m_pThis = NULL;
 
 enum EKnobArrow {ARROW_SHAPE, ARROW_SIZE, ARROW_COLOR};
 #if (defined (EMP_322) || defined(EMP_313))
-KnobMenu::KnobItem KnobArrowMenu[6] =  
-{ 
+KnobMenu::KnobItem KnobArrowMenu[6] =
+{
     {_("Shape"), "", MIN, MultiFuncArrow::SetShape, MultiFuncArrow::PressSetShape},
 	{_("Size"), "", MIN, MultiFuncArrow::SetSize, MultiFuncArrow::PressSetSize},
 	{_("Color"), "", MIN, MultiFuncArrow::SetColor, MultiFuncArrow::PressSetColor},
@@ -36,7 +34,7 @@ KnobMenu::KnobItem KnobArrowMenu[6] =
 	{"", "", ERROR, NULL, NULL},
 };
 #else
-KnobMenu::KnobItem KnobArrowMenu[5] = 
+KnobMenu::KnobItem KnobArrowMenu[5] =
 {
 	{_("Shape"), "", MIN, MultiFuncArrow::SetShape, NULL},
 	{_("Size"), "", MIN, MultiFuncArrow::SetSize, NULL},
@@ -67,7 +65,6 @@ const char * arrowColorName[6] =
 	_("Blue"),
 };
 
-
 MultiFuncArrow::MultiFuncArrow()
 :m_arrow(NULL), m_pressMode(CLICK), m_arrowOpr(ADD), m_knobItemBku(NULL)
 {
@@ -94,7 +91,7 @@ MultiFuncArrow::~MultiFuncArrow()
 	m_pThis = NULL;
 	//KnobMenu::GetInstance()->SetItem(m_knobItemBku, sizeof(m_knobItemBku)/sizeof(KnobMenu::KnobItem), m_knobTypeBku);
 	KnobUndo();
-} 
+}
 
 void MultiFuncArrow::Do()
 {
@@ -114,7 +111,7 @@ void MultiFuncArrow::Do()
 
 					case MODIFY:
 						m_arrow->MoveEnd();
-						m_arrowOpr = ADD; 
+						m_arrowOpr = ADD;
 						//hide hand cursor, add...
 						InvisibleCursor(TRUE);
 						break;
@@ -129,7 +126,7 @@ void MultiFuncArrow::Do()
 			if(m_arrow->MoveBegin())
 			{
 				//enter moving mode
-				m_arrowOpr = MODIFY;	
+				m_arrowOpr = MODIFY;
 
 				// set system cursor to current pos
 				m_pos.x = m_arrow->GetArrowPos().x;
@@ -149,7 +146,7 @@ void MultiFuncArrow::Do()
 /*
  *@brief delete arrow one by one from last
  *@retval if or not arrow list is empty
- */ 
+ */
 void MultiFuncArrow::Undo()
 {
 	if(m_arrow == NULL)
@@ -163,7 +160,7 @@ void MultiFuncArrow::Undo()
 
 		case MODIFY:
 			m_arrow->UndoMove();
-			m_arrowOpr = ADD; 
+			m_arrowOpr = ADD;
 			//hide hand cursor, add...
 			InvisibleCursor(TRUE);
 			break;
@@ -210,7 +207,6 @@ void MultiFuncArrow::Mouse(int offsetX, int offsetY)
 	if(m_arrow == NULL)
         return;
 
-
 	m_pos = GetPoint(offsetX, offsetY);
 	m_arrow->SetArrowPos(m_pos);
 	if (m_arrowOpr == MODIFY)
@@ -223,14 +219,14 @@ void MultiFuncArrow::Esc()
 		Undo();
 
 	MultiFuncUndo();
-	
+
 	if(m_pThis != NULL)
 	{
 		m_pThis = NULL;
 	}
 }
 
-void MultiFuncArrow::DrawArrow(POINT pos, unsigned int direction, double scale, 
+void MultiFuncArrow::DrawArrow(POINT pos, unsigned int direction, double scale,
 		unsigned int color, unsigned int shape)
 {
 	if (shape == CArrow::SIMPLEARROW)
@@ -252,7 +248,7 @@ void MultiFuncArrow::KeyEvent(unsigned char keyValue)
 	switch(keyValue)
 	{
 		case KEY_SET:
-			if(m_timer > 0)	
+			if(m_timer > 0)
 			{
 				g_source_remove(m_timer);
 				m_timer = 0;
@@ -330,7 +326,7 @@ void MultiFuncArrow::KeyEvent(unsigned char keyValue)
 			Esc();
 			ViewMain::GetInstance()->KeyEvent(keyValue);
 			break;
-	}	
+	}
 }
 
 void MultiFuncArrow::KnobEvent(unsigned char keyValue, unsigned char offset)
@@ -378,13 +374,13 @@ void MultiFuncArrow::KnobArrowCreate()
 	//size
 	CArrow::SIZE size = m_arrow->GetArrowSize();
 	KnobMenu::GetInstance()->SetValue(ARROW_SIZE, (char *)(arrowSizeName[size]), GetKnobRetSize(size));
-	
+
 	//color
 	CArrow::COLOR color = m_arrow->GetArrowColor();
 	KnobMenu::GetInstance()->SetValue(ARROW_COLOR, (char *)(arrowColorName[color]), GetKnobRetColor(color));
 }
 
-//emp5800 按键切换，改变箭头的形状
+//emp5800 鎸夐敭鍒囨崲锛屾敼鍙樼澶寸殑褰㈢姸
 EKnobReturn MultiFuncArrow::PressSetShape(void)
 {
     EKnobReturn ret = ERROR;
@@ -414,7 +410,7 @@ EKnobReturn MultiFuncArrow::SetShape(EKnobOper opr)
 	EKnobReturn ret = ERROR;
 
 	int temp = 0;
-     
+
    	if(m_pThis != NULL)
 	{
         if (m_pThis->m_arrowOpr == MODIFY)
@@ -446,8 +442,8 @@ EKnobReturn MultiFuncArrow::SetShape(EKnobOper opr)
 			default:
                 return ERROR;
 				break;
-		}	
-		
+		}
+
 		ret = GetKnobRetShape(shape);
 
 		if (shape < (int)sizeof(arrowShapeName))
@@ -457,7 +453,7 @@ EKnobReturn MultiFuncArrow::SetShape(EKnobOper opr)
 	return ret;
 }
 
-//按键切换，实现改变箭头的大小（当temp = 3,切换到小箭头
+//鎸夐敭鍒囨崲锛屽疄鐜版敼鍙樼澶寸殑澶у皬锛堝綋temp = 3,鍒囨崲鍒板皬绠ご
 EKnobReturn MultiFuncArrow::PressSetSize(void)
 {
    EKnobReturn ret = ERROR;
@@ -496,7 +492,7 @@ EKnobReturn MultiFuncArrow::SetSize(EKnobOper opr)
 	{
         if (m_pThis->m_arrowOpr == MODIFY)
             return ERROR;
-		
+
         CArrow::SIZE size = m_pThis->m_arrow->GetArrowSize();
 		temp = size;
 
@@ -523,11 +519,11 @@ EKnobReturn MultiFuncArrow::SetSize(EKnobOper opr)
 			default:
                 return ERROR;
 				break;
-		}	
-		
+		}
+
 		ret = GetKnobRetSize(size);
 
-		if (size < (int)sizeof(arrowSizeName)) 
+		if (size < (int)sizeof(arrowSizeName))
 			KnobMenu::GetInstance()->SetValue(ARROW_SIZE, (char *)(arrowSizeName[size]), ret);
 	}
 
@@ -543,7 +539,7 @@ EKnobReturn MultiFuncArrow::PressSetColor(void)
    {
         if (m_pThis->m_arrowOpr == MODIFY)
             return ERROR;
-       
+
        CArrow::COLOR color = m_pThis->m_arrow->GetArrowColor();
        temp = color;
        if (temp <= CArrow::BLUE)
@@ -573,7 +569,7 @@ EKnobReturn MultiFuncArrow::SetColor(EKnobOper opr)
 	{
         if (m_pThis->m_arrowOpr == MODIFY)
             return ERROR;
-       
+
         CArrow::COLOR color = m_pThis->m_arrow->GetArrowColor();
         temp = color;
 
@@ -600,11 +596,11 @@ EKnobReturn MultiFuncArrow::SetColor(EKnobOper opr)
 			default:
                 return ERROR;
 				break;
-		}	
+		}
 
 		ret = GetKnobRetColor(color);
 
-		if (color < (int)sizeof(arrowColorName)) 
+		if (color < (int)sizeof(arrowColorName))
 			KnobMenu::GetInstance()->SetValue(ARROW_COLOR, (char *)(arrowColorName[color]), ret);
 	}
 
@@ -627,7 +623,7 @@ EKnobReturn MultiFuncArrow::GetKnobRetShape(CArrow::SHAPE shape)
 EKnobReturn MultiFuncArrow::GetKnobRetSize(CArrow::SIZE size)
 {
 	EKnobReturn ret = ERROR;
-	
+
 	if(size == CArrow::SMALL)
 		ret = MIN;
 	else if(size == CArrow::BIG)
@@ -651,13 +647,12 @@ EKnobReturn MultiFuncArrow::GetKnobRetColor(CArrow::COLOR color)
 	return ret;
 }
 
-gboolean MultiFuncArrow::HandleClicked(gpointer data) 
-{ 
+gboolean MultiFuncArrow::HandleClicked(gpointer data)
+{
     if(m_pThis == NULL)
     {
         return FALSE;
     }
 
-    return m_pThis->Clicked(); 
+    return m_pThis->Clicked();
 }
-

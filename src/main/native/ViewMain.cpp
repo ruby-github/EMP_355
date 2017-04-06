@@ -1,53 +1,52 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
-#include "ImageArea.h"
-#include "KnobMenu.h"
+#include "display/ImageArea.h"
+#include "display/KnobMenu.h"
 #include "ViewMain.h"
-#include "gui_global.h"
-#include "gui_func.h"
-#include "TopArea.h"
-#include "Knob2D.h"
-#include "NoteArea.h"
-#include "ViewProbe.h"
-#include "ViewReport.h"
-#include "ViewArchive.h"
-#include "ViewNewPat.h"
-#include "ViewIcon.h"
-#include "KeyDef.h"
-#include "MultiFuncFactory.h"
-#include "KeyFunc.h"
-#include "ImgProc2D.h"
-#include "KnobPw.h"
-#include "ModeStatus.h"
-#include "FreezeMode.h"
-#include "ScanMode.h"
-#include "Format2D.h"
-#include "FormatM.h"
-#include "FormatPw.h"
-#include "FormatCfm.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
+#include "display/TopArea.h"
+#include "imageControl/Knob2D.h"
+#include "comment/NoteArea.h"
+#include "probe/ViewProbe.h"
+#include "calcPeople/ViewReport.h"
+#include "patient/ViewArchive.h"
+#include "patient/ViewNewPat.h"
+#include "display/ViewIcon.h"
+#include "keyboard/KeyDef.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "keyboard/KeyFunc.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageControl/KnobPw.h"
+#include "imageProc/ModeStatus.h"
+#include "imageProc/FreezeMode.h"
+#include "imageProc/ScanMode.h"
+#include "imageProc/Format2D.h"
+#include "imageProc/FormatM.h"
+#include "imageProc/FormatPw.h"
+#include "imageProc/FormatCfm.h"
 #include "Def.h"
-#include "pthread.h"
-#include "../sysMan/SysGeneralSetting.h"
-#include "MeasureMan.h"
-#include "ViewSystem.h"
-#include "UserDefineKey.h"
-#include "HintArea.h"
-#include "../sysMan/ViewSuperuser.h"
+#include <pthread.h>
+#include "sysMan/SysGeneralSetting.h"
+#include "measure/MeasureMan.h"
+#include "sysMan/ViewSystem.h"
+#include "sysMan/UserDefineKey.h"
+#include "display/HintArea.h"
+#include "sysMan/ViewSuperuser.h"
 #include "imageProc/GlobalClassMan.h"
 #include "keyboard/LightDef.h"
-#include "imageProc/ScanMode.h"
 #include "probe/ProbeMan.h"
-#include "ViewDicomSupervise.h"
-#include "EmpAuthorization.h"
-#include "ImgProcPw.h"
-#include "MenuPW.h"
-#include "MeasureD.h"
-#include "Zoom.h"
-#include "ManRegister.h"
-#include "MonitorControl.h"
-#include "UserSelect.h"           //addec by LL
+#include "sysMan/ViewDicomSupervise.h"
+#include <EmpAuthorization.h>
+#include "imageProc/ImgProcPw.h"
+#include "imageProc/MenuPW.h"
+#include "measure/MeasureD.h"
+#include "imageProc/Zoom.h"
+#include "periDevice/ManRegister.h"
+#include "periDevice/MonitorControl.h"
+#include "sysMan/UserSelect.h"           //addec by LL
 
-#include "FpgaCtrl2D.h"           
+#include "imageControl/FpgaCtrl2D.h"
 extern MenuPW g_menuPW;
 // test_Artifact
 // #include "imageProc/ImgProcCfm.h"
@@ -58,14 +57,13 @@ int g_tgcSlider[8] = {128, 128, 128, 128, 128, 128, 128, 128}; // global variabl
 bool ViewMain::m_cursorVisible = true;
 extern bool g_authorizationOn;
 
-
 //manual/auto trace in freeze pw
-int g_setFunc = 1; //1: no useful, 2: adjust is using, 3: finish to calc auto trace 
+int g_setFunc = 1; //1: no useful, 2: adjust is using, 3: finish to calc auto trace
 //current operation (1: start line of cycle, 2: ps positoin, 3: ed position, 4: end line of cycle)
-int g_curOper = 1; 
+int g_curOper = 1;
 /**
- * 1: 【Set】is 确认in pw freeze,
- * 2: 【Set】is 校正
+ * 1: 銆怱et銆慽s 纭in pw freeze,
+ * 2: 銆怱et銆慽s 鏍℃
  * 3:  not in manual or trace in freeze pw
  */
 
@@ -92,7 +90,6 @@ gboolean ClickArchive(gpointer data)
 
 	return false;
 }
-
 
 void InvisibleCursor(bool invisible, bool resetCursor)
 {
@@ -166,42 +163,42 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 {
 	KnobMenu* ptrKnob = KnobMenu::GetInstance();
     AbsMultiFunc* ptrMultiFunc = MultiFuncFactory::GetInstance()->GetObject();
-    
+
     ProbeSocket::ProbePara para;
     ProbeMan::GetInstance()->GetCurProbe(para);
     char type = Img2D::GetInstance()->ReviseProbeType(para.type);
 #ifdef EMP_355
     //////////monitor control///////////////
-    MonitorControl monitorCtl;  
-    switch(keyValue) 
+    MonitorControl monitorCtl;
+    switch(keyValue)
     {
         case KEY_BRIGHT_ADD:
             {
-                monitorCtl.SetBrightAdd(); 
+                monitorCtl.SetBrightAdd();
             }
             break;
 
         case KEY_BRIGHT_SUB:
             {
-                monitorCtl.SetBrightSub(); 
+                monitorCtl.SetBrightSub();
             }
             break;
 
         case KEY_CONTRAST_ADD:
             {
-                monitorCtl.SetContrastAdd(); 
+                monitorCtl.SetContrastAdd();
             }
             break;
 
         case KEY_CONTRAST_SUB:
             {
-                monitorCtl.SetContrastSub(); 
+                monitorCtl.SetContrastSub();
             }
             break;
 
         case KEY_AUTOADJUST:
             {
-                monitorCtl.AutoAdjust(); 
+                monitorCtl.AutoAdjust();
             }
             break;
 
@@ -215,7 +212,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
     if((MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW)&&(ViewSuperuser::GetInstance()->GetDemoStatus()/*menureview super user mode*/))
     {
-        switch(keyValue) 
+        switch(keyValue)
         {
 			case KEY_SET:
                 {
@@ -240,7 +237,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
     			break;
 #endif
 #endif
-            default:	
+            default:
                 {
 #if (defined(EMP_460) || defined(EMP_355))
             if (keyValue == 'q')
@@ -259,9 +256,9 @@ void ViewMain::KeyEvent(unsigned char keyValue)
         }
 		m_keyValue = keyValue;
 		return;
-	}	
+	}
 
-    switch(keyValue) 
+    switch(keyValue)
 	{
 		case KEY_POWER:
 			{
@@ -298,7 +295,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					{
 						if(g_menuPW.GetAutoTraceStatus())
 							ImgProcPw::GetInstance()->SetAutoCalc(TRUE);
-                        MeasureMan::GetInstance()->ClearPwTraceUnFreeze(); 
+                        MeasureMan::GetInstance()->ClearPwTraceUnFreeze();
 					}
 					FreezeMode::GetInstance()->PressUnFreeze();
 				}
@@ -329,14 +326,14 @@ void ViewMain::KeyEvent(unsigned char keyValue)
         case KEY_4D:
             {
 #ifdef EMP3D
-				if ( para.type == 'v' || para.type == 'V' || 
+				if ( para.type == 'v' || para.type == 'V' ||
 					 para.type == 'c' || para.type == 'C' ||
 					 para.type == 'l' || para.type == 'L')
 					ScanMode::GetInstance()->Enter4D();
 				else
-					HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
+					HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
 #else
-                HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
+                HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
 #endif
             }
             break;
@@ -374,13 +371,13 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				int mode = s.GetScanMode();
 
 				if (mode == ScanMode::D2)
-					Format2D::GetInstance()->ChangeFormat(Format2D::B);	
+					Format2D::GetInstance()->ChangeFormat(Format2D::B);
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B);
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B);
 				}
 			}
 			break;
@@ -401,24 +398,24 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				{
 					Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
 					if (format != Format2D::BB)
-						Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
-					else 
-						Format2D::GetInstance()->SwitchBB();	
+						Format2D::GetInstance()->ChangeFormat(Format2D::BB);
+					else
+						Format2D::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
 				{
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::BB)
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 					else
 						FormatCfm::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 				}
-			}        
+			}
 			break;
 
 		case KEY_QUAD:
@@ -434,24 +431,24 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				{
 					Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
 					if (format != Format2D::B4)
-						Format2D::GetInstance()->ChangeFormat(Format2D::B4);	
-					else 
-						Format2D::GetInstance()->SwitchB4();	
+						Format2D::GetInstance()->ChangeFormat(Format2D::B4);
+					else
+						Format2D::GetInstance()->SwitchB4();
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
 				{
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::B4)
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
 					else
 						FormatCfm::GetInstance()->SwitchB4();
 				}
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
 				}
-			}        
+			}
 			break;
 
 		case KEY_DEPTH:
@@ -495,8 +492,8 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
 #ifdef EMP_3410
                 if (type == 'P' && CManRegister::GetInstance()->IsAuthorize("CW"))
-#elif EMP_355 
-					if (0)        //G30暂时屏蔽CW功能
+#elif EMP_355
+					if (0)        //G30鏆傛椂灞忚斀CW鍔熻兘
 #else
 					if (type == 'P')
 #endif
@@ -524,21 +521,21 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 {
 #ifdef EMP_3D
 
-					if ( para.type == 'v' || para.type == 'V' || 
+					if ( para.type == 'v' || para.type == 'V' ||
 						 para.type == 'c' || para.type == 'C' ||
 						 para.type == 'l' || para.type == 'L')
 					{
-						///> control light 
+						///> control light
 						ScanMode::GetInstance()->DarkAllModeLight();
 						g_keyInterface.CtrlLight(TRUE, LIGHT_CW);
 
 						ScanMode::GetInstance()->Enter4D();
 					}
 					else
-						HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
+						HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
 #else
-                    HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
-#endif                
+                    HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
+#endif
                 }
             }
  			break;
@@ -546,7 +543,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 		case KEY_PDI:
 			{
 				ScanMode::GetInstance()->ExitSpecialMeasure();
-                
+
                 ScanMode* ptrS = ScanMode::GetInstance();
              if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
                 {
@@ -559,18 +556,18 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     ptrS->UpdatePw();
                     g_keyInterface.CtrlLight(FALSE, LIGHT_PDI);
                 }
-                else 
+                else
                     ptrS->EnterPdi();
             }
             break;
 
 		case KEY_PW:
 			{
-                
+
                 ScanMode* ptrS = ScanMode::GetInstance();
                 ModeStatus s;
                 int mode = s.GetScanMode();
-                
+
                 if(mode == ScanMode::PW_INIT || mode == ScanMode::PWCFM_INIT || mode == ScanMode::PWPDI_INIT)
                 {
                     ptrMultiFunc->Update();
@@ -602,7 +599,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
         case KEY_CFM:
             {
 				ScanMode::GetInstance()->ExitSpecialMeasure();
-                
+
                 ScanMode* ptrS = ScanMode::GetInstance();
                 if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
                 {
@@ -610,7 +607,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     Img2D::GetInstance()->ExitEFVI();
                 }
 
-                if (mode == ScanMode::PWCFM) 
+                if (mode == ScanMode::PWCFM)
                     ptrS->UpdatePw();
                 else
                     ptrS->EnterCfm();
@@ -626,7 +623,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 else
                 {
                     if (mode != ScanMode::M)
-                        g_keyInterface.CtrlLight(TRUE,LIGHT_M); 
+                        g_keyInterface.CtrlLight(TRUE,LIGHT_M);
                     if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
                     {
                         Img2D::GetInstance()->ExitTpView();
@@ -636,7 +633,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 }
             }
             break;
-	
+
         case KEY_AUTO:
 			if (ModeStatus::IsEFOVMode()) {
 				HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
@@ -675,24 +672,24 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				{
 					Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
 					if (format != Format2D::BB)
-						Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
-					else 
-						Format2D::GetInstance()->SwitchBB();	
+						Format2D::GetInstance()->ChangeFormat(Format2D::BB);
+					else
+						Format2D::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
 				{
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::BB)
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 					else
 						FormatCfm::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 				}
-			}        
+			}
 			break;
 
 		case KEY_QUAD:
@@ -707,26 +704,26 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				{
 					Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
 					if (format != Format2D::B4)
-						Format2D::GetInstance()->ChangeFormat(Format2D::B4);	
-					else 
-						Format2D::GetInstance()->SwitchB4();	
+						Format2D::GetInstance()->ChangeFormat(Format2D::B4);
+					else
+						Format2D::GetInstance()->SwitchB4();
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
 				{
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::B4)
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
 					else
 						FormatCfm::GetInstance()->SwitchB4();
 				}
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
 				}
-			}        
+			}
 			break;
-        
+
 		case KEY_P3:
 			{
 				if (ModeStatus::IsEFOVMode()) {
@@ -755,7 +752,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     {
                         Img2D* ptrImg = Img2D::GetInstance();
                         if (ptrImg->IsCompoundSpaceOn() || ptrImg->IsCompoundFreqOn() || ptrImg->GetTpViewStatus() || ptrImg->GetEFVIStatus() || Zoom::GetInstance()->GetLocalZoomStatus())
-                        { 
+                        {
                             HintArea::GetInstance()->UpdateHint(_("When zoom, compound imaging, Tp-View or EFVI is on, it only has one focus."), 4);
                             break;
                         }
@@ -775,7 +772,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
 		case KEY_CW:
             {
-             
+
                 if (type == 'P')
                 {
                     ScanMode* ptrS = ScanMode::GetInstance();
@@ -802,14 +799,14 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 else
                 {
 
-                    HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
+                    HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
                 }
             }
             break;
 
 		case KEY_PDI:
 			{
-             
+
 				ScanMode::GetInstance()->ExitSpecialMeasure();
                 ScanMode* ptrS = ScanMode::GetInstance();
                 ModeStatus s;
@@ -826,14 +823,14 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     ptrS->UpdatePw();
                     g_keyInterface.CtrlLight(FALSE, LIGHT_PDI);
                 }
-                else 
+                else
                     ptrS->EnterPdi();
             }
             break;
 
 		case KEY_PW:
             {
-             
+
                 ScanMode* ptrS = ScanMode::GetInstance();
                 ModeStatus s;
                 int mode = s.GetScanMode();
@@ -850,7 +847,6 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                         Img2D::GetInstance()->ExitTpView();
                         Img2D::GetInstance()->ExitEFVI();
                     }
-
 
                     if ((mode == ScanMode::CFM) && (format2D == Format2D::B))
                         ptrS->EnterPwCfmFromCfm();
@@ -881,7 +877,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     Img2D::GetInstance()->ExitEFVI();
                 }
 
-                if (mode == ScanMode::PWCFM) 
+                if (mode == ScanMode::PWCFM)
                 {
                     ptrS->UpdatePw();
                     g_keyInterface.CtrlLight(FALSE, LIGHT_CFM);
@@ -902,7 +898,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 else
                 {
                     if (mode != ScanMode::M)
-                        g_keyInterface.CtrlLight(TRUE,LIGHT_M); 
+                        g_keyInterface.CtrlLight(TRUE,LIGHT_M);
                     if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
                     {
                         Img2D::GetInstance()->ExitTpView();
@@ -971,7 +967,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					break;
 				}
 				if (ModeStatus::IsUnFreezeMode())
-				{ 
+				{
 					KeyFreq kf;
 					kf.Execute();
 				}
@@ -979,14 +975,14 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 			break;
 
 		case KEY_CHROMA:
-			{                
+			{
                 if (ModeStatus::IsEFOVMode()) {
                     HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
                     break;
                 }
 
                 HintArea::GetInstance()->ClearHint();
-                //int retTemp = D2PressChroma();          
+                //int retTemp = D2PressChroma();
 				KeyChroma kc;
 				kc.Execute();
 			}
@@ -1035,30 +1031,30 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				{
 					Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
 					if (format != Format2D::BB)
-						Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
-					else 
-						Format2D::GetInstance()->SwitchBB();	
+						Format2D::GetInstance()->ChangeFormat(Format2D::BB);
+					else
+						Format2D::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
 				{
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::BB)
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 					else
 						FormatCfm::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 				}
 				else
 				{
 					ScanMode::GetInstance()->Enter2D();
-					Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
+					Format2D::GetInstance()->ChangeFormat(Format2D::BB);
 
 				}
-			}        
+			}
 			break;
 
         case KEY_M:
@@ -1083,8 +1079,8 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				ScanMode::GetInstance()->ExitSpecialMeasure();
 				ScanMode::GetInstance()->DarkAllModeLight();
 				g_keyInterface.CtrlLight(TRUE,LIGHT_BM);
-				ScanMode::GetInstance()->EnterM();       
-				//ScanMode::GetInstance()->Enter2D();       
+				ScanMode::GetInstance()->EnterM();
+				//ScanMode::GetInstance()->Enter2D();
 				ScanMode::GetInstance()->UpdateBM();
 			}
 			break;
@@ -1163,7 +1159,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     Img2D::GetInstance()->ExitTpView();
                     Img2D::GetInstance()->ExitEFVI();
                 }
-				
+
 				int current;
 				ModeStatus s;
 				int mode = s.GetScanMode();
@@ -1172,30 +1168,30 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				{
 					Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
 					if (format != Format2D::BB)
-						Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
-					else 
-						Format2D::GetInstance()->SwitchBB();	
+						Format2D::GetInstance()->ChangeFormat(Format2D::BB);
+					else
+						Format2D::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
 				{
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::BB)
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 					else
 						FormatCfm::GetInstance()->SwitchBB();
 				}
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 				}
 				else
 				{
 					ScanMode::GetInstance()->Enter2D();
-					Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
+					Format2D::GetInstance()->ChangeFormat(Format2D::BB);
 
 				}
-			}        
+			}
 			break;
 
         case KEY_M:
@@ -1219,7 +1215,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 Img2D::GetInstance()->ExitTpView();
                 Img2D::GetInstance()->ExitEFVI();
             }
-            ScanMode::GetInstance()->EnterM();       
+            ScanMode::GetInstance()->EnterM();
             ScanMode::GetInstance()->UpdateBM();
             break;
 
@@ -1258,7 +1254,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					break;
 				}
 				if (ModeStatus::IsUnFreezeMode())
-				{ 
+				{
 					KeyFreq kf;
 					kf.Execute();
 				}
@@ -1302,13 +1298,13 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     {
                         Format2D::GetInstance()->ChangeFormat(Format2D::BB);
                         MySleep(60000);
-                        Format2D::GetInstance()->SwitchBB(FALSE, current);	
+                        Format2D::GetInstance()->SwitchBB(FALSE, current);
                         MySleep(80000);
-                        Format2D::GetInstance()->SwitchBB(TRUE, current);	
+                        Format2D::GetInstance()->SwitchBB(TRUE, current);
                     }
-                    else 
+                    else
                     {
-                        Format2D::GetInstance()->SwitchBB(TRUE, current);	
+                        Format2D::GetInstance()->SwitchBB(TRUE, current);
                     }
                 }
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
@@ -1316,10 +1312,10 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::BB)
 					{
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
-                        FormatCfm::GetInstance()->SwitchBB(FALSE, current);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
+                        FormatCfm::GetInstance()->SwitchBB(FALSE, current);
                         usleep(450000);
-                        FormatCfm::GetInstance()->SwitchBB(TRUE, current);	
+                        FormatCfm::GetInstance()->SwitchBB(TRUE, current);
                         usleep(300000);
                     }
 					else
@@ -1330,11 +1326,11 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 					usleep(250000);
-					FormatCfm::GetInstance()->SwitchBB(FALSE, current);	
+					FormatCfm::GetInstance()->SwitchBB(FALSE, current);
 					usleep(250000);
-					FormatCfm::GetInstance()->SwitchBB(TRUE, current);	
+					FormatCfm::GetInstance()->SwitchBB(TRUE, current);
 				}
 			}
 			break;
@@ -1357,13 +1353,13 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
                     if (format != Format2D::BB)
                     {
-                        Format2D::GetInstance()->ChangeFormat(Format2D::BB);	
+                        Format2D::GetInstance()->ChangeFormat(Format2D::BB);
                         MySleep(80000);
-                        Format2D::GetInstance()->SwitchBB(FALSE, current);	
+                        Format2D::GetInstance()->SwitchBB(FALSE, current);
                     }
-				else 
+				else
 					{
-						Format2D::GetInstance()->SwitchBB(FALSE, current);	
+						Format2D::GetInstance()->SwitchBB(FALSE, current);
 					}
 				}
 				else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
@@ -1371,9 +1367,9 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
 					if (format != FormatCfm::BB)
 					{
-						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+						FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 						usleep(300000);
-                        FormatCfm::GetInstance()->SwitchBB(FALSE, current);	
+                        FormatCfm::GetInstance()->SwitchBB(FALSE, current);
                         usleep(300000);
 					}
 					else
@@ -1384,9 +1380,9 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				else if ((mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D))
 				{
 					ScanMode::GetInstance()->EnterCfm();
-					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);	
+					FormatCfm::GetInstance()->ChangeFormat(FormatCfm::BB);
 					usleep(250000);
-					FormatCfm::GetInstance()->SwitchBB(FALSE, current);	
+					FormatCfm::GetInstance()->SwitchBB(FALSE, current);
 				}
 			}
 			break;
@@ -1437,28 +1433,28 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 else
                 {
 #if defined(EMP3D)
-					if ( para.type == 'v' || para.type == 'V' || 
+					if ( para.type == 'v' || para.type == 'V' ||
 						 para.type == 'c' || para.type == 'C' ||
 						 para.type == 'l' || para.type == 'L')
 					{
-						///> control light 
+						///> control light
 						ScanMode::GetInstance()->DarkAllModeLight();
 						g_keyInterface.CtrlLight(TRUE, LIGHT_CW);
 
 						ScanMode::GetInstance()->Enter4D();
 					}
 					else
-						HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
+						HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
 #else
-                    HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1); 
-#endif               
+                    HintArea::GetInstance()->UpdateHint(_("Not realize now!"), 1);
+#endif
                 }
             }
             break;
 
 		case KEY_PDI:
 			{
-             
+
 				ScanMode::GetInstance()->ExitSpecialMeasure();
                 ScanMode* ptrS = ScanMode::GetInstance();
                 ModeStatus s;
@@ -1475,7 +1471,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     ptrS->UpdatePw();
                     g_keyInterface.CtrlLight(FALSE, LIGHT_PDI);
                 }
-                else 
+                else
                     ptrS->EnterPdi();
             }
             break;
@@ -1499,7 +1495,6 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                         Img2D::GetInstance()->ExitEFVI();
                     }
 
-
                     if ((mode == ScanMode::CFM) && (format2D == Format2D::B))
                         ptrS->EnterPwCfmFromCfm();
                     else if ((mode == ScanMode::PDI) && (format2D == Format2D::B))
@@ -1516,7 +1511,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
         case KEY_CFM:
             {
-              
+
 				ScanMode::GetInstance()->ExitSpecialMeasure();
                 ScanMode* ptrS = ScanMode::GetInstance();
                 ModeStatus s;
@@ -1528,7 +1523,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                     Img2D::GetInstance()->ExitEFVI();
                 }
 
-                if (mode == ScanMode::PWCFM) 
+                if (mode == ScanMode::PWCFM)
                 {
                     ptrS->UpdatePw();
                     g_keyInterface.CtrlLight(FALSE, LIGHT_CFM);
@@ -1549,7 +1544,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 else
                 {
                     if (mode != ScanMode::M)
-                        g_keyInterface.CtrlLight(TRUE,LIGHT_M); 
+                        g_keyInterface.CtrlLight(TRUE,LIGHT_M);
                     if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
                     {
                         Img2D::GetInstance()->ExitTpView();
@@ -1631,7 +1626,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
                     if(curOper == 0)
                         g_curOper = 4;
-                    else 
+                    else
                         g_curOper = curOper;
                 }
 
@@ -1656,7 +1651,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					FreezeMode::GetInstance()->PressFreeze();
 				else if (ModeStatus::IsAutoReplayMode())
 					FreezeMode::GetInstance()->ChangeAutoReplay();
-				
+
                 ViewArchive::GetInstance()->CreateWindow();
 			}
 			break;
@@ -1681,10 +1676,10 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 			}
 			break;
 #if (defined(EMP_460) || defined(EMP_355))
-        case KEY_MENU: 
+        case KEY_MENU:
 #else
-	    case KEY_REVIEW:		// change between menu and read image		
-#endif            
+	    case KEY_REVIEW:		// change between menu and read image
+#endif
 			MenuReviewCallBack();
             //CManRegister::GetInstance()->GenerateRegisterKey(1);
             break;
@@ -1743,10 +1738,10 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
 		case KEY_MEASURE:
 			{
-				if (ModeStatus::IsEFOVMode()) 
+				if (ModeStatus::IsEFOVMode())
 				{
 					ScanMode::EFOVStatus status = ScanMode::GetInstance()->GetEFOVStatus();
-					if (status == ScanMode::PREPARE || status == ScanMode::CAPTURE) 
+					if (status == ScanMode::PREPARE || status == ScanMode::CAPTURE)
 					{
 						HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
 						break;
@@ -1766,19 +1761,19 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				kbm.Execute();
 			}
 			break;
-        
+
         case KEY_UP:
 			{
 				ptrMultiFunc->KeyUp();
 			}
 			break;
-   
+
         case KEY_DOWN:
 			{
 				ptrMultiFunc->KeyDown();
 			}
 			break;
-		
+
         case KEY_LEFT:
 			{
 				ptrMultiFunc->KeyLeft();
@@ -1840,10 +1835,10 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 					HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
 					break;
 				}
-			
+
 				 if (ModeStatus::IsAutoReplayMode())
 					 FreezeMode::GetInstance()->ChangeAutoReplay();
-				 else if (ModeStatus::IsUnFreezeMode())	
+				 else if (ModeStatus::IsUnFreezeMode())
 					 FreezeMode::GetInstance()->PressFreeze();
 
 				 ViewSystem::GetInstance()->CreateWindow();
@@ -1909,7 +1904,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
 		case KEY_P1:
             {
-                if (ModeStatus::IsEFOVMode()) 
+                if (ModeStatus::IsEFOVMode())
                 {
                     HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
                     break;
@@ -1971,12 +1966,12 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
                 FreezeMode::GetInstance()->ExitAutoReplay();
                 ViewNewPat::GetInstance()->CreateWindow();
-               
+
                 if(ModeStatus::IsPwMode())
                 {
                     if(g_menuPW.GetAutoTraceStatus())
                         ImgProcPw::GetInstance()->SetAutoCalc(TRUE);
-                    MeasureMan::GetInstance()->ClearPwTraceUnFreeze(); 
+                    MeasureMan::GetInstance()->ClearPwTraceUnFreeze();
                 }
 
                 FreezeMode::GetInstance()->PressUnFreeze();
@@ -2009,7 +2004,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 }
                 proParaItem.pro2d.BandPassWindowFunc = test;
                 proParaItem.pro2d.LowPassWindowFunc = test;
-                
+
                 //cfm
                 proParaItem.procolor.WallFilterSection = test;
                 proParaItem.procolor.dopfreq = 118;
@@ -2018,7 +2013,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 
                 memcpy(&debugParaItem.defaultPara, &proParaItem, sizeof(ExamItem::ProjectDefaultParaItem));
                 //em.WriteProjectPara(&proParaItem, "75L40K", "Default", &ini);
-                
+
                 test += 0.6;
                 //em.RemoveUserFromFile("75L40K", "Test", &ini);
                 em.WriteProDebugParaItem(&debugParaItem, "75L40K", "user2", &ini);
@@ -2091,7 +2086,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 			break;
 
 		case KEY_MBP:
-			if (ModeStatus::IsEFOVMode()) 
+			if (ModeStatus::IsEFOVMode())
 			{
 				HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
 				break;
@@ -2113,7 +2108,6 @@ void ViewMain::KeyEvent(unsigned char keyValue)
 				}
 			}
 			break;
-
 
             case KEY_S:
             {
@@ -2218,7 +2212,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 //ImgCfm::GetInstance()->ChangeLowFilterFc(SUB);
             }
             break;
-        
+
         case '4':
             {
                 Img2D::GetInstance()->ChangeFreqBPFilter_test(ADD, 4);
@@ -2230,7 +2224,7 @@ void ViewMain::KeyEvent(unsigned char keyValue)
                 Img2D::GetInstance()->ChangeFreqBPFilter_test(SUB, 4);
             }
             break;
-        
+
         case '5':
             {
                 Img2D::GetInstance()->ChangeFreqBPFilter_test(ADD, 5);
@@ -2439,20 +2433,18 @@ void ViewMain::KeyEvent(unsigned char keyValue)
             }
 */
 
-
-
         default:
 			break;
 	}
 }
 
-/* add demo 
+/* add demo
  * hj
  */
 void ViewMain::MenuReviewCallBack(void)
 {
 	if (ModeStatus::IsEFOVMode() && !Replay::GetInstance()->GetReadSnapStatus())
-	{ 
+	{
 		if (KeyReview::m_menuRead == TRUE)
 		{
 			KeyReview km;
@@ -2468,7 +2460,7 @@ void ViewMain::MenuReviewCallBack(void)
     	if (ModeStatus::IsAutoReplayMode())
     		FreezeMode::GetInstance()->ChangeAutoReplay();
     	FreezeMode::GetInstance()->ExitAutoReplay();
-        
+
     	KeyReview km;
         if(ViewSuperuser::GetInstance()->GetDemoStatus()) //demo
     	    km.SetDemoIDAndPath();
@@ -2494,7 +2486,7 @@ gboolean ViewMain::IsAuthenValid(void)
    if(!m_vecAuthenInfo.empty())
     {
         //printf("authen\n");
-        unsigned char info[AUTHEN_NUM+1]; 
+        unsigned char info[AUTHEN_NUM+1];
         int size = m_vecAuthenInfo.size();
         int i;
 
@@ -2502,7 +2494,7 @@ gboolean ViewMain::IsAuthenValid(void)
         info[size] = '\0';
         for (i = 0; i < size; i ++)
         {
-            info[i] = m_vecAuthenInfo[i]; 
+            info[i] = m_vecAuthenInfo[i];
         }
 
         // clear
@@ -2525,7 +2517,7 @@ gboolean ViewMain::IsSuperAuthenValid(void)
     }
    if(!m_vecSuperAuthenInfo.empty())
     {
-        unsigned char info[SUPER_AUTHEN_NUM+1]; 
+        unsigned char info[SUPER_AUTHEN_NUM+1];
         int size = m_vecSuperAuthenInfo.size();
         int i;
 
@@ -2533,7 +2525,7 @@ gboolean ViewMain::IsSuperAuthenValid(void)
         info[size] = '\0';
         for (i = 0; i < size; i ++)
         {
-            info[i] = m_vecSuperAuthenInfo[i]; 
+            info[i] = m_vecSuperAuthenInfo[i];
         }
 
         // clear
@@ -2541,19 +2533,15 @@ gboolean ViewMain::IsSuperAuthenValid(void)
         // compare
         if (strcmp((const char*)info, "emperor1997") == 0)
             ViewSuperuser::GetInstance()->CreateWindow();
-  
+
      // compare
         if (strcmp((const char*)info, "e1997") == 0)
             ViewSuperuser::GetInstance()->CreateDemoWindow();
 
     }
 
-
     return FALSE;
 }
-
-
-
 
 void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
 {
@@ -2569,15 +2557,15 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
 		knob = SUB;
 	if (offset == 1)
 		knob = ADD;
-    
+
    //close knob event in demo. lhm
    if ((MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW)&&(ViewSuperuser::GetInstance()->GetDemoStatus()))
       {
         return;
-      }   
+      }
 
 	switch (keyValue)
-	{ 
+	{
 #if (defined(EMP_460) || defined(EMP_355))
         case KNOB_VALUE:
 #endif
@@ -2585,7 +2573,7 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
                 ptrMultiFunc->Value(knob);
 			}
 			break;
-   
+
 #ifndef EMP_460
 #ifndef EMP_355
        	case KNOB_2D: // 2D
@@ -2676,7 +2664,7 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
                     ptrMultiFunc->Value(knob);
                 }
                 else
-                {  
+                {
                     g_ptrKeyFunc(knob);
                 }
             }
@@ -2697,7 +2685,7 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
                     {
                         Img2D::GetInstance()->ChangeGain2D(knob);
                     }
-                     if(mode == ScanMode::M) 
+                     if(mode == ScanMode::M)
                     {
                         Img2D::GetInstance()->ChangeGainM(knob);
                     }
@@ -2717,7 +2705,6 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
 			}
           break;
 
-        
 #elif defined(EMP_313)
       case KNOB_VALUE: // value
             {
@@ -2726,7 +2713,7 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset)
                     ptrMultiFunc->Value(knob);
                 }
                 else
-                {  
+                {
                     g_ptrKeyFunc(knob);
                 }
             }
@@ -2767,8 +2754,8 @@ void ViewMain::SliderEvent(unsigned char keyValue, unsigned char offset)
    if ((MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW)&&(ViewSuperuser::GetInstance()->GetDemoStatus()))
       {
         return;
-      }   
-   
+      }
+
     if (ModeStatus::IsEFOVMode()) {
         HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
         if ((offset >= SLIDER_OFF) && (offset <= (SLIDER_OFF + 8)))
@@ -2894,7 +2881,7 @@ ViewMain* ViewMain::GetInstance()
 {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new ViewMain;
-    
+
     return m_ptrInstance;
 }
 
@@ -2972,7 +2959,7 @@ void ViewMain::Create(void)
 	gtk_widget_modify_bg(m_daMenu, GTK_STATE_NORMAL, g_black);
     gtk_drawing_area_size(GTK_DRAWING_AREA(m_daMenu), MENU_AREA_W, IMG_AREA_H+HINT_AREA_H);
     gtk_fixed_put(GTK_FIXED(m_fixedWindow), m_daMenu, 0, TOP_AREA_H+2);
-    
+
     // 2D knob menu
     KnobD2Create();
 
@@ -2985,7 +2972,7 @@ void ViewMain::Create(void)
     // note area
     GtkWidget *canvas_note;
     canvas_note = m_ptrNoteArea->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), canvas_note, IMAGE_X+IMG_AREA_X, IMAGE_Y+IMG_AREA_Y); 
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), canvas_note, IMAGE_X+IMG_AREA_X, IMAGE_Y+IMG_AREA_Y);
 
     // Top area
     GtkWidget *da_topArea;
@@ -3007,14 +2994,14 @@ void ViewMain::Create(void)
     ViewIcon::GetInstance()->Create();
     gtk_fixed_put(GTK_FIXED(m_fixedWindow), ViewIcon::GetInstance()->GetIconArea(), 5, 742); // 740
 
-    g_keyInterface.Push(this);    
+    g_keyInterface.Push(this);
 
     Show();
 	gtk_widget_hide(m_daMenu);
 
     m_ptrNoteArea->Hide();
 
-    // update top area 
+    // update top area
     SysGeneralSetting *sysGeneralSetting = new SysGeneralSetting;
     string hospital_name;
     sysGeneralSetting->GetHospital(hospital_name);
@@ -3063,7 +3050,7 @@ void ViewMain::MySleep(int msecond)
 		case GDK_F2:
 			MenuArea::GetInstance()->ShowBioBracketMenu();
 			break;
-		case GDK_F3:	
+		case GDK_F3:
 			MenuArea::GetInstance()->ShowBioVerifyMenu();
 			break;
 		default:

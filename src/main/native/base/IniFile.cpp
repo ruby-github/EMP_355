@@ -1,4 +1,4 @@
-#include "IniFile.h"
+#include "base/IniFile.h"
 #include "Def.h"
 
 using std::string;
@@ -128,8 +128,6 @@ void IniFile::WriteDoubleList(const char *group, const char *key, double value[]
     g_key_file_set_double_list(m_keyFile, group, key, value, length);
 }
 
-
-
 void IniFile::RemoveString(const char *group, const char *key)
 {
     GError *error = NULL;
@@ -175,7 +173,6 @@ vector <string> IniFile::GetGroupKey(const gchar *group)
     g_strfreev(tmp);
     return group_key;
 }
-
 
 bool IniFile::SyncConfigFile(void)
 {

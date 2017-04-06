@@ -2,19 +2,19 @@
  * 2009, 深圳恩普电子技术有限公司
  *
  * @file: MeasureD.cpp
- * @brief: measure in D(PW/CW) scan mode 
- * 
+ * @brief: measure in D(PW/CW) scan mode
+ *
  * version: V1.0
  * date: 2009-7-15
  * @author: zhanglei
  */
 
-#include "MeasureD.h"
+#include "measure/MeasureD.h"
 #include <vector>
 #include <stdio.h>
 #include <math.h>
-#include "../display/HintArea.h"
-#include "ImageAreaDraw.h"
+#include "display/HintArea.h"
+#include "display/ImageAreaDraw.h"
 
 using std::vector;
 extern bool g_calcPwStatus;
@@ -63,7 +63,7 @@ void DMeasureManualTrack::PressLeft(POINT p)
 				m_draw.DrawCursor(m_tempP);
 			}
 			m_p1 = m_tempP;
-			m_line_tempP = m_tempP;	
+			m_line_tempP = m_tempP;
 			m_draw.DrawCursor(m_tempP, FALSE);
 			m_draw.DrawCursor(m_tempP);
 
@@ -125,7 +125,7 @@ void DMeasureManualTrack::PressLeft(POINT p)
 				m_ptrMan->AddNew(MEASURE_TRACK, m_draw.GetOrderNumber(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 				//m_ptrMan->AddNew(MEASURE_TRACK, m_draw.GetCursorType(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 				if(m_update.DTrace(buf, attr, false))
-					m_draw.ChangeCursorType(); // 更改鼠标类型
+					m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
 				Init();
 
 				// change pointer
@@ -171,7 +171,7 @@ void DMeasureManualTrack::PressRight(POINT p)
 				    //m_draw.DrawTraceLine(m_track[i], m_track[i-1], TRUE);
 					//	m_track.pop_back();
 				}
-				m_track.clear();//清除vector中的轨迹记录
+				m_track.clear();//娓呴櫎vector涓殑杞ㄨ抗璁板綍
                 m_trackTemp.clear();
 
 				m_isDraw = TRUE;
@@ -204,7 +204,7 @@ void DMeasureManualTrack::MouseMove(POINT p)
 			{
 				m_draw.DrawCursor(m_tempP);
 			}
-			m_tempP = p;		
+			m_tempP = p;
 			m_draw.DrawCursor(m_tempP);
 			m_isDraw = TRUE;
 			break;
@@ -228,7 +228,7 @@ void DMeasureManualTrack::MouseMove(POINT p)
             m_trackTemp.clear();
 
 			m_draw.DrawCursor(p);
-			m_isDraw = TRUE;	
+			m_isDraw = TRUE;
 
 			break;
 		default:
@@ -246,7 +246,7 @@ void DMeasureManualTrack::Value(EKnobOper opr)
     int size_track_temp = m_trackTemp.size();
 
     if(opr == ADD)
-    {//redraw 
+    {//redraw
         if((size_track > 0) && (size_track_temp > 0))
         {
             if (m_isDraw)
@@ -308,7 +308,7 @@ void DMeasureManualTrack::Value(EKnobOper opr)
         return;
     }
 
-    m_isDraw = TRUE;	
+    m_isDraw = TRUE;
 }
 
 extern AbsMeasure* g_ptrAbsMeasure;
@@ -331,9 +331,9 @@ void DMeasureManualTrack::Esc()
 		if (m_isDraw)
 		{
 			m_draw.DrawCursor(m_tempP);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		int i;
 		int vec_size;
@@ -345,7 +345,7 @@ void DMeasureManualTrack::Esc()
             vec_size = m_track.size() - 1;
             for(i=0; i<vec_size; i++)
                 m_draw.DrawTraceLine(m_track[i], m_track[i+1], TRUE);
-        }		
+        }
 	//	m_update.ClearMeasure();
 	}
 	m_track.clear();
@@ -423,7 +423,7 @@ void DMeasureManualDot::PressLeft(POINT p)
 				}
 
 				//	m_psTmp = m_dot[0];
-				//清除掉中间多余的光标
+				//娓呴櫎鎺変腑闂村浣欑殑鍏夋爣
 				for(i=1; i!=vec_size-1; i++)
 				{
 					m_draw.DrawCursor(m_dot[i], FALSE);
@@ -442,7 +442,7 @@ void DMeasureManualDot::PressLeft(POINT p)
 				// save measure result
 				m_ptrMan->AddNew(MEASURE_TRACK, m_draw.GetCursorType(), m_dot, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 				if(m_update.DTrace(buf, attr, false))
-					m_draw.ChangeCursorType(); // 更改鼠标类型
+					m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
 				Init();
 
 				// change pointer
@@ -500,7 +500,7 @@ void DMeasureManualDot::MouseMove(POINT p)
 		m_draw.DrawCursor(m_tempP);
 	}
 
-	m_tempP = p;		
+	m_tempP = p;
 	m_draw.DrawCursor(m_tempP);
 	m_isDraw = TRUE;
 }
@@ -512,9 +512,9 @@ void DMeasureManualDot::Esc()
 		if (m_isDraw)
 		{
 			m_draw.DrawCursor(m_tempP);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		int i;
 		int vec_size;
@@ -525,7 +525,7 @@ void DMeasureManualDot::Esc()
 			m_draw.DrawCursor(m_tempP);
 			for(i=0; i<vec_size; i++)
 				m_draw.DrawCursor(m_dot[i], FALSE);
-		}		
+		}
 		HintArea::GetInstance()->ClearHint();
 	}
 }
@@ -544,9 +544,9 @@ void DMeasureManualDot::Change()
 
 			m_draw.DrawCursor(m_tempP, FALSE);
 			m_draw.DrawCursor(m_tempP);
-			m_isDraw = TRUE;//TRUE;=======be careful	
+			m_isDraw = TRUE;//TRUE;=======be careful
 			break;
-		
+
 		default:
 			break;
 	}
@@ -629,7 +629,7 @@ void DMeasureManualAuto::AutoCalc()
         attr.cursorType = m_draw.GetOrderNumber();
         attr.curColor = m_draw.GetCurColor();
         attr.confirmColor = m_draw.GetConfirmColor();
-        
+
         static int orderNum = 1;
         int order = m_draw.GetOrderNumber();
         if((orderNum != order) || order == 1)
@@ -644,7 +644,7 @@ void DMeasureManualAuto::AutoCalc()
             m_ptrMan->AddNew(MEASURE_TRACK_AUTO, m_draw.GetCursorType(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
             if(ImageAreaDraw::GetInstance()->GetCalcAutoPara() != NULL)
                 m_update.DTrace(ImageAreaDraw::GetInstance()->GetCalcAutoPara(), attr, false);
-        } 
+        }
         orderNum = m_draw.GetOrderNumber();
 #endif
 #ifdef EMP_355
@@ -668,14 +668,14 @@ void DMeasureManualAuto::AutoTraceInit()
 
     POINT cycleStart, cycleEnd;
     POINT ps, ed;
-    
+
     const Image::AutoTracePara *para = Replay::GetInstance()->GetCurrentTraceData();
     ImageAreaDraw::GetInstance()->DrawTraceTag(para, cycleStart, cycleEnd, ps, ed);
     m_startP = cycleStart;
     m_endP = cycleEnd;
     m_psP = ps;
     m_edP = ed;
-    AutoCalc(); 
+    AutoCalc();
 }
 
 void DMeasureManualAuto::PressLeft(POINT p)
@@ -766,7 +766,7 @@ void DMeasureManualAuto::PressLeft(POINT p)
                             m_track.push_back(m_edP);
 
                             //m_update.ClearLast();
-                            //m_update.DTrace(buf, attr, false);             
+                            //m_update.DTrace(buf, attr, false);
                             m_update.DTraceAdjust(buf, attr, false);
                             m_cursorTypeChg = true;
                             //m_cursorTypeChg = false;
@@ -808,7 +808,7 @@ void DMeasureManualAuto::PressLeft(POINT p)
                             m_calc.DCalcTraceOther(buf, vec, m_psP, tmpP);
                         m_track.push_back(m_psP);
                         m_track.push_back(m_edP);
-                        
+
                         m_update.DTraceAdjust(buf, attr, false);
                         m_cursorTypeChg = true;
                         // add to measure man
@@ -896,7 +896,7 @@ void DMeasureManualAuto::PressLeft(POINT p)
                             m_cursorTypeChg = true;
                             // add to measure man
                             m_ptrMan->AddNewAdjust(MEASURE_TRACK_AUTO, m_draw.GetOrderNumber(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
-                            //m_update.DTrace(buf, attr, true);      
+                            //m_update.DTrace(buf, attr, true);
                         }
                     }
                     break;
@@ -940,7 +940,7 @@ void DMeasureManualAuto::PressLeft(POINT p)
 				m_draw.DrawVLine(m_endP, false);
                 //printf("start.x=%d end.x=%d\n", m_startP.x, m_endP.x);
 				vec = Replay::GetInstance()->GetTraceData(m_startP.x, m_endP.x);
-				
+
 				m_startP.y = baseLine;
 				m_endP.y = baseLine;
 				m_psP = m_startP;
@@ -974,7 +974,7 @@ void DMeasureManualAuto::PressLeft(POINT p)
                 else
                     m_cursorTypeChg = false;
 
-				m_step = 0;	
+				m_step = 0;
 				m_isDraw = TRUE;
 				Init();
 
@@ -1056,7 +1056,7 @@ void DMeasureManualAuto::PressRight(POINT p)
                 g_setFunc = 1;
                 g_curOper = 1;
                 m_startP = m_endP = m_draw.DrawInitialVLine();
-                m_edP.x = m_psP.x = 0; 
+                m_edP.x = m_psP.x = 0;
             }
             break;
 
@@ -1205,9 +1205,9 @@ void DMeasureManualAuto::Value(EKnobOper opr)
     {
         if(g_curOper < MAX_OPT)
             g_curOper += 1;
-        else 
+        else
             g_curOper = 1;
-        
+
         switch(g_curOper)
         {
             case 1:
@@ -1369,7 +1369,7 @@ void DMeasureManualAuto::Change()
         SemiAutoCalc();
         return;
     }
-    else if (((g_setFunc == 3) && (!m_auto)) || g_setFunc == 1) //半自动切换到手动
+    else if (((g_setFunc == 3) && (!m_auto)) || g_setFunc == 1) //鍗婅嚜鍔ㄥ垏鎹㈠埌鎵嬪姩
     {
         if(g_ptrAbsMeasure != NULL)
         {
@@ -1457,8 +1457,6 @@ void DMeasureManualAuto::Esc()
     m_update.ClearMeasure();
 }
 
-
-
 ///integral calacute
 DMeasureIntegralTrack::DMeasureIntegralTrack(const SingleItemInfo *ptrSingleItemInfo):MOUSE_INTERVAL(2)
 {
@@ -1499,7 +1497,7 @@ void DMeasureIntegralTrack::PressLeft(POINT p)
                 m_draw.DrawHDotLine(m_tempP,true);
             }
             m_p1 = m_tempP;
-            m_line_tempP = m_tempP;	
+            m_line_tempP = m_tempP;
 
             m_draw.DrawVLine(m_tempP,false);
             m_draw.DrawHDotLine(m_tempP,false);
@@ -1525,7 +1523,7 @@ void DMeasureIntegralTrack::PressLeft(POINT p)
                     m_draw.DrawHDotLine(m_tempP,true);
                     m_draw.DrawVLine(m_tempP, false);
                     m_draw.DrawHDotLine(m_tempP, false);
-                    for(unsigned int i = (m_track.size() - 1); i>0; i--) 
+                    for(unsigned int i = (m_track.size() - 1); i>0; i--)
                     {
                         if((m_track[i-1].x==m_track[i].x)||(m_track[i-1].y==m_track[i].y)&&(m_track.size()>3)&&(i>1))
                         {
@@ -1545,20 +1543,20 @@ void DMeasureIntegralTrack::PressLeft(POINT p)
                     }
                     else
                         m_draw.DrawINTEGRALTraceLine(m_track[i], m_track[i-1], FALSE);
-                } 
+                }
 
                 double m_integral_area0=0.0;
                 m_integral_area0= m_calc.DCalcINTEGRALTrack(m_track);
 
                 m_ptrMan->AddNew(INTEGRAL_TRACK, m_draw.GetCursorType(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
                 double resultTmp;
-                resultTmp = m_integral_area0;	
+                resultTmp = m_integral_area0;
                 m_ptrMan->SingleMeaDataMan(resultTmp, m_itemInfo, allData, SAVE);
 
                 m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
 
                 //begin new track length measure
-                m_draw.ChangeCursorType(); // 更改鼠标类型
+                m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
                 Init();
 
                 // change pointer
@@ -1569,8 +1567,6 @@ void DMeasureIntegralTrack::PressLeft(POINT p)
             break;
     }
 }
-
-
 
 void DMeasureIntegralTrack::PressRight(POINT p)
 {
@@ -1615,7 +1611,7 @@ void DMeasureIntegralTrack::PressRight(POINT p)
             m_mouse_count = 0;
 
             //清除正在测量的结果
-            m_update.ClearMeasure();	
+            m_update.ClearMeasure();
             break;
 
         default:
@@ -1696,7 +1692,6 @@ void DMeasureIntegralTrack::MouseMove(POINT p)
 
                     m_isDraw = FALSE;
 
-
                 }
             }
             else
@@ -1736,7 +1731,7 @@ void DMeasureIntegralTrack::MouseMove(POINT p)
                     m_isDraw = FALSE;
                 }
 
-            } 
+            }
             break;
 
         default:
@@ -1753,17 +1748,17 @@ void DMeasureIntegralTrack::Esc()
     if (m_isDraw)
     {
         m_draw.DrawHDotLine(m_tempP, true);
-    }		
+    }
 
     if (m_step == 0)
     {
         if (m_isDraw)
         {
             m_draw.DrawVLine(m_tempP,true);
-        }	
+        }
 
     }
-    else 
+    else
     {
         int i;
         int vec_size;
@@ -1775,13 +1770,10 @@ void DMeasureIntegralTrack::Esc()
             vec_size = m_track.size() - 1;
             for(i=0; i<vec_size; i++)
                 m_draw.DrawINTEGRALTraceLine(m_track[i], m_track[i+1], TRUE);
-        }		
+        }
     }
     m_track.clear();
 }
-
-
-
 
 //========================================= [Vel] ====================================//
 DMeasureVel::DMeasureVel(const SingleItemInfo *ptrSingleItemInfo)
@@ -1916,7 +1908,7 @@ void DMeasureVel::Esc()
         m_draw.DrawHDotLine(m_tempP, true);
         //清除正在测量的结果
         m_update.ClearMeasure();
-    }		
+    }
 }
 
 //========================================= PG max ====================================//
@@ -2038,11 +2030,11 @@ void DMeasurePGmax::Esc()
 	m_draw.DrawHDotLine(m_tempP, true);
 	//清除正在测量的结果
 	m_update.ClearMeasure();
-    }		
+    }
 }
 
 //========================================= [RI] ====================================//
-//name: 软件包测量时传入该项的名称，在D模式的基本测量中传入NULL
+//name: 杞欢鍖呮祴閲忔椂浼犲叆璇ラ」鐨勫悕绉帮紝鍦―妯″紡鐨勫熀鏈祴閲忎腑浼犲叆NULL
 DMeasureRI::DMeasureRI(const MultiItemInfo *ptrMultiItemInfo)
 {
 	m_itemInfo = ptrMultiItemInfo;
@@ -2084,17 +2076,17 @@ void DMeasureRI::PressLeft(POINT p)
 	attr.curColor = m_draw.GetCurColor();
 	attr.confirmColor = m_draw.GetConfirmColor();
 
-	for(i=0; i<MULTI_MAX; i++) 
+	for(i=0; i<MULTI_MAX; i++)
 	{
 		if (i<MEA_MULTI) dataMea[i] = INVALID_VAL;
 		allData[i] = INVALID_VAL;
 	}
-	unit_coeffi[0] = 1;	
-	unit_coeffi[1] = 1;	
-	unit_coeffi[2] = 1;	
-	unit_coeffi[3] = 1;	
+	unit_coeffi[0] = 1;
+	unit_coeffi[1] = 1;
+	unit_coeffi[2] = 1;
+	unit_coeffi[3] = 1;
 	for(i=4; i<MEA_MULTI; i++) {unit_coeffi[i] = 1;}
-	
+
 	switch(m_step)
 	{
 		case 0: //ps
@@ -2109,7 +2101,7 @@ void DMeasureRI::PressLeft(POINT p)
 			m_draw.DrawCursor(m_tempP, false, XOR, true);
 			m_draw.DrawHDotLine(m_tempP, false);
 
-			dataMea[0] = m_ps = m_calc.DCalcVel(m_tempP);//计算ps速度
+			dataMea[0] = m_ps = m_calc.DCalcVel(m_tempP);//璁＄畻ps閫熷害
 			m_ptrMan->MultiMeaDataMan(dataMea, m_itemInfo, allData, NOT_SAVE);
 			m_update.GenDisplayMulti(m_itemInfo, allData, attr, true, unit_coeffi);
 
@@ -2145,13 +2137,13 @@ void DMeasureRI::PressLeft(POINT p)
 
 			if(m_itemInfo->meaType == PSED)
 			{
-				m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+				m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 				dataMea[0] = m_ps;
 				dataMea[1] = m_ed;
 			}
 			else if(m_itemInfo->meaType == RI)
 			{
-				m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+				m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 				m_ri = m_calc.DCalcRI(m_ps, m_ed);
 				dataMea[0] = m_ps;
 				dataMea[1] = m_ed;
@@ -2159,7 +2151,7 @@ void DMeasureRI::PressLeft(POINT p)
 			}
 			else
 			{
-				m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+				m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 				m_ri = m_calc.DCalcRI(m_ps, m_ed);
 				m_sd = m_calc.DCalcSD(m_ps, m_ed);
 				dataMea[0] = m_ps;
@@ -2169,8 +2161,8 @@ void DMeasureRI::PressLeft(POINT p)
 			}
 			m_ptrMan->MultiMeaDataMan(dataMea, m_itemInfo, allData, SAVE);
 			m_update.GenDisplayMulti(m_itemInfo, allData, attr, false, unit_coeffi);
-			
-			m_step = 0;	
+
+			m_step = 0;
 			m_isDraw = TRUE;
 
 			// begin new vel measure
@@ -2234,17 +2226,17 @@ void DMeasureRI::MouseMove(POINT p)
 
 	int i;
 
-	for(i=0; i<MULTI_MAX; i++) 
+	for(i=0; i<MULTI_MAX; i++)
 	{
 		if (i<MEA_MULTI) dataMea[i] = INVALID_VAL;
 		allData[i] = INVALID_VAL;
 	}
-	unit_coeffi[0] = 1;	
-	unit_coeffi[1] = 1;	
-	unit_coeffi[2] = 1;	
-	unit_coeffi[3] = 1;	
+	unit_coeffi[0] = 1;
+	unit_coeffi[1] = 1;
+	unit_coeffi[2] = 1;
+	unit_coeffi[3] = 1;
 	for(i=4; i<MEA_MULTI; i++) {unit_coeffi[i] = 1;}
-	
+
 	switch(m_step)
 	{
 		case 0: //ps
@@ -2279,13 +2271,13 @@ void DMeasureRI::MouseMove(POINT p)
 			//calc
 			if(m_itemInfo->meaType == PSED)
 			{
-				m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+				m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 				dataMea[0] = m_ps;
 				dataMea[1] = m_ed;
 			}
 			else if(m_itemInfo->meaType == RI)
 			{
-				m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+				m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 				m_ri = m_calc.DCalcRI(m_ps, m_ed);
 				dataMea[0] = m_ps;
 				dataMea[1] = m_ed;
@@ -2293,7 +2285,7 @@ void DMeasureRI::MouseMove(POINT p)
 			}
 			else
 			{
-				m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+				m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 				m_ri = m_calc.DCalcRI(m_ps, m_ed);
 				m_sd = m_calc.DCalcSD(m_ps, m_ed);
 				dataMea[0] = m_ps;
@@ -2318,9 +2310,9 @@ void DMeasureRI::Esc()
 		{
 		    m_draw.DrawCursor(m_tempP, true, XOR, true);
 		    m_draw.DrawHDotLine(m_tempP, true);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		if (m_isDraw)
 		{
@@ -2329,7 +2321,7 @@ void DMeasureRI::Esc()
 			m_draw.DrawOrderNumber(m_p1, m_draw.GetOrderNumber());
 			m_draw.DrawCursor(m_tempP, true, XOR, true);
 			m_draw.DrawHDotLine(m_tempP, true);
-		}		
+		}
 	}
     m_update.ClearMeasure();
 }
@@ -2353,7 +2345,7 @@ DMeasureSD::DMeasureSD()
 	Init();
 }
 DMeasureSD::~DMeasureSD()
-{	
+{
 	Esc();
 }
 
@@ -2380,8 +2372,8 @@ void DMeasureSD::PressLeft(POINT p)
 			m_draw.DrawCursor(m_tempP, false, XOR, true);
 			m_draw.DrawHDotLine(m_tempP, false);
 
-			m_ps = m_calc.DCalcVel(m_tempP);//计算ps速度
-			m_update.DSD(m_ps, m_ed, m_sd, attr);	
+			m_ps = m_calc.DCalcVel(m_tempP);//璁＄畻ps閫熷害
+			m_update.DSD(m_ps, m_ed, m_sd, attr);
 
 			// begin new measure
 			m_step = 1;
@@ -2408,9 +2400,9 @@ void DMeasureSD::PressLeft(POINT p)
 			vec.push_back(m_tempP);
 			m_ptrMan->AddNew(SD, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 
-			m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
+			m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
 			m_sd = m_calc.DCalcSD(m_ps, m_ed);
-			m_update.DSD(m_ps, m_ed, m_sd, attr, false);	
+			m_update.DSD(m_ps, m_ed, m_sd, attr, false);
 			m_step = 0;
 			m_isDraw = TRUE;
 
@@ -2517,9 +2509,9 @@ void DMeasureSD::Esc()
 		{
 		    m_draw.DrawCursor(m_tempP, true, XOR, true);
 		    m_draw.DrawHDotLine(m_tempP, true);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		if (m_isDraw)
 		{
@@ -2527,7 +2519,7 @@ void DMeasureSD::Esc()
 			m_draw.DrawHDotLine(m_p1, false);
 			m_draw.DrawCursor(m_tempP, true, XOR, true);
 			m_draw.DrawHDotLine(m_tempP, true);
-		}		
+		}
 	}
 
 	//清除正在测量的结果
@@ -2573,13 +2565,13 @@ void DMeasureTime::PressLeft(POINT p)
 			if (m_isDraw)
 			{
 			    m_draw.DrawVLine(m_tempP, true);
-			}			
+			}
 			m_p1 = m_tempP;
 			m_draw.DrawVLine(m_tempP, false);
 			m_draw.DrawOrderNumber(m_p1, m_draw.GetOrderNumber());
 
 			// next step
-			m_step = 1;	
+			m_step = 1;
 			m_draw.DrawVLine(m_tempP, true);
 			m_isDraw = TRUE;
 			break;
@@ -2600,10 +2592,10 @@ void DMeasureTime::PressLeft(POINT p)
 				vec.push_back(m_tempP);
 				m_ptrMan->AddNew(TIME_D, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 				m_time = m_calc.DCalcTime(m_p1, m_tempP);
-			
+
 				m_ptrMan->SingleMeaDataMan(m_time, m_itemInfo, allData, SAVE);
 				m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
-				
+
 				// begin new time measure
 				// m_draw.ChangeCursorType();
 				Init();
@@ -2663,7 +2655,7 @@ void DMeasureTime::MouseMove(POINT p)
 			if (m_isDraw)
 			{
 				m_draw.DrawVLine(m_tempP, true);
-			}			
+			}
 			m_tempP = p;
 			m_draw.DrawVLine(m_tempP, true);
 			m_isDraw = TRUE;
@@ -2673,7 +2665,7 @@ void DMeasureTime::MouseMove(POINT p)
 			if (m_isDraw)
 			{
 				m_draw.DrawVLine(m_tempP, true);
-			}			
+			}
 			m_tempP = p;
 			m_draw.DrawVLine(m_tempP, true);
 			m_isDraw = TRUE;
@@ -2716,16 +2708,16 @@ void DMeasureTime::Esc()
 		if (m_isDraw)
 		{
 		    m_draw.DrawVLine(m_tempP, true);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		if (m_isDraw)
 		{
 			m_draw.DrawVLine(m_tempP, true);
 			m_draw.DrawVLine(m_p1, false);
 			m_draw.DrawOrderNumber(m_p1, m_draw.GetOrderNumber());
-		}		
+		}
 	}
 	//清除正在测量的结果
     m_update.ClearMeasure();
@@ -2766,16 +2758,15 @@ void DMeasureHR::PressLeft(POINT p)
 	attr.curColor = m_draw.GetCurColor();
 	attr.confirmColor = m_draw.GetConfirmColor();
 
-
-	for(i=0; i<MULTI_MAX; i++) 
+	for(i=0; i<MULTI_MAX; i++)
 	{
 		if (i<MEA_MULTI) dataMea[i] = INVALID_VAL;
 		allData[i] = INVALID_VAL;
 	}
-	unit_coeffi[0] = 1;	
-	unit_coeffi[1] = 1;	
-	unit_coeffi[2] = 1;	
-	unit_coeffi[3] = 1;	
+	unit_coeffi[0] = 1;
+	unit_coeffi[1] = 1;
+	unit_coeffi[2] = 1;
+	unit_coeffi[3] = 1;
 	for(i=4; i<MEA_MULTI; i++) {unit_coeffi[i] = 1;}
 
 	switch(m_step)
@@ -2785,13 +2776,13 @@ void DMeasureHR::PressLeft(POINT p)
 			if (m_isDraw)
 			{
 			    m_draw.DrawVLine(m_tempP, true);
-			}			
+			}
 			m_p1 = m_tempP;
 			m_draw.DrawVLine(m_tempP, false);
 			m_draw.DrawOrderNumber(m_p1, m_draw.GetOrderNumber());
 
 			// next step
-			m_step = 1;	
+			m_step = 1;
 			m_draw.DrawVLine(m_tempP, true);
 			m_isDraw = TRUE;
 			break;
@@ -2812,16 +2803,16 @@ void DMeasureHR::PressLeft(POINT p)
 				vec.clear();
 				vec.push_back(m_p1);
 				vec.push_back(m_tempP);
-				
+
 				m_ptrMan->AddNew(HR_D, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 				m_time = m_calc.DCalcTime(m_p1, m_tempP);
 				m_hr = fabs(m_time) > ZERO ? m_calc.DCalcHR(m_time) : (double)INVALID_VAL;
 				dataMea[0] = m_time;
 				dataMea[1] = m_hr;
-					
+
 				m_ptrMan->MultiMeaDataMan(dataMea, m_itemInfo, allData, SAVE);
 				m_update.GenDisplayMulti(m_itemInfo, allData, attr, false, unit_coeffi);
-				
+
 				// begin new time measure
 				Init();
 
@@ -2876,25 +2867,25 @@ void DMeasureHR::MouseMove(POINT p)
 	attr.cursorType = m_draw.GetOrderNumber();
 	attr.curColor = m_draw.GetCurColor();
 	attr.confirmColor = m_draw.GetConfirmColor();
-	
-	for(i=0; i<MULTI_MAX; i++) 
+
+	for(i=0; i<MULTI_MAX; i++)
 	{
 		if (i<MEA_MULTI) dataMea[i] = INVALID_VAL;
 		allData[i] = INVALID_VAL;
 	}
-	unit_coeffi[0] = 1;	
-	unit_coeffi[1] = 1;	
-	unit_coeffi[2] = 1;	
-	unit_coeffi[3] = 1;	
+	unit_coeffi[0] = 1;
+	unit_coeffi[1] = 1;
+	unit_coeffi[2] = 1;
+	unit_coeffi[3] = 1;
 	for(i=4; i<MEA_MULTI; i++) {unit_coeffi[i] = 1;}
-	
+
 	switch(m_step)
 	{
 		case 0:
 			if (m_isDraw)
 			{
 			    m_draw.DrawVLine(m_tempP, true);
-			}			
+			}
 			m_tempP = p;
 			m_draw.DrawVLine(m_tempP, true);
 			m_isDraw = TRUE;
@@ -2904,7 +2895,7 @@ void DMeasureHR::MouseMove(POINT p)
 			if (m_isDraw)
 			{
 			    m_draw.DrawVLine(m_tempP, true);
-			}			
+			}
 			m_tempP = p;
 			m_draw.DrawVLine(m_tempP, true);
 			m_isDraw = TRUE;
@@ -2952,21 +2943,20 @@ void DMeasureHR::Esc()
 		if (m_isDraw)
 		{
 		    m_draw.DrawVLine(m_tempP, true);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		if (m_isDraw)
 		{
 		    m_draw.DrawVLine(m_tempP, true);
 		    m_draw.DrawVLine(m_p1, false);
 			m_draw.DrawOrderNumber(m_p1, m_draw.GetOrderNumber());
-		}		
+		}
 	}
 	//清除正在测量的结果
     m_update.ClearMeasure();
 }
-
 
 //========================================= [Accel] ====================================//
 DMeasureAccel::DMeasureAccel(const SingleItemInfo *ptrSingleItemInfo)
@@ -3009,13 +2999,13 @@ void DMeasureAccel::PressLeft(POINT p)
 			{
 			    m_draw.DrawVDotLine(m_tempP, true);
 			    m_draw.DrawCursor(m_tempP, true, XOR, true);
-			}	
+			}
 			m_p1 = m_tempP;
 			m_draw.DrawVDotLine(m_tempP, false);
 			m_draw.DrawCursor(m_tempP, false, XOR, true);
 
 			// next step
-			m_step = 1;	
+			m_step = 1;
 			m_tempP = m_draw.CalcNextP(m_tempP, 2);
 			m_draw.SetCursor(m_tempP);
 			m_draw.DrawLine(m_p1, m_tempP, true);
@@ -3115,7 +3105,7 @@ void DMeasureAccel::MouseMove(POINT p)
 				//		m_draw.DrawCursor(m_tempP);
 				m_draw.DrawVDotLine(m_tempP, true);
 				m_draw.DrawCursor(m_tempP, true, XOR, true);
-			}			
+			}
 			m_tempP = p;
 			//	m_draw.DrawCursor(m_tempP);
 			m_draw.DrawVDotLine(m_tempP, true);
@@ -3130,7 +3120,7 @@ void DMeasureAccel::MouseMove(POINT p)
 				m_draw.DrawLine(m_p1, m_tempP, true);
 				m_draw.DrawVDotLine(m_tempP, true);
 				m_draw.DrawCursor(m_tempP, true, XOR, true);
-			}			
+			}
 			m_tempP = p;
 			//	m_draw.DrawCursor(m_tempP);
 			m_draw.DrawLine(m_p1, m_tempP, true);
@@ -3158,9 +3148,9 @@ void DMeasureAccel::Esc()
 			//	m_draw.DrawCursor(m_tempP);
 			m_draw.DrawVDotLine(m_tempP, true);
 			m_draw.DrawCursor(m_tempP, true, XOR, true);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		if (m_isDraw)
 		{
@@ -3171,7 +3161,7 @@ void DMeasureAccel::Esc()
 			m_draw.DrawLine(m_p1, m_tempP, true);
 			m_draw.DrawVDotLine(m_tempP, true);
 			m_draw.DrawCursor(m_tempP, true, XOR, true);
-		}		
+		}
 	}
 	//清除正在测量的结果
     m_update.ClearMeasure();
@@ -3212,7 +3202,6 @@ void DMeasureP12t::PressLeft(POINT p)
 	attr.curColor = m_draw.GetCurColor();
 	attr.confirmColor = m_draw.GetConfirmColor();
 
-
 	switch(m_step)
 	{
 		case 0:
@@ -3222,14 +3211,14 @@ void DMeasureP12t::PressLeft(POINT p)
 				//	m_draw.DrawCursor(m_tempP);
 				m_draw.DrawVDotLine(m_tempP, true);
 				m_draw.DrawCursor(m_tempP, true, XOR, true);
-			}			
+			}
 			m_p1 = m_tempP;
 			//	m_draw.DrawCursor(m_tempP, FALSE);
 			m_draw.DrawVDotLine(m_tempP, false);
 			m_draw.DrawCursor(m_tempP, false, XOR, true);
 
 			// next step
-			m_step = 1;	
+			m_step = 1;
 			m_tempP = m_draw.CalcNextP(m_tempP, 2);
 			m_draw.SetCursor(m_tempP);
 			//	m_draw.DrawCursor(m_tempP);
@@ -3258,9 +3247,9 @@ void DMeasureP12t::PressLeft(POINT p)
 			vec.push_back(m_p1);
 			vec.push_back(m_tempP);
 			m_ptrMan->AddNew(P12T, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
-			
+
 			Result(SAVE, attr);
-			
+
 			// begin new HR measure
 			m_draw.ChangeCursorType();
 			Init();
@@ -3329,7 +3318,7 @@ void DMeasureP12t::MouseMove(POINT p)
 				//		m_draw.DrawCursor(m_tempP);
 				m_draw.DrawVDotLine(m_tempP, true);
 				m_draw.DrawCursor(m_tempP, true, XOR, true);
-			}			
+			}
 			m_tempP = p;
 			//	m_draw.DrawCursor(m_tempP);
 			m_draw.DrawVDotLine(m_tempP, true);
@@ -3344,7 +3333,7 @@ void DMeasureP12t::MouseMove(POINT p)
 				m_draw.DrawLine(m_p1, m_tempP, true);
 				m_draw.DrawVDotLine(m_tempP, true);
 				m_draw.DrawCursor(m_tempP, true, XOR, true);
-			}			
+			}
 			m_tempP = p;
 			//	m_draw.DrawCursor(m_tempP);
 			m_draw.DrawLine(m_p1, m_tempP, true);
@@ -3370,9 +3359,9 @@ void DMeasureP12t::Esc()
 			//	m_draw.DrawCursor(m_tempP);
 		    m_draw.DrawVDotLine(m_tempP, true);
 		    m_draw.DrawCursor(m_tempP, true, XOR, true);
-		}		
+		}
 	}
-	else 
+	else
 	{
 		if (m_isDraw)
 		{
@@ -3383,7 +3372,7 @@ void DMeasureP12t::Esc()
 			m_draw.DrawLine(m_p1, m_tempP, true);
 			m_draw.DrawVDotLine(m_tempP, true);
 			m_draw.DrawCursor(m_tempP, true, XOR, true);
-		}		
+		}
 	}
 	//清除正在测量的结果
     m_update.ClearMeasure();
@@ -3417,8 +3406,8 @@ void DMeasureP12t::Result(int saveR, UpdateMeasure::ResultAttr& attr)
 
 //========================================= [PI] ====================================//
 /*
- *>method = 0: PI测量
- *>method = 1: PG mean测量
+ *>method = 0: PI娴嬮噺
+ *>method = 1: PG mean娴嬮噺
  * */
 DMeasurePI::DMeasurePI(int method,const SingleItemInfo *ptrSingleItemInfo)
 {
@@ -3475,14 +3464,14 @@ void DMeasurePI::PressLeft(POINT p)
 			if (m_isDraw)
 			{
 			    m_draw.DrawCursor(m_tempP, true);
-			}			
+			}
 			m_vec.clear();
 			m_vec.push_back(m_tempP);
 			m_draw.DrawCursor(m_tempP, false);
             m_trackTemp.clear();
 
 			// next step
-			m_step = 1;	
+			m_step = 1;
 			m_draw.DrawCursor(m_tempP, true);
 			m_isDraw = TRUE;
 			break;
@@ -3599,7 +3588,7 @@ void DMeasurePI::MouseMove(POINT p)
 			if (m_isDraw)
 			{
 			    m_draw.DrawCursor(m_tempP, true);
-			}			
+			}
 			m_tempP = p;
 			m_draw.DrawCursor(m_tempP, true);
 			m_isDraw = TRUE;
@@ -3620,7 +3609,7 @@ void DMeasurePI::MouseMove(POINT p)
 				m_tempP = p;
 				m_vec.push_back(m_tempP);
 				m_draw.DrawCursor(m_tempP, true);
-				
+
                 m_trackTemp.clear();
                 m_isDraw = TRUE;
 			}
@@ -3642,7 +3631,7 @@ void DMeasurePI::Value(EKnobOper opr)
     int size_track_temp = m_trackTemp.size();
 
     if(opr == ADD)
-    {//redraw 
+    {//redraw
         if((size_track > 0) && (size_track_temp > 0))
         {
             if (m_isDraw)
@@ -3702,9 +3691,8 @@ void DMeasurePI::Value(EKnobOper opr)
         return;
     }
 
-    m_isDraw = TRUE;	
+    m_isDraw = TRUE;
 }
-
 
 void DMeasurePI::Esc()
 {
@@ -3718,14 +3706,13 @@ void DMeasurePI::Esc()
             for (int i = (m_vec.size()-1); i != 0; i--)
                 m_draw.DrawTraceLine(m_vec[i], m_vec[i-1], true);
 
-        }		
+        }
     }
 	//清除正在测量的结果
 	m_update.ClearMeasure();
     m_vec.clear();
     m_trackTemp.clear();
 }
-
 
 //#include <iostream>
 //using namespace std;
@@ -3762,12 +3749,12 @@ void DMeasurePI::Esc()
 // 			if (m_isDraw)
 // 			{
 // 				m_draw.DrawCursor(m_tempP);
-// 			}			
+// 			}
 // 			m_vec.push_back(m_tempP);
 // 			m_draw.DrawCursor(m_tempP, FALSE);
 
 // 			// next step
-// 			m_step = 1;	
+// 			m_step = 1;
 // 			m_draw.DrawCursor(m_tempP);
 // 			m_isDraw = TRUE;
 // 			break;
@@ -3846,7 +3833,7 @@ void DMeasurePI::Esc()
 // 			if (m_isDraw)
 // 			{
 // 				m_draw.DrawCursor(m_tempP);
-// 			}			
+// 			}
 // 			m_tempP = p;
 // 			m_draw.DrawCursor(m_tempP);
 // 			m_isDraw = TRUE;
@@ -3856,7 +3843,7 @@ void DMeasurePI::Esc()
 // 			if (m_isDraw)
 // 			{
 // 				m_draw.DrawCursor(m_tempP);
-// 			}			
+// 			}
 // 			m_draw.DrawCursor(p);
 // 			m_draw.DrawLine(m_tempP, p);
 // 			m_vec.push_back(m_tempP);

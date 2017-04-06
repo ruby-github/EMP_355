@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 
 class ViewSuperuser:public FakeXEvent
 {
@@ -17,7 +17,7 @@ public:
     bool GetDemoStatus() { return !m_statusDemo; }
     void ExitDemo();
 
-#ifdef TRANSDUCER 
+#ifdef TRANSDUCER
     int GetPressValue() { return m_tranPressCorrect;}
 #endif
 
@@ -51,7 +51,7 @@ private:
 #else
     static const int WPORBE_NUM = 11;
 #endif
-#endif    
+#endif
 
     static std::string m_probeName[WPORBE_NUM];
 
@@ -109,8 +109,8 @@ private:
     static void HandleBtnChgMonitorClicked2(GtkButton *widget, ViewSuperuser *data) { return data->BtnChgMonitorClicked2(widget); }
 
 #ifdef TRANSDUCER
-    static void on_spinbutton_press_adjust(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSuperuser *data) 
-    { data->SpinbuttonPressAdjust(editable, new_text, new_text_length, position); }  
+    static void on_spinbutton_press_adjust(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSuperuser *data)
+    { data->SpinbuttonPressAdjust(editable, new_text, new_text_length, position); }
 #endif
 
     //demo

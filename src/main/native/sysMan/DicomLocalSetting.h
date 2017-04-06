@@ -2,7 +2,7 @@
 #define _DICOM_LOCAL_SETTING_H_
 
 #include <gtk/gtk.h>
-#include "FakeXEvent.h"
+#include "display/FakeXEvent.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -12,14 +12,14 @@ class DicomLocalSetting
 
         static DicomLocalSetting* GetInstance();
         GtkWidget* CreateDicomWindow(GtkWidget *parent);
-        
+
         void init_local_setting(void);
     private:
         DicomLocalSetting();
         ~DicomLocalSetting();
 
         static DicomLocalSetting* m_ptrInstance;
-        
+
         //Local
         GtkWidget *m_entry_network_ip;
         GtkWidget *m_entry_network_mask;
@@ -27,7 +27,6 @@ class DicomLocalSetting
 
         GtkWidget *m_entry_host_port;
         GtkWidget *m_entry_host_ae;
-
 
         void ButtonSettingClicked(GtkButton *button);
         gboolean KeyFilter(GtkWidget *entry, GdkEventKey *event);
@@ -37,7 +36,7 @@ class DicomLocalSetting
             if (data)
                 data->ButtonSettingClicked(button);
         }
-        
+
         static gboolean HandleKeyFilter(GtkWidget *entry, GdkEventKey *event, gpointer data)
         {
             ((DicomLocalSetting *)data)->KeyFilter(entry, event);

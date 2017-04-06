@@ -25,8 +25,8 @@ extern "C"
 #include <libavcodec/avcodec.h>
 #include <libavutil/imgutils.h>
 }
-#include "bs.h"
-#include "AviEncDecH264.h"
+#include "patient/bs.h"
+#include "patient/AviEncDecH264.h"
 #define DATA_MAX 3000000
 
 //#include "Replay.h"
@@ -437,7 +437,6 @@ void h264_parser_parse( h264_t *h, nal_t *nal, int *pb_nal_start )
     h->i_ref_idc = nal->i_ref_idc;
 }
 
-
 static int  ParseNAL( nal_t *nal, avi_t *a, h264_t *h, int *pb_slice )
 {
     int b_flush = 0;
@@ -715,7 +714,7 @@ typedef struct
     FILE* tmp;
 }video_info_t;
 
-//参数设置
+//鍙傛暟璁剧疆
 static int x264_param_init( x264_param_t * param ,video_info_t* info)
 {
     /*
@@ -777,7 +776,7 @@ static int encode_frame( x264_t* encoder, x264_picture_t* pic_in, FILE* tmp )
     }
 }
 
-//编码
+//缂栫爜
 static int encode( x264_param_t* param, video_info_t *info )
 {
     int frame;
@@ -802,14 +801,14 @@ static int encode( x264_param_t* param, video_info_t *info )
     {
         //取一帧图片
         data[0] = info->data[frame];
-        //数据转换RGB2YUV420
+        //鏁版嵁杞崲RGB2YUV420
         //av_image_fill_pointers(data, PIX_FMT_RGB24,info->height, info->data[frame],&srcstride);
         sws_scale(convertCtx, (const uint8_t* const*)data, &srcstride, 0, info->height, pic_in.img.plane, pic_in.img.i_stride );
         //编一帧图片
         encode_frame( encoder, &pic_in, info->tmp);
     }
 
-    //释放资源
+    //閲婃斁璧勬簮
     if (convertCtx)
     {
         sws_freeContext(convertCtx);
@@ -846,13 +845,13 @@ int CreateAviEncode( unsigned char* inputdata[], FILE * outputfile,
     int b = 4;
     int c= a+b;
     printf("a:%d, b:%d, a+b=c:%d\n", a, b, c);
-    //参数设置
+    //鍙傛暟璁剧疆
     x264_param_init( &param, &video_info);
     int sub = b - a;
     printf("sub:%d\n", sub);
-    //编码
+    //缂栫爜
     encode( &param, &video_info );
-    //封装
+    //灏佽
     avc_to_avi(  outputfile, tmp,frame_rate);
 
     fclose(tmp);
@@ -861,10 +860,6 @@ int CreateAviEncode( unsigned char* inputdata[], FILE * outputfile,
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 static int open_codec_context(int* stream_idx, AVFormatContext *fmt_ctx, enum AVMediaType type )
 {
@@ -933,10 +928,10 @@ bool ReadAviData(const char *src_filename, uint8_t *buf,int frame_total, int wid
     int frame_finished;
    // const char *src_filename = "./1.avi";
     uint8_t *rgb_buf = NULL;
-    //注册视频文件
+    //娉ㄥ唽瑙嗛鏂囦欢
     av_register_all();
 
-    //打开视频文件及分配空间给context
+    //鎵撳紑瑙嗛鏂囦欢鍙婂垎閰嶇┖闂寸粰context
     if ( avformat_open_input(&fmt_ctx, src_filename, NULL, NULL) < 0 )
     {
         PRINTF("av open input file failed!\n");
@@ -1043,7 +1038,7 @@ bool ReadAviData(const char *src_filename, uint8_t *buf,int frame_total, int wid
    // fclose(fp);
 
 end:
-    //释放资源.......
+    //閲婃斁璧勬簮.......
     if (sws_ctx)
     {
         sws_freeContext(sws_ctx);
@@ -1073,20 +1068,3 @@ end:
         return true;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

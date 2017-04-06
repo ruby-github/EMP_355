@@ -1,16 +1,16 @@
 #include <dirent.h>
 
-#include "gui_func.h"
-#include "gui_global.h"
-#include "FileMan.h"
-#include "KeyValueOpr.h"
-#include "KeyDef.h"
-#include "FakeXEvent.h"
-#include "PeripheralMan.h"
-#include "ViewDialog.h"
-#include "ViewArchive.h"
-#include "ViewArchiveImgMan.h"
-#include "ViewUdiskDataSelect.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "patient/FileMan.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyDef.h"
+#include "display/FakeXEvent.h"
+#include "periDevice/PeripheralMan.h"
+#include "display/ViewDialog.h"
+#include "patient/ViewArchive.h"
+#include "patient/ViewArchiveImgMan.h"
+#include "patient/ViewUdiskDataSelect.h"
 
 ViewUdiskDataSelect* ViewUdiskDataSelect::m_ptrInstance = NULL;
 
@@ -72,7 +72,7 @@ void ViewUdiskDataSelect::CreateWindow(GtkWindow *parent)
     modelRoot = create_root_model();
     if (modelRoot != NULL)
         gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeRoot), modelRoot);
-    g_object_unref (modelRoot); 
+    g_object_unref (modelRoot);
 
 	swBranch = gtk_scrolled_window_new (NULL, NULL);
 	gtk_widget_show (swBranch);
@@ -223,11 +223,11 @@ static void progress_callback(goffset current, goffset total, gpointer data)
 //	PRINTF("prac = %f\n", prac);
 	if(prac >= 0 && prac <= 1.0)
 	{
-		gdk_threads_enter();	
+		gdk_threads_enter();
 		ViewDialog::GetInstance()->SetProgressBar(prac);
 		while(gtk_events_pending())
 			gtk_main_iteration();
-		gdk_threads_leave();	
+		gdk_threads_leave();
 	}
 	else
 		PRINTF("fraction out of range!\n");
@@ -254,9 +254,9 @@ static gboolean LoadSelectedData(gpointer data)
 
 	if(!ptr->CheckUsbStorageState())
 	{
-		ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), 
+		ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
 				ViewDialog::ERROR,
-				_("No USB storage found!"), 
+				_("No USB storage found!"),
 				NULL);
 		return FALSE;
 	}
@@ -264,9 +264,9 @@ static gboolean LoadSelectedData(gpointer data)
 	{
 		if(!ptr->MountUsbStorage())
 		{
-			ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), 
+			ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
 					ViewDialog::ERROR,
-					_("Failed to mount USB storage!"), 
+					_("Failed to mount USB storage!"),
 					NULL);
 			return FALSE;
 		}
@@ -360,9 +360,9 @@ static gboolean LoadSelectedData(gpointer data)
 	}
 	else
 	{
-		ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), 
+		ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
 				ViewDialog::INFO,
-				result, 
+				result,
 				NULL);
 	}
 
@@ -388,8 +388,8 @@ void ViewUdiskDataSelect::BtnOKClicked(GtkButton *button)
 		g_timeout_add(1000, LoadSelectedData, NULL);
 
 		PRINTF("Load From U disk!\n");
-		ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), 
-				ViewDialog::PRG_CANCEL, 
+		ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+				ViewDialog::PRG_CANCEL,
 				_("Please wait, loading data from USB storage..."),
 				CancelLoadSlide);
 	}
@@ -407,12 +407,12 @@ GtkWidget* ViewUdiskDataSelect::create_treeview(gint type)
     GtkWidget *treeview;
     GtkCellRenderer *render;
     GtkTreeViewColumn *col;
-    
+
     treeview = gtk_tree_view_new ();
-	g_object_set(G_OBJECT(treeview), 
-			"enable-search", FALSE, 
-			"headers-visible", FALSE, 
-			"rules-hint", TRUE, 
+	g_object_set(G_OBJECT(treeview),
+			"enable-search", FALSE,
+			"headers-visible", FALSE,
+			"rules-hint", TRUE,
 			NULL);
 
     render = gtk_cell_renderer_toggle_new();
@@ -447,7 +447,7 @@ void ViewUdiskDataSelect::ToggleData(GtkCellRendererToggle *cell, gchar *path_st
 		treeview = m_treeBranch;
 	else
 		return;
-	
+
 //	PRINTF("Toggle path: %s\n", path_str);
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(treeview));
 	GtkTreeIter iter;
@@ -459,7 +459,7 @@ void ViewUdiskDataSelect::ToggleData(GtkCellRendererToggle *cell, gchar *path_st
 	gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
 
 	/* do something with the value */
-	checked ^= 1; //按位异或
+	checked ^= 1; //鎸変綅寮傛垨
 
 	/* set new value */
 	gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);

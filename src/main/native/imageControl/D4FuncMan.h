@@ -1,27 +1,27 @@
 #include <sys/types.h>
 #include <errno.h>
 //#include "../probe/ProbeSocket.h"
-#include "UIS4DReceiveInterface.h"
-#include "../base/IniFile.h"
+#include <UIS4DReceiveInterface.h>
+#include "base/IniFile.h"
 
-#include "DSC.h"
+#include <DSC.h>
 class D4FuncMan
 {
     public:
-        ~D4FuncMan(); 
+        ~D4FuncMan();
         static D4FuncMan* GetInstance();
 
         void GetPara(SUIS4DPARA &Para);
         void GetDataFromUsb(const unsigned char *pData);
         void Exit4D();
 
-        // 设置4D mode标记
+        // 璁剧疆4D mode鏍囪
         void Set4DMode(bool flag)
         {
             m_d4_mode = flag;
         }
 
-        // 获得4D mode标记
+        // 鑾峰緱4D mode鏍囪
         bool Get4DMode(){return m_d4_mode;}
 
     private:
@@ -30,13 +30,13 @@ class D4FuncMan
         SUIS4DPARA m_Para4d;
 
         bool m_d4_mode;
-     
+
         unsigned char *m_yBits;
         unsigned int m_lineNo_bak;
         unsigned char *m_pD4bits;
         unsigned char m_frameNum;
         unsigned char m_reverseFlag;
-        DSCCONTROLATTRIBUTES* m_ptrDscpara; 
+        DSCCONTROLATTRIBUTES* m_ptrDscpara;
 
     private:
         D4FuncMan();
@@ -50,7 +50,5 @@ class D4FuncMan
         void GetDepth();
 
         ///> extern member
-        static D4FuncMan* m_ptrInstance;	
+        static D4FuncMan* m_ptrInstance;
 };
-       
-

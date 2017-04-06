@@ -3,13 +3,13 @@
 
 #include <deque>
 #include <gtk/gtk.h>
-#include "FakeXEvent.h"
-#include "../include/AbsCalendarOpr.h"
+#include "display/FakeXEvent.h"
+#include "AbsCalendarOpr.h"
 #include <vector>
-#include "DCMDef.h"
-#include "ImageArea.h"
-#include "Image.h"
-#include "PatientInfo.h"
+#include "periDevice/DCMDef.h"
+#include "display/ImageArea.h"
+#include "imageProc/Image.h"
+#include "patient/PatientInfo.h"
 
 using std::deque;
 class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
@@ -24,12 +24,12 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
             COL_NAME_S,
             COL_Gender_S,
             COL_ACCESSION_NUMBER_S,
-            COL_BIRTH_DATE_S, 
+            COL_BIRTH_DATE_S,
             COL_EXAM_DATE_S,
             COL_EXAM_DESCRIPTION_S,
             NUM_COLS_S
         };
-        
+
         enum{
             COL_PATIENT_ID_D,
             COL_NAME_D,
@@ -38,7 +38,7 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
             COL_SIZE_D,
             COL_WEIGHT_D,
             COL_ACCESSION_NUMBER_D,
-            COL_BIRTH_DATE_D, 
+            COL_BIRTH_DATE_D,
             COL_EXAM_DATE_D,
             COL_EXAM_TIME_D,
             COL_EXAM_DOCTOR_D,
@@ -71,7 +71,7 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
         GtkWidget* m_treeview_detination;
         GtkWidget* m_checkbutton_select_all;
         GtkWidget* m_combobox_device;
-        GtkWidget *m_button_retrieve; 
+        GtkWidget *m_button_retrieve;
         GtkWidget*  m_progress_bar;
 
         int m_dateFormat;
@@ -80,7 +80,7 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
         int m_studyNo;
         bool m_isSelect;
         int m_itemIndex;
-        int m_imageNum; 
+        int m_imageNum;
         bool m_retrieveFlag;
         unsigned char m_videoBit[IMG_AREA_W*IMG_AREA_H*IMG_BPP];
         static PatientInfo m_patientInfo;
@@ -90,7 +90,6 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
         int m_count_success;
         int m_count_failed;
 
-
         PatientInfo::Info m_info;
         vector<DCMQRQUERYRES> QueryRes;
         vector<int> vecIndex;
@@ -99,7 +98,7 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
         GtkTreeModel* create_query_model();
         GtkWidget* create_retrieve_treeview();
         GtkTreeModel* create_retrieve_model();
-       
+
         void ToggleRecord(GtkCellRendererToggle *cell, gchar *path_str);
         void ButtonQueryClicked(GtkButton *button);
         void ButtonClearClicked(GtkButton *button);
@@ -127,7 +126,7 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
             if (data)
                 data->ButtonClearClicked(button);
         }
-        
+
         static void HandleButtonRetrieveClicked(GtkButton *button, ViewQueryRetrieve *data)
         {
             if (data)
@@ -139,12 +138,12 @@ class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr
             if (data)
                 data->ButtonQuitClicked(button);
         }
-        
+
         static void HandleStartCalendarPress(GtkWidget *widget, GdkEventButton *event, ViewQueryRetrieve *data) { data->StartCalendarPress(widget, event); }
-        
+
         static void HandleEndCalendarPress(GtkWidget *widget, GdkEventButton *event, ViewQueryRetrieve *data) { data->EndCalendarPress(widget, event); }
-        
-		static void HandleToggleRecord(GtkCellRendererToggle *cell, gchar *path_str, ViewQueryRetrieve *data) { data->ToggleRecord(cell, path_str); 
+
+		static void HandleToggleRecord(GtkCellRendererToggle *cell, gchar *path_str, ViewQueryRetrieve *data) { data->ToggleRecord(cell, path_str);
         }
         static void HandleSelectAllToggled(GtkToggleButton *togglebutton, ViewQueryRetrieve *data) { data->ChkSelectAllToggled(togglebutton); }
         static unsigned int  GetDCMStudyElement(DCMSTUDYELEMENT element);

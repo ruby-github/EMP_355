@@ -4,16 +4,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "KeyValueOpr.h"
-#include "ViewCD.h"
-#include "ViewDialog.h"
-#include "ViewArchive.h"
-#include "gui_global.h"
-#include "KeyDef.h"
-#include "ImgMan.h"
-#include "VideoMan.h"
-#include "PeripheralMan.h"
-#include "CdBurn.h"
+#include "keyboard/KeyValueOpr.h"
+#include "periDevice/ViewCD.h"
+#include "display/ViewDialog.h"
+#include "patient/ViewArchive.h"
+#include "display/gui_global.h"
+#include "keyboard/KeyDef.h"
+#include "patient/ImgMan.h"
+#include "patient/VideoMan.h"
+#include "periDevice/PeripheralMan.h"
+#include "periDevice/CdBurn.h"
 
 #define LIST_PATH "/tmp/pathlist"
 #define TMPDIR "/tmp/tmp_mkisofs"
@@ -46,7 +46,7 @@ GtkWidget* ViewCD::GetWindow(void)
 {
     if (GTK_IS_WIDGET(m_window))
         return m_window;
-    else 
+    else
         return NULL;
 }
 
@@ -190,7 +190,6 @@ void ViewCD::CreateWindow(GtkWidget *parent, vector<string> vec, bool is_cd)
     gtk_fixed_put (GTK_FIXED (fixed), btnAddAll, 280, 235);
     gtk_widget_set_size_request (btnAddAll, 80, 60);
     g_signal_connect(G_OBJECT(btnAddAll), "clicked", G_CALLBACK(HandleBtnAddAllClicked), this);
-
 
     btnDelAll = gtk_button_new_with_mnemonic ("<<");
     gtk_fixed_put (GTK_FIXED (fixed), btnDelAll, 280, 325);
@@ -526,7 +525,7 @@ void ViewCD::AppendParent(const char* parent, vector<string> child)
     }
     if(exist)
     {
-        // remove the exist then append new 
+        // remove the exist then append new
         gtk_tree_store_remove (store, &iter_parent);
     }
     gtk_tree_store_append(store, &iter_parent, NULL);
@@ -621,7 +620,7 @@ void ViewCD::BtnAddClicked(GtkButton *button)
     }
     else
     {
-        if( gtk_tree_model_iter_parent(model, &iter2, &iter1) )	
+        if( gtk_tree_model_iter_parent(model, &iter2, &iter1) )
         {
             gtk_tree_model_get(model, &iter2, 0, &val2, -1);
             AppendChild(val2, val1);
@@ -694,7 +693,7 @@ void ViewCD::BtnDelAllClicked(GtkButton *button)
 gboolean ViewCD::PrepareData(vector<string> folder, vector<string> path)
 {
     char buf[256];
-    vector<string>::iterator it;	
+    vector<string>::iterator it;
     struct stat filestat;
 
     FILE *fp = fopen(LIST_PATH, "w");
@@ -758,7 +757,7 @@ gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition)
     gchar *buffer = NULL, *f;
     GIOStatus status;
 
-    if (condition == G_IO_HUP || condition == G_IO_ERR) 
+    if (condition == G_IO_HUP || condition == G_IO_ERR)
     {
         perror("MakeIso GIOChannel error:");
         m_cont = 0;
@@ -777,7 +776,7 @@ gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition)
         buffer[3] = 0;
         f = buffer;
 
-        while (*f==' ' || *f==9) f++;	
+        while (*f==' ' || *f==9) f++;
         PRINTF("mkisofs progress: %s\n", f);
 
 #if 0
@@ -795,14 +794,14 @@ gboolean ViewCD::MakeIsoCallback(GIOChannel *source, GIOCondition condition)
     else if(strstr(buffer, MKISOFS_ERROR) && !strstr(buffer, MKISOFS_IGNORE))	//error with mkisofs
     {
         m_cont = 0;
-        if (!strstr(buffer, MKISOFS_NOSPACE)) 
+        if (!strstr(buffer, MKISOFS_NOSPACE))
         {
             PRINTF("Not enough free disk space to create iso image!\n");
             g_free(buffer);
             return FALSE;
         }
     }
-    else if(!strncmp(buffer, MKISOFS_OK, strlen(MKISOFS_OK))) 
+    else if(!strncmp(buffer, MKISOFS_OK, strlen(MKISOFS_OK)))
     {
         m_cont = 0;
         PRINTF("mkisofs progress: 100%%\n");
@@ -847,7 +846,7 @@ gboolean ViewCD::MakeIso()
     else
     {
         if(info.last_track_addr < info.next_writable_addr && info.next_writable_addr)
-            cmdline = g_strdup_printf("/usr/bin/mkisofs -r -J -o %s -C %lld,%lld -M %s -graft-points -path-list %s", 
+            cmdline = g_strdup_printf("/usr/bin/mkisofs -r -J -o %s -C %lld,%lld -M %s -graft-points -path-list %s",
                     ISOPATH, info.last_track_addr, info.next_writable_addr, info.device.c_str(), PATHLIST);
         else
             return FALSE;
@@ -864,8 +863,8 @@ gboolean ViewCD::MakeIso()
     //	PRINTF("cmd: %s arg num=%d\n", cmd, arg);
 
     GError *error = NULL;
-    status = g_spawn_async_with_pipes(NULL, cmd, NULL, 
-            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD), 
+    status = g_spawn_async_with_pipes(NULL, cmd, NULL,
+            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
             NULL, NULL, &pid, NULL, &g_out, &g_err, &error);
     g_strfreev(cmd);
     if(status == FALSE)
@@ -908,7 +907,7 @@ gboolean ViewCD::MakeIso()
     g_source_remove(event);
 
     g_io_channel_shutdown(comerr, FALSE, NULL);
-    g_io_channel_unref(comerr);  
+    g_io_channel_unref(comerr);
     g_io_channel_shutdown(com, FALSE, NULL);
     g_io_channel_unref(com);
     g_spawn_close_pid(pid);
@@ -921,7 +920,7 @@ gboolean ViewCD::BurnCDCallback(GIOChannel *source, GIOCondition condition)
     gchar *buffer = NULL;
     GIOStatus status;
 
-    if (condition == G_IO_HUP || condition == G_IO_ERR) 
+    if (condition == G_IO_HUP || condition == G_IO_ERR)
     {
         perror("BurnCD GIOChannel error:");
         m_cont = 0;
@@ -963,8 +962,8 @@ gboolean ViewCD::BurnCD(const char *device)
     }
     //	PRINTF("cmd: %s arg num=%d\n", cmd, arg);
 
-    status = g_spawn_async_with_pipes(NULL, cmd, NULL, 
-            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD), 
+    status = g_spawn_async_with_pipes(NULL, cmd, NULL,
+            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
             NULL, NULL, &pid, NULL, &g_out, &g_err, NULL);
     g_strfreev(cmd);
     if(status == FALSE)
@@ -1006,7 +1005,7 @@ gboolean ViewCD::BurnCD(const char *device)
     g_source_remove(event);
 
     g_io_channel_shutdown(comerr, FALSE, NULL);
-    g_io_channel_unref(comerr);  
+    g_io_channel_unref(comerr);
     g_io_channel_shutdown(com, FALSE, NULL);
     g_io_channel_unref(com);
     g_spawn_close_pid(pid);
@@ -1019,7 +1018,7 @@ gboolean ViewCD::BurnDVDCallback(GIOChannel *source, GIOCondition condition)
     gchar *buffer = NULL;
     GIOStatus status;
 
-    if (condition == G_IO_HUP || condition == G_IO_ERR) 
+    if (condition == G_IO_HUP || condition == G_IO_ERR)
     {
         perror("BurnDVD GIOChannel error:");
         m_cont = 0;
@@ -1064,8 +1063,8 @@ gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device)
     }
     //	PRINTF("cmd: %s arg num=%d\n", cmd, arg);
 
-    status = g_spawn_async_with_pipes(NULL, cmd, NULL, 
-            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD), 
+    status = g_spawn_async_with_pipes(NULL, cmd, NULL,
+            (GSpawnFlags ) (G_SPAWN_DO_NOT_REAP_CHILD),
             NULL, NULL, &pid, NULL, &g_out, &g_err, NULL);
     g_strfreev(cmd);
     if(status == FALSE)
@@ -1107,7 +1106,7 @@ gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device)
     g_source_remove(event);
 
     g_io_channel_shutdown(comerr, FALSE, NULL);
-    g_io_channel_unref(comerr);  
+    g_io_channel_unref(comerr);
     g_io_channel_shutdown(com, FALSE, NULL);
     g_io_channel_unref(com);
     g_spawn_close_pid(pid);
@@ -1181,7 +1180,6 @@ void ViewCD::BtnBackupClicked(GtkButton *button)
     CdBurn::GetInstance()->StartBurn(LIST_PATH);
 }
 
-
 void ViewCD::BtnExportClicked(GtkButton *button)
 {
     if(m_vecFolder.size()==0 || m_vecPath.size()==0)
@@ -1211,4 +1209,3 @@ void ViewCD::BtnExitClicked(GtkButton *button)
 {
     DestroyWindow();
 }
-

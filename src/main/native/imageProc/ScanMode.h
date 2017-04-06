@@ -1,20 +1,20 @@
 #ifndef SCAN_MODE_H
 #define SCAN_MODE_H
 
-#include "FpgaCtrl2D.h"
-#include "Img2D.h"
-#include "ImgPw.h"
-#include "ImgCfm.h"
-#include "Format2D.h"
-#include "FormatM.h"
-#include "FormatPw.h"
-#include "FormatCfm.h"
+#include "imageControl/FpgaCtrl2D.h"
+#include "imageControl/Img2D.h"
+#include "imageControl/ImgPw.h"
+#include "imageControl/ImgCfm.h"
+#include "imageProc/Format2D.h"
+#include "imageProc/FormatM.h"
+#include "imageProc/FormatPw.h"
+#include "imageProc/FormatCfm.h"
 #include "AbsUpdate2D.h"
 #include "AbsUpdatePw.h"
 #include "AbsUpdateCfm.h"
-#include "MultiFuncFactory.h"
-#include "Replay.h"
-#include "UIS4DReceiveInterface.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "imageProc/Replay.h"
+#include <UIS4DReceiveInterface.h>
 
 class ScanMode
 {
@@ -40,25 +40,24 @@ public:
         int baselineCalc;
     };
 
-
     ~ScanMode();
     static ScanMode* GetInstance();
 
     void Enter2D();
-		
+
     void EnterM(); ///< enter initial M mode, 2D + MCursor
     void UpdateBM(); ///< enter real M mode from initial M mode
     void UpdateM(); ///< enter real M mode from initial M mode
-		
+
     void EnterPw();
     void UpdatePw();
     int SwitchPw();
-		
+
     void EnterCfm();
     void EnterPdi();
 
     void Enter4D();
-		
+
     void EnterPwCfmFromCfm();
     void UpdatePwCfmFromInit();
     int SwitchPwCfm();
@@ -90,12 +89,12 @@ public:
 
     void EnterAnatomicM();
 
-    ScanMode::EScanMode GetScanMode() 
-    { 
+    ScanMode::EScanMode GetScanMode()
+    {
         if (m_isSpecialMeasure)
-            return m_scanModeMeasure; 
-        else 
-            return m_scanMode; 
+            return m_scanModeMeasure;
+        else
+            return m_scanMode;
     }
     ScanMode::EScanMode GetFpgaScanMode() { return m_fpgaScanMode; }
     int GetPwCurImg() { return m_pwCurImg; } //1-2d, 2-pw, 3-both 2d and pw
@@ -119,18 +118,18 @@ private:
 
     static ScanMode* m_ptrInstance;
     		AbsUpdatePw* m_ptrUpdate;
-    // extern 
+    // extern
     FpgaCtrl2D m_fpgaCtrl2D;
 
     AbsUpdate2D* m_ptrUpdate2D;
     Img2D* m_ptrImg2D;
     Format2D* m_ptrFormat2D;
     FormatM* m_ptrFormatM;
-		
+
     AbsUpdatePw* m_ptrUpdatePw;
     ImgPw* m_ptrImgPw;
     FormatPw* m_ptrFormatPw;
-		
+
     AbsUpdateCfm* m_ptrUpdateCfm;
     ImgCfm* m_ptrImgCfm;
     FormatCfm* m_ptrFormatCfm;
@@ -152,9 +151,9 @@ private:
     int m_pulseNumTmp;
 
         ///> 0-pw and 2D both real
-    ///> 1-2D real 
-    ///> 2-pw real 
-    int m_pwCurImg; 
+    ///> 1-2D real
+    ///> 2-pw real
+    int m_pwCurImg;
 
     ///> special measure
     bool m_isSpecialMeasure;

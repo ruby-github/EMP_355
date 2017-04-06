@@ -1,43 +1,43 @@
 #include <gtk/gtk.h>
 
-#include "ViewSuperuser.h"
+#include "sysMan/ViewSuperuser.h"
 #include "ViewMain.h"
-#include "gui_func.h"
-#include "../keyboard/KeyDef.h"
-#include "../probe/ProbeMan.h"
-#include "../keyboard/MultiFuncFactory.h"
-#include "../imageControl/Img2D.h"
-#include "ModeStatus.h"
-#include "KeyFunc.h"
-#include "ScreenSaver.h"
+#include "display/gui_func.h"
+#include "keyboard/KeyDef.h"
+#include "probe/ProbeMan.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "imageControl/Img2D.h"
+#include "imageProc/ModeStatus.h"
+#include "keyboard/KeyFunc.h"
+#include "sysMan/ScreenSaver.h"
 #include <iostream>
-#include "SysGeneralSetting.h"
+#include "sysMan/SysGeneralSetting.h"
 #include "display/ImageAreaPara.h"
-#include "MonitorControl.h"
+#include "periDevice/MonitorControl.h"
 using namespace std;
 
 #if defined(EMP_360)
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
     "3.5CV", "6.5VMC", "7.5LVS", "3.5MC", "6.5MC", "30P16A", "35D40J(SNR)", "35D40J(NDK)"
 };
 #elif defined(EMP_161)
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
     "3.5CV", "6.5VMC", "7.5LVS", "3.5MC", "30P16A"
 };
 #elif (defined(EMP_322) || defined(EMP_313))
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
     "35C50J", "75L40J", "65C10J", "35C20G", "65C20G", "90L40J", "35D40J(SNR)", "35D40J(NDK)", "30P16A"
 };
 #elif defined(EMP_430)
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
 	"35C60E", "65L40E", "65C10E", "65C15D", "35D50D"
 };
 #elif defined(EMP_440)
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
     "35C60E", "65C10E", "65L40E",  "65C15D"
 };
@@ -55,12 +55,12 @@ std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 #endif
 #else
 #ifdef VET
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
     "35C50K", "65C10K", "75L40K", "35C20H", "65C15D", "30P16A", "90L25K", "10L25J", "35D40J(SNR)", "35D40J(NDK)", "55L60H"
 };
 #else
-std::string ViewSuperuser::m_probeName[WPORBE_NUM] = 
+std::string ViewSuperuser::m_probeName[WPORBE_NUM] =
 {
     "35C50K", "65C10K", "75L40K", "35C20H", "65C15D", "30P16A", "90L25K", "10L25J", "35D40J(SNR)", "35D40J(NDK)", "65C10H"
 };
@@ -76,7 +76,7 @@ ViewSuperuser::ViewSuperuser()
     m_statusDemo = TRUE;
     m_probeType = 0;
 	m_window = NULL;
-#ifdef TRANSDUCER 
+#ifdef TRANSDUCER
    m_tranPressCorrect = 0;
 #endif
 }
@@ -152,7 +152,7 @@ void ViewSuperuser::CreateWindow(void)
 	gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
 	gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
 	gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-	gtk_window_set_title (GTK_WINDOW (m_window), "超级用户工具");
+	gtk_window_set_title (GTK_WINDOW (m_window), "瓒呯骇鐢ㄦ埛宸ュ叿");
 	gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
 	g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(HandleWindowDeleteEvent), this);
 
@@ -176,33 +176,33 @@ void ViewSuperuser::CreateWindow(void)
 			(GtkAttachOptions) (GTK_FILL),
 			(GtkAttachOptions) (GTK_FILL), 0, 0);
 
-    labelProbe = gtk_label_new ("探头工具");
+    labelProbe = gtk_label_new ("鎺㈠ご宸ュ叿");
     gtk_frame_set_label_widget (GTK_FRAME (frameProbe), labelProbe);
     gtk_label_set_use_markup (GTK_LABEL (labelProbe), TRUE);
-	
+
 	tableProbe = gtk_table_new(3, 2, FALSE);
 	gtk_table_set_row_spacing(GTK_TABLE(tableProbe), 0, 10);
 	gtk_table_set_col_spacings(GTK_TABLE(tableProbe), 10);
 	gtk_container_set_border_width(GTK_CONTAINER(tableProbe), 10);
 	gtk_container_add (GTK_CONTAINER (frameProbe), tableProbe);
-	
+
 	GtkWidget *comboboxMachine = gtk_combo_box_new_text();
 	gtk_table_attach_defaults(GTK_TABLE(tableProbe), comboboxMachine, 0, 1, 0, 1);
 
 #if defined(EMP_360)
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "G60"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "G60");
 #elif defined(EMP_161)
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "EMP-3000"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "EMP-3000");
 #elif defined(EMP_322)
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "EMP-2900Plus"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "EMP-2900Plus");
 #elif defined(EMP_313)
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "EMP-2800"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "EMP-2800");
 #elif (defined(EMP_430)|| defined(EMP_440))
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "A60"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "A60");
 #elif defined(EMP_355)
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "G30Plus"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "G30Plus");
 #else
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "G70"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxMachine), "G70");
 #endif
 
 	gtk_combo_box_set_active(GTK_COMBO_BOX(comboboxMachine), 0);
@@ -215,10 +215,10 @@ void ViewSuperuser::CreateWindow(void)
     {
         char newProbeName[256];
         ProbeMan::GetInstance()->VerifyProbeName(m_probeName[i].c_str(), newProbeName);
-        gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxProbe), newProbeName); 
+        gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxProbe), newProbeName);
     }
 	gtk_combo_box_set_active(GTK_COMBO_BOX(comboboxProbe), 0);
-    m_probeType = 0; 
+    m_probeType = 0;
 	g_signal_connect (G_OBJECT(comboboxProbe), "changed", G_CALLBACK(HandleProbeChanged), this);
 
 	labelWrite = gtk_label_new_with_mnemonic("写探头");
@@ -237,7 +237,7 @@ void ViewSuperuser::CreateWindow(void)
 	gtk_widget_set_size_request (frameAperture, 200, 80);
 	gtk_frame_set_shadow_type (GTK_FRAME (frameAperture), GTK_SHADOW_OUT);
 
-    GtkWidget *labelAperutre = gtk_label_new ("暗道测试工具");
+    GtkWidget *labelAperutre = gtk_label_new ("鏆楅亾娴嬭瘯宸ュ叿");
     gtk_frame_set_label_widget (GTK_FRAME (frameAperture), labelAperutre);
     gtk_label_set_use_markup (GTK_LABEL (labelAperutre), TRUE);
 
@@ -249,8 +249,8 @@ void ViewSuperuser::CreateWindow(void)
 
 	GtkWidget *comboboxAperture = gtk_combo_box_new_text();
 	gtk_table_attach_defaults(GTK_TABLE(tableAperture), comboboxAperture, 0, 1, 0, 1);
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxAperture), "OFF"); 
-	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxAperture), "ON"); 
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxAperture), "OFF");
+	gtk_combo_box_append_text(GTK_COMBO_BOX(comboboxAperture), "ON");
 	gtk_combo_box_set_active(GTK_COMBO_BOX(comboboxAperture), -1);
 	g_signal_connect (G_OBJECT(comboboxAperture), "changed", G_CALLBACK(HandleChgAperture), this);
 
@@ -276,7 +276,7 @@ void ViewSuperuser::CreateWindow(void)
     gtk_widget_set_size_request (framePress, 440, 70); //550
     gtk_frame_set_shadow_type (GTK_FRAME (framePress), GTK_SHADOW_OUT);
 
-    GtkWidget *labelPress = gtk_label_new ("压力校准");
+    GtkWidget *labelPress = gtk_label_new ("鍘嬪姏鏍″噯");
     gtk_widget_show (labelPress);
     gtk_frame_set_label_widget (GTK_FRAME (framePress), labelPress);
     gtk_label_set_use_markup (GTK_LABEL (labelPress), TRUE);
@@ -285,9 +285,8 @@ void ViewSuperuser::CreateWindow(void)
     gtk_widget_show (fixedPress);
     gtk_container_add (GTK_CONTAINER (framePress), fixedPress);
 
-   
     GtkWidget *tablePress = gtk_table_new (1, 2, FALSE); //14
-    gtk_widget_show (tablePress); 
+    gtk_widget_show (tablePress);
     gtk_fixed_put (GTK_FIXED (fixedPress), tablePress, 5, 10);
     gtk_widget_set_size_request (tablePress, 200, 20);//520
     gtk_table_set_row_spacings (GTK_TABLE(tablePress), 10);
@@ -312,8 +311,8 @@ void ViewSuperuser::CreateWindow(void)
     gtk_widget_set_size_request (label_press, 200, 30);
     gtk_misc_set_alignment (GTK_MISC (label_press), 0, 0.5);
 
-	labelExit = gtk_label_new_with_mnemonic("确定");
-#else  
+	labelExit = gtk_label_new_with_mnemonic("纭畾");
+#else
 	labelExit = gtk_label_new_with_mnemonic("退出");
 #endif
 	imageExit = gtk_image_new_from_stock(GTK_STOCK_QUIT, GTK_ICON_SIZE_BUTTON);
@@ -324,7 +323,7 @@ void ViewSuperuser::CreateWindow(void)
     gtk_widget_show_all(m_window);
     g_keyInterface.Pop();
 
-    //clear 
+    //clear
     if (m_vecAuthenInfo.size())
       m_vecAuthenInfo.clear();
 
@@ -348,14 +347,14 @@ void ViewSuperuser::CreateDemoWindow(void)
 	gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
 	gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
 	gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-	gtk_window_set_title (GTK_WINDOW (m_window), "进入演示");
+	gtk_window_set_title (GTK_WINDOW (m_window), "杩涘叆婕旂ず");
 	gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
 	g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(HandleWindowDeleteEvent), this);
 
 	fixed = gtk_fixed_new ();
 	gtk_container_add (GTK_CONTAINER (m_window), fixed);
 
-    labelDemo = gtk_label_new_with_mnemonic("进入演示功能");
+    labelDemo = gtk_label_new_with_mnemonic("杩涘叆婕旂ず鍔熻兘");
     imageDemo = gtk_image_new_from_stock(GTK_STOCK_YES, GTK_ICON_SIZE_BUTTON);
     btnEnterDemo = create_button_icon(labelDemo, imageDemo);
     g_signal_connect (G_OBJECT(btnEnterDemo), "clicked", G_CALLBACK(HandleBtnEnterDemoClicked), this);
@@ -364,13 +363,13 @@ void ViewSuperuser::CreateDemoWindow(void)
     gtk_widget_show_all(m_window);
 
     m_statusAuthen = false;
-    
+
     g_keyInterface.Pop();
- 
-    //clear 
+
+    //clear
     if (m_vecAuthenInfo.size())
       m_vecAuthenInfo.clear();
-  
+
     g_keyInterface.Push(this);
     SetSystemCursorToCenter();
 }
@@ -383,10 +382,10 @@ GtkWidget *ViewSuperuser::create_probe_treeview(void)
 	GtkTreeViewColumn *column;
 
 	treeview = gtk_tree_view_new();
-	g_object_set(G_OBJECT(treeview), 
-			"enable-search", FALSE, 
-			"headers-visible", FALSE, 
-			"sensitive", FALSE, 
+	g_object_set(G_OBJECT(treeview),
+			"enable-search", FALSE,
+			"headers-visible", FALSE,
+			"sensitive", FALSE,
 			NULL);
 
 	render = gtk_cell_renderer_text_new();
@@ -460,13 +459,13 @@ void ViewSuperuser::SpinbuttonPressAdjust(GtkEditable *editable, gchar *new_text
     old_str.insert(*position, new_str);
     double pressad = atof(old_str.c_str());
     int press1 = (int) (pressad * 1000); //atoi(old_str.c_str());
-    
+
     SysGeneralSetting sysGel;
     sysGel.SetPressAdjust(press1);
     sysGel.SyncFile();
 
-    printf("--press1=%d\n", press1); 
-   
+    printf("--press1=%d\n", press1);
+
     if (press1 < -20 || press1 > 20)
     {
         PRINTF("++++press is beyond value\n");
@@ -517,7 +516,7 @@ gboolean ViewSuperuser::WriteProbe(void)
     for (i = 0; i < ProbeMan::MAX_SOCKET; i ++)
     {
         sprintf(index, "%d", i);
-        if (para[i].exist) 
+        if (para[i].exist)
             sprintf(name, "%d: %s", i+1, para[i].model);
         else
             sprintf(name, "%d: 无探头", i+1);
@@ -531,22 +530,22 @@ gboolean ViewSuperuser::WriteProbe(void)
 bool ViewSuperuser::ConfirmAuthen(void)
 {
     bool ret = false;
-    unsigned char info[AUTHEN_NUM+1]; 
+    unsigned char info[AUTHEN_NUM+1];
     int len = m_vecAuthenInfo.size();
     int size = (len > AUTHEN_NUM)?AUTHEN_NUM:len;
     memset(info, 0, sizeof(info));
     for (int i = 0; i < size; i++)
     {
-        info[i] = m_vecAuthenInfo[len-size+i]; 
+        info[i] = m_vecAuthenInfo[len-size+i];
     }
-    
+
       // compare
     if (strcmp((const char*)info, "emperor1997") == 0)
     {
         if (m_statusAuthen)
         {
             m_vecAuthenInfo.clear();
-            CreateWindow(); 
+            CreateWindow();
             ret = true;
         }
     }
@@ -556,13 +555,13 @@ bool ViewSuperuser::ConfirmAuthen(void)
 bool ViewSuperuser::ConfirmDemo(void)
 {
     bool ret = false;
-    unsigned char info[DEMO_NUM+1]; 
+    unsigned char info[DEMO_NUM+1];
     int len = m_vecAuthenInfo.size();
     int size = (len > DEMO_NUM)?DEMO_NUM:len;
     memset(info, 0, sizeof(info));
     for (int i = 0; i < size; i++)
     {
-        info[i] = m_vecAuthenInfo[len-size+i]; 
+        info[i] = m_vecAuthenInfo[len-size+i];
     }
 
       // compare
@@ -580,11 +579,11 @@ bool ViewSuperuser::ConfirmDemo(void)
 
 void ViewSuperuser::Exit(void)
 {
-    g_keyInterface.Pop(); 
+    g_keyInterface.Pop();
 }
 /*
  * socket: a string to the path, "0" means the fisrt socket
- * status : a string to show 
+ * status : a string to show
  */
 gboolean ViewSuperuser::UpdateProbeStatus(const char* socket, const char* status)
 {
@@ -620,19 +619,18 @@ void ViewSuperuser::KeyEvent(unsigned char keyValue)
             FakeXEvent::KeyEvent(keyValue);
             break;
 
-
 #if 0
-            
+
             if (m_statusAuthen)
-            {                
+            {
                 Exit();
             }
             else if(m_statusDemo)
-            {               
+            {
                 g_timeout_add(100, ExitWindow, this);
             }
             else
-            {              
+            {
                 //DestroyWindow();
                 g_timeout_add(100, ExitWindow, this);
                 FakeEscKey();
@@ -680,4 +678,3 @@ void ViewSuperuser::BtnChgMonitorClicked2(GtkButton *button)
     mc.AutoBalance();
     ScreenSaver::GetInstance()->EnterScreenSaver3();
 }
-

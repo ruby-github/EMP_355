@@ -10,7 +10,7 @@
 #define MEASURE_RES_LINES_MAX 13
 
 //#define MEASURE_RES_AREA_W 400
-//#define MEASURE_RES_AREA_H 272 //MEASURE_RES_LINES_MAX * MeasureResult_H 
+//#define MEASURE_RES_AREA_H 272 //MEASURE_RES_LINES_MAX * MeasureResult_H
 //#define MEASURE_RES_AREA_X 5
 //#define MEASURE_RES_AREA_Y (IMG_AREA_H-MEASURE_RES_AREA_H)
 
@@ -34,10 +34,10 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include "Def.h"
-#include "gui_global.h"
-#include "MultiFuncFactory.h"
+#include "display/gui_global.h"
+#include "keyboard/MultiFuncFactory.h"
 #include <vector>
-#include "gui_func.h"
+#include "display/gui_func.h"
 #include "keyboard/KeyDef.h"
 // freetype2 support
 #include <ft2build.h>
@@ -48,7 +48,7 @@ class ImageArea
 public:
     ~ImageArea();
     static ImageArea* GetInstance();
-    
+
     // enum DotSize{LARGE, MID, SMALL};
 
     enum DrawArea{SYMBOL, SPECTRA, PARA, PIXMAP, IMT};
@@ -129,7 +129,7 @@ public:
 
     // void DrawDashLine(int x1, int y1, int x2, int y2, bool draw, const GdkColor* const color);
     // void DrawMeasureDashLine(GdkFunction mode, const GdkColor* const color, int x1, int y1, int x2, int y2, DotSize size=MID);
-   
+
     void DrawDashLine(DrawAttr &attr, const GdkColor* const color, int x1, int y1, int x2, int y2, bool update=true, int distance=10);
     void DrawDashLine(DrawAttr &attr, const GdkColor* const color, int x1, int y1, int x2, int y2, int size, bool update=true);
 
@@ -162,7 +162,7 @@ public:
     void DrawString(GdkGC *gc, int x, int y, const char *str);
 	void DrawString(const char *str, int x, int y, const GdkColor* const color=g_white);
     void DrawString(const char *str, int x, int y, const GdkColor* const color, bool xorMode);
- 
+
     void DrawStringFps(const char *str, int x, int y, const GdkColor* const color=g_white);
 
     void DrawBodyMark(int x, int y, GdkPixbuf* pixbuf, double scale, guint colorIndex, guint index);
@@ -180,8 +180,8 @@ public:
 
     void AddTimeOutFps();
     void DelTimeOutFps();
-    void ClearUpdateCounts(); 
-    
+    void ClearUpdateCounts();
+
     gboolean UpdateFps();
     static void SetCineRemoveImg(int count);
 
@@ -207,7 +207,7 @@ private:
     static ImageArea* m_ptrInstance;
 
     static GtkWidget *m_imageDA;
-    
+
     PangoFontDescription *m_baseFont;
 
 	GdkPixbuf *m_imgPixbuf;
@@ -217,10 +217,10 @@ private:
 	//static unsigned char m_bitsImg[IMAGE_W*IMAGE_H*IMG_BPP];
 	//used for mix when in EFOV
 	static unsigned char m_bitsEFOV[IMG_AREA_W*IMG_AREA_H*IMG_BPP];
-	//the last frame replay data 
+	//the last frame replay data
 	static unsigned char m_bitsLastReplay[IMG_AREA_W*IMG_AREA_H*IMG_BPP];
 	//used for mix when in freeze mode
-	static unsigned char m_bitsReplayMix[IMG_AREA_W*IMG_AREA_H*IMG_BPP]; 
+	static unsigned char m_bitsReplayMix[IMG_AREA_W*IMG_AREA_H*IMG_BPP];
 	//used for mix when in unfreeze mode
 	static unsigned char m_bitsMix[IMG_AREA_W*IMG_AREA_H*IMG_BPP];
     static unsigned char m_bitsIMT[IMG_AREA_W*IMG_AREA_H*3];//hlx
@@ -269,7 +269,7 @@ private:
 	int width;
     };
     std::vector<MeasurePos> m_meaResultPos;
-	int m_meaResultLineH; //测量结果每行高度（像素），通过pango_layout_get_size()得到，注意：调用该函数时如果layout中无字符，得到的结果可能不对
+	int m_meaResultLineH; //娴嬮噺缁撴灉姣忚楂樺害锛堝儚绱狅級锛岄€氳繃pango_layout_get_size()寰楀埌锛屾敞鎰忥細璋冪敤璇ュ嚱鏁版椂濡傛灉layout涓棤瀛楃锛屽緱鍒扮殑缁撴灉鍙兘涓嶅
 	struct RectArea m_meaResultRect;
     int m_curCountLines;
 

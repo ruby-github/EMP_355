@@ -1,15 +1,14 @@
-#include "FpgaReceive.h"
-#include "Format2D.h"
-#include "BDSC.h"
-#include "Img2D.h"
-#include "DscMan.h"
-#include "ImgPw.h"
+#include "imageProc/FpgaReceive.h"
+#include "imageProc/Format2D.h"
+#include <BDSC.h>
+#include "imageControl/Img2D.h"
+#include "imageProc/DscMan.h"
+#include "imageControl/ImgPw.h"
 //for test
-#include "CalcTime.h"
-#include "ModeStatus.h"
-#include "../imageControl/D4FuncMan.h"
-#include "../keyboard/MultiFuncMode.h"
-
+#include "base/CalcTime.h"
+#include "imageProc/ModeStatus.h"
+#include "imageControl/D4FuncMan.h"
+#include "keyboard/MultiFuncMode.h"
 
 #ifdef EMP_460 //G40
 	PcieControl* FpgaReceive::m_ptrUsb = PcieControl::GetInstance();
@@ -24,7 +23,7 @@ extern bool updateoffsound;
 
 #ifdef EMP_355
 int g_fps = 0;
-#endif 
+#endif
 /**
 * @brief service routine only used to receive data from usb device
 */
@@ -98,9 +97,9 @@ begin:
             static int n = 0;
 
 			for (pkt = 0; pkt < pktPerBlock; pkt++)
-            {	
+            {
                 int offset; //offset in block
-                offset = pkt * pktSize;	
+                offset = pkt * pktSize;
 
                 ptrTemp = ptrSrc + offset;
 #if 1
@@ -144,7 +143,7 @@ begin:
 
                     if (ptrTemp[16] == 2) //第17位标识是模式
                     {
-#ifdef EMP_430 
+#ifdef EMP_430
                         memset(ptrTemp+450, 0, 52);
 #endif
                         //memset(ptrTemp+450, 0, 62);
@@ -163,7 +162,7 @@ begin:
                         memset(pBits+pktSize-rmColor, ptrTemp[pktSize-1], rmColor);
                         ptrTemp = pBits;
                     }
-                
+
 #if 0
 
                 printf("------------output 0-25-----------");
@@ -188,7 +187,7 @@ begin:
 		{
 			if (ptrTemp[16] == 1 && ptrTemp[8] == boxRange[1])
 			{
-				g_fps++;	
+				g_fps++;
 			}
 		}
 #endif
@@ -223,15 +222,15 @@ begin:
 			//CFM
 			mode = ptrMode->GetScanMode();
 			int cur = ptrMode->GetPwCurImg();
-			if ((mode == ScanMode::CFM) || (mode == ScanMode::PWCFM_INIT) || (mode == ScanMode::PDI) || (mode == ScanMode::PWPDI_INIT)  
+			if ((mode == ScanMode::CFM) || (mode == ScanMode::PWCFM_INIT) || (mode == ScanMode::PDI) || (mode == ScanMode::PWPDI_INIT)
 					|| ((mode == ScanMode::PWPDI) && (cur == 1)) || ((mode == ScanMode::PWCFM) && (cur == 1))
 					|| (mode == ScanMode::CFM_VS_2D) || (mode == ScanMode::PDI_VS_2D)
-					) 
+					)
 			{
 				ImgCfm::GetInstance()->GetBoxRange(boxRange);
 				for (i = boxRange[0]; i <= boxRange[1]; i ++)
 				{
-					DataCfm(pBits, i);			
+					DataCfm(pBits, i);
 					ptrDscMan->SendDataToDsc(pBits);
 				}
 			}
@@ -245,7 +244,7 @@ begin:
 			if (((mode == ScanMode::PW) || ((mode == ScanMode::PWCFM) && (cur == 2)) || ((mode == ScanMode::PWPDI) && (cur == 2)))
 			    || ((mode == ScanMode::CW) || ((mode == ScanMode::CWCFM) && (cur == 2)) || ((mode == ScanMode::CWPDI) && (cur == 2))))
 			{
-				DataPw(pBits, simultData);			
+				DataPw(pBits, simultData);
 				ptrDscMan->SendDataToDsc(pBits);
 			}
 
@@ -280,10 +279,10 @@ begin:
 
             //copy data to mem
             for (pkt = 0; pkt < pktPerBlock; pkt++)
-            {	
+            {
                 mode = ptrMode->GetScanMode();
                 if (mode == ScanMode::PW)
-                    DataPw(pBits, count);	
+                    DataPw(pBits, count);
                 else
                     Data2D(pBits, count);
                 if (count < 255)
@@ -309,7 +308,7 @@ begin:
 /**
  * @brief get the ptrDsc and save it
  */
-void FpgaReceive::SetDsc(CDSC *ptrDsc) 
+void FpgaReceive::SetDsc(CDSC *ptrDsc)
 {
     m_ptrDsc = ptrDsc;
 }
@@ -397,4 +396,3 @@ void FpgaReceive::InitDataCfm()
         m_cfmData[i * 3 + 2] = 128;
     }
 }
-

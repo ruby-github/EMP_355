@@ -1,10 +1,10 @@
 #include <gtk/gtk.h>
-#include "gui_func.h"
-#include "gui_global.h"
-#include "ViewPatSearch.h"
-#include "KeyValueOpr.h"
-#include "KeyDef.h"
-#include "ViewNewPat.h"
+#include "display/gui_func.h"
+#include "display/gui_global.h"
+#include "patient/ViewPatSearch.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyDef.h"
+#include "patient/ViewNewPat.h"
 
 using std::vector;
 
@@ -56,7 +56,7 @@ void ViewPatSearch::CreateWindow(GtkWindow *parent, const vector<Database::NewPa
     g_signal_connect ((gpointer) button_ok, "clicked",
 		      G_CALLBACK (on_button_ok_clicked),
 		      this);
- 
+
     GtkWidget *image_exit = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
     GtkWidget *label_exit = gtk_label_new_with_mnemonic (_("Exit"));
     button_exit = create_button_icon(label_exit, image_exit);
@@ -64,7 +64,7 @@ void ViewPatSearch::CreateWindow(GtkWindow *parent, const vector<Database::NewPa
     g_signal_connect ((gpointer) button_exit, "clicked",
 		      G_CALLBACK (on_button_exit_clicked),
 		      this);
- 
+
     scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (scrolledwindow);
     gtk_fixed_put (GTK_FIXED (fixed), scrolledwindow, 20, 10);
@@ -128,8 +128,6 @@ void ViewPatSearch::CreateWindow(GtkWindow *parent, const vector<Database::NewPa
     GtkListStore *store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 #endif
 
-
- 
     GtkTreeIter treeIter;
     vector<Database::NewPatSearchResult>::const_iterator iter;
     for (iter = result.begin(); iter != result.end(); ++iter) {
@@ -168,12 +166,12 @@ void ViewPatSearch::CreateWindow(GtkWindow *parent, const vector<Database::NewPa
     m_selected = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
     gtk_tree_selection_set_mode(m_selected, GTK_SELECTION_SINGLE);
     gtk_container_add (GTK_CONTAINER (scrolledwindow), treeview);
- 
+
     gtk_widget_show(m_window);
 
     g_keyInterface.Push(this);
     SetSystemCursorToCenter();
-   
+
     return ;
 }
 
@@ -220,7 +218,7 @@ void ViewPatSearch::DestroyWindow(void)
 void ViewPatSearch::KeyEvent(unsigned char keyValue)
 {
     FakeXEvent::KeyEvent(keyValue);
-    
+
     switch(keyValue) {
     case KEY_ESC:
 	BtnExitClicked(NULL);
@@ -229,4 +227,3 @@ void ViewPatSearch::KeyEvent(unsigned char keyValue)
 	break;
     }
 }
-

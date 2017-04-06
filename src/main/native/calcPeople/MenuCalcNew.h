@@ -9,10 +9,10 @@
 #ifndef __MENUCALC_NEW_H__
 #define __MENUCALC_NEW_H__
 
-#include "MenuTree.h"
-#include "ExamItem.h"
-#include "ScanMode.h"
-#include "MeasureDef.h"
+#include "display/MenuTree.h"
+#include "probe/ExamItem.h"
+#include "imageProc/ScanMode.h"
+#include "calcPeople/MeasureDef.h"
 
 extern SingleItemInfo userDef_new[100];
 
@@ -60,7 +60,7 @@ class MenuCalcNew
 		static void HandleFetal2Pressed(GtkButton *widget, MenuCalcNew *data)
 		{ data->Fetal2Pressed(widget); }
 
-		vector<GUIMenuNew> m_vecAllCalcItem; 
+		vector<GUIMenuNew> m_vecAllCalcItem;
 		vector<GUIMenuNew> m_vecCurExamItemCalcItem;
 		vector<GUIMenuNew> m_vecCurScanModeCalcItem;
 		int m_sizeDefaultItems;

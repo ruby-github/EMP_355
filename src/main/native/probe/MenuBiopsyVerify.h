@@ -1,7 +1,6 @@
 #ifndef _MENU_BIOPSYVERIFY_H_
 #define _MENU_BIOPSYVERIFY_H_
 
-
 #define WIDTH_BIOPSYVERIFY_MENU 175// 220
 #define HEIGHT_BIOPSYVERIFY_MENU  635
 #define HEIGHT_BIOPSYVERIFY_MENUITEM 25 //
@@ -30,7 +29,7 @@ public:
 	void UpdateAngleMenuItem(void);
 
 private:
-   
+
     GtkWidget *m_vboxBioVerify;
 	GtkWidget *m_labelBioBracketType;
 

@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 #include "Def.h"
-#include "MeaResult.h"
-#include "MeasureDraw.h"
-#include "UpdateMeasure.h"
+#include "calcPeople/MeaResult.h"
+#include "measure/MeasureDraw.h"
+#include "measure/UpdateMeasure.h"
 
 using std::deque;
 using std::string;
@@ -18,7 +18,7 @@ using std::vector;
 void SetChangePointerMeasure(void);
 void SetChangePointerCalc(void);
 ///> change pointer when input "true" to SetChangePointer
-void ChangePointerWhenMeasure(void); 
+void ChangePointerWhenMeasure(void);
 
 class MeasureMan
 {
@@ -34,7 +34,7 @@ class MeasureMan
 		void ClearAll();
 		void ClearAllValue(void);
         void GetMeasureUnit(float& coeffi, string& units, int unit);
-        int GetDequeSize(); 
+        int GetDequeSize();
 
 		void DeleteAllForClearScreen(bool update=true);
 
@@ -54,7 +54,7 @@ class MeasureMan
 		struct MeasureInfo
 		{
 			EMeaType measureType;
-			int cursorType;	
+			int cursorType;
 		    int cursorSize;
 		    int confirmColor;
 			vector<POINT> vecPoint;
@@ -72,7 +72,7 @@ class MeasureMan
 		static const int MAX = 4;//屏幕上测量线最多保留MAX个
 
 		deque<MeasureInfo> m_deq; ///< define an sequence container, including MAX memebers.
-		
+
 		MeaResult *m_ptrMeaResult;
         POINT m_startP;
         POINT m_endP;
@@ -97,11 +97,11 @@ class MeasureMan
 		void EraseVolEllipse2(MeasureInfo info);
 		void EraseAngleDot(MeasureInfo info);//三点法
 		void EraseAngleLine(MeasureInfo info);//两线法
-		void EraseRatioDistDot(MeasureInfo info);//距离比例测量－两点法
-		void EraseRatioDistPeri(MeasureInfo info);//距离周长比例测量
-		void EraseRatioArea(MeasureInfo info);//面积比例／狭窄比
-		void EraseRatioVol(MeasureInfo info);//体积比例
-		void EraseRatioAngle(MeasureInfo info);//角度比例
+		void EraseRatioDistDot(MeasureInfo info);//璺濈姣斾緥娴嬮噺锛嶄袱鐐规硶
+		void EraseRatioDistPeri(MeasureInfo info);//璺濈鍛ㄩ暱姣斾緥娴嬮噺
+		void EraseRatioArea(MeasureInfo info);//闈㈢Н姣斾緥锛忕嫮绐勬瘮
+		void EraseRatioVol(MeasureInfo info);//浣撶Н姣斾緥
+		void EraseRatioAngle(MeasureInfo info);//瑙掑害姣斾緥
 		void EraseHip(MeasureInfo info);
 		void EraseEF(MeasureInfo info);
 		void EraseTime(MeasureInfo info);

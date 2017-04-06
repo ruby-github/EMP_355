@@ -1,4 +1,4 @@
-#include "DefaultBiopsySetting.h"
+#include "probe/DefaultBiopsySetting.h"
 #include "Def.h"
 
 DefaultBiopsySetting::DefaultBiopsySetting()
@@ -35,4 +35,3 @@ double  DefaultBiopsySetting::GetBiopsyAngleValueOfAngleType(const string bioBra
 {
 	return (m_ptrIni->ReadDouble(bioBracketTypeAngle.c_str(),"BiopsyAngle"));
 }
-

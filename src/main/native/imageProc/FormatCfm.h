@@ -1,10 +1,10 @@
 #ifndef FORMAT_CFM_H
 #define FORMAT_CFM_H
 
-#include "Format2D.h"
-#include "FpgaReceive.h"
+#include "imageProc/Format2D.h"
+#include "imageProc/FpgaReceive.h"
 #include "AbsUpdateCfm.h"
-#include "ImgCfm.h"
+#include "imageControl/ImgCfm.h"
 
 /*
  * @brief change 2d display format or switch current image in BB/4B format
@@ -22,15 +22,15 @@ class FormatCfm
 		bool SwitchBB(bool left, int &current);
 		int SwitchBB(void);
 		int SwitchB4();
-		
+
 		EFormatCfm GetFormat();
 
         // special measure
         void SetFormatForSnap(EFormatCfm format) { m_formatSnap = format; }
-	
+
 	private:
 		FormatCfm();
-		
+
 		static FormatCfm* m_ptrInstance;
 
 		DscMan* m_ptrDsc;
@@ -42,7 +42,7 @@ class FormatCfm
 
 		EFormatCfm m_format; ///< current cfm format
 		int m_curB; ///< curent B image. BB(0-left, 1-right), 2B(0-upleft, 1-upright, 2-downleft, 3-downright)
-		EFormatCfm m_formatSnap; 
+		EFormatCfm m_formatSnap;
 };
 
 #endif

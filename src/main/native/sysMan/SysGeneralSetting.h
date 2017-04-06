@@ -1,12 +1,12 @@
 #ifndef __SYSGENERALSETTING_H__
 #define __SYSGENERALSETTING_H__
 
-#include "IniFile.h"
+#include "base/IniFile.h"
 
 class SysGeneralSetting
 {
 public:
-	
+
     SysGeneralSetting();
     ~SysGeneralSetting();
 
@@ -17,7 +17,7 @@ public:
     int GetConnectorType(void);
     int GetVideoFormat(void);
     int GetPrinterMethod(void);
-    int GetPrinter(void); 
+    int GetPrinter(void);
     int GetScreenProtect(void);
     int GetPrintViewMode(void);
     void SetPrintViewMode(int viewMode);
@@ -37,7 +37,7 @@ public:
     void SetConnectorType(int connectorType);
     void SetVideoFormat(int format);
     void SetPrinterMethod(int method);
-    void SetPrinter(int printer); 
+    void SetPrinter(int printer);
     void SetScreenProtect(int screenProtect);
     void SyncFile(void);
     void DefaultFactory(void);
@@ -57,6 +57,4 @@ private:
     IniFile *ptrIni;
 };
 
-
 #endif
-

@@ -2,20 +2,19 @@
  * 2009, 深圳恩普电子技术有限公司
  *
  * @file: MeasureDraw.cpp
- * @brief: Draw graphic used when measuring 
- * 
+ * @brief: Draw graphic used when measuring
+ *
  * version: V1.0
  * date: 2009-7-9
  * @author: zhanglei
  */
 #include <stdlib.h>
-#include "MeasureDraw.h"
+#include "measure/MeasureDraw.h"
 #include "ViewMain.h"
-#include "../sysMan/SysMeasurementSetting.h"
-#include <stdlib.h>
+#include "sysMan/SysMeasurementSetting.h"
 #include <math.h>
-#include "../display/ImageAreaDraw.h"
-#include "SysGeneralSetting.h"
+#include "display/ImageAreaDraw.h"
+#include "sysMan/SysGeneralSetting.h"
 
 POINT MeasureDraw::m_cursor;
 int MeasureDraw::m_cursorType = 0;
@@ -46,7 +45,7 @@ void MeasureDraw::DrawCursor(POINT p, bool isCur, EDrawMode mode, bool restrict)
     if (restrict) {
         int boundUp, boundDown, boundLeft, boundRight;
         ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
-    
+
         if (p.x < boundLeft) p.x = boundLeft;
         if (p.x > boundRight) p.x = boundRight;
         if (p.y < boundUp) p.y = boundUp;
@@ -75,7 +74,6 @@ void MeasureDraw::DrawCursor(POINT p, bool isCur, EDrawMode mode, bool restrict)
 	SetCursor(tmp);
 }
 
-
 void MeasureDraw::ChangeCursorType(void)
 {
     //if (m_cursorType == 3 || m_cursorType > 3)
@@ -88,7 +86,7 @@ POINT MeasureDraw::DrawInitialCursor(void)
 {
 	CalcMeasureCenter();
 
-	// draw cursor at point m_cursor 
+	// draw cursor at point m_cursor
 	DrawCursor(m_cursor, true, XOR);
 
 	// hide system cursor
@@ -105,7 +103,7 @@ POINT MeasureDraw::DrawInitialCursor(void)
 POINT MeasureDraw::CalcNextP(POINT p1, int method)
 {
     	POINT p2;
-	
+
 	if (method == 0)
 	{
 		p2.x = p1.x;
@@ -157,7 +155,7 @@ void MeasureDraw::DrawPoint(POINT p, bool isCur, EDrawMode mode)
 /*
  * @brief draw cursor in point p
  *
- * @para isCur 
+ * @para isCur
  * TRUE: draw current cursor
  * FALSE: draw not current cursor
  */
@@ -229,7 +227,6 @@ void MeasureDraw::DrawINTEGRALTraceLine(POINT p1, POINT p2, bool isCur, EDrawMod
     if (p2.y < boundUp) p2.y = (boundUp);
     if (p2.y > boundDown) p2.y = (boundDown-2);
 
-
     DrawBaseLine(p1, p2, isCur, mode);
 }
 void MeasureDraw::DrawLine(POINT p1, POINT p2, bool isCur, EDrawMode mode)
@@ -250,21 +247,21 @@ void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode
 
 	//	ConvertPoint(point1);
 
-	if(tan == 0)//水平
+	if(tan == 0)//姘村钩
 	{
 		endp1.x = bou1_x;
 		endp2.x = bou2_x;
 		endp1.y = point1.y;
 		endp2.y = point1.y;
 	}
-	else if((tan > 999)||(tan < -999))//竖直
+	else if((tan > 999)||(tan < -999))//绔栫洿
 	{
 		endp1.y = bou1_y;
 		endp2.y = bou2_y;
 		endp1.x = point1.x;
 		endp2.x = point1.x;
 	}
-	else//斜线
+	else//鏂滅嚎
 	{
 		temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
 		if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y))
@@ -279,8 +276,8 @@ void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode
 				endp1.x = point1.x + (int)((double)(bou1_y-point1.y) / tan);
 				endp1.y = bou1_y;
 			}
-			else	
-			{  
+			else
+			{
 				endp1.x = point1.x + (int)((double)(bou2_y-point1.y) / tan);
 				endp1.y = bou2_y;
 			}
@@ -315,7 +312,7 @@ void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode
 			m_imgAttr.mode.gdkMode = GDK_XOR;
 			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
 		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;	
+			m_imgAttr.mode.gdkMode = GDK_COPY;
 			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
 		}
 	}
@@ -343,7 +340,7 @@ vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int le
 
 //	printf("%s-%s: cursor (%d, %d)\n", __FILE__, __FUNCTION__, point1.x, point1.y);
 	vec.clear();
-	if(tanTheta == 0)//水平
+	if(tanTheta == 0)//姘村钩
 	{
 //		printf("%s-%s: H\n", __FILE__, __FUNCTION__);
 		endp1.x = ((point1.x - half_len) > bou1_x) ? (point1.x - half_len) : bou1_x;
@@ -352,7 +349,7 @@ vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int le
 		endp2.y = point1.y;
 //		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
 	}
-	else if(tanTheta > 999 || tanTheta < -999)//竖直
+	else if(tanTheta > 999 || tanTheta < -999)//绔栫洿
 	{
 //		printf("%s-%s: V\n", __FILE__, __FUNCTION__);
 		endp1.y = ((point1.y - half_len) > bou1_y) ? (point1.y - half_len) : bou1_y;
@@ -361,7 +358,7 @@ vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int le
 		endp2.x = point1.x;
 //		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
 	}
-	else//斜线
+	else//鏂滅嚎
 	{
 //		printf("%s-%s: O\n", __FILE__, __FUNCTION__);
 		double sinTheta = sin(theta);
@@ -382,7 +379,7 @@ vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int le
 			m_imgAttr.mode.gdkMode = GDK_XOR;
 			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
 		} else if (mode == COPY) {
-			m_imgAttr.mode.gdkMode = GDK_COPY;	
+			m_imgAttr.mode.gdkMode = GDK_COPY;
 			m_ptrImgArea->DrawLine(m_imgAttr, color, endp1.x, endp1.y, endp2.x, endp2.y);
 		}
 	}
@@ -408,22 +405,22 @@ void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMo
 	double tan;
 	double temp;
 	const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
-	
-	if(point1.y == point2.y)//水平
+
+	if(point1.y == point2.y)//姘村钩
 	{
         endp1.x = bou1_x;
         endp2.x = bou2_x;
         endp1.y = point1.y;
         endp2.y = point1.y;
 	}
-	else if(point1.x == point2.x)//竖直
+	else if(point1.x == point2.x)//绔栫洿
 	{
         endp1.y = bou1_y;
         endp2.y = bou2_y;
         endp1.x = point1.x;
         endp2.x = point1.x;
 	}
-	else//斜线
+	else//鏂滅嚎
 	{
         tan = ((double)(point2.y - point1.y)) / ((double)(point2.x - point1.x));
         temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
@@ -439,8 +436,8 @@ void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMo
                 endp1.x = point1.x + (int)((double)(bou1_y-point1.y) / tan);
                 endp1.y = bou1_y;
             }
-            else	
-            {  
+            else
+            {
                 endp1.x = point1.x + (int)((double)(bou2_y-point1.y) / tan);
                 endp1.y = bou2_y;
             }
@@ -493,9 +490,8 @@ void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMo
 	}
 }
 
-
 /*
- * @brief draw horizontal line 
+ * @brief draw horizontal line
  */
 void MeasureDraw::DrawHLine(POINT p, bool isCur, EDrawMode mode)
 {
@@ -532,7 +528,7 @@ void MeasureDraw::DrawHLine(POINT p, bool isCur, EDrawMode mode)
 }
 
 /*
- * @brief draw vetical line 
+ * @brief draw vetical line
  */
 void MeasureDraw::DrawVLine(POINT p, bool isCur, EDrawMode mode)
 {
@@ -575,10 +571,10 @@ void MeasureDraw::DrawVLine(POINT p, bool isCur, EDrawMode mode)
 void MeasureDraw::DrawCrossLine(POINT p, bool isCur, EDrawMode mode)
 {
 //    ConvertPoint(p);
-    
+
     int boundUp, boundDown, boundLeft, boundRight;
     ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
-    
+
     if (p.x < boundLeft) p.x = boundLeft;
     if (p.x > boundRight) p.x = boundRight;
     if (p.y < boundUp) p.y = boundUp;
@@ -698,7 +694,7 @@ POINT MeasureDraw::DrawInitialHLine(bool isCur)
 {
 	CalcMeasureCenter();
 
-	// draw cursor at point m_cursor 
+	// draw cursor at point m_cursor
 	DrawHDotLine(m_cursor, true, XOR);
 
 	// hide system cursor
@@ -714,7 +710,7 @@ POINT MeasureDraw::DrawInitialVLine(bool isCur)
 {
 	CalcMeasureCenter();
 
-	// draw cursor at point m_cursor 
+	// draw cursor at point m_cursor
 	DrawVLine(m_cursor, true, XOR);
 
 	// hide system cursor
@@ -723,18 +719,17 @@ POINT MeasureDraw::DrawInitialVLine(bool isCur)
 	return m_cursor;
 }
 
-
 POINT MeasureDraw::DrawInitialCrossLine(bool isCur)
 {
 	CalcMeasureCenter();
 
-	// draw cursor at point m_cursor 
+	// draw cursor at point m_cursor
 	DrawCrossLine(m_cursor, true, XOR);
 
 	// hide system cursor
 	InvisibleCursor(TRUE);
 
-	return m_cursor;	
+	return m_cursor;
 }
 
 void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
@@ -745,14 +740,14 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
     float xcos, xsin, ycos, ysin, temp1, temp2, temp3, temp4;
     float tn;
 
-    x0 = (x1+x2)/2; //椭圆圆心(x0, y0)
+    x0 = (x1+x2)/2; //妞渾鍦嗗績(x0, y0)
     y0 = (y1+y2)/2;
 
-    i = (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2); //计算长轴半径 r1
+    i = (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2); //璁＄畻闀胯酱鍗婂緞 r1
     length1= sqrt(i);
     r1 = length1/2;
 
-    j = (x3-x0)*(x3-x0)+(y3-y0)*(y3-y0); //计算短轴半径 r2
+    j = (x3-x0)*(x3-x0)+(y3-y0)*(y3-y0); //璁＄畻鐭酱鍗婂緞 r2
     r2 = sqrt(j);
 
     x = 0; y = r2;
@@ -812,7 +807,7 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
     t=x%6;
     if(t==1)t=1;
     else t = 0;
-    
+
     xcos = x*temp1;
     xsin = x*temp2;
     ycos = y*temp3;
@@ -876,7 +871,7 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur)
     t=x%6;
     if(t==1)t=1;
     else t = 0;
-    
+
     xcos = x*temp1;
     xsin = x*temp2;
     ycos = y*temp3;
@@ -945,7 +940,7 @@ void MeasureDraw::PwTrace(const vector<POINT>& trace, EDrawMode mode)
     GdkFunction gdk_mode;
     if (mode == XOR)
 	    gdk_mode = GDK_XOR;
-    else 
+    else
 	    gdk_mode = GDK_COPY;
 
     vector<POINT>::const_iterator iter;
@@ -963,7 +958,7 @@ void MeasureDraw::DrawTraceTag(POINT p, bool isCur, EDrawMode mode, bool update)
     if(p.x == 0)
         return;
     GdkColor *color;
-    
+
     if (isCur) {
 	color = MeasureColorConvert(m_colorCurIndex);
 	if (mode == XOR)
@@ -998,7 +993,7 @@ void MeasureDraw::DrawIMTIntima(POINT start, unsigned int *pIntima, int count, b
     int x1, y1;
 #if 0
     GdkColor* color;
-    bool updown = ImgProc2D::GetInstance()->GetUpDownStatusForIMT(); 
+    bool updown = ImgProc2D::GetInstance()->GetUpDownStatusForIMT();
     if (updown)
         color = g_yellow;
     else
@@ -1025,7 +1020,7 @@ void MeasureDraw::DrawIMTAdvent(POINT start, unsigned int *pAdventitia, int coun
       int x1, y1;
 #if 0
       GdkColor* color;
-      bool updown = ImgProc2D::GetInstance()->GetUpDownStatusForIMT(); 
+      bool updown = ImgProc2D::GetInstance()->GetUpDownStatusForIMT();
       if (updown)
           color = g_red;
       else
@@ -1055,9 +1050,9 @@ void MeasureDraw::DrawAngleArc(POINT center, POINT left, POINT right, bool isCur
 
 	for (int i = 0; i < 2; i++)
 	{
-		alpha = asin((center.y - P[i].y) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) + 
+		alpha = asin((center.y - P[i].y) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) +
 					(center.y - P[i].y) * (center.y - P[i].y)));
-		beta = acos((P[i].x - center.x) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) + 
+		beta = acos((P[i].x - center.x) / sqrt((float)(P[i].x - center.x) * (P[i].x - center.x) +
 					(center.y - P[i].y) * (center.y - P[i].y)));
 		if ((alpha >= (float)0) && (beta < (float)PI / 2))
 			angle[i] = alpha * 180 / (float)PI;
@@ -1104,7 +1099,7 @@ void MeasureDraw::DrawAngleArc(POINT center, POINT left, POINT right, bool isCur
 
 void MeasureDraw::DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode)
 {
-    
+
 	p.x = p.x + 10;
 	if (p.x < 0) p.x = 0;
 	if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
@@ -1139,7 +1134,6 @@ void MeasureDraw::DrawOrderNumberForErase(POINT p, int orderNumber, int confirmC
 	else if (mode == COPY)
 		m_ptrImgArea->DrawString(str, p.x, p.y, color, false);
 }
-
 
 void MeasureDraw::ChangeOrderNumber()
 {
@@ -1194,7 +1188,7 @@ void MeasureDraw::DrawFanshaped(POINT center, POINT left, POINT right, double an
     else
         theta = arctan(abs(tan_theta));
     //    if(left.x == center.x)
-#endif 
+#endif
     DrawBaseLine(left, right, true, XOR);
     //m_ptrImgArea->DrawLine(m_imgAttr, g_yellow, left.x, left.y, right.x, right.y);
     //m_ptrImgArea->DrawString(NULL, center.x, center.y, "angle");

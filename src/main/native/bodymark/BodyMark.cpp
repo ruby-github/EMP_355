@@ -1,7 +1,7 @@
-#include "BodyMark.h"
-#include "SysNoteSetting.h"
-#include "ImageArea.h"
-#include "ModeStatus.h"
+#include "bodymark/BodyMark.h"
+#include "sysMan/SysNoteSetting.h"
+#include "display/ImageArea.h"
+#include "imageProc/ModeStatus.h"
 
 const double BodyMark::BODYMARK_SCALE[3] = {0.8, 1.2, BDMK_MAX_SCALE};
 const double BodyMark::PROBEMARK_SCALE[3] = {0.8, 1.0, BDMK_PROBE_MAX_SCALE};
@@ -43,7 +43,7 @@ void BodyMark::CheckBodyMarkPos(guint index)
 {
 	int w = gdk_pixbuf_get_width(m_bodyPixbuf) * BODYMARK_SCALE[m_bodySize];
 	int h = gdk_pixbuf_get_height(m_bodyPixbuf) * BODYMARK_SCALE[m_bodySize];
-	
+
 	if(m_bodyPos[index].x > m_bodyPosRange.x + m_bodyPosRange.width - w)
 		m_bodyPos[index].x = m_bodyPosRange.x + m_bodyPosRange.width - w;
 	if(m_bodyPos[index].y > m_bodyPosRange.y + m_bodyPosRange.height - h)
@@ -107,7 +107,7 @@ void BodyMark::SetProbeMarkColor(COLOR color, guint index)
 		// clear
 		m_update.DrawBodyMark(m_bodyPos[index], m_bodyPixbuf, BODYMARK_SCALE[m_bodySize], m_bodyColor, index);
 		m_update.DrawProbeMark(m_probePos[index], m_probeDir, MAX_DIRECTION, PROBEMARK_SCALE[m_probeSize], m_probeColor, index);
-		
+
 		// draw on orginal pos
 		m_bodyColor = color;
 		m_probeColor = color;
@@ -204,14 +204,14 @@ bool BodyMark::ChangeProbeMarkDir(EKnobOper opr, guint index)
 	{
 		m_update.DrawProbeMark(m_probePos[index], m_probeDir, MAX_DIRECTION, PROBEMARK_SCALE[m_probeSize], m_probeColor, index);
 
-		if (opr == ADD) 
+		if (opr == ADD)
 		{
 			if (m_probeDir < MAX_DIRECTION-1)
-				m_probeDir ++;	 
-			else 
+				m_probeDir ++;
+			else
 				m_probeDir = 0;
 		}
-		else if (opr == SUB) 
+		else if (opr == SUB)
 		{
 			if (m_probeDir > 0)
 				m_probeDir --;
@@ -269,7 +269,7 @@ void BodyMark::UndoMoveBody(guint index)
 		// clear
 		m_update.DrawBodyMark(m_bodyPos[index], m_bodyPixbuf, BODYMARK_SCALE[m_bodySize], m_bodyColor, index);
 		m_update.DrawProbeMark(m_probePos[index], m_probeDir, MAX_DIRECTION, PROBEMARK_SCALE[m_probeSize], m_probeColor, index);
-		
+
 		// draw on orginal pos
 		m_bodyPos[index] = m_bodyPosBak;
 		m_probePos[index] = m_probePosBak;
@@ -288,4 +288,3 @@ void BodyMark::GetBodyMarkKnobValue(void)
 }
 
 ///> private
-

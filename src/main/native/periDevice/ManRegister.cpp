@@ -11,7 +11,7 @@
  * @date: 2015-11-10
  */
 
-#include "ManRegister.h"
+#include "periDevice/ManRegister.h"
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -27,8 +27,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include "Def.h"
-#include "ViewSystem.h"
-
+#include "sysMan/ViewSystem.h"
 
 #define MAXSIZE_MAC 6
 #define MAXSIZE_SD 20
@@ -46,11 +45,11 @@
 const string CManRegister::Optional[MAX_OPTIONAL_NUM] =
 {
     "Dicom",
-    "Anatomic M", 
-    "CW",         
-    "eFci",      
-    "eView",     
-    "IMT",       
+    "Anatomic M",
+    "CW",
+    "eFci",
+    "eView",
+    "IMT",
 };
 
 const char* CManRegister::ValueOpt[MAX_OPTIONAL_NUM] =
@@ -88,7 +87,7 @@ CManRegister::CManRegister(string resFileDir) : m_resFilePath(""), m_isAuthorize
 		m_resFilePath = resFileDir + DIR_SEPARATOR_CHAR;
 	else
 		m_resFilePath = resFileDir;
-	
+
 	string registerKey = "";
     /**查找当前目录下所有文件名称
      * 读取文件内容，校验，赋值
@@ -96,7 +95,7 @@ CManRegister::CManRegister(string resFileDir) : m_resFilePath(""), m_isAuthorize
     if (access(m_resFilePath.c_str(), F_OK) < 0)
         PRINTF("The directory used to store the license is invalid!\n");
 
-    vector<string> file_name; 
+    vector<string> file_name;
     GetFiles(m_resFilePath.c_str(), file_name);
 
     for(int i = 0; i < file_name.size(); i++)
@@ -130,10 +129,9 @@ CManRegister::~CManRegister()
     m_ptrInstance = NULL;
 }
 
-
 /*
  * @biref: 获取选配功能加密之后的序列号,并保存到license文件中
- * para destFileDir[in]: 文件路径
+ * para destFileDir[in]: 鏂囦欢璺緞
  */
 bool CManRegister::GenerateLicenseFile(string destFileDir, string fileName)
 {
@@ -175,7 +173,7 @@ bool CManRegister::GenerateLicenseFile(string destFileDir, string fileName)
 	}
 
 	int fd = open(destFilePath.c_str(), O_CREAT|O_TRUNC|O_RDWR, 00777);
-	
+
 	if (fd < 0)
 	{
 		PRINTF("Fail to open license file!\n");
@@ -196,14 +194,14 @@ bool CManRegister::GenerateLicenseFile(string destFileDir, string fileName)
 }
 
 /**
- * @brief: 存储密钥到相应选配文件
+ * @brief: 瀛樺偍瀵嗛挜鍒扮浉搴旈€夐厤鏂囦欢
  * para registerKey[in]: 注册序列号
  */
 bool CManRegister::SaveRegisterKeyFile(string registerKey)
 {
 	string filePath = m_resFilePath + m_currentFileName; //KEY_FILENAME;
 	int fd = open(filePath.c_str(), O_CREAT|O_TRUNC|O_RDWR, 00777);
-	
+
 	if (fd < 0)
 	{
 		PRINTF("Fail to open register key file!\n");
@@ -224,7 +222,7 @@ bool CManRegister::ReadRegisterKeyFile(string &registerKey, string fileName)
 {
 	string filePath = m_resFilePath + fileName;
 	int fd = open(filePath.c_str(), O_RDWR);
-	
+
 	if (fd < 0)
 	{
 		PRINTF("Fail to open register key file!\n");
@@ -257,7 +255,7 @@ bool CManRegister::ReadRegisterKeyFile(string &registerKey, string fileName)
 
 /**
  * @brief: 序列号校验，成功则选配添加成功且保存序列号到文件
- * para registerKey[in]: 解密软件生成的序列号
+ * para registerKey[in]: 瑙ｅ瘑杞欢鐢熸垚鐨勫簭鍒楀彿
  */
 bool CManRegister::CheckAuthorize(string registerKey, int optionIndex)
 {
@@ -312,11 +310,11 @@ void CManRegister::SetAuthorize(string optional, bool status)
 
 /**
  *@brief: 获取目录下文件名称
- *para *path[in]: 目录路径
+ *para *path[in]: 鐩綍璺緞
  *para files[out]: 当前目录下文件名称
  */
 void CManRegister::GetFiles(const char *path, vector<string>& files)
-{ 
+{
 	const char *name;
 	GDir *dir;
 	GError *err = NULL;
@@ -331,7 +329,7 @@ void CManRegister::GetFiles(const char *path, vector<string>& files)
     {
         PRINTF("%s: the dir is null!\n", __FUNCTION__);
         g_dir_close(dir);
-        return; 
+        return;
     }
     string str;
     while(name != NULL)
@@ -432,7 +430,7 @@ int CManRegister::OpenSCSIDevice(const char *dev)
         return -1;
     }
 
-    if ((ioctl(fd, SG_GET_VERSION_NUM, &vers) < 0) || (vers < 30000)) 
+    if ((ioctl(fd, SG_GET_VERSION_NUM, &vers) < 0) || (vers < 30000))
 	{
         PRINTF("/dev is not an sg device, or old sg driver\n");
         close(fd);
@@ -557,7 +555,7 @@ void CManRegister::GenerateLicenseCode(char *code)
 	GetSCSIDiskID(scsiID);
 	GetMacID(macID);
     GetValue(value, m_currentIndex);
-	
+
 	sprintf(ptrCurPos, "%010d", GetRand());
 	ptrCurPos += randBit;
 
@@ -624,4 +622,3 @@ unsigned int CManRegister::GetSecond()
     p = localtime(&getTime);
 	return p->tm_sec;
 }
-

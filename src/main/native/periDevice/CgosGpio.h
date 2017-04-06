@@ -1,8 +1,7 @@
-
 #ifndef __CGOSGPIO_H__
 #define __CGOSGPIO_H__
 
-#include "Cgos.h"
+#include <Cgos.h>
 
 class CgosGpioI2C
 {
@@ -14,10 +13,8 @@ public:
     int I2CRead(unsigned char addr, unsigned char reg,int len, unsigned char buf[]);
 
 private:
-    HCGOS hCgos;  
+    HCGOS hCgos;
 
 };
-
-
 
 #endif

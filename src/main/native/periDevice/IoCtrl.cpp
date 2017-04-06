@@ -1,5 +1,5 @@
-#include "IoCtrl.h"
-#include "UsbControl.h"
+#include "periDevice/IoCtrl.h"
+#include "imageControl/UsbControl.h"
 
 static const int DATA_ADDR_COM = 58;
 static const int SOCKET_ADDR_COM = 59;
@@ -51,7 +51,7 @@ int IoCtrl::HighVoltage(INT8U onOff)
 }
 
 /**
-* @brief switch the interface of probe 
+* @brief switch the interface of probe
 * @param addr addr of interface
 */
 int IoCtrl::SetInterface(INT8U addr)
@@ -59,7 +59,7 @@ int IoCtrl::SetInterface(INT8U addr)
 	int ret = ERROR;
 	unsigned char request;
 	int value = addr;
-	
+
 	request = CMD_SET_INTERFACE;
 
 	PRINTF("io set interface \n");
@@ -87,7 +87,6 @@ int IoCtrl::SetInterface(INT8U addr)
         PRINTF("write to fpga error\n");
         return (ERR_OP);
     }
-
 
 	return (SUCCESS);
 }
@@ -169,7 +168,7 @@ int IoCtrl::EndWriteProbe(void)
 	return (SUCCESS);
 }
 /**
-* @brief read one probe(on pointed interface) parameter 
+* @brief read one probe(on pointed interface) parameter
 * @param readCmd command to read probe info
 * @param rec_buf array to store parameter readed
 * @param len data length ; len must < 256
@@ -195,7 +194,7 @@ int IoCtrl::ReadOneProbe(int readCmd, unsigned char recBuf[], unsigned  int len)
 		count = 1;
 		while(count > 0)
 		{
-			// read 
+			// read
 			ret = m_ptrInterface->ReqProbe(request, endPointSize*256+value,endPointSize, buf_temp);
 			if (ret != SUCCESS)
 			{
@@ -206,7 +205,7 @@ int IoCtrl::ReadOneProbe(int readCmd, unsigned char recBuf[], unsigned  int len)
 				PRINTF("Begin print usb data\n");
 				if ((int)(len - offset) >= endPointSize)
 					memcpy(buf+offset, buf_temp, endPointSize);
-				else 
+				else
 					memcpy(buf+offset, buf_temp, len - offset);
 				break;
 			}
@@ -234,12 +233,12 @@ int IoCtrl::BeginReadImage(void)
 		PRINTF("io begin receive data error\n");
 		return (ERR_OP);
 	}
-	
+
 	return (SUCCESS);
 }
 
 /**
-* @brief write probe parameter   note:after write probe ,must write ReqIo(0xba,0x03) to 
+* @brief write probe parameter   note:after write probe ,must write ReqIo(0xba,0x03) to
 	make sure the bulkout is correct
 * @param interfaces: it should be 1,2,3.....
 * @param probe_buff:probe parameter
@@ -251,7 +250,7 @@ int IoCtrl::ProbeWrite(INT8U interfaces, INT8U *probeBuff, INT32U len)
 	usleep(1000000);
 
 	m_ptrInterface->WriteBufToProbe(interfaces, len, probeBuff);
-	
+
 	usleep(10000);
 
     //恢复给fpga发送参数状态
@@ -259,4 +258,3 @@ int IoCtrl::ProbeWrite(INT8U interfaces, INT8U *probeBuff, INT32U len)
 
 	return (SUCCESS);
 }
-

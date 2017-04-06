@@ -56,7 +56,6 @@ EKnobReturn D2ChgSpaceCompound(EKnobOper oper);
 EKnobReturn D2ChgFreqCompound(EKnobOper oper);
 #endif
 
-
 EKnobReturn D2PressChgScanAngle(void);
 EKnobReturn D2ChgScanAngle(EKnobOper oper);
 
@@ -86,7 +85,7 @@ EKnobReturn D2PressChgSteer(void);
 
 EKnobReturn D2PressFocus(void);
 
-EKnobReturn D2PressChgSpaceCompound(void); 
+EKnobReturn D2PressChgSpaceCompound(void);
 EKnobReturn D2ChgSpaceCompound(EKnobOper oper);
 
 EKnobReturn D2PressChgFreqCompound(void);
@@ -108,7 +107,7 @@ EKnobReturn D2ChgEFVI(EKnobOper oper);
 EKnobReturn D2PressChgEFVI();
 
 EKnobReturn D2PressDepth(EKnobOper oper);
-	
+
 EKnobReturn D2PressChgScanLine(void);
 EKnobReturn D2ChgScanLine(EKnobOper oper);
 

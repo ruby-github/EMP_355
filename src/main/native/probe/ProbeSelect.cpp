@@ -9,33 +9,33 @@
  * @author: zhanglei
  */
 
-#include "ProbeSelect.h"
-#include "ModeStatus.h"
-#include "Knob2D.h"
-#include "KnobM.h"
-#include "KnobPw.h"
-#include "KnobCfm.h"
-#include "ImgProc2D.h"
-#include "ImgProcM.h"
-#include "ImgProcPw.h"
-#include "ImgProcCfm.h"
-#include "Img2D.h"
-#include "ImgPw.h"
-#include "ImgCfm.h"
-#include "GlobalClassMan.h"
-#include "Update2D.h"
-#include "BiopsyLine.h"
+#include "probe/ProbeSelect.h"
+#include "imageProc/ModeStatus.h"
+#include "imageControl/Knob2D.h"
+#include "imageControl/KnobM.h"
+#include "imageControl/KnobPw.h"
+#include "imageControl/KnobCfm.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ImgProcM.h"
+#include "imageProc/ImgProcPw.h"
+#include "imageProc/ImgProcCfm.h"
+#include "imageControl/Img2D.h"
+#include "imageControl/ImgPw.h"
+#include "imageControl/ImgCfm.h"
+#include "imageProc/GlobalClassMan.h"
+#include "imageControl/Update2D.h"
+#include "probe/BiopsyLine.h"
 #include "keyboard/KeyFunc.h"
 #include "keyboard/LightDef.h"
 #include "keyboard/KeyValueOpr.h"
-#include "../imageProc/ScanMode.h"
-#include "../patient/PatientInfo.h"
-#include "../display/TopArea.h"
-#include "ViewProbe.h"
-#include "MenuCalcNew.h"
-#include "MenuMeasure.h"
+#include "imageProc/ScanMode.h"
+#include "patient/PatientInfo.h"
+#include "display/TopArea.h"
+#include "probe/ViewProbe.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "measure/MenuMeasure.h"
 /*
- * @brief select probe and exam item 
+ * @brief select probe and exam item
  */
 #ifdef VET
 ExamItem::EItem ProbeSelect::m_itemIndex = ExamItem::EItem(0);
@@ -75,7 +75,7 @@ bool ProbeSelect::ProbeRead()
 
 	// read probe
 	m_ptrProbe->GetAllProbe(m_para);
-	
+
 	// get exam item list
 	int i;
 	for (i = 0; i < ProbeMan::MAX_SOCKET; i ++)
@@ -92,7 +92,7 @@ bool ProbeSelect::ProbeRead()
 	       // probeItemProbe[i].clear();
         }
 	}
-	
+
 	if (select == ProbeMan::MAX_SOCKET)
 	{
 		return FALSE;
@@ -112,9 +112,8 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     KeyLocalZoom klz;
     klz.ExitLocalZoom();
 
-
 	// get real probe and item parameter
-    m_ptrProbe->SetProbeSocket(indexSocket); 
+    m_ptrProbe->SetProbeSocket(indexSocket);
     ProbeSocket::ProbePara curPara;
     m_ptrProbe->GetCurProbe(curPara);
     if(g_init)
@@ -127,7 +126,7 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
         //keeping calc and bodymark are right
         string geninitfirstitem="Adult Abdomen";
         exam.GetInitUserItemInfo(curPara.model, userItemName, geninitfirstitem);
-        int probeIndex = indexSocket; 
+        int probeIndex = indexSocket;
         if(probeIndex < ProbeMan::MAX_SOCKET)
         {
             for(int m = 0; m < (int)m_itemList[probeIndex].size(); m++)
@@ -184,7 +183,7 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     g_menuMeasure.ChangeExamItem(item);
     // init 2D
     Img2D* ptrImg2D = Img2D::GetInstance();
-    ptrImg2D->SetCalc2D( GlobalClassMan::GetInstance()->GetCalc2D(curPara.model) ); 
+    ptrImg2D->SetCalc2D( GlobalClassMan::GetInstance()->GetCalc2D(curPara.model) );
     ptrImg2D->InitProbe2D(&curPara, &paraItem);
     ImgProc2D::GetInstance()->Init(&(paraItem.d2));
 
@@ -194,14 +193,14 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
 #if not defined(EMP_322) && not defined(EMP_313)
     // init pw
     ImgPw* ptrImgPw = ImgPw::GetInstance();
-    ptrImgPw->SetCalcPw( GlobalClassMan::GetInstance()->GetCalcPw(curPara.model) ); 
-    ptrImgPw->InitProbe(&curPara, &paraItem);	
+    ptrImgPw->SetCalcPw( GlobalClassMan::GetInstance()->GetCalcPw(curPara.model) );
+    ptrImgPw->InitProbe(&curPara, &paraItem);
     ImgProcPw::GetInstance()->Init(&(paraItem.spectrum));
 
     // init cfm
     ImgCfm* ptrImgCfm = ImgCfm::GetInstance();
-    ptrImgCfm->SetCalcCfm( GlobalClassMan::GetInstance()->GetCalcCfm(curPara.model) ); 
-    ptrImgCfm->InitProbe(&curPara, &paraItem);	
+    ptrImgCfm->SetCalcCfm( GlobalClassMan::GetInstance()->GetCalcCfm(curPara.model) );
+    ptrImgCfm->InitProbe(&curPara, &paraItem);
     ImgProcCfm::GetInstance()->Init(&(paraItem.color));
 #endif
     // recreate biopsy line
@@ -212,11 +211,11 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     ScanMode::GetInstance()->DarkAllModeLight();
     g_keyInterface.CtrlLight(TRUE,LIGHT_D2);
 #endif
-    ScanMode::GetInstance()->Enter2D();	
+    ScanMode::GetInstance()->Enter2D();
 
     // power on HV
     //if (indexSocket < ProbeMan::MAX_SOCKET) // probe is found
-    m_ptrProbe->ActiveHV(TRUE); 
+    m_ptrProbe->ActiveHV(TRUE);
 
     //enable emit
     Img2D::GetInstance()->EnableEmit();
@@ -226,7 +225,7 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     Update2D::SetCineRemoveImg(3);
     // unfreeze
     FreezeMode* ptrFreeze = FreezeMode::GetInstance();
-    ptrFreeze->UnFreeze(); 
+    ptrFreeze->UnFreeze();
 }
 
 //test for A60
@@ -239,7 +238,7 @@ bool ProbeSelect::OneProbeRead(int socket)
 
 	// read probe
 	m_ptrProbe->GetOneProbe(m_para, socket);
-	
+
     // get exam item list
     int i = socket;
     if (m_para[i].exist)
@@ -277,7 +276,7 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem)
 	m_socketIndex = indexSocket;
 
 	// get real probe and item parameter
-	m_ptrProbe->SetProbeSocket(indexSocket); 
+	m_ptrProbe->SetProbeSocket(indexSocket);
 #ifdef EMP_430
     ActiveHV(TRUE);
     usleep(50000);
@@ -295,7 +294,6 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem)
 	ExamItem::ParaItem paraItem;
 	m_ptrUpdate->ExamItem(indexItem);
 
-
 //	ExamItem::ParaItem paraItem;
 	m_e.SetItemOfProbe(curPara.model, (ExamItem::EItem)indexItem);
 	m_e.GetCurrentItemPara(paraItem);
@@ -304,7 +302,7 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem)
 	g_menuMeasure.ChangeExamItem(m_e.ITEM_LIB[indexItem]);
 	// init 2D
 	Img2D* ptrImg2D = Img2D::GetInstance();
-	ptrImg2D->SetCalc2D( GlobalClassMan::GetInstance()->GetCalc2D(curPara.model) ); 
+	ptrImg2D->SetCalc2D( GlobalClassMan::GetInstance()->GetCalc2D(curPara.model) );
 	ptrImg2D->InitProbe2D(&curPara, &paraItem);
     ImgProc2D::GetInstance()->Init(&(paraItem.d2));
 #if 0
@@ -333,33 +331,33 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem)
 #ifndef EMP_313
 	// init pw
 	ImgPw* ptrImgPw = ImgPw::GetInstance();
-	ptrImgPw->SetCalcPw( GlobalClassMan::GetInstance()->GetCalcPw(curPara.model) ); 
-	ptrImgPw->InitProbe(&curPara, &paraItem);	
+	ptrImgPw->SetCalcPw( GlobalClassMan::GetInstance()->GetCalcPw(curPara.model) );
+	ptrImgPw->InitProbe(&curPara, &paraItem);
 	ImgProcPw::GetInstance()->Init(&(paraItem.spectrum));
 
 	// init cfm
 	ImgCfm* ptrImgCfm = ImgCfm::GetInstance();
-	ptrImgCfm->SetCalcCfm( GlobalClassMan::GetInstance()->GetCalcCfm(curPara.model) ); 
-	ptrImgCfm->InitProbe(&curPara, &paraItem);	
+	ptrImgCfm->SetCalcCfm( GlobalClassMan::GetInstance()->GetCalcCfm(curPara.model) );
+	ptrImgCfm->InitProbe(&curPara, &paraItem);
 	ImgProcCfm::GetInstance()->Init(&(paraItem.color));
 #endif
 #endif
     // recreate biopsy line
     BiopsyLine::GetInstance()->Create();
-	
+
 	// enter 2D scan mode
 #if (defined(EMP_322) || defined (EMP_313))
     ScanMode::GetInstance()->DarkAllModeLight();
     g_keyInterface.CtrlLight(TRUE,LIGHT_D2);
 #endif
-	ScanMode::GetInstance()->Enter2D();	
+	ScanMode::GetInstance()->Enter2D();
 
     //test
-    m_ptrProbe->ActiveHV(TRUE); 
+    m_ptrProbe->ActiveHV(TRUE);
 
     //enable emit
     Img2D::GetInstance()->EnableEmit();
-	
+
     usleep(1000);
     // power on HV
     //if (indexSocket < ProbeMan::MAX_SOCKET) // probe is found
@@ -368,7 +366,7 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem)
 
     // unfreeze
 	FreezeMode* ptrFreeze = FreezeMode::GetInstance();
-	ptrFreeze->UnFreeze(); 	
+	ptrFreeze->UnFreeze();
 }
 
 void ProbeSelect::GetDefaultValue(int &socket, ExamItem::EItem &item, bool &flag)
@@ -380,7 +378,7 @@ void ProbeSelect::GetDefaultValue(int &socket, ExamItem::EItem &item, bool &flag
 			break;
 	}
     int defaultSocket = m_ptrProbe->GetDefaultProbeSocket();
-   
+
     if (defaultSocket != ProbeMan::MAX_SOCKET)
     {
         char path[256];
@@ -402,7 +400,7 @@ void ProbeSelect::GetDefaultValue(int &socket, ExamItem::EItem &item, bool &flag
         }
         else
         {
-            item = m_e.GetDefaultItem(m_para[i].model); 
+            item = m_e.GetDefaultItem(m_para[i].model);
         }
         flag = false;
     }

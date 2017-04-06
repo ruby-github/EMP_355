@@ -1,13 +1,11 @@
-
 #include <stdio.h>
-#include "CgosGpio.h"
+#include "periDevice/CgosGpio.h"
 
 #undef TEXT
 
 #ifndef TEXT
 #define TEXT(s) s
 #endif
-
 
 void report(char *s)
 {
@@ -30,7 +28,7 @@ CgosGpioI2C::CgosGpioI2C()
         report(TEXT("The driver has been installed.\n"));
         if (!CgosLibInitialize()) {
             report(TEXT("Still could not open driver, a reboot might be required!\n"));
-        }		
+        }
     }
 
     // open the cgos board
@@ -50,7 +48,7 @@ CgosGpioI2C::~CgosGpioI2C()
 {
 
     if (hCgos) CgosBoardClose(hCgos);
-    
+
     CgosLibUninitialize();
 }
 
@@ -67,7 +65,6 @@ int CgosGpioI2C::I2CWrite(unsigned char addr, int len, unsigned char buf[])
     }
 
 }
-
 
 int CgosGpioI2C::I2CRead(unsigned char addr, unsigned char reg,int len, unsigned char buf[])
 {

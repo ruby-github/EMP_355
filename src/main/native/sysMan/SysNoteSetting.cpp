@@ -1,5 +1,5 @@
 #include "Def.h"
-#include "SysNoteSetting.h"
+#include "sysMan/SysNoteSetting.h"
 
 SysNoteSetting::SysNoteSetting()
 {
@@ -73,6 +73,3 @@ void SysNoteSetting::DefaultFactory(void)
     ptrIni->WriteInt("NoteSetting", "FontColor", fontColor);
     ptrIni->WriteInt("NoteSetting", "BodyMarkColor", bodyMarkColor);
 }
-
-
-

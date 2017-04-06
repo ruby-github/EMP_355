@@ -11,9 +11,9 @@ public:
     ~HintArea();
     static HintArea *GetInstance();
     GtkWidget * Create(void);
-    void UpdateHint(const char *text, int timeout=0); 
+    void UpdateHint(const char *text, int timeout=0);
     void ClearHint(void);
-    
+
     guint m_timeout;
 private:
     HintArea();

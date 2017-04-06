@@ -1,6 +1,6 @@
 /**
 * @brief DCMMan.h: interface for the CDCMMan class.
-* CDCMMan is management of DICOM, include set DICOM setting, connect remote, 
+* CDCMMan is management of DICOM, include set DICOM setting, connect remote,
 * send DICOM image, worklist, MPPs, storage commit, query/retrieve.
 *
 * @version: 1.2
@@ -11,7 +11,7 @@
 #ifndef DCM_MAN_H
 #define DCM_MAN_H
 
-#include "DCMDef.h"
+#include "periDevice/DCMDef.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -64,7 +64,7 @@ public:
 	void SetSRVerifierName(string name);
 	void SetSRVerifyOrganization(string organization);
 
-	void SetLocalAE(string strAE);	
+	void SetLocalAE(string strAE);
 	void SetLocalPort(int port);
 	string GetLocalAE();
 	int GetLocalPort();
@@ -159,7 +159,7 @@ public:
 	/**
 	 *@return DCMSUCCESS: Success to export study.
 	 *@return DCMINVALIDSTORAGEDEVICE: Inputting storage media is invalid.
-	 *@return DCMSTUDYEXISTED: The study record is already existed in DICOMDIR in storage media, will not export no longer. 
+	 *@return DCMSTUDYEXISTED: The study record is already existed in DICOMDIR in storage media, will not export no longer.
 	 *@return DCMNOENOUGHSPACE: The storage media have not enough space.
 	 *@return DCMEXPORTFAILURE: Fail to export.
 	 */
@@ -168,7 +168,7 @@ public:
 	/**
 	 *@return DCMSUCCESS: Success to browse DICOMDIR.
 	 *@return DCMINVALIDSTORAGEDEVICE: Inputting storage media is invalid.
-	 *@return DCMNONEXISTDICOMDIR: Non DICOMDIR is existed in storage media. 
+	 *@return DCMNONEXISTDICOMDIR: Non DICOMDIR is existed in storage media.
 	 */
 	EDCMReturnStatus BrowseDICOMDIR(string destDirStorageMedia, vector<DCMDICOMDIRSTUDYLEVEL> &vecStudyLevel);
 
@@ -176,9 +176,9 @@ public:
 	 *@return DCMSUCCESS: Success to import study.
 	 *@return DCMINVALIDVALUE: Inputting parameter is invalid value.
 	 *@return DCMINVALIDSTORAGEDEVICE: Inputting storage media is invalid.
-	 *@return DCMSTUDYEXISTED: The study record is already existed in local, will not import no longer. 
-	 *@return DCMNONENTIREDICOMDIR: File(s) lost in DICOMDIR in storage media. 
-	 *@return DCMIMPORTFAILURE: Fail to import. 
+	 *@return DCMSTUDYEXISTED: The study record is already existed in local, will not import no longer.
+	 *@return DCMNONENTIREDICOMDIR: File(s) lost in DICOMDIR in storage media.
+	 *@return DCMIMPORTFAILURE: Fail to import.
 	 */
 	EDCMReturnStatus ImportStudy(int studyIndex, string destDirStorageMedia, GetDCMStudyElement callbackGetStudy, GetDCMImageElement callbackGetImage, GetDCMSRElement callbackGetSR, PROGRESSSTATUS psCallback);
 

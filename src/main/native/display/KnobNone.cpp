@@ -2,24 +2,24 @@
  * 2009, 深圳恩普电子技术有限公司
  *
  * @file: KnobNone.cpp
- * @brief: knob in no knob func 
+ * @brief: knob in no knob func
  *
  * version: V1.0
  * date: 2009-11-30
  * @author: zhanglei
  */
 
-#include "KnobMenu.h"
-#include "KnobNone.h"
-#include "KnobReplay.h"
-#include "KnobLoadSnap.h"
-#include "Knob2D.h"
-#include "KnobM.h"
-#include "KnobPw.h"
-#include "KnobCfm.h"
-#include "ModeStatus.h"
-#include "ScanMode.h"
-#include "../imageControl/KnobEFOV.h"
+#include "display/KnobMenu.h"
+#include "display/KnobNone.h"
+#include "imageProc/KnobReplay.h"
+#include "patient/KnobLoadSnap.h"
+#include "imageControl/Knob2D.h"
+#include "imageControl/KnobM.h"
+#include "imageControl/KnobPw.h"
+#include "imageControl/KnobCfm.h"
+#include "imageProc/ModeStatus.h"
+#include "imageProc/ScanMode.h"
+#include "imageControl/KnobEFOV.h"
 #ifdef EMP_322
 KnobMenu::KnobItem KnobNoneMenu[6] = {
 	{"", "", ERROR, NULL, NULL},
@@ -28,7 +28,7 @@ KnobMenu::KnobItem KnobNoneMenu[6] = {
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
-};	
+};
 #else
 KnobMenu::KnobItem KnobNoneMenu[5] = {
 	{"", "", ERROR, NULL, NULL},
@@ -36,13 +36,12 @@ KnobMenu::KnobItem KnobNoneMenu[5] = {
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
 	{"", "", ERROR, NULL, NULL},
-};	
+};
 #endif
 void KnobNoneCreate()
 {
-    KnobMenu::GetInstance()->SetItem(KnobNoneMenu, sizeof(KnobNoneMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::NONE);   
+    KnobMenu::GetInstance()->SetItem(KnobNoneMenu, sizeof(KnobNoneMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::NONE);
 }
-
 
 void KnobUndo()
 {
@@ -115,5 +114,3 @@ void KnobUndo()
 			KnobReplayCreate();
     }
 }
-
-

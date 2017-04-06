@@ -3,7 +3,7 @@
 #define MENU_M_SUB_H
 
 #include "Def.h"
-#include "CusSpin.h"
+#include "display/CusSpin.h"
 
 class MenuM
 {
@@ -14,7 +14,7 @@ public:
     GtkWidget * Create(void);
     void Hide(void);
     void Show(void);
-    
+
 	void Sensitive(bool on);
     void UpdatePolarity(bool on);
     void UpdateTimeMark(bool on);
@@ -28,7 +28,7 @@ private:
     GtkWidget *m_labelPolarity;
     GtkWidget *m_labelTimemark;
     GtkWidget *m_frameFormat;
-    //GtkWidget *m_btnFormat; 
+    //GtkWidget *m_btnFormat;
 
     GtkWidget *m_check_btn_polarity;
     GtkWidget *m_check_btn_timemark;
@@ -61,7 +61,6 @@ private:
     void BtnFormat5Clicked(GtkButton *button);
     void ForeachWidget(GtkWidget *widget);
     void WriteFormatM(int format);
-
 
 //signal connect
     static void HandleChkPolarity(GtkButton *button, MenuM *data) { data->ChkPolarity(button); }

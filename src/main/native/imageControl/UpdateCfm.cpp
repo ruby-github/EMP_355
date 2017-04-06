@@ -1,14 +1,13 @@
+#include "imageControl/UpdateCfm.h"
+#include "imageControl/KnobCfm.h"
+#include "imageProc/MenuCFM.h"
+#include "keyboard/KeyFunc.h"
+#include "display/ImageAreaPara.h"
+#include "display/ImageAreaDraw.h"
+#include "display/KnobMenu.h"
+#include "probe/MenuBiopsy.h"//2016.09.18--hy
 
-#include "UpdateCfm.h"
-#include "KnobCfm.h"
-#include "MenuCFM.h"
-#include "KeyFunc.h"
-#include "../display/ImageAreaPara.h"
-#include "../display/ImageAreaDraw.h"
-#include "../display/KnobMenu.h"
-#include "MenuBiopsy.h"//2016.09.18--hy
-
-const char * Toggle_Cfm[2] = 
+const char * Toggle_Cfm[2] =
 {
     N_("OFF"),
     N_("ON")
@@ -76,12 +75,12 @@ void UpdateCfm::PRFRange(int data, EKnobReturn status)
 void UpdateCfm::Baseline(int index, EKnobReturn status)
 {
 	sprintf(m_str, "%d", index);
-	SyncKnobCfm(CFM_BASELINE, m_str, status);	
+	SyncKnobCfm(CFM_BASELINE, m_str, status);
 }
 void UpdateCfm::WallFilter(int index, EKnobReturn status)
 {
 	sprintf(m_str, "%d", index);
-	SyncKnobCfm(CFM_WALL_FILTER, m_str, status);	
+	SyncKnobCfm(CFM_WALL_FILTER, m_str, status);
 	m_ptrImgPara->UpdateCfmWF(index);
 	ImageArea::GetInstance()->UpdateImgArea();
 }
@@ -98,7 +97,7 @@ void UpdateCfm::LineDensity(int index, EKnobReturn status)
  	N_("LOW"),
 	N_("HIGH")
     };
-	
+
 	SyncKnobCfm(CFM_LINE_DENSITY,(char*)Level[index], status);
     //m_ptrImgPara->Update2DLineDensity(index);
 }
@@ -111,12 +110,12 @@ void UpdateCfm::PacketSize(int index, EKnobReturn status)
 void UpdateCfm::ColorMap(int index, EKnobReturn status)
 {
 	sprintf(m_str, "%d", index);
-	SyncKnobCfm(CFM_MAP, m_str, status);	
+	SyncKnobCfm(CFM_MAP, m_str, status);
 }
 void UpdateCfm::Turbo(int index, EKnobReturn status)
 {
 	sprintf(m_str, "%d", index);
-	SyncKnobCfm(CFM_TURBO, m_str, status);	
+	SyncKnobCfm(CFM_TURBO, m_str, status);
 }
 
 void UpdateCfm::ScanLines()
@@ -130,7 +129,7 @@ void UpdateCfm::ScanLines()
     else
         ret = OK;
     sprintf(m_str, "%d", index);
-    SyncKnobCfm(CFM_SCAN_LINES, m_str, ret);	
+    SyncKnobCfm(CFM_SCAN_LINES, m_str, ret);
 }
 
 void UpdateCfm::SetVelRange(double max, double min, double maxKHz, double minKHz)
@@ -140,12 +139,12 @@ void UpdateCfm::SetVelRange(double max, double min, double maxKHz, double minKHz
 
 void UpdateCfm::ColorInvert(bool data, EKnobReturn status)
 {
-	SyncKnobCfm(CFM_INVERT, (char*)Toggle_Cfm[data], status);	
+	SyncKnobCfm(CFM_INVERT, (char*)Toggle_Cfm[data], status);
 }
 void UpdateCfm::FlowOpt(int index, EKnobReturn status)
 {
 	sprintf(m_str, "%d", index);
-	SyncKnobCfm(CFM_FLOW_OPT, m_str, status);	
+	SyncKnobCfm(CFM_FLOW_OPT, m_str, status);
 }
 
 void UpdateCfm::FocPosRatio(int index, EKnobReturn status)
@@ -156,7 +155,7 @@ void UpdateCfm::FocPosRatio(int index, EKnobReturn status)
         sprintf(m_str, "1/2");
     else
         sprintf(m_str, "3/4");
-	SyncKnobCfm(CFM_FOC_POS, m_str, status);	
+	SyncKnobCfm(CFM_FOC_POS, m_str, status);
 }
 
 void UpdateCfm::EnterCfm()
@@ -178,7 +177,7 @@ void UpdateCfm::EnterCfmKnob(void)
     KnobCfmCreate();
 }
 
-// update参数为true时，使用在自动优化时的清屏，解决进入模式时某些非实时情况下的标志绘制
+// update鍙傛暟涓簍rue鏃讹紝浣跨敤鍦ㄨ嚜鍔ㄤ紭鍖栨椂鐨勬竻灞忥紝瑙ｅ喅杩涘叆妯″紡鏃舵煇浜涢潪瀹炴椂鎯呭喌涓嬬殑鏍囧織缁樺埗
 // 默认参数为false, 切换模式时使用
 void UpdateCfm::EnterCfmImg(bool update)
 {
@@ -235,7 +234,7 @@ void UpdateCfm::ChangeFormatCfm(int format)
     m_ptrImgDraw->ReDrawFocus();
 
 	ImageArea::GetInstance()->RedrawBodyMarkWhenModeChanged();
-#ifdef TRANSDUCER  
+#ifdef TRANSDUCER
     m_ptrImgPara->ReDrawTransducer();
 #endif
 }
@@ -311,7 +310,6 @@ void UpdateCfm::Artifact(int index, EKnobReturn status)
 	sprintf(m_str, "%d", index);
 	g_menuCFM.UpdateArtifact(m_str, status);
 }
-
 
 ///////////////////////////////  test  //////////////////////////////////////
 void UpdateCfm::TissueGate(int index, EKnobReturn status)
