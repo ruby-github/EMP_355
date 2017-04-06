@@ -1776,7 +1776,7 @@ void ViewArchive::BirthDateYearInsert(GtkEditable *editable, gchar *new_text, gi
     if (old_str.length() == 4) {
         int year = atoi(old_str.c_str());
         if (year < 1900) {
-            *position = 4;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 4;      // 移动光标之输入框末尾
            // gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), "1900"); //2012.08.17
             gtk_entry_set_text(GTK_ENTRY(m_entryYearStart), "1900");
             year = 1900;
@@ -1785,7 +1785,7 @@ void ViewArchive::BirthDateYearInsert(GtkEditable *editable, gchar *new_text, gi
             sprintf(curYear, "%d", m_curYear);
             gtk_entry_set_text(GTK_ENTRY(m_entryYearStart), curYear);
             year = m_curYear;
-            *position = 4;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 4;      // 移动光标之输入框末尾
         }
         gtk_widget_grab_focus(m_entryMonthStart);
     }
@@ -1813,7 +1813,7 @@ void ViewArchive::BirthDateMonthInsert(GtkEditable *editable, gchar *new_text, g
 #endif
             gtk_entry_set_text(GTK_ENTRY(m_entryMonthStart), "12");
             month = 12;
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
         }
         if (old_str.length() == 2)
             gtk_widget_grab_focus(m_entryDayStart);
@@ -1837,7 +1837,7 @@ void ViewArchive::BirthDateDayInsert(GtkEditable *editable, gchar *new_text, gin
     const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryMonthStart));
     if (strlen(year_text) == 0 || strlen(year_text) < 4 || strlen(month_text) == 0) {
         if (day > 31) {
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
             gtk_entry_set_text(GTK_ENTRY(m_entryDayStart), "31");
         }
         return ;
@@ -1850,7 +1850,7 @@ void ViewArchive::BirthDateDayInsert(GtkEditable *editable, gchar *new_text, gin
             sprintf(str_last_day, "%d", last_day);
             gtk_entry_set_text(GTK_ENTRY(m_entryDayStart), str_last_day);
             day = last_day;
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
         }
     }
     return;
@@ -1867,7 +1867,7 @@ void ViewArchive::BirthDateEndYearInsert(GtkEditable *editable, gchar *new_text,
     if (old_str.length() == 4) {
         int year = atoi(old_str.c_str());
         if (year < 1900) {
-            *position = 4;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 4;      // 移动光标之输入框末尾
             gtk_entry_set_text(GTK_ENTRY(m_entryYearEnd), "1900");
             year = 1900;
         } else if (year > m_curYear) {
@@ -1875,7 +1875,7 @@ void ViewArchive::BirthDateEndYearInsert(GtkEditable *editable, gchar *new_text,
             sprintf(curYear, "%d", m_curYear);
             gtk_entry_set_text(GTK_ENTRY(m_entryYearEnd), curYear);
             year = m_curYear;
-            *position = 4;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 4;      // 移动光标之输入框末尾
         }
         gtk_widget_grab_focus(m_entryMonthEnd);
     }
@@ -1903,7 +1903,7 @@ void ViewArchive::BirthDateEndMonthInsert(GtkEditable *editable, gchar *new_text
 #endif
             gtk_entry_set_text(GTK_ENTRY(m_entryMonthEnd), "12");
             month = 12;
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
         }
         if (old_str.length() == 2)
             gtk_widget_grab_focus(m_entryDayEnd);
@@ -1928,7 +1928,7 @@ void ViewArchive::BirthDateEndDayInsert(GtkEditable *editable, gchar *new_text, 
     const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryMonthEnd));
     if (strlen(year_text) == 0 || strlen(year_text) < 4 || strlen(month_text) == 0) {
         if (day > 31) {
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
             gtk_entry_set_text(GTK_ENTRY(m_entryDayEnd), "31");
         }
         return ;
@@ -1941,7 +1941,7 @@ void ViewArchive::BirthDateEndDayInsert(GtkEditable *editable, gchar *new_text, 
             sprintf(str_last_day, "%d", last_day);
             gtk_entry_set_text(GTK_ENTRY(m_entryDayEnd), str_last_day);
             day = last_day;
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
         }
     }
     return;
@@ -2163,7 +2163,7 @@ void ViewArchive::ToggleRecord(GtkCellRendererToggle *cell, gchar *path_str)
 	gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
 
 	/* do something with the value */
-	checked ^= 1; //鎸変綅寮傛垨
+	checked ^= 1; //按位异或
 
 	/* set new value */
 	gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);

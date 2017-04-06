@@ -369,7 +369,6 @@ void KnobMenu::Refresh(void)
     }
 }
 
-//◀ ◁ ▶ ▷
 void KnobMenu::Display(KnobItem item, char *buf, const char *tmp)
 {
     if (strcmp(item.name, "") == 0){
@@ -425,15 +424,15 @@ void KnobMenu::Display(KnobItem item, char *buf, const char *tmp)
     }
     else if (item.status == MAX) {
         if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n鈼€  %s  鈻穃n%s", _(item.name),  _(item.value),tmp);
+            sprintf(buf, "%s\n◀  %s  ▷\n%s", _(item.name),  _(item.value),tmp);
         else
-            sprintf(buf, "%s\n鈼€  %s  鈻穃n%s", _(item.name),  item.value,tmp);
+            sprintf(buf, "%s\n◀  %s  ▷\n%s", _(item.name),  item.value,tmp);
     }
     else if (item.status == OK) {
         if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n鈼€  %s  鈻禱n%s", _(item.name),  _(item.value),tmp);
+            sprintf(buf, "%s\n◀  %s  ▶\n%s", _(item.name),  _(item.value),tmp);
         else
-            sprintf(buf, "%s\n鈼€  %s  鈻禱n%s", _(item.name),  item.value,tmp);
+            sprintf(buf, "%s\n◀  %s  ▶\n%s", _(item.name),  item.value,tmp);
     }
     else if (item.status == PRESS) {
         if (strcmp(item.value, ""))
