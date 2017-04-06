@@ -5,13 +5,40 @@
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/KnobEvent.h"
 
-#define TOP_AREA_X 180 //ModLayout 180 PreLayout 220
+//       |------------------------------------- 1024 --------------------------------------|
+//           130                                                    130          180
+// ---   |---------|---------------------------------------------|---------|---------------|
+//  |    |         |                                             |         |               |
+//  | 60 |  LOGO   |-------------------- Top --------------------|  Time   |   MenuLabel   |
+//  |    |         |                                             |         |               |
+//  |    |---------|---------------------------------------------|---------|---------------|
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+// 768   |                                Image                            | MenuNoteBook  |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |                                                                 |               |
+//  |    |-----------------------------------------------------------------|---------------|
+//  |    |                                                                 |               |
+//  | 105|                                ShortcutMenu                     |   Reserved    |
+//  |    |                                                                 |               |
+//  |    |-----------------------------------------------------------------|---------------|
+//  | 35 |                                   Hint                          | SystemStatus  |
+// ---   |-----------------------------------------------------------------|---------------|
+
+
+#define TOP_AREA_X 0 //ModLayout 180 PreLayout 220
 #define TOP_AREA_Y 0
 
 #define GAP_AREA_H 2
 
-#define IMG_AREA_X 180 //ModLayout 180 PreLayout 220
-#define IMG_AREA_Y 100
+#define IMG_AREA_X 0 //ModLayout 180 PreLayout 220
+#define IMG_AREA_Y 60
 
 // #define STATUS_X 220
 // #define STATUS_Y 644
@@ -19,11 +46,11 @@
 // #define STATUS_HEIGHT (45-2)
 
 //#define HINT_X (370+2)
-#define HINT_X 180 //ModLayout 180 PreLayout 220
-#define HINT_Y 660 //ModLayout 664 PreLayout 642
+#define HINT_X 0 //ModLayout 180 PreLayout 220
+#define HINT_Y 733 //ModLayout 664 PreLayout 642
 
-#define KNOB_X 180 //ModLayout 180 PreLayout 220
-#define KNOB_Y 705 //ModLayout 705 PreLayout 685
+#define KNOB_X 0 //ModLayout 180 PreLayout 220
+#define KNOB_Y 628 //ModLayout 705 PreLayout 685
 
 #define SYSCURSOR_X (TOP_AREA_X/2)//110//238
 #define SYSCUROSR_Y (SCREEN_HEIGHT/4)//90
@@ -54,7 +81,6 @@ public:
     void MenuReviewCallBack(void);
 
     GtkWidget* GetMainWindow(void);
-    GtkWidget* GetMainWindowFixed() { return m_fixedWindow; }
     void KeyEvent(unsigned char keyValue);
     void KnobEvent(unsigned char keyValue, unsigned char offset);
     void SliderEvent(unsigned char keyValue, unsigned char offset);
@@ -79,8 +105,8 @@ private:
     HintArea* m_ptrHintArea;
     MenuArea* m_ptrMenuArea;
     NoteArea* m_ptrNoteArea;
-//signal handle
-//signal connect
+    //signal handle
+    //signal connect
 
     void MySleep(int msecond);
     int keyTSIN;

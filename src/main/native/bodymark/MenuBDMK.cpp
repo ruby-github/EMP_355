@@ -198,7 +198,7 @@ GtkWidget* MenuBDMK::Create(void)
     gtk_fixed_put (GTK_FIXED (m_fixed), hbox, 0, 535);
     gtk_widget_set_size_request (hbox, MENU_AREA_W, 30);
 
-	GtkWidget *labelLeft = create_label("鈼€", 0, 0, g_white, NULL);
+	GtkWidget *labelLeft = create_label("◀", 0, 0, g_white, NULL);
 	m_btnLeft = create_button(labelLeft, 60, 0, g_deep);
 	gtk_box_pack_start (GTK_BOX (hbox), m_btnLeft, FALSE, FALSE, 0);
 	g_signal_connect(G_OBJECT(m_btnLeft), "clicked", G_CALLBACK(HandleLeftClicked), this);
@@ -239,14 +239,14 @@ void MenuBDMK::SetPageValue(guint page, guint total_page)
 	}
 	else if(page > 1 && total_page > page)
 	{
-		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "鈼€");
+		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "◀");
 		gtk_button_set_label(GTK_BUTTON(m_btnRight), "▶");
 		gtk_widget_set_sensitive (m_btnLeft, TRUE);
 		gtk_widget_set_sensitive (m_btnRight, TRUE);
 	}
 	else if(page > 1 && total_page == page)
 	{
-		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "鈼€");
+		gtk_button_set_label(GTK_BUTTON(m_btnLeft), "◀");
 		gtk_button_set_label(GTK_BUTTON(m_btnRight), "");
 		gtk_widget_set_sensitive (m_btnLeft, TRUE);
 		gtk_widget_set_sensitive (m_btnRight, FALSE);

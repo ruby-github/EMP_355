@@ -3,7 +3,7 @@
 #define _KNOB_MENU_H_
 
 #define WIDTH_KNOB_MENU 844 //ModLayout 844 PreLayout 804
-#define HEIGHT_KNOB_MENU 60 //ModLayout 60 PreLayout 80
+#define HEIGHT_KNOB_MENU 105 //ModLayout 60 PreLayout 80
 
 #include <gtk/gtk.h>
 #include "Def.h"

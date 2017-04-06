@@ -14,6 +14,8 @@
 #include "imageProc/ModeStatus.h"
 #include <stdlib.h>
 #include "keyboard/KeyDef.h"
+#include "display/TopArea.h"
+
 ImageAreaPara* ImageAreaPara::m_ptrInstance = NULL;
 
 #ifdef TRANSDUCER
@@ -494,7 +496,9 @@ void ImageAreaPara::DrawGeneralPara()
         sprintf(m_bufText, "%3dP %3.1fX %2dV %3dfps", m_pwr, m_zoomScale, m_volumePw, m_fps);
     }
 #endif
-    m_ptrImg->DrawString(m_bufText, x, y);
+    //m_ptrImg->DrawString(m_bufText, x, y);
+
+    TopArea::GetInstance()->UpdateImageParam(m_bufText);
 }
 
 void ImageAreaPara::Draw2DPara()
@@ -503,7 +507,7 @@ void ImageAreaPara::Draw2DPara()
     int y = 30;
 
     FillRectangle(x, y, m_eareWs, m_eareH);
-    m_ptrImg->DrawString("<b><span underline=\"low\" >2D</span></b>", x, y);
+    m_ptrImg->DrawString("<b><span underline=\"low\" >B</span></b>", x, y);
 
     FillRectangle(x, y+20, m_eareWl, m_eareH);
     sprintf(m_bufText, "%dG %ddB %dMBP %s", m_gain2D, m_dynamicRange, m_mbp, m_tsi.c_str());
@@ -522,7 +526,7 @@ void ImageAreaPara::DrawMPara()
     int y = 75 + 20;
 
     FillRectangle(x, y, m_eareWs, m_eareH);
-    m_ptrImg->DrawString("<b><span underline=\"low\" >M</span></b>", x, y);
+    m_ptrImg->DrawString("<b><span underline=\"low\" >C</span></b>", x, y);
 
     FillRectangle(x, y+20, m_eareWl, m_eareH);
     sprintf(m_bufText, "%3dG", m_gainM);

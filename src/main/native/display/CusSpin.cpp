@@ -19,7 +19,6 @@ void CusSpin::Show(void)
 	gtk_widget_show_all(m_cusspin);
    }
 
-//◀  ▶ ◁   ▷
 GtkWidget* CusSpin::Create()
 {
     m_cusspin = gtk_table_new(1, 4, FALSE);
@@ -32,15 +31,17 @@ GtkWidget* CusSpin::Create()
     gtk_widget_modify_bg(btn, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_cusspin), btn, 0, 1, 0, 1);
     GTK_WIDGET_UNSET_FLAGS (btn, GTK_CAN_FOCUS);
-    gtk_widget_modify_bg(btn, GTK_STATE_PRELIGHT, g_deep);
-    gtk_widget_modify_bg(btn, GTK_STATE_ACTIVE, g_deep);
 
-    m_labelSub = create_label("鈼€", 0, 0, g_black, NULL);
+    modify_widget_bg(btn);
+
+    m_labelSub = create_label("◀", 0, 0, g_black, NULL);
     m_btnSub = create_button(m_labelSub, 18, 0, g_white); // 20
     gtk_widget_modify_bg(m_btnSub, GTK_STATE_INSENSITIVE, g_white);
     gtk_table_attach_defaults(GTK_TABLE(m_cusspin), m_btnSub, 1, 2, 0, 1);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btnSub), FALSE);
     g_signal_connect(m_btnSub, "clicked", G_CALLBACK(HandleBtnSub), this);
+
+    modify_widget_bg(m_btnSub);
 
     m_entry = gtk_entry_new();
     gtk_widget_set_usize(m_entry, 30, -1); // 32
@@ -54,6 +55,8 @@ GtkWidget* CusSpin::Create()
     gtk_table_attach_defaults(GTK_TABLE(m_cusspin), m_btnAdd, 3, 4, 0, 1);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btnAdd), FALSE);
     g_signal_connect(m_btnAdd, "clicked", G_CALLBACK(HandleBtnAdd), this);
+
+    modify_widget_bg(m_btnAdd);
 
     UpdateLabel();
 
@@ -84,7 +87,7 @@ void CusSpin::SetValue(const char* str, EKnobReturn flag)
 	switch(flag)
 	{
 		case OK:
-			gtk_label_set_text(GTK_LABEL(m_labelSub), "鈼€");
+			gtk_label_set_text(GTK_LABEL(m_labelSub), "◀");
 			gtk_label_set_text(GTK_LABEL(m_labelAdd), "▶");
 			gtk_widget_set_sensitive(m_btnSub, true);
 			gtk_widget_set_sensitive(m_btnAdd, true);
@@ -96,7 +99,7 @@ void CusSpin::SetValue(const char* str, EKnobReturn flag)
 			gtk_widget_set_sensitive(m_btnAdd, true);
 			break;
 		case MAX:
-			gtk_label_set_text(GTK_LABEL(m_labelSub), "鈼€");
+			gtk_label_set_text(GTK_LABEL(m_labelSub), "◀");
 			gtk_label_set_text(GTK_LABEL(m_labelAdd), "▷");
 			gtk_widget_set_sensitive(m_btnSub, true);
 			gtk_widget_set_sensitive(m_btnAdd, false);

@@ -2,7 +2,7 @@
 #ifndef __MENU_AREA_H__
 #define __MENU_AREA_H__
 
-#define MENU_AREA_H 705 //ModLayout 705 PreLayout 688
+#define MENU_AREA_H 628 //ModLayout 705 PreLayout 688
 #define MENU_AREA_W 180 //ModLayout 180 PreLayout 220
 
 #include <gtk/gtk.h>

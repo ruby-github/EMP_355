@@ -93,4 +93,6 @@ void SetTheme(const char *rc_path);
 void XRemapKey(Display *display, int old_keycode, KeySym new_keysym);
 void ChangeKeymap();
 
+void modify_widget_bg(GtkWidget* widget);
+
 #endif

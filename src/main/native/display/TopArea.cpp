@@ -35,6 +35,8 @@ TopArea::TopArea(void)
     m_inReadImg = false;
     m_timeout = 0;
 
+    m_image_param = "";
+
     SysGeneralSetting sys;
     m_dateFormat = sys.GetDateFormat();
 }
@@ -47,29 +49,29 @@ TopArea::~TopArea()
 
 void TopArea::DrawLogo(void)
 {
-//    const char *logo_file = "./res/logo.bmp";
-    char logo_file[255];
-    sprintf(logo_file, "%s/%s", CFG_RES_PATH, "res/logo.png");
-    GError *error = NULL;
-    GdkPixbuf *logo = gdk_pixbuf_new_from_file(logo_file, &error);
+    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file((string(CFG_RES_PATH) + string("res/logo.png")).c_str(), NULL);
+    GdkPixbuf* pixbuf_scale = gdk_pixbuf_scale_simple(pixbuf, 120, 50, GDK_INTERP_BILINEAR);
 
     GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    gdk_draw_pixbuf(m_pixmapTop, gc, logo, 0, 0, 0, 5, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
+    gdk_draw_pixbuf(m_pixmapTop, gc, pixbuf_scale, 0, 0, 0, 5, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
     g_object_unref(gc);
+
+    g_object_unref(pixbuf_scale);
+    g_object_unref(pixbuf);
 }
 
 void TopArea::UpdateHospitalName(const char *name)
 {
-    const int y = 10;
+    const int y = 5;
    // sprintf(m_hospital, "%s", name);
 
     PRINTF("hospital name====%s\n",name);
     //m_hospital = name;
     sprintf(m_hospital, "%s", name);
-    ClearArea(TOP_AREA_P1-10, y, 300+15, 35);
+    ClearArea(TOP_AREA_P1, y, 120, 50);
     PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, name);
     int font_size = 16;
-    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name, 300);
+    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name, 120);
     g_object_unref(layout);
 
     DrawString(name, TOP_AREA_P1, y, g_white, font);
@@ -78,8 +80,8 @@ void TopArea::UpdateHospitalName(const char *name)
 #ifdef VET
 void TopArea::UpdatePatInfo(const char *animal_name, const char *owner_name, const char *species, const char *sex, const char *age, const char *id)
 {
-	const int x = 10;
-	const int y = 65;
+	const int x = TOP_AREA_P2 + 5;
+	const int y = 5;
 
     char text_buf[256];
     char *text_animal_name = _("Animal:");
@@ -90,11 +92,11 @@ void TopArea::UpdatePatInfo(const char *animal_name, const char *owner_name, con
     char *text_id = _("ID:");
 
 	sprintf(text_buf, "%s%s  %s%s  %s%s  %s%s  %s%s  %s%s", text_animal_name, animal_name, text_owner_name, owner_name, text_species, species, text_sex, sex, text_age, age, text_id, id);
-	ClearArea(x, y, 820, 30);
+	ClearArea(x, y, 424, 20);
 
 	int font_size = 12;
 	PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, text_buf);
-	PangoFontDescription* font = AdaptStringFont(FONT_STRING, "", font_size, layout, text_buf, 820);
+	PangoFontDescription* font = AdaptStringFont(FONT_STRING, "", font_size, layout, text_buf, 424);
 	g_object_unref(layout);
 
 	DrawString(text_buf, x, y, g_white, font);
@@ -103,8 +105,8 @@ void TopArea::UpdatePatInfo(const char *animal_name, const char *owner_name, con
 #else
 void TopArea::UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id)
 {
-    const int x = 10;
-    const int y = 65;
+    const int x = TOP_AREA_P2 + 5;
+    const int y = 5;
 
     char text_buf[256];
     char *text_name = _("Name:");
@@ -114,11 +116,11 @@ void TopArea::UpdatePatInfo(const char *name, const char *sex, const char *age, 
     char *text_id = _("ID:");
 
     sprintf(text_buf, "%s %s    %s %s    %s %s    %s %s", text_name, name, text_sex, sex, text_age, age, text_id, id);
-    ClearArea(x, y, 820, 30);
+    ClearArea(x, y, 424, 20);
 
     PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, text_buf);
     int font_size = 12;
-    PangoFontDescription* font = AdaptStringFont("DejaVu Sans", "Book", font_size, layout, text_buf, 820);
+    PangoFontDescription* font = AdaptStringFont("DejaVu Sans", "Book", font_size, layout, text_buf, 424);
     g_object_unref(layout);
 
     DrawString(text_buf, x, y, g_white, font);
@@ -173,10 +175,15 @@ void TopArea::UpdateSysInfo(void)
 		probe_type = m_probeType;
 	}
 
-    sprintf(probe_info, " %s \n %s", probe_type.c_str(), m_checkPart);
+  if (m_image_param.empty()) {
+    sprintf(probe_info, "%s    %s", probe_type.c_str(), m_checkPart);
+  } else {
+    sprintf(probe_info, "%s    %s    %s", m_image_param.c_str(), probe_type.c_str(), m_checkPart);
+  }
+
     //sprintf(probe_info, "%s /%3dmm\n%s", probe_type.c_str(), m_depth, m_checkPart);
-    ClearArea(TOP_AREA_P2+5, 5, TOP_AREA_P3-TOP_AREA_P2-10+30+5, 35+10); //LL
-	DrawString(probe_info, TOP_AREA_P2+10, 5, g_white, NULL);
+    ClearArea(TOP_AREA_P2+5, 35, TOP_AREA_P3-TOP_AREA_P2-10, 20); //LL
+	  DrawString(probe_info, TOP_AREA_P2+5, 35, g_white, NULL);
 
 	//tis = m_TIS;
 	float tis = m_TIS;
@@ -193,11 +200,11 @@ void TopArea::UpdateSysInfo(void)
 
 		if (tis < 0.4)
 		{
-			sprintf(other_info, "%s\nTIS < 0.4  ",m_freq);
+			sprintf(other_info, "%s\nTIS < 0.4", m_freq);
 		}
 		else
 		{
-			sprintf(other_info, "%s\nTIS   %.1f  ", m_freq, tis);
+			sprintf(other_info, "%s\nTIS   %.1f", m_freq, tis);
 		}
 	}
 #else
@@ -207,14 +214,13 @@ void TopArea::UpdateSysInfo(void)
 		tis = (int)(tis / 0.2) * 0.2;
 
 		if (tis < 0.4)
-			sprintf(other_info, "TIS < 0.4  ");
+			sprintf(other_info, "TIS < 0.4");
 		else
-			sprintf(other_info, "TIS   %.1f  ", tis);
+			sprintf(other_info, "TIS   %.1f", tis);
 	}
 #endif
-    ClearArea(TOP_AREA_P3+5, 5, TOP_AREA_P4-TOP_AREA_P3-10, 35-15-5); //LL
-	DrawString(other_info, 560, 5, g_white, NULL);
-	//DrawString(other_info, 580, 5, g_white, NULL);
+    ClearArea(TOP_AREA_P3+5, 35, TOP_AREA_P4-TOP_AREA_P3-10, 20); //LL
+	  DrawString(other_info, TOP_AREA_P3+5, 35, g_white, NULL);
 }
 
 void TopArea::GetTIS(string& TIS)
@@ -291,22 +297,21 @@ void TopArea::DrawDateTime(void)
 
     switch (m_dateFormat) {
         case 0:
-            sprintf(buf, "%04d-%02d-%02d %s\n %02d:%02d:%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
+            sprintf(buf, "%04d-%02d-%02d %s\n%02d:%02d:%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
             break;
         case 1:
-            sprintf(buf, "%02d-%02d-%04d %s\n %02d:%02d:%02d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
+            sprintf(buf, "%02d-%02d-%04d %s\n%02d:%02d:%02d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
             break;
         case 2:
-            sprintf(buf, "%02d-%02d-%04d %s\n %02d:%02d:%02d", now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
+            sprintf(buf, "%02d-%02d-%04d %s\n%02d:%02d:%02d", now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
             break;
         default:
-            sprintf(buf, "%04d-%02d-%02d %s\n %02d:%02d:%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
+            sprintf(buf, "%04d-%02d-%02d %s\n%02d:%02d:%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
             break;
     }
-    //ClearArea(TOP_AREA_W-180, 5, 180, 17);
-    //ClearArea(TOP_AREA_W-180, 5, 192, 35);//瑙ｅ喅涓嫳鏂囧垏鎹紝鍒锋柊鏃堕棿鍜屾棩鏈熶笉鍏ㄧ殑闂
-    ClearArea(TOP_AREA_P4+15, 5, TOP_AREA_W-TOP_AREA_P4, 35);//瑙ｅ喅涓嫳鏂囧垏鎹紝鍒锋柊鏃堕棿鍜屾棩鏈熶笉鍏ㄧ殑闂
-    DrawString(buf, TOP_AREA_P4+15, 5, g_white, NULL);
+
+    ClearArea(TOP_AREA_P4+10, 10, 130, 40);
+    DrawString(buf, TOP_AREA_P4+10, 10, g_white, NULL);
 }
 
 GtkWidget * TopArea::Create(void)
@@ -367,12 +372,13 @@ void TopArea::TopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event)
     gdk_gc_set_foreground(gc, g_black);
     gdk_draw_rectangle(m_pixmapTop, gc, TRUE, 0, 0, widget->allocation.width, widget->allocation.height);
 
-// draw spacing line
-    gdk_gc_set_foreground(gc, g_deep);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P2, 5,  TOP_AREA_P2, 45);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P3, 5,  TOP_AREA_P3, 45);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P4, 5,  TOP_AREA_P4, 45);
-    gdk_draw_line(m_pixmapTop, gc, 5,   50, 835, 50);
+    // draw spacing line
+    gdk_gc_set_foreground(gc, g_gray);
+    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P2, 5,  TOP_AREA_P2, 58);
+    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P3, 30,  TOP_AREA_P3, 58);
+    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P4, 5,  TOP_AREA_P4, 58);
+    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P2,   30, TOP_AREA_P4, 30);
+    gdk_draw_line(m_pixmapTop, gc, 5,   58, 839, 58);
     g_object_unref(gc);
 
     DrawLogo();
@@ -462,4 +468,10 @@ void TopArea::ClearArea(int x, int y, int width, int height)
 
     gdk_draw_rectangle(m_pixmapTop, gc, TRUE, x, y, width, height);
     g_object_unref(gc);
+}
+
+void TopArea::UpdateImageParam(std::string param) {
+  m_image_param = param;
+
+  UpdateSysInfo();
 }

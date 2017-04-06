@@ -6,7 +6,7 @@
 #include <string>
 
 #define TOP_AREA_W 844 //ModLayout 844 PreLayout 804
-#define TOP_AREA_H 100-2
+#define TOP_AREA_H 60
 /*
  *      Logo |    Hospital        |  Probe     |  TIS |  Time
  *           |                    |            |      |
@@ -14,9 +14,9 @@
  *	  0      P1                   P2           P3     P4          844
  */
 #define TOP_AREA_P1 130
-#define TOP_AREA_P2 440
-#define TOP_AREA_P3 570
-#define TOP_AREA_P4 650
+#define TOP_AREA_P2 260
+#define TOP_AREA_P3 614
+#define TOP_AREA_P4 694
 
 class TopArea
 {
@@ -51,6 +51,8 @@ public:
     void SetDateFormat(int DateFormat) { m_dateFormat = DateFormat; }
     std::string GetProbeType(void) { return m_probeType_old; }
 
+    void UpdateImageParam(std::string param);
+
 private:
     TopArea();
     void UpdateSysInfo(void);
@@ -78,6 +80,8 @@ private:
     double m_TIS;
    // float tis;
     int m_dateFormat;
+
+    std::string m_image_param;
 
 //signal handle
     void TopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event);

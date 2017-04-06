@@ -3,7 +3,7 @@
 #define _HINT_AREA_H_
 
 #define HINT_AREA_W 844 //ModLayout 844 PreLayout 804
-#define HINT_AREA_H 40+6
+#define HINT_AREA_H 35
 
 class HintArea
 {

@@ -84,6 +84,11 @@ bool init_colors(void)
 	return false;
     if ((g_skyBlue = new_color(0, 255*65535/255, 255*65535/255)) == NULL)
 	return false;
+
+    g_deep = new_color(0, 0, 0);
+    g_deepGray = new_color(0, 0, 0);
+
+
     return true;
 }
 
@@ -104,7 +109,7 @@ void free_init_colors(void)
 }
 
 /*
- * UTF8缂栫爜甯歌鏍煎紡
+ * UTF8
    U-00000000 – U-0000007F:  0xxxxxxx
    U-00000080 – U-000007FF:  110xxxxx 10xxxxxx
    U-00000800 – U-0000FFFF:  1110xxxx 10xxxxxx 10xxxxxx
@@ -485,7 +490,9 @@ GtkWidget *create_button(GtkWidget *label, guint width, guint height, const GdkC
 	if (color)
 		gtk_widget_modify_bg(button, GTK_STATE_NORMAL, color);
 	gtk_button_set_focus_on_click(GTK_BUTTON(button), FALSE);
-//	gtk_button_set_focus_on_click(GTK_BUTTON(button), true);//test--2016.08.11
+  //	gtk_button_set_focus_on_click(GTK_BUTTON(button), true);//test--2016.08.11
+
+  modify_widget_bg(button);
 
 	return button;
 }
@@ -515,6 +522,8 @@ GtkWidget* create_button_icon(GtkWidget *label, GtkWidget *icon_image)
 
 	gtk_button_set_focus_on_click(GTK_BUTTON(button), FALSE);
     gtk_widget_show_all(button);
+
+  modify_widget_bg(button);
 
     return button;
 }
@@ -555,6 +564,9 @@ GtkWidget* create_combobox(guint width, guint height, const char *layouttype, Gt
     gtk_combo_box_set_active (GTK_COMBO_BOX (combobox), 0);
     g_object_unref (treemodel);
 
+
+  modify_widget_bg(combobox);
+
     return combobox;
 }
 
@@ -576,6 +588,9 @@ GtkWidget* create_combo_box_with_text(const int width, const int height, const v
 	gtk_widget_set_usize(combobox, width, height);
 
     g_object_unref (liststore);
+
+  modify_widget_bg(combobox);
+
     return combobox;
 }
 
@@ -2298,4 +2313,13 @@ void ChangeKeymap()
 
 	XFlush(display);
 	XCloseDisplay(display);
+}
+
+void modify_widget_bg(GtkWidget* widget) {
+  GdkColor* bg_color = new GdkColor();
+  gdk_color_parse("green", bg_color);
+
+  gtk_widget_modify_bg(widget, GTK_STATE_ACTIVE, bg_color);
+  gtk_widget_modify_bg(widget, GTK_STATE_PRELIGHT, bg_color);
+  gtk_widget_modify_bg(widget, GTK_STATE_SELECTED, bg_color);
 }

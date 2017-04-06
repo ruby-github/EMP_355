@@ -2927,41 +2927,18 @@ void ViewMain::Create(void)
     gtk_container_set_border_width(GTK_CONTAINER(m_mainWindow), 0);
     gtk_widget_modify_bg(m_mainWindow, GTK_STATE_NORMAL, g_deep);
 
-//	g_signal_connect(m_mainWindow,"key-press-event",G_CALLBACK(HandleKeyPressEvent),this);
+    //	g_signal_connect(m_mainWindow,"key-press-event",G_CALLBACK(HandleKeyPressEvent),this);
 
     m_fixedWindow = gtk_fixed_new();
     gtk_widget_set_usize(m_fixedWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
     gtk_widget_set_uposition(m_fixedWindow, 0, 0);
     gtk_container_add(GTK_CONTAINER(m_mainWindow), m_fixedWindow);
 
-    // Knob Area
-    GtkWidget *tableKnob;
-    tableKnob = m_ptrKnob->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableKnob, KNOB_X, KNOB_Y);
-#if 0
-    char tmp[20];
-    int detal_x = WIDTH_KNOB_MENU / 20;
-    int detal_y = HEIGHT_KNOB_MENU / 3;
-    GtkWidget* label_tmp;
-    for(int i = 0; i < 5; i++)
-    {
-        sprintf(tmp, "F%d", i+1);
-        label_tmp = gtk_label_new_with_mnemonic(tmp);
-        gtk_fixed_put(GTK_FIXED(m_fixedWindow), label_tmp, KNOB_X + detal_x + i * detal_x * 18 / 5, KNOB_Y + detal_y);
-    }
-#endif
-    // Menu Area
-    GtkWidget *tableMenu;
-    tableMenu = m_ptrMenuArea->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableMenu, 0, TOP_AREA_H);
-
-    m_daMenu = gtk_drawing_area_new();
-	gtk_widget_modify_bg(m_daMenu, GTK_STATE_NORMAL, g_black);
-    gtk_drawing_area_size(GTK_DRAWING_AREA(m_daMenu), MENU_AREA_W, IMG_AREA_H+HINT_AREA_H);
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), m_daMenu, 0, TOP_AREA_H+2);
-
-    // 2D knob menu
-    KnobD2Create();
+    // Top area
+    GtkWidget *da_topArea;
+    da_topArea = m_ptrTopArea->Create();
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_topArea, TOP_AREA_X, TOP_AREA_Y);
+    m_ptrTopArea->AddTimeOut();
 
     // image area
     GtkWidget *da_image;
@@ -2972,13 +2949,47 @@ void ViewMain::Create(void)
     // note area
     GtkWidget *canvas_note;
     canvas_note = m_ptrNoteArea->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), canvas_note, IMAGE_X+IMG_AREA_X, IMAGE_Y+IMG_AREA_Y);
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), canvas_note, IMG_AREA_X + IMAGE_X, IMG_AREA_Y + IMAGE_Y);
 
-    // Top area
-    GtkWidget *da_topArea;
-    da_topArea = m_ptrTopArea->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_topArea, TOP_AREA_X, TOP_AREA_Y);
-    m_ptrTopArea->AddTimeOut();
+    // Knob Area
+    GtkWidget *tableKnob;
+    tableKnob = m_ptrKnob->Create();
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableKnob, KNOB_X, KNOB_Y);
+
+    #if 0
+    char tmp[20];
+    int detal_x = WIDTH_KNOB_MENU / 20;
+    int detal_y = HEIGHT_KNOB_MENU / 3;
+    GtkWidget* label_tmp;
+    for(int i = 0; i < 5; i++)
+    {
+        sprintf(tmp, "F%d", i+1);
+        label_tmp = gtk_label_new_with_mnemonic(tmp);
+        gtk_fixed_put(GTK_FIXED(m_fixedWindow), label_tmp, KNOB_X + detal_x + i * detal_x * 18 / 5, KNOB_Y + detal_y);
+    }
+    #endif
+
+    // hint
+    GtkWidget *da_hintArea;
+    da_hintArea = m_ptrHintArea->Create();
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_hintArea, HINT_X, HINT_Y);
+
+    // icon view
+    ViewIcon::GetInstance()->Create();
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), ViewIcon::GetInstance()->GetIconArea(), 844, 733); // 740
+
+    // Menu Area
+    GtkWidget *tableMenu;
+    tableMenu = m_ptrMenuArea->Create();
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableMenu, 844, 0);
+
+    m_daMenu = gtk_drawing_area_new();
+	  gtk_widget_modify_bg(m_daMenu, GTK_STATE_NORMAL, g_black);
+    gtk_drawing_area_size(GTK_DRAWING_AREA(m_daMenu), MENU_AREA_W, MENU_AREA_H - TOP_AREA_H);
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), m_daMenu, 844, TOP_AREA_H);
+
+    // 2D knob menu
+    KnobD2Create();
 
     // status area
     // GtkWidget *status_area = gtk_drawing_area_new();
@@ -2986,18 +2997,10 @@ void ViewMain::Create(void)
     // gtk_fixed_put(GTK_FIXED(m_fixedWindow),status_area, STATUS_X, STATUS_Y);
     // gtk_widget_modify_bg(status_area, GTK_STATE_NORMAL, g_black);
 
-    GtkWidget *da_hintArea;
-    da_hintArea = m_ptrHintArea->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_hintArea, HINT_X, HINT_Y);
-
-    // icon view
-    ViewIcon::GetInstance()->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), ViewIcon::GetInstance()->GetIconArea(), 5, 742); // 740
-
     g_keyInterface.Push(this);
 
     Show();
-	gtk_widget_hide(m_daMenu);
+	  gtk_widget_hide(m_daMenu);
 
     m_ptrNoteArea->Hide();
 
@@ -3024,13 +3027,13 @@ void ViewMain::Create(void)
     //ClickArchive(NULL);
     //test(NULL);
 
-#ifdef EMP_3410
+  #ifdef EMP_3410
 	if(g_authorizationOn)
 		CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 0);
-#else
+  #else
 	if(g_authorizationOn)
 		CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 1);
-#endif
+  #endif
 }
 
 void ViewMain::MySleep(int msecond)

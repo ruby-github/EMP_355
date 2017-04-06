@@ -663,7 +663,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 #endif
 
 					if (MultiFuncFactory::GetInstance()->GetMultiFuncType() == MultiFuncFactory::LOCAL_ZOOM) {
-						// imageSymbol鍙犲姞(symbol -> m_bitsReplayMix)
+						// imageSymbol (symbol -> m_bitsReplayMix)
 						unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
 						pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
 						widthSrc1 = IMG_AREA_W;
@@ -787,7 +787,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 				roiHeightSrc = m_symbolArea.h;
 				ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
 
-				// imageSpectra鍙犲姞
+				// imageSpectra
 				if (ModeStatus::IsMImgMode() || ModeStatus::IsAnatomicMode() || ModeStatus::IsPWImgMode() || ModeStatus::IsCWImgMode()) {
 					unsigned char* spectraData = (unsigned char *)m_imageSpectra->imageData;
 					pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*m_spectraArea.y*IMG_BPP + m_spectraArea.x*IMG_BPP);
@@ -801,7 +801,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 					ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
 				}
 
-				// preBox鍙犲姞(box -> m_bitsMix)
+				// preBox (box -> m_bitsMix)
 				if (ModeStatus::IsColorMode()) {
 					unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
 					pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
@@ -877,7 +877,6 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 				roiHeightSrc = IMAGE_H;
 				ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
 
-				// 缁樺埗鍙犲姞瀹屾垚鍚庣殑鏁版嵁
 				gdk_draw_pixbuf(widget->window,
 						widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
 						m_mixPixbuf,
@@ -949,7 +948,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 	}
 
 #if 0
-	// 缁樺埗PixmapArea
+	// PixmapArea
 	gdk_draw_drawable(widget->window,
 			gc,
 			m_pixmapArea,
@@ -982,7 +981,6 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event)
 			IMAGE_W, IMAGE_H);
 	//   }
 
-	// 缁樺埗娴嬮噺缁撴灉
 	gdk_gc_set_function(gc, GDK_COPY);
 	vector<MeasurePos>::iterator iter;
 	for (iter = m_meaResultPos.begin(); iter != m_meaResultPos.end(); ++iter) {

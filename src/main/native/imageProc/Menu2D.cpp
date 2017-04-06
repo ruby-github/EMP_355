@@ -76,6 +76,8 @@ GtkWidget* Menu2D::Create(void)
     g_signal_connect(m_check_btn_polarity, "clicked", G_CALLBACK(HandleChkPolarity), this);
     gtk_widget_show(m_check_btn_polarity);
 
+    modify_widget_bg(m_check_btn_polarity);
+
     // restric on/off
     m_labelRestric = create_label("", 0, 0, g_lightGray, NULL);
     m_check_btn_restric = gtk_check_button_new();
@@ -83,6 +85,8 @@ GtkWidget* Menu2D::Create(void)
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_check_btn_restric, 0, 1, 1, 2);
     g_signal_connect(m_check_btn_restric, "clicked", G_CALLBACK(HandleChkRestric), this);
     gtk_widget_show(m_check_btn_polarity);
+
+    modify_widget_bg(m_check_btn_restric);
 
     // rotate 90/270/OFF
     spin_rotate.SetItem(&item_rotate);

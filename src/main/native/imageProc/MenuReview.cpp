@@ -219,7 +219,6 @@ void MenuReview::UpdateLabel(void)
 	gtk_widget_set_tooltip_text(m_btnDel, _("Delete"));
 }
 
-//◀ ◁ ▶ ▷
 GtkWidget* MenuReview::Create(void)
 {
 	int i, j;
@@ -292,7 +291,7 @@ GtkWidget* MenuReview::Create(void)
     gtk_fixed_put (GTK_FIXED (m_fixed), hbox_scroll, 0, 570);
     gtk_widget_set_size_request (hbox_scroll, MENU_AREA_W, 30);
 
-//	GtkWidget *labelLeft = create_label("鈼€", 0, 0, g_white, NULL);
+//	GtkWidget *labelLeft = create_label("◀", 0, 0, g_white, NULL);
 	GtkWidget *imgPrevious = gtk_image_new_from_stock(GTK_STOCK_MEDIA_PREVIOUS, GTK_ICON_SIZE_LARGE_TOOLBAR);
 //	m_btnLeft = create_button(labelLeft, 60, 0, g_deep);
 	m_btnLeft = create_button_icon_only(imgPrevious, 0, 0, g_deep);
@@ -396,8 +395,8 @@ void MenuReview::SetImgPath(const char *path)
 
 /*
  *  隐藏Tooltips，仅用于存储图片时使用
- *  褰揟ooltip鏄剧ず鏃跺瓨鍌ㄥ浘鐗囦細瀵艰嚧鍥惧儚鏁版嵁琚玊ooltip瑕嗙洊锛屽洜姝ゅ湪瀛樺偍鍥剧墖鏃堕渶瑕佸厛闅愯棌Tooltip锛屽瓨鍌ㄥ畬鎴愬悗闇€瑕侀噸鏂拌缃甌ooltip
- *  鐢变簬瀛樺偍鍥剧墖鍚庝細璋冪敤UpdatePreviewList鍒锋柊鍒楄〃锛屽悓鏃朵細閲嶈Tooltip锛屼絾鍏ㄩ€夈€佸垹闄ょ瓑鎸夐挳鏈噸璁撅紝鍥犳闇€瑕佸湪瀹屾垚瀛樺偍鍚庤皟鐢║pdateLabel杩涜閲嶈
+ *  当Tooltip显示时存储图片会导致图像数据被Tooltip覆盖，因此在存储图片时需要先隐藏Tooltip，存储完成后需要重新设置Tooltip
+ *  由于存储图片后会调用UpdatePreviewList刷新列表，同时会重设Tooltip，但全选、删除等按钮未重设，因此需要在完成存储后调用UpdateLabel进行重设
  */
 void MenuReview::HideTooltips()
 {
@@ -622,12 +621,12 @@ void MenuReview::LoadSnapToScreen(const char* path)
     	}
     }
 
-	//璁剧疆鍥惧儚鍙傛暟
+	//设置图像参数
 	ScanMode::GetInstance()->EnterSpecialMeasure(item.para);
 
 	//clear arrow and measure data
 	CArrow::DeleteAllForFreeze();
-	MeasureMan::GetInstance()->DeleteAllForClearScreen(FALSE); //姝ゅ涓嶅彲杩涜鍒锋柊鎿嶄綔
+	MeasureMan::GetInstance()->DeleteAllForClearScreen(FALSE); //此处不可进行刷新操作
 
     if(!ViewSuperuser::GetInstance()->GetDemoStatus())
     {
