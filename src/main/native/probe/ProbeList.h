@@ -71,7 +71,7 @@ unsigned char Probe75L40K[PROBE_INFO_SIZE] = //75L40K
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'A',		'P',		'X',		0x5a,
 };
-unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H //浣庨寰嚫
+unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H
 {
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
