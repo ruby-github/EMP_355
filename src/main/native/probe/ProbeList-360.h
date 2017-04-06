@@ -67,7 +67,7 @@ unsigned char Probe75LVS[PROBE_INFO_SIZE] = //7.5LVS
     'E',		'M',		'P',		0x5a,
 };
 #endif
-unsigned char Probe35MC[PROBE_INFO_SIZE] = //3.5MC //浣庨寰嚫
+unsigned char Probe35MC[PROBE_INFO_SIZE] = //3.5MC
 {
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
@@ -87,7 +87,7 @@ unsigned char Probe35MC[PROBE_INFO_SIZE] = //3.5MC //浣庨寰嚫
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65MC[PROBE_INFO_SIZE] = //6.5MC  //楂橀寰嚫
+unsigned char Probe65MC[PROBE_INFO_SIZE] = //6.5MC
 {
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',

@@ -4,7 +4,7 @@
 ///> probe list A60
 #define PROBE_INFO_SIZE  128
 #ifdef EMP_430
-enum EProbeList430 {P35C60E, P65L40E, P65C10E, PT65C15D, P35D50D}; // P35C20H, P28P16, P90L25K, P10L25J, P35D50D}; //80 闃靛厓
+enum EProbeList430 {P35C60E, P65L40E, P65C10E, PT65C15D, P35D50D}; // P35C20H, P28P16, P90L25K, P10L25J, P35D50D};
 
 unsigned char Probe35C60E[PROBE_INFO_SIZE] = //35C60E convex
 {
@@ -70,7 +70,7 @@ unsigned char Probe65L40E[PROBE_INFO_SIZE] = //75L40K 之前探头是3840 现在
     0,		0,		0,		0x5a,
 };
 
-unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
+unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = //65C15D
 {
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
@@ -96,7 +96,7 @@ unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
     0,		0,		0,		0x5a,
 };
 #if 0
-unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H //浣庨寰嚫
+unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H
 {
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',

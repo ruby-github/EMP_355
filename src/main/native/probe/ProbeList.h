@@ -91,7 +91,7 @@ unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H //浣庨寰嚫
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
+unsigned char Probe65C15D[PROBE_INFO_SIZE] = //65C15D
 {
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
@@ -267,7 +267,7 @@ unsigned char Probe35D40JNDK[PROBE_INFO_SIZE] = //volume convex
 };
 
 #ifdef VET
-unsigned char Probe55L60H[PROBE_INFO_SIZE] = //鍙浜烘祦
+unsigned char Probe55L60H[PROBE_INFO_SIZE] =
 {
     '5',	'5',	'L',	'6',	'0',	'H',	'0',	'0',	'0',	'0',
     'L',	0,		96,		1,		92,		63,	    27,		0,		0,		0,
@@ -286,7 +286,7 @@ unsigned char Probe55L60H[PROBE_INFO_SIZE] = //鍙浜烘祦
 };
 
 #else
-unsigned char Probe65C10H[PROBE_INFO_SIZE] = //鍙浜烘祦
+unsigned char Probe65C10H[PROBE_INFO_SIZE] =
 {
     '6',	'5',	'C',	'1',	'0',	'H',	'0',	'0',	'0',	'0',
     'C',	0,		96,		1,		92,		150,	0,		10,		0,		0,

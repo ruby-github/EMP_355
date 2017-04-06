@@ -4,7 +4,7 @@
 ///> probe list 3000+A60
 #define PROBE_INFO_SIZE  128
 #ifdef EMP_440
-enum EProbeList440 {P35CV, P65VMC, P75LVS, PT65C15D}; // P35C20H, P28P16, P90L25K, P10L25J, P35D50D}; //80 闃靛厓
+enum EProbeList440 {P35CV, P65VMC, P75LVS, PT65C15D}; // P35C20H, P28P16, P90L25K, P10L25J, P35D50D};
 
 unsigned char Probe35CV[PROBE_INFO_SIZE] = //3.5CV
 {
@@ -69,7 +69,7 @@ unsigned char Probe75LVS[PROBE_INFO_SIZE] = //7.5LVS
     0,		0,		0,		0x5a,
 };
 
-unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
+unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = //65C15D
 {
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',

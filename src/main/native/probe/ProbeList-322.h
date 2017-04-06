@@ -67,7 +67,7 @@ unsigned char Probe75L40J[PROBE_INFO_SIZE] = //75L40J
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe35C20G[PROBE_INFO_SIZE] = //35C20G //浣庨寰嚫
+unsigned char Probe35C20G[PROBE_INFO_SIZE] = //35C20G
 {
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
@@ -87,7 +87,7 @@ unsigned char Probe35C20G[PROBE_INFO_SIZE] = //35C20G //浣庨寰嚫
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65C20G[PROBE_INFO_SIZE] = //65C20G  //楂橀寰嚫
+unsigned char Probe65C20G[PROBE_INFO_SIZE] = //65C20G
 {
     // black-white
     '6',	'5',	'C',	'2',	'0',	'G',	'0',	'0',	'0',	'0',
