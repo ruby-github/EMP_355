@@ -47,10 +47,12 @@ public:
     void ShowCalcMenu(void);
     void ShowNoteMenu(void);
     void ShowBiopsyMenu(void);
-    void ShowSystemMenu(void);
-    void GetMenuIndex(int &index);
     void ShowBioBracketMenu(void);
     void ShowBioVerifyMenu(void);
+    void ShowSystemMenu(void);
+
+    void GetMenuIndex(int &index);
+
 private:
     MenuArea();
     static MenuArea *m_ptrInstance;

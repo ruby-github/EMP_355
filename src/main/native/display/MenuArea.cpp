@@ -386,6 +386,8 @@ void MenuArea::Show2DMenu(void) {
     g_menu2D.Show();
     //    gtk_widget_show(m_noteBook);
     //    gtk_widget_show(m_btnExit);
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 0);
 }
 
 void MenuArea::ShowMMenu(void) {
@@ -460,6 +462,7 @@ void MenuArea::ShowCWCFMMenu(bool currentCw) {
     }
     PRINTF("-------------menu type = %d\n", m_menuType);
 }
+
 void MenuArea::ShowPWCFMMenu(bool currentPw) {
     m_in2DOnly = false;
     m_menuType = PWCFM;
@@ -499,6 +502,8 @@ void MenuArea::ShowMeasureMenu(void) {
     g_keyInterface.CtrlLight(TRUE,LIGHT_MEASURE);
 #endif
     g_menuMeasure.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 5);
 }
 
 void MenuArea::ShowBDMKMenu(void) {
@@ -509,6 +514,8 @@ void MenuArea::ShowBDMKMenu(void) {
     g_keyInterface.CtrlLight(TRUE,LIGHT_BODYMARK);
 #endif
     g_menuBDMK.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 6);
 }
 
 void MenuArea::ShowReviewMenu(void) {
@@ -516,6 +523,8 @@ void MenuArea::ShowReviewMenu(void) {
     HideAllOtherMenu();
     gtk_label_set_text(GTK_LABEL(m_labelSub), _("Review"));
     g_menuReview.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 7);
 }
 
 void MenuArea::ShowCalcMenu(void) {
@@ -526,6 +535,8 @@ void MenuArea::ShowCalcMenu(void) {
     g_keyInterface.CtrlLight(TRUE,LIGHT_CALC);
 #endif
     g_menuCalc.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 8);
 }
 
 void MenuArea::ShowNoteMenu(void) {
@@ -536,6 +547,8 @@ void MenuArea::ShowNoteMenu(void) {
     // ShowMenu();
     g_menuNote.Show();
 
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 9);
+
 }
 
 void MenuArea::ShowBiopsyMenu(void) {
@@ -544,18 +557,59 @@ void MenuArea::ShowBiopsyMenu(void) {
     // gtk_label_set_text(GTK_LABEL(m_labelSub), _("System Setting\n\nBiopsy Setting"));
     gtk_label_set_text(GTK_LABEL(m_labelSub), _("Biopsy"));
     g_menuBiopsy.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 10);
 }
 void MenuArea::ShowBioBracketMenu(void) {
     m_menuType = BIOPSYBRACKET;
     HideAllOtherMenu();
     gtk_label_set_text(GTK_LABEL(m_labelSub), _("Biopsy Bracket"));
     g_menuBiopsyBracket.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 11);
 }
 void MenuArea::ShowBioVerifyMenu(void) {
     m_menuType = BIOPSYVERIFY;
     HideAllOtherMenu();
     gtk_label_set_text(GTK_LABEL(m_labelSub), _("Verify"));
     g_menuBiopsyVerify.Show();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 12);
+}
+
+void MenuArea::ShowEFOVPrepare(void) {
+    m_menuType = EFOV;
+    HideAllOtherMenu();
+    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nPrepare Status"));
+    g_menuEFOV.ShowPrepare();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 13);
+}
+void MenuArea::ShowEFOVCapture(void) {
+    m_menuType = EFOV;
+    HideAllOtherMenu();
+    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nCapture Status"));
+    g_menuEFOV.ShowCapture();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 13);
+}
+
+void MenuArea::ShowEFOVView(void) {
+    m_menuType = EFOV;
+    HideAllOtherMenu();
+    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nView Status"));
+    g_menuEFOV.ShowView();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 13);
+}
+
+void MenuArea::ShowEFOVReview(void) {
+    m_menuType = EFOV;
+    HideAllOtherMenu();
+    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nReview Status"));
+    g_menuEFOV.ShowReview();
+
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 13);
 }
 
 void MenuArea::ShowSystemMenu(void) {
@@ -564,33 +618,8 @@ void MenuArea::ShowSystemMenu(void) {
     gtk_label_set_text(GTK_LABEL(m_labelSub), _("System Setting"));
     g_menuSystem.Show();
     PRINTF("-------------------------------show system menu\n");
-}
 
-void MenuArea::ShowEFOVPrepare(void) {
-    m_menuType = EFOV;
-    HideAllOtherMenu();
-    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nPrepare Status"));
-    g_menuEFOV.ShowPrepare();
-}
-void MenuArea::ShowEFOVCapture(void) {
-    m_menuType = EFOV;
-    HideAllOtherMenu();
-    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nCapture Status"));
-    g_menuEFOV.ShowCapture();
-}
-
-void MenuArea::ShowEFOVView(void) {
-    m_menuType = EFOV;
-    HideAllOtherMenu();
-    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nView Status"));
-    g_menuEFOV.ShowView();
-}
-
-void MenuArea::ShowEFOVReview(void) {
-    m_menuType = EFOV;
-    HideAllOtherMenu();
-    gtk_label_set_text(GTK_LABEL(m_labelSub), _("pScape Mode\n\nReview Status"));
-    g_menuEFOV.ShowReview();
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 14);
 }
 
 void MenuArea::HideAllOtherMenu(void) {
