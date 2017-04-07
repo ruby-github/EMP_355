@@ -57,19 +57,19 @@ void TopArea::DrawLogo(void) {
 }
 
 void TopArea::UpdateHospitalName(const char *name) {
-    const int y = 5;
+    const int y = 10;
     // sprintf(m_hospital, "%s", name);
 
     PRINTF("hospital name====%s\n",name);
     //m_hospital = name;
     sprintf(m_hospital, "%s", name);
-    ClearArea(TOP_AREA_P1, y, 120, 50);
+    ClearArea(TOP_AREA_P1 + 5, y, 110, 45);
     PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, name);
-    int font_size = 16;
-    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name, 120);
+    int font_size = 24;
+    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name, 110);
     g_object_unref(layout);
 
-    DrawString(name, TOP_AREA_P1, y, g_white, font);
+    DrawString(name, TOP_AREA_P1 + 5, y, g_white, font);
     pango_font_description_free(font);
 }
 #ifdef VET
