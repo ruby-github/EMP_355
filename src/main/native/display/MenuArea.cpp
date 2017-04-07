@@ -62,6 +62,9 @@ GtkWidget* MenuArea::Create(void) {
     g_signal_connect(G_OBJECT(m_noteBook), "switch-page", G_CALLBACK(HandleNotebookChanged), this);
     gtk_container_set_border_width (GTK_CONTAINER (m_noteBook), 0);
 
+    //gtk_notebook_set_scrollable(GTK_NOTEBOOK(m_noteBook), TRUE);
+    //gtk_notebook_set_show_tabs(GTK_NOTEBOOK(m_noteBook), TRUE);
+
     //2D menu
     GtkWidget *table2D = g_menu2D.Create();
     gtk_widget_set_usize(table2D, widthMax, heightMaxNB);
@@ -657,6 +660,7 @@ void MenuArea::HideAllOtherMenu(void) {
     if(m_menuType != BIOPSYVERIFY)
         g_menuBiopsyVerify.Hide();
     //-------------------------------------//
+
     DarkFucusLight();
 }
 

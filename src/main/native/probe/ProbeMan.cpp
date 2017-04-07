@@ -21,6 +21,10 @@
 #include "imageControl/FpgaGeneral.h"
 #include "base/IniFile.h"
 
+#include <string>
+
+using namespace std;
+
 ProbeMan* ProbeMan::m_ptrInstance = NULL;
 #if (defined(EMP_360)||defined(EMP_440))
 const int ProbeMan::CMD_READ_PARA[MAX_SOCKET] = {0x0, 0x2, 0x1, 0x3};
@@ -863,5 +867,27 @@ string ProbeMan::ReadDefaultProbe(IniFile* ptrIni) {
 }
 
 void ProbeMan::VerifyProbeName(const char *fromType, char *toType) {
-    sprintf(toType, "%s", fromType);
+    // "35C50L",  "70L40J", "65C10L", "35C20I", "65C15E", "30P16B", "10L25K"
+    // "C35",     "L75",    "C65",    "C35-20", "C65-15", "P30",    "L10"
+
+    string probe_name = string(fromType);
+
+    if (probe_name == "35C50L") {
+        probe_name = "C35";
+    } else if (probe_name == "70L40J") {
+        probe_name = "L75";
+    } else if (probe_name == "65C10L") {
+        probe_name = "C65";
+    } else if (probe_name == "35C20I") {
+        probe_name = "C35-20";
+    } else if (probe_name == "65C15E") {
+        probe_name = "C65-15";
+    } else if (probe_name == "30P16B") {
+        probe_name = "P30";
+    } else if (probe_name == "10L25K") {
+        probe_name = "L10";
+    } else {
+    }
+
+    sprintf(toType, "%s", probe_name.c_str());
 }
