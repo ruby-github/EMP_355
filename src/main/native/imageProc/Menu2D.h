@@ -5,16 +5,15 @@
 #include "Def.h"
 #include "display/CusSpin.h"
 
-class Menu2D
-{
+class Menu2D {
 public:
     Menu2D();
-    ~Menu2D(){}
+    ~Menu2D() {}
     void Hide(void);
     void Show(void);
     GtkWidget * Create(void);
 
-	void Sensitive(bool on);
+    void Sensitive(bool on);
     void UpdateLabel(void);
     void UpdatePolarity(bool on);
     void UpdateNoiseReject(bool on);
@@ -52,7 +51,7 @@ private:
     CusSpin spin_chroma;
     CusSpin spin_imgEhn;
 
-	bool m_sensitive;
+    bool m_sensitive;
 
     static CusSpin::CusSpinItem item_rotate;
     static CusSpin::CusSpinItem item_frame;
@@ -78,16 +77,34 @@ private:
     void ForeachWidget(GtkWidget *widget);
 
 //signal connect
-    static void HandleChkPolarity(GtkButton *button, Menu2D *data) { data->ChkPolarity(button); }
-    static void HandleChkRestric(GtkButton *button, Menu2D *data) { data->ChkNoiseReject(button); }
-    static void HandleBtnTrans(GtkButton *button, Menu2D *data) { data->BtnTrans(button); }
-    static void HandleBtnReject(GtkButton *button, Menu2D *data) { data->BtnReject(button); }
-    static void HandleBtnGlobalZoom(GtkButton *button, Menu2D *data) { data->BtnGlobalZoom(button); }
-    static void HandleBtnPIP(GtkButton *button, Menu2D *data) { data->BtnPIP(button); }
-    static void HandleBtn4B(GtkButton *button, Menu2D *data) { data->Btn4B(button); }
-    static void HandleForeachWidget(gpointer element, Menu2D *data) { data->ForeachWidget(GTK_WIDGET(element)); }
+    static void HandleChkPolarity(GtkButton *button, Menu2D *data) {
+        data->ChkPolarity(button);
+    }
+    static void HandleChkRestric(GtkButton *button, Menu2D *data) {
+        data->ChkNoiseReject(button);
+    }
+    static void HandleBtnTrans(GtkButton *button, Menu2D *data) {
+        data->BtnTrans(button);
+    }
+    static void HandleBtnReject(GtkButton *button, Menu2D *data) {
+        data->BtnReject(button);
+    }
+    static void HandleBtnGlobalZoom(GtkButton *button, Menu2D *data) {
+        data->BtnGlobalZoom(button);
+    }
+    static void HandleBtnPIP(GtkButton *button, Menu2D *data) {
+        data->BtnPIP(button);
+    }
+    static void HandleBtn4B(GtkButton *button, Menu2D *data) {
+        data->Btn4B(button);
+    }
+    static void HandleForeachWidget(gpointer element, Menu2D *data) {
+        data->ForeachWidget(GTK_WIDGET(element));
+    }
 
-    static void HandleBtnEFOV(GtkButton *button, Menu2D *data) { data->BtnEnterEFOV(button); }
+    static void HandleBtnEFOV(GtkButton *button, Menu2D *data) {
+        data->BtnEnterEFOV(button);
+    }
     void BtnEnterEFOV(GtkButton *button);
 };
 

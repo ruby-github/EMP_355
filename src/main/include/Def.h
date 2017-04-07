@@ -17,14 +17,14 @@
 
 ///> general define
 #ifndef FALSE
-	#define FALSE 0
+#define FALSE 0
 #endif
 #ifndef TRUE
-	#define TRUE 1
+#define TRUE 1
 #endif
 
 #ifndef NULL
-	#define NULL 0
+#define NULL 0
 #endif
 
 #define PI 3.1415926
@@ -33,11 +33,11 @@
 
 ///> output debug info
 #ifdef DEBUG
-	#define PRINTF(fmt, args...) printf(fmt, ##args);
-	#define ASSERT assert
+#define PRINTF(fmt, args...) printf(fmt, ##args);
+#define ASSERT assert
 #else
-	#define PRINTF(fmt, args...)
-	#define ASSERT
+#define PRINTF(fmt, args...)
+#define ASSERT
 #endif
 
 #define SCREEN_WIDTH 1024
@@ -270,36 +270,34 @@
 #endif
 
 ///> define new type
-enum EKnobOper{SUB, ADD, ROTATE};
+enum EKnobOper {SUB, ADD, ROTATE};
 
-enum EKnobReturn{ERROR, OK, MIN, MAX, PRESS};
+enum EKnobReturn {ERROR, OK, MIN, MAX, PRESS};
 
-enum EDrawMode{COPY, XOR};
+enum EDrawMode {COPY, XOR};
 
 #ifdef VET
-enum EStudy{ANIMAL, PART};
+enum EStudy {ANIMAL, PART};
 #else
 
 #if (defined(EMP_322) || defined(EMP_313))
-enum EStudy{ABD, OB, GYN, UR, CAR, SP, ORT, EXTRA};
+enum EStudy {ABD, OB, GYN, UR, CAR, SP, ORT, EXTRA};
 #else
-enum EStudy{ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
+enum EStudy {ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
 #endif
 //enum EStudy{ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
 #endif
-typedef struct tagPOINT
-{
-	int x;
-	int y;
+typedef struct tagPOINT {
+    int x;
+    int y;
 } POINT, *PPOINT;
 
 /* The RGBTRIPLE structure describes a color consisting of relative intensities of red, green, and blue.
 */
-typedef struct tagRGBTRIPLE
-{
-  unsigned char rgbtRed;			//!< Specifies the intensity of red in the color.
-  unsigned char rgbtGreen;			//!< Specifies the intensity of green in the color.
-  unsigned char rgbtBlue;			//!< Specifies the intensity of blue in the color.
+typedef struct tagRGBTRIPLE {
+    unsigned char rgbtRed;			//!< Specifies the intensity of red in the color.
+    unsigned char rgbtGreen;			//!< Specifies the intensity of green in the color.
+    unsigned char rgbtBlue;			//!< Specifies the intensity of blue in the color.
 } RGBTRIPLE;
 typedef EKnobReturn (*pKeyFunc)(EKnobOper);
 

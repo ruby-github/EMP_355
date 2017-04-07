@@ -6,7 +6,7 @@
 #include <string>
 
 #define TOP_AREA_W 844 //ModLayout 844 PreLayout 804
-#define TOP_AREA_H 100-2
+#define TOP_AREA_H 60
 /*
  *      Logo |    Hospital        |  Probe     |  TIS |  Time
  *           |                    |            |      |
@@ -14,12 +14,11 @@
  *	  0      P1                   P2           P3     P4          844
  */
 #define TOP_AREA_P1 130
-#define TOP_AREA_P2 440
-#define TOP_AREA_P3 570
-#define TOP_AREA_P4 650
+#define TOP_AREA_P2 260
+#define TOP_AREA_P3 614
+#define TOP_AREA_P4 694
 
-class TopArea
-{
+class TopArea {
 public:
     ~TopArea();
     static TopArea * GetInstance();
@@ -31,7 +30,7 @@ public:
 #else
     void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
 #endif
-   // void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
+    // void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
     void UpdateProbeType(const char *type);
     void UpdateFreq(const char *freq);
     void UpdateCheckPart(const char *part);
@@ -40,7 +39,9 @@ public:
     void UpdateTIS(double TIS);
     void DrawDateTime(void);
     void SetReadImg(bool status);
-    bool GetReadImg() { return m_inReadImg; }
+    bool GetReadImg() {
+        return m_inReadImg;
+    }
     void DrawSnap(GdkPixbuf *pixbuf, int src_x, int src_y, int width, int height);
     void AddTimeOut();
     void DelTimeOut();
@@ -48,8 +49,14 @@ public:
     void GetCheckPart(std::string& ExamType);
     void GetDepth(int& Depth);
     void GetHospitalName(std::string &name);
-    void SetDateFormat(int DateFormat) { m_dateFormat = DateFormat; }
-    std::string GetProbeType(void) { return m_probeType_old; }
+    void SetDateFormat(int DateFormat) {
+        m_dateFormat = DateFormat;
+    }
+    std::string GetProbeType(void) {
+        return m_probeType_old;
+    }
+
+    void UpdateImageParam(std::string param);
 
 private:
     TopArea();
@@ -70,27 +77,32 @@ private:
     char m_probeType[30];
     char m_freq[30];
     char m_checkPart[30];
-   // std::string m_hospital;
-  char m_hospital[256];
+    // std::string m_hospital;
+    char m_hospital[256];
 
     int m_depth;
     double m_MI;
     double m_TIS;
-   // float tis;
+    // float tis;
     int m_dateFormat;
+
+    std::string m_image_param;
 
 //signal handle
     void TopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event);
     void TopAreaExpose(GtkWidget *widget, GdkEventExpose *event);
 //signal connect
-    static gboolean HandleTopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, TopArea *data)
-	{ data->TopAreaConfigure(widget, event); return FALSE; }
-    static gboolean HandleTopAreaExpose(GtkWidget *widget, GdkEventExpose *event, TopArea *data)
-	{ data->TopAreaExpose(widget, event); return FALSE; }
+    static gboolean HandleTopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, TopArea *data) {
+        data->TopAreaConfigure(widget, event);
+        return FALSE;
+    }
+    static gboolean HandleTopAreaExpose(GtkWidget *widget, GdkEventExpose *event, TopArea *data) {
+        data->TopAreaExpose(widget, event);
+        return FALSE;
+    }
 };
 
-inline void TopArea::UpdateTopArea(void)
-{
+inline void TopArea::UpdateTopArea(void) {
     gtk_widget_queue_draw(m_topArea);
 }
 #endif

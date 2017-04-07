@@ -5,8 +5,7 @@
 #include "display/FakeXEvent.h"
 #include <string>
 
-class ViewPrinterAdd : public FakeXEvent
-{
+class ViewPrinterAdd : public FakeXEvent {
 public:
     ~ViewPrinterAdd();
     static ViewPrinterAdd* GetInstance();
@@ -30,10 +29,18 @@ private:
     void BtnCancelClicked(GtkButton *button);
     void BtnPPDNameClicked(GtkButton *button);
 // signal connect
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewPrinterAdd *data) { return data->WindowDeleteEvent(widget, event); }
-    static void on_button_add_clicked(GtkButton *button, ViewPrinterAdd *data) { data->BtnAddClicked(button); }
-    static void on_button_cancel_clicked(GtkButton *button, ViewPrinterAdd *data) { data->BtnCancelClicked(button); }
-    static void on_button_ppd_file_clicked(GtkButton *button, ViewPrinterAdd *data) { data->BtnPPDNameClicked(button); }
+    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewPrinterAdd *data) {
+        return data->WindowDeleteEvent(widget, event);
+    }
+    static void on_button_add_clicked(GtkButton *button, ViewPrinterAdd *data) {
+        data->BtnAddClicked(button);
+    }
+    static void on_button_cancel_clicked(GtkButton *button, ViewPrinterAdd *data) {
+        data->BtnCancelClicked(button);
+    }
+    static void on_button_ppd_file_clicked(GtkButton *button, ViewPrinterAdd *data) {
+        data->BtnPPDNameClicked(button);
+    }
 };
 
 #endif /* _VIEWPRINTADD_H_ */

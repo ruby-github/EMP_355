@@ -21,51 +21,43 @@ CusSpin::CusSpinItem Menu2D::item_frame = {N_("Frame aver."), "1", OK, ChgFrame}
 CusSpin::CusSpinItem Menu2D::item_line = {N_("Line aver."), "1", OK, ChgLine};
 CusSpin::CusSpinItem Menu2D::item_smooth = {N_("Smooth"), "1", OK, ChgSmooth};
 CusSpin::CusSpinItem Menu2D::item_gamma = {N_("Gamma"), "1", OK, ChgGamma};
-CusSpin::CusSpinItem Menu2D::item_imgEhn = {N_("ePure"), "0", OK, ChgImgEhn};
+CusSpin::CusSpinItem Menu2D::item_imgEhn = {N_("iPurity"), "0", OK, ChgImgEhn};
 
-Menu2D::Menu2D(void)
-{
-	m_table = 0;
+Menu2D::Menu2D(void) {
+    m_table = 0;
 }
 
-void Menu2D::Hide(void)
-{
-	gtk_widget_hide_all(m_table);
+void Menu2D::Hide(void) {
+    gtk_widget_hide_all(m_table);
 }
 
-void Menu2D::Show(void)
-{
-	gtk_widget_show_all(m_table);
+void Menu2D::Show(void) {
+    gtk_widget_show_all(m_table);
 
-    if (ModeStatus::IsSpectrumColorMode())
-    {
+    if (ModeStatus::IsSpectrumColorMode()) {
         gtk_widget_hide(m_btn4B);
     }
 
     gtk_widget_hide(m_check_btn_polarity);
 }
 
-void Menu2D::ForeachWidget(GtkWidget *widget)
-{
-	if(widget != m_btn4B)
-		gtk_widget_set_sensitive(widget, (bool)m_sensitive);
+void Menu2D::ForeachWidget(GtkWidget *widget) {
+    if(widget != m_btn4B)
+        gtk_widget_set_sensitive(widget, (bool)m_sensitive);
 }
 
-void Menu2D::Sensitive(bool on)
-{
-	m_sensitive = on;
+void Menu2D::Sensitive(bool on) {
+    m_sensitive = on;
 
-	GList *list = NULL;
-	list = gtk_container_get_children(GTK_CONTAINER(m_table));
-	if(list)
-	{
-		g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
-		g_list_free(list);
-	}
+    GList *list = NULL;
+    list = gtk_container_get_children(GTK_CONTAINER(m_table));
+    if(list) {
+        g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
+        g_list_free(list);
+    }
 }
 
-GtkWidget* Menu2D::Create(void)
-{
+GtkWidget* Menu2D::Create(void) {
     m_table = gtk_table_new(20, 1, TRUE);
 
     //polarity
@@ -76,6 +68,8 @@ GtkWidget* Menu2D::Create(void)
     g_signal_connect(m_check_btn_polarity, "clicked", G_CALLBACK(HandleChkPolarity), this);
     gtk_widget_show(m_check_btn_polarity);
 
+    modify_widget_bg(m_check_btn_polarity);
+
     // restric on/off
     m_labelRestric = create_label("", 0, 0, g_lightGray, NULL);
     m_check_btn_restric = gtk_check_button_new();
@@ -83,6 +77,8 @@ GtkWidget* Menu2D::Create(void)
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_check_btn_restric, 0, 1, 1, 2);
     g_signal_connect(m_check_btn_restric, "clicked", G_CALLBACK(HandleChkRestric), this);
     gtk_widget_show(m_check_btn_polarity);
+
+    modify_widget_bg(m_check_btn_restric);
 
     // rotate 90/270/OFF
     spin_rotate.SetItem(&item_rotate);
@@ -175,8 +171,7 @@ GtkWidget* Menu2D::Create(void)
 
     // EFOV
 #ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize("eView"))
-    {
+    if(CManRegister::GetInstance()->IsAuthorize("pScape")) {
         m_labelEFOV = create_label("", 0, 0, g_lightGray, NULL);
         GtkWidget *btn_efov_mode = create_button(m_labelEFOV, 0, 0, g_deep);
         gtk_widget_modify_bg(btn_efov_mode, GTK_STATE_INSENSITIVE, g_deepGray);
@@ -198,8 +193,7 @@ GtkWidget* Menu2D::Create(void)
     return m_table;
 }
 
-void Menu2D::UpdateLabel(void)
-{
+void Menu2D::UpdateLabel(void) {
     gtk_label_set_text(GTK_LABEL(m_labelPolarity), _("Polarity"));
     gtk_label_set_text(GTK_LABEL(m_labelRestric), _("Noise Reject"));
     spin_rotate.UpdateLabel();
@@ -214,89 +208,73 @@ void Menu2D::UpdateLabel(void)
     gtk_label_set_text(GTK_LABEL(m_labelPIP), _("Picture In Picture"));
     gtk_label_set_text(GTK_LABEL(m_label4B), _("4B"));
 #ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize("eView"))
-        gtk_label_set_text(GTK_LABEL(m_labelEFOV), _("eView Mode"));
+    if(CManRegister::GetInstance()->IsAuthorize("pScape"))
+        gtk_label_set_text(GTK_LABEL(m_labelEFOV), _("pScape Mode"));
 #else
-    gtk_label_set_text(GTK_LABEL(m_labelEFOV), _("eView Mode"));
+    gtk_label_set_text(GTK_LABEL(m_labelEFOV), _("pScape Mode"));
 #endif
 }
 
-void Menu2D::UpdatePolarity(bool on)
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_polarity),on);
+void Menu2D::UpdatePolarity(bool on) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_polarity),on);
 }
-void Menu2D::UpdateNoiseReject(bool on)
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_restric),on);
+void Menu2D::UpdateNoiseReject(bool on) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_restric),on);
 }
-void Menu2D::UpdateFrame(const char* str, EKnobReturn status)
-{
+void Menu2D::UpdateFrame(const char* str, EKnobReturn status) {
     spin_frame.SetValue(str, status);
 }
 
-void Menu2D::UpdateRotate(const char* str, EKnobReturn status)
-{
-	spin_rotate.SetValue(str, status);
+void Menu2D::UpdateRotate(const char* str, EKnobReturn status) {
+    spin_rotate.SetValue(str, status);
 }
 
-void Menu2D::UpdateLine(const char* str, EKnobReturn status)
-{
-	spin_line.SetValue(str, status);
+void Menu2D::UpdateLine(const char* str, EKnobReturn status) {
+    spin_line.SetValue(str, status);
 }
 
-void Menu2D::UpdateSmooth(const char* str, EKnobReturn status)
-{
-	spin_smooth.SetValue(str, status);
+void Menu2D::UpdateSmooth(const char* str, EKnobReturn status) {
+    spin_smooth.SetValue(str, status);
 }
 
-void Menu2D::UpdateGamma(const char* str, EKnobReturn status)
-{
-	spin_gamma.SetValue(str, status);
+void Menu2D::UpdateGamma(const char* str, EKnobReturn status) {
+    spin_gamma.SetValue(str, status);
 }
 
-void Menu2D::UpdateImgEhn(const char* str, EKnobReturn status)
-{
-	spin_imgEhn.SetValue(str, status);
+void Menu2D::UpdateImgEhn(const char* str, EKnobReturn status) {
+    spin_imgEhn.SetValue(str, status);
 }
 
 ///> private
-void Menu2D::ChkPolarity(GtkButton *button)
-{
-	gboolean value;
-	value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-	ImgProc2D::GetInstance()->ChangePolarity(value);
+void Menu2D::ChkPolarity(GtkButton *button) {
+    gboolean value;
+    value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+    ImgProc2D::GetInstance()->ChangePolarity(value);
 }
 
-void Menu2D::ChkNoiseReject(GtkButton *button)
-{
-	gboolean value;
-	value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
-	ImgProc2D::GetInstance()->ChangeNoiseReject(value);
+void Menu2D::ChkNoiseReject(GtkButton *button) {
+    gboolean value;
+    value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+    ImgProc2D::GetInstance()->ChangeNoiseReject(value);
 }
 
-void Menu2D::BtnTrans(GtkButton *button)
-{
+void Menu2D::BtnTrans(GtkButton *button) {
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::GRAY_TRANS);
 }
 
-void Menu2D::BtnReject(GtkButton *button)
-{
+void Menu2D::BtnReject(GtkButton *button) {
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::GRAY_REJECT);
 }
 
-void Menu2D::BtnGlobalZoom(GtkButton *button)
-{
+void Menu2D::BtnGlobalZoom(GtkButton *button) {
     int rotate = ImgProc2D::GetInstance()->GetRotate();
-	ModeStatus ms;
-    if (ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B) && ms.IsUnFreezeMode())
-    {
+    ModeStatus ms;
+    if (ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B) && ms.IsUnFreezeMode()) {
         if (rotate == 0)
             MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::GLOBAL_ZOOM);
         else
             HintArea::GetInstance()->UpdateHint(_("[Global Zoom]: Invalid when image is rotated."), 1);
-    }
-    else
-    {
+    } else {
 #if (defined(EMP_322) || defined(EMP_313))
         HintArea::GetInstance()->UpdateHint(_("[Global Zoom]: Only valid in B mode and UnFreeze status."), 1);
 #else
@@ -305,68 +283,52 @@ void Menu2D::BtnGlobalZoom(GtkButton *button)
     }
 }
 
-void Menu2D::BtnPIP(GtkButton *button)
-{
-	ModeStatus ms;
-    if (ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B) && ms.IsUnFreezeMode())
-    {
+void Menu2D::BtnPIP(GtkButton *button) {
+    ModeStatus ms;
+    if (ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B) && ms.IsUnFreezeMode()) {
         MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::PIP_ZOOM);
-    }
-	else
-    {
+    } else {
 #if (defined(EMP_322) || defined(EMP_313))
-		HintArea::GetInstance()->UpdateHint(_("[PIP]: Only valid in B mode and UnFreeze status."), 1);
+        HintArea::GetInstance()->UpdateHint(_("[PIP]: Only valid in B mode and UnFreeze status."), 1);
 #else
         HintArea::GetInstance()->UpdateHint(_("[PIP]: Only valid in 2D B mode and UnFreeze status."), 1);
 #endif
     }
 }
 
-void Menu2D::Btn4B(GtkButton *button)
-{
-    if (MultiFuncFactory::GetInstance()->GetMultiFuncType() != MultiFuncFactory::PIP_ZOOM)
-    {
+void Menu2D::Btn4B(GtkButton *button) {
+    if (MultiFuncFactory::GetInstance()->GetMultiFuncType() != MultiFuncFactory::PIP_ZOOM) {
         ModeStatus s;
         int mode = s.GetScanMode();
-        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
-        {
+        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus()) {
             Img2D::GetInstance()->ExitTpView();
             Img2D::GetInstance()->ExitEFVI();
         }
-        if (mode == ScanMode::D2)
-        {
+        if (mode == ScanMode::D2) {
             Format2D::EFormat2D format = Format2D::GetInstance()->GetFormat();
             if (format != Format2D::B4)
                 Format2D::GetInstance()->ChangeFormat(Format2D::B4);
             else
                 Format2D::GetInstance()->SwitchB4();
-        }
-        else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI))
-        {
+        } else if ((mode == ScanMode::CFM) || (mode == ScanMode::PDI)) {
             FormatCfm::EFormatCfm format = FormatCfm::GetInstance()->GetFormat();
             if (format != FormatCfm::B4)
                 FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
             else
                 FormatCfm::GetInstance()->SwitchB4();
-        }
-        else if (mode == ScanMode::CFM_VS_2D)
-        {
+        } else if (mode == ScanMode::CFM_VS_2D) {
             ScanMode::GetInstance()->EnterCfm();
             FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
-        }
-        else if (mode == ScanMode::PDI_VS_2D)
-        {
+        } else if (mode == ScanMode::PDI_VS_2D) {
             ScanMode::GetInstance()->EnterPdi();
             FormatCfm::GetInstance()->ChangeFormat(FormatCfm::B4);
         }
     }
 }
 
-void Menu2D::ChgRotate(EKnobOper oper)
-{
-	ModeStatus ms;
-	if ((ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B)))
-    {
+void Menu2D::ChgRotate(EKnobOper oper) {
+    ModeStatus ms;
+    if ((ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B))) {
 #if 0
         if (CDrawIMT::GetInstance()->UpdateIMTStatus())
             HintArea::GetInstance()->UpdateHint(_("[Rotate]: Invalid when IMTMeasure is open."), 1);
@@ -374,9 +336,7 @@ void Menu2D::ChgRotate(EKnobOper oper)
             ImgProc2D::GetInstance()->ChangeRotate(oper);
 #endif
         ImgProc2D::GetInstance()->ChangeRotate(oper);
-    }
-    else
-    {
+    } else {
 #if (defined(EMP_322) || defined(EMP_313))
         HintArea::GetInstance()->UpdateHint(_("[Rotate]: Only valid in B mode."), 1);
 #else
@@ -385,36 +345,29 @@ void Menu2D::ChgRotate(EKnobOper oper)
     }
 }
 
-void Menu2D::ChgFrame(EKnobOper oper)
-{
-	ImgProc2D::GetInstance()->ChangeFrameAver(oper);
+void Menu2D::ChgFrame(EKnobOper oper) {
+    ImgProc2D::GetInstance()->ChangeFrameAver(oper);
 }
 
-void Menu2D::ChgLine(EKnobOper oper)
-{
-	ImgProc2D::GetInstance()->ChangeLineAver(oper);
+void Menu2D::ChgLine(EKnobOper oper) {
+    ImgProc2D::GetInstance()->ChangeLineAver(oper);
 }
 
-void Menu2D::ChgSmooth(EKnobOper oper)
-{
-	ImgProc2D::GetInstance()->ChangeSmooth(oper);
+void Menu2D::ChgSmooth(EKnobOper oper) {
+    ImgProc2D::GetInstance()->ChangeSmooth(oper);
 }
 
-void Menu2D::ChgGamma(EKnobOper oper)
-{
-	ImgProc2D::GetInstance()->ChangeGamma(oper);
+void Menu2D::ChgGamma(EKnobOper oper) {
+    ImgProc2D::GetInstance()->ChangeGamma(oper);
 }
 
-void Menu2D::ChgImgEhn(EKnobOper oper)
-{
-	ImgProc2D::GetInstance()->ChangeImgEhn(oper);
+void Menu2D::ChgImgEhn(EKnobOper oper) {
+    ImgProc2D::GetInstance()->ChangeImgEhn(oper);
 }
 
-void Menu2D::BtnEnterEFOV(GtkButton *button)
-{
+void Menu2D::BtnEnterEFOV(GtkButton *button) {
     ModeStatus ms;
-    if (DscMan::GetInstance()->GetDscPara()->dcaProbeType == 'L' && ms.IsUnFreezeMode() && ModeStatus::IsD2Mode())
-    {
+    if (DscMan::GetInstance()->GetDscPara()->dcaProbeType == 'L' && ms.IsUnFreezeMode() && ModeStatus::IsD2Mode()) {
         // exit local zoom if in it
         KeyLocalZoom klz;
         klz.ExitLocalZoom();
@@ -424,9 +377,7 @@ void Menu2D::BtnEnterEFOV(GtkButton *button)
 
         // enter EFOV mode
         ScanMode::GetInstance()->EnterEFOV();
-    }
-    else
-    {
+    } else {
 #if (defined(EMP_322) || defined(EMP_313))
         HintArea::GetInstance()->UpdateHint(_("[eView]: Only valid in B/BB mode, unfreeze status, linear probe."), 2);
 #else
@@ -434,4 +385,4 @@ void Menu2D::BtnEnterEFOV(GtkButton *button)
 #endif
         //HintArea::GetInstance()->UpdateHint(_("[eView]: Only valid when probe type is linear and unfreeze status."), 1);
     }
- }
+}

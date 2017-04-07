@@ -1,68 +1,56 @@
 #include "Def.h"
 #include "sysMan/SysNoteSetting.h"
 
-SysNoteSetting::SysNoteSetting()
-{
+SysNoteSetting::SysNoteSetting() {
     char path[256];
     sprintf(path, "%s/%s", CFG_RES_PATH, SYS_SETTING_FILE);
     ptrIni = new IniFile(path);
 }
 
-SysNoteSetting::~SysNoteSetting()
-{
+SysNoteSetting::~SysNoteSetting() {
     if (ptrIni != NULL) {
-	delete ptrIni;
-	ptrIni = NULL;
+        delete ptrIni;
+        ptrIni = NULL;
     }
 }
 
-int SysNoteSetting::GetFontSize(void)
-{
+int SysNoteSetting::GetFontSize(void) {
     return ptrIni->ReadInt("NoteSetting", "FontSize");
 }
 
-int SysNoteSetting::GetBodyMarkSize(void)
-{
+int SysNoteSetting::GetBodyMarkSize(void) {
     return ptrIni->ReadInt("NoteSetting", "BodyMarkSize");
 }
 
-int SysNoteSetting::GetFontColor(void)
-{
+int SysNoteSetting::GetFontColor(void) {
     return ptrIni->ReadInt("NoteSetting", "FontColor");
 }
 
-int SysNoteSetting::GetBodyMarkColor(void)
-{
+int SysNoteSetting::GetBodyMarkColor(void) {
     return ptrIni->ReadInt("NoteSetting", "BodyMarkColor");
 }
 
-void SysNoteSetting::SetFontSize(int fontSize)
-{
+void SysNoteSetting::SetFontSize(int fontSize) {
     ptrIni->WriteInt("NoteSetting", "FontSize", fontSize);
 }
 
-void SysNoteSetting::SetBodyMarkSize(int bodyMarkSize)
-{
+void SysNoteSetting::SetBodyMarkSize(int bodyMarkSize) {
     ptrIni->WriteInt("NoteSetting", "BodyMarkSize", bodyMarkSize);
 }
 
-void SysNoteSetting::SetFontColor(int fontColor)
-{
+void SysNoteSetting::SetFontColor(int fontColor) {
     ptrIni->WriteInt("NoteSetting", "FontColor", fontColor);
 }
 
-void SysNoteSetting::SetBodyMarkColor(int bodyMarkColor)
-{
+void SysNoteSetting::SetBodyMarkColor(int bodyMarkColor) {
     ptrIni->WriteInt("NoteSetting", "BodyMarkColor", bodyMarkColor);
 }
 
-void SysNoteSetting::SyncFile(void)
-{
+void SysNoteSetting::SyncFile(void) {
     ptrIni->SyncConfigFile();
 }
 
-void SysNoteSetting::DefaultFactory(void)
-{
+void SysNoteSetting::DefaultFactory(void) {
     int fontSize = 1;
     int bodyMarkSize = 1;
     int fontColor = 1;

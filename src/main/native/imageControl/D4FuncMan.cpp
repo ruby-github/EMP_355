@@ -26,15 +26,13 @@ int g_shm_id0, g_shm_id1;
 
 D4FuncMan* D4FuncMan::m_ptrInstance = NULL;
 
-D4FuncMan* D4FuncMan::GetInstance()
-{
-	if ( m_ptrInstance == NULL)
-		m_ptrInstance = new D4FuncMan;
-	return m_ptrInstance;
+D4FuncMan* D4FuncMan::GetInstance() {
+    if ( m_ptrInstance == NULL)
+        m_ptrInstance = new D4FuncMan;
+    return m_ptrInstance;
 }
 
-D4FuncMan::D4FuncMan()
-{
+D4FuncMan::D4FuncMan() {
     m_ptrDscpara = DscMan::GetInstance()->GetDscPara();
     m_tis = "";
     m_checkpart = "";
@@ -50,8 +48,7 @@ D4FuncMan::D4FuncMan()
     m_yBits = m_pD4bits + m_ptrDscpara->dcaCurScanStart*440;
 }
 
-D4FuncMan::~D4FuncMan()
-{
+D4FuncMan::~D4FuncMan() {
     if (m_ptrInstance != NULL)
         delete m_ptrInstance;
 
@@ -59,8 +56,7 @@ D4FuncMan::~D4FuncMan()
         delete []m_pD4bits;
 }
 
-void D4FuncMan::GetPara(SUIS4DPARA &Para)
-{
+void D4FuncMan::GetPara(SUIS4DPARA &Para) {
     GetProbeInfo();
     GetDepth();
     GetTIS();
@@ -73,24 +69,20 @@ void D4FuncMan::GetPara(SUIS4DPARA &Para)
     Para = m_Para4d;
 }
 
-void D4FuncMan::GetDataFromUsb(const unsigned char *pData)
-{
+void D4FuncMan::GetDataFromUsb(const unsigned char *pData) {
     // DSCCONTROLATTRIBUTES* m_ptrDscpara = DscMan::GetInstance()->GetDscPara();
     DscMan::GetInstance()->GetWriteLock();
     unsigned int lineNo = 0;
 
-    if (*(pData+16) == 0x02 && *(pData+17)==0xff && *(pData+18)==0x02 && *(pData+19)==0xff)
-    {
+    if (*(pData+16) == 0x02 && *(pData+17)==0xff && *(pData+18)==0x02 && *(pData+19)==0xff) {
         lineNo = *(pData+9);
-        if (lineNo > m_ptrDscpara->dcaCurScanEnd || lineNo < m_ptrDscpara->dcaCurScanStart)
-        {
+        if (lineNo > m_ptrDscpara->dcaCurScanEnd || lineNo < m_ptrDscpara->dcaCurScanStart) {
 
             DscMan::GetInstance()->ReadWriteUnlock();
             return;
         }
 
-        if (m_lineNo_bak > lineNo)
-        {
+        if (m_lineNo_bak > lineNo) {
             g_uis4d_ri.WriteDataToShm(g_sem_id0, m_pD4bits, m_frameNum, m_reverseFlag, g_pshm_data0);
             memset(m_pD4bits,0,440*256);
             m_yBits = m_pD4bits + m_ptrDscpara->dcaCurScanStart*440;
@@ -109,11 +101,10 @@ void D4FuncMan::GetDataFromUsb(const unsigned char *pData)
     return;
 }
 
-void D4FuncMan::Exit4D()
-{
+void D4FuncMan::Exit4D() {
     printf("\n\n ++++++++++++09001Color: Exit4D +++++++++++++++++++++++\n\n");
 
-	D4FuncMan::GetInstance()->Set4DMode(false);
+    D4FuncMan::GetInstance()->Set4DMode(false);
 
     // keyboard control
     KeyboardOversee((void *)&g_keyInterface, false);
@@ -124,7 +115,7 @@ void D4FuncMan::Exit4D()
     Img2D::GetInstance()->SetMBP(1);
 
 #ifndef EMP_322
-	g_keyInterface.CtrlLight(FALSE, LIGHT_CW);
+    g_keyInterface.CtrlLight(FALSE, LIGHT_CW);
 #endif
 
     SUIS4DPARA para;
@@ -143,50 +134,37 @@ void D4FuncMan::Exit4D()
     Img2D::GetInstance()->SetGainFrom4D(para.gain);
     Img2D::GetInstance()->SetTGCFrom4D(g_tgcSlider);
 
-	ScanMode::GetInstance()->Enter2D();
+    ScanMode::GetInstance()->Enter2D();
     //printf("%s,%d========================\n",__PRETTY_FUNCTION__,__LINE__);
 #if 0
     string mode;
     mode = para.scan_mode;
-    if(strcmp(mode.c_str(),"M")==0)
-    {
+    if(strcmp(mode.c_str(),"M")==0) {
         g_keyInterface.CtrlLight(TRUE,LIGHT_M);
-        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
-        {
+        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus()) {
             Img2D::GetInstance()->ExitTpView();
             Img2D::GetInstance()->ExitEFVI();
         }
         ScanMode::GetInstance()->EnterM();
-    }
-    else if(strcmp(mode.c_str(),"PW")==0)
-    {
-        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
-        {
+    } else if(strcmp(mode.c_str(),"PW")==0) {
+        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus()) {
             Img2D::GetInstance()->ExitTpView();
             Img2D::GetInstance()->ExitEFVI();
         }
         ScanMode::GetInstance()->EnterPw();
-    }
-    else if(strcmp(mode.c_str(),"CFM")==0)
-    {
-        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
-        {
+    } else if(strcmp(mode.c_str(),"CFM")==0) {
+        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus()) {
             Img2D::GetInstance()->ExitTpView();
             Img2D::GetInstance()->ExitEFVI();
         }
-         ScanMode::GetInstance()->EnterCfm();
-    }
-    else if(strcmp(mode.c_str(),"PDI")==0)
-    {
-        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus())
-        {
+        ScanMode::GetInstance()->EnterCfm();
+    } else if(strcmp(mode.c_str(),"PDI")==0) {
+        if (Img2D::GetInstance()->GetTpViewStatus() || Img2D::GetInstance()->GetEFVIStatus()) {
             Img2D::GetInstance()->ExitTpView();
             Img2D::GetInstance()->ExitEFVI();
         }
         ScanMode::GetInstance()->EnterPdi();
-    }
-    else
-    {
+    } else {
         ScanMode::GetInstance()->ExitSpecialMeasure();
 #if (defined (EMP_322) || defined (EMP_313))
         ScanMode::GetInstance()->DarkAllModeLight();
@@ -197,8 +175,7 @@ void D4FuncMan::Exit4D()
 #endif
 }
 
-void D4FuncMan::GetProbeInfo()
-{
+void D4FuncMan::GetProbeInfo() {
     ProbeSocket::ProbePara para;
     ProbeMan::GetInstance()->GetCurProbe(para);
 
@@ -216,22 +193,17 @@ void D4FuncMan::GetProbeInfo()
         para.type = 'C';
     }
 
-    if ('C' == para.type)         //  convert
-    {
+    if ('C' == para.type) {       //  convert
         pr = para.r;
         fr = "1000";
         memset(tmp1, 0, 6);
         sprintf(tmp1,"%d", para.width);
         theta = tmp1;//para.width;
-    }
-    else  if('l' == para.type || 'L' == para.type)    // linear
-    {
+    } else  if('l' == para.type || 'L' == para.type) { // linear
         fr = "0";
         pr = 0;
         pw = para.width/100;
-    }
-    else if ('V' == para.type)
-    {
+    } else if ('V' == para.type) {
         pr = para.r;
         char *tmp  = new char[5];
         memset(tmp, 0, 5);
@@ -242,8 +214,7 @@ void D4FuncMan::GetProbeInfo()
         theta = tmp1;
 
         delete []tmp;
-    }
-    else
+    } else
         para.type = 'C';
 
     delete []tmp1;
@@ -284,22 +255,19 @@ void D4FuncMan::GetProbeInfo()
     return;
 }
 
-void D4FuncMan::GetTIS()
-{
+void D4FuncMan::GetTIS() {
     TopArea::GetInstance()->GetTIS(m_tis);
     m_Para4d.tis = m_tis;
     return;
 }
 
-void D4FuncMan::GetCheckPart()
-{
+void D4FuncMan::GetCheckPart() {
     TopArea::GetInstance()->GetCheckPart(m_checkpart);
     m_Para4d.check_part = m_checkpart;
     return;
 }
 
-void D4FuncMan::GetDepth()
-{
+void D4FuncMan::GetDepth() {
     int depth;
     depth = Img2D::GetInstance()->GetDepth();
     //TopArea::GetInstance()->GetDepth(depth);
@@ -307,16 +275,14 @@ void D4FuncMan::GetDepth()
     m_Para4d.depth = depth;
 }
 
-void D4FuncMan::GetHospitalName()
-{
+void D4FuncMan::GetHospitalName() {
     string m_hospitalname;
     TopArea::GetInstance()->GetHospitalName(m_hospitalname);
     m_Para4d.hospital_name = m_hospitalname;
     return;
 }
 #ifndef VET
-void D4FuncMan::GetPatientInfo()
-{
+void D4FuncMan::GetPatientInfo() {
     PatientInfo::Info info;
     g_patientInfo.GetInfo(info);
     PatientInfo::Patient pat = info.p;
@@ -337,8 +303,7 @@ void D4FuncMan::GetPatientInfo()
 }
 #endif
 
-void D4FuncMan::GetTimeFormat()
-{
+void D4FuncMan::GetTimeFormat() {
     SysGeneralSetting sys;
     int date_format = sys.GetDateFormat();
     int language = sys.GetLanguage();

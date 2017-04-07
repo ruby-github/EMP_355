@@ -3,8 +3,7 @@
 
 #include "base/IniFile.h"
 
-class SysPrinterSetting
-{
+class SysPrinterSetting {
 public:
 
     SysPrinterSetting();

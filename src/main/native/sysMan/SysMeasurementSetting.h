@@ -3,25 +3,24 @@
 
 #include "base/IniFile.h"
 
-struct TraceItem{
-	unsigned char psSet;
-	unsigned char edSet;
-	unsigned char riSet;
-	unsigned char sdSet;
-	unsigned char tamaxSet;
-	unsigned char piSet;
-	unsigned char timeSet;
-	unsigned char hrSet;
-	unsigned char pgmaxSet;
-	unsigned char pgmeanSet;
+struct TraceItem {
+    unsigned char psSet;
+    unsigned char edSet;
+    unsigned char riSet;
+    unsigned char sdSet;
+    unsigned char tamaxSet;
+    unsigned char piSet;
+    unsigned char timeSet;
+    unsigned char hrSet;
+    unsigned char pgmaxSet;
+    unsigned char pgmeanSet;
 };
 
 extern TraceItem g_traceCalcItem;
 
 extern void GetTraceItem(struct TraceItem &calcItem);
 
-class SysMeasurementSetting
-{
+class SysMeasurementSetting {
 public:
     SysMeasurementSetting();
     ~SysMeasurementSetting();

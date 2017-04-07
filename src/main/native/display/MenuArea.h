@@ -2,32 +2,35 @@
 #ifndef __MENU_AREA_H__
 #define __MENU_AREA_H__
 
-#define MENU_AREA_H 705 //ModLayout 705 PreLayout 688
+#define MENU_AREA_H 628 //ModLayout 705 PreLayout 688
 #define MENU_AREA_W 180 //ModLayout 180 PreLayout 220
 
 #include <gtk/gtk.h>
 
-class MenuArea
-{
+class MenuArea {
 public:
-    ~MenuArea(){ if (m_ptrInstance != NULL) delete m_ptrInstance; }
+    ~MenuArea() {
+        if (m_ptrInstance != NULL) delete m_ptrInstance;
+    }
     static MenuArea* GetInstance();
 
 // enum EMenuType {MAIN, D2, M, PW, CW, CFM, PDI, PWCFM, CWCFM, MEASURE, BDMK, REVIEW, CALC, NOTE, BIOPSY, SYSTEM, EFOV};
     enum EMenuType {MAIN, D2, M, PW, CW, CFM, PDI, PWCFM, CWCFM, MEASURE, BDMK, REVIEW, CALC, NOTE, BIOPSY, SYSTEM, EFOV,BIOPSYBRACKET,BIOPSYVERIFY};
-void ShowEFOVPrepare(void);
+    void ShowEFOVPrepare(void);
     void ShowEFOVCapture(void);
     void ShowEFOVView(void);
     void ShowEFOVReview(void);
 
     EMenuType GetMenuType(void);
-    bool GetMenuVisible() { return m_menuVisbible; }
+    bool GetMenuVisible() {
+        return m_menuVisbible;
+    }
     void SwitchMenu(EMenuType type);
     EMenuType GetNotebookType(void);
 
     GtkWidget* Create(void);
-	void ShowMenu(void);
-	void HideMenu(void);
+    void ShowMenu(void);
+    void HideMenu(void);
     void UpdateLabel(void);
     void UpdateSubMenu(void);
     void ShowMainMenu(void);
@@ -44,17 +47,19 @@ void ShowEFOVPrepare(void);
     void ShowCalcMenu(void);
     void ShowNoteMenu(void);
     void ShowBiopsyMenu(void);
+    void ShowBioBracketMenu(void);
+    void ShowBioVerifyMenu(void);
     void ShowSystemMenu(void);
+
     void GetMenuIndex(int &index);
-	void ShowBioBracketMenu(void);
-	void ShowBioVerifyMenu(void);
+
 private:
     MenuArea();
     static MenuArea *m_ptrInstance;
 
-	void HideCurMenuChild(void);
+    void HideCurMenuChild(void);
 
-	EMenuType m_menuType;
+    EMenuType m_menuType;
     bool m_menuVisbible;
 
     GtkWidget *m_tableMenu;
@@ -74,8 +79,9 @@ private:
     void MainMenuClk(GtkButton *button);
     void NotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
 //signal connect
-    static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, MenuArea *data)
-	{ data->NotebookChanged(notebook, page, page_num); }
+    static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, MenuArea *data) {
+        data->NotebookChanged(notebook, page, page_num);
+    }
 
     void HideAllOtherMenu(void);
 };

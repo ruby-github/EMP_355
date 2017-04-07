@@ -8,8 +8,7 @@
 #include "measure/MeasureDraw.h"
 #include "measure/MeasureMan.h"
 
-class MMeasureTime: public AbsMeasure
-{
+class MMeasureTime: public AbsMeasure {
 public:
     MMeasureTime(const SingleItemInfo *ptrSingleItemInfo);
     ~MMeasureTime();
@@ -38,8 +37,7 @@ private:
     const SingleItemInfo *m_itemInfo;
 };
 
-class MMeasureVel: public AbsMeasure
-{
+class MMeasureVel: public AbsMeasure {
 public:
     MMeasureVel(const SingleItemInfo *ptrSingleItemInfo);
     ~MMeasureVel();
@@ -67,8 +65,7 @@ private:
     const SingleItemInfo *m_itemInfo;
 };
 
-class MMeasureDistSlope: public AbsMeasure
-{
+class MMeasureDistSlope: public AbsMeasure {
 public:
     MMeasureDistSlope(const MultiItemInfo *ptrMultiItemInfo);
     ~MMeasureDistSlope();
@@ -97,8 +94,7 @@ private:
     void Result(int saveR, UpdateMeasure::ResultAttr& attr);
 };
 
-class MMeasureDepth: public AbsMeasure
-{
+class MMeasureDepth: public AbsMeasure {
 public:
     MMeasureDepth(const SingleItemInfo *ptrSingleItemInfo);
     ~MMeasureDepth();
@@ -125,8 +121,7 @@ private:
     const SingleItemInfo *m_itemInfo;
 };
 
-class MMeasureHR: public AbsMeasure
-{
+class MMeasureHR: public AbsMeasure {
 public:
     MMeasureHR();
     ~MMeasureHR() {};
@@ -151,47 +146,45 @@ private:
     double m_hr;
 };
 
-//灏勮鍒嗘暟娴嬮噺锛峂妯″紡Teicholz鏂规硶
-class MMeasureEFTei: public AbsMeasure
-{
-    public:
-	MMeasureEFTei(const SingleItemInfo *ptrSingleItemInfo);
-	~MMeasureEFTei();
+//射血分数测量－M模式Teicholz方法
+class MMeasureEFTei: public AbsMeasure {
+public:
+    MMeasureEFTei(const SingleItemInfo *ptrSingleItemInfo);
+    ~MMeasureEFTei();
 
-	void Init();
-	void PressLeft(POINT p); ///< do
-	void PressRight(POINT p); ///< undo
-	void MouseMove(POINT p);
-	void Change();
-	void Esc();
+    void Init();
+    void PressLeft(POINT p); ///< do
+    void PressRight(POINT p); ///< undo
+    void MouseMove(POINT p);
+    void Change();
+    void Esc();
 
-    private:
-	MeasureCalc m_calc;
-	MeasureDraw m_draw;
-	UpdateMeasure m_update;
-	MeasureMan* m_ptrMan;
+private:
+    MeasureCalc m_calc;
+    MeasureDraw m_draw;
+    UpdateMeasure m_update;
+    MeasureMan* m_ptrMan;
 
     int m_item;
     const SingleItemInfo *m_itemInfo;
 
-	int m_step; ///< current status(step)
-	bool m_isDraw;
-	POINT m_lvdd_start;
-	POINT m_lvdd_end;
-	POINT m_lvds_start;
-	POINT m_lvds_end;
-	POINT m_tempP;
-	POINT m_p1;
-	double m_lvdd;//宸﹀鑸掑紶鐩村緞
-	double m_lvds;//宸﹀鏀剁缉鐩村緞
-	double m_lvvd;//宸﹀鑸掑紶浣撶Н
-	double m_lvvs;//宸﹀鏀剁缉浣撶Н
-	double m_ef;
+    int m_step; ///< current status(step)
+    bool m_isDraw;
+    POINT m_lvdd_start;
+    POINT m_lvdd_end;
+    POINT m_lvds_start;
+    POINT m_lvds_end;
+    POINT m_tempP;
+    POINT m_p1;
+    double m_lvdd;//左室舒张直径
+    double m_lvds;//左室收缩直径
+    double m_lvvd;//左室舒张体积
+    double m_lvvs;//左室收缩体积
+    double m_ef;
 };
 
 #if 0
-class MMeasureSlope: public AbsMeasure
-{
+class MMeasureSlope: public AbsMeasure {
 public:
     MMeasureSlope();
     ~MMeasureSlope() {};

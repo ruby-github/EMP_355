@@ -11,20 +11,17 @@
  * @管理一部分要用到value键来进行图像处理的功能函数
  */
 
-EKnobReturn GlobalZoom(EKnobOper oper)
-{
+EKnobReturn GlobalZoom(EKnobOper oper) {
     Zoom::GetInstance()->GlobalZoomScale(oper);
     return OK;
 }
 
-EKnobReturn PIPZoom(EKnobOper oper)
-{
-	Zoom::GetInstance()->PIPZoomScale(oper);
+EKnobReturn PIPZoom(EKnobOper oper) {
+    Zoom::GetInstance()->PIPZoomScale(oper);
     return OK;
 }
 
-EKnobReturn GrayTransport(EKnobOper oper)
-{
+EKnobReturn GrayTransport(EKnobOper oper) {
     ImgProc2D::GetInstance()->ChangeGrayTransPointX(oper);
     return OK;
 }

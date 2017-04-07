@@ -8,7 +8,7 @@ class FakeXEvent: public AbsKeyboardEvent {
 public:
     virtual void KeyEvent(unsigned char keyValue);
     virtual void MouseEvent(char offsetX, char offsetY);
-    virtual ~FakeXEvent(){};
+    virtual ~FakeXEvent() {};
 };
 
 #endif

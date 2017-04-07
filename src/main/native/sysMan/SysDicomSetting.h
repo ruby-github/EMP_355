@@ -3,8 +3,7 @@
 
 #include "base/IniFile.h"
 
-class SysDicomSetting
-{
+class SysDicomSetting {
 public:
 
     SysDicomSetting();

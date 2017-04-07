@@ -8,8 +8,7 @@ enum EProbeList340 {P35C50K, P65C10K, P75L40K, P35C20H, P65C15D, P30P16A, P90L25
 #else
 enum EProbeList340 {P35C50K, P65C10K, P75L40K, P35C20H, P65C15D, P30P16A, P90L25K, P10L25J, P35D40JSNR, P35D40JNDK,  P65C10H};
 #endif
-unsigned char Probe35C50K[PROBE_INFO_SIZE] = //35C50K convex
-{
+unsigned char Probe35C50K[PROBE_INFO_SIZE] = { //35C50K convex
     // black-white
     '3',	'5',	'C',	'5',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		72,		0,		52,		0,		0,
@@ -22,7 +21,7 @@ unsigned char Probe35C50K[PROBE_INFO_SIZE] = //35C50K convex
     //color
     '3',	'5',	'C',	'5',	'0',	'K',	0,		0,		0,		0,
     'C',	1,		28,		2,		56,		72,		0,		51,		0,		0,
-   // 0,		40,		1,		20,		3,		20,		0,		46,		0,		50,
+    // 0,		40,		1,		20,		3,		20,		0,		46,		0,		50,
     0,		40,		1,		20,		3,		20,		0,		54,		0,		66,
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
@@ -30,8 +29,7 @@ unsigned char Probe35C50K[PROBE_INFO_SIZE] = //35C50K convex
     'A',		'P',		'X',		0x5a,
 };
 
-unsigned char Probe65C10K[PROBE_INFO_SIZE] = //65C10K //TV
-{
+unsigned char Probe65C10K[PROBE_INFO_SIZE] = { //65C10K //TV
     // black-white
     '6',   '5',    'C',    '1',    '0',    'J',    '0',	'0',	'0',	'0',
     'C',    1,		28,		2,		56,		150,	0,		10,		0,		0,
@@ -50,8 +48,7 @@ unsigned char Probe65C10K[PROBE_INFO_SIZE] = //65C10K //TV
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'A',		'P',		'X',		0x5a,
 };
-unsigned char Probe75L40K[PROBE_INFO_SIZE] = //75L40K
-{
+unsigned char Probe75L40K[PROBE_INFO_SIZE] = { //75L40K
     // black-white
     '7',   '5',    'L',    '4',    '0',    'J',		'0',	'0',	'0',	'0',
     'L',    1,		28,		2,		56,		38,		80,		0,		0,		0,
@@ -71,8 +68,7 @@ unsigned char Probe75L40K[PROBE_INFO_SIZE] = //75L40K
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'A',		'P',		'X',		0x5a,
 };
-unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H //浣庨寰嚫
-{
+unsigned char Probe35C20H[PROBE_INFO_SIZE] = { //35C20H //低频微凸
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
     'C',    0,		96,		1,		92,		88,		0,		21,		0,		0,
@@ -91,8 +87,7 @@ unsigned char Probe35C20H[PROBE_INFO_SIZE] = //35C20H //浣庨寰嚫
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
-{
+unsigned char Probe65C15D[PROBE_INFO_SIZE] = { //65C15D  //高频微凸
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
     'C',	0,		80,		1,		60,		98,		0,		15,		0,		0,
@@ -116,8 +111,7 @@ unsigned char Probe65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe30P16A[PROBE_INFO_SIZE] = //30P16A
-{
+unsigned char Probe30P16A[PROBE_INFO_SIZE] = { //30P16A
     // black-white
     '3',   '0',    'P',    '1',    '6',    'A',		'0',	'0',	'0',	'0',
     'P',    0,		64,		2,		56,		16,		0,		0,		0,		0,
@@ -130,7 +124,7 @@ unsigned char Probe30P16A[PROBE_INFO_SIZE] = //30P16A
     //color
     '3',	'0',	'P',	'1',	'6',	'A',	    0,		0,		0,		0,
     'P',	0,		64,		2,		56,		90,		0,		0,		16,		 30,
-   // 0,		40,		0,		80,		2,		50,		0,		50,		0,		54,
+    // 0,		40,		0,		80,		2,		50,		0,		50,		0,		54,
     0,		40,		0,		80,		2,		50,		0,		48,		0,		56,
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
@@ -138,8 +132,7 @@ unsigned char Probe30P16A[PROBE_INFO_SIZE] = //30P16A
     'O',		'S',		'C',		0x5a,
 };
 
-unsigned char Probe10C60K[PROBE_INFO_SIZE] = //10C60K convex
-{
+unsigned char Probe10C60K[PROBE_INFO_SIZE] = { //10C60K convex
     // black-white
     '1',        '0',    'C',    '6',    '0',    'J',    '0',    '0',    '0',    '0',
     'C',        1,              28,             2,              56,             24,             26,             60,             0,              0,
@@ -160,8 +153,7 @@ unsigned char Probe10C60K[PROBE_INFO_SIZE] = //10C60K convex
 
 };
 
-unsigned char Probe90L25K[PROBE_INFO_SIZE] = //90L25K
-{
+unsigned char Probe90L25K[PROBE_INFO_SIZE] = { //90L25K
     // black-white
     '9',   '0',    'L',    '2',    '5',    'K',		'0',	'0',	'0',	'0',
     'L',    1,		28,		2,		56,		25,		60,		0,		0,		0,
@@ -181,8 +173,7 @@ unsigned char Probe90L25K[PROBE_INFO_SIZE] = //90L25K
     0,		0,		0,		0x5a,
 };
 
-unsigned char Probe10L25K[PROBE_INFO_SIZE] = //10L25J
-{
+unsigned char Probe10L25K[PROBE_INFO_SIZE] = { //10L25J
 #if 0
     // black-white
     '1',   '0',    'L',    '2',    '5',    'J',		'0',	'0',	'0',	'0',
@@ -222,8 +213,7 @@ unsigned char Probe10L25K[PROBE_INFO_SIZE] = //10L25J
 #endif
 };
 
-unsigned char Probe35D40JSNR[PROBE_INFO_SIZE] = //volume convex
-{
+unsigned char Probe35D40JSNR[PROBE_INFO_SIZE] = { //volume convex
     // black-white
     '3',	'5',	'D',	'4',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		68,		20,		40,		0,		0,
@@ -244,8 +234,7 @@ unsigned char Probe35D40JSNR[PROBE_INFO_SIZE] = //volume convex
     'S',		'N',		'R',		0x5a,
 };
 
-unsigned char Probe35D40JNDK[PROBE_INFO_SIZE] = //volume convex
-{
+unsigned char Probe35D40JNDK[PROBE_INFO_SIZE] = { //volume convex
     // black-white
     '3',	'5',	'D',	'4',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		68,		20,		40,		0,		0,
@@ -267,8 +256,7 @@ unsigned char Probe35D40JNDK[PROBE_INFO_SIZE] = //volume convex
 };
 
 #ifdef VET
-unsigned char Probe55L60H[PROBE_INFO_SIZE] = //鍙浜烘祦
-{
+unsigned char Probe55L60H[PROBE_INFO_SIZE] = { //可视人流
     '5',	'5',	'L',	'6',	'0',	'H',	'0',	'0',	'0',	'0',
     'L',	0,		96,		1,		92,		63,	    27,		0,		0,		0,
     1,		0,		1,		20,		1,		30,		1,		2,		1,		50,
@@ -286,8 +274,7 @@ unsigned char Probe55L60H[PROBE_INFO_SIZE] = //鍙浜烘祦
 };
 
 #else
-unsigned char Probe65C10H[PROBE_INFO_SIZE] = //鍙浜烘祦
-{
+unsigned char Probe65C10H[PROBE_INFO_SIZE] = { //可视人流
     '6',	'5',	'C',	'1',	'0',	'H',	'0',	'0',	'0',	'0',
     'C',	0,		96,		1,		92,		150,	0,		10,		0,		0,
     1,		0,		1,		22,		1,		30,		1,		2,		1,		60,

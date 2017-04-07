@@ -13,26 +13,22 @@ using std::string;
 
 ViewPrinterAdd* ViewPrinterAdd::m_ptrInstance = NULL;
 
-ViewPrinterAdd::ViewPrinterAdd()
-{
+ViewPrinterAdd::ViewPrinterAdd() {
 }
 
-ViewPrinterAdd::~ViewPrinterAdd()
-{
+ViewPrinterAdd::~ViewPrinterAdd() {
     if (m_ptrInstance != NULL)
-	delete m_ptrInstance;
+        delete m_ptrInstance;
 }
 
-ViewPrinterAdd* ViewPrinterAdd::GetInstance()
-{
+ViewPrinterAdd* ViewPrinterAdd::GetInstance() {
     if (m_ptrInstance == NULL)
-	m_ptrInstance = new ViewPrinterAdd;
+        m_ptrInstance = new ViewPrinterAdd;
 
     return m_ptrInstance;
 }
 
-void ViewPrinterAdd::CreateWindow(GtkWindow *parent)
-{
+void ViewPrinterAdd::CreateWindow(GtkWindow *parent) {
     GtkWidget *fixed_window;
     GtkWidget *label_printer_uri;
     GtkWidget *label_uri;
@@ -157,8 +153,7 @@ void ViewPrinterAdd::CreateWindow(GtkWindow *parent)
     return ;
 }
 
-void ViewPrinterAdd::DestroyWindow(void)
-{
+void ViewPrinterAdd::DestroyWindow(void) {
     if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
@@ -166,19 +161,16 @@ void ViewPrinterAdd::DestroyWindow(void)
     }
 }
 
-gboolean ViewPrinterAdd::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
-{
+gboolean ViewPrinterAdd::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     DestroyWindow();
     return FALSE;
 }
 
-void ViewPrinterAdd::BtnPPDNameClicked(GtkButton *button)
-{
+void ViewPrinterAdd::BtnPPDNameClicked(GtkButton *button) {
     ViewPPDSelect::GetInstance()->CreateWindow(GTK_WINDOW(m_window));
 }
 
-void ViewPrinterAdd::BtnAddClicked(GtkButton *button)
-{
+void ViewPrinterAdd::BtnAddClicked(GtkButton *button) {
     if (m_uriName.empty()) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                                           ViewDialog::ERROR,
@@ -207,31 +199,28 @@ void ViewPrinterAdd::BtnAddClicked(GtkButton *button)
     const char* prt_name = gtk_entry_get_text(GTK_ENTRY(m_entry_printer_name));
     PRINTF("print name : %s\nuri : %s\nppd file : %s\n", prt_name, m_uriName.c_str(), m_ppdFileName.c_str());
     prt.AddPrinter(prt_name, m_uriName.c_str(), m_ppdFileName.c_str());
-	PeripheralMan::GetInstance()->SwitchPrinterDriver();
+    PeripheralMan::GetInstance()->SwitchPrinterDriver();
     ViewSystem::GetInstance()->update_specific_printer_model();
     DestroyWindow();
 }
 
-void ViewPrinterAdd::BtnCancelClicked(GtkButton *button)
-{
+void ViewPrinterAdd::BtnCancelClicked(GtkButton *button) {
     DestroyWindow();
 }
 
-void ViewPrinterAdd::KeyEvent(unsigned char keyValue)
-{
+void ViewPrinterAdd::KeyEvent(unsigned char keyValue) {
     FakeXEvent::KeyEvent(keyValue);
 
     switch(keyValue) {
     case KEY_ESC:
-	BtnCancelClicked(NULL);
-	break;
+        BtnCancelClicked(NULL);
+        break;
     default:
-	break;
+        break;
     }
 }
 
-void ViewPrinterAdd::SetPPDName(const char* name, const char *path)
-{
+void ViewPrinterAdd::SetPPDName(const char* name, const char *path) {
     m_ppdFileName = path;
     gtk_label_set_text(GTK_LABEL(m_labelPPDName), name);
 }

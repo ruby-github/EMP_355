@@ -3,30 +3,33 @@
 #define _KNOB_MENU_H_
 
 #define WIDTH_KNOB_MENU 844 //ModLayout 844 PreLayout 804
-#define HEIGHT_KNOB_MENU 60 //ModLayout 60 PreLayout 80
+#define HEIGHT_KNOB_MENU 105 //ModLayout 60 PreLayout 80
 
 #include <gtk/gtk.h>
 #include "Def.h"
 #include "periDevice/ManRegister.h"
 
-class KnobMenu
-{
+class KnobMenu {
 public:
-    ~KnobMenu(){ if (m_ptrInstance != NULL) delete m_ptrInstance; }
+    ~KnobMenu() {
+        if (m_ptrInstance != NULL) delete m_ptrInstance;
+    }
 
-	typedef EKnobReturn (*pKnobFunc)(EKnobOper);
-	typedef EKnobReturn (*pKnobFuncPress)(void);
-	struct KnobItem{
+    typedef EKnobReturn (*pKnobFunc)(EKnobOper);
+    typedef EKnobReturn (*pKnobFuncPress)(void);
+    struct KnobItem {
         char *name;
         char value[20];
-		EKnobReturn status;
-		pKnobFunc pf;
-		pKnobFuncPress pfPress;
-	};
+        EKnobReturn status;
+        pKnobFunc pf;
+        pKnobFuncPress pfPress;
+    };
 
     enum EKnobType {NONE, D2, M, PW, CFM, REPLAY, SNAP, ARROW, BDMK, ANATOMIC_M, EFOV};
 
-    EKnobType GetKnobType(void) { return m_knobType; }
+    EKnobType GetKnobType(void) {
+        return m_knobType;
+    }
     static KnobMenu* GetInstance();
 
     GtkWidget * Create(void);
@@ -43,7 +46,7 @@ public:
     void Knob4_Screw(int cw);
     void Knob5_Screw(int cw);
 
-	void Knob1_Press(void);
+    void Knob1_Press(void);
     void Knob2_Press(void);
     void Knob3_Press(void);
     void Knob4_Press(void);
@@ -57,7 +60,7 @@ private:
 #if (defined (EMP_322) || defined(EMP_313))
     static const int KNOB_NUM = 6;
 #else
-  static const int KNOB_NUM = 5;
+    static const int KNOB_NUM = 5;
 #endif
     EKnobType m_knobType;
     void Refresh(void);

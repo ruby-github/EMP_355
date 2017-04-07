@@ -8,12 +8,15 @@
 
 using std::vector;
 
-class ProbeSelect
-{
+class ProbeSelect {
 public:
-    static ExamItem::EItem GetItemIndex(void) { return m_itemIndex; }
+    static ExamItem::EItem GetItemIndex(void) {
+        return m_itemIndex;
+    }
 
-    ProbeSelect() { m_ptrProbe = ProbeMan::GetInstance(); }
+    ProbeSelect() {
+        m_ptrProbe = ProbeMan::GetInstance();
+    }
 
     bool Execute(); //only for test
     bool ProbeRead();
@@ -27,7 +30,7 @@ public:
 
 private:
     static ExamItem::EItem m_itemIndex;
-	static int m_socketIndex;
+    static int m_socketIndex;
 
     ProbeMan* m_ptrProbe;
     ExamItem m_e;

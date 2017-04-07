@@ -22,7 +22,9 @@ public:
     void ClearAllData(void); //When new patient, must call the function.
     void SetCompleteMeasureFlag(int etype);
     void CompleteCurrentMeasure();
-    string GetExamItem(void) { return m_examItem; }
+    string GetExamItem(void) {
+        return m_examItem;
+    }
 
 private:
     void UpdateCurrentExamItemMeasureItems(string item);

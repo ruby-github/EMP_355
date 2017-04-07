@@ -4,10 +4,9 @@
 ///> probe list 3000+A60
 #define PROBE_INFO_SIZE  128
 #ifdef EMP_440
-enum EProbeList440 {P35CV, P65VMC, P75LVS, PT65C15D}; // P35C20H, P28P16, P90L25K, P10L25J, P35D50D}; //80 闃靛厓
+enum EProbeList440 {P35CV, P65VMC, P75LVS, PT65C15D}; // P35C20H, P28P16, P90L25K, P10L25J, P35D50D}; //80 阵元
 
-unsigned char Probe35CV[PROBE_INFO_SIZE] = //3.5CV
-{
+unsigned char Probe35CV[PROBE_INFO_SIZE] = { //3.5CV
     // black-white
     '3',	'5',	'C',	'5',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		72,		0,		48,		0,		0,
@@ -27,8 +26,7 @@ unsigned char Probe35CV[PROBE_INFO_SIZE] = //3.5CV
     0,		0,		0,		0x5a,
 };
 
-unsigned char Probe65VMC[PROBE_INFO_SIZE] = //6.5VMC //TV
-{
+unsigned char Probe65VMC[PROBE_INFO_SIZE] = { //6.5VMC //TV
     // black-white
     '6',   '5',    'C',    '1',    '0',    'J',    '0',	    '0',	'0',	'0',
     'C',    1,		28,		2,		56,		150,	0,		10,		0,		0,
@@ -48,8 +46,7 @@ unsigned char Probe65VMC[PROBE_INFO_SIZE] = //6.5VMC //TV
     0,		0,		0,		0x5a,
 };
 
-unsigned char Probe75LVS[PROBE_INFO_SIZE] = //7.5LVS
-{
+unsigned char Probe75LVS[PROBE_INFO_SIZE] = { //7.5LVS
     // black-white
     '7',   '5',    'L',    '4',    '0',    'J',		'0',	'0',	'0',	'0',
     'L',    1,		28,		2,		56,		38,		0,		0,		0,		0,
@@ -69,8 +66,7 @@ unsigned char Probe75LVS[PROBE_INFO_SIZE] = //7.5LVS
     0,		0,		0,		0x5a,
 };
 
-unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = //65C15D  //楂橀寰嚫
-{
+unsigned char ProbeT65C15D[PROBE_INFO_SIZE] = { //65C15D  //高频微凸
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
     'C',	0,		80,		1,		60,		98,		0,		15,		0,		0,

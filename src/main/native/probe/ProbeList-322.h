@@ -6,8 +6,7 @@
 #ifdef EMP_322
 enum EProbeList322 {P35C50J, P75L40J, P65C10J, P35C20G, P65C20G, P90L40J, PL35D40JSNR, PL35D40JNDK, PL30P16A};
 
-unsigned char Probe35C50J[PROBE_INFO_SIZE] = //35C50J convex
-{
+unsigned char Probe35C50J[PROBE_INFO_SIZE] = { //35C50J convex
     // black-white
     '3',	'5',	'C',	'5',	'0',	'J',	'0',	'0',	'0',	'0',
     'C',	1,		28,		2,		56,		72,		0,		52,		0,		0,
@@ -27,8 +26,7 @@ unsigned char Probe35C50J[PROBE_INFO_SIZE] = //35C50J convex
     'E',		'M',		'P',		0x5a,
 };
 
-unsigned char Probe65C10J[PROBE_INFO_SIZE] = //65C10J //TV
-{
+unsigned char Probe65C10J[PROBE_INFO_SIZE] = { //65C10J //TV
     // black-white
     '6',   '5',    'C',    '1',    '0',    'J',    '0',	'0',	'0',	'0',
     'C',    1,		28,		2,		56,		150,	0,		10,		0,		0,
@@ -47,8 +45,7 @@ unsigned char Probe65C10J[PROBE_INFO_SIZE] = //65C10J //TV
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe75L40J[PROBE_INFO_SIZE] = //75L40J
-{
+unsigned char Probe75L40J[PROBE_INFO_SIZE] = { //75L40J
     // black-white
     '7',   '5',    'L',    '4',    '0',    'J',		'0',	'0',	'0',	'0',
     'L',    1,		28,		2,		56,		38,		0,		0,		0,		0,
@@ -67,8 +64,7 @@ unsigned char Probe75L40J[PROBE_INFO_SIZE] = //75L40J
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe35C20G[PROBE_INFO_SIZE] = //35C20G //浣庨寰嚫
-{
+unsigned char Probe35C20G[PROBE_INFO_SIZE] = { //35C20G //低频微凸
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
     'C',    0,		96,		1,		92,		88,		0,		21,		0,		0,
@@ -87,15 +83,14 @@ unsigned char Probe35C20G[PROBE_INFO_SIZE] = //35C20G //浣庨寰嚫
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65C20G[PROBE_INFO_SIZE] = //65C20G  //楂橀寰嚫
-{
+unsigned char Probe65C20G[PROBE_INFO_SIZE] = { //65C20G  //高频微凸
     // black-white
     '6',	'5',	'C',	'2',	'0',	'G',	'0',	'0',	'0',	'0',
     'C',	0,		96,		1,		92,		88,		0,		20,		0,		0,
-	1,		20,		1,		0,
-	1,		50,		0,		90,
-	1,		60,		0,		80,
-	1,		80,		0,		70,
+    1,		20,		1,		0,
+    1,		50,		0,		90,
+    1,		60,		0,		80,
+    1,		80,		0,		70,
     0,		0,		0,		0,
     0,		0,		0,		0,
     0,		0,		0,		0,
@@ -113,8 +108,7 @@ unsigned char Probe65C20G[PROBE_INFO_SIZE] = //65C20G  //楂橀寰嚫
     'E',		'M',		'P',		0x5a,
 };
 
-unsigned char Probe90L40J[PROBE_INFO_SIZE] = //90L40J
-{
+unsigned char Probe90L40J[PROBE_INFO_SIZE] = { //90L40J
     // black-white
     '9',   '0',    'L',    '4',    '0',    'J',		'0',	'0',	'0',	'0',
     'L',    1,		28,		2,		56,		38,		70,		0,		0,		0,

@@ -2,8 +2,7 @@
 #define LIGHT_DEF_H
 
 #if defined (EMP_322)
-enum ELightValue
-{
+enum ELightValue {
     LIGHT_CHROMA = 8,
     LIGHT_FREQ = 9,
     LIGHT_AUTO = 10,
@@ -20,7 +19,7 @@ enum ELightValue
     LIGHT_BM = 21,
     LIGHT_M = 22,
     LIGHT_BB = 23,
-	LIGHT_D2 = 24,
+    LIGHT_D2 = 24,
     LIGHT_4B = 25,
     LIGHT_TSI = 26,
     LIGHT_BODYMARK = 27,
@@ -29,8 +28,7 @@ enum ELightValue
     LIGHT_DEPTH = 30, //reserve
 };
 #elif defined (EMP_313)
-enum ELightValue
-{
+enum ELightValue {
     LIGHT_ARROW = 8,
     LIGHT_FREQ = 15,
     LIGHT_CURSOR = 11,
@@ -56,10 +54,9 @@ enum ELightValue
 };
 
 #elif (defined(EMP_460) || defined(EMP_355))
-enum ELightValue
-{
+enum ELightValue {
 #if 0
-	LIGHT_VALUE = 22, //not used now
+    LIGHT_VALUE = 22, //not used now
 #endif
     // add new
     LIGHT_BODYMARK = 0x08,
@@ -67,13 +64,13 @@ enum ELightValue
     LIGHT_INVERT = 0x0A,
     LIGHT_LEFTRIGHT = 0xB,
     LIGHT_UPDOWN = 0x0C,
-	LIGHT_CW = 0x0D,
-	LIGHT_PDI = 0x0E,
-	LIGHT_PW = 0x0F,
-	LIGHT_CFM = 0x11,
-	LIGHT_D2 = 0x12,
+    LIGHT_CW = 0x0D,
+    LIGHT_PDI = 0x0E,
+    LIGHT_PW = 0x0F,
+    LIGHT_CFM = 0x11,
+    LIGHT_D2 = 0x12,
     LIGHT_DUAL = 0x13,
-	LIGHT_M = 0x14,
+    LIGHT_M = 0x14,
     LIGHT_FREEZE = 0x15,
     LIGHT_FOCUS = 0x17,
     LIGHT_ZOOM = 0x19,
@@ -81,29 +78,28 @@ enum ELightValue
     LIGHT_MEASURE = 0x1B,
 
     LIGHT_MENU = 11,
-	LIGHT_AUTO = 13,
+    LIGHT_AUTO = 13,
 
 };
 
 #else
-enum ELightValue
-{
-	LIGHT_CAPSLOCK = 8, //not used now
-	LIGHT_SHIFT = 9, //not used now
+enum ELightValue {
+    LIGHT_CAPSLOCK = 8, //not used now
+    LIGHT_SHIFT = 9, //not used now
     LIGHT_UPDOWN = 10, //not used now
-	LIGHT_MENU = 11,
-	LIGHT_FREEZE = 12,
-	LIGHT_SAVE = 13, //not used now
-	LIGHT_P1 = 14, //not used now
-	LIGHT_P2 = 15, //not used now
-	LIGHT_M = 16,
-	LIGHT_CW = 17,
-	LIGHT_PDI = 18,
-	LIGHT_PW = 19,
-	LIGHT_CFM = 20,
-	LIGHT_D2 = 21,
-	LIGHT_AUTO = 22,
-	LIGHT_LEFTRIGHT = 23, //not used now
+    LIGHT_MENU = 11,
+    LIGHT_FREEZE = 12,
+    LIGHT_SAVE = 13, //not used now
+    LIGHT_P1 = 14, //not used now
+    LIGHT_P2 = 15, //not used now
+    LIGHT_M = 16,
+    LIGHT_CW = 17,
+    LIGHT_PDI = 18,
+    LIGHT_PW = 19,
+    LIGHT_CFM = 20,
+    LIGHT_D2 = 21,
+    LIGHT_AUTO = 22,
+    LIGHT_LEFTRIGHT = 23, //not used now
 };
 #endif
 #endif

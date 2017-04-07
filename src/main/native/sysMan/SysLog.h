@@ -13,21 +13,20 @@
  *
  * @para: Want to change to system log file's name and path? Change the value of FILENAME.
  */
-class SysLog:public std::ofstream
-{
-	public:
-        ~SysLog();
+class SysLog:public std::ofstream {
+public:
+    ~SysLog();
 
-		static class SysLog* Instance();
+    static class SysLog* Instance();
 
-	private:
-        SysLog();
+private:
+    SysLog();
 
-		static class SysLog* m_ptrInstance;
+    static class SysLog* m_ptrInstance;
 
-		void Open();
+    void Open();
 
-		#define FILENAME "./res/log/sys.log"
+#define FILENAME "./res/log/sys.log"
 };
 
 #endif

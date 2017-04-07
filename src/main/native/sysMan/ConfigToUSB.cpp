@@ -14,28 +14,24 @@
 
 ConfigToUSB* ConfigToUSB::m_ptrInstance = NULL;
 
-ConfigToUSB::ConfigToUSB()
-{
+ConfigToUSB::ConfigToUSB() {
     m_listBranch = NULL;
     m_vecPath.clear();
 }
 
-ConfigToUSB::~ConfigToUSB()
-{
+ConfigToUSB::~ConfigToUSB() {
     if (m_ptrInstance != NULL)
         delete m_ptrInstance;
 }
 
-ConfigToUSB* ConfigToUSB::GetInstance()
-{
+ConfigToUSB* ConfigToUSB::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new ConfigToUSB;
 
     return m_ptrInstance;
 }
 
-void ConfigToUSB::CreateWindow(GtkWindow *parent)
-{
+void ConfigToUSB::CreateWindow(GtkWindow *parent) {
     GtkWidget *fixed;
     GtkWidget *btnOK, *btnCancel;
     GtkWidget *swRoot, *swBranch;
@@ -105,14 +101,11 @@ void ConfigToUSB::CreateWindow(GtkWindow *parent)
 
 }
 
-void ConfigToUSB::DestroyWindow(void)
-{
-    if(g_list_length(m_listBranch) > 0)
-    {
+void ConfigToUSB::DestroyWindow(void) {
+    if(g_list_length(m_listBranch) > 0) {
         //clean the data in list
         m_listBranch = g_list_first(m_listBranch);
-        while(m_listBranch)
-        {
+        while(m_listBranch) {
             GtkTreeModel *model = NULL;
             if(m_listBranch->data)
                 model = GTK_TREE_MODEL(m_listBranch->data);
@@ -134,48 +127,42 @@ void ConfigToUSB::DestroyWindow(void)
     }
 }
 
-gboolean ConfigToUSB::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
-{
+gboolean ConfigToUSB::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     DestroyWindow();
     return FALSE;
 }
 
-void ConfigToUSB::KeyEvent(unsigned char keyValue)
-{
+void ConfigToUSB::KeyEvent(unsigned char keyValue) {
     FakeXEvent::KeyEvent(keyValue);
 
     switch(keyValue) {
-        case KEY_ESC:
-            BtnCancelClicked(NULL);
-            break;
-        default:
-            break;
+    case KEY_ESC:
+        BtnCancelClicked(NULL);
+        break;
+    default:
+        break;
     }
 }
 
 static GCancellable* cancellable = NULL;
 
-static void progress_callback(goffset current, goffset total, gpointer data)
-{
+static void progress_callback(goffset current, goffset total, gpointer data) {
     if(g_cancellable_is_cancelled(cancellable))
         return;
 
     double prac = (double)current/total;
     //	PRINTF("prac = %f\n", prac);
-    if(prac >= 0 && prac <= 1.0)
-    {
+    if(prac >= 0 && prac <= 1.0) {
         gdk_threads_enter();
         ViewDialog::GetInstance()->SetProgressBar(prac);
         while(gtk_events_pending())
             gtk_main_iteration();
         gdk_threads_leave();
-    }
-    else
+    } else
         PRINTF("fraction out of range!\n");
 }
 
-static gboolean LoadSelectedData(gpointer data)
-{
+static gboolean LoadSelectedData(gpointer data) {
     int cond = 0;
     int count = 1;
     int total = 0;
@@ -185,22 +172,18 @@ static gboolean LoadSelectedData(gpointer data)
 
     vector<string> vec = ConfigToUSB::GetInstance()->GetSelectedVec();
 
-    if(!ptr->CheckUsbStorageState())
-    {
+    if(!ptr->CheckUsbStorageState()) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                ViewDialog::ERROR,
-                _("No USB storage found!"),
-                NULL);
+                                          ViewDialog::ERROR,
+                                          _("No USB storage found!"),
+                                          NULL);
         return FALSE;
-    }
-    else
-    {
-        if(!ptr->MountUsbStorage())
-        {
+    } else {
+        if(!ptr->MountUsbStorage()) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                    ViewDialog::ERROR,
-                    _("Failed to mount USB storage!"),
-                    NULL);
+                                              ViewDialog::ERROR,
+                                              _("Failed to mount USB storage!"),
+                                              NULL);
             return FALSE;
         }
     }
@@ -210,8 +193,7 @@ static gboolean LoadSelectedData(gpointer data)
     //list all string for test
     vector<string>::iterator ite = vec.begin();
     total = vec.size() / 2; // 1 image = 1 pic + 1 ini
-    while(ite < vec.end() && !cond)
-    {
+    while(ite < vec.end() && !cond) {
         PRINTF("Send file: %s\n", (*ite).c_str());
         GFile *fAbs = g_file_new_for_path((*ite).c_str());
         GFile *fParent = g_file_get_parent(fAbs);
@@ -222,10 +204,8 @@ static gboolean LoadSelectedData(gpointer data)
 
         //create the parent directory
         GError *err_mkdir = NULL;
-        if(!g_file_make_directory_with_parents(fDest, NULL, &err_mkdir))
-        {
-            if(err_mkdir->code!=G_IO_ERROR_EXISTS)
-            {
+        if(!g_file_make_directory_with_parents(fDest, NULL, &err_mkdir)) {
+            if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
                 PRINTF("g_file_make_directory error: %s\n", err_mkdir->message);
                 sprintf(result, _("Failed to send data to USB storage!\nError: Failed to create directory."));
                 cond = -1;
@@ -239,8 +219,7 @@ static gboolean LoadSelectedData(gpointer data)
 
         //Update info
         gchar *basename = g_path_get_basename((*ite).c_str());
-        if(fm.CompareSuffix(basename, "ini") != 0)
-        {
+        if(fm.CompareSuffix(basename, "ini") != 0) {
             sprintf(str_info, "%s %s   %d/%d\n%s", _("Loading..."), basename, count, total, _("Please wait..."));
             ViewDialog::GetInstance()->SetText(str_info);
             ViewDialog::GetInstance()->SetProgressBar(0);
@@ -260,20 +239,18 @@ static gboolean LoadSelectedData(gpointer data)
         int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, cancellable, progress_callback, NULL, &err);
         g_object_unref(src);
         g_object_unref(dest);
-        if(!ret)
-        {
+        if(!ret) {
             PRINTF("g_file_copy error: %s\n", err->message);
-            switch(err->code)
-            {
-                case G_IO_ERROR_NO_SPACE:
-                    sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
-                    break;
-                case G_IO_ERROR_CANCELLED:
-                    sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
-                    break;
-                default:
-                    sprintf(result, _("Failed to send data to USB storage!"));
-                    break;
+            switch(err->code) {
+            case G_IO_ERROR_NO_SPACE:
+                sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
+                break;
+            case G_IO_ERROR_CANCELLED:
+                sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
+                break;
+            default:
+                sprintf(result, _("Failed to send data to USB storage!"));
+                break;
             }
             cond = -1;
             g_error_free(err);
@@ -286,67 +263,59 @@ static gboolean LoadSelectedData(gpointer data)
     ViewDialog::GetInstance()->Destroy();
 
     //Handle result
-    if(!cond)
-    {
+    if(!cond) {
         sprintf(result, _("Success to export to USB storage."));
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                ViewDialog::INFO,
-                result,
-                NULL);
+                                          ViewDialog::INFO,
+                                          result,
+                                          NULL);
 
-    }
-    else
-    {
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                ViewDialog::INFO,
-                result,
-                NULL);
+                                          ViewDialog::INFO,
+                                          result,
+                                          NULL);
     }
 
     return FALSE;
 }
 
-static int CancelLoadUSB(gpointer data)
-{
+static int CancelLoadUSB(gpointer data) {
     PRINTF("Cancel copy!\n");
     g_cancellable_cancel(cancellable);
     return 0;
 }
 
-void ConfigToUSB::BtnOKClicked(GtkButton *button)
-{
+void ConfigToUSB::BtnOKClicked(GtkButton *button) {
     //Copy the selected file to SLIDE_PATH
-    if(GetAllSelectPath())
-    {
+    if(GetAllSelectPath()) {
         g_timeout_add(1000, LoadSelectedData, NULL);
 
         //	PRINTF("Load From U disk!\n");
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                ViewDialog::PRG_CANCEL,
-                _("Please wait, sending data to USB storage..."),
-                CancelLoadUSB);
+                                          ViewDialog::PRG_CANCEL,
+                                          _("Please wait, sending data to USB storage..."),
+                                          CancelLoadUSB);
     }
     DestroyWindow();
 }
 
-void ConfigToUSB::BtnCancelClicked(GtkButton *button)
-{
+void ConfigToUSB::BtnCancelClicked(GtkButton *button) {
     DestroyWindow();
 }
 
 //type: 0=root, 1=branch
-GtkWidget* ConfigToUSB::create_treeview(gint type)
-{
+GtkWidget* ConfigToUSB::create_treeview(gint type) {
     GtkWidget *treeview;
     GtkCellRenderer *render;
     GtkTreeViewColumn *col;
 
     treeview = gtk_tree_view_new ();
     g_object_set(G_OBJECT(treeview),
-            "enable-search", FALSE,
-            "headers-visible", FALSE,
-            "rules-hint", TRUE,
-            NULL);
+                 "enable-search", FALSE,
+                 "headers-visible", FALSE,
+                 "rules-hint", TRUE,
+                 NULL);
 
     render = gtk_cell_renderer_toggle_new();
     g_signal_connect (G_OBJECT(render), "toggled", G_CALLBACK (on_data_toggled), this);
@@ -361,8 +330,7 @@ GtkWidget* ConfigToUSB::create_treeview(gint type)
     return treeview;
 }
 
-GtkTreeModel* ConfigToUSB::create_root_model()
-{
+GtkTreeModel* ConfigToUSB::create_root_model() {
     GtkListStore *store;
 
     store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
@@ -370,8 +338,7 @@ GtkTreeModel* ConfigToUSB::create_root_model()
     return GTK_TREE_MODEL (store);
 }
 
-void ConfigToUSB::ToggleData(GtkCellRendererToggle *cell, gchar *path_str)
-{
+void ConfigToUSB::ToggleData(GtkCellRendererToggle *cell, gchar *path_str) {
     GtkWidget *treeview;
     gint type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "type"));
     if(type == 0)
@@ -392,44 +359,36 @@ void ConfigToUSB::ToggleData(GtkCellRendererToggle *cell, gchar *path_str)
     gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
 
     /* do something with the value */
-    checked ^= 1; //鎸変綅寮傛垨
+    checked ^= 1; //按位异或
 
     /* set new value */
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);
 
-    if(type == 0 ) //Root
-    {
+    if(type == 0 ) { //Root
         gint rows = atoi(gtk_tree_path_to_string(path));
         UpdateBranchModel(rows);
         GList *list = g_list_first(m_listBranch);
         SetAllToggleValue(GTK_TREE_MODEL(g_list_nth_data(list, rows)), checked);
-    }
-    else if(type == 1) //Branch
-    {
+    } else if(type == 1) { //Branch
         GtkTreeIter i;
         GtkTreeModel *m;
-        if(!checked)
-        {
+        if(!checked) {
             GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
             if(gtk_tree_selection_get_selected(s, &m, &i))
                 gtk_list_store_set(GTK_LIST_STORE(m), &i, COL_CHECKED, checked, -1);
-        }
-        else
-        {
+        } else {
             //check all status
             gboolean checkall = TRUE;
             m = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeBranch));
             gboolean valid = gtk_tree_model_get_iter_first(m, &i);
-            while(valid)
-            {
+            while(valid) {
                 gboolean val;
                 gtk_tree_model_get(m, &i, COL_CHECKED, &val, -1);
                 if(!val)
                     checkall = FALSE;
                 valid = gtk_tree_model_iter_next(m, &i);
             }
-            if(checkall)
-            {
+            if(checkall) {
                 GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
                 if(gtk_tree_selection_get_selected(s, &m, &i))
                     gtk_list_store_set(GTK_LIST_STORE(m), &i, COL_CHECKED, TRUE, -1);
@@ -441,8 +400,7 @@ void ConfigToUSB::ToggleData(GtkCellRendererToggle *cell, gchar *path_str)
     gtk_tree_path_free (path);
 }
 
-void ConfigToUSB::UpdateRootModel(void)
-{
+void ConfigToUSB::UpdateRootModel(void) {
     DIR *dir;
     struct dirent *ent;
 
@@ -450,28 +408,25 @@ void ConfigToUSB::UpdateRootModel(void)
     GtkTreeIter iter;
 
     dir = opendir(USERCONFIG_PARENT_PATH);
-    if(!dir)
-    {
+    if(!dir) {
         perror("open path error");
         return;
     }
 
-    while((ent = readdir(dir)) != NULL)
-    {
+    while((ent = readdir(dir)) != NULL) {
         PRINTF("DIR: %s\n", ent->d_name);
         if(ent->d_name[0]=='.')
             continue;
         //	if(ent->d_type==DT_DIR)
         gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, ent->d_name, NULL);
         //export file of default dir or  userconfig dir
-        if(g_file_test(tmpPath, G_FILE_TEST_IS_DIR) && ((strcmp(ent->d_name, "userconfig") == 0) || (strcmp(ent->d_name, "default") == 0)))
-        {
+        if(g_file_test(tmpPath, G_FILE_TEST_IS_DIR) && ((strcmp(ent->d_name, "userconfig") == 0) || (strcmp(ent->d_name, "default") == 0))) {
             //	PRINTF("DIR: %s\n", ent->d_name);
             gtk_list_store_append(store, &iter);
             gtk_list_store_set(store, &iter,
-                    COL_CHECKED, FALSE,
-                    COL_NAME, ent->d_name,
-                    -1);
+                               COL_CHECKED, FALSE,
+                               COL_NAME, ent->d_name,
+                               -1);
             GtkTreeModel *model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
             m_listBranch = g_list_append(m_listBranch, model);
         }
@@ -481,14 +436,12 @@ void ConfigToUSB::UpdateRootModel(void)
 }
 
 // rows: the row's number in the Root model
-void ConfigToUSB::UpdateBranchModel(gint rows)
-{
+void ConfigToUSB::UpdateBranchModel(gint rows) {
     GList *list = g_list_first(m_listBranch);
     gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeBranch), GTK_TREE_MODEL(g_list_nth_data(list, rows)));
 }
 
-GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar *branch)
-{
+GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar *branch) {
     DIR *dir;
     struct dirent *ent;
     gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, branch, NULL);
@@ -498,31 +451,27 @@ GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar *branch)
     GtkTreeIter iter;
 
     dir = opendir(path);
-    if(!dir)
-    {
+    if(!dir) {
         perror("open path error");
         return NULL;
     }
 
     FileMan fm;
     gboolean flag = 0;
-    while((ent = readdir(dir)) != NULL)
-    {
+    while((ent = readdir(dir)) != NULL) {
         if(ent->d_name[0]=='.')
             continue;
         //	if(ent->d_type==DT_REG)
         gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, path, ent->d_name, NULL);
-        if(g_file_test(tmpPath, G_FILE_TEST_IS_REGULAR))
-        {
+        if(g_file_test(tmpPath, G_FILE_TEST_IS_REGULAR)) {
             //	if(fm.CompareSuffix(ent->d_name, "jpg")==0 || fm.CompareSuffix(ent->d_name, "bmp")==0 || fm.CompareSuffix(ent->d_name, "emp")==0 || fm.CompareSuffix(ent->d_name, "avi")==0 || fm.CompareSuffix(ent->d_name, "cine")==0)
-            if (fm.CompareSuffix(ent->d_name, "ini")==0)
-            {
+            if (fm.CompareSuffix(ent->d_name, "ini")==0) {
                 //	PRINTF("	FILE: %s\n", ent->d_name);
                 gtk_list_store_append(store, &iter);
                 gtk_list_store_set(store, &iter,
-                        COL_CHECKED, FALSE,
-                        COL_NAME, ent->d_name,
-                        -1);
+                                   COL_CHECKED, FALSE,
+                                   COL_NAME, ent->d_name,
+                                   -1);
                 flag = 1;
             }
         }
@@ -537,14 +486,12 @@ GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar *branch)
         return NULL;
 }
 
-void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection)
-{
+void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection) {
     GtkTreeIter iter;
     GtkTreeModel *model;
     gchar *text;
 
-    if(gtk_tree_selection_get_selected(selection, &model, &iter))
-    {
+    if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
         gtk_tree_model_get(model, &iter, COL_NAME, &text, -1);
         GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
         //	PRINTF("Selection path: %s\n", gtk_tree_path_to_string(path));
@@ -554,8 +501,7 @@ void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection)
     }
 }
 
-void ConfigToUSB::SetAllToggleValue(GtkTreeModel *model, gboolean value)
-{
+void ConfigToUSB::SetAllToggleValue(GtkTreeModel *model, gboolean value) {
     gboolean valid;
     GtkTreeIter iter;
 
@@ -564,20 +510,17 @@ void ConfigToUSB::SetAllToggleValue(GtkTreeModel *model, gboolean value)
 
     valid = gtk_tree_model_get_iter_first(model, &iter);
 
-    while(valid)
-    {
+    while(valid) {
         gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_CHECKED, value, -1);
         valid = gtk_tree_model_iter_next(model, &iter);
     }
 }
 
-gboolean ConfigToUSB::CheckBranchStauts(void)
-{
+gboolean ConfigToUSB::CheckBranchStauts(void) {
     return FALSE;
 }
 
-gboolean ConfigToUSB::GetAllSelectPath(void)
-{
+gboolean ConfigToUSB::GetAllSelectPath(void) {
     m_vecPath.clear();
 
     gchar *nameRoot, *nameBranch;
@@ -590,14 +533,11 @@ gboolean ConfigToUSB::GetAllSelectPath(void)
     modelRoot = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeRoot));
     validRoot = gtk_tree_model_get_iter_first(modelRoot, &iterRoot);
 
-    if(g_list_length(m_listBranch) > 0)
-    {
+    if(g_list_length(m_listBranch) > 0) {
         GList *list = g_list_first(m_listBranch);
-        while(list)
-        {
+        while(list) {
             //	PRINTF("New Branch\n");
-            if(!validRoot || !list->data)
-            {
+            if(!validRoot || !list->data) {
                 validRoot = gtk_tree_model_iter_next(modelRoot, &iterRoot);
                 list = list->next;
                 continue;
@@ -609,12 +549,10 @@ gboolean ConfigToUSB::GetAllSelectPath(void)
             modelBranch = GTK_TREE_MODEL(list->data);
             validBranch = gtk_tree_model_get_iter_first(modelBranch, &iterBranch);
             //check all iter in branch list
-            while(validBranch)
-            {
+            while(validBranch) {
                 gtk_tree_model_get(modelBranch, &iterBranch, COL_CHECKED, &checkedBranch, COL_NAME, &nameBranch, -1);
                 //	PRINTF("Branch Name=%s, Checked=%d\n", nameBranch, checkedBranch);
-                if(checkedBranch)
-                {
+                if(checkedBranch) {
                     gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, nameRoot, nameBranch, NULL);
                     //		PRINTF("Push to vector: %s\n", path);
                     m_vecPath.push_back(path);
@@ -642,11 +580,9 @@ gboolean ConfigToUSB::GetAllSelectPath(void)
 }
 
 #if 0
-void ConfigToUSB::BtnSelectAllClicked(GtkButton *button)
-{
+void ConfigToUSB::BtnSelectAllClicked(GtkButton *button) {
 }
 
-void ConfigToUSB::BtnDeselectClicked(GtkButton *button)
-{
+void ConfigToUSB::BtnDeselectClicked(GtkButton *button) {
 }
 #endif

@@ -20,10 +20,10 @@
 #include "measure/MeasureMan.h"
 
 /***
- * 濡傛灉鍦ㄥ悓涓€涓鍣ㄤ腑娣诲姞鐩稿悓鐨勪袱涓猈idgets銆傛鏃跺涓や釜涓殑浠绘剰涓€涓繘琛屼簡鎿嶄綔鍒囨崲涔嬪悗閮藉彧浼氬埛鏂版渶鍏堝姞鍏ュ鍣ㄤ腑鐨剋idget
+ * 如果在同一个容器中添加相同的两个Widgets。此时对两个中的任意一个进行了操作切换之后都只会刷新最先加入容器中的widget
  * g_menuPW and g_menuCW 是相同的两个全局变量。
  * 增加到菜单上去的时候却要分成两页，此时对CW的操作不会刷新。
- * 浜х敓鐨刡ug鏄bugFree 1377 and 1378
+ * 产生的bug是见bugFree 1377 and 1378
  * lhm 2013.10.27
  ***/
 MenuPW g_menuPW;
@@ -34,8 +34,7 @@ CusSpin::CusSpinItem MenuPW::item_timeres = {N_("Time Resolution"), "1", OK, Chg
 //CusSpin::CusSpinItem MenuPW::item_threshold = {N_("Trace Threshold"), "1", OK, ChgTraceThreshold};
 //CusSpin::CusSpinItem MenuPW::item_smooth = {N_("Trace Smooth"), "1", OK, ChgTraceSmooth};
 
-GtkTreeModel *MenuPW::CreateScaleModel()
-{
+GtkTreeModel *MenuPW::CreateScaleModel() {
     GtkListStore *liststore;
     GtkTreeIter iter;
     liststore = gtk_list_store_new(1, G_TYPE_STRING);
@@ -47,8 +46,7 @@ GtkTreeModel *MenuPW::CreateScaleModel()
     return GTK_TREE_MODEL(liststore);
 }
 
-void MenuPW::UpdateScaleModel(GtkTreeModel *model)
-{
+void MenuPW::UpdateScaleModel(GtkTreeModel *model) {
     GtkTreeIter iter;
     GtkListStore *store = GTK_LIST_STORE(model);
 
@@ -58,23 +56,21 @@ void MenuPW::UpdateScaleModel(GtkTreeModel *model)
     gtk_list_store_set(store, &iter, 0, _("kHz"), -1);
 }
 
-GtkTreeModel *MenuPW::CreateTraceTypeModel()
-{
-	GtkListStore *liststore;
-	GtkTreeIter iter;
-	liststore = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("Max"), -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("Mean"), -1);
+GtkTreeModel *MenuPW::CreateTraceTypeModel() {
+    GtkListStore *liststore;
+    GtkTreeIter iter;
+    liststore = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("Max"), -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("Mean"), -1);
 //	gtk_list_store_append(liststore, &iter);
 //	gtk_list_store_set(liststore, &iter, 0, _("Scatter"), -1);
 
-	return GTK_TREE_MODEL(liststore);
+    return GTK_TREE_MODEL(liststore);
 }
 
-void MenuPW::UpdateTraceTypeModel(GtkTreeModel *model)
-{
+void MenuPW::UpdateTraceTypeModel(GtkTreeModel *model) {
     GtkTreeIter iter;
     GtkListStore *store = GTK_LIST_STORE(model);
 
@@ -86,23 +82,21 @@ void MenuPW::UpdateTraceTypeModel(GtkTreeModel *model)
 //  gtk_list_store_set(store, &iter, 0, _("Scatter"), -1);
 }
 
-GtkTreeModel *MenuPW::CreateDirectionModel()
-{
-	GtkListStore *liststore;
-	GtkTreeIter iter;
-	liststore = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("above"), -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("below"), -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, _("both"), -1);
+GtkTreeModel *MenuPW::CreateDirectionModel() {
+    GtkListStore *liststore;
+    GtkTreeIter iter;
+    liststore = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("above"), -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("below"), -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, _("both"), -1);
 
-	return GTK_TREE_MODEL(liststore);
+    return GTK_TREE_MODEL(liststore);
 }
 
-void MenuPW::UpdateDirectionModel(GtkTreeModel *model)
-{
+void MenuPW::UpdateDirectionModel(GtkTreeModel *model) {
     GtkTreeIter iter;
     GtkListStore *store = GTK_LIST_STORE(model);
 
@@ -114,37 +108,35 @@ void MenuPW::UpdateDirectionModel(GtkTreeModel *model)
     gtk_list_store_set(store, &iter, 0, _("both"), -1);
 }
 
-GtkTreeModel *MenuPW::CreateThresholdModel()
-{
-	GtkListStore *liststore;
-	GtkTreeIter iter;
-	liststore = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "0", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "1", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "2", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "3", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "4", -1);
-/*	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "5", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "6", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "7", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "8", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "9", -1);
-*/
-	return GTK_TREE_MODEL(liststore);
+GtkTreeModel *MenuPW::CreateThresholdModel() {
+    GtkListStore *liststore;
+    GtkTreeIter iter;
+    liststore = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "0", -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "1", -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "2", -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "3", -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "4", -1);
+    /*	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "5", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "6", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "7", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "8", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "9", -1);
+    */
+    return GTK_TREE_MODEL(liststore);
 }
 
-void MenuPW::UpdateThresholdModel(GtkTreeModel *model)
-{
+void MenuPW::UpdateThresholdModel(GtkTreeModel *model) {
     GtkTreeIter iter;
     GtkListStore *store = GTK_LIST_STORE(model);
 
@@ -158,48 +150,46 @@ void MenuPW::UpdateThresholdModel(GtkTreeModel *model)
     gtk_list_store_set(store, &iter, 0, "3", -1);
     gtk_tree_model_iter_next(model, &iter);
     gtk_list_store_set(store, &iter, 0, "4", -1);
-/*  gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "5", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "6", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "7", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "8", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "9", -1);
-	*/
+    /*  gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "5", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "6", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "7", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "8", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "9", -1);
+    	*/
 }
 
-GtkTreeModel *MenuPW::CreateSmoothModel()
-{
-	GtkListStore *liststore;
-	GtkTreeIter iter;
-	liststore = gtk_list_store_new(1, G_TYPE_STRING);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "0", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "1", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "2", -1);
-/*	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "3", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "4", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "5", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "6", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "7", -1);
-	gtk_list_store_append(liststore, &iter);
-	gtk_list_store_set(liststore, &iter, 0, "8", -1);
-*/
-	return GTK_TREE_MODEL(liststore);
+GtkTreeModel *MenuPW::CreateSmoothModel() {
+    GtkListStore *liststore;
+    GtkTreeIter iter;
+    liststore = gtk_list_store_new(1, G_TYPE_STRING);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "0", -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "1", -1);
+    gtk_list_store_append(liststore, &iter);
+    gtk_list_store_set(liststore, &iter, 0, "2", -1);
+    /*	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "3", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "4", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "5", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "6", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "7", -1);
+    	gtk_list_store_append(liststore, &iter);
+    	gtk_list_store_set(liststore, &iter, 0, "8", -1);
+    */
+    return GTK_TREE_MODEL(liststore);
 }
 
-void MenuPW::UpdateSmoothModel(GtkTreeModel *model)
-{
+void MenuPW::UpdateSmoothModel(GtkTreeModel *model) {
     GtkTreeIter iter;
     GtkListStore *store = GTK_LIST_STORE(model);
 
@@ -209,28 +199,26 @@ void MenuPW::UpdateSmoothModel(GtkTreeModel *model)
     gtk_list_store_set(store, &iter, 0, "1", -1);
     gtk_tree_model_iter_next(model, &iter);
     gtk_list_store_set(store, &iter, 0, "2", -1);
-/*    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "3", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "4", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "5", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "6", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "7", -1);
-    gtk_tree_model_iter_next(model, &iter);
-    gtk_list_store_set(store, &iter, 0, "8", -1);
-*/
+    /*    gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "3", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "4", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "5", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "6", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "7", -1);
+        gtk_tree_model_iter_next(model, &iter);
+        gtk_list_store_set(store, &iter, 0, "8", -1);
+    */
 }
 
-MenuPW::MenuPW(void)
-{
-	m_table = 0;
+MenuPW::MenuPW(void) {
+    m_table = 0;
 }
 
-void MenuPW::Hide(void)
-{
+void MenuPW::Hide(void) {
     gtk_combo_box_popdown(GTK_COMBO_BOX(m_comboScale));
     gtk_combo_box_popdown(GTK_COMBO_BOX(m_comboTraceType));
     gtk_combo_box_popdown(GTK_COMBO_BOX(m_comboDirection));
@@ -238,15 +226,13 @@ void MenuPW::Hide(void)
     gtk_combo_box_popdown(GTK_COMBO_BOX(m_comboSmooth));
     gtk_widget_hide_all(m_table);
 
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoCalc)))
-    {
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoCalc))) {
         ImgProcPw::GetInstance()->SetAutoCalc(FALSE);
         //UpdateAutoCalc(FALSE);
     }
 }
 
-void MenuPW::Show(void)
-{
+void MenuPW::Show(void) {
     gtk_widget_show_all(m_table);
 
     gtk_widget_hide(m_btn_angle);
@@ -258,8 +244,7 @@ void MenuPW::Show(void)
        gtk_widget_hide(m_chkBtnAutoCalc);
      */
     gtk_widget_hide(m_chkBtnAutoTrace);
-    if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoCalc)))
-    {
+    if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoCalc))) {
         ImgProcPw::GetInstance()->SetAutoCalc(TRUE);
     }
 
@@ -276,32 +261,27 @@ void MenuPW::Show(void)
     gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboSmooth), index_smooth);
 }
 
-bool MenuPW::GetAutoTraceStatus(void)
-{
+bool MenuPW::GetAutoTraceStatus(void) {
     return (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoCalc)));
 }
 
-void MenuPW::ForeachWidget(GtkWidget *widget)
-{
-	if(widget != m_btnScale && widget != m_comboScale
-		&& widget != m_chkBtnAutoTrace && widget != m_chkBtnAutoCalc)
-		gtk_widget_set_sensitive(widget, (bool)m_sensitive);
+void MenuPW::ForeachWidget(GtkWidget *widget) {
+    if(widget != m_btnScale && widget != m_comboScale
+            && widget != m_chkBtnAutoTrace && widget != m_chkBtnAutoCalc)
+        gtk_widget_set_sensitive(widget, (bool)m_sensitive);
 }
 
-void MenuPW::Sensitive(bool on)
-{
-	m_sensitive = on;
-	GList *list = NULL;
-	list = gtk_container_get_children(GTK_CONTAINER(m_table));
-	if(list)
-	{
-		g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
-		g_list_free(list);
-	}
+void MenuPW::Sensitive(bool on) {
+    m_sensitive = on;
+    GList *list = NULL;
+    list = gtk_container_get_children(GTK_CONTAINER(m_table));
+    if(list) {
+        g_list_foreach(list, (GFunc)(HandleForeachWidget), this);
+        g_list_free(list);
+    }
 }
-GtkWidget* MenuPW::Create(void)
-{
-	char path[256];
+GtkWidget* MenuPW::Create(void) {
+    char path[256];
     m_table = gtk_table_new(20, 8, TRUE);
 
     // Time Mark
@@ -331,23 +311,23 @@ GtkWidget* MenuPW::Create(void)
     gtk_button_set_focus_on_click(GTK_BUTTON(m_chkBtnAutoTrace), FALSE);
     gtk_widget_hide(m_chkBtnAutoTrace);
 
-	// Fast Angle
+    // Fast Angle
     m_labelAngle = create_label("", 0, 0, g_lightGray, NULL);
     m_btn_angle = create_button(m_labelAngle, 0, 0, g_deep);
-	gtk_widget_modify_bg(m_btn_angle, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(m_btn_angle, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_btn_angle, 0, 6, 4, 5);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btn_angle), FALSE);
 
     GtkWidget *label_angleSub = create_label("-", 0, 0, g_lightGray, NULL);
     m_btn_angleSub = create_button(label_angleSub, 0, 0, g_deep);
-	gtk_widget_modify_bg(m_btn_angleSub, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(m_btn_angleSub, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_btn_angleSub, 6, 7, 4, 5);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btn_angleSub), FALSE);
     g_signal_connect(m_btn_angleSub, "clicked", G_CALLBACK(HandleBtnAngleSub), this);
 
     GtkWidget *label_angleAdd = create_label("+", 0, 0, g_lightGray, NULL);
     m_btn_angleAdd = create_button(label_angleAdd, 0, 0, g_deep);
-	gtk_widget_modify_bg(m_btn_angleAdd, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(m_btn_angleAdd, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_btn_angleAdd, 7, 8, 4, 5);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btn_angleAdd), FALSE);
     g_signal_connect(m_btn_angleAdd, "clicked", G_CALLBACK(HandleBtnAngleAdd), this);
@@ -361,7 +341,7 @@ GtkWidget* MenuPW::Create(void)
     // Scale Unit
     m_labelScale = create_label("", 0, 0, g_lightGray, NULL);
     m_btnScale = create_button(m_labelScale, 0, 0, g_deep);
-	gtk_widget_modify_bg(m_btnScale, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(m_btnScale, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), m_btnScale, 0, 5, 6, 7);
     gtk_button_set_focus_on_click(GTK_BUTTON(m_btnScale), FALSE);
 
@@ -377,7 +357,7 @@ GtkWidget* MenuPW::Create(void)
     // Auto Trace-Type
     m_labelTraceType = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_tracetype= create_button(m_labelTraceType, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_tracetype, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_tracetype, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), btn_tracetype, 0, 5, 7, 8);
     gtk_button_set_focus_on_click(GTK_BUTTON(btn_tracetype), FALSE);
 
@@ -389,7 +369,7 @@ GtkWidget* MenuPW::Create(void)
     // Auto Trace-Direction
     m_labelDirection = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_direction = create_button(m_labelDirection, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_direction, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_direction, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), btn_direction, 0, 5, 8, 9);
     gtk_button_set_focus_on_click(GTK_BUTTON(btn_direction), FALSE);
 
@@ -401,7 +381,7 @@ GtkWidget* MenuPW::Create(void)
     // Auto Trace-Threshold
     m_labelThreshold = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_threshold = create_button(m_labelThreshold, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_threshold, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_threshold, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), btn_threshold, 0, 5, 9, 10);
     gtk_button_set_focus_on_click(GTK_BUTTON(btn_threshold), FALSE);
 
@@ -413,7 +393,7 @@ GtkWidget* MenuPW::Create(void)
     // Auto Trace-Smooth
     m_labelSmooth = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_smooth = create_button(m_labelSmooth, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_smooth, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_smooth, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_table_attach_defaults(GTK_TABLE(m_table), btn_smooth, 0, 5, 10, 11);
     gtk_button_set_focus_on_click(GTK_BUTTON(btn_smooth), FALSE);
 
@@ -438,7 +418,7 @@ GtkWidget* MenuPW::Create(void)
     sprintf(path, "%s/%s", CFG_RES_PATH, "res/btn_format/1.jpg");
     GtkWidget *image1 = gtk_image_new_from_file(path);
     GtkWidget *btn_format1 = create_button(NULL, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_format1, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_format1, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_button_set_image(GTK_BUTTON(btn_format1), image1);
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format1, 0, 1, 0, 1);
     g_signal_connect(btn_format1, "clicked", G_CALLBACK(HandleBtnFormat1), this);
@@ -447,7 +427,7 @@ GtkWidget* MenuPW::Create(void)
     sprintf(path, "%s/%s", CFG_RES_PATH, "res/btn_format/2.jpg");
     GtkWidget *image2 = gtk_image_new_from_file(path);
     GtkWidget *btn_format2 = create_button(NULL, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_format2, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_format2, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_button_set_image(GTK_BUTTON(btn_format2), image2);
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format2, 1, 2, 0, 1);
     g_signal_connect(btn_format2, "clicked", G_CALLBACK(HandleBtnFormat2), this);
@@ -456,7 +436,7 @@ GtkWidget* MenuPW::Create(void)
     sprintf(path, "%s/%s", CFG_RES_PATH, "res/btn_format/3.jpg");
     GtkWidget *image3 = gtk_image_new_from_file(path);
     GtkWidget *btn_format3 = create_button(NULL, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_format3, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_format3, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_button_set_image(GTK_BUTTON(btn_format3), image3);
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format3, 2, 3, 0, 1);
     g_signal_connect(btn_format3, "clicked", G_CALLBACK(HandleBtnFormat3), this);
@@ -465,7 +445,7 @@ GtkWidget* MenuPW::Create(void)
     sprintf(path, "%s/%s", CFG_RES_PATH, "res/btn_format/4.jpg");
     GtkWidget *image4 = gtk_image_new_from_file(path);
     GtkWidget *btn_format4 = create_button(NULL, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_format4, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_format4, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_button_set_image(GTK_BUTTON(btn_format4), image4);
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format4, 0, 1, 1, 2);
     g_signal_connect(btn_format4, "clicked", G_CALLBACK(HandleBtnFormat4), this);
@@ -474,7 +454,7 @@ GtkWidget* MenuPW::Create(void)
     sprintf(path, "%s/%s", CFG_RES_PATH, "res/btn_format/5.jpg");
     GtkWidget *image5 = gtk_image_new_from_file(path);
     GtkWidget *btn_format5 = create_button(NULL, 0, 0, g_deep);
-	gtk_widget_modify_bg(btn_format5, GTK_STATE_INSENSITIVE, g_deepGray);
+    gtk_widget_modify_bg(btn_format5, GTK_STATE_INSENSITIVE, g_deepGray);
     gtk_button_set_image(GTK_BUTTON(btn_format5), image5);
     gtk_table_attach_defaults(GTK_TABLE(tableFormat), btn_format5, 1, 2, 1, 2);
     g_signal_connect(btn_format5, "clicked", G_CALLBACK(HandleBtnFormat5), this);
@@ -485,8 +465,7 @@ GtkWidget* MenuPW::Create(void)
     return m_table;
 }
 
-void MenuPW::UpdateLabel(void)
-{
+void MenuPW::UpdateLabel(void) {
     gtk_label_set_text(GTK_LABEL(m_labelTimemark), _("Time Mark"));
     gtk_label_set_text(GTK_LABEL(m_labelAutoTrace), _("Auto Trace"));
     gtk_label_set_text(GTK_LABEL(m_labelAutoCalc), _("Auto Calculate"));
@@ -506,35 +485,29 @@ void MenuPW::UpdateLabel(void)
     gtk_frame_set_label(GTK_FRAME(m_frameFormat), _("Display Format"));
 }
 
-void MenuPW::UpdateTimeRes(const char* str, EKnobReturn status)
-{
-	spin_timeres.SetValue(str, status);
+void MenuPW::UpdateTimeRes(const char* str, EKnobReturn status) {
+    spin_timeres.SetValue(str, status);
 }
 
-void MenuPW::UpdateAutoTrace(bool on)
-{
+void MenuPW::UpdateAutoTrace(bool on) {
     //gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoTrace), on);
 }
 
-void MenuPW::UpdateAutoCalc(bool on)
-{
+void MenuPW::UpdateAutoCalc(bool on) {
     ImgProcPw::GetInstance()->SetAutoCalc(on);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_chkBtnAutoCalc), on);
 }
 
-void MenuPW::UpdateTimeMark(bool on)
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_timemark),on);
+void MenuPW::UpdateTimeMark(bool on) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_check_btn_timemark),on);
 }
 
 ///> private
-void MenuPW::ChgTimeRes(EKnobOper oper)
-{
-	ImgProcPw::GetInstance()->ChangeTimeSmooth(oper);
+void MenuPW::ChgTimeRes(EKnobOper oper) {
+    ImgProcPw::GetInstance()->ChangeTimeSmooth(oper);
 }
 
-void MenuPW::ChkAutoTraceClicked(GtkToggleButton *togglebutton)
-{
+void MenuPW::ChkAutoTraceClicked(GtkToggleButton *togglebutton) {
     gboolean value = gtk_toggle_button_get_active(togglebutton);
 
     // if (!value) {
@@ -553,14 +526,12 @@ void MenuPW::ChkAutoTraceClicked(GtkToggleButton *togglebutton)
     // ImgProcPw::GetInstance()->SetDscTraceStatus(TRUE);
 }
 
-void MenuPW::ChkTimeMarkClicked(GtkToggleButton *togglebutton)
-{
+void MenuPW::ChkTimeMarkClicked(GtkToggleButton *togglebutton) {
     gboolean value = gtk_toggle_button_get_active(togglebutton);
     ImgProcPw::GetInstance()->ChangeTimeMark(value);
 }
 
-void MenuPW::ChkAutoCalcClicked(GtkToggleButton *togglebutton)
-{
+void MenuPW::ChkAutoCalcClicked(GtkToggleButton *togglebutton) {
     MeasureCalc calc;
     UpdateMeasure update;
 
@@ -571,134 +542,97 @@ void MenuPW::ChkAutoCalcClicked(GtkToggleButton *togglebutton)
     if(ModeStatus::IsUnFreezeMode())
         ImgProcPw::GetInstance()->SetAutoCalc(value);
 
-    if(!value)
-    {
+    if(!value) {
         ImgProcPw::GetInstance()->SetAutoCalc(value);
 
-        //娴嬮噺澧炲姞鍒版祴閲忕鐞嗕腑
-        if(g_calcPwStatus)
-        {
+        //测量增加到测量管理中
+        if(g_calcPwStatus) {
             update.ClearLast();
             MeasureMan::GetInstance()->ClearLast();
             POINT psP, edP;
             psP.x = edP.x = 0;
             psP.y = edP.y = IMAGE_H/2;
             ImageAreaDraw::GetInstance()->SetPsEdValue(psP, edP, 1);
-        }
-        else
+        } else
             ImageAreaDraw::GetInstance()->ClearAutoCalcPara(); //只是显示，没有增加到测量管理中
 
         ImageArea::GetInstance()->ClearTrace();
     }
 }
 
-void MenuPW::BtnAdjustClicked(GtkButton *button)
-{
+void MenuPW::BtnAdjustClicked(GtkButton *button) {
     PRINTF("HIGH-Q adjust clicked\n");
 }
 
-void MenuPW::BtnAngleSubClicked(GtkButton *button)
-{
-	ImgPw::GetInstance()->ChangeCorrectAngleFast(SUB);
+void MenuPW::BtnAngleSubClicked(GtkButton *button) {
+    ImgPw::GetInstance()->ChangeCorrectAngleFast(SUB);
 }
 
-void MenuPW::BtnAngleAddClicked(GtkButton *button)
-{
-	ImgPw::GetInstance()->ChangeCorrectAngleFast(ADD);
+void MenuPW::BtnAngleAddClicked(GtkButton *button) {
+    ImgPw::GetInstance()->ChangeCorrectAngleFast(ADD);
 }
 
-void MenuPW::BtnFormat1Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
-        if(StatusChangeFormat())
-        {
+void MenuPW::BtnFormat1Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
+        if(StatusChangeFormat()) {
             FormatPw::GetInstance()->ChangeFormat(FormatPw::P_TOTAL);
             WriteFormatPw(FormatPw::P_TOTAL);
-        }
-        else
+        } else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuPW::BtnFormat2Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
-        if(StatusChangeFormat())
-        {
+void MenuPW::BtnFormat2Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
+        if(StatusChangeFormat()) {
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP11_UD);
             WriteFormatPw(FormatPw::BP11_UD);
-        }
-        else
+        } else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuPW::BtnFormat3Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
-        if(StatusChangeFormat())
-        {
+void MenuPW::BtnFormat3Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
+        if(StatusChangeFormat()) {
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP21_UD);
             WriteFormatPw(FormatPw::BP21_UD);
-        }
-        else
+        } else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuPW::BtnFormat4Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
-        if(StatusChangeFormat())
-        {
+void MenuPW::BtnFormat4Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
+        if(StatusChangeFormat()) {
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP12_UD);
             WriteFormatPw(FormatPw::BP12_UD);
-        }
-        else
+        } else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuPW::BtnFormat5Clicked(GtkButton *button)
-{
-    if (ModeStatus::IsUnFreezeMode())
-    {
-        if(StatusChangeFormat())
-        {
+void MenuPW::BtnFormat5Clicked(GtkButton *button) {
+    if (ModeStatus::IsUnFreezeMode()) {
+        if(StatusChangeFormat()) {
             FormatPw::GetInstance()->ChangeFormat(FormatPw::BP11_LR);
             WriteFormatPw(FormatPw::BP11_LR);
-        }
-        else
+        } else
             HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is disable in current mode."), 2);
-    }
-    else
-    {
+    } else {
         HintArea::GetInstance()->UpdateHint(_("[Format]: Format change is invalid in freeze mode."), 2);
     }
 }
 
-void MenuPW::BtnComboScaleChanged(GtkComboBox *widget)
-{
+void MenuPW::BtnComboScaleChanged(GtkComboBox *widget) {
     SysGeneralSetting sysGeneralSetting;
     int scaleunit = gtk_combo_box_get_active(widget);
     sysGeneralSetting.SetScaleUnit(scaleunit);
@@ -708,8 +642,7 @@ void MenuPW::BtnComboScaleChanged(GtkComboBox *widget)
     m_ptrImgDraw->SetPwScaleUnit(ImageAreaDraw::SCALEUNIT(gtk_combo_box_get_active(widget)));
 }
 
-void MenuPW::BtnComboTraceTypeChanged(GtkComboBox *widget)
-{
+void MenuPW::BtnComboTraceTypeChanged(GtkComboBox *widget) {
     SysGeneralSetting sysGeneralSetting;
     int tracetype= gtk_combo_box_get_active(widget);
     sysGeneralSetting.SetTraceType(tracetype);
@@ -717,8 +650,7 @@ void MenuPW::BtnComboTraceTypeChanged(GtkComboBox *widget)
 
     ImgProcPw::GetInstance()->SetTraceType(gtk_combo_box_get_active(widget));
 }
-void MenuPW::BtnComboDirectionChanged(GtkComboBox *widget)
-{
+void MenuPW::BtnComboDirectionChanged(GtkComboBox *widget) {
     SysGeneralSetting sysGeneralSetting;
     int direction = gtk_combo_box_get_active(widget);
     sysGeneralSetting.SetDirection(direction);
@@ -726,8 +658,7 @@ void MenuPW::BtnComboDirectionChanged(GtkComboBox *widget)
 
     ImgProcPw::GetInstance()->SetTraceDirection(gtk_combo_box_get_active(widget));
 }
-void MenuPW::BtnComboThresholdChanged(GtkComboBox *widget)
-{
+void MenuPW::BtnComboThresholdChanged(GtkComboBox *widget) {
     SysGeneralSetting sysGeneralSetting;
     int threshold = gtk_combo_box_get_active(widget);
     sysGeneralSetting.SetThreshold(threshold);
@@ -735,33 +666,30 @@ void MenuPW::BtnComboThresholdChanged(GtkComboBox *widget)
 
     ImgProcPw::GetInstance()->SetTraceThreshold(gtk_combo_box_get_active(widget));
 }
-void MenuPW::BtnComboSmoothChanged(GtkComboBox *widget)
-{
+void MenuPW::BtnComboSmoothChanged(GtkComboBox *widget) {
     SysGeneralSetting sysGeneralSetting;
     int smooth = gtk_combo_box_get_active(widget);
     sysGeneralSetting.SetSmooth(smooth);
     sysGeneralSetting.SyncFile();
 
-	ImgProcPw::GetInstance()->SetTraceSmooth(gtk_combo_box_get_active(widget));
+    ImgProcPw::GetInstance()->SetTraceSmooth(gtk_combo_box_get_active(widget));
 }
 
-bool MenuPW::StatusChangeFormat()
-{
-	ModeStatus modeStatus;
-	ScanMode::EScanMode mode = modeStatus.GetScanMode();
-	if ((mode == ScanMode::PW) || (mode == ScanMode::PWCFM) || (mode == ScanMode::PWPDI) || (mode == ScanMode::PW_SIMULT)
-			|| (mode == ScanMode::PWCFM_SIMULT) || (mode == ScanMode::PWPDI_SIMULT)
+bool MenuPW::StatusChangeFormat() {
+    ModeStatus modeStatus;
+    ScanMode::EScanMode mode = modeStatus.GetScanMode();
+    if ((mode == ScanMode::PW) || (mode == ScanMode::PWCFM) || (mode == ScanMode::PWPDI) || (mode == ScanMode::PW_SIMULT)
+            || (mode == ScanMode::PWCFM_SIMULT) || (mode == ScanMode::PWPDI_SIMULT)
             || (mode == ScanMode::CW) || (mode == ScanMode::CWCFM) || (mode == ScanMode::CWPDI) )
-		return TRUE;
-	else
-		return FALSE;
+        return TRUE;
+    else
+        return FALSE;
 }
 
 /*@brief: write Pw format to config file
  * @para format[in]: PW format
  */
-void MenuPW::WriteFormatPw(int format)
-{
+void MenuPW::WriteFormatPw(int format) {
     SysOptions sysOpt;
     sysOpt.SetDisplayFormatPW(format);
     sysOpt.SyncFile();

@@ -12,11 +12,10 @@
 #define ABS_DCMDATA_H
 #include "periDevice/DCMDef.h"
 
-class CAbsDCMData
-{
+class CAbsDCMData {
 public:
-	virtual ~CAbsDCMData(){};
-	virtual bool GetDCMData(bool (*)(DCMELEMENT &))=0;
+    virtual ~CAbsDCMData() {};
+    virtual bool GetDCMData(bool (*)(DCMELEMENT &))=0;
 
 };
 

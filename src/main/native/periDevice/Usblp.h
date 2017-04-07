@@ -18,27 +18,27 @@
 /*
 打印报告各项的内容
 */
-struct print_re_item{
-	char *id;
-	char *name;
+struct print_re_item {
+    char *id;
+    char *name;
 //hlx
 #ifdef VET
-	char *species;
-	char *owner;
+    char *species;
+    char *owner;
 #endif
 
-	char *check_num;
-	char *sex;
+    char *check_num;
+    char *sex;
     char *ageUnit;
-	char *age;
-	char *section;
-	char *diag_date;
-	char *hospital;
-	char *diag_doctor;
-	char *report_doctor;
-	char *ul_idea;
-	char *comment;
-	char *image_data[2];//报告中图像的数据
+    char *age;
+    char *section;
+    char *diag_date;
+    char *hospital;
+    char *diag_doctor;
+    char *report_doctor;
+    char *ul_idea;
+    char *comment;
+    char *image_data[2];//报告中图像的数据
 //	vector<string> imageName;
 };
 

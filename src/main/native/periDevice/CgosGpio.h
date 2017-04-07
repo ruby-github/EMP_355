@@ -3,8 +3,7 @@
 
 #include <Cgos.h>
 
-class CgosGpioI2C
-{
+class CgosGpioI2C {
 public:
     CgosGpioI2C();
     ~CgosGpioI2C();

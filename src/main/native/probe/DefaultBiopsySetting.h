@@ -4,16 +4,15 @@
 #include "base/IniFile.h"
 using namespace std;
 
-class DefaultBiopsySetting
-{
+class DefaultBiopsySetting {
 public:
-	 DefaultBiopsySetting();
+    DefaultBiopsySetting();
     ~DefaultBiopsySetting();
 
-	//int GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
+    //int GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
     double GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
 
-	//int GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
+    //int GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
     double  GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
 
 private:

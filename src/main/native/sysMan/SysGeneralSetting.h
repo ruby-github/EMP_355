@@ -3,8 +3,7 @@
 
 #include "base/IniFile.h"
 
-class SysGeneralSetting
-{
+class SysGeneralSetting {
 public:
 
     SysGeneralSetting();

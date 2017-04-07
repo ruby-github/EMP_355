@@ -8,28 +8,25 @@
 #include "Def.h"
 #include "periDevice/I2CCtrl.h"
 
-I2CInterface::I2CInterface()
-{
+I2CInterface::I2CInterface() {
     m_fd = open("/dev/i2c-1",O_RDWR);
-    if (m_fd < 0){
+    if (m_fd < 0) {
         PRINTF("open i2c device fail\n");
     }
 }
 
-I2CInterface::~I2CInterface()
-{
+I2CInterface::~I2CInterface() {
     if ( m_fd >= 0 )
         close(m_fd);
 }
 
-int I2CInterface::I2CWrite( unsigned char addr, int len ,unsigned char buf[])
-{
+int I2CInterface::I2CWrite( unsigned char addr, int len ,unsigned char buf[]) {
     int ret;
     struct i2c_rdwr_ioctl_data ioctl_data;
 
     ioctl_data.nmsgs = 1 ;
     ioctl_data.msgs = (struct i2c_msg *)malloc(ioctl_data.nmsgs * sizeof(ioctl_data.msgs));
-    if (ioctl_data.msgs == NULL){
+    if (ioctl_data.msgs == NULL) {
         PRINTF("malloc mem fail\n");
         return -1;;
     }
@@ -45,8 +42,7 @@ int I2CInterface::I2CWrite( unsigned char addr, int len ,unsigned char buf[])
     return ret;
 }
 
-int I2CInterface::I2CRead( unsigned char addr, unsigned char reg, int len, unsigned char buffer[])
-{
+int I2CInterface::I2CRead( unsigned char addr, unsigned char reg, int len, unsigned char buffer[]) {
     int ret;
     struct i2c_rdwr_ioctl_data ioctl_data;
     struct i2c_msg msgs[2];

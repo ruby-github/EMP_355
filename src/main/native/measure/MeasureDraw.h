@@ -10,8 +10,7 @@
 #include "imageProc/ModeStatus.h"
 #include "sysMan/SysMeasurementSetting.h"
 
-class MeasureDraw
-{
+class MeasureDraw {
 public:
     MeasureDraw();
     ~MeasureDraw();
@@ -26,8 +25,8 @@ public:
     int GetConfirmColor(void);
     void SetCurColor(int color);
     int GetCurColor(void);
-	int GetOrderNumber(void);
-	void SetOrderNumber(int number);
+    int GetOrderNumber(void);
+    void SetOrderNumber(int number);
 
     POINT DrawInitialCursor(void);
     POINT DrawInitialHLine(bool isCur=TRUE);
@@ -39,13 +38,13 @@ public:
     void DrawTraceLine(POINT p1, POINT p2, bool isCur=FALSE, EDrawMode mode=XOR);
     void DrawINTEGRALTraceLine(POINT p1, POINT p2, bool isCur=FALSE, EDrawMode mode=XOR);
     void DrawLine(POINT p1, POINT p2, bool isCur=FALSE, EDrawMode mode=XOR);
-	void DrawDotLine(POINT p1, POINT p2, bool isCur=FALSE, EDrawMode mode=XOR);
+    void DrawDotLine(POINT p1, POINT p2, bool isCur=FALSE, EDrawMode mode=XOR);
     void DrawHDotLine(POINT p, bool isCur=TRUE, EDrawMode mode=XOR);
     void DrawVDotLine(POINT p, bool isCur=TRUE, EDrawMode mode=XOR);
     void DrawHLine(POINT p, bool isCur=TRUE, EDrawMode mode=XOR);
     void DrawVLine(POINT p, bool isCur=TRUE, EDrawMode mode=XOR); // no cursor
     void DrawTanBeeline(POINT point, double tan, bool isCur=FALSE, EDrawMode mode=XOR);
-	vector<POINT> DrawTanLineSegment(POINT point1, double angle, int length, bool isCur=FALSE, EDrawMode mode=XOR);
+    vector<POINT> DrawTanLineSegment(POINT point1, double angle, int length, bool isCur=FALSE, EDrawMode mode=XOR);
     void DrawDotBeeline(POINT point1, POINT point2, bool isCur=FALSE, EDrawMode mode=XOR);
     void DrawCrossLine(POINT p, bool isCur=TRUE, EDrawMode mode=XOR);
 
@@ -65,9 +64,9 @@ public:
     void DrawIMTIntima(POINT start, unsigned int *pIntima, int count, bool draw);
     void DrawIMTAdvent(POINT start, unsigned int *pAdventitia, int count, bool draw);
 
-	void DrawAngleArc(POINT center, POINT left, POINT right, bool isCur=TRUE, EDrawMode mode=XOR);
-	void DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode = XOR);
-	void ChangeOrderNumber(void);
+    void DrawAngleArc(POINT center, POINT left, POINT right, bool isCur=TRUE, EDrawMode mode=XOR);
+    void DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode = XOR);
+    void ChangeOrderNumber(void);
     void DrawOrderNumberForErase(POINT p, int orderNumber, int confirmColor, EDrawMode mode = XOR);
 
     void DrawFanshaped(POINT center, POINT left, POINT right, double angle);
@@ -79,7 +78,7 @@ private:
     static int m_cursorType;
     int m_cursorSize;
     static POINT m_cursor; // point of measure, according to image area
-	static int m_orderNumber;
+    static int m_orderNumber;
 
     int m_colorCurIndex;
     int m_colorConfirmIndex;
@@ -91,73 +90,60 @@ private:
     void CalcMeasureCenter();
 };
 
-inline int MeasureDraw::GetCursorType()
-{
+inline int MeasureDraw::GetCursorType() {
     return m_cursorType;
 }
 
-inline void MeasureDraw::SetCursorType(int type)
-{
+inline void MeasureDraw::SetCursorType(int type) {
     m_cursorType = type;
 }
 
-inline int MeasureDraw::GetCursorSize(void)
-{
+inline int MeasureDraw::GetCursorSize(void) {
     return m_cursorSize;
 }
-inline void MeasureDraw::SetCursorSize(int size)
-{
+inline void MeasureDraw::SetCursorSize(int size) {
     m_cursorSize = size;
 }
 
-inline int MeasureDraw::GetCurColor(void)
-{
+inline int MeasureDraw::GetCurColor(void) {
     return m_colorCurIndex;
 }
-inline void MeasureDraw::SetCurColor(int color)
-{
+inline void MeasureDraw::SetCurColor(int color) {
     m_colorCurIndex = color;
 }
 
-inline int MeasureDraw::GetConfirmColor(void)
-{
+inline int MeasureDraw::GetConfirmColor(void) {
     return m_colorConfirmIndex;
 }
-inline void MeasureDraw::SetConfirmColor(int color)
-{
+inline void MeasureDraw::SetConfirmColor(int color) {
     m_colorConfirmIndex = color;
 }
 
-inline void MeasureDraw::SetCursor( POINT p )
-{
-	m_cursor = p;
+inline void MeasureDraw::SetCursor( POINT p ) {
+    m_cursor = p;
 }
 
-inline POINT MeasureDraw::GetCursor(void)
-{
-	return m_cursor;
+inline POINT MeasureDraw::GetCursor(void) {
+    return m_cursor;
 }
 
-inline int MeasureDraw::GetOrderNumber(void)
-{
+inline int MeasureDraw::GetOrderNumber(void) {
 #ifdef TRANSDUCER
     SysMeasurementSetting sysMeasure;
     int m_meaResultFontSize = sysMeasure.GetMeasureResult();
     int measure_line_max = 14;
-    if(m_meaResultFontSize == 1)
-    {
+    if(m_meaResultFontSize == 1) {
         measure_line_max = 10;
     }
     if (m_orderNumber > measure_line_max)
-		m_orderNumber = 1;
+        m_orderNumber = 1;
 #endif
 
     return m_orderNumber;
 }
 
-inline void MeasureDraw::SetOrderNumber(int number)
-{
-	m_orderNumber = number;
+inline void MeasureDraw::SetOrderNumber(int number) {
+    m_orderNumber = number;
 }
 
 #endif

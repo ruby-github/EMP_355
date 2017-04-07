@@ -3,8 +3,7 @@
 
 #include "base/IniFile.h"
 
-class SysUserDefinedKey
-{
+class SysUserDefinedKey {
 public:
 
     SysUserDefinedKey();

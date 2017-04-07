@@ -5,17 +5,16 @@
 #include "Def.h"
 #include "display/CusSpin.h"
 
-class MenuM
-{
+class MenuM {
 public:
     MenuM();
-    ~MenuM(){};
+    ~MenuM() {};
 
     GtkWidget * Create(void);
     void Hide(void);
     void Show(void);
 
-	void Sensitive(bool on);
+    void Sensitive(bool on);
     void UpdatePolarity(bool on);
     void UpdateTimeMark(bool on);
     void UpdateLine(const char *str, EKnobReturn status);
@@ -41,10 +40,10 @@ private:
     static CusSpin::CusSpinItem item_smooth;
     static CusSpin::CusSpinItem item_enhanceM;
 
-	bool m_sensitive;
+    bool m_sensitive;
     int m_format;
 
-	//signal handle
+    //signal handle
     static void ChgLine(EKnobOper oper);
     static void ChgEnhanceM(EKnobOper oper);
     static void ChgSmooth(EKnobOper oper);
@@ -63,18 +62,38 @@ private:
     void WriteFormatM(int format);
 
 //signal connect
-    static void HandleChkPolarity(GtkButton *button, MenuM *data) { data->ChkPolarity(button); }
-    static void HandleChkTimemark(GtkButton *button, MenuM *data) { data->ChkTimemark(button); }
-    static void HandleBtnAnatomic(GtkButton *button, MenuM *data) { data->BtnAnatomic(button); }
+    static void HandleChkPolarity(GtkButton *button, MenuM *data) {
+        data->ChkPolarity(button);
+    }
+    static void HandleChkTimemark(GtkButton *button, MenuM *data) {
+        data->ChkTimemark(button);
+    }
+    static void HandleBtnAnatomic(GtkButton *button, MenuM *data) {
+        data->BtnAnatomic(button);
+    }
 
-    static void HandleBtnFormat(GtkButton *button, MenuM *data) { data->BtnFormatClicked(button); }
+    static void HandleBtnFormat(GtkButton *button, MenuM *data) {
+        data->BtnFormatClicked(button);
+    }
 
-    static void HandleBtnFormat1(GtkButton *button, MenuM *data) { data->BtnFormat1Clicked(button); }
-    static void HandleBtnFormat2(GtkButton *button, MenuM *data) { data->BtnFormat2Clicked(button); }
-    static void HandleBtnFormat3(GtkButton *button, MenuM *data) { data->BtnFormat3Clicked(button); }
-    static void HandleBtnFormat4(GtkButton *button, MenuM *data) { data->BtnFormat4Clicked(button); }
-    static void HandleBtnFormat5(GtkButton *button, MenuM *data) { data->BtnFormat5Clicked(button); }
-    static void HandleForeachWidget(gpointer element, MenuM *data) { data->ForeachWidget(GTK_WIDGET(element)); }
+    static void HandleBtnFormat1(GtkButton *button, MenuM *data) {
+        data->BtnFormat1Clicked(button);
+    }
+    static void HandleBtnFormat2(GtkButton *button, MenuM *data) {
+        data->BtnFormat2Clicked(button);
+    }
+    static void HandleBtnFormat3(GtkButton *button, MenuM *data) {
+        data->BtnFormat3Clicked(button);
+    }
+    static void HandleBtnFormat4(GtkButton *button, MenuM *data) {
+        data->BtnFormat4Clicked(button);
+    }
+    static void HandleBtnFormat5(GtkButton *button, MenuM *data) {
+        data->BtnFormat5Clicked(button);
+    }
+    static void HandleForeachWidget(gpointer element, MenuM *data) {
+        data->ForeachWidget(GTK_WIDGET(element));
+    }
 };
 
 extern MenuM g_menuM;

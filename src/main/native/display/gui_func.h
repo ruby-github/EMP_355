@@ -50,10 +50,10 @@ GtkWidget* create_combobox(guint width, guint height, const char *layouttype, Gt
 GtkWidget* create_combo_box_with_text(const int width, const int height, const std::vector<std::string> text);
 GtkWidget* create_pixmap(const gchar *filename);
 PangoLayout * create_pango_text(GtkWidget *widget,
-				const char *text,
-				int width,
-				PangoFontDescription *font,
-				const GdkColor* const color);
+                                const char *text,
+                                int width,
+                                PangoFontDescription *font,
+                                const GdkColor* const color);
 
 void doKeyEvent(const unsigned int keycode, int is_press);
 void doBtnEvent(const unsigned int button, int is_press);
@@ -82,15 +82,19 @@ int GetComboBoxIndex(GtkComboBox *combobox, string name);
 bool IsNum(std::string str);
 PangoFontDescription* AdaptStringFont(const char *font_family, const char *font_style, int font_size, PangoLayout *layout, const char *str, const int max_width);
 
-template <typename T> T max_3(const T &a, const T &b, const T &c)
-{ return a > b ? (a > c ? a : c) : (b > c ? b : c); }
+template <typename T> T max_3(const T &a, const T &b, const T &c) {
+    return a > b ? (a > c ? a : c) : (b > c ? b : c);
+}
 
-template <typename T> T min_3(const T &a, const T &b, const T &c)
-{ return a < b ? (a < c ? a : c) : (b < c ? b : c); }
+template <typename T> T min_3(const T &a, const T &b, const T &c) {
+    return a < b ? (a < c ? a : c) : (b < c ? b : c);
+}
 
 void SetTheme(const char *rc_path);
 
 void XRemapKey(Display *display, int old_keycode, KeySym new_keysym);
 void ChangeKeymap();
+
+void modify_widget_bg(GtkWidget* widget);
 
 #endif

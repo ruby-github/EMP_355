@@ -21,8 +21,12 @@ private:
     void BtnGeneral(GtkButton *button);
     void BtnBiopsy(GtkButton *button);
 //signal connect
-    static void HandleBtnGeneral(GtkButton *button, MenuSystem *data) { data->BtnGeneral(button); }
-    static void HandleBtnBiopsy(GtkButton *button, MenuSystem *data) { data->BtnBiopsy(button); }
+    static void HandleBtnGeneral(GtkButton *button, MenuSystem *data) {
+        data->BtnGeneral(button);
+    }
+    static void HandleBtnBiopsy(GtkButton *button, MenuSystem *data) {
+        data->BtnBiopsy(button);
+    }
 };
 
 extern MenuSystem g_menuSystem;

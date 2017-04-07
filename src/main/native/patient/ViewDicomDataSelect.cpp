@@ -23,28 +23,24 @@
 ViewDicomDataSelect* ViewDicomDataSelect::m_ptrInstance = NULL;
 
 PatientInfo ViewDicomDataSelect::m_patientInfo;
-ViewDicomDataSelect::ViewDicomDataSelect()
-{
-	m_listBranch = NULL;
+ViewDicomDataSelect::ViewDicomDataSelect() {
+    m_listBranch = NULL;
     m_studyNo = 0;
 }
 
-ViewDicomDataSelect::~ViewDicomDataSelect()
-{
+ViewDicomDataSelect::~ViewDicomDataSelect() {
     if (m_ptrInstance != NULL)
-	delete m_ptrInstance;
+        delete m_ptrInstance;
 }
 
-ViewDicomDataSelect* ViewDicomDataSelect::GetInstance()
-{
+ViewDicomDataSelect* ViewDicomDataSelect::GetInstance() {
     if (m_ptrInstance == NULL)
         m_ptrInstance = new ViewDicomDataSelect;
 
     return m_ptrInstance;
 }
 #ifndef VET
-void ViewDicomDataSelect::CreateWindow(GtkWindow *parent)
-{
+void ViewDicomDataSelect::CreateWindow(GtkWindow *parent) {
     GtkWidget *fixed;
     GtkWidget *dataSrc;
     GtkWidget *dataDe;
@@ -76,14 +72,14 @@ void ViewDicomDataSelect::CreateWindow(GtkWindow *parent)
     gtk_fixed_put (GTK_FIXED (fixed), label_list, 30, 10);
     gtk_label_set_use_markup (GTK_LABEL (label_list), TRUE);
     gtk_widget_set_size_request (label_list, 150, 30);
-	gtk_misc_set_alignment (GTK_MISC (label_list), 0, 0.5);
+    gtk_misc_set_alignment (GTK_MISC (label_list), 0, 0.5);
 
     dataSrc = gtk_scrolled_window_new (NULL, NULL);
-	gtk_widget_show (dataSrc);
-	gtk_fixed_put (GTK_FIXED (fixed), dataSrc, 20+10, 10+30);
-	gtk_widget_set_size_request (dataSrc, 200+45, 300+20);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (dataSrc), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (dataSrc), GTK_SHADOW_IN);
+    gtk_widget_show (dataSrc);
+    gtk_fixed_put (GTK_FIXED (fixed), dataSrc, 20+10, 10+30);
+    gtk_widget_set_size_request (dataSrc, 200+45, 300+20);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (dataSrc), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (dataSrc), GTK_SHADOW_IN);
 
     GtkTreeModel *modelRoot = create_root_model();
     m_treeSrc = gtk_tree_view_new_with_model (modelRoot);
@@ -98,53 +94,49 @@ void ViewDicomDataSelect::CreateWindow(GtkWindow *parent)
     gtk_fixed_put (GTK_FIXED (fixed), label_quality, 300, 10);
     gtk_label_set_use_markup (GTK_LABEL (label_quality), TRUE);
     gtk_widget_set_size_request (label_quality, 150, 30);
-	gtk_misc_set_alignment (GTK_MISC (label_quality), 0, 0.5);
+    gtk_misc_set_alignment (GTK_MISC (label_quality), 0, 0.5);
 
     dataDe = gtk_scrolled_window_new (NULL, NULL);
-	gtk_widget_show (dataDe);
-	gtk_fixed_put (GTK_FIXED (fixed), dataDe, 300, 10+30);
-	gtk_widget_set_size_request (dataDe, 250+60, 300+20);
-	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (dataDe), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (dataDe), GTK_SHADOW_IN);
+    gtk_widget_show (dataDe);
+    gtk_fixed_put (GTK_FIXED (fixed), dataDe, 300, 10+30);
+    gtk_widget_set_size_request (dataDe, 250+60, 300+20);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (dataDe), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (dataDe), GTK_SHADOW_IN);
 
-	m_treeDe = create_treeview_list();
-	gtk_widget_show (m_treeDe);
-	gtk_container_add (GTK_CONTAINER (dataDe), m_treeDe);
+    m_treeDe = create_treeview_list();
+    gtk_widget_show (m_treeDe);
+    gtk_container_add (GTK_CONTAINER (dataDe), m_treeDe);
 
     label_import = gtk_label_new_with_mnemonic (_("Import"));
-	image_import= gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
-	m_button_import = create_button_icon(label_import, image_import);
+    image_import= gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
+    m_button_import = create_button_icon(label_import, image_import);
     gtk_fixed_put (GTK_FIXED (fixed), m_button_import, 250+40, 410);
     //gtk_widget_set_size_request (m_button_import, 100, 35);
     g_signal_connect(m_button_import, "clicked", G_CALLBACK(HandleButtonImportClicked), this);
 
     label_cancel = gtk_label_new_with_mnemonic (_("Exit"));
     image_cancel = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
-	button_cancel = create_button_icon(label_cancel, image_cancel);
-	gtk_fixed_put (GTK_FIXED (fixed), button_cancel, 320+130, 410);
+    button_cancel = create_button_icon(label_cancel, image_cancel);
+    gtk_fixed_put (GTK_FIXED (fixed), button_cancel, 320+130, 410);
     g_signal_connect(button_cancel, "clicked", G_CALLBACK(HandleButtonCancelClicked), this);
 
     UpdateDicomDirList();
-	gtk_widget_show_all(m_window);
+    gtk_widget_show_all(m_window);
 
-	g_keyInterface.Push(this);
+    g_keyInterface.Push(this);
     SetSystemCursorToCenter();
 
 }
 
-void ViewDicomDataSelect::UpdateDicomDirList(void)
-{
+void ViewDicomDataSelect::UpdateDicomDirList(void) {
     string destDirStorageMedia = UDISK_PATH;
     EDCMReturnStatus status = CDCMMan::GetMe()->BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
-    if(status == DCMSUCCESS)
-    {
+    if(status == DCMSUCCESS) {
         int size = vecStudyLevel.size();
-        if(size == 0)
-        {
+        if(size == 0) {
             gtk_widget_set_sensitive(m_button_import,false);
             return ;
-        }
-        else
+        } else
             gtk_widget_set_sensitive(m_button_import,true);
 
         GtkTreeModel *model;
@@ -153,34 +145,29 @@ void ViewDicomDataSelect::UpdateDicomDirList(void)
         model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeSrc));
         gtk_tree_store_clear(GTK_TREE_STORE(model));
 
-        for(int i=0;i<size;i++)
-        {
+        for(int i=0; i<size; i++) {
             gtk_tree_store_append(GTK_TREE_STORE(model), &iter,NULL);
             gtk_tree_store_set(GTK_TREE_STORE(model), &iter,
-                    0, vecStudyLevel[i].levelName.c_str(),
-                    1,i,
-                    -1);
-            if(vecStudyLevel[i].vecSeriesLevel.size()>0)
-            {
-                for(int j=0;j<vecStudyLevel[i].vecSeriesLevel.size();j++)
-                {
+                               0, vecStudyLevel[i].levelName.c_str(),
+                               1,i,
+                               -1);
+            if(vecStudyLevel[i].vecSeriesLevel.size()>0) {
+                for(int j=0; j<vecStudyLevel[i].vecSeriesLevel.size(); j++) {
 
                     GtkTreeIter iter_branch0;
                     gtk_tree_store_append(GTK_TREE_STORE(model),&iter_branch0,&iter);
                     gtk_tree_store_set(GTK_TREE_STORE(model),&iter_branch0,
-                            0, vecStudyLevel[i].vecSeriesLevel[j].levelName.c_str(),
-                            1,j,
-                            -1);
-                    if(vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size()>0)
-                    {
-                        for(int k=0;k<vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size();k++)
-                        {
+                                       0, vecStudyLevel[i].vecSeriesLevel[j].levelName.c_str(),
+                                       1,j,
+                                       -1);
+                    if(vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size()>0) {
+                        for(int k=0; k<vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size(); k++) {
                             GtkTreeIter iter_branch1;
                             gtk_tree_store_append(GTK_TREE_STORE(model),&iter_branch1,&iter_branch0);
                             gtk_tree_store_set(GTK_TREE_STORE(model),&iter_branch1,
-                                    0,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].levelName.c_str(),
-                                    1,k,
-                                    -1);
+                                               0,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].levelName.c_str(),
+                                               1,k,
+                                               -1);
                             gtk_tree_model_iter_next(model, &iter_branch1);
                         }
                     }
@@ -192,8 +179,7 @@ void ViewDicomDataSelect::UpdateDicomDirList(void)
     }
 }
 
-void ViewDicomDataSelect::add_column(GtkTreeView *treeview)
-{
+void ViewDicomDataSelect::add_column(GtkTreeView *treeview) {
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
 
@@ -208,9 +194,8 @@ void ViewDicomDataSelect::add_column(GtkTreeView *treeview)
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 }
 
-GtkTreeModel* ViewDicomDataSelect::create_root_model()
-{
-	GtkTreeIter iter;
+GtkTreeModel* ViewDicomDataSelect::create_root_model() {
+    GtkTreeIter iter;
     GtkTreeStore *store = gtk_tree_store_new(2, G_TYPE_STRING,G_TYPE_INT);
 #if 0
     string destDirStorageMedia = UDISK_PATH;
@@ -218,34 +203,29 @@ GtkTreeModel* ViewDicomDataSelect::create_root_model()
     int size = vecStudyLevel.size();
     if(size == 0)
         return NULL;
-    for(int i=0;i<size;i++)
-    {
+    for(int i=0; i<size; i++) {
         gtk_tree_store_append(store, &iter,NULL);
         gtk_tree_store_set(store, &iter,
-                0, vecStudyLevel[i].levelName.c_str(),
-                1,vecStudyLevel[i].index,
-                -1);
+                           0, vecStudyLevel[i].levelName.c_str(),
+                           1,vecStudyLevel[i].index,
+                           -1);
 #if 0
-        if(vecStudyLevel[i].vecSeriesLevel.size()>0)
-        {
-            for(int j=0;j<vecStudyLevel[i].vecSeriesLevel.size();j++)
-            {
+        if(vecStudyLevel[i].vecSeriesLevel.size()>0) {
+            for(int j=0; j<vecStudyLevel[i].vecSeriesLevel.size(); j++) {
                 GtkTreeIter iter_branch0;
                 gtk_tree_store_append(store,&iter_branch0,&iter);
                 gtk_tree_store_set(store,&iter_branch0,
-                        0, vecStudyLevel[i].vecSeriesLevel[j].levelName,
-                        1,vecStudyLevel[i].vecSeriesLevel[j].index,
-                        -1);
-                if(vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size()>0)
-                {
-                    for(int k=0;k<vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size();k++)
-                    {
+                                   0, vecStudyLevel[i].vecSeriesLevel[j].levelName,
+                                   1,vecStudyLevel[i].vecSeriesLevel[j].index,
+                                   -1);
+                if(vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size()>0) {
+                    for(int k=0; k<vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel.size(); k++) {
                         GtkTreeIter iter_branch1;
                         gtk_tree_store_append(store,&iter_branch1,&iter_branch0);
                         gtk_tree_store_set(store,&iter_branch1,
-                                0,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].levelName,
-                                1,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].index,
-                                -1);
+                                           0,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].levelName,
+                                           1,vecStudyLevel[i].vecSeriesLevel[j].vecFileLevel[k].index,
+                                           -1);
                     }
                 }
             }
@@ -257,8 +237,7 @@ GtkTreeModel* ViewDicomDataSelect::create_root_model()
     return GTK_TREE_MODEL (store);
 }
 
-GtkWidget* ViewDicomDataSelect::create_treeview_list()
-{
+GtkWidget* ViewDicomDataSelect::create_treeview_list() {
     GtkWidget *treeview;
     GtkTreeModel *model = NULL;
     GtkCellRenderer *renderer;
@@ -266,39 +245,37 @@ GtkWidget* ViewDicomDataSelect::create_treeview_list()
 
     treeview = gtk_tree_view_new ();
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
+    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Property"), renderer, "text", COL_QUALITY, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 150, NULL);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes(_("Value"), renderer, "text", COL_VALUE, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-	g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 450, NULL);
+    g_object_set(G_OBJECT(column),  "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 450, NULL);
 
     model = create_model_list();
     if (model != NULL)
-		gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
+        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
     g_object_unref (model);
 
-	return treeview;
+    return treeview;
 }
 
-GtkTreeModel* ViewDicomDataSelect::create_model_list()
-{
+GtkTreeModel* ViewDicomDataSelect::create_model_list() {
     GtkListStore *store;
 
     store = gtk_list_store_new(NUM_COL,
-			G_TYPE_STRING,
-			G_TYPE_STRING);
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
 
-	return GTK_TREE_MODEL (store);
+    return GTK_TREE_MODEL (store);
 }
 
-void ViewDicomDataSelect::TreeSelectionChanged(GtkTreeSelection *selection)
-{
+void ViewDicomDataSelect::TreeSelectionChanged(GtkTreeSelection *selection) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreePath *path;
@@ -311,154 +288,143 @@ void ViewDicomDataSelect::TreeSelectionChanged(GtkTreeSelection *selection)
     gtk_tree_model_get (model, &iter, 1, &index, -1);
     path = gtk_tree_model_get_path(model,&iter);
     depth = gtk_tree_path_get_depth(path);
-    switch(depth)
-    {
-        case 1:
-            {
-                gtk_tree_model_get (model, &iter, 1, &index, -1);
-                m_studyIndex = index;
-                InsertInfo1(index);
-            break;
-            }
-        case 2:
-            {
-                gtk_tree_model_get (model, &iter, 1, &index, -1);
-                int index0 = index;
-                gtk_tree_path_up(path);
-                gtk_tree_model_get_iter(model,&iter,path);
-                gtk_tree_model_get (model, &iter, 1, &index, -1);
-                int index1 = index;
-                m_studyIndex = index1;
-                InsertInfo2(index1,index0);
-                break;
-            }
-        case 3:
-            {
-                gtk_tree_model_get (model, &iter, 1, &index, -1);
-                m_studyIndex = index;
-                int index0 = index;
-                gtk_tree_path_up(path);
-                gtk_tree_model_get_iter(model,&iter,path);
-                gtk_tree_model_get (model, &iter, 1, &index, -1);
-                int index1 = index;
-                gtk_tree_path_up(path);
-                gtk_tree_model_get_iter(model,&iter,path);
-                gtk_tree_model_get (model, &iter, 1, &index, -1);
-                int index2 = index;
-                m_studyIndex = index2;
-                InsertInfo3(index2,index1,index0);
-                break;
-            }
+    switch(depth) {
+    case 1: {
+        gtk_tree_model_get (model, &iter, 1, &index, -1);
+        m_studyIndex = index;
+        InsertInfo1(index);
+        break;
+    }
+    case 2: {
+        gtk_tree_model_get (model, &iter, 1, &index, -1);
+        int index0 = index;
+        gtk_tree_path_up(path);
+        gtk_tree_model_get_iter(model,&iter,path);
+        gtk_tree_model_get (model, &iter, 1, &index, -1);
+        int index1 = index;
+        m_studyIndex = index1;
+        InsertInfo2(index1,index0);
+        break;
+    }
+    case 3: {
+        gtk_tree_model_get (model, &iter, 1, &index, -1);
+        m_studyIndex = index;
+        int index0 = index;
+        gtk_tree_path_up(path);
+        gtk_tree_model_get_iter(model,&iter,path);
+        gtk_tree_model_get (model, &iter, 1, &index, -1);
+        int index1 = index;
+        gtk_tree_path_up(path);
+        gtk_tree_model_get_iter(model,&iter,path);
+        gtk_tree_model_get (model, &iter, 1, &index, -1);
+        int index2 = index;
+        m_studyIndex = index2;
+        InsertInfo3(index2,index1,index0);
+        break;
+    }
     }
 }
-void ViewDicomDataSelect::InsertInfo1(int index)
-{
-	GtkTreeModel *model;
-	GtkTreeIter iter;
+void ViewDicomDataSelect::InsertInfo1(int index) {
+    GtkTreeModel *model;
+    GtkTreeIter iter;
 
-	string patientName;
-	ViewQueryRetrieve::ChangePersonNameFormatForShow(vecStudyLevel[index].patientName, patientName);
+    string patientName;
+    ViewQueryRetrieve::ChangePersonNameFormatForShow(vecStudyLevel[index].patientName, patientName);
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeDe));
     gtk_list_store_clear(GTK_LIST_STORE(model));
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Patient Name"),
-            COL_VALUE,patientName.c_str(),
-            -1);
+                       COL_QUALITY,_("Patient Name"),
+                       COL_VALUE,patientName.c_str(),
+                       -1);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Patient ID"),
-            COL_VALUE,vecStudyLevel[index].patientID.c_str(),
-            -1);
+                       COL_QUALITY,_("Patient ID"),
+                       COL_VALUE,vecStudyLevel[index].patientID.c_str(),
+                       -1);
 
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Exam Date"),
-            COL_VALUE,vecStudyLevel[index].studyDate.c_str(),
-            -1);
+                       COL_QUALITY,_("Exam Date"),
+                       COL_VALUE,vecStudyLevel[index].studyDate.c_str(),
+                       -1);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Exam Time"),
-            COL_VALUE,vecStudyLevel[index].studyTime.c_str(),
-            -1);
+                       COL_QUALITY,_("Exam Time"),
+                       COL_VALUE,vecStudyLevel[index].studyTime.c_str(),
+                       -1);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Accession Number"),
-            COL_VALUE,vecStudyLevel[index].accessionNumber.c_str(),
-            -1);
+                       COL_QUALITY,_("Accession Number"),
+                       COL_VALUE,vecStudyLevel[index].accessionNumber.c_str(),
+                       -1);
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Description"),
-            COL_VALUE,vecStudyLevel[index].studyDescription.c_str(),
-            -1);
+                       COL_QUALITY,_("Description"),
+                       COL_VALUE,vecStudyLevel[index].studyDescription.c_str(),
+                       -1);
 
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("Instance UID"),
-            COL_VALUE,vecStudyLevel[index].studyInstanceUID.c_str(),
-            -1);
+                       COL_QUALITY,_("Instance UID"),
+                       COL_VALUE,vecStudyLevel[index].studyInstanceUID.c_str(),
+                       -1);
 }
 
-void ViewDicomDataSelect::InsertInfo2(int index1,int index2)
-{
+void ViewDicomDataSelect::InsertInfo2(int index1,int index2) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeDe));
     gtk_list_store_clear(GTK_LIST_STORE(model));
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("type"),
-            COL_VALUE,vecStudyLevel[index1].vecSeriesLevel[index2].type.c_str(),
-            -1);
+                       COL_QUALITY,_("type"),
+                       COL_VALUE,vecStudyLevel[index1].vecSeriesLevel[index2].type.c_str(),
+                       -1);
     gtk_tree_model_iter_next(model, &iter);
 }
 
-void ViewDicomDataSelect::InsertInfo3(int index1,int index2,int index3)
-{
+void ViewDicomDataSelect::InsertInfo3(int index1,int index2,int index3) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeDe));
     gtk_list_store_clear(GTK_LIST_STORE(model));
     gtk_list_store_append(GTK_LIST_STORE(model), &iter);
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-            COL_QUALITY,_("filePath"),
-            COL_VALUE,vecStudyLevel[index1].vecSeriesLevel[index2].vecFileLevel[index3].filePath.c_str(),
-            -1);
+                       COL_QUALITY,_("filePath"),
+                       COL_VALUE,vecStudyLevel[index1].vecSeriesLevel[index2].vecFileLevel[index3].filePath.c_str(),
+                       -1);
 }
 
-void ViewDicomDataSelect::PROGRESSSTATUS(int nPos)
-{
+void ViewDicomDataSelect::PROGRESSSTATUS(int nPos) {
     double frac;
     frac = nPos*0.01;
 
-	gdk_threads_enter();
+    gdk_threads_enter();
     ViewDialog::GetInstance()->SetProgressBar(frac);
     while(gtk_events_pending())
         gtk_main_iteration();
-	gdk_threads_leave();
+    gdk_threads_leave();
 
 }
-gboolean ImportStudyForDicom(gpointer data)
-{
+gboolean ImportStudyForDicom(gpointer data) {
     ViewDicomDataSelect *tmp;
     tmp = (ViewDicomDataSelect *)data;
     tmp->ImportStudy();
     return FALSE;
 }
 
-unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
-{
+unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element) {
     PatientInfo::Info info;
-	info.p.id = element.stPatientID;
-	string firstName, midName, lastName;
-	ViewQueryRetrieve::ChangePersonNameFormat(element.stPatientName, firstName, lastName, midName);
+    info.p.id = element.stPatientID;
+    string firstName, midName, lastName;
+    ViewQueryRetrieve::ChangePersonNameFormat(element.stPatientName, firstName, lastName, midName);
     info.p.name.last = lastName;
     info.p.name.first = firstName;
     info.p.name.mid = midName;
 
-    if(element.stPatientSex.c_str() !=NULL)
-    {
+    if(element.stPatientSex.c_str() !=NULL) {
         string sex = element.stPatientSex;
         if(strcmp(sex.c_str(),"F")==0)
             info.p.sex = 0;
@@ -470,12 +436,10 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
             info.p.sex = -1;
         else
             info.p.sex = -1;
-    }
-    else
+    } else
         info.p.sex = -1;
 
-    if(strlen(element.stPatientAge.c_str())!=0)
-    {
+    if(strlen(element.stPatientAge.c_str())!=0) {
         string age = element.stPatientAge;
         int age_len = strlen(age.c_str());
         char str[256]="\0";
@@ -490,15 +454,12 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
             info.p.ageUnit = 1;
         else if(strcmp(str_tmp,"D")==0)
             info.p.ageUnit = 2;
-    }
-    else
-    {
+    } else {
         info.p.age = 0;
         info.p.ageUnit = 0;
     }
 
-    if(strlen(element.stPatientBirthDate.c_str())!=0)
-    {
+    if(strlen(element.stPatientBirthDate.c_str())!=0) {
         string birthDate = element.stPatientBirthDate;
         char birth_year[100] = "\0";
         char birth_month[100] = "\0";
@@ -509,9 +470,7 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.p.birthDate.year = atoi(birth_year);
         info.p.birthDate.month = atoi(birth_month);
         info.p.birthDate.day = atoi(birth_day);
-    }
-    else
-    {
+    } else {
         info.p.birthDate.year =0;
         info.p.birthDate.month = 0;
         info.p.birthDate.day = 0;
@@ -537,14 +496,13 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.e.height = 0.0;
 
     if(weightT!= 0)
-    info.e.weight = atof(weightT);
+        info.e.weight = atof(weightT);
     else
         info.e.weight = 0.0;
 
     info.e.BSA =0.0;
 
-    if(strlen(element.stStudyDate.c_str())!=0)
-    {
+    if(strlen(element.stStudyDate.c_str())!=0) {
         string studyDate = element.stStudyDate;
         char exam_year[100] = "\0";
         char exam_month[100] = "\0";
@@ -556,15 +514,12 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.e.examDate.year = atoi(exam_year);
         info.e.examDate.month = atoi(exam_month);
         info.e.examDate.day = atoi(exam_day);
-    }
-    else
-    {
+    } else {
         info.e.examDate.year = 0;
         info.e.examDate.month =0;
         info.e.examDate.day = 0;
     }
-    if(strlen(element.stStudyTime.c_str())!=0)
-    {
+    if(strlen(element.stStudyTime.c_str())!=0) {
         string studyTime= element.stStudyTime;
         char exam_hour[100] = "\0";
         char exam_minute[100] = "\0";
@@ -576,14 +531,12 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
         info.e.examTime.hour = atoi(exam_hour);
         info.e.examTime.second = atoi(exam_second);
         info.e.examTime.minute = atoi(exam_minute);
-    }
-    else
-    {
+    } else {
         info.e.examTime.hour = 0;
         info.e.examTime.second = 0;
         info.e.examTime.minute = 0;
     }
-	ViewQueryRetrieve::ChangePersonNameFormatForShow(element.stStudyDoctor, info.e.examDoctor);
+    ViewQueryRetrieve::ChangePersonNameFormatForShow(element.stStudyDoctor, info.e.examDoctor);
     info.e.comment = element.stStudyDescription;
     info.e.reportDoctor = "";
 
@@ -619,39 +572,34 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element)
     return m_ptrInstance->m_studyNo;
 }
 
-void ViewDicomDataSelect::CreateExamDir(int examNum)
-{
+void ViewDicomDataSelect::CreateExamDir(int examNum) {
     gchar *path;
-	gchar buf[100];
+    gchar buf[100];
 
     char strExamNum[100];
     sprintf(strExamNum, "%d", examNum);
-	path = g_build_path(G_DIR_SEPARATOR_S, STORE_PATH, strExamNum, NULL);
-	if (g_access(path, F_OK) == 0)
-	{
-		PRINTF("-----------------------folder of store path %d is exist, path = %s\n", examNum, path);
-		sprintf(buf, "rm -rf %s\n", path);
-		FileMan fm;
-		if (fm.DelDirectory(buf) == -1)
-		{
-			perror("rmdir fail!");
-			PRINTF("delete folder of store path 0 error\n");
-			g_free(path);
-			return;
-		}
-	}
+    path = g_build_path(G_DIR_SEPARATOR_S, STORE_PATH, strExamNum, NULL);
+    if (g_access(path, F_OK) == 0) {
+        PRINTF("-----------------------folder of store path %d is exist, path = %s\n", examNum, path);
+        sprintf(buf, "rm -rf %s\n", path);
+        FileMan fm;
+        if (fm.DelDirectory(buf) == -1) {
+            perror("rmdir fail!");
+            PRINTF("delete folder of store path 0 error\n");
+            g_free(path);
+            return;
+        }
+    }
 
-	if (g_mkdir(path, 0755) == -1)
-	{
-		PRINTF("create folder of store path %d error\n", examNum);
-	}
+    if (g_mkdir(path, 0755) == -1) {
+        PRINTF("create folder of store path %d error\n", examNum);
+    }
 
-	g_free(path);
+    g_free(path);
 
 }
 
-string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned char *pImageBuf, unsigned long bufLen)
-{
+string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned char *pImageBuf, unsigned long bufLen) {
     m_ptrInstance->CreateExamDir(m_ptrInstance->m_studyNo);
 
     time_t at;
@@ -665,8 +613,7 @@ string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned 
     memset(fileName, 0, 15);
     sprintf(fileName, "%d%d%d%d%d%d%d%d%d%d%d%d", (ct->tm_year+1900), (ct->tm_mon+1)/10, (ct->tm_mon+1)%10, (ct->tm_mday)/10, (ct->tm_mday)%10, (ct->tm_hour)/10, (ct->tm_hour)%10, (ct->tm_min)/10, (ct->tm_min)%10, (ct->tm_sec)/10, (ct->tm_sec)%10, m_ptrInstance->m_imageNum);
     m_ptrInstance->m_imageNum++;
-    if(element.imgFrameNumber>1)
-    {
+    if(element.imgFrameNumber>1) {
         SysOptions so;
         int format = so.GetCineFormat();
 
@@ -680,8 +627,7 @@ string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned 
             item.format = VideoMan::CINE;
         item.data = pImageBuf;
 
-        for(int i = 0;i<bufLen/(IMG_AREA_W*IMG_AREA_H*IMG_BPP);i++)
-        {
+        for(int i = 0; i<bufLen/(IMG_AREA_W*IMG_AREA_H*IMG_BPP); i++) {
 
             Image::AutoTracePara para;
             Image image((unsigned int*)pImageBuf, para);
@@ -697,21 +643,18 @@ string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned 
         VideoMan::GetInstance()->SaveVideoForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item);
         m_ptrInstance->deq.clear();
 
-        switch(format)
-        {
-            case VideoMan::CINE:
-                strcat(fileName, ".cine");
-                break;
-            case VideoMan::AVI:
-                strcat(fileName, ".avi");
-                break;
-            default:
-                strcat(fileName, ".avi");
-                break;
+        switch(format) {
+        case VideoMan::CINE:
+            strcat(fileName, ".cine");
+            break;
+        case VideoMan::AVI:
+            strcat(fileName, ".avi");
+            break;
+        default:
+            strcat(fileName, ".avi");
+            break;
         }
-    }
-    else if (element.imgFrameNumber == 1)
-    {
+    } else if (element.imgFrameNumber == 1) {
         SysOptions so;
         int format = so.GetImageFormat();
 
@@ -726,29 +669,27 @@ string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned 
         ImgMan::ImgItem item_frm;
         int format_bak = ImgMan::GetInstance()->GetImgFormat();
 
-        if(ImgMan::GetInstance()->SaveSnapForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item) == 0)
-        {
+        if(ImgMan::GetInstance()->SaveSnapForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item) == 0) {
             ImgMan::GetInstance()->SetImgFormat(ImgMan::FRM);
             ImgMan::GetInstance()->SaveSnapForRetrieve(m_ptrInstance->m_studyNo, fileName, STORE_PATH, &item_frm);
             ImgMan::GetInstance()->SetImgFormat(format_bak);
         }
-        switch(format)
-        {
-            case ImgMan::FRM:
-                strcat(fileName, ".frm");
-                break;
-            case ImgMan::EMP:
-                strcat(fileName, ".emp");
-                break;
-            case ImgMan::BMP:
-                strcat(fileName, ".bmp");
-                break;
-            case ImgMan::JPEG:
-                strcat(fileName, ".jpg");
-                break;
-            default:
-                strcat(fileName, ".bmp");
-                break;
+        switch(format) {
+        case ImgMan::FRM:
+            strcat(fileName, ".frm");
+            break;
+        case ImgMan::EMP:
+            strcat(fileName, ".emp");
+            break;
+        case ImgMan::BMP:
+            strcat(fileName, ".bmp");
+            break;
+        case ImgMan::JPEG:
+            strcat(fileName, ".jpg");
+            break;
+        default:
+            strcat(fileName, ".bmp");
+            break;
         }
     }
     string part = element.imgStudyPart;
@@ -768,34 +709,28 @@ string ViewDicomDataSelect::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned 
     return imgFileName;
 }
 
-void ViewDicomDataSelect::GetDCMSRElement(DCMSRELEMENT element)
-{
+void ViewDicomDataSelect::GetDCMSRElement(DCMSRELEMENT element) {
     m_ptrInstance->m_srIndication = element.srIndication;
     m_ptrInstance->m_srComments = element.srComments;
     m_ptrInstance->m_srReferenceImageFilename = element.srReferenceImageFilename;
 
 }
 
-void ViewDicomDataSelect::ImportStudy(void)
-{
+void ViewDicomDataSelect::ImportStudy(void) {
 #if 1
     PeripheralMan *ptr = PeripheralMan::GetInstance();
-    if(!ptr->CheckUsbStorageState())
-    {
+    if(!ptr->CheckUsbStorageState()) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
-                ViewDialog::ERROR,
-                _("No USB storage found!"),
-                NULL);
+                                          ViewDialog::ERROR,
+                                          _("No USB storage found!"),
+                                          NULL);
         return;
-    }
-    else
-    {
-        if(!ptr->MountUsbStorage())
-        {
+    } else {
+        if(!ptr->MountUsbStorage()) {
             ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
-                    ViewDialog::ERROR,
-                    _("Failed to mount USB storage!"),
-                    NULL);
+                                              ViewDialog::ERROR,
+                                              _("Failed to mount USB storage!"),
+                                              NULL);
             return;
         }
     }
@@ -809,17 +744,13 @@ void ViewDicomDataSelect::ImportStudy(void)
     m_ptrInstance->m_srReferenceImageFilename.clear();
     EDCMReturnStatus status = CDCMMan::GetMe()->ImportStudy(m_studyIndex,destDirStorageMedia,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement,PROGRESSSTATUS);
 
-    if(status == DCMSUCCESS)
-    {
+    if(status == DCMSUCCESS) {
         string errmsg;
         string studyNo;
         Database db;
-        if (db.ArchivePat(m_ptrInstance->m_info,errmsg))
-        {
+        if (db.ArchivePat(m_ptrInstance->m_info,errmsg)) {
             db.GetExamIDCurrent(m_ptrInstance->m_info.e.examNum);
-        }
-        else
-        {
+        } else {
             PRINTF("Achieve unsuccessfully!\n");
         }
         ViewQueryRetrieve::GetInstance()->SetRetrieveFlag(false);
@@ -834,129 +765,108 @@ void ViewDicomDataSelect::ImportStudy(void)
 
         ViewDialog::GetInstance()->Destroy();
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("Import data successfully!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("Import data successfully!"),
+                                          NULL);
         //printf("Send Successfully\n");
         ptr->UmountUsbStorage();
-    }
-    else if(status == DCMSTUDYEXISTED)
-    {
+    } else if(status == DCMSTUDYEXISTED) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("Study Info has existed!"),
-                NULL);
-    }
-    else if (status == DCMNOENOUGHSPACE)
-    {
+                                          ViewDialog::INFO,
+                                          _("Study Info has existed!"),
+                                          NULL);
+    } else if (status == DCMNOENOUGHSPACE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("No enough space!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("No enough space!"),
+                                          NULL);
     }
 
-    else if (status == DCMNONEXISTDICOMDIR)
-    {
+    else if (status == DCMNONEXISTDICOMDIR) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("DICOMDIR is not existed!"),
-                NULL);
-    }
-    else if (status == DCMNONENTIREDICOMDIR)
-    {
+                                          ViewDialog::INFO,
+                                          _("DICOMDIR is not existed!"),
+                                          NULL);
+    } else if (status == DCMNONENTIREDICOMDIR) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("File has lost in DICOMDIR !"),
-                NULL);
-    }
-    else if (status == DCMIMPORTFAILURE)
-    {
+                                          ViewDialog::INFO,
+                                          _("File has lost in DICOMDIR !"),
+                                          NULL);
+    } else if (status == DCMIMPORTFAILURE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("Import data unsuccessfully!"),
-                NULL);
-    }
-    else
-    {
+                                          ViewDialog::INFO,
+                                          _("Import data unsuccessfully!"),
+                                          NULL);
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::INFO,
-                _("Import data unsuccessfully!"),
-                NULL);
+                                          ViewDialog::INFO,
+                                          _("Import data unsuccessfully!"),
+                                          NULL);
     }
 }
 
-void ViewDicomDataSelect::ButtonImportClicked(GtkButton *button)
-{
+void ViewDicomDataSelect::ButtonImportClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *selection;
     gboolean exist;
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeSrc));
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeSrc));
-    if (gtk_tree_selection_get_selected(selection, &model, &iter) == TRUE)
-    {
+    if (gtk_tree_selection_get_selected(selection, &model, &iter) == TRUE) {
         g_timeout_add(100, ImportStudyForDicom, this);
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::PROGRESS,
-                NULL,
-                NULL);
-    }
-    else
-    {
+                                          ViewDialog::PROGRESS,
+                                          NULL,
+                                          NULL);
+    } else {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                ViewDialog::ERROR,
-                _("No record is selected!"),
-                NULL);
+                                          ViewDialog::ERROR,
+                                          _("No record is selected!"),
+                                          NULL);
         return;
 
     }
 }
 
-void ViewDicomDataSelect::ButtonCancelClicked(GtkButton *button)
-{
+void ViewDicomDataSelect::ButtonCancelClicked(GtkButton *button) {
     DestroyWindow();
 }
 
-gboolean ViewDicomDataSelect::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event)
-{
+gboolean ViewDicomDataSelect::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     DestroyWindow();
     return FALSE;
 }
 
-void ViewDicomDataSelect::DestroyWindow(void)
-{
+void ViewDicomDataSelect::DestroyWindow(void) {
     if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
         m_window = NULL;
     }
     //PeripheralMan *ptr = PeripheralMan::GetInstance();
-   // ptr->UmountUsbStorage();
+    // ptr->UmountUsbStorage();
 
 }
 
-static gboolean DestroyWin(gpointer data)
-{
+static gboolean DestroyWin(gpointer data) {
     ViewDicomDataSelect *tmp;
     tmp = (ViewDicomDataSelect *)data;
     tmp->DestroyWindow();
     return FALSE;
 }
 
-void ViewDicomDataSelect::KeyEvent(unsigned char keyValue)
-{
-	FakeXEvent::KeyEvent(keyValue);
+void ViewDicomDataSelect::KeyEvent(unsigned char keyValue) {
+    FakeXEvent::KeyEvent(keyValue);
 
-	switch(keyValue)
-	{
-		case KEY_ESC:
-		    g_timeout_add(100, DestroyWin, this);
-		    FakeEscKey();
-		    break;
+    switch(keyValue) {
+    case KEY_ESC:
+        g_timeout_add(100, DestroyWin, this);
+        FakeEscKey();
+        break;
 
-		default:
-			break;
-	}
+    default:
+        break;
+    }
 }
 
 #endif
