@@ -538,7 +538,7 @@ GtkWidget* ViewArchiveImgMan::CreateImgArea(GtkWidget *fixed) {
     gtk_fixed_put(GTK_FIXED(fixedImg), hboxImgSel, 0, 653);
     gtk_widget_set_size_request (hboxImgSel, 140, 30);
 
-    btnLastImg = gtk_button_new_with_mnemonic ("鈼€");
+    btnLastImg = gtk_button_new_with_mnemonic ("◀");
     gtk_box_pack_start (GTK_BOX (hboxImgSel), btnLastImg, FALSE, TRUE, 0);
     g_signal_connect(G_OBJECT(btnLastImg), "clicked", G_CALLBACK(HandleBtnLastImgPageClicked), this);
 
@@ -1696,7 +1696,7 @@ void ViewArchiveImgMan::UpdatePatInfo(string examID) {
     }
 
     if (info.e.BSA*100 >= 0) {
-        sprintf(buf, "%.2fm虏", info.e.BSA);
+        sprintf(buf, "%.2fm²", info.e.BSA);
         gtk_label_set_text(GTK_LABEL(m_labEntryGenBSA), buf);
     }
 

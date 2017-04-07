@@ -54,11 +54,11 @@ Calc2D* GlobalClassMan::GetCalc2D(string model) {
         m_ptrCalc2D = new Calc2DConvex;
     } else if (strcmp(type, "75L40K") == 0) {
         m_ptrCalc2D = new Calc2DLinear;
-    } else if (strcmp(type, "65C10K") == 0) { //鑵斾綋
+    } else if (strcmp(type, "65C10K") == 0) { //腔体
         m_ptrCalc2D = new Calc2DTV;
-    } else if (strcmp(type, "35C20H") == 0) { //浣庨寰嚫
+    } else if (strcmp(type, "35C20H") == 0) { //低频微凸
         m_ptrCalc2D = new Calc2DTinyConvex;
-    } else if (strcmp(type, "65C15D") == 0) { //楂橀寰嚫
+    } else if (strcmp(type, "65C15D") == 0) { //高频微凸
         m_ptrCalc2D = new Calc2DTinyConvexHigh;
     } else if (strcmp(type, "30P16A") == 0) { //phase
         m_ptrCalc2D = new Calc2DPhase;

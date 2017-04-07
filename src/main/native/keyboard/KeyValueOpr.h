@@ -13,12 +13,12 @@ using std::vector;
 
 /************************************
  *KeyValueOpr:		键盘接口类
- *.WinOptStack:		鐢ㄤ簬淇濆瓨鍚勪釜绐楀彛瀵归敭鐩樼殑鍝嶅簲鍑芥暟鎸囬拡鐨剉ector
+ *.WinOptStack:		用于保存各个窗口对键盘的响应函数指针的vector
  *.SendLightValue: 	接收键盘灯值,并将灯值发送给键盘
- *.Push: 			鍦ㄦ瘡涓獥鍙ｅ缓绔嬫椂璋冪敤姝ゅ嚱鏁板皢鏈獥鍙ｅ閿洏鐨勫搷搴斿嚱鏁版寚閽堝帇鍏ector
- *.Pop:				鍦ㄦ瘡涓獥鍙ｉ€€鍑烘槸璋冪敤姝ゅ嚱鏁板皢鏈獥鍙ｅ閿洏鐨勫搷搴斿嚱鏁版寚閽堜粠vector鎾ら攢
+ *.Push: 			在每个窗口建立时调用此函数将本窗口对键盘的响应函数指针压入vector
+ *.Pop:				在每个窗口退出是调用此函数将本窗口对键盘的响应函数指针从vector撤销
  *.GetElement:		获得vector的第n个元素，此函数暂时没用
- *.SendKeyValue:	灏嗘帴鏀跺埌鐨勯敭鍊煎彂閫佺粰鍚勪釜绐楀彛
+ *.SendKeyValue:	将接收到的键值发送给各个窗口
  ***********************************/
 
 class KeyValueOpr {
@@ -48,16 +48,16 @@ private:
 
 extern KeyValueOpr g_keyInterface;
 
-//鑾峰彇閿€煎苟鍙戦€佺粰鍚勪釜绐楀彛
+//获取键值并发送给各个窗口
 extern gboolean GetKeyValue(GIOChannel *source, GIOCondition condition, gpointer data);
 
-//閿洏鐩戣
+//键盘监视
 extern void *KeyboardOversee( void * pKeyInterface, bool isHandShake = true);
 
 //请求获得键盘TGC值
 void KeyboardRequestTGC(void);
 
-//閿洏澹伴煶鎺у埗
+//键盘声音控制
 void KeyboardSound(bool value);
 
 #endif //__OPERATOR_H_

@@ -18,7 +18,7 @@ public:
     static const float INIT_SCALE = 1.0;//0.95;
     static const int MAX_DYNAMIC_INDEX = 16; ///<max index of dynamic range
 
-    static const int TX = 20; ///< 鍙戝皠鏃堕棿, unit:us
+    static const int TX = 20; ///< 发射时间, unit:us
 
     struct CalcPara
     /*
@@ -30,17 +30,17 @@ public:
     */
     {
         int probeArray; ///< array of probe探头阵元数
-        int probeLines; ///< scan lines of probe鎺㈠ご鎵弿绾挎暟
-        int probeWidth; ///< linear width/convex angle of probe鍑搁樀瑙掑害/绾块樀瀹藉害 (real width(cm) * 100), unit: mm(L)
+        int probeLines; ///< scan lines of probe探头扫描线数
+        int probeWidth; ///< linear width/convex angle of probe凸阵角度/线阵宽度 (real width(cm) * 100), unit: mm(L)
         int probeWidthPhase; ///< width of phase
-        int probeR; ///< radius of probe鎺㈠ご鍗婂緞, unit: mm
+        int probeR; ///< radius of probe探头半径, unit: mm
         int focSum; ///< sum of focus
         int focPos[FOC_MAX]; ///< focus position unit:mm
         double soundSpeed; ///< ultrasound speed. unit: km/s.
         double soundSpeedTsi; ///< ultrasound speed according to current tsi type. unit: km/s.
         int depth; ///< curr depth
         int depthMax; ///< max depth of this probe
-        int depthDots; ///< dots in height(鎴愬儚鐐规暟)
+        int depthDots; ///< dots in height(成像点数)
         int imgScaleIndex; ///< level of image salce(eg: if imageScale can be 1.0 1.2 1.4 1.6, then imageScaleIndex is 2 when imageScale = 1.4)
         int imgScaleIndexMax; ///< max of image scale index
         int imgScale; ///< real image scale * 10

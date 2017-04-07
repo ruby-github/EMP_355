@@ -22,29 +22,29 @@
 #include "patient/FileMan.h"
 //#include "ScanMode.h"
 
-// 0: "AdultAbdo": 鎴愪汉鑵归儴
+// 0: "AdultAbdo": 成人腹部
 // 1: "AdultLiver": 成人肝胆脾
-// 2: "KidAbdo": 灏忓効鑵归儴
-// 3: "AdultCardio": 鎴愪汉蹇冭剰
-// 4: "KidCardio": 灏忓効蹇冭剰
-// 5: "MammaryGlands": 涔宠吅
+// 2: "KidAbdo": 小儿腹部
+// 3: "AdultCardio": 成人心脏
+// 4: "KidCardio": 小儿心脏
+// 5: "MammaryGlands": 乳腺
 // 6: "Thyroid": 甲状腺
-// 7: "EyeBall": 鐪肩悆
-// 8: "SmallPart": 娴呰〃鍣ㄥ畼
-// 9: "Gyn": 濡囩
-// 10: "EarlyPreg": 鏃╁瓡
+// 7: "EyeBall": 眼球
+// 8: "SmallPart": 浅表器官
+// 9: "Gyn": 妇科
+// 10: "EarlyPreg": 早孕
 // 11: "MiddleLaterPreg": 中晚孕
-// 12: "FetusCardio": 鑳庡効蹇冭剰
+// 12: "FetusCardio": 胎儿心脏
 // 13: "KidneyUreter": 双肾输尿管
-// 14: "BladderProstate": 鑶€鑳卞墠鍒楄吅
+// 14: "BladderProstate": 膀胱前列腺
 // 15: "Carotid": 颈动脉
 // 16: "Jugular": 颈静脉
-// 17: "PeripheryArtery": 澶栧懆鍔ㄨ剦
-// 18: "PeripheryVein": 澶栧懆闈欒剦
+// 17: "PeripheryArtery": 外周动脉
+// 18: "PeripheryVein": 外周静脉
 // 19: "HipJoint": 髋关节
 // 20: "Meniscus": 半月板
 // 21: "JointCavity": 关节腔
-// 22: "Spine": 鑴婃煴
+// 22: "Spine": 脊柱
 // 23: "TCD": 经颅多普勒
 // 24: "User1": 用户自定义1
 // 25: "User2": 用户自定义2
@@ -351,9 +351,9 @@ void ExamItem::GetImgOptimize(char* probeModel, ParaItem &para) {
 void ExamItem::ReadExamItemPara(int probeIndex, int itemIndex, ParaItem* paraItem, char *itemName) {
     char path[256];
     const gchar *name = ViewSystem::GetInstance()->GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0)) {
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0)) {
         sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
         //        sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, name, ".ini");
     } else {
@@ -380,11 +380,11 @@ void ExamItem::ReadExamItemPara(int probeIndex, int itemIndex, ParaItem* paraIte
 void ExamItem::WriteExamItemPara(int probeIndex, int itemIndex, ParaItem* paraItem,char *itemName) {
     FileMan fm;
     char path[256];
-    char path_other[256]; //鍙槸鐢ㄦ潵鍒板榛樿鐢ㄦ埛鏃跺€欑殑鍙傛暟
+    char path_other[256]; //只是用来到处默认用户时候的参数
     const gchar *name = ViewSystem::GetInstance()->GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
 
     {
         sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR,"userconfig/", name, ".ini");
@@ -675,11 +675,11 @@ void ExamItem::DeleteNewItemFile(int probeIndex, const char *old_string, const c
 void ExamItem::DeleteItemParaFile(int probeIndex, const char *old_string, const char *str) {
     FileMan fm;
     char path[256];
-    char path_other[256]; //鍙槸鐢ㄦ潵鍒板榛樿鐢ㄦ埛鏃跺€欑殑鍙傛暟
+    char path_other[256]; //只是用来到处默认用户时候的参数
     const gchar *name = ViewSystem::GetInstance()->GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0)) {
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0)) {
         sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
         //    sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, name, ".ini");
     } else {
@@ -713,9 +713,9 @@ void ExamItem::DeleteItemParaFile(int probeIndex, const char *old_string, const 
 void ExamItem::WriteDefinedItemPara(int probeIndex, char *new_string,const char *str,const char *str_index) {
     char path[256];
     const gchar *name = ViewSystem::GetInstance()->GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
 
     {
         //  sprintf(path1, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, name, ".ini");
@@ -758,9 +758,9 @@ void ExamItem::WriteNewItemFile(int probeIndex, char *new_string,const char *str
     char path1[256];
     char path_other[256];
     const gchar *name = ViewSystem::GetInstance()->GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
 
     {
         sprintf(path1, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
@@ -1516,9 +1516,9 @@ void ExamItem::WriteDefinedExamItemPara(const char *department, string section, 
 
     char path1[256];
     const gchar *name = ViewSystem::GetInstance()->GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
 
     {
         sprintf(path1, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);

@@ -33,8 +33,8 @@ private:
     POINT m_psP;
     POINT m_edP;
 
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
-    vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
+    vector<POINT> m_track;//存储轨迹用于擦除
+    vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -72,7 +72,7 @@ private:
     double m_pi;
     int m_hr;
     POINT m_psTmp;
-    vector<POINT> m_dot;//瀛樺偍鎻忕偣浣嶇疆鐢ㄤ簬鎿﹂櫎
+    vector<POINT> m_dot;//存储描点位置用于擦除
     POINT m_psP;
     POINT m_edP;
 
@@ -103,7 +103,7 @@ public:
 private:
     POINT m_startP;
     POINT m_endP;
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+    vector<POINT> m_track;//存储轨迹用于擦除
     POINT m_psP;
     POINT m_edP;
     POINT m_cursor;
@@ -139,7 +139,7 @@ public:
 private:
     double m_integral_area;
     double m_perimeter;
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+    vector<POINT> m_track;//存储轨迹用于擦除
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -440,10 +440,10 @@ private:
 
 /*
  * @brief measure PI(pulse index) in doppler mode
- * >method = 0: PI娴嬮噺
- * >method = 1: PG mean娴嬮噺
+ * >method = 0: PI测量
+ * >method = 1: PG mean测量
  */
-class DMeasurePI :public AbsMeasure { //搴旇鍐嶅姞鍏ラ紶鏍囧弽鍚戣繍鍔ㄦ椂鑷姩寰€鍓嶆摝闄よ建杩圭嚎
+class DMeasurePI :public AbsMeasure { //应该再加入鼠标反向运动时自动往前擦除轨迹线
 public:
     DMeasurePI(int method,const SingleItemInfo *ptrSingleItemInfo);
     ~DMeasurePI();
@@ -469,7 +469,7 @@ private:
     bool m_isDraw;
     POINT m_tempP;
     vector<POINT> m_vec;
-    vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
+    vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘
     POINT m_psP;
     POINT m_edP;
     double m_ps;

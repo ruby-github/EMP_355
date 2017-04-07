@@ -349,8 +349,8 @@ private:
 
     // measure when zoom
     bool m_zoomMeasureCtrl; ///<是否进入局部放大的测量状态
-    double m_zoomScale; ///<灞€閮ㄦ斁澶х殑鍊嶇巼
-    double m_scale2DZoom[4]; ///<灞€閮ㄦ斁澶у悗鐨勬瘮渚嬪昂
+    double m_zoomScale; ///<局部放大的倍率
+    double m_scale2DZoom[4]; ///<局部放大后的比例尺
     int m_focIndexRange[2];
 
     // compound

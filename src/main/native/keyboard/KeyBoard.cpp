@@ -389,9 +389,9 @@ int KbdHandShake(int fdcom) {
 }
 
 /******************************
- *閿洏涓插彛鐩戣
+ *键盘串口监视
  *fdcom:	串口设备号
- *pKeyInterface:	KeyValueOpr瀵硅薄鎸囬拡
+ *pKeyInterface:	KeyValueOpr对象指针
  *****************************/
 void UartOversee( int fdcom, void *pKeyInterface) {
     if (keyboard_channel) return;

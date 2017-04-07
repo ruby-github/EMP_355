@@ -435,7 +435,7 @@ void MeasureMan::EraseMeasureLine(MeasureInfo info) {
         EraseDist(info);
         break;
 
-    case VEL_M://M妯″紡
+    case VEL_M://M模式
         info.meaType = VEL_M;
         EraseDist(info);
         break;
@@ -542,7 +542,7 @@ void MeasureMan::EraseDist(MeasureInfo info) {
     m_draw.DrawDotLine(p1, p2, FALSE);
 }
 
-void MeasureMan::EraseDist2Line(MeasureInfo info) { //涓ょ嚎娉曟祴璺濈
+void MeasureMan::EraseDist2Line(MeasureInfo info) { //两线法测距离
     m_draw.SetCursorType(info.cursorType);
     m_draw.SetCursorSize(info.cursorSize);
     m_draw.SetConfirmColor(info.confirmColor);
@@ -700,7 +700,7 @@ void MeasureMan::EraseAL(MeasureInfo info) {
    int i;
    const int diamNum = 20;
    double diamCenterX, diamCenterY;
-   double lenSlope;//LV Length绾跨殑鏂滅巼
+   double lenSlope;//LV Length线的斜率
    double diamSlope;//直径的斜率
    int trackSize;
    int tempPosi1, tempPosi2;
@@ -1281,7 +1281,7 @@ void MeasureMan::EraseTrace(MeasureInfo info) {
     vec_size = info.vecPoint.size();
 
     if (vec_size > 2)
-        vec_size = vec_size - 2;//闄ゅ幓ps鍜宔d鍗犵殑闀垮害
+        vec_size = vec_size - 2;//除去ps和ed占的长度
     else
         return;
 
@@ -1296,7 +1296,7 @@ void MeasureMan::EraseTrace(MeasureInfo info) {
     edP = info.vecPoint[vec_size + 1];
 
     // clear measure line
-    if ((info.meaType == MEASURE_TRACK) || (info.meaType == PI_D)) { //闈炲崐鑷姩鎻忚抗
+    if ((info.meaType == MEASURE_TRACK) || (info.meaType == PI_D)) { //非半自动描迹
         m_draw.SetCursorType(m_draw.GetCursorType());
         m_draw.DrawCursor(p1, FALSE);
         m_draw.DrawCursor(p2, FALSE);
@@ -1309,7 +1309,7 @@ void MeasureMan::EraseTrace(MeasureInfo info) {
     vector<POINT> vec;
     size_t i;
     if (info.meaType == MEASURE_TRACK_AUTO) {
-        for (i = 1; i < vec_size-1; ++i) {//鎻愬彇鍘熷鐨勬弿杩癸紙鎶婄鐐瑰垎绂诲鐞嗭級
+        for (i = 1; i < vec_size-1; ++i) {//提取原始的描迹（把端点分离处理）
             vec.push_back(info.vecPoint[i]);
         }
         m_draw.PwTrace(vec, XOR);
@@ -1331,7 +1331,7 @@ void MeasureMan::EraseTrace(MeasureInfo info) {
 }
 
 //保存软件包测量结果
-//item:鏈祴閲忛」鐨勬灇涓惧彿
+//item:本测量项的枚举号
 //void MeasureMan::SetMeasureResult(const float data1, const float data2, const float data3, const float data4, const int item, const int valueNums)
 void MeasureMan::SetMeasureResult(float value[MEA_MULTI], const int item, const int valueNums) {
     m_ptrMeaResult->SetLastValue(value, item, valueNums);
@@ -1577,7 +1577,7 @@ void MeasureMan::SingleMeaDataMan(const float meaData, const SingleItemInfo *ite
     if (saveR == SAVE) {
         value[0] = meaData;
         for (i=1; i<MEA_MULTI; i++) value[i] = INVALID_VAL;
-        SetMeasureResult(value, itemInfo->item, MEA_SINGLE);//绉戝埆娴嬮噺淇濆瓨娴嬮噺缁撴灉
+        SetMeasureResult(value, itemInfo->item, MEA_SINGLE);//科别测量保存测量结果
     }
 
     multiMethInfo = (CalcInfoArray *)(itemInfo->ptrCalcInfo);
@@ -1610,7 +1610,7 @@ void MeasureMan::MultiMeaDataMan(float meaData[MEA_MULTI], const MultiItemInfo *
     const CalcInfoArray *multiMethInfo;
 
     if (saveR == SAVE) {
-        SetMeasureResult(meaData, itemInfo->multiItem, MEA_MULTI);//绉戝埆娴嬮噺淇濆瓨娴嬮噺缁撴灉
+        SetMeasureResult(meaData, itemInfo->multiItem, MEA_MULTI);//科别测量保存测量结果
     }
 
     multiMethInfo = (CalcInfoArray *)itemInfo->ptrCalcInfo;
@@ -1663,7 +1663,7 @@ void MeasureMan::EraseMeasureOrderNumber(MeasureInfo info) {
     case ANGLE_2LINE:
     case SLOPE:
     case DIST_SLOPE_M:
-    case VEL_M://M妯″紡
+    case VEL_M://M模式
     case VEL_D:
     case PI_D:
     case MEASURE_TRACK:

@@ -31,7 +31,7 @@ GtkWidget* MenuSystem::Create(void) {
     gtk_container_add(GTK_CONTAINER(btn_biopsy), m_labelBiopsy);
     gtk_table_attach_defaults(GTK_TABLE(m_table), btn_biopsy, 0, 1, 1, 2);
 
-    // 绌垮埡鍔熻兘鏆傛椂灞忚斀(2900pluss,閰嶆湁绌垮埡绾挎帰澶达級鎵撳紑鍔熻兘
+    // 穿刺功能暂时屏蔽(2900pluss,配有穿刺线探头）打开功能
     //gtk_widget_modify_bg(btn_biopsy, GTK_STATE_INSENSITIVE, g_deep);
     // gtk_widget_set_sensitive(btn_biopsy, FALSE);
 

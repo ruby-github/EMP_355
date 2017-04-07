@@ -134,7 +134,7 @@ void ViewSuperuser::CreateWindow(void) {
     gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
     gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
     gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-    gtk_window_set_title (GTK_WINDOW (m_window), "瓒呯骇鐢ㄦ埛宸ュ叿");
+    gtk_window_set_title (GTK_WINDOW (m_window), "超级用户工具");
     gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
     g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(HandleWindowDeleteEvent), this);
 
@@ -158,7 +158,7 @@ void ViewSuperuser::CreateWindow(void) {
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
 
-    labelProbe = gtk_label_new ("鎺㈠ご宸ュ叿");
+    labelProbe = gtk_label_new ("探头工具");
     gtk_frame_set_label_widget (GTK_FRAME (frameProbe), labelProbe);
     gtk_label_set_use_markup (GTK_LABEL (labelProbe), TRUE);
 
@@ -218,7 +218,7 @@ void ViewSuperuser::CreateWindow(void) {
     gtk_widget_set_size_request (frameAperture, 200, 80);
     gtk_frame_set_shadow_type (GTK_FRAME (frameAperture), GTK_SHADOW_OUT);
 
-    GtkWidget *labelAperutre = gtk_label_new ("鏆楅亾娴嬭瘯宸ュ叿");
+    GtkWidget *labelAperutre = gtk_label_new ("暗道测试工具");
     gtk_frame_set_label_widget (GTK_FRAME (frameAperture), labelAperutre);
     gtk_label_set_use_markup (GTK_LABEL (labelAperutre), TRUE);
 
@@ -257,7 +257,7 @@ void ViewSuperuser::CreateWindow(void) {
     gtk_widget_set_size_request (framePress, 440, 70); //550
     gtk_frame_set_shadow_type (GTK_FRAME (framePress), GTK_SHADOW_OUT);
 
-    GtkWidget *labelPress = gtk_label_new ("鍘嬪姏鏍″噯");
+    GtkWidget *labelPress = gtk_label_new ("压力校准");
     gtk_widget_show (labelPress);
     gtk_frame_set_label_widget (GTK_FRAME (framePress), labelPress);
     gtk_label_set_use_markup (GTK_LABEL (labelPress), TRUE);
@@ -292,7 +292,7 @@ void ViewSuperuser::CreateWindow(void) {
     gtk_widget_set_size_request (label_press, 200, 30);
     gtk_misc_set_alignment (GTK_MISC (label_press), 0, 0.5);
 
-    labelExit = gtk_label_new_with_mnemonic("纭畾");
+    labelExit = gtk_label_new_with_mnemonic("确定");
 #else
     labelExit = gtk_label_new_with_mnemonic("退出");
 #endif
@@ -327,14 +327,14 @@ void ViewSuperuser::CreateDemoWindow(void) {
     gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
     gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
     gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-    gtk_window_set_title (GTK_WINDOW (m_window), "杩涘叆婕旂ず");
+    gtk_window_set_title (GTK_WINDOW (m_window), "进入演示");
     gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
     g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(HandleWindowDeleteEvent), this);
 
     fixed = gtk_fixed_new ();
     gtk_container_add (GTK_CONTAINER (m_window), fixed);
 
-    labelDemo = gtk_label_new_with_mnemonic("杩涘叆婕旂ず鍔熻兘");
+    labelDemo = gtk_label_new_with_mnemonic("进入演示功能");
     imageDemo = gtk_image_new_from_stock(GTK_STOCK_YES, GTK_ICON_SIZE_BUTTON);
     btnEnterDemo = create_button_icon(labelDemo, imageDemo);
     g_signal_connect (G_OBJECT(btnEnterDemo), "clicked", G_CALLBACK(HandleBtnEnterDemoClicked), this);

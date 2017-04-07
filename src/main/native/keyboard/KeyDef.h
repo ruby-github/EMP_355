@@ -13,7 +13,7 @@
 #define KEY_ESC 0x0E
 
 #if defined(K24C)
-#define KEY_DUAL 0x81 //鍙孊
+#define KEY_DUAL 0x81 //双B
 #define KEY_QUAD 0x82 //4B
 #define KEY_DEPTH 0x85
 #define KEY_LOCALZOOM 0xDA
@@ -119,12 +119,12 @@
 #elif defined(EMP_313)
 #define KEY_BB 0x81
 #define KEY_BM 0x82
-#define KEY_REVIEW 0x8E //璇诲彇
-#define KEY_ARCHIVE 0xBD   //蹇瓨
-#define KEY_ENDEXAM 0x91 //瀛樺偍
-//#define KEY_ENDEXAM 0xF9 //瀛樺偍
-#define KEY_SAVE 0xF9 //鎵撳嵃
-//#define KEY_SAVE 0x91 //鎵撳嵃
+#define KEY_REVIEW 0x8E //读取
+#define KEY_ARCHIVE 0xBD   //快存
+#define KEY_ENDEXAM 0x91 //存储
+//#define KEY_ENDEXAM 0xF9 //存储
+#define KEY_SAVE 0xF9 //打印
+//#define KEY_SAVE 0x91 //打印
 #define KEY_CURSOR 0xB0 //Distance
 #define KEY_LOCALZOOM 0x8C
 #define KEY_DEPTH 0x85

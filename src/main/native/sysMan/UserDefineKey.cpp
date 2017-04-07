@@ -187,7 +187,7 @@ void UserDefineKey::FactoryCreate(EKeyFunc type) {
             FreezeMode::GetInstance()->PressFreeze();
 
         ViewSystem::GetInstance()->CreateWindow();
-#ifndef EMP_355        //鎸夎嚜瀹氫箟閿繘鍏ystemsetting鏃讹紝淇濇寔鍐荤粨
+#ifndef EMP_355        //按自定义键进入systemsetting时，保持冻结
         FreezeMode::GetInstance()->PressUnFreeze();
 #endif
     }

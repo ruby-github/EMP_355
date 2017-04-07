@@ -1,8 +1,8 @@
 #include "imageProc/ImgProc2D.h"
 #include "imageProc/ImgProcM.h"
 
-EKnobReturn GlobalZoom(EKnobOper oper);//鍏ㄥ眬鏀惧ぇ
+EKnobReturn GlobalZoom(EKnobOper oper);//全局放大
 
 EKnobReturn PIPZoom(EKnobOper oper);//画中画放大
 
-EKnobReturn GrayTransport(EKnobOper oper);//鐏板害杞崲
+EKnobReturn GrayTransport(EKnobOper oper);//灰度转换

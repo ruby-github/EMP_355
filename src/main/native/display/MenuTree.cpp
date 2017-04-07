@@ -172,7 +172,7 @@ void TreeMenu::TreeViewExpanded(GtkTreeView *treeview, GtkTreeIter *iter, GtkTre
 void TreeMenu::TreeViewCollapse(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path) {
 }
 
-//treeview灞曞紑涔嬪墠鍋氱殑浜嬫儏锛屽睍寮€涔嬪墠鍏堟敹璧锋墍鏈夌殑鑿滃崟
+//treeview展开之前做的事情，展开之前先收起所有的菜单
 bool TreeMenu::TreeViewTestRowExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path) {
     gtk_tree_view_collapse_all(treeview);
     return FALSE; //必须要有返回值,才能触发事件

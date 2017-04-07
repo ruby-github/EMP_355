@@ -63,7 +63,7 @@ bool CreateBitmap24(unsigned char* input, int fd_output, unsigned int width, uns
     for(i=0; i<height; i++)
         for(j=0; j<width; j++)
             for(n=0; n<3; n++)
-                *(data+(height-i-1)*width*3+j*3+n) = *(input+(i*3*width+j*3+(2-n)));	//涓婁笅棰犲€掞紝BGR鏍煎紡
+                *(data+(height-i-1)*width*3+j*3+n) = *(input+(i*3*width+j*3+(2-n)));	//上下颠倒，BGR格式
 
     if(write(fd_output, data, ImgSize)==-1) {
         perror("Failed to write bitmap info header, error:");

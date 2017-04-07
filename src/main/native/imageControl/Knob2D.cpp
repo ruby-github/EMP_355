@@ -75,7 +75,7 @@ KnobMenu::KnobItem Knob2DMenu[20] = {
     {N_("EFVI"), "", MIN, D2ChgEFVI, NULL},
     {N_("Scan Line"), "", MIN, D2ChgScanLine, NULL},
     {N_("Polarity"), "", MIN, D2ChgPolarity, NULL},
-    {N_("Pwr"), "", MIN, D2ChgPwr, NULL},//澧炲姞pwr+/-
+    {N_("Pwr"), "", MIN, D2ChgPwr, NULL},//增加pwr+/-
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
@@ -245,7 +245,7 @@ EKnobReturn D2ChgDynamicRange(EKnobOper oper) {
     return Img2D::GetInstance()->ChangeDynamicRange(oper);
 }
 
-//em5800 鎸夐敭鍒囨崲锛屾敼鍙樼嚎瀵嗗害绛夌骇锛堥珮/浣庯級
+//em5800 按键切换，改变线密度等级（高/低）
 EKnobReturn D2PressChgLineDensity(void) {
     EKnobReturn ret = ERROR;
     EKnobOper oper = ROTATE;
@@ -490,7 +490,7 @@ void ParepareForCompound(void) {
     }
 }
 
-//EMP5800 鐩存帴鎸夋寜閿潵鍒囨崲
+//EMP5800 直接按按键来切换
 EKnobReturn D2PressChgSpaceCompound(void) {
     EKnobReturn ret = ERROR;
     //int index = 3;
@@ -536,7 +536,7 @@ EKnobReturn D2ChgSpaceCompound(EKnobOper oper) {
     return ptrImg->ChangeCompoundSpace(oper);
 }
 
-//emp5800 鎸夐敭鍒囨崲绌洪棿棰戠巼澶嶅悎
+//emp5800 按键切换空间频率复合
 EKnobReturn D2PressChgFreqCompound(void) {
     char type = GlobalClassMan::GetInstance()->GetProbeType();
     EKnobReturn ret = ERROR;

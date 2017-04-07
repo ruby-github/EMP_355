@@ -40,7 +40,7 @@ const int HumanDOP_Ovul = 266;  // 排卵期孕期长度280-14
 /*
  * 产科表数组数据存储格式：前三个为表头长度－第一个元素为产科表数据长度，第二个为产科表数据相对于实际大小的倍数，第三个为表数据的起始时间。后面为产科表数据
  * */
-//浜х琛ㄧ殑璧峰鏃堕棿閮借繕娌″姞
+//产科表的起始时间都还没加
 const int cer_goldstein[] = {
     167, 10, 105, //15w0d-
     151, 152, 154, 155, 157, 159, 160, 161, 163, 164, 166, 167, 169,
@@ -633,12 +633,12 @@ int MeaCalcFun::DoNothing(float data[], float *result, int state, int item, int 
 }
 
 /* 函数功能：从存储测量值的数组中获取参与计算的测量值
- * 杩斿洖鍊硷細MEA_SUCCESS, MEA_FAIL, MEA_ERROR
+ * 返回值：MEA_SUCCESS, MEA_FAIL, MEA_ERROR
  * currvalue：传入在测量中，本测量项的当前值
- * allItem[]锛氬悇娴嬮噺鍊肩殑鏋氫妇鍙凤紝濡傛灉鏄祴閲忎腑锛岀涓€涓綅缃瓨鍌ㄥ綋鍓嶆祴閲忛」鐨勬灇涓惧彿
- * value[]锛氬瓨鏀捐鑾峰彇鐨勫悇涓祴閲忓€硷紝娴嬮噺鍊肩殑瀛樺偍浣嶇疆瑕佸拰allItem涓殑鏋氫妇鍙蜂竴涓€瀵瑰簲
+ * allItem[]：各测量值的枚举号，如果是测量中，第一个位置存储当前测量项的枚举号
+ * value[]：存放要获取的各个测量值，测量值的存储位置要和allItem中的枚举号一一对应
  * itemNum：传入测量项的个数
- * state锛欼N_MEASURE锛嶆祴閲忎腑锛孖N_REPORT锛嶆姤鍛婁腑
+ * state：IN_MEASURE－测量中，IN_REPORT－报告中
  * */
 int MeaCalcFun::CalcGetValue(const float currValue, float value[][MEA_MULTI], const int allItem[], const int currItem, const int itemNums, const int state) {
     int i;
@@ -673,13 +673,13 @@ int MeaCalcFun::CalcGetValue(const float currValue, float value[][MEA_MULTI], co
 
 #define GENERAL_PISA_F(diam) (CHECK1PAR(diam) ? (2*PI * diam * diam ) : (float)INVALID_VAL)
 #define GENERAL_AREA_F(diam) (CHECK1PAR(diam) ? (PI * diam * diam / 4.0) : (float)INVALID_VAL)
-#define GENERAL_VOL_F(l, w, h) (CHECK3PAR(l, w, h) ? (1.0/6.0 * PI * l * w * h) : (float)INVALID_VAL)	//閫傜敤浜庤吂閮紝濡囩锛屼骇绉戠殑浣撶Н璁＄畻
-#define PELLET_VOL_F(diam) (CHECK1PAR(diam) ? (1.0/6.0 * PI * diam * diam * diam) : (float)INVALID_VAL)	//閫傜敤浜庤吂閮紝濡囩锛屼骇绉戠殑浣撶Н璁＄畻
+#define GENERAL_VOL_F(l, w, h) (CHECK3PAR(l, w, h) ? (1.0/6.0 * PI * l * w * h) : (float)INVALID_VAL)	//适用于腹部，妇科，产科的体积计算
+#define PELLET_VOL_F(diam) (CHECK1PAR(diam) ? (1.0/6.0 * PI * diam * diam * diam) : (float)INVALID_VAL)	//适用于腹部，妇科，产科的体积计算
 #define GENERAL_RATIO_F(data1, data2) ((CHECK2PAR(data1, data2)&&(data2 > ZERO)) ? (data1 / data2) : (float)INVALID_VAL)
 
 #define ADULT_AVA_VMAX_F(lvotArea, lvotVmax, avVmax) (CHECK3PAR(lvotArea, lvotVmax, avVmax) ? (lvotArea * lvotVmax / avVmax) : (float)INVALID_VAL)//*************//
-#define ADULT_EDV_ESV_CUBED_F(lvidd_s) (CHECK1PAR(lvidd_s) ? (lvidd_s * lvidd_s * lvidd_s) : (float)INVALID_VAL)//Cubed鍏紡
-#define ADULT_EDV_ESV_TEICH_F(lvidd_s) (CHECK1PAR(lvidd_s) ? (((lvidd_s) * (lvidd_s) * (lvidd_s) * 7) / (2.4 + lvidd_s)) : (float)INVALID_VAL)//Teich鍏紡
+#define ADULT_EDV_ESV_CUBED_F(lvidd_s) (CHECK1PAR(lvidd_s) ? (lvidd_s * lvidd_s * lvidd_s) : (float)INVALID_VAL)//Cubed公式
+#define ADULT_EDV_ESV_TEICH_F(lvidd_s) (CHECK1PAR(lvidd_s) ? (((lvidd_s) * (lvidd_s) * (lvidd_s) * 7) / (2.4 + lvidd_s)) : (float)INVALID_VAL)//Teich公式
 //注意：(EDV和ESV的BP方法少公式，A/L方法是多项测量的计算，还没做好)
 #define ADULT_EF_F(edv, esv) ((CHECK2PAR(edv, esv)&&(edv > ZERO)) ? ((edv - esv) * 100.0 / edv) : (float)INVALID_VAL)//*************//
 #define ADULT_SV_F(edv, esv) (CHECK2PAR(edv, esv) ? (edv - esv) : (float)INVALID_VAL)//*************//
@@ -703,7 +703,7 @@ int MeaCalcFun::CalcGetValue(const float currValue, float value[][MEA_MULTI], co
 
 #define OB_AFI_F(luq, llq, ruq, rlq) (CHECK4PAR(luq, llq, ruq, rlq) ? (luq + llq + ruq + rlq) : (float)INVALID_VAL)
 #define OB_MEAN_SAC_F(sac1, sac2, sac3) (CHECK3PAR(sac1, sac2, sac3) ? ((sac1 + sac2 + sac3) / 3) : (float)INVALID_VAL)
-#define OB_RATIO(data1, data2) ((CHECK2PAR(data1, data2)&&(data2 > ZERO)) ? (data1 / data2) : (float)INVALID_VAL)//閫傚悎浜庝骇绉戠殑澶氶」姣斾緥璁＄畻
+#define OB_RATIO(data1, data2) ((CHECK2PAR(data1, data2)&&(data2 > ZERO)) ? (data1 / data2) : (float)INVALID_VAL)//适合于产科的多项比例计算
 #define OB_EFW_HADLOCK1_F(ac, fl) (CHECK2PAR(ac, fl) ? (pow(10 , (1.304+0.05281*ac+0.1938*fl-0.004*ac*fl))*0.001) : (float)INVALID_VAL)
 #define OB_BPDA_F(bpd, ofd) (CHECK2PAR(bpd, ofd) ? sqrt(bpd * ofd * 100.0 / 1.265) : (float)INVALID_VAL)
 
@@ -714,7 +714,7 @@ int MeaCalcFun::CalcGetValue(const float currValue, float value[][MEA_MULTI], co
 #define FETAL_CO_F(sv, hr) (CHECK2PAR(sv, hr) ? (sv * hr) / 1000.0 : (float)INVALID_VAL)//*************//
 #define FETAL_RATIO_F(data1, data2) ((CHECK2PAR(data1, data2)&&(data2 > ZERO)) ? (data1 / data2) : (float)INVALID_VAL)
 #define FETAL_IVS_PER_F(ivsd, ivss) ((CHECK2PAR(ivsd, ivss)&&(ivsd > ZERO)) ? ((ivss - ivsd) * 100.0 / ivsd) : (float)INVALID_VAL)
-//#define FETAL_LV_MASS //鑳庡効鐨凩V Mass鏆傛椂娌℃湁鍏紡
+//#define FETAL_LV_MASS //胎儿的LV Mass暂时没有公式
 #define FETAL_LVETC_F(lv_et, hr_av) (CHECK2PAR(lv_et, hr_av) ? (lv_et * sqrt(hr_av/60)) : (float)INVALID_VAL)//*************//
 #define FETAL_LVPEPC_F(lv_pep, hr_av) (CHECK2PAR(lv_pep, hr_av) ? ((lv_pep * 1000 + 0.4 * hr_av) / 1000.0) : (float)INVALID_VAL)//*************//
 #define FETAL_LV_RV_PEPC_F(pep, hr) (CHECK2PAR(pep, hr) ? (pep + 0.4 * hr) : (float)INVALID_VAL)//*************//
@@ -722,8 +722,8 @@ int MeaCalcFun::CalcGetValue(const float currValue, float value[][MEA_MULTI], co
 #define FETAL_LVOT_RVOT_AREA_F(lvot_rvot_d) (float)INVALID_VAL
 #define FETAL_LVPW_PER_F(lvpws, lvpwd) ((CHECK2PAR(lvpwd, lvpws)&&(lvpwd > ZERO)) ? ((lvpws - lvpwd) * 100.0 / lvpwd) : (float)INVALID_VAL)
 //#define FETAL_LVETC(lvet, hr_av) (CHECK2PAR(lvet, hr_av) ? (lvet * sqrt(hr_av / 60.0)) : (float)INVALID_VAL)
-#define FETAL_MEAN_VCF_F(lvidd, lvids, lvet) ((CHECK3PAR(lvidd, lvids, lvet)&&(lvidd>ZERO)&&(lvet>ZERO)) ? ((lvidd-lvids)/(lvidd*lvet)) : (float)INVALID_VAL) //Mean VCF鍜孧ean VCFc鍧囩敤姝ゅ叕寮忥紝Mean VCFc鐢↙V ETc璁＄畻//*************//
-#define FETAL_MEAN_VCFC_F(lvidd, lvids, lvet, hr_av) ((CHECK4PAR(lvidd, lvids, lvet, hr_av)&&(lvidd>ZERO)&&(lvet>ZERO)&&(hr_av>ZERO)) ? ((lvidd-lvids)/(lvidd*(lvet * sqrt(hr_av / 60.0)))) : (float)INVALID_VAL) //Mean VCF鍜孧ean VCFc鍧囩敤姝ゅ叕寮忥紝Mean VCFc鐢↙V ETc璁＄畻//*************//
+#define FETAL_MEAN_VCF_F(lvidd, lvids, lvet) ((CHECK3PAR(lvidd, lvids, lvet)&&(lvidd>ZERO)&&(lvet>ZERO)) ? ((lvidd-lvids)/(lvidd*lvet)) : (float)INVALID_VAL) //Mean VCF和Mean VCFc均用此公式，Mean VCFc用LV ETc计算//*************//
+#define FETAL_MEAN_VCFC_F(lvidd, lvids, lvet, hr_av) ((CHECK4PAR(lvidd, lvids, lvet, hr_av)&&(lvidd>ZERO)&&(lvet>ZERO)&&(hr_av>ZERO)) ? ((lvidd-lvids)/(lvidd*(lvet * sqrt(hr_av / 60.0)))) : (float)INVALID_VAL) //Mean VCF和Mean VCFc均用此公式，Mean VCFc用LV ETc计算//*************//
 #define FETAL_RVPEPC_F(rv_pep, hr_pv) (CHECK2PAR(rv_pep, hr_pv) ? ((rv_pep * 1000 + 0.4 * hr_pv) / 1000.0) : (float)INVALID_VAL)//*************//
 #define FETAL_LVMASS_CUBED_F(ivsd, lvidd, lvpwd) (CHECK3PAR(ivsd, lvidd, lvpwd) ? (0.8 * 1.04 *( pow((double)(ivsd + lvidd + lvpwd), 3.0 ) - pow((double)lvidd, 3.0) ) + 0.6) : (float)INVALID_VAL)//参数均应以cm为单位
 
@@ -732,12 +732,12 @@ int MeaCalcFun::CalcGetValue(const float currValue, float value[][MEA_MULTI], co
 #endif
 
 /* 函数功能：从存储测量值的数组中获取参与计算的测量值
- * 杩斿洖鍊硷細MEA_SUCCESS, MEA_FAIL, MEA_ERROR
+ * 返回值：MEA_SUCCESS, MEA_FAIL, MEA_ERROR
  * currvalue：传入在测量中，本测量项的当前值
- * allItem[]锛氬悇娴嬮噺鍊肩殑鏋氫妇鍙凤紝濡傛灉鏄祴閲忎腑锛岀涓€涓綅缃瓨鍌ㄥ綋鍓嶆祴閲忛」鐨勬灇涓惧彿
- * value[]锛氬瓨鏀捐鑾峰彇鐨勫悇涓祴閲忓€硷紝娴嬮噺鍊肩殑瀛樺偍浣嶇疆瑕佸拰allItem涓殑鏋氫妇鍙蜂竴涓€瀵瑰簲
+ * allItem[]：各测量值的枚举号，如果是测量中，第一个位置存储当前测量项的枚举号
+ * value[]：存放要获取的各个测量值，测量值的存储位置要和allItem中的枚举号一一对应
  * itemNum：传入测量项的个数
- * state锛欼N_MEASURE锛嶆祴閲忎腑锛孖N_REPORT锛嶆姤鍛婁腑
+ * state：IN_MEASURE－测量中，IN_REPORT－报告中
  * */
 int MeaCalcFun::CalcGetPar(CalcInfoTmp *calcInfo, const float currValue[], float value[][MEA_MULTI], const int currItem, const int parPosi, const int state) {
     int i, j;
@@ -820,7 +820,7 @@ int MeaCalcFun::SectionCalc(CalcInfoTmp *calcInfo, float data[], int item, int s
     for (i=0; i<CALC_RESULT_CLASSES; i++)
         calcResult[i] = INVALID_VAL;
 
-    resultPosi = *calcPosi;//鏈绠楃粨鏋滃瓨鏀剧殑浣嶇疆
+    resultPosi = *calcPosi;//本计算结果存放的位置
     (*calcPosi)++;//在测量结束时自动把计算结果存放位置移后一个
 
     int state;
@@ -851,7 +851,7 @@ int MeaCalcFun::SectionCalc(CalcInfoTmp *calcInfo, float data[], int item, int s
         }
         m_ptrMeaResult->CalcSetValue(calcResult, calcInfo->item, section);
 
-        //璁＄畻鍓嶅垪鑵轰綋绉椂璁＄畻PSAD
+        //计算前列腺体积时计算PSAD
         if (calcInfo->item == UR_PROSTATE_VOL)
             CalcPSAD();
     }
@@ -866,7 +866,7 @@ int MeaCalcFun::SectionCalc(CalcInfoTmp *calcInfo, float data[], int item, int s
                 HLevelInfo.pars[j] = (*hCalc)[i]->pars[j];
             }
             HLevelInfo.ptrHCalcInfo = (*hCalc)[i]->ptrHCalcInfo;
-            SectionCalc(&HLevelInfo, data, calcInfo->item, save, calcPosi, resultPosi);//浼犲叆鐨勫弬鏁版湁闂
+            SectionCalc(&HLevelInfo, data, calcInfo->item, save, calcPosi, resultPosi);//传入的参数有问题
             i++;
         }
     }
@@ -1579,8 +1579,8 @@ int MeaCalcFun::CalcGW(const float data, int *gw, const int obTable[]) {
     int startDay;
 
     tableLen = obTable[0];//产科表长度
-    multiple = obTable[1];//浜х琛ㄦ暟鎹浉瀵规绫崇殑鏀惧ぇ鍊嶆暟
-    startDay = obTable[2];//浜х琛ㄦ暟鎹殑璧峰鏃堕棿
+    multiple = obTable[1];//产科表数据相对毫米的放大倍数
+    startDay = obTable[2];//产科表数据的起始时间
 
     tableStart = (float)obTable[GW_TABLE_HEAD_LEN];
     tableEnd = (float)obTable[tableLen + GW_TABLE_HEAD_LEN - 1];
@@ -1611,8 +1611,8 @@ int MeaCalcFun::CalcGW(const float data, int *gw, const int obTable[],int k) {
     int startDay;
 
     tableLen = obTable[0];//产科表长度
-    multiple = obTable[1];//浜х琛ㄦ暟鎹浉瀵规绫崇殑鏀惧ぇ鍊嶆暟
-    startDay = obTable[2];//浜х琛ㄦ暟鎹殑璧峰鏃堕棿
+    multiple = obTable[1];//产科表数据相对毫米的放大倍数
+    startDay = obTable[2];//产科表数据的起始时间
 
     tableStart = (float)obTable[GW_TABLE_HEAD_LEN];
     tableEnd = (float)obTable[tableLen + GW_TABLE_HEAD_LEN - 1];
@@ -1697,7 +1697,7 @@ Avg:
 
     int edcb;
     if (countLast != 0) {
-        avgGw[0][0] = sumLast / countLast;//鏈€鍚庡€煎瓡鍛ㄧ殑骞冲潎瀛曞懆
+        avgGw[0][0] = sumLast / countLast;//最后值孕周的平均孕周
         if (EDCBFormula(HumanDOP, (int)avgGw[0][0], &edcb) == MEA_SUCCESS)
             avgGw[1][0] = (float)edcb;
         else
@@ -1708,7 +1708,7 @@ Avg:
     }
 
     if (countMean != 0) {
-        avgGw[0][1] = sumMean / countMean;//骞冲潎鍊煎瓡鍛ㄧ殑骞冲潎瀛曞懆
+        avgGw[0][1] = sumMean / countMean;//平均值孕周的平均孕周
         if (EDCBFormula(HumanDOP, avgGw[0][1], &edcb) == MEA_SUCCESS)
             avgGw[1][1] = (float)edcb;
         else
@@ -1918,7 +1918,7 @@ save:
     return MEA_SUCCESS;
 }
 #endif
-#if 0	//浜虹敤澶囦唤
+#if 0	//人用备份
 //void CalculateEDCB(int daypast, unsigned char resultline, unsigned char year1, unsigned char mon1, unsigned char date1)
 int MeaCalcFun::EDCBCalc(CalcInfoTmp *calcInfo, float data[], int item, int save, int position) {
     unsigned int key;
@@ -2120,7 +2120,7 @@ int MeaCalcFun::EDCBCalc(CalcInfoTmp *calcInfo, float data[], int item, int save
     float gw;
     float calcResult[CALC_RESULT_CLASSES];
     int i;
-    int gpLen = HumanDOP;//瀛曟湡闀垮害
+    int gpLen = HumanDOP;//孕期长度
 #ifdef VET
     //hlx
     /*
@@ -2291,7 +2291,7 @@ int MeaCalcFun::EDCBCalc(CalcInfoTmp *calcInfo, float data[], int item, int save
 }
 
 /*
-//姝ゅ嚱鏁扮敤浜庢姤鍛婁腑
+//此函数用于报告中
 //本函数的参数和返回值原都应该是int型，为了适用回调的函数形式,均改成float型，在调用是需注意强制转换
 float MeaCalcFun::EDCBCalc(float gw)
 {
@@ -2734,7 +2734,7 @@ int MeaCalcFun::EFWCalc(CalcInfoTmp *calcInfo, float data[], int item, int save,
     m_ptrMeaResult = MeaResult::GetInstance();
     const int method = GetCurEfwMethod();//获取 EFW的方法
 //	printf("EFW method= %d\n", method);
-    if (method + OB_EFW != calcInfo->item)//濡傛灉褰撳墠鏂规硶涓嶆槸鏈珽FW锛屽垯鐩存帴杩斿洖
+    if (method + OB_EFW != calcInfo->item)//如果当前方法不是本EFW，则直接返回
         return MEA_FAIL;
 
     sign = EFWGetData(item, IN_MEASURE, method, dataOther);

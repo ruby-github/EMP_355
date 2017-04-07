@@ -1203,7 +1203,7 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button) {
 
     GtkTreeModel *new_model1 = create_item_calc_model1();
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_calc1), new_model1);
-    //楂樹寒鎻掑叆鐨勮瘝鏉★紝骞舵洿鏂版粴鍔ㄦ潯
+    //高亮插入的词条，并更新滚动条
     GtkTreeSelection *new_selection;
     GtkTreeIter iter_new;
     new_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_calc1));
@@ -1214,7 +1214,7 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button) {
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path_scroll, NULL, TRUE, 1.0, 1.0);
     gtk_tree_path_free (path_scroll);
 
-    //鏇存柊departent鍒楄〃
+    //更新departent列表
     GtkTreeStore *calculate_store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc)));
     gtk_tree_store_remove(calculate_store, &iter);
 
@@ -1424,7 +1424,7 @@ void CalcSetting::ButtonBackAllClicked(GtkButton *button) {
     ptrIni->WriteInt(exam_type, "Sequence", squence_copy);
     ptrIni->SyncConfigFile();
 
-    //鏇存柊鍒楄〃
+    //更新列表
     ChangeModel2();
 
     if (g_menuCalc.GetExamItem() == exam_type)
@@ -1539,13 +1539,13 @@ void CalcSetting::DeleteItem(void) {
         ptrIni_calc1->SyncConfigFile();
     }
 
-    //鍚屾椂鍒犻櫎鑷畾涔夌殑閰嶇疆瀛楁
+    //同时删除自定义的配置字段
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d", select_num);
     ptrIni_calc->RemoveGroup(CustomEtype);
     ptrIni_calc->SyncConfigFile();
 
-    //鏇存柊Exam Item 鍜孌epartmen 鍒楄〃
+    //更新Exam Item 和Departmen 列表
     ChangeModel2();
     ClearAllCalc();
 }
@@ -1633,9 +1633,9 @@ void CalcSetting::ButtonDownClicked(GtkButton *button) {
         gtk_tree_path_next(path);
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE);
         if(item_length-path_num >2)
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 1.0, 1.0);//绉诲姩鍚庣殑閫変腑璇嶆潯缃簳
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 1.0, 1.0);//移动后的选中词条置底
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//淇濊瘉鍦ㄦ渶涓嬬鐨勮瘝鏉＄Щ鍔ㄥ悗鑳藉姝ｅ父鏄剧ず
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//保证在最下端的词条移动后能够正常显示
         gtk_tree_path_free (path);
     }
 
@@ -1713,9 +1713,9 @@ void CalcSetting::ButtonUpClicked(GtkButton *button) {
     if(gtk_tree_path_prev(path)) {
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE);
         if(item_length-path_num >12)
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 0.0, 1.0);// 绉诲姩鍚庨€変腑璇嶆潯缃《
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path, NULL, TRUE, 0.0, 1.0);// 移动后选中词条置顶
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//淇濊瘉鍦ㄦ渶涓婄鐨勮瘝鏉＄Щ鍔ㄦ椂鑳藉姝ｇ‘鏄剧ず
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_calc1)));//保证在最上端的词条移动时能够正确显示
     }
     gtk_tree_path_free (path);
 
@@ -2026,7 +2026,7 @@ void CalcSetting::UpdateAllCalc() {
     sprintf(userselectname3, "%s%s", CFG_RES_PATH, DEFAULT_CALC_ITEM_FILE );
     f.CopyFile(userselectname3, path3);
 
-    //鏇存柊Exam Item 鍜孌epartmen 鍒楄〃
+    //更新Exam Item 和Departmen 列表
     ChangeModel2();
     ClearAllCalc();
 }
@@ -2081,7 +2081,7 @@ void CalcSetting::GetCalcListEtype(char *exam_type, vector<int> & vecItemCalc) {
     }
 }
 
-//鑾峰緱exam_type妫€鏌ラ儴浣嶄笅鐨勬祴閲忛」鎬绘暟
+//获得exam_type检查部位下的测量项总数
 int CalcSetting::GetCalcListNum(char *exam_type) {
     char path1[256];
     sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -2122,9 +2122,9 @@ int CalcSetting::GetMeasureSequence(const char *exam_type) {
 }
 
 /*
- *int Etype: 鑷畾涔夌殑娴嬮噺Etype
- *int measure_type: 閫氳繃Etype锛岄渶瑕佸緱鍒扮殑娴嬮噺鏂瑰紡
- *string calc_name: 閫氳繃Etype锛岄渶瑕佸緱鍒扮殑鑷畾涔夋祴閲忕殑鍚嶇О
+ *int Etype: 自定义的测量Etype
+ *int measure_type: 通过Etype，需要得到的测量方式
+ *string calc_name: 通过Etype，需要得到的自定义测量的名称
  */
 void CalcSetting::GetCustomCalcMeasure(int Etype, int &measure_type, string &calc_name) {
     char path1[256];

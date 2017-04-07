@@ -1339,7 +1339,7 @@ void ViewPrintPreview::InitReportPagePath(char *path) {
     }
 
     char cmd[512];
-    if(0 == access(m_path, F_OK)) { //鐩綍瀛樺湪
+    if(0 == access(m_path, F_OK)) { //目录存在
         for(int i = 0;; i++) {
             sprintf(cmd, "%s/report_page%d.png", m_path, i);
             if(access(cmd, F_OK) == 0) {
@@ -1631,7 +1631,7 @@ void ViewPrintPreview::CreatePages(char *path) {
             //pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, IMG_SCALE_WIDTH, IMG_SCALE_HEIGHT);
             //gdk_pixbuf_scale(image.pixbuf, pixbuf, 0, 0, IMG_SCALE_WIDTH, IMG_SCALE_HEIGHT, (-80)*IMAGE_SCALE, (-120)*IMAGE_SCALE, IMAGE_SCALE, IMAGE_SCALE, GDK_INTERP_HYPER);
 
-            //鎴彇鍖哄煙璧峰浣嶇疆鍙婂ぇ灏忥紝鍘熷浘澶у皬844x660
+            //截取区域起始位置及大小，原图大小844x660
             int offset_x = 0;
             int offset_y = -100;
             int src_w = 750;
@@ -1642,7 +1642,7 @@ void ViewPrintPreview::CreatePages(char *path) {
             int dest_h = src_h * scale;
             pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, dest_w, dest_h);
             gdk_pixbuf_scale(image.pixbuf, pixbuf, 0, 0, dest_w, dest_h, offset_x*scale, offset_y*scale, scale, scale, GDK_INTERP_HYPER);
-            //涔熷彲鐢╟omposite寰楀埌鏂扮殑pixbuf锛屼笅闈㈢殑缁撴灉涓巗cale鐩稿悓
+            //也可用composite得到新的pixbuf，下面的结果与scale相同
             //gdk_pixbuf_composite(image.pixbuf, pixbuf, 0, 0, dest_w, dest_h, offset_x*scale, offset_y*scale, scale, scale, GDK_INTERP_HYPER, 255);
             //	printf("source pixbuf w = %d, h = %d\n", gdk_pixbuf_get_width(image.pixbuf), gdk_pixbuf_get_height(image.pixbuf));
             //	printf("pixbuf w = %d, h = %d\n", gdk_pixbuf_get_width(pixbuf), gdk_pixbuf_get_height(pixbuf));
@@ -2015,7 +2015,7 @@ void ViewPrintPreview::CreatePagesForRetrieve(char *path,string indication,strin
         char absPath[512];
         sprintf(absPath,"%s/%s",path,imageName[i].c_str());
         if(ImgMan::GetInstance()->ReadSnap(absPath, &image) == 0) {
-            //鎴彇鍖哄煙璧峰浣嶇疆鍙婂ぇ灏忥紝鍘熷浘澶у皬844x660
+            //截取区域起始位置及大小，原图大小844x660
             int offset_x = 0;
             int offset_y = -100;
             int src_w = 750;

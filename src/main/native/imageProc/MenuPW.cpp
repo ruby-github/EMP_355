@@ -20,10 +20,10 @@
 #include "measure/MeasureMan.h"
 
 /***
- * 濡傛灉鍦ㄥ悓涓€涓鍣ㄤ腑娣诲姞鐩稿悓鐨勪袱涓猈idgets銆傛鏃跺涓や釜涓殑浠绘剰涓€涓繘琛屼簡鎿嶄綔鍒囨崲涔嬪悗閮藉彧浼氬埛鏂版渶鍏堝姞鍏ュ鍣ㄤ腑鐨剋idget
+ * 如果在同一个容器中添加相同的两个Widgets。此时对两个中的任意一个进行了操作切换之后都只会刷新最先加入容器中的widget
  * g_menuPW and g_menuCW 是相同的两个全局变量。
  * 增加到菜单上去的时候却要分成两页，此时对CW的操作不会刷新。
- * 浜х敓鐨刡ug鏄bugFree 1377 and 1378
+ * 产生的bug是见bugFree 1377 and 1378
  * lhm 2013.10.27
  ***/
 MenuPW g_menuPW;
@@ -545,7 +545,7 @@ void MenuPW::ChkAutoCalcClicked(GtkToggleButton *togglebutton) {
     if(!value) {
         ImgProcPw::GetInstance()->SetAutoCalc(value);
 
-        //娴嬮噺澧炲姞鍒版祴閲忕鐞嗕腑
+        //测量增加到测量管理中
         if(g_calcPwStatus) {
             update.ClearLast();
             MeasureMan::GetInstance()->ClearLast();

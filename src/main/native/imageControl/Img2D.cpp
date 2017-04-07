@@ -138,7 +138,7 @@ Img2D::Img2D() {
     m_edgeEnhanceIndex = 0;
     m_soundPowerIndex = 8;
     m_harmonic = FALSE;
-    m_tsiIndex = 0; ///< 甯歌
+    m_tsiIndex = 0; ///< 常规
     m_mbpIndex = 0;
     m_mbpIndexBak = 0;
     m_agcIndex = 0;
@@ -3184,7 +3184,7 @@ void Img2D::SetScale2D(double scale) {
 
     //ModeStatus s;
     //int curB = s.Get2DCurrentB();
-    /**瑙ｅ喅鍒囨崲鎺㈠ご鍒诲害灏烘病鏈夊垏鎹㈢殑闂**/
+    /**解决切换探头刻度尺没有切换的问题**/
     int curB = Format2D::GetInstance()->GetLastRealB();
     m_scale2D[curB] = scale;
     if (m_zoomMeasureCtrl) {

@@ -4,7 +4,7 @@
 #include "calcPeople/MeaResult.h"
 #include "display/gui_global.h"
 
-/***************************璁＄畻鍑芥暟**********************************/
+/***************************计算函数**********************************/
 class MeaCalcFun {
 
 public:
@@ -15,7 +15,7 @@ public:
     static void CalcEDCB_LMP(unsigned int LMP_Y, unsigned int LMP_M, unsigned int LMP_D, char* retval);
     static void CalcEDCB_Ovul(unsigned int LMP_Y, unsigned int LMP_M, unsigned int LMP_D, char* retval);
 
-    //浜х
+    //产科
     static int CalcGWMan(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
     static int EDCBCalc(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
     static int EFWCalc(CalcInfoTmp *calcInfo, float data[], int item, int save, int *position, const int parPosi);
@@ -93,7 +93,7 @@ const titleUnitInfo AlEdvInfo[] = {{"LVAd", CM2}, {"LVLd", CM}, {"EDV", CM3}, {"
 const titleUnitInfo AlEsvInfo[] = {{"LVAs", CM2}, {"LVLs", CM}, {"ESV", CM3}, {"\0", NOUNIT}};//AL ESV
 const titleUnitInfo SlopeMInfo[] = {{"Dist", CM}, {"Slope", CMS}, {"\0", NOUNIT}};//DIST_SLOPE_M
 const titleUnitInfo P12tInfo[] = {{"Vmax", CMS}, {"P1/2t", SEC}, {"Slope", CMS2}, {"\0", NOUNIT}};//P12T
-const titleUnitInfo HipInfo[] = {{"伪", ANG}, {"尾", ANG}, {"\0", NOUNIT}};//HIP
+const titleUnitInfo HipInfo[] = {{"α", ANG}, {"β", ANG}, {"\0", NOUNIT}};//HIP
 const titleUnitInfo SacInfo[] = {{"Diam1", CM}, {"Diam2", CM},{"Diam3", CM},{"mean Diam",CM}, {"\0", NOUNIT}};//Sac
 
 /******************************Basic Measure**************************************/
@@ -103,7 +103,7 @@ const MultiItemInfo BasicMultiInfo[] = {
     {D_HR, D_HR_MULTI, HR_D, "\0", HrInfo, NULL },
     {D_PGMAX, D_PGMAX_MULTI, PGMAX, "\0", PgmaxInfo, NULL },
     {D_RI, D_RI_MULTI, RI, "\0", RiInfo, NULL },
-    {D_SD, D_SD_MULTI, SD, "\0", SdInfo, NULL },//杞箟瀛楃
+    {D_SD, D_SD_MULTI, SD, "\0", SdInfo, NULL },//转义字符
     {D2_RATIO_ANGLE, D2_RATIO_ANGLE_MULTI, RATIO_ANGLE, "\0", RationAngleInfo, NULL },
 };
 
@@ -591,7 +591,7 @@ const SingleItemInfo AdultInfo[] = {
     {ADULT_LVOT_ACC_T, TIME_D, N_("LVOT Accel Time(D)"), SEC, NULL},
     {ADULT_LVOT_VMAX, PGMAX, N_("LVOT Vmax(D)"), ADULT_LVOT_VMAX_MULTI, &AdultLvotVmaxCalc},
     {ADULT_AI_ACC_T, TIME_D, N_("AI Accel Time(D)"), SEC, NULL},
-    {ADULT_AI_P12T, P12T, N_("AI P1/2t(D)"), ADULT_AI_P12T_MULTI, NULL},//鍘嬪姏闄嶅崐鏃堕棿锛屽疄闄呬笂瑕佹樉绀篤max, P1/2t, Slope
+    {ADULT_AI_P12T, P12T, N_("AI P1/2t(D)"), ADULT_AI_P12T_MULTI, NULL},//压力降半时间，实际上要显示Vmax, P1/2t, Slope
     {ADULT_AI_DEC_SLOPE, SLOPE_D, N_("AI Dec Slope(D)"), CMS2, NULL},
     //	{ADULT_AI_ALIAS_V, DIALOG_BOX, "AI Alias Vel", CMS, NULL},//弹出对话框，选择测量或输入
     {ADULT_AI_VMAX, PGMAX, N_("AI Vmax(D)"), ADULT_AI_VMAX_MULTI, NULL},
@@ -600,7 +600,7 @@ const SingleItemInfo AdultInfo[] = {
     {ADULT_HR_AV, HR_D, N_("HR-AV(D)"), ADULT_HR_AV_MULTI, NULL},
     //D Mitral Valve
     {ADULT_HR_MV, HR_D, N_("HR-MV(D)"), ADULT_HR_MV_MULTI, NULL},
-    {ADULT_MV_P12T, P12T, N_("MV P1/2t(D)"), ADULT_MV_P12T_MULTI, &AdultMVP12tCalc},//鍘嬪姏闄嶅崐鏃堕棿锛屽疄闄呬笂瑕佹樉绀篤max, P1/2t, Slope
+    {ADULT_MV_P12T, P12T, N_("MV P1/2t(D)"), ADULT_MV_P12T_MULTI, &AdultMVP12tCalc},//压力降半时间，实际上要显示Vmax, P1/2t, Slope
 //	{ADULT_MV_ALIAS_V, VEL_D, "MV Alias Vel", CM, NULL},//弹出对话框，选择测量或输入
     {ADULT_MV_PEAK_E_V, PGMAX, N_("MV Peak E Vel(D)"), ADULT_MV_PEAK_E_V_MULTI, &AdultMVPeakECalc},//测量速度和压力阶差
     {ADULT_MV_PEAK_A_V, PGMAX, N_("MV Peak A Vel(D)"), ADULT_MV_PEAK_A_V_MULTI, &AdultMVPeakECalc},//测量速度和压力阶差
@@ -610,8 +610,8 @@ const SingleItemInfo AdultInfo[] = {
     {ADULT_MV_DEC_SLOPE, SLOPE_D, N_("MV Decel Slope(D)"), CMS2, NULL},
     {ADULT_IVCT, TIME_D, N_("IVCT(D)"), SEC, &AdultIVCTCalc},
     {ADULT_MV_ACC_T, TIME_D, N_("MV Accel Time(D)"), SEC, NULL},
-    {ADULT_MV_VMAX, VEL_D, N_("MV Vmax(D)"), CMS, NULL},//浠呴€熷害娴嬮噺
-    {ADULT_MR_VMAX, VEL_D, N_("MR Vmax(D)"), CMS, NULL},//浠呴€熷害娴嬮噺
+    {ADULT_MV_VMAX, VEL_D, N_("MV Vmax(D)"), CMS, NULL},//仅速度测量
+    {ADULT_MR_VMAX, VEL_D, N_("MR Vmax(D)"), CMS, NULL},//仅速度测量
 //	{ADULT_MR_ALIAS_V, VEL_D, "MR Alias Vel", CM, NULL},//弹出对话框，选择测量或输入
     //D Pulmonic Valve
     {ADULT_HR_TV, HR_D, N_("HR-TV(D)"), ADULT_HR_TV_MULTI, NULL},
@@ -865,8 +865,8 @@ const SingleItemInfo OBInfo[] = {
     {OB_LV_LEN, DIST_DOT, N_("LV Length"), CM, NULL},
     {OB_LV_WIDTH, DIST_DOT, N_("LV Width"), CM, NULL},
     {OB_LVOT_DIAM, DIST_DOT, N_("LVOT Diam"), CM, NULL},
-    {OB_HA_2D, AREA_ELLIPSE, N_("Heart Area"), CM2, &OBHrtCThrCCalc},//妞渾闈㈢Н
-    {OB_HRTC_2D, PERI_ELLIPSE, N_("Heart Circ"), CM, &OBHrtCThrCCalc},//妞渾鍛ㄩ暱
+    {OB_HA_2D, AREA_ELLIPSE, N_("Heart Area"), CM2, &OBHrtCThrCCalc},//椭圆面积
+    {OB_HRTC_2D, PERI_ELLIPSE, N_("Heart Circ"), CM, &OBHrtCThrCCalc},//椭圆周长
     {OB_HR, HR_M, N_("Heart Rate"), BPM, NULL},
     {OB_THC, PERI_ELLIPSE, N_("ThrC"), CM, &OBHrtCThrCCalc},//胸周长
     {OB_AOR_DIAM, DIST_DOT, N_("AoR Diam"), CM, &OBAoRDiamCalc},
@@ -884,20 +884,20 @@ const SingleItemInfo OBInfo[] = {
     {OB_MPA_DIAM, DIST_DOT, N_("MPA Diam(2D)"), CM, &OBMPADiamCalc},
 #ifdef EMP_322
 #else
-    {OB_THORACIC_AO, RI, N_("Thoracic Ao"), OB_THORACIC_AO_MULTI, NULL},//鑳镐富鍔ㄨ剦
+    {OB_THORACIC_AO, RI, N_("Thoracic Ao"), OB_THORACIC_AO_MULTI, NULL},//胸主动脉
 #endif
     {OB_GS, DIST_DOT, N_("GS"), CM, &OBGSCalc},
     {OB_BPD, DIST_DOT, N_("BPD"), CM, &OBBPDCalc},
-    {OB_AC, PERI_ELLIPSE, N_("AC"), CM, &OBACCalc},//鍛ㄩ暱
-    {OB_HC, PERI_ELLIPSE, N_("HC"), CM, &OBHCCalc},//鍛ㄩ暱
+    {OB_AC, PERI_ELLIPSE, N_("AC"), CM, &OBACCalc},//周长
+    {OB_HC, PERI_ELLIPSE, N_("HC"), CM, &OBHCCalc},//周长
     {OB_HL, DIST_DOT, N_("HL"), CM, &OBHLCalc},
     {OB_FL, DIST_DOT, N_("FL"), CM,  &OBFLCalc},
     {OB_TAD, DIST_DOT,N_( "TAD"), CM, &OBTADCalc},
     {OB_APAD, DIST_DOT, N_("APAD"), CM, &OBAPADCalc},
     {OB_THD, DIST_DOT, N_("THD"), CM, &OBTHDCalc},
     {OB_OFD, DIST_DOT, N_("OFD"), CM, &OBOFDCalc},
-    {OB_FTA, AREA_ELLIPSE, N_("FTA"), CM2, &OBFTACalc},//闈㈢Н娴嬮噺12.05
-    //{OB_FTA, DIST_DOT, N_("FTA"), CM, NULL},//闈㈢Н娴嬮噺
+    {OB_FTA, AREA_ELLIPSE, N_("FTA"), CM2, &OBFTACalc},//面积测量12.05
+    //{OB_FTA, DIST_DOT, N_("FTA"), CM, NULL},//面积测量
     {OB_EAR, DIST_DOT, N_("Ear"), CM, NULL},
     {OB_ORIBIT1, DIST_DOT, N_("Orbit1"), CM, NULL},
     {OB_ORIBIT2, DIST_DOT, N_("Orbit2"), CM, NULL},
@@ -906,10 +906,10 @@ const SingleItemInfo OBInfo[] = {
     {OB_NASAL, DIST_DOT, N_("Nasal"), CM, NULL},
     {OB_CLAVICLE, DIST_DOT, N_("Clavicle"), CM, NULL},
     {OB_M_PHALANX5, DIST_DOT, N_("M Phalanx 5"), CM, NULL},
-    {OB_L_FOOT_L, DIST_DOT, N_("L Foot L"), CM, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
-    {OB_L_FOOT_A, ANGLE_3DOT, N_("L Foot A"), ANG, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
-    {OB_R_FOOT_L, DIST_DOT, N_("R Foot L"), CM, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
-    {OB_R_FOOT_A, ANGLE_3DOT, N_("R Foot A"), ANG, NULL},//鍏充簬鑴氱殑娴嬮噺蹇樹簡
+    {OB_L_FOOT_L, DIST_DOT, N_("L Foot L"), CM, NULL},//关于脚的测量忘了
+    {OB_L_FOOT_A, ANGLE_3DOT, N_("L Foot A"), ANG, NULL},//关于脚的测量忘了
+    {OB_R_FOOT_L, DIST_DOT, N_("R Foot L"), CM, NULL},//关于脚的测量忘了
+    {OB_R_FOOT_A, ANGLE_3DOT, N_("R Foot A"), ANG, NULL},//关于脚的测量忘了
     {OB_BLADDER_AP, DIST_DOT, N_("Bladder AP"), CM, NULL},
     {OB_BLADDER_L, DIST_DOT, N_("Bladder L"), CM, NULL},
     {OB_BLADDER_TR, DIST_DOT, N_("Bladder Tr"), CM, NULL},
@@ -930,8 +930,8 @@ const SingleItemInfo OBInfo[] = {
     {OB_R_LUNG_DIAM, DIST_DOT, N_("R Lung Diam"), CM, NULL},
 #ifdef EMP_322
 #else
-    {OB_L_UTERINE_A, RI, N_("L Uterine A"), OB_L_UTERINE_A_MULTI, NULL},//瀛愬鍔ㄨ剦锛屾病鍐欐竻娴嬪暐
-    {OB_R_UTERINE_A, RI, N_("R Uterine A"), OB_R_UTERINE_A_MULTI, NULL},//瀛愬鍔ㄨ剦锛屾病鍐欐竻娴嬪暐
+    {OB_L_UTERINE_A, RI, N_("L Uterine A"), OB_L_UTERINE_A_MULTI, NULL},//子宫动脉，没写清测啥
+    {OB_R_UTERINE_A, RI, N_("R Uterine A"), OB_R_UTERINE_A_MULTI, NULL},//子宫动脉，没写清测啥
 #endif
     {OB_PELVIS_AP, DIST_DOT, N_("Pelvis AP"), CM, NULL},
     {OB_PELVIS_L, DIST_DOT, N_("Pelvis L"), CM, NULL},
@@ -1943,9 +1943,9 @@ const SingleItemInfo FetalInfo[] = {
     {FETAL_IVC_DIAM, DIST_DOT, N_("IVC Diam(2D)"), CM, NULL},
     //Fetal 2D Valves
     {FETAL_AO_AN_DIAM, DIST_DOT, N_("Ao Annul Diam(2D)"), CM, NULL},
-    {FETAL_AO_AN_CIRC, PERI_TRACK, N_("Ao Annul Circ(2D)"), CM, NULL},//杞ㄨ抗娉曟祴鍛ㄩ暱
+    {FETAL_AO_AN_CIRC, PERI_TRACK, N_("Ao Annul Circ(2D)"), CM, NULL},//轨迹法测周长
     {FETAL_MV_AN_DIAM, DIST_DOT, N_("MV Annul Diam(2D)"), CM, NULL},
-    {FETAL_MV_AN_CIRC, PERI_TRACK, N_("MV Annul Circ(2D)"), CM, NULL},//杞ㄨ抗娉曟祴鍛ㄩ暱
+    {FETAL_MV_AN_CIRC, PERI_TRACK, N_("MV Annul Circ(2D)"), CM, NULL},//轨迹法测周长
     {FETAL_PV_AN_DIAM, DIST_DOT, N_("PV Annul Diam(2D)"), CM, NULL},
     {FETAL_TV_AN_DIAM, DIST_DOT, N_("TV Annul Diam(2D)"), CM, NULL},
     //Fetal M Dimen
@@ -1994,16 +1994,16 @@ const SingleItemInfo FetalInfo[] = {
     {FETAL_TV_EF_SLOPE_MM, SLOPE, N_("TV E-F Slope(M)"), CMS, NULL},//仅显示斜率
     {FETAL_TV_AC_INTERVAL_MM, TIME_M, N_("TV A-C Interval(M)"), SEC, NULL},
     //Fetal D Utero and Placenta
-    {FETAL_PLACENTA, SD, N_("Placenta(D)"), FETAL_PLACENTA_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_UM_A, SD, N_("Umbilical A(D)"), FETAL_UM_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_UM_V, VEL_D, N_("Umbilical V(D)"), CMS, NULL},//浠呮祴閫熷害
-    {FETAL_L_UT_A, SD, N_("L Uterine A(D)"), FETAL_L_UT_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_R_UT_A, SD, N_("R Uterine A(D)"), FETAL_R_UT_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_L_OV_A, SD, N_("L Ovarian A(D)"), FETAL_L_OV_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_R_OV_A, SD, N_("R Ovarian A(D)"), FETAL_R_OV_A_MULTI, NULL},//娴婸S, ED, RI, S/D
+    {FETAL_PLACENTA, SD, N_("Placenta(D)"), FETAL_PLACENTA_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_UM_A, SD, N_("Umbilical A(D)"), FETAL_UM_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_UM_V, VEL_D, N_("Umbilical V(D)"), CMS, NULL},//仅测速度
+    {FETAL_L_UT_A, SD, N_("L Uterine A(D)"), FETAL_L_UT_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_R_UT_A, SD, N_("R Uterine A(D)"), FETAL_R_UT_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_L_OV_A, SD, N_("L Ovarian A(D)"), FETAL_L_OV_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_R_OV_A, SD, N_("R Ovarian A(D)"), FETAL_R_OV_A_MULTI, NULL},//测PS, ED, RI, S/D
     //Fetal D Vessels
     {FETAL_FROAMEN_OVALE, PGMAX, N_("Foramen Ovale(D)"), FETAL_FROAMEN_OVALE_MULTI, NULL},
-    {FETAL_DUCT_ART, SD, N_("Duct Art(D)"), FETAL_DUCT_ART_MULTI, NULL},//娴婸S, ED, RI, S/D
+    {FETAL_DUCT_ART, SD, N_("Duct Art(D)"), FETAL_DUCT_ART_MULTI, NULL},//测PS, ED, RI, S/D
     {FETAL_L_COR_A, PGMAX, N_("L Coronary A(D)"), FETAL_L_COR_A_MULTI, NULL},
     {FETAL_R_COR_A, PGMAX, N_("R Coronary A(D)"), FETAL_R_COR_A_MULTI, NULL},
     {FETAL_AOR, PGMAX, N_("AoR(D)"), FETAL_AOR_MULTI, NULL},
@@ -2014,9 +2014,9 @@ const SingleItemInfo FetalInfo[] = {
     {FETAL_MPA, PGMAX, N_("MPA(D)"), FETAL_MPA_MULTI, NULL},
     {FETAL_LPA, PGMAX, N_("LPA(D)"), FETAL_LPA_MULTI, NULL},
     {FETAL_RPA, PGMAX, N_("RPA(D)"), FETAL_RPA_MULTI, NULL},
-//	{FETAL_PULM_V, PGMAX, N_("Pulm V"), FETAL_PULM_V_MULTI, NULL},//浠呴€熷害娴嬮噺
-    {FETAL_PULM_V, VEL_D, N_("Pulm V(D)"), CMS, NULL},//浠呴€熷害娴嬮噺
-    {FETAL_DUCT_VEN, SD, N_("Duct Ven(D)"), FETAL_DUCT_VEN_MULTI, NULL},//娴婸S, ED, RI, S/D
+//	{FETAL_PULM_V, PGMAX, N_("Pulm V"), FETAL_PULM_V_MULTI, NULL},//仅速度测量
+    {FETAL_PULM_V, VEL_D, N_("Pulm V(D)"), CMS, NULL},//仅速度测量
+    {FETAL_DUCT_VEN, SD, N_("Duct Ven(D)"), FETAL_DUCT_VEN_MULTI, NULL},//测PS, ED, RI, S/D
     //Fetal D AV and MV
     {FETAL_LVOT_ACC_TIME, TIME_D, N_("LVOT Acc Time(D)"), SEC, NULL},
     {FETAL_LVOT_VMAX, PGMAX, N_("LVOT Vmax(D)"), FETAL_LVOT_VMAX_MULTI, NULL},
@@ -2047,18 +2047,18 @@ const SingleItemInfo FetalInfo[] = {
     {FETAL_TR_VMAX, PGMAX, N_("TR Vmax(D)"), FETAL_TR_VMAX_MULTI, NULL},
     {FETAL_HR_TV, HR_D, N_("HR-TV(D)"), FETAL_HR_TV_MULTI, NULL},
     //Fetal D Peripheral Vasc
-    {FETAL_THORACIC_AO, SD, N_("Thoracic Ao(D)"), FETAL_THORACIC_AO_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_L_RENAL_A, SD, N_("L Renal A(D)"), FETAL_L_RENAL_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_R_RENAL_A, SD, N_("R Renal A(D)"), FETAL_R_RENAL_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_HEPATIC_A, SD, N_("Hepatic A(D)"), FETAL_HEPATIC_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_HEPATIC_V, SD, N_("Hepatic V(D)"), FETAL_HEPATIC_V_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_SPLENIC_A, SD, N_("Splenic A(D)"), FETAL_SPLENIC_A_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_L_MCA, SD, N_("L MCA(D)"), FETAL_L_MCA_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_R_MCA, SD, N_("R MCA(D)"), FETAL_R_MCA_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_L_ICA, SD, N_("L ICA(D)"), FETAL_L_ICA_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_R_ICA, SD, N_("R ICA(D)"), FETAL_R_ICA_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_SVC, SD, N_("SVC(D)"), FETAL_SVC_MULTI, NULL},//娴婸S, ED, RI, S/D
-    {FETAL_IVC, SD, N_("IVC(D)"), FETAL_IVC_MULTI, NULL}//娴婸S, ED, RI, S/D
+    {FETAL_THORACIC_AO, SD, N_("Thoracic Ao(D)"), FETAL_THORACIC_AO_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_L_RENAL_A, SD, N_("L Renal A(D)"), FETAL_L_RENAL_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_R_RENAL_A, SD, N_("R Renal A(D)"), FETAL_R_RENAL_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_HEPATIC_A, SD, N_("Hepatic A(D)"), FETAL_HEPATIC_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_HEPATIC_V, SD, N_("Hepatic V(D)"), FETAL_HEPATIC_V_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_SPLENIC_A, SD, N_("Splenic A(D)"), FETAL_SPLENIC_A_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_L_MCA, SD, N_("L MCA(D)"), FETAL_L_MCA_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_R_MCA, SD, N_("R MCA(D)"), FETAL_R_MCA_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_L_ICA, SD, N_("L ICA(D)"), FETAL_L_ICA_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_R_ICA, SD, N_("R ICA(D)"), FETAL_R_ICA_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_SVC, SD, N_("SVC(D)"), FETAL_SVC_MULTI, NULL},//测PS, ED, RI, S/D
+    {FETAL_IVC, SD, N_("IVC(D)"), FETAL_IVC_MULTI, NULL}//测PS, ED, RI, S/D
 };
 
 const MultiItemInfo FetalMultiInfo[] = {
@@ -2325,8 +2325,8 @@ const SingleItemInfo VSInfo[] = {
 };
 
 /*
- *VS鍜孴CD鏄互鏈夊椤规祴閲忕殑娴嬮噺椤逛负涓荤殑绉戝埆锛屽湪VSMultiInfo鍜孴CDMultiInfo涓紝濡傛灉鏌愰」鏄崟椤规祴閲忥紝
- *鍒檛itleUnit[MEA_MULTI-1].unitItem瀛樺偍姝ゅ崟椤规祴閲忕殑鏋氫妇鍙凤紝绋嬪簭鏍规嵁姝ゆ灇涓惧彿瀵绘壘瀹冨湪VSInfo涓殑浣嶇疆
+ *VS和TCD是以有多项测量的测量项为主的科别，在VSMultiInfo和TCDMultiInfo中，如果某项是单项测量，
+ *则titleUnit[MEA_MULTI-1].unitItem存储此单项测量的枚举号，程序根据此枚举号寻找它在VSInfo中的位置
  * */
 const MultiItemInfo VSMultiInfo[] = {
     {VS_L_CCA, VS_L_CCA_MULTI, PSED, "L CCA", PsEdInfo, &VSLIcaCcaCalc},
@@ -2337,7 +2337,7 @@ const MultiItemInfo VSMultiInfo[] = {
     {VS_R_MID_CCA, VS_R_MID_CCA_MULTI, PSED, "R Mid CCA", PsEdInfo, NULL},
     {VS_L_PROX_CCA, VS_L_PROX_CCA_MULTI, PSED, "L Prox CCA", PsEdInfo, NULL},
     {VS_R_PROX_CCA, VS_R_PROX_CCA_MULTI, PSED, "R Prox CCA", PsEdInfo, NULL},
-    {VS_L_ICA, VS_L_ICA_MULTI, PSED, "L ICA", PsEdInfo,  &VSLIcaCcaCalc},  //鎵€鏈塈CA鐨勬祴閲忔枃妗ｄ笂鍐欑殑閮芥槸Vel娴嬮噺锛屽疄闄呬笂鍔ㄨ剦涓嶅簲璇ュ彧娴嬩竴涓€熷害锛屽湪绾歌川璧勬枡涓婃紡鍐欎簡锛屾墍浠ヨ璁や负鍙湁閫熷害娴嬮噺
+    {VS_L_ICA, VS_L_ICA_MULTI, PSED, "L ICA", PsEdInfo,  &VSLIcaCcaCalc},  //所有ICA的测量文档上写的都是Vel测量，实际上动脉不应该只测一个速度，在纸质资料上漏写了，所以误认为只有速度测量
     {VS_R_ICA, VS_R_ICA_MULTI, PSED, "R ICA", PsEdInfo, &VSRIcaCcaCalc},
     {VS_L_DIST_ICA, VS_L_DIST_ICA_MULTI, PSED, "L Dist ICA", PsEdInfo, NULL},
     {VS_R_DIST_ICA, VS_R_DIST_ICA_MULTI, PSED, "R Dist ICA", PsEdInfo, NULL},

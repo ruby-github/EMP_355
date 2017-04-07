@@ -511,10 +511,10 @@ void ImageAreaPara::DrawPwGen2Para(void) {
     }
 
     if (abs(m_anglePw) > 60) {
-        sprintf(m_bufText, "%d掳", m_anglePw);
+        sprintf(m_bufText, "%d°", m_anglePw);
         m_ptrImg->DrawString(m_bufText, x, y, g_red);
     } else {
-        sprintf(m_bufText, "%d掳", m_anglePw);
+        sprintf(m_bufText, "%d°", m_anglePw);
         m_ptrImg->DrawString(m_bufText, x, y, g_white);
     }
 }
@@ -529,7 +529,7 @@ void ImageAreaPara::DrawCwPara() {
     m_ptrImg->DrawString("<b><span underline=\"low\" >CW</span></b>", x, y);
 
     FillRectangle(x, y+20, m_eareWl, m_eareH);
-    sprintf(m_bufText, "GC%d %.1fcm %dKHz %dHz %d掳", m_gainCw, m_svPosCw/10, (int)m_PRFCw, m_wfCw, m_angleCw);
+    sprintf(m_bufText, "GC%d %.1fcm %dKHz %dHz %d°", m_gainCw, m_svPosCw/10, (int)m_PRFCw, m_wfCw, m_angleCw);
     m_ptrImg->DrawString(m_bufText, x, y+20);
 }
 

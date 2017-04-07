@@ -29,7 +29,7 @@ const int ProbeMan::SOCKET_ADDR[MAX_SOCKET] = {0x0, 0x2, 0x1, 0x3};
 const int ProbeMan::CMD_READ_PARA[MAX_SOCKET] = {0x0, 0x2, 0x1};
 const int ProbeMan::SOCKET_ADDR[MAX_SOCKET] = {0x0, 0x2, 0x1};
 #elif (defined(EMP_322) || defined(EMP_313))
-const int ProbeMan::CMD_READ_PARA[MAX_SOCKET] = {0x0, 0x0, 0x0};//鎺㈠ご鍦板潃
+const int ProbeMan::CMD_READ_PARA[MAX_SOCKET] = {0x0, 0x0, 0x0};//探头地址
 const int ProbeMan::SOCKET_ADDR[MAX_SOCKET] = {0x2, 0x1, 0x0}; //探头座切换，继电器切换
 #elif (defined(EMP_430))
 const int ProbeMan::CMD_READ_PARA[MAX_SOCKET] = {0x0, 0x0, 0x0, 0x0};

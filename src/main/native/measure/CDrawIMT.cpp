@@ -205,12 +205,12 @@ void CDrawIMT::UpdateIMT(void) {
     imt_para.imt_min = 0.0;		        // IMT MIN
     imt_para.imt_std = 0.0;	           // IMT 标准差
     imt_para.imt_mean = 0.0;		  // IMT 平均值
-    imt_para.imt_length = 0.0;	     // IMT 娴嬮噺闀垮害
-    imt_para.imt_quality = 0.0;	 	// IMT 鍝佽川鍥犲瓙
+    imt_para.imt_length = 0.0;	     // IMT 测量长度
+    imt_para.imt_quality = 0.0;	 	// IMT 品质因子
 
     CIMT::GetInstance()->AnalyseData(imt_para, pRoi, pRoiPre, pIntima, pAdventitia, roi_w);
 
-    //鏄剧ず缁撴灉
+    //显示结果
     m_update.IMTResult(imt_para, m_attr, true);
 
 }

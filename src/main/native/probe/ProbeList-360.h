@@ -64,7 +64,7 @@ unsigned char Probe75LVS[PROBE_INFO_SIZE] = { //7.5LVS
     'E',		'M',		'P',		0x5a,
 };
 #endif
-unsigned char Probe35MC[PROBE_INFO_SIZE] = { //3.5MC
+unsigned char Probe35MC[PROBE_INFO_SIZE] = { //3.5MC //低频微凸
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
     'C',    0,		96,		1,		92,		88,		0,		21,		0,		0,
@@ -83,7 +83,7 @@ unsigned char Probe35MC[PROBE_INFO_SIZE] = { //3.5MC
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65MC[PROBE_INFO_SIZE] = { //6.5MC
+unsigned char Probe65MC[PROBE_INFO_SIZE] = { //6.5MC  //高频微凸
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
     'C',	0,		80,		1,		60,		98,		0,		15,		0,		0,

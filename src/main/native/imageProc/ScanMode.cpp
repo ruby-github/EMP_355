@@ -1337,7 +1337,7 @@ ScanMode::EFOVStatus ScanMode::GetEFOVStatus() {
 }
 static void D4QuitCallback(int flag) {
     D4FuncMan::GetInstance()->Exit4D();
-    usleep(1000);// 淇濊瘉淇″彿蹇界暐鏄湪瀛愯繘绋嬬粨鏉熷悗
+    usleep(1000);// 保证信号忽略是在子进程结束后
     signal(SIGCHLD, SIG_IGN);
 }
 

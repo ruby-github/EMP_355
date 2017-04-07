@@ -114,7 +114,7 @@ void  CFpgaGeneral::AD9273ControlInit(void) { //9273初始化
     SpiControlSetting(0x0f, 0x2D, 0x00);		//CROSS_POINT_SWITCH
     Update();
 
-    AD9273_TestChNo(0, 1 ); //璁剧疆鍋忕疆鐢垫祦
+    AD9273_TestChNo(0, 1 ); //设置偏置电流
 
     //AD9273_TestIO(TRUE);
     ct.End();
@@ -211,7 +211,7 @@ void CFpgaGeneral::AD5805ControlInit() { //5805 init
     //bit1-0: BITS_CUSTOM1[11:10], SET AS 11
     //BIT3-2: BITS_CUSTOM2[11:10],SET AS 11
     //BIT6-4: 000=TEST MODE OFF, 100=EN_RAMP,010=DUAL_CUSTOM_PAT,001=SINGLE_CUSTOM_PAT
-    SpiControlSetting(0xff,0x25, 0x000f);	//姝ｅ父宸ヤ綔
+    SpiControlSetting(0xff,0x25, 0x000f);	//正常工作
     //SpiControlSetting(0xff,0x25, 0x001f);
     //SpiControlSetting(0xff,0x25, 0x0029);
 
@@ -309,7 +309,7 @@ void  CFpgaGeneral::PowerOff(void) {
     SpiControlSetting(0x0f, 0x08, 0x01);
 }
 
-void  CFpgaGeneral::Ready(void) { //鍑嗗灏辩华
+void  CFpgaGeneral::Ready(void) { //准备就绪
     SpiControlSetting(0x0f, 0x08, 0x02);
 }
 
@@ -349,10 +349,10 @@ void  CFpgaGeneral::AdjustOutputPhase(unsigned char chipcs, unsigned char phasev
     Update();
 }
 
-//	ChipCs[0]---1:閫変腑绗竴鐗嘇DC杩涜SPI鎺у埗
-//	ChipCs[1]---1:閫変腑绗簩鐗嘇DC杩涜SPI鎺у埗
-//	ChipCs[2]---1:閫変腑绗笁鐗嘇DC杩涜SPI鎺у埗
-//	ChipCs[3]---1:閫変腑绗洓鐗嘇DC杩涜SPI鎺у埗
+//	ChipCs[0]---1:选中第一片ADC进行SPI控制
+//	ChipCs[1]---1:选中第二片ADC进行SPI控制
+//	ChipCs[2]---1:选中第三片ADC进行SPI控制
+//	ChipCs[3]---1:选中第四片ADC进行SPI控制
 void  CFpgaGeneral::SpiControlSetting(unsigned int chipcs, unsigned int regaddr,unsigned int data) {
     INT32U value;
     value = (chipcs <<8) + regaddr;
@@ -409,12 +409,12 @@ void  CFpgaGeneral::ProbeSocketSel(U32 SocketNo) {
 //	#define COMAddrFPGAAddrA	58
 //	#define COMDataFPGAAddrA    59
 #if 0
-    FPGAConData[0] = 3;				//鎺㈠ご搴х户鐢靛櫒鍒囨崲 缁勫悎鍦板潃
+    FPGAConData[0] = 3;				//探头座继电器切换 组合地址
     FPGAConData[0+1] = 0;//3>>8;		//
 
     EzUsb::GetInstance()->BulkOut(2, 1, COMAddrFPGAAddrA, 0);
 
-    FPGAConData[0] = SocketNo;		//鎺㈠ご搴х户鐢靛櫒鍒囨崲 缁勫悎鏁版嵁
+    FPGAConData[0] = SocketNo;		//探头座继电器切换 组合数据
     FPGAConData[0+1] = SocketNo>>8;	//
 
     EzUsb::GetInstance()->BulkOut(2, 1, COMDataFPGAAddrA, 0);
@@ -425,7 +425,7 @@ void  CFpgaGeneral::ProbeSocketSel(U32 SocketNo) {
 
 unsigned char* CFpgaGeneral::venreq(unsigned char VendorReq,unsigned short ReqValue) {
 #if 0
-//	if(VendorReq==0xB9)  //姣忔鍐荤粨瑙ｅ喕锛屽皢OimageBegin缃浂
+//	if(VendorReq==0xB9)  //每次冻结解冻，将OimageBegin置零
 //		 OimageBegin=0;
     bResult = FALSE;
     nBytes = 0;

@@ -140,7 +140,7 @@ double MeasureCalc::D2CalcEllipse(POINT long_axis_start, POINT long_axis_end, PO
         result = PI * long_axis * short_axis / 100.0;
     } else if (sign == 2) {
         if(long_axis >= short_axis)
-            result = (2 * PI * short_axis + 4 * (long_axis - short_axis)) / 10.0;//鍛ㄩ暱鍏紡闇€瑕佸啀鏌ヨ瘉
+            result = (2 * PI * short_axis + 4 * (long_axis - short_axis)) / 10.0;//周长公式需要再查证
         else
             result = (2 * PI * long_axis + 4 * (short_axis - long_axis)) / 10.0;
     } else if (sign == 3) {
@@ -355,7 +355,7 @@ double MeasureCalc::MCalcVel(POINT p1, POINT p2) {
     if (dx == 0)
         result = 0;
     else
-        result = fabs((scale_depth * (double)dy / 10.0) / (scale_time * (double)dx));//鍗曚綅鍖栨垚cm鍜宻
+        result = fabs((scale_depth * (double)dy / 10.0) / (scale_time * (double)dx));//单位化成cm和s
 
     return result;
 }
@@ -371,7 +371,7 @@ double MeasureCalc::MCalcDepth(POINT p1, POINT p2) {
     return result;
 }
 
-//蹇冪巼璁＄畻锛屾渶鍚庤繕搴旇鍔犲叆鐢辩敤鎴烽€夋嫨鐨勫嚑涓績鍔ㄥ懆鏈熺殑鍙傛暟
+//心率计算，最后还应该加入由用户选择的几个心动周期的参数
 double MeasureCalc::MCalcHR(double time) {
     double result;
     SysMeasurementSetting sys;
@@ -514,7 +514,7 @@ double MeasureCalc::DCalcTraceAutoOther(char buf[], vector<POINT> vec, POINT ps,
     //	attr.curColor = draw.GetCurColor();
     //	attr.confirmColor = draw.GetConfirmColor();
     //
-    //	娴嬮噺缈昏瘧
+    //	测量翻译
 #if 1
     if (TraceCalcItem.psSet) {
         sprintf(buf_tmp, "%s= %3.2fcm/s", _("PS"), psv);
@@ -665,7 +665,7 @@ double MeasureCalc::DCalcTraceOther(char buf[], vector<POINT> vec, POINT ps, POI
     //	attr.curColor = draw.GetCurColor();
     //	attr.confirmColor = draw.GetConfirmColor();
     //
-    //	娴嬮噺缈昏瘧
+    //	测量翻译
 #if 1
     if (TraceCalcItem.psSet) {
         sprintf(buf_tmp, "%s= %3.2fcm/s", _("PS"), psv);
@@ -808,7 +808,7 @@ double MeasureCalc::DCalcTraceAuto(char buf[], vector<POINT> vec, POINT &ps, POI
     MeasureDraw draw;
     char buf_tmp[128]= {'\0'};
     //
-    //	娴嬮噺缈昏瘧
+    //	测量翻译
     if (TraceCalcItem.psSet) {
         sprintf(buf_tmp, "%s= %3.2fcm/s", _("PS"), psv);
         strcat(buf, buf_tmp);
@@ -920,7 +920,7 @@ double MeasureCalc::DCalcTrace(char buf[], vector<POINT> vec, POINT &ps, POINT &
     //	attr.curColor = draw.GetCurColor();
     //	attr.confirmColor = draw.GetConfirmColor();
     //
-    //	娴嬮噺缈昏瘧
+    //	测量翻译
 #if 1
     if (TraceCalcItem.psSet) {
         sprintf(buf_tmp, "%s= %3.2fcm/s", _("PS"), psv);
@@ -1139,7 +1139,7 @@ double MeasureCalc::DCalcTamax(vector<POINT> vec) {
  * @para p1, p2[in] start point and end point
  * @ret[out] hear rate value, unit: b/min
  */
-//蹇冪巼璁＄畻 鑷姩璁＄畻鍛ㄦ湡=1
+//心率计算 自动计算周期=1
 double MeasureCalc::DCalcHRAuto(double time) {
     int cycle = 1;
     double result;
@@ -1156,7 +1156,7 @@ double MeasureCalc::DCalcHRAuto(double time) {
  * @para p1, p2[in] start point and end point
  * @ret[out] hear rate value, unit: b/min
  */
-//蹇冪巼璁＄畻锛屾渶鍚庤繕搴旇鍔犲叆鐢辩敤鎴烽€夋嫨鐨勫嚑涓績鍔ㄥ懆鏈熺殑鍙傛暟
+//心率计算，最后还应该加入由用户选择的几个心动周期的参数
 double MeasureCalc::DCalcHR(double time) {
     SysMeasurementSetting sys;
     int cycle = sys.GetHeartBeatCycle();

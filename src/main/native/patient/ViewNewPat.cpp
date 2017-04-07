@@ -778,7 +778,7 @@ void ViewNewPat::BirthDateYearInsert(GtkEditable *editable, gchar *new_text, gin
     if (old_str.length() == 4) {
         int year = atoi(old_str.c_str());
         if (year < 1900) {
-            *position = 4;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 4;      // 移动光标之输入框末尾
             gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), "1900");
             year = 1900;
         } else if (year > m_curYear) {
@@ -817,7 +817,7 @@ void ViewNewPat::BirthDateMonthInsert(GtkEditable *editable, gchar *new_text, gi
             g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
             return ;
         } else if (month > 12) {
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
             gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth), "12");
             month = 12;
         }
@@ -869,7 +869,7 @@ void ViewNewPat::BirthDateDayInsert(GtkEditable *editable, gchar *new_text, gint
     const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
     if (strlen(year_text) == 0 || strlen(year_text) < 4 || strlen(month_text) == 0) {
         if (day > 31) {
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
             gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), "31");
         }
         return ;
@@ -878,7 +878,7 @@ void ViewNewPat::BirthDateDayInsert(GtkEditable *editable, gchar *new_text, gint
         int month = atoi(month_text);
         int last_day = g_date_get_days_in_month (GDateMonth(month), GDateYear(year));
         if (day > last_day) {
-            *position = 2;      // 绉诲姩鍏夋爣涔嬭緭鍏ユ鏈熬
+            *position = 2;      // 移动光标之输入框末尾
             char str_last_day[3];
             sprintf(str_last_day, "%d", last_day);
             gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), str_last_day);
@@ -994,7 +994,7 @@ GtkWidget* ViewNewPat::create_note_general(void) {
     gtk_fixed_put (GTK_FIXED (fixed_tab_general), label_kg, 210, 45);
     gtk_widget_set_size_request (label_kg, 30, 30);
 
-    label_m2 = gtk_label_new ("m虏");
+    label_m2 = gtk_label_new ("m²");
     gtk_widget_show (label_m2);
     gtk_fixed_put (GTK_FIXED (fixed_tab_general), label_m2, 210, 80);
     gtk_widget_set_size_request (label_m2, 30, 30);
@@ -1036,7 +1036,7 @@ void ViewNewPat::OBFocusOut(GtkWidget *widget, GdkEventFocus *event) {
     }
 
     unsigned char monthdays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    if(!(atoi(year) % 4)) monthdays[1] = 29; ///闂板勾
+    if(!(atoi(year) % 4)) monthdays[1] = 29; ///闰年
 
     char warming[512];
     if(atoi(month) > 12) {

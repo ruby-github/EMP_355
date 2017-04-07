@@ -301,7 +301,7 @@ void Zoom::LocalZoomCtrl(bool on) {
         m_ptrDscPara->dca2DIPAttrs.ipaLocalZoom = FALSE;
 
         if (m_ptrDsc != NULL) {
-            m_ptrDsc->UpdateScale();// need for exit local zoo 鍋忚浆鐨勬儏鍐典笅涓嶈兘杩涘叆localzoomm
+            m_ptrDsc->UpdateScale();// need for exit local zoo 偏转的情况下不能进入localzoomm
         }
         if (m_ptrDsc != NULL) {
             m_ptrDsc->Update();

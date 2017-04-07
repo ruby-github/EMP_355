@@ -221,18 +221,18 @@ const char *sectionstr[][LANG_MAX] = {
     {"Abdomen", "\u8179\u90e8", "\u0436\u0438\u0432\u043e\u0442\u0410\u043a", "Jama brzuszna", "Abdomen","Abdomen", "Abdomen",      },  //"Abdomen"
     {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce", "Cardiaque", "Cardiaco", "Kardial",                 },  //"Cardiac"
     {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia", "Urologie", "Urologico","Urologie",   },  //"Urology"
-    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo",  "Obst茅trique",  "Obstetrico",  "Geburtshilfe"   },  //"Obstetrics"
+    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo",  "Obstétrique",  "Obstetrico",  "Geburtshilfe"   },  //"Obstetrics"
     {"Tendon", "\u808c\u8171", "\u0441\u0443\u0445\u043e\u0436\u0438\u043b\u0438\u0435", "Tendon", "Tendon","Tendon",  "Sehne",                                                   },//"Tendon"
-    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Peque帽as partes", "Small-Parts",             },  //"Small Part"
-    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu","Cardio f\u0153tal",  "Fetal Cardio","f枚tale Kardio"    },  //"Fetal Cardio"
-    {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire", "Vascular", "Vaskul盲r",                        },  //"Vascular"
+    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes", "Small-Parts",             },  //"Small Part"
+    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu","Cardio f\u0153tal",  "Fetal Cardio","fötale Kardio"    },  //"Fetal Cardio"
+    {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire", "Vascular", "Vaskulär",                        },  //"Vascular"
 #if 1 // "Others" take place for "TCD" and "Orthopedic"
     //{"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD", "TCD","TCD",  "TCD",                                                                   },  //"TCD"
-    {"Others", "鍏朵粬", "袛褉褍谐懈械", "Inne", "Autres",  "Otro", "Andere",                                                                   },  //"Others"
+    {"Others", "其他", "Другие", "Inne", "Autres",  "Otro", "Andere",                                                                   },  //"Others"
 
 #else
     {"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD", "TCD","TCD",  "TCD",                                                                   },  //"TCD"
-    {"Orthopedic", "\u77eb\u5f62\u5916\u79d1", "\u041e\u0440\u0442\u043e\u043f\u0435\u0434\u0438\u044f", "Ortopedia",  "Orthop茅die",   "Ortopedico", "Orthop盲disch",                }   //"Orthopedic"
+    {"Orthopedic", "\u77eb\u5f62\u5916\u79d1", "\u041e\u0440\u0442\u043e\u043f\u0435\u0434\u0438\u044f", "Ortopedia",  "Orthopédie",   "Ortopedico", "Orthopädisch",                }   //"Orthopedic"
 #endif
 };
 #else
@@ -243,11 +243,11 @@ const char *sectionstr[][LANG_MAX] = {
     {"Abdomen", "\u6210\u4eba\u8179\u90e8", "\u0410\u0431\u0434\u043e\u043c.", "Jama brzuszna","Abdomen", "Abdomen", "Abdomen",      },  //"Abdomen"
     {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce","Cardiaque",  "Cardiaco", "Kardial",                 },  //"Cardiac"
     {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia","Urologie", "Urologico", "Urologie",   },  //"Urology"
-    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obst茅trique", "Obstetrico",  "Geburtshilfe",     },  //"Obstetrics"
-    {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia","Gyn茅cologie", "Gynecologico",  "Gyn盲kologie",        },  //"Gynecology"
-    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Peque帽as partes","Small-Parts",             },  //"Small Part"
-    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu","Cardio f\u0153tal", "Cardio Fetal", "f枚tale Kardio"    },  //"Fetal Cardio"
-    {"Others", "鍏朵粬", "袛褉褍谐懈械", "Inne", "Autres",  "Otro","Andere",                                                                   },  //"Others"
+    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obstétrique", "Obstetrico",  "Geburtshilfe",     },  //"Obstetrics"
+    {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia","Gynécologie", "Gynecologico",  "Gynäkologie",        },  //"Gynecology"
+    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes","Small-Parts",             },  //"Small Part"
+    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu","Cardio f\u0153tal", "Cardio Fetal", "fötale Kardio"    },  //"Fetal Cardio"
+    {"Others", "其他", "Другие", "Inne", "Autres",  "Otro","Andere",                                                                   },  //"Others"
 
 };
 #else
@@ -256,18 +256,18 @@ const char *sectionstr[][LANG_MAX] = {
     {"Abdomen", "\u6210\u4eba\u8179\u90e8", "\u0410\u0431\u0434\u043e\u043c.", "Jama brzuszna", "Abdomen","Abdomen", "Abdomen",      },  //"Abdomen"
     {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce","Cardiaque", "Cardiaco",  "Kardial",                 },  //"Cardiac"
     {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia", "Urologie", "Urologico", "Urologie",   },  //"Urology"
-    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obst茅trique","Obstetrico",  "Geburtshilfe",     },  //"Obstetrics"
-    {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia", "Gyn茅cologie", "Gynecologico",  "Gyn盲kologie",        },  //"Gynecology"
-    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Peque帽as partes",  "Small-Parts",             },  //"Small Part"
-    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu", "Cardio f\u0153tal","Cardio Fetal", "f枚tale Kardio"    },  //"Fetal Cardio"
-    {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire","Vascular", "Vaskul盲r",                        },  //"Vascular"
+    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obstétrique","Obstetrico",  "Geburtshilfe",     },  //"Obstetrics"
+    {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia", "Gynécologie", "Gynecologico",  "Gynäkologie",        },  //"Gynecology"
+    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes",  "Small-Parts",             },  //"Small Part"
+    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu", "Cardio f\u0153tal","Cardio Fetal", "fötale Kardio"    },  //"Fetal Cardio"
+    {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire","Vascular", "Vaskulär",                        },  //"Vascular"
 #if 1 // "Others" take place for "TCD" and "Orthopedic"
     //{"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD", "TCD",  "TCD",                                                                   },  //"TCD"
 
-    {"Others", "鍏朵粬", "袛褉褍谐懈械", "Inne", "Autres","Otro",  "Andere",                                                                   },  //"Others"
+    {"Others", "其他", "Другие", "Inne", "Autres","Otro",  "Andere",                                                                   },  //"Others"
 #else
     {"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD","TCD", "TCD",  "TCD",                                                                   },  //"TCD"
-    {"Orthopedic", "\u77eb\u5f62\u5916\u79d1", "\u041e\u0440\u0442\u043e\u043f\u0435\u0434\u0438\u044f", "Ortopedia", "Orthop茅die", "Ortopedico", "Orthop盲disch",                }   //"Orthopedic"
+    {"Orthopedic", "\u77eb\u5f62\u5916\u79d1", "\u041e\u0440\u0442\u043e\u043f\u0435\u0434\u0438\u044f", "Ortopedia", "Orthopédie", "Ortopedico", "Orthopädisch",                }   //"Orthopedic"
 #endif
 
 };
@@ -276,9 +276,9 @@ const char *sectionstr[][LANG_MAX] = {
 const char *defaultstr = "System Default";
 const char *defaultflag ="\u221a"; //62; //251; // \u221a;//
 const char *templet1str[LANG_MAX] = ////{ ENGLISH, CHINESE, RU, PL, FR,es, DE}
-{"Template 1",  "\u6a21\u677f1", "\u0428\u0430\u0431\u043b\u043e\u043d 1", "szablon 1", "Mod拧拧le 1",  "Templete 1",  "Template 1",     };//"templet"
+{"Template 1",  "\u6a21\u677f1", "\u0428\u0430\u0431\u043b\u043e\u043d 1", "szablon 1", "Modššle 1",  "Templete 1",  "Template 1",     };//"templet"
 const char *Customstr[LANG_MAX] = ////{ ENGLISH, CHINESE, RU, PL, ,FR,es, DE}
-{"Custom Template", "\u81ea\u5B9a\u4e49\u6a21\u677f", "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u0438\u0435 \u0448\u0430\u0431\u043b\u043e\u043d\u044b","Custom Template","Mod拧拧le auto-d拧艩fini", "Custom Templete","Custom Template",      };//"Custom Template"
+{"Custom Template", "\u81ea\u5B9a\u4e49\u6a21\u677f", "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u0438\u0435 \u0448\u0430\u0431\u043b\u043e\u043d\u044b","Custom Template","Modššle auto-dšŠfini", "Custom Templete","Custom Template",      };//"Custom Template"
 
 char ShowArr[MAX_CALCARR_COUNT+1] = {0x66};
 GtkWidget* CheckButtonArr[MAX_CALCARR_COUNT] = {NULL};
@@ -3146,7 +3146,7 @@ GtkWidget* ViewSystem::create_note_general(void) {
     gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_language, 150+20, 350);
     gtk_widget_set_size_request (m_combobox_language, 100, 30);
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "English");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "涓枃");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "中文");
 
 #ifdef EMP_355
     label_vga=gtk_label_new(_("<b>VGA Source:</b>"));
@@ -3166,12 +3166,12 @@ GtkWidget* ViewSystem::create_note_general(void) {
 #endif
 
 #ifdef VET
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "袪褍褋褋泻懈泄 褟蟹褘泻");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Русский язык");
 #else
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "袪褍褋褋泻懈泄 褟蟹褘泻");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Русский язык");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Polski");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Fran莽ais");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Espa帽ol");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Français");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Español");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Deutsch");
 #endif
 
@@ -3467,7 +3467,7 @@ void ViewSystem::BtnAdjustTimeClicked(GtkButton *button) {
     char setdatetime[50];
     char hctosys[20];
     sprintf(setdatetime, "hwclock --set --date=\"%d/%d/%d %d:%d:%d\"", month+1, day, year, hour, minute, second);
-    //鍚屾鏃堕棿
+    //同步时间
     sprintf(hctosys, "hwclock --hctosys");
 #if 0
     system(setdatetime);
@@ -5080,7 +5080,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     //gtk_fixed_put (GTK_FIXED (fixed_image), m_comboboxentry_user_select, 110+20, 10);
     gtk_widget_set_size_request (m_comboboxentry_user_select, 120+100, 30);
     bin_entry_dia = gtk_bin_get_child (GTK_BIN(m_comboboxentry_user_select));
-    gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 40); //25 in order to display 校屑芯谢褔邪薪 褋懈褋褌械屑褘
+    gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 40); //25 in order to display Умолчан системы
     g_signal_connect(G_OBJECT(bin_entry_dia), "insert_text", G_CALLBACK(on_entry_name_insert), this);
     g_signal_connect(G_OBJECT(bin_entry_dia), "focus-out-event", G_CALLBACK(HandleUserSelectFocusOut), this);
 
@@ -5275,7 +5275,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     //g_signal_connect(G_OBJECT(m_entry_new_check_part), "insert_text", G_CALLBACK(on_entry_new_check_part), this);
     //g_signal_connect(G_OBJECT(m_entry_new_check_part), "focus-out-event", G_CALLBACK(HandleNewCheckPartFocusOut), this);
 
-    //纭畾
+    //确定
     GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
     GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("OK"));
     GtkWidget* button_ok = create_button_icon(labelOK, imageOK);
@@ -5283,7 +5283,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_fixed_put (GTK_FIXED (fixed_new_check_part), button_ok, 22+10+20, 120-50+30);
     g_signal_connect(button_ok, "clicked", G_CALLBACK(HandleNewCheckPartBtnOk), this);
 
-    //鍙栨秷
+    //取消
     GtkWidget *imageCancel = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
     GtkWidget *labelCancel = gtk_label_new_with_mnemonic (_("Cancel"));
     GtkWidget* button_cancel = create_button_icon(labelCancel, imageCancel);
@@ -5610,7 +5610,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_widget_set_size_request (m_combobox_steer, 100, 30);
     gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_steer, 1, 2, 4, 5);
     for (i = 0; i < Img2D::MAX_STEER; i ++)	{
-        sprintf(buf, "%d掳", Img2D::STEER_ANGLE[i]);
+        sprintf(buf, "%d°", Img2D::STEER_ANGLE[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_steer), buf);
     }
 
@@ -5730,7 +5730,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_rotation, 370, 310);
     gtk_widget_set_size_request (m_combobox_rotation, 100, 30);
     for (i = 0; i < ImgProc2D::MAX_ROTATE; i ++) {
-        sprintf(buf , "%d掳", ImgProc2D::Rotate[i]);
+        sprintf(buf , "%d°", ImgProc2D::Rotate[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_rotation), buf);
     }
 #endif
@@ -5861,7 +5861,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     }
 
     // image enhance
-    label_imgEnh = gtk_label_new (_("iPurity:"));
+    label_imgEnh = gtk_label_new (_("ePure:"));
     gtk_widget_show (label_imgEnh);
     //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_imgEnh, 5, 490);
     gtk_widget_set_size_request (label_imgEnh, -1, 30);
@@ -6582,7 +6582,7 @@ void ViewSystem::CellRendererRename(GtkCellRendererText *renderer, gchar *path_s
         return;
     }
     if (strcmp(new_text, "") == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("The new item name can not be empty!"), NULL); //缁撶偣鍚嶇О涓嶈兘涓虹┖
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
 
         return;
     }
@@ -6704,7 +6704,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
         int probeIndex;
         probeIndex = GetProbeType();
 
-        //鍏堝啓鍏ユ柊寤哄悕绉板埌鏂囦欢
+        //先写入新建名称到文件
         if ((probeIndex >= 0)) {
             examItem.WriteNewItemFile(probeIndex, checkpart, str, str_index);
             examItem.WriteNewItemToCommentFile(probeIndex, checkpart, str);
@@ -6730,7 +6730,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
         examItem.GetItemListOfProbe((char*)PROBE_LIST[probeIndex].c_str(), ((vector<ExamItem::EItem>*) &vecItemIndex));
         GtkTreeModel *new_model1 = create_exam_item_model(vecItemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), new_model1);
-        //楂樹寒鎻掑叆鐨勮瘝鏉★紝骞舵洿鏂版粴鍔ㄦ潯
+        //高亮插入的词条，并更新滚动条
         GtkTreeSelection *new_selection;
         GtkTreeIter iter_new;
         new_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
@@ -6747,7 +6747,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
         gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, checkpart, -1);
         GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
 
-        //鍒锋柊treeview
+        //刷新treeview
         vector<int> vecItemIndex;
         examItem.GetItemListOfProbe((char*)PROBE_LIST[probeIndex].c_str(), ((vector<ExamItem::EItem>*) &vecItemIndex));
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(vecItemIndex));
@@ -6766,7 +6766,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
 }
 
 void ViewSystem::AddItemClicked(GtkButton *button) {
-    char *new_string = _("New Item");//涓存椂鎻掑叆缁撶偣
+    char *new_string = _("New Item");//临时插入结点
 
     GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
     GtkTreeModel *model;
@@ -6826,7 +6826,7 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
     gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, new_string, -1);
     GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
 
-    //鍒锋柊treeview
+    //刷新treeview
     int probeIndex;
     probeIndex = GetProbeType();
 
@@ -6854,7 +6854,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select one item to be delete!"), NULL); //璇峰厛閫夋嫨寰呭垹闄ょ殑缁撶偣!
+                                          _("Please select one item to be delete!"), NULL); //请先选择待删除的结点!
         return;
     }
 
@@ -6916,7 +6916,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
 
             if((strcmp(useritemname.c_str(),str0.c_str())==0)&&(userflag==true)&&(strcmp(userprobe.c_str(),PROBE_LIST[probeIndex].c_str())==0)&&(strcmp(username,  _(userselect.c_str()))==0)) {
                 ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                                  _("Fail to delete! The item is under using!"), NULL); //鍒犻櫎澶辫触!
+                                                  _("Fail to delete! The item is under using!"), NULL); //删除失败!
                 return;
             } else {
                 examItem.DeleteNewItemFile(probeIndex, str0.c_str(), str1.c_str());
@@ -6981,7 +6981,7 @@ void ViewSystem::SpinbuttonInsertGain(GtkEditable *editable, gchar *new_text, gi
 
 void ViewSystem::SpinbuttonInsertAngle(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
     string new_str = new_text;
-    string s1 = "掳";
+    string s1 = "°";
     string::size_type pos = 0;
     if((pos=new_str.find(s1, 0)) == string::npos) {
         if (!g_ascii_isdigit(*new_text))
@@ -7001,7 +7001,7 @@ gboolean ViewSystem::SpinbuttonOutputAngle(GtkSpinButton *spin) {
     int value;
     adj = gtk_spin_button_get_adjustment (spin);
     value = (int)gtk_adjustment_get_value (adj);
-    text = g_strdup_printf ("%d掳", value);
+    text = g_strdup_printf ("%d°", value);
     gtk_entry_set_text (GTK_ENTRY (spin), text);
     g_free (text);
 
@@ -7045,9 +7045,9 @@ void ViewSystem::UpdateUserItem(void) {
     const char* name = GetUserName();
     printf("name = %s\n", name);
     memset(user_configure, 0, USERCONFIG_LEN);
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
         sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");
     } else {
 #ifdef VET
@@ -7747,9 +7747,9 @@ void ViewSystem::SetImagePara(const ExamItem::ParaItem &item) {
 
 void ViewSystem::save_image_para(ExamItem::ParaItem &item) {
     const char* name = GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
         UserSelect::GetInstance()->write_username(m_comboboxentry_user_select, USERNAME_DB, name);
     }
 
@@ -8156,9 +8156,9 @@ void ViewSystem::set_image_item_sensitive(bool status) {
 
 void ViewSystem::save_image_setting(void) {
     const char* name = GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
 
     {
         UserSelect::GetInstance()->write_username(m_comboboxentry_user_select, USERNAME_DB, name);
@@ -9166,7 +9166,7 @@ void ViewSystem::ButtonSelectOneCommentClicked(GtkButton *button) {
 
     GtkTreeModel *new_model1 = create_item_comment_model1();
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_comment1), new_model1);
-//楂樹寒鎻掑叆鐨勮瘝鏉★紝骞舵洿鏂版粴鍔ㄦ潯
+//高亮插入的词条，并更新滚动条
     GtkTreeSelection *new_selection;
     GtkTreeIter iter_new;
     new_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_comment1));
@@ -9344,15 +9344,15 @@ void ViewSystem::ButtonDownClicked(GtkButton *button) {
         g_free(path_string);
         gtk_tree_path_next(path);
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE);
-        //鍦ㄨ瘝鏉′笅绉绘椂锛屾洿鏂版粴鍔ㄦ潯
+        //在词条下移时，更新滚动条
         /*    gdouble value = gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
             gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)), value+18);
             gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
          */
         if(item_length-path_num >2)
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE, 1.0, 1.0);//绉诲姩鍚庣殑閫変腑璇嶆潯缃簳
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE, 1.0, 1.0);//移动后的选中词条置底
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));//淇濊瘉鍦ㄦ渶涓嬬鐨勮瘝鏉＄Щ鍔ㄥ悗鑳藉姝ｅ父鏄剧ず
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));//保证在最下端的词条移动后能够正常显示
         gtk_tree_path_free (path);
     }
 }
@@ -9431,15 +9431,15 @@ void ViewSystem::ButtonUpClicked(GtkButton *button) {
     g_free(path_string);
     if(gtk_tree_path_prev(path)) {
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE);
-        //鍦ㄨ瘝鏉′笂绉绘椂锛屾洿鏂版粴鍔ㄦ潯
+        //在词条上移时，更新滚动条
         /*gdouble value = gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
           gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)), value-18);
           gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
          */
         if(item_length-path_num >12)
-            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE, 0.0, 1.0);// 绉诲姩鍚庨€変腑璇嶆潯缃《
+            gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE, 0.0, 1.0);// 移动后选中词条置顶
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));//淇濊瘉鍦ㄦ渶涓婄鐨勮瘝鏉＄Щ鍔ㄦ椂鑳藉姝ｇ‘鏄剧ず
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));//保证在最上端的词条移动时能够正确显示
     }
     gtk_tree_path_free (path);
 }
@@ -9511,7 +9511,7 @@ void ViewSystem::MenuInstallActivate(GtkMenuItem *menuitem) {
 }
 
 /**
- * @brief: 娉ㄩ攢/鍗歌浇閫夐厤 鐩存帴鍒犻櫎瀵嗛挜鏂囦欢锛屽悓鏃惰缃爣璇嗕负false
+ * @brief: 注销/卸载选配 直接删除密钥文件，同时设置标识为false
  */
 void ViewSystem::MenuUninstallActivate(GtkMenuItem *menuitem) {
     GtkTreeModel *model;
@@ -9532,7 +9532,7 @@ void ViewSystem::MenuUninstallActivate(GtkMenuItem *menuitem) {
     gtk_tree_path_free (path);
     m_powerOffFlag = true;
 
-    ///>绉婚櫎鏂囦欢
+    ///>移除文件
     if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[row])) {
         char filePath[256];
         sprintf(filePath, "%s/%s", OPTIONAL_DIR, CManRegister::Optional[row].c_str());
@@ -9618,7 +9618,7 @@ void ViewSystem::BtnExportClicked(GtkButton *button) {
 }
 
 /**
- * @brief: 鏍￠獙搴忓垪鍙凤紝楠岃瘉娉ㄥ唽鏄惁鎴愬姛
+ * @brief: 校验序列号，验证注册是否成功
  */
 void ViewSystem::BtnRegisterClicked(GtkButton *button) {
     const gchar *registerKey = gtk_entry_get_text(GTK_ENTRY(m_entryRegisterKey));
@@ -9878,7 +9878,7 @@ void ViewSystem::ButtonAddClicked(GtkButton *button) {
         gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, new_string, -1);
         GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
 
-        //鍒锋柊treeview
+        //刷新treeview
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_comment),  create_item_comment_model(0));
         gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_treeview_item_comment), new_path);
         //设置结点为编辑状态
@@ -9891,7 +9891,7 @@ void ViewSystem::ButtonAddClicked(GtkButton *button) {
                                          column_tree_view,
                                          m_cellrenderer_comment_text,
                                          TRUE);
-        //鏇存柊婊氬姩鏉″埌搴曢儴
+        //更新滚动条到底部
         gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment), new_path, NULL, TRUE, 1.0, 1.0);
 
         gtk_tree_path_free (new_path);
@@ -9999,7 +9999,7 @@ void ViewSystem::CellRendererRenameSelectComment(GtkCellRendererText *m_cellrend
         return;
     }
     if (strcmp(new_text, "") == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("The new item name can not be empty!"), NULL); //缁撶偣鍚嶇О涓嶈兘涓虹┖
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
 
         return;
     }
@@ -10109,7 +10109,7 @@ void ViewSystem::CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_c
         return;
     }
     if (strcmp(new_text, "") == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("The new item name can not be empty!"), NULL); //缁撶偣鍚嶇О涓嶈兘涓虹┖
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
 
         return;
     }
@@ -10709,8 +10709,8 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_widget_show (m_combobox_unit_area);
     gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_area, 110, 60);
     gtk_widget_set_size_request (m_combobox_unit_area, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_area), "cm虏");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_area),"mm虏");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_area), "cm²");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_area),"mm²");
 
     label_unit_vol = gtk_label_new(_("Volume"));
     gtk_label_set_use_markup (GTK_LABEL (label_unit_vol), TRUE);
@@ -10722,8 +10722,8 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_widget_show (m_combobox_unit_vol);
     gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_vol, 110, 110);
     gtk_widget_set_size_request (m_combobox_unit_vol, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vol),"cm鲁");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vol), "mm鲁");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vol),"cm³");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vol), "mm³");
 
     label_unit_time = gtk_label_new(_("Time"));
     gtk_label_set_use_markup (GTK_LABEL (label_unit_time), TRUE);
@@ -10776,9 +10776,9 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_widget_show (m_combobox_unit_accel);
     gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_accel, 110, 260);
     gtk_widget_set_size_request (m_combobox_unit_accel, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "cm/s虏");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "mm/s虏");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "m/s虏");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "cm/s²");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "mm/s²");
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "m/s²");
 
     label_unit_efw = gtk_label_new(_("EFW"));
     gtk_label_set_use_markup (GTK_LABEL (label_unit_efw), TRUE);
@@ -12975,9 +12975,9 @@ void ViewSystem::image_default_setting() {
     const char *name = exam.ReadDefaultUserSelect(&ini).c_str();
     bool flag = exam.ReadUserItemFlag(&ini);
 
-    if (((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))||(flag)) {
+    if (((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))||(flag)) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("Fail to default factory! Define user or New item is under using!"), NULL);
 
     } else {
@@ -13177,9 +13177,9 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
     const char* name = GetUserName();
     char path[256];
 
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
         // avoid to delete a config which is in use
         char *username = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_comboboxentry_user_select));
 
@@ -14006,9 +14006,9 @@ void ViewSystem::EntryNameInsert(GtkEditable *editable, gchar *new_text, gint ne
 void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
     const gchar *name = gtk_entry_get_text(GTK_ENTRY(widget));
 
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(name, "绯荤粺榛樿") != 0) && (strcmp(name, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(name, "Par d茅faut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
+    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
+            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
+            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
 
     {
         UserSelect::GetInstance()->write_username(m_comboboxentry_user_select, USERNAME_DB, name);

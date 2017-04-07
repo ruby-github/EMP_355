@@ -633,7 +633,7 @@ void ViewProbe::KeyEvent(unsigned char keyValue) {
 
     switch(keyValue) {
     case KEY_ESC:
-        //	case KEY_PROBE: //閬垮厤蹇€熼绻佹寜涓婸robe鏃讹紝绐楀彛鍫嗘爤鍑洪敊
+        //	case KEY_PROBE: //避免快速频繁按下Probe时，窗口堆栈出错
         BtnCancelClicked(NULL);
         break;
 

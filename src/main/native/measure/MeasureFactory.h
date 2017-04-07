@@ -29,7 +29,7 @@ private:
     int m_type;
 };
 
-//杞欢鍖呮祴閲忎腑鍙祴閲忚窛绂昏€屾病鏈夎绠楃殑閫氱敤鍑芥暟
+//软件包测量中只测量距离而没有计算的通用函数
 //extern void DistanceTitle(Results results);
 
 #endif

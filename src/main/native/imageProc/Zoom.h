@@ -34,7 +34,7 @@ public:
     bool ReSendLocalZoomInfo(void);
     bool GetLocalZoomStatus(void);
     void GetScanLineRange(int lineRange[2]);
-    void GetScanDotRange(int dotRange[2]); ///<鐩稿浜庢湭鏀惧ぇ鍓嶇殑鍥惧儚浣嶇疆
+    void GetScanDotRange(int dotRange[2]); ///<相对于未放大前的图像位置
     int GetScanDotBeginDepth(void);
     void GetLocalZoomScale(double &scale); ///<局部放大本身的倍率。
     void ClearLocalZoom();

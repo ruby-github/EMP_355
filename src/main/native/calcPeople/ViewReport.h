@@ -285,7 +285,7 @@ private:
 #endif
     void AddAverRes(GtkWidget *fixed, guint *y, const char *title);
 
-//脤铆录脫 hlx
+//hlx
 
     void AddTDRes(GtkWidget *fixed, guint *y, const char *title);
     void AddOBEfwTable(GtkWidget *fixed, guint *y, const char *title, int fetal=FETAL_BY_SET);

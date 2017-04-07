@@ -2884,7 +2884,7 @@ void ImageAreaDraw::DrawScanDirection(bool update) {
     ScanDirection(xPos, yPos, true);
     m_prePointSD[m_curB].x = xPos;
     m_prePointSD[m_curB].y = yPos;
-    // 鐢⊿canDirection璁板綍缈昏浆锛屼互渚汼etScaleYFreeze浣跨敤
+    // 用ScanDirection记录翻转，以供SetScaleYFreeze使用
     m_prePointSD[m_curB].LRStatus = m_LRStatus;
     m_prePointSD[m_curB].UDStatus = m_UDStatus;
     m_drawSD[m_curB] = true;
@@ -5646,10 +5646,10 @@ void ImageAreaDraw::BMLine(int curBMLine, bool LRStatus, bool UDStatus, GdkPoint
         }
 
         if (totalLines % 2 == 0) {
-            theta = delta * ((curBMLine < halfLines) ? (halfLines - curBMLine) : (curBMLine - halfLines - 1)); //濂囧伓闂
+            theta = delta * ((curBMLine < halfLines) ? (halfLines - curBMLine) : (curBMLine - halfLines - 1)); //奇偶问题
             theta = theta + delta/2;
         } else {
-            theta = delta * ((curBMLine < halfLines) ? (halfLines - curBMLine) : (curBMLine - halfLines)); //濂囧伓闂
+            theta = delta * ((curBMLine < halfLines) ? (halfLines - curBMLine) : (curBMLine - halfLines)); //奇偶问题
         }
 
         double sineTheta = sin(theta);
@@ -5769,7 +5769,7 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
 
     // 假设扫描线数为偶数
     const int svWidth = 20;	// 取样容积线宽度
-    const int angleLen = 30;	// 瑙掑害绾跨殑闀垮害
+    const int angleLen = 30;	// 角度线的长度
 
     GdkPoint point1, point2, point3, point4; // 1为取样容积线起点,2为终点,3为容积起点,4为终点
     GdkSegment beginSeg;

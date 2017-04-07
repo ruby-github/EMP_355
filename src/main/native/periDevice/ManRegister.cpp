@@ -122,7 +122,7 @@ CManRegister::~CManRegister() {
 
 /*
  * @biref: 获取选配功能加密之后的序列号,并保存到license文件中
- * para destFileDir[in]: 鏂囦欢璺緞
+ * para destFileDir[in]: 文件路径
  */
 bool CManRegister::GenerateLicenseFile(string destFileDir, string fileName) {
     if (access(destFileDir.c_str(), F_OK) < 0) {
@@ -177,7 +177,7 @@ bool CManRegister::GenerateLicenseFile(string destFileDir, string fileName) {
 }
 
 /**
- * @brief: 瀛樺偍瀵嗛挜鍒扮浉搴旈€夐厤鏂囦欢
+ * @brief: 存储密钥到相应选配文件
  * para registerKey[in]: 注册序列号
  */
 bool CManRegister::SaveRegisterKeyFile(string registerKey) {
@@ -231,7 +231,7 @@ bool CManRegister::ReadRegisterKeyFile(string &registerKey, string fileName) {
 
 /**
  * @brief: 序列号校验，成功则选配添加成功且保存序列号到文件
- * para registerKey[in]: 瑙ｅ瘑杞欢鐢熸垚鐨勫簭鍒楀彿
+ * para registerKey[in]: 解密软件生成的序列号
  */
 bool CManRegister::CheckAuthorize(string registerKey, int optionIndex) {
     if(optionIndex >= MAX_OPTIONAL_NUM) {
@@ -278,7 +278,7 @@ void CManRegister::SetAuthorize(string optional, bool status) {
 
 /**
  *@brief: 获取目录下文件名称
- *para *path[in]: 鐩綍璺緞
+ *para *path[in]: 目录路径
  *para files[out]: 当前目录下文件名称
  */
 void CManRegister::GetFiles(const char *path, vector<string>& files) {

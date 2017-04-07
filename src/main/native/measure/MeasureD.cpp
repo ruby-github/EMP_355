@@ -114,7 +114,7 @@ void DMeasureManualTrack::PressLeft(POINT p) {
         m_ptrMan->AddNew(MEASURE_TRACK, m_draw.GetOrderNumber(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
         //m_ptrMan->AddNew(MEASURE_TRACK, m_draw.GetCursorType(), m_track, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
         if(m_update.DTrace(buf, attr, false))
-            m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+            m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -155,7 +155,7 @@ void DMeasureManualTrack::PressRight(POINT p) {
             //m_draw.DrawTraceLine(m_track[i], m_track[i-1], TRUE);
             //	m_track.pop_back();
         }
-        m_track.clear();//娓呴櫎vector涓殑杞ㄨ抗璁板綍
+        m_track.clear();//清除vector中的轨迹记录
         m_trackTemp.clear();
 
         m_isDraw = TRUE;
@@ -371,7 +371,7 @@ void DMeasureManualDot::PressLeft(POINT p) {
         }
 
         //	m_psTmp = m_dot[0];
-        //娓呴櫎鎺変腑闂村浣欑殑鍏夋爣
+        //清除掉中间多余的光标
         for(i=1; i!=vec_size-1; i++) {
             m_draw.DrawCursor(m_dot[i], FALSE);
         }
@@ -388,7 +388,7 @@ void DMeasureManualDot::PressLeft(POINT p) {
         // save measure result
         m_ptrMan->AddNew(MEASURE_TRACK, m_draw.GetCursorType(), m_dot, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
         if(m_update.DTrace(buf, attr, false))
-            m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+            m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -1200,7 +1200,7 @@ void DMeasureManualAuto::Change() {
     if((g_setFunc == 3 || g_setFunc == 0) && m_auto) { //全自动切换到半自动
         SemiAutoCalc();
         return;
-    } else if (((g_setFunc == 3) && (!m_auto)) || g_setFunc == 1) { //鍗婅嚜鍔ㄥ垏鎹㈠埌鎵嬪姩
+    } else if (((g_setFunc == 3) && (!m_auto)) || g_setFunc == 1) { //半自动切换到手动
         if(g_ptrAbsMeasure != NULL) {
             delete g_ptrAbsMeasure;
             g_ptrAbsMeasure = NULL;
@@ -1355,7 +1355,7 @@ void DMeasureIntegralTrack::PressLeft(POINT p) {
         m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
 
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -1793,7 +1793,7 @@ void DMeasurePGmax::Esc() {
 }
 
 //========================================= [RI] ====================================//
-//name: 杞欢鍖呮祴閲忔椂浼犲叆璇ラ」鐨勫悕绉帮紝鍦―妯″紡鐨勫熀鏈祴閲忎腑浼犲叆NULL
+//name: 软件包测量时传入该项的名称，在D模式的基本测量中传入NULL
 DMeasureRI::DMeasureRI(const MultiItemInfo *ptrMultiItemInfo) {
     m_itemInfo = ptrMultiItemInfo;
     m_item = ptrMultiItemInfo->multiItem;
@@ -1855,7 +1855,7 @@ void DMeasureRI::PressLeft(POINT p) {
         m_draw.DrawCursor(m_tempP, false, XOR, true);
         m_draw.DrawHDotLine(m_tempP, false);
 
-        dataMea[0] = m_ps = m_calc.DCalcVel(m_tempP);//璁＄畻ps閫熷害
+        dataMea[0] = m_ps = m_calc.DCalcVel(m_tempP);//计算ps速度
         m_ptrMan->MultiMeaDataMan(dataMea, m_itemInfo, allData, NOT_SAVE);
         m_update.GenDisplayMulti(m_itemInfo, allData, attr, true, unit_coeffi);
 
@@ -1889,17 +1889,17 @@ void DMeasureRI::PressLeft(POINT p) {
             m_ptrMan->AddNew(SD, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 
         if(m_itemInfo->meaType == PSED) {
-            m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+            m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
             dataMea[0] = m_ps;
             dataMea[1] = m_ed;
         } else if(m_itemInfo->meaType == RI) {
-            m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+            m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
             m_ri = m_calc.DCalcRI(m_ps, m_ed);
             dataMea[0] = m_ps;
             dataMea[1] = m_ed;
             dataMea[2] = m_ri;
         } else {
-            m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+            m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
             m_ri = m_calc.DCalcRI(m_ps, m_ed);
             m_sd = m_calc.DCalcSD(m_ps, m_ed);
             dataMea[0] = m_ps;
@@ -2012,17 +2012,17 @@ void DMeasureRI::MouseMove(POINT p) {
 
         //calc
         if(m_itemInfo->meaType == PSED) {
-            m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+            m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
             dataMea[0] = m_ps;
             dataMea[1] = m_ed;
         } else if(m_itemInfo->meaType == RI) {
-            m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+            m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
             m_ri = m_calc.DCalcRI(m_ps, m_ed);
             dataMea[0] = m_ps;
             dataMea[1] = m_ed;
             dataMea[2] = m_ri;
         } else {
-            m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+            m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
             m_ri = m_calc.DCalcRI(m_ps, m_ed);
             m_sd = m_calc.DCalcSD(m_ps, m_ed);
             dataMea[0] = m_ps;
@@ -2097,7 +2097,7 @@ void DMeasureSD::PressLeft(POINT p) {
         m_draw.DrawCursor(m_tempP, false, XOR, true);
         m_draw.DrawHDotLine(m_tempP, false);
 
-        m_ps = m_calc.DCalcVel(m_tempP);//璁＄畻ps閫熷害
+        m_ps = m_calc.DCalcVel(m_tempP);//计算ps速度
         m_update.DSD(m_ps, m_ed, m_sd, attr);
 
         // begin new measure
@@ -2124,7 +2124,7 @@ void DMeasureSD::PressLeft(POINT p) {
         vec.push_back(m_tempP);
         m_ptrMan->AddNew(SD, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 
-        m_ed = m_calc.DCalcVel(m_tempP);//璁＄畻ed閫熷害
+        m_ed = m_calc.DCalcVel(m_tempP);//计算ed速度
         m_sd = m_calc.DCalcSD(m_ps, m_ed);
         m_update.DSD(m_ps, m_ed, m_sd, attr, false);
         m_step = 0;
@@ -3036,8 +3036,8 @@ void DMeasureP12t::Result(int saveR, UpdateMeasure::ResultAttr& attr) {
 
 //========================================= [PI] ====================================//
 /*
- *>method = 0: PI娴嬮噺
- *>method = 1: PG mean娴嬮噺
+ *>method = 0: PI测量
+ *>method = 1: PG mean测量
  * */
 DMeasurePI::DMeasurePI(int method,const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;

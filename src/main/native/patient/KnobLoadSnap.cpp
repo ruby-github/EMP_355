@@ -72,7 +72,7 @@ EKnobReturn ReviewPreviousSnap(void) {
     g_menuReview.ExitSlide();
     return PRESS;
 }
-//鎸夐敭鍒囨崲锛屾敼鍙樺够鐏墖鎾斁鐨勫紑涓庡叧
+//按键切换，改变幻灯片播放的开与关
 EKnobReturn PressReviewSlidePlay(void) {
     EKnobOper oper = ROTATE;
     return g_menuReview.SlidePlay(oper);
@@ -80,7 +80,7 @@ EKnobReturn PressReviewSlidePlay(void) {
 EKnobReturn ReviewSlidePlay(EKnobOper oper) {
     return g_menuReview.SlidePlay(oper);
 }
-//鎸夐敭鍒囨崲锛屾敼鍙樻挱鏀鹃€熷害
+//按键切换，改变播放速度
 EKnobReturn PressReviewSlideSpeed(void) {
     EKnobOper oper = ROTATE;
     return g_menuReview.SlideSpeed(oper);

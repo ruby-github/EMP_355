@@ -226,17 +226,17 @@ void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode
 
     //	ConvertPoint(point1);
 
-    if(tan == 0) { //姘村钩
+    if(tan == 0) { //水平
         endp1.x = bou1_x;
         endp2.x = bou2_x;
         endp1.y = point1.y;
         endp2.y = point1.y;
-    } else if((tan > 999)||(tan < -999)) { //绔栫洿
+    } else if((tan > 999)||(tan < -999)) { //竖直
         endp1.y = bou1_y;
         endp2.y = bou2_y;
         endp1.x = point1.x;
         endp2.x = point1.x;
-    } else { //鏂滅嚎
+    } else { //斜线
         temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
         if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y)) {
             endp1.x = bou2_x;
@@ -298,21 +298,21 @@ vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int le
 
 //	printf("%s-%s: cursor (%d, %d)\n", __FILE__, __FUNCTION__, point1.x, point1.y);
     vec.clear();
-    if(tanTheta == 0) { //姘村钩
+    if(tanTheta == 0) { //水平
 //		printf("%s-%s: H\n", __FILE__, __FUNCTION__);
         endp1.x = ((point1.x - half_len) > bou1_x) ? (point1.x - half_len) : bou1_x;
         endp2.x = ((point1.x + half_len) < bou2_x) ? (point1.x + half_len) : bou2_x;
         endp1.y = point1.y;
         endp2.y = point1.y;
 //		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
-    } else if(tanTheta > 999 || tanTheta < -999) { //绔栫洿
+    } else if(tanTheta > 999 || tanTheta < -999) { //竖直
 //		printf("%s-%s: V\n", __FILE__, __FUNCTION__);
         endp1.y = ((point1.y - half_len) > bou1_y) ? (point1.y - half_len) : bou1_y;
         endp2.y = ((point1.y + half_len) < bou2_y) ? (point1.y + half_len) : bou2_y;
         endp1.x = point1.x;
         endp2.x = point1.x;
 //		printf("p1 (%d, %d), p2 (%d, %d)\n", endp1.x, endp1.y, endp2.x, endp2.y);
-    } else { //鏂滅嚎
+    } else { //斜线
 //		printf("%s-%s: O\n", __FILE__, __FUNCTION__);
         double sinTheta = sin(theta);
         double cosTheta = cos(theta);
@@ -355,17 +355,17 @@ void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMo
     double temp;
     const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
 
-    if(point1.y == point2.y) { //姘村钩
+    if(point1.y == point2.y) { //水平
         endp1.x = bou1_x;
         endp2.x = bou2_x;
         endp1.y = point1.y;
         endp2.y = point1.y;
-    } else if(point1.x == point2.x) { //绔栫洿
+    } else if(point1.x == point2.x) { //竖直
         endp1.y = bou1_y;
         endp2.y = bou2_y;
         endp1.x = point1.x;
         endp2.x = point1.x;
-    } else { //鏂滅嚎
+    } else { //斜线
         tan = ((double)(point2.y - point1.y)) / ((double)(point2.x - point1.x));
         temp = (double)point1.y + ((double)(bou2_x-point1.x)) * tan;
         if ((temp >= (double)bou1_y) && (temp<=(double)bou2_y)) {
@@ -645,14 +645,14 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
     float xcos, xsin, ycos, ysin, temp1, temp2, temp3, temp4;
     float tn;
 
-    x0 = (x1+x2)/2; //妞渾鍦嗗績(x0, y0)
+    x0 = (x1+x2)/2; //椭圆圆心(x0, y0)
     y0 = (y1+y2)/2;
 
-    i = (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2); //璁＄畻闀胯酱鍗婂緞 r1
+    i = (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2); //计算长轴半径 r1
     length1= sqrt(i);
     r1 = length1/2;
 
-    j = (x3-x0)*(x3-x0)+(y3-y0)*(y3-y0); //璁＄畻鐭酱鍗婂緞 r2
+    j = (x3-x0)*(x3-x0)+(y3-y0)*(y3-y0); //计算短轴半径 r2
     r2 = sqrt(j);
 
     x = 0;

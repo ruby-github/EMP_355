@@ -1,5 +1,4 @@
 /**
-* 2009, 锟斤拷锟节讹拷锟秸碉拷锟接硷拷锟斤拷锟斤拷锟睫癸拷司
 *
 * @file:Fpga_control.cpp
 * @brief:fpga send data
@@ -603,7 +602,7 @@ int FpgaCtrl2D::SendSample48m(INT32U sample) {
 }
 
 /**
-* @brief 60m 64鐐筧rperture BW
+* @brief 60m 64点arperture BW
 * @param sample  16bits(0-15)
 */
 int FpgaCtrl2D::SendSampleApertureBW(INT32U sample) {
@@ -618,7 +617,7 @@ int FpgaCtrl2D::SendSampleApertureBW(INT32U sample) {
 }
 
 /**
-* @brief 60m 64鐐筧rperture color
+* @brief 60m 64点arperture color
 * @param sample  16bits(0-15)
 */
 int FpgaCtrl2D::SendSampleApertureColor(INT32U sample) {
@@ -726,7 +725,7 @@ int FpgaCtrl2D::SendFocusSum(INT8U sum) {
 }
 
 /**
-* @param max_period  16bits(0-15) focus pulse 鍗忚涓婁负2bits
+* @param max_period  16bits(0-15) focus pulse 协议上为2bits
 */
 int FpgaCtrl2D::SendMaxPeriod(INT32U maxPeriod) {
     INT32U addr;
@@ -1804,8 +1803,8 @@ int FpgaCtrl2D::SendFreqCompoundCoef(INT16U* value, INT32U size) {
 
 #if 1
 /**
- * @ 瀹圭Н鎺㈠ご甯ч噰鏍疯鏁板櫒   8bits(0--7)
- * @ 瀹圭Н鎺㈠ごslices         8bits(8--15)
+ * @ 容积探头帧采样计数器   8bits(0--7)
+ * @ 容积探头slices         8bits(8--15)
  * @ add by LWF 2012.3.6
  */
 int FpgaCtrl2D::SendVPSamplesCnt(INT32U cnt) {

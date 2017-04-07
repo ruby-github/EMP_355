@@ -133,7 +133,7 @@ AbsMeasure* MeaFactoryMainSingle::Create(int type) {
         g_ptrAbsMeasure = NULL;
     }
 
-    //鑷姩璁＄畻鎵撳紑鏃讹紝绂佹娴嬮噺
+    //自动计算打开时，禁止测量
     bool autoCalc = ImgProcPw::GetInstance()->GetAutoCalc();
     if  (autoCalc) {
         HintArea::GetInstance()->UpdateHint(_("Please turn off auto calc!"), 1);
@@ -145,7 +145,7 @@ AbsMeasure* MeaFactoryMainSingle::Create(int type) {
 
     m_type = type;
     ptrMeaResult = MeaResult::GetInstance();
-//妫€鏌ユ墍閫夋嫨娴嬮噺鐨勬ā寮忓拰褰撳墠鎵弿妯″紡鏄惁鐩哥
+//检查所选择测量的模式和当前扫描模式是否相符
     ModeStatus s;
 //	int mode = s.GetScanMode();
 

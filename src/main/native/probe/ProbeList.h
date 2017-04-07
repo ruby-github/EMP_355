@@ -68,7 +68,7 @@ unsigned char Probe75L40K[PROBE_INFO_SIZE] = { //75L40K
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'A',		'P',		'X',		0x5a,
 };
-unsigned char Probe35C20H[PROBE_INFO_SIZE] = { //35C20H
+unsigned char Probe35C20H[PROBE_INFO_SIZE] = { //35C20H //低频微凸
     // black-white
     '3',   '5',    'C',    '2',    '0',    'G',		'0',	'0',	'0',	'0',
     'C',    0,		96,		1,		92,		88,		0,		21,		0,		0,
@@ -87,7 +87,7 @@ unsigned char Probe35C20H[PROBE_INFO_SIZE] = { //35C20H
     0,		0,		0,		0,		0,		0,		0,		0,		0,		0,
     'E',		'M',		'P',		0x5a,
 };
-unsigned char Probe65C15D[PROBE_INFO_SIZE] = { //65C15D
+unsigned char Probe65C15D[PROBE_INFO_SIZE] = { //65C15D  //高频微凸
     // black-white
     '6',	'5',	'C',	'1',	'5',	'G',	'0',	'0',	'0',	'0',
     'C',	0,		80,		1,		60,		98,		0,		15,		0,		0,
@@ -256,7 +256,7 @@ unsigned char Probe35D40JNDK[PROBE_INFO_SIZE] = { //volume convex
 };
 
 #ifdef VET
-unsigned char Probe55L60H[PROBE_INFO_SIZE] = {
+unsigned char Probe55L60H[PROBE_INFO_SIZE] = { //可视人流
     '5',	'5',	'L',	'6',	'0',	'H',	'0',	'0',	'0',	'0',
     'L',	0,		96,		1,		92,		63,	    27,		0,		0,		0,
     1,		0,		1,		20,		1,		30,		1,		2,		1,		50,
@@ -274,7 +274,7 @@ unsigned char Probe55L60H[PROBE_INFO_SIZE] = {
 };
 
 #else
-unsigned char Probe65C10H[PROBE_INFO_SIZE] = {
+unsigned char Probe65C10H[PROBE_INFO_SIZE] = { //可视人流
     '6',	'5',	'C',	'1',	'0',	'H',	'0',	'0',	'0',	'0',
     'C',	0,		96,		1,		92,		150,	0,		10,		0,		0,
     1,		0,		1,		22,		1,		30,		1,		2,		1,		60,

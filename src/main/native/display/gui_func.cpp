@@ -85,7 +85,6 @@ bool init_colors(void) {
     g_deep = new_color(0, 0, 0);
     g_deepGray = new_color(0, 0, 0);
 
-
     return true;
 }
 
@@ -105,7 +104,7 @@ void free_init_colors(void) {
 }
 
 /*
- * UTF8
+ * UTF8编码常见格式
    U-00000000 – U-0000007F:  0xxxxxxx
    U-00000080 – U-000007FF:  110xxxxx 10xxxxxx
    U-00000800 – U-0000FFFF:  1110xxxx 10xxxxxx 10xxxxxx
@@ -539,7 +538,6 @@ GtkWidget* create_combobox(guint width, guint height, const char *layouttype, Gt
     gtk_combo_box_set_active (GTK_COMBO_BOX (combobox), 0);
     g_object_unref (treemodel);
 
-
     modify_widget_bg(combobox);
 
     return combobox;
@@ -752,7 +750,7 @@ void fakeXMotionEventScreen(int &x0, int &y0, int offsetX, int offsetY) {
     int w = SCREEN_WIDTH;
     int h = SCREEN_HEIGHT;
 
-    //灏嗛紶鏍囩Щ鍔ㄨ寖鍥撮攣瀹氬湪SCREEN_WIDTH, SCREEN_HEIGHT涔嬪唴
+    //将鼠标移动范围锁定在SCREEN_WIDTH, SCREEN_HEIGHT之内
 #if 0
     // get system size
     Display *temp;

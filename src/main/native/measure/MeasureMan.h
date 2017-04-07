@@ -95,11 +95,11 @@ private:
     void EraseVolEllipse2(MeasureInfo info);
     void EraseAngleDot(MeasureInfo info);//三点法
     void EraseAngleLine(MeasureInfo info);//两线法
-    void EraseRatioDistDot(MeasureInfo info);//璺濈姣斾緥娴嬮噺锛嶄袱鐐规硶
-    void EraseRatioDistPeri(MeasureInfo info);//璺濈鍛ㄩ暱姣斾緥娴嬮噺
-    void EraseRatioArea(MeasureInfo info);//闈㈢Н姣斾緥锛忕嫮绐勬瘮
-    void EraseRatioVol(MeasureInfo info);//浣撶Н姣斾緥
-    void EraseRatioAngle(MeasureInfo info);//瑙掑害姣斾緥
+    void EraseRatioDistDot(MeasureInfo info);//距离比例测量－两点法
+    void EraseRatioDistPeri(MeasureInfo info);//距离周长比例测量
+    void EraseRatioArea(MeasureInfo info);//面积比例／狭窄比
+    void EraseRatioVol(MeasureInfo info);//体积比例
+    void EraseRatioAngle(MeasureInfo info);//角度比例
     void EraseHip(MeasureInfo info);
     void EraseEF(MeasureInfo info);
     void EraseTime(MeasureInfo info);

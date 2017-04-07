@@ -112,14 +112,14 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type) {
         delete g_ptrAbsMeasure;
         g_ptrAbsMeasure = NULL;
     }
-    //鑷姩璁＄畻鎵撳紑鏃讹紝绂佹娴嬮噺
+    //自动计算打开时，禁止测量
     bool autoCalcStatus = ImgProcPw::GetInstance()->GetAutoCalc();
     if (autoCalcStatus) {
         HintArea::GetInstance()->UpdateHint(_("Please turn off auto calc!"), 1);
         return g_ptrAbsMeasure;
     }
 
-    //妫€鏌ユ墍閫夋嫨娴嬮噺鐨勬ā寮忓拰褰撳墠鎵弿妯″紡鏄惁鐩哥
+    //检查所选择测量的模式和当前扫描模式是否相符
     EMeasureMode currMeaMode;
     currMeaMode = JudgeMode();
     ModeStatus ms;
@@ -239,7 +239,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type) {
         //	case D2_SIMPSONS:
         //		g_ptrAbsMeasure = new D2MeasureSimpsons(&BasicInfo[type - BASIC_MEA_START]);
 
-        //========================鐗规畩娴嬮噺
+        //========================特殊测量
     case D2_ANGUSTY_DIST:
         if ((currMeaMode == MEA_2D) || (currMeaMode == MEA_2D_M) || (currMeaMode == MEA_2D_PW))
             g_ptrAbsMeasure = new D2MeasureRatioDistDot(0,&BasicInfo[type - BASIC_MEA_START]);
@@ -351,7 +351,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type) {
         }
         break;
 
-        //========================M妯″紡娴嬮噺
+        //========================M模式测量
     case M_TIME:
         if ((currMeaMode == MEA_M) || (currMeaMode == MEA_2D_M))
             g_ptrAbsMeasure = new MMeasureTime(&BasicInfo[type - BASIC_MEA_START]);
@@ -387,7 +387,7 @@ AbsMeasure* MeasureFactory::Create(EMeasureFactory type) {
             g_ptrAbsMeasure = NULL;
         break;
 
-        //=========================D妯″紡娴嬮噺
+        //=========================D模式测量
     case D_VEL:
         if ((currMeaMode == MEA_PW) || (currMeaMode == MEA_2D_PW))
             g_ptrAbsMeasure = new DMeasureVel(&BasicInfo[type - BASIC_MEA_START]);

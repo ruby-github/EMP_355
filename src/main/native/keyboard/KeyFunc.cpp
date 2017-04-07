@@ -216,7 +216,7 @@ void KeyAutoOptimize::ImgOptimize(ProbeSocket::ProbePara p, ExamItem::ParaItem i
     ptrImgCfm->InitProbeOptimize(&p, &i);
     ImgProcCfm::GetInstance()->InitOptimize(&(i.color));
 #endif
-    // 濡傛灉鏄疢妯″紡锛屽垯闇€瑕侀噸鏂拌绠桵澧炵泭锛屽洜涓哄湪PW InitProbeOptimize涓璓W澧炵泭瑕嗙洊浜哅澧炵泭
+    // 如果是M模式，则需要重新计算M增益，因为在PW InitProbeOptimize中PW增益覆盖了M增益
     if (ModeStatus::IsMImgMode()) {
         ptrImg2D->ReSendGainM();
     }

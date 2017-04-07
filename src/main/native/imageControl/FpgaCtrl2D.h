@@ -182,7 +182,7 @@ public:
     int SendFocusSum(INT8U sum);
 
     /**
-    * @param max_period  16bits(0-15) focus pulse 鍗忚涓婁负2bits
+    * @param max_period  16bits(0-15) focus pulse 协议上为2bits
     */
     int SendMaxPeriod(INT32U maxPeriod);
     int SendTgcMaxPeriod(INT32U maxPeriod);

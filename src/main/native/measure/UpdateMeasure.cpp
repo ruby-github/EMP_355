@@ -460,13 +460,13 @@ void UpdateMeasure::D2Hip(double angle1, double angle2, ResultAttr& attr, bool i
     string result;
 
     if ((angle2==INVALID_VAL) && (inMeasure==true)) {
-        sprintf(buf, "伪= %3.0f藲", angle1);
+        sprintf(buf, "α= %3.0f˚", angle1);
         result = buf;
         UpdateResult(result, attr.cursorType, attr.curColor);
         return;
     }
 
-    sprintf(buf, "伪= %3.0f藲\n尾= %3.0f藲", angle1, angle2);
+    sprintf(buf, "α= %3.0f˚\nβ= %3.0f˚", angle1, angle2);
 
     if(inMeasure==true) {
         result = buf;
@@ -502,26 +502,26 @@ void UpdateMeasure::D2Hip(double angle1, double angle2, ResultAttr& attr, bool i
     string result;
 
     if ((-0.0001<angle2) && (angle2<0.0001) && (inMeasure==true)) {
-        sprintf(buf, "伪= %3.2f藲", angle1);
+        sprintf(buf, "α= %3.2f˚", angle1);
         result = buf;
         UpdateResult(result, attr.cursorType, attr.curColor);
         return;
     }
 
     if ((angle1>=60) && (angle2<55)) //type = Ia
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= Ia", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= Ia", angle1, angle2);
     else if ((angle1>=60) && (angle2>=55)&&(angle2<77)) //type = Ib
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= Ib", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= Ib", angle1, angle2);
     else if ((angle1>=50) && (angle1<60) && (angle2>=55)&&(angle2<77))//type = IIa or IIb
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= IIa, IIb", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= IIa, IIb", angle1, angle2);
     else if ((angle1>=43) && (angle1<50) && (angle2>=0) && (angle2<=77)) //type = IId
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= IIc", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= IIc", angle1, angle2);
     else if ((angle1>=43) && (angle1<50) && (angle2>77)) //type = IId
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= IId", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= IId", angle1, angle2);
     else if ((angle1>=0) && (angle1<43) && (angle2>77)) //type = III or IV
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= III, IV", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= III, IV", angle1, angle2);
     else
-        sprintf(buf, "伪= %3.2f藲\n尾= %3.2f藲\nType= XXX", angle1, angle2);
+        sprintf(buf, "α= %3.2f˚\nβ= %3.2f˚\nType= XXX", angle1, angle2);
 
     result = buf;
 
@@ -560,7 +560,7 @@ void UpdateMeasure::D2AreaDot(double area, ResultAttr& attr, bool inMeasure) {
     float coeffi = 1.0;
     MeasureMan::GetInstance()->GetMeasureUnit( coeffi, units, CM2);
     sprintf(buf, "%s= %3.2f%s",_("area"), area*coeffi, units.c_str());
-    //sprintf(buf, "area= %3.2fcm虏", area);
+    //sprintf(buf, "area= %3.2fcm²", area);
     string result = buf;
     if (inMeasure == true)
         UpdateResult(result, attr.cursorType, attr.curColor);
@@ -578,7 +578,7 @@ void UpdateMeasure::D2AreaRec(double area, ResultAttr& attr, bool inMeasure) {
     MeasureMan::GetInstance()->GetMeasureUnit( coeffi, units, CM2);
 
     sprintf(buf, "%s= %3.2f%s",_("area"), area*coeffi, units.c_str());
-    //sprintf(buf, "area= %3.2fcm虏", area);
+    //sprintf(buf, "area= %3.2fcm²", area);
     string result = buf;
     if (inMeasure == true)
         UpdateResult(result, attr.cursorType, attr.curColor);
@@ -688,7 +688,7 @@ void UpdateMeasure::D2VolEllipse2(double area, double dist, double vol, ResultAt
     }
 
     sprintf(buf, "%s= %3.2f%s\n%s= %3.2f%s\n%s= %3.2f%s", _("area"), area*coeffi_area, unit_area.c_str(), _("dist"), dist*coeffi, unit.c_str(),  _("vol"), vol*coeffi_vol, unit_vol.c_str());
-    //sprintf(buf, "area= %3.2fcm虏\ndist= %3.2fcm\nvol= %3.2fcm鲁", area, dist, vol);
+    //sprintf(buf, "area= %3.2fcm²\ndist= %3.2fcm\nvol= %3.2fcm³", area, dist, vol);
     result = buf;
 
     if (inMeasure == true)
@@ -735,7 +735,7 @@ void UpdateMeasure::D2Angle3Dot(double dist_left, double dist_right, double angl
         return;
     }
 
-    sprintf(buf, "%s= %3.2f%s\n%s= %3.2f%s\n%s= %3.2f藲", _("dist1"), dist_left*coeffi, unit.c_str(), _("dist2"), dist_right*coeffi, unit.c_str(), _("angle"), angle);
+    sprintf(buf, "%s= %3.2f%s\n%s= %3.2f%s\n%s= %3.2f˚", _("dist1"), dist_left*coeffi, unit.c_str(), _("dist2"), dist_right*coeffi, unit.c_str(), _("angle"), angle);
     result = buf;
 
     if (inMeasure == true)
@@ -749,7 +749,7 @@ void UpdateMeasure::D2Angle3Dot(double dist_left, double dist_right, double angl
 
 void UpdateMeasure::D2Angle2Line(double angle, ResultAttr& attr, bool inMeasure) {
     char buf[50];
-    sprintf(buf, "%s= %3.2f藲", _("angle"), angle);
+    sprintf(buf, "%s= %3.2f˚", _("angle"), angle);
     string result = buf;
     if (inMeasure == true)
         UpdateResult(result, attr.cursorType, attr.curColor);
@@ -866,7 +866,7 @@ void UpdateMeasure::D2RatioArea(double area1, double area2, double ratio, Result
     MeasureMan::GetInstance()->GetMeasureUnit( coeffi, unit, CM2);
     if (((-0.0001<area2) && (area2<0.0001)) && ((-0.0001<ratio) && (ratio<0.0001)) && (inMeasure==true)) {
         sprintf(buf, "%s= %3.2f%s", _("area1"), area1*coeffi, unit.c_str());
-        //sprintf(buf, "area1= %3.2fcm虏", area1);
+        //sprintf(buf, "area1= %3.2fcm²", area1);
         result = buf;
         UpdateResult(result, attr.cursorType, attr.curColor);
         return;
@@ -876,7 +876,7 @@ void UpdateMeasure::D2RatioArea(double area1, double area2, double ratio, Result
     } else {
         sprintf(buf, "%s= %3.2f%s\n%s= %3.2f%s\n%s= %3.2f", _("area1"), area1*coeffi, unit.c_str(), _("area2"), area2*coeffi, unit.c_str(), _("ratio"), ratio);
     }
-    //sprintf(buf, "area1= %3.2fcm虏\narea2= %3.2fcm虏\nratio= %3.2f", _("area1"), area1, _("area2"), area2, _("ratio"), ratio);
+    //sprintf(buf, "area1= %3.2fcm²\narea2= %3.2fcm²\nratio= %3.2f", _("area1"), area1, _("area2"), area2, _("ratio"), ratio);
     result = buf;
 
     if (inMeasure == true)
@@ -897,7 +897,7 @@ void UpdateMeasure::D2AngustyArea(double area1, double area2, double angusty, Re
     float coeffi = 1.0;
     MeasureMan::GetInstance()->GetMeasureUnit( coeffi, unit, CM2);
     if (((-0.0001<area2) && (area2<0.001)) && ((-0.0001<angusty) && (angusty<0.001)) && (inMeasure==true)) {
-        //sprintf(buf, "area1= %3.2fcm虏", area1);
+        //sprintf(buf, "area1= %3.2fcm²", area1);
         sprintf(buf, "%s= %3.2f%s", _("area1"), area1*coeffi, unit.c_str());
         result = buf;
         UpdateResult(result, attr.cursorType, attr.curColor);
@@ -908,7 +908,7 @@ void UpdateMeasure::D2AngustyArea(double area1, double area2, double angusty, Re
     } else {
         sprintf(buf, "%s= %3.2f%s\n%s= %3.2f%s\n%s= %3.2f", _("area1"), area1*coeffi, unit.c_str(), _("area2"), area2*coeffi, unit.c_str(), _("angusty"), angusty);
     }
-    //sprintf(buf, "area1= %3.2fcm虏\narea2= %3.2fcm虏\nangusty= %3.2f", area1, area2, angusty);
+    //sprintf(buf, "area1= %3.2fcm²\narea2= %3.2fcm²\nangusty= %3.2f", area1, area2, angusty);
     result = buf;
 
     if (inMeasure == true)
@@ -940,7 +940,7 @@ void UpdateMeasure::D2RatioVol(double vol1, double vol2, double ratio, ResultAtt
     } else {
         sprintf(buf, "%s= %3.2f%s\n%s= %3.2f%s\n%s= %3.2f", _("vol1"), vol1*coeffi, unit.c_str(), _("vol2"), vol2*coeffi, unit.c_str(), _("ratio"), ratio);
     }
-    //sprintf(buf, "vol1= %3.2fcm鲁\nvol2= %3.2fcm鲁\nratio= %3.2f", vol1, vol2, ratio);
+    //sprintf(buf, "vol1= %3.2fcm³\nvol2= %3.2fcm³\nratio= %3.2f", vol1, vol2, ratio);
     result = buf;
 
     if (inMeasure == true)
@@ -958,16 +958,16 @@ void UpdateMeasure::D2RatioAngle(double angle1, double angle2, double ratio, Res
     string result;
 
     if (((-0.0001<angle2) && (angle2<0.0001)) && ((-0.0001<ratio) && (ratio<0.0001)) && (inMeasure==true)) {
-        sprintf(buf, "%s= %3.2f藲", _("angle1"), angle1);
+        sprintf(buf, "%s= %3.2f˚", _("angle1"), angle1);
         result = buf;
         UpdateResult(result, attr.cursorType, attr.curColor);
         return;
     }
 
     if((int)ratio ==INVALID_VAL) {
-        sprintf(buf, "%s= %3.2f藲\n%s= %3.2f藲\n%s %s", _("angle1"), angle1, _("angle2"), angle2, _("ratio"), _(" Invalid"));
+        sprintf(buf, "%s= %3.2f˚\n%s= %3.2f˚\n%s %s", _("angle1"), angle1, _("angle2"), angle2, _("ratio"), _(" Invalid"));
     } else {
-        sprintf(buf, "%s= %3.2f藲\n%s= %3.2f藲\n%s= %3.2f", _("angle1"), angle1, _("angle2"), angle2, _("ratio"), ratio);
+        sprintf(buf, "%s= %3.2f˚\n%s= %3.2f˚\n%s= %3.2f", _("angle1"), angle1, _("angle2"), angle2, _("ratio"), ratio);
     }
     result = buf;
 
@@ -1326,7 +1326,7 @@ void UpdateMeasure::DSD(double ps, double ed, double sd, ResultAttr& attr, bool 
 // void UpdateMeasure::DAccel(double accel, bool inMeasure)
 // {
 // 	char buf[50];
-// 	sprintf(buf, "+ accel= %3.2fcm/s虏", accel);
+// 	sprintf(buf, "+ accel= %3.2fcm/s²", accel);
 // 	string result = buf;
 // 	if (inMeasure == true)
 // 		UpdateResult(result);

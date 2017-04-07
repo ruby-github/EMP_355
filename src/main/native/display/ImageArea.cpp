@@ -19,7 +19,7 @@
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/ViewSystem.h"
 namespace {
-//	const int MeasureResult_H = 17;	// 娴嬮噺缁撴灉姣忚楂樺害(鍍忕礌)
+//	const int MeasureResult_H = 17;	// 测量结果每行高度(像素)
 const int kHistogramWidth = 256+2;
 const int kHistogramHeight = 150+2;
 const int kHistogramX = IMAGE_X + IMAGE_W - kHistogramWidth;
@@ -636,7 +636,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
 #endif
 
                     if (MultiFuncFactory::GetInstance()->GetMultiFuncType() == MultiFuncFactory::LOCAL_ZOOM) {
-                        // imageSymbol (symbol -> m_bitsReplayMix)
+                        // imageSymbol叠加(symbol -> m_bitsReplayMix)
                         unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
                         pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
                         widthSrc1 = IMG_AREA_W;
@@ -758,7 +758,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
                 roiHeightSrc = m_symbolArea.h;
                 ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
 
-                // imageSpectra
+                // imageSpectra叠加
                 if (ModeStatus::IsMImgMode() || ModeStatus::IsAnatomicMode() || ModeStatus::IsPWImgMode() || ModeStatus::IsCWImgMode()) {
                     unsigned char* spectraData = (unsigned char *)m_imageSpectra->imageData;
                     pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*m_spectraArea.y*IMG_BPP + m_spectraArea.x*IMG_BPP);
@@ -772,7 +772,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
                     ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
                 }
 
-                // preBox (box -> m_bitsMix)
+                // preBox叠加(box -> m_bitsMix)
                 if (ModeStatus::IsColorMode()) {
                     unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
                     pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
@@ -845,6 +845,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
                 roiHeightSrc = IMAGE_H;
                 ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
 
+                // 绘制叠加完成后的数据
                 gdk_draw_pixbuf(widget->window,
                                 widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
                                 m_mixPixbuf,
@@ -915,7 +916,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
     }
 
 #if 0
-    // PixmapArea
+    // 绘制PixmapArea
     gdk_draw_drawable(widget->window,
                       gc,
                       m_pixmapArea,
@@ -947,6 +948,7 @@ void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
                       IMAGE_W, IMAGE_H);
     //   }
 
+    // 绘制测量结果
     gdk_gc_set_function(gc, GDK_COPY);
     vector<MeasurePos>::iterator iter;
     for (iter = m_meaResultPos.begin(); iter != m_meaResultPos.end(); ++iter) {

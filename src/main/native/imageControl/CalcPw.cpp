@@ -459,7 +459,7 @@ int CalcPw::SVPosPRFToHPRF(float &depthBegin, float &depthEnd, int prf) {
     depthBegin = depthBegin - emitDepth;
     depthEnd = depthEnd - emitDepth;
 
-    //瀹炶返寰楀嚭鏉ョ殑鏍￠獙鍏紡
+    //实践得出来的校验公式
     float prfDepth = (float)((1000000.0/prf - FOC_LOW_TIME) * 1.54)/(float)2.0;
     if(depthBegin > prfDepth) {
         depthBegin = prfDepth - (float)svLen/20;

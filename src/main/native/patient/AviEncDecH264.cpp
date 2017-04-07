@@ -662,7 +662,7 @@ FILE* outputfile;
 FILE* tmp;
 } video_info_t;
 
-//鍙傛暟璁剧疆
+//参数设置
 static int x264_param_init( x264_param_t * param ,video_info_t* info) {
 /*
 x264_param_default( param );
@@ -718,7 +718,7 @@ if ( i_frame_size > 0 ) {
 }
 }
 
-//缂栫爜
+//编码
 static int encode( x264_param_t* param, video_info_t *info ) {
 int frame;
 int srcstride = info->width*3;
@@ -741,14 +741,14 @@ struct SwsContext* convertCtx = sws_getContext( info->width,
 for (frame = 0; frame < info->frame_total; frame++) {
     //取一帧图片
     data[0] = info->data[frame];
-    //鏁版嵁杞崲RGB2YUV420
+    //数据转换RGB2YUV420
     //av_image_fill_pointers(data, PIX_FMT_RGB24,info->height, info->data[frame],&srcstride);
     sws_scale(convertCtx, (const uint8_t* const*)data, &srcstride, 0, info->height, pic_in.img.plane, pic_in.img.i_stride );
     //编一帧图片
     encode_frame( encoder, &pic_in, info->tmp);
 }
 
-//閲婃斁璧勬簮
+//释放资源
 if (convertCtx) {
     sws_freeContext(convertCtx);
 }
@@ -783,13 +783,13 @@ int a = 3;
 int b = 4;
 int c= a+b;
 printf("a:%d, b:%d, a+b=c:%d\n", a, b, c);
-//鍙傛暟璁剧疆
+//参数设置
 x264_param_init( &param, &video_info);
 int sub = b - a;
 printf("sub:%d\n", sub);
-//缂栫爜
+//编码
 encode( &param, &video_info );
-//灏佽
+//封装
 avc_to_avi(  outputfile, tmp,frame_rate);
 
 fclose(tmp);
@@ -858,10 +858,10 @@ int picture_size;
 int frame_finished;
 // const char *src_filename = "./1.avi";
 uint8_t *rgb_buf = NULL;
-//娉ㄥ唽瑙嗛鏂囦欢
+//注册视频文件
 av_register_all();
 
-//鎵撳紑瑙嗛鏂囦欢鍙婂垎閰嶇┖闂寸粰context
+//打开视频文件及分配空间给context
 if ( avformat_open_input(&fmt_ctx, src_filename, NULL, NULL) < 0 ) {
     PRINTF("av open input file failed!\n");
     //exit(1);
@@ -956,7 +956,7 @@ while (av_read_frame(fmt_ctx, &pkt) >= 0) {
 // fclose(fp);
 
 end:
-//閲婃斁璧勬簮.......
+//释放资源.......
 if (sws_ctx) {
     sws_freeContext(sws_ctx);
 }

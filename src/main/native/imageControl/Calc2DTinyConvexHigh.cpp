@@ -294,7 +294,7 @@ void Calc2DTinyConvexHigh::CalcDynamicDemod(int order) {
         depth[4] = 120;
     }
 
-    if (probeR < 20) {	//楂橀寰嚫
+    if (probeR < 20) {	//高频微凸
         if (freq < 90) {
 #ifdef EMP_430
             fd[0] = 6.5;

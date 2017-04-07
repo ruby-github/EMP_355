@@ -343,11 +343,11 @@ bool Database::ArchivePat(PatientInfo::Info &info, string &errorMsg) {
 }
 
 // Sqlite3 basic invocation sequence:
-// 1, sqlite3_prepare  缂栬瘧sql璇彞
-// 2, sqlite3_bind_*   浣跨敤sql鍙傛暟鏃讹紝鐢ㄤ簬灏唖ql鍙傛暟缁戝畾鍒皊ql璇彞
-// 3, sqlite3_step     鐢ㄦ潵鎵ц缂栬瘧鍚庣殑sql璇彞
+// 1, sqlite3_prepare  编译sql语句
+// 2, sqlite3_bind_*   使用sql参数时，用于将sql参数绑定到sql语句
+// 3, sqlite3_step     用来执行编译后的sql语句
 // 4, sqlite3_column_* 用于从查询的结果中获取数据
-// 5, sqlite3_finalize 鐢ㄦ潵閲婃斁sqlite3_stmt瀵硅薄
+// 5, sqlite3_finalize 用来释放sqlite3_stmt对象
 
 /*
 void Database::Testdb(void)
@@ -611,7 +611,7 @@ void Database::GetPatInfo(const char *patID, PatientInfo::Patient &pat_info) {
 }
 
 // DESCRIPTION: 查找数据库中ID号是否存在
-// RETURN: 瀛樺湪杩斿洖鏌ユ壘鐨剆tring绫诲瀷鐨処D锛屼笉瀛樺湪杩斿洖绌簊tring
+// RETURN: 存在返回查找的string类型的ID，不存在返回空string
 string Database::GetPatIDExist(const char *id) {
     sqlite3_stmt *stmt=NULL;
     string exist_id;
@@ -635,8 +635,8 @@ string Database::GetPatIDExist(const char *id) {
     return exist_id;
 }
 
-// DESCRIPTION: 鏌ユ壘鏁版嵁搴撲腑鏄惁瀛樺湪鍖荤敓濮撳悕doc_name
-// RETURN: 瀛樺湪杩斿洖true
+// DESCRIPTION: 查找数据库中是否存在医生姓名doc_name
+// RETURN: 存在返回true
 bool Database::GetDoctorExist(const char *doc_name) {
     sqlite3_stmt *stmt=NULL;
     int doc_count = 0;
@@ -666,7 +666,7 @@ bool Database::GetDoctorExist(const char *doc_name) {
         return false;
 }
 
-// 鍥介檯鍖栧鍚嶅拰鏃ユ湡鏍煎紡鐨凷ql璇彞
+// 国际化姓名和日期格式的Sql语句
 void Database::GetFormatForSQL(string &name, string &birthdate, string &examdate) {
     if (m_langCN)
         name = "LastName || FirstName AS Name";
@@ -817,7 +817,7 @@ bool Database::DoctorSearch(vector<string> *result) {
     return true;
 }
 #ifdef VET
-//娣诲姞VET 涓讳汉鍚嶅悕瀛楃殑鑾峰彇
+//添加VET 主人名名字的获取
 bool Database::OwnerNameSearch(vector<string> *result) {
     sqlite3_stmt *stmt=NULL;
     string sql = "SELECT OwnerName FROM patient_info ORDER BY ID";
@@ -1089,7 +1089,7 @@ bool Database::QuichSearch(NewPatSearchTerm& term, vector<NewPatSearchResult>& r
             << sql_examdate << ", ExamID, ExamType, Age, AgeUnit "
             << "FROM patient_info, exam_info "
             << "WHERE patient_info.ID = exam_info.PatId "
-            //<< "AND ExamDate >= '" << dateBegin << "' AND ExamDate <= '" << dateEnd << "' " //2012.08.21lihuamei 涓轰簡瑙ｅ喅蹇€熸悳绱㈠湪鏃ユ湀骞寸殑鏍煎紡涓嬫悳绱㈠嚭鐜扮殑闂
+            //<< "AND ExamDate >= '" << dateBegin << "' AND ExamDate <= '" << dateEnd << "' " //2012.08.21lihuamei 为了解决快速搜索在日月年的格式下搜索出现的问题
             << "ORDER BY ID";
 #endif
     sql = ostream.str();

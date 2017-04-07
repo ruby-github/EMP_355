@@ -67,7 +67,7 @@ int MonitorControl::AutoBalance(void) {
     return 0;
 }
 
-//宸ㄥ嘲///////////
+//巨峰///////////
 int MonitorControl::DisplayWrite(unsigned char reg, unsigned char value) {
     unsigned char buffer[2] = { reg, value };
     I2CInterface i2c;
@@ -85,7 +85,7 @@ int MonitorControl::DisplayWrite(unsigned char reg, unsigned char value) {
     }
 }
 
-///鐫挎樉//////////
+///睿显//////////
 int MonitorControl::DisplayWrite1(unsigned char reg) {
     unsigned char buffer[2] = { reg,reg };
     I2CInterface i2c;

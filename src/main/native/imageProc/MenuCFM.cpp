@@ -30,7 +30,7 @@ void MenuCFM::Hide(void) {
 }
 
 void MenuCFM::Show(void) {
-    //鍐嶆璧嬪€硷紝鐩殑鏄垏鎹㈠埌cfm妯″紡涓嬬殑鏃跺€欓槇鍊煎拰褰╄壊鎶戝埗涓嶅彲鎿嶄綔
+    //再此赋值，目的是切换到cfm模式下的时候阈值和彩色抑制不可操作
     spin_threshold.SetItem(&item_threshold);
     spin_reject.SetItem(&item_reject);
 

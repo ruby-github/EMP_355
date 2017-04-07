@@ -415,7 +415,7 @@ void ImgPw::GetCurPara(ExamItem::ParaItem* ptrParaItem) {
 void ImgPw::EnterPw() {
     EKnobReturn ret;
     //m_PRFIndex=8;
-    // 鎺у埗FPGA寮€濮嬩紶杈揚W鍥惧儚
+    // 控制FPGA开始传输PW图像
     OnPwImgCtrl(TRUE);
     if (m_speedIndex == 0)
         ret = MIN;
@@ -428,7 +428,7 @@ void ImgPw::EnterPw() {
 //	SpectrumSpeed(m_speedIndex, m_PRFIndex, ret);
     ret = PRF(m_PRFIndex);
 
-    // gain M鍜孭W妯″紡鍏辩敤缁熶竴TGC鍦板潃锛屽洜姝よ繘鍏ユ椂闇€閲嶆柊鍙戦€乀GC
+    // gain M和PW模式共用统一TGC地址，因此进入时需重新发送TGC
     GainPw(m_gainPw);
 }
 
@@ -458,7 +458,7 @@ void ImgPw::EnterCw() {
         ret = OK;
     DopplerFreq(m_freq[m_freqIndex], ret);
 
-    // gain M鍜孭W妯″紡鍏辩敤缁熶竴TGC鍦板潃锛屽洜姝よ繘鍏ユ椂闇€閲嶆柊鍙戦€乀GC
+    // gain M和PW模式共用统一TGC地址，因此进入时需重新发送TGC
     GainCw(m_gainCw);
 
     m_ptrImg2D->ModeCwCtrl(TRUE);
@@ -2247,8 +2247,8 @@ EKnobReturn ImgPw::PRFSimult3(int index) {
 bool ImgPw::CalcPRFNormal(int prf, float samplePos) {
     CalcPRFMaxIndex(samplePos);
 
-    //鍥犱负m_PRFIndex鍦ㄤ笂闈㈢殑鍑芥暟涓彲鑳戒細鍙樺寲锛屾鏃惰绠楃殑maxPeriof蹇呴』鍜屽彉鍖栦簡鐨刾rfIndex瀵瑰簲
-    //璇ュ鐞嗘斁鍒颁笂闈㈢殑鍑芥暟鍐呴儴杩涜澶勭悊
+    //因为m_PRFIndex在上面的函数中可能会变化，此时计算的maxPeriof必须和变化了的prfIndex对应
+    //该处理放到上面的函数内部进行处理
     //m_ptrCalc->CalcMaxPeriod(prf);
 
     // view
@@ -3037,7 +3037,7 @@ int ImgPw::GetPRFValue(int prfIndex) {
     ASSERT(prfIndex < MAX_PRF);
 
 //解决当scale调节到使得PW_PRF[index]等于0，死机问题。
-    //鎰挎剰鏄繑鍥炵殑prf鍊艰鍦ㄥ埆鐨勮绠楀叕寮忎腑鍏呭綋鍒嗘瘝 2014.03.11 lhma
+    //愿意是返回的prf值要在别的计算公式中充当分母 2014.03.11 lhma
     int temp;
     static int prfBak;
     if (m_specMode == SPECTRUM_PW)

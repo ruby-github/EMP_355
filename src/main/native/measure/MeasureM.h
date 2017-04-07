@@ -146,7 +146,7 @@ private:
     double m_hr;
 };
 
-//灏勮鍒嗘暟娴嬮噺锛峂妯″紡Teicholz鏂规硶
+//射血分数测量－M模式Teicholz方法
 class MMeasureEFTei: public AbsMeasure {
 public:
     MMeasureEFTei(const SingleItemInfo *ptrSingleItemInfo);
@@ -176,10 +176,10 @@ private:
     POINT m_lvds_end;
     POINT m_tempP;
     POINT m_p1;
-    double m_lvdd;//宸﹀鑸掑紶鐩村緞
-    double m_lvds;//宸﹀鏀剁缉鐩村緞
-    double m_lvvd;//宸﹀鑸掑紶浣撶Н
-    double m_lvvs;//宸﹀鏀剁缉浣撶Н
+    double m_lvdd;//左室舒张直径
+    double m_lvds;//左室收缩直径
+    double m_lvvd;//左室舒张体积
+    double m_lvvs;//左室收缩体积
     double m_ef;
 };
 

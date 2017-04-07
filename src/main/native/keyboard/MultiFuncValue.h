@@ -329,7 +329,7 @@ public:
 };
 
 /*
- * @brief change chroma  璋冭妭浼僵
+ * @brief change chroma  调节伪彩
  */
 class MultiFuncChroma: public AbsMultiFunc {
 public:

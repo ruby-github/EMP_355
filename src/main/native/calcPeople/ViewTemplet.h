@@ -33,7 +33,7 @@ private:
 
     GtkWidget *m_window;
     GtkWidget *m_treeView;
-    int m_flagDepth;//澶嶅埗鏃剁粨鐐圭殑娣卞害鏍囧織
+    int m_flagDepth;//复制时结点的深度标志
     // char m_copyNode[4][maxNodeLen];//复制结点时所选结点的值(f1-f4)
     // char m_parentNode[maxNodeLen];//复制时所选结点的父结点
 

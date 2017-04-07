@@ -805,7 +805,7 @@ bool PeripheralMan::MountUsbStorage() {
         //	if(mount(m_storage.device.c_str(), UDISK_PATH, m_storage.fstype.c_str(), MS_SYNCHRONOUS, NULL) < 0) //use sync flag is very slow!
         //	if(mount(m_storage.device.c_str(), UDISK_PATH, m_storage.fstype.c_str(), 0, NULL) < 0)
         char option[100];
-        if(strcmp(m_storage.fstype.c_str(), "vfat")==0) //鏀寔FAT16锛孎AT32
+        if(strcmp(m_storage.fstype.c_str(), "vfat")==0) //支持FAT16，FAT32
             sprintf(option, "shortname=mixed,iocharset=utf8,flush");
         else	//经测试，支持NTFS，不支持exFat，其他未测
             sprintf(option, "iocharset=utf8");

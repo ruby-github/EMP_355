@@ -116,7 +116,7 @@ void UpdatePw::CorrectAngle(int angle, EKnobReturn status) {
     m_ptrImgDraw->UpdateAngle(angle, isCw, draw);
 
     // knob
-    sprintf(m_str, "%d掳", angle);
+    sprintf(m_str, "%d°", angle);
     SyncKnobPw(PW_ANGLE, m_str, status);
 
     // image
@@ -180,7 +180,7 @@ void UpdatePw::Baseline(int index, int maxIndex, EKnobReturn status) {
 }
 
 void UpdatePw::Steer(int angle, EKnobReturn status) {
-    sprintf(m_str, "%d掳", angle);
+    sprintf(m_str, "%d°", angle);
     SyncKnobPw(PW_STEER, m_str, status);
     SyncKnobCfm(CFM_STEER, m_str, status);
     m_ptrImgDraw->SetSteerAngle(angle);

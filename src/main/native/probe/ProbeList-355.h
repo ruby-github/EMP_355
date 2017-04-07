@@ -129,7 +129,7 @@ unsigned char Probe90L40J_1[128] = { //90L40J
     0,		0,		0,		0x5a,
 };
 
-unsigned char Probe35C20I[128] = { //35C20I
+unsigned char Probe35C20I[128] = { //35C20I //低频微凸
     // black-white
     '3',   '5',    'C',    '2',    '0',    'I',		'0',	'0',	'0',	'0',
     'C',    0,		96,		1,		92,		90,		0,		20,		0,		0,
@@ -150,7 +150,7 @@ unsigned char Probe35C20I[128] = { //35C20I
     'E',		'M',		'P',		0x5a,
 };
 
-unsigned char Probe65C15E_80[128] = { //65C15E
+unsigned char Probe65C15E_80[128] = { //65C15E  //高频微凸   停产
     // black-white
     '6',	'5',	'C',	'1',	'5',	'E',	'0',	'0',	'0',	'0',
     'C',	0,		80,		1,		60,		98,		0,		15,		0,		0,
@@ -175,7 +175,7 @@ unsigned char Probe65C15E_80[128] = { //65C15E
     'A',		'P',		'X',		0x5a,
 };
 
-unsigned char Probe65C15E_128[128] = { //65C15E
+unsigned char Probe65C15E_128[128] = { //65C15E  //高频微凸
     // black-white
     '6',	'5',	'C',	'1',	'5',	'E',	'0',	'0',	'0',	'0',
     'C',	1,		18,		2,		56,		93,		0,		15,		0,		0,
@@ -259,7 +259,7 @@ unsigned char Probe30P16B[PROBE_INFO_SIZE] = { //30P16B
     'J',        'R',        0,        0x5a,
 };
 
-unsigned char Probe65C10I[PROBE_INFO_SIZE] = {
+unsigned char Probe65C10I[PROBE_INFO_SIZE] = { //可视人流
     '6',	'5',	'C',	'1',	'0',	'I',	'0',	'0',	'0',	'0',
     'C',	0,		96,		1,		92,		150,	0,		10,		0,		0,
     1,		0,		1,		22,		1,		30,		1,		2,		1,		60,

@@ -20,7 +20,7 @@ private:
     int DisplayWrite(unsigned char reg, unsigned char value = 0xff );//jufeng
     int DisplayWrite1(unsigned char reg);//ruixian
 
-#define VIDEO_ADDR1 0x37//鐫挎樉
+#define VIDEO_ADDR1 0x37//睿显
 #define BRIGHT_ADD      0x03
 #define BRIGHT_SUB      0x01
 #define CONTRAST_ADD    0x07
@@ -31,7 +31,7 @@ private:
 #define POWER_OFF       0x17
 #define USER_RESET      0x13
 
-#define VIDEO_ADDR2 0x55//宸ㄥ嘲
+#define VIDEO_ADDR2 0x55//巨峰
 #define INVALID_VALUE 0xff
 
 #define SET_BRIGHT_ADD      0x11

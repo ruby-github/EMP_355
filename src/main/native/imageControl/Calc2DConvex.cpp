@@ -369,7 +369,7 @@ void Calc2DConvex::CalcDynamicDemod(int order) {
         }
     }
 
-    if ((probeR >= 40) || (probeR < 5)) {	//鍑搁樀R50
+    if ((probeR >= 40) || (probeR < 5)) {	//凸阵R50
         if (freq < 35) {
 #ifdef EMP_430
             fd[0] = 3.5;
@@ -906,7 +906,7 @@ void Calc2DConvex::CalcDynamicDemod(int order) {
             fd_35D40J[3] = 2.8;
             fd_35D40J[4] = 2.3;
         }
-    } else  if (probeR >= 20) {	//浣庨寰嚫
+    } else  if (probeR >= 20) {	//低频微凸
         if (freq < 60) {
             fd[0] = 4.5;
             fd[1] = 4.1;

@@ -153,7 +153,7 @@ gboolean CAuthorize::CallbackUKey(gpointer data) {
 /*
  * 函数功能：验证key的有效性
  * 参数：
- *    feature锛氬姛鑳絀D
+ *    feature：功能ID
  *  返回值:
  *    0:授权   -1:未找到设备   -2：过期  -3：未授权
  */
@@ -161,7 +161,7 @@ int CAuthorize::CheckAuthorize(unsigned int feature) {
     hasp_handle_t handle = HASP_INVALID_HANDLE_VALUE;
     hasp_status_t status;
 
-    // 涓庨攣寤虹珛浼氳瘽
+    // 与锁建立会话
     status = hasp_login(feature, (hasp_vendor_code_t *)vendor_code, &handle);
 
     switch (status) {

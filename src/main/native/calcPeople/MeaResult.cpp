@@ -221,8 +221,8 @@ void MeaResult::InitResultInfo(void) {
 #endif
 }
 
-//value[]:浼犲叆鐨勭粨鏋滃€硷紝鐜板湪鏈€澶氭湁涓や釜
-//item:娴嬮噺椤瑰湪MeasureFactoryAbdo鐨勬灇涓惧彿
+//value[]:传入的结果值，现在最多有两个
+//item:测量项在MeasureFactoryAbdo的枚举号
 //meaResult:保存测量结果的数组
 //valueNum:标记本测量本测量项是一个测量值还是两个测量值:1－一个，2－两个
 int MeaResult::SetLastValue(const float value[], const int item, const int valueNums) {
@@ -290,7 +290,7 @@ int MeaResult::GetLastValue(const int item, float value[MEA_MULTI], int obFetal)
         return sign;
 
     if ( ((int)(*(ptrResultSingle + item_tmp))[MEA_TIMES - 1] != INVALID_VAL) || ((int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN) ) { //两个测量值的或单个的有数据
-        if ( (int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN ) { //澶氫釜娴嬮噺鍊肩殑
+        if ( (int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN ) { //多个测量值的
             position = (int)(*(ptrResultSingle + item_tmp))[1];
             if ((position == MULTI_SIGN)||(position > multiVolume))
                 return MEA_ERROR;
@@ -302,7 +302,7 @@ int MeaResult::GetLastValue(const int item, float value[MEA_MULTI], int obFetal)
                 value[i] = (*(ptrResultMulti + position)).result[MEA_TIMES * (i+1) - 1];
             }
             return MEA_SUCCESS;
-        } else { //鍗曚釜娴嬮噺鍊肩殑
+        } else { //单个测量值的
             for(i=0; i<MEA_MULTI; i++) {
                 if (i==0)
                     value[0] = (*(ptrResultSingle + item_tmp))[MEA_TIMES - 1];
@@ -331,7 +331,7 @@ int MeaResult::GetAllValue(const int item, float value[MEA_MULTI][MEA_TIMES], in
         return sign;
 
     if (((int)(*(ptrResultSingle + item_tmp))[MEA_TIMES - 1] != INVALID_VAL) || ((int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN )) { //两个测量值的或单个的有数据
-        if ( (int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN ) { //澶氫釜娴嬮噺鍊肩殑
+        if ( (int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN ) { //多个测量值的
             position = (int)(*(ptrResultSingle + item_tmp))[1];
             if ((position == MULTI_SIGN)||(position > multiVolume))
                 return MEA_ERROR;
@@ -345,7 +345,7 @@ int MeaResult::GetAllValue(const int item, float value[MEA_MULTI][MEA_TIMES], in
                 }
             }
             return MEA_SUCCESS;
-        } else { //鍗曚釜娴嬮噺鍊肩殑
+        } else { //单个测量值的
             for(i=0; i<MEA_MULTI; i++) {
                 for (j=0; j<MEA_TIMES; j++) {
                     if (i==0)
@@ -381,7 +381,7 @@ int MeaResult::GetMeanValue(const int item, float value[MEA_MULTI], int obFetal)
     }
 
     if( ((int)(*(ptrResultSingle + item_tmp))[MEA_TIMES - 1] != INVALID_VAL) || ((int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN) ) { //两个测量值的或单个的有数据
-        if ( (int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN ) { //澶氫釜娴嬮噺鍊肩殑
+        if ( (int)(*(ptrResultSingle + item_tmp))[0] == MULTI_SIGN ) { //多个测量值的
             position = (*(ptrResultSingle + item_tmp))[1];
             if ((position == MULTI_SIGN)||(position > multiVolume))
                 return MEA_ERROR;
@@ -414,7 +414,7 @@ int MeaResult::GetMeanValue(const int item, float value[MEA_MULTI], int obFetal)
                     break;
             }
 
-            if (counter == 0) return MEA_FAIL;//娌℃湁鏁版嵁
+            if (counter == 0) return MEA_FAIL;//没有数据
 
             value[0] /= counter;
             for (i=1; i<MEA_MULTI; i++) value[i] = INVALID_VAL;
@@ -427,8 +427,8 @@ int MeaResult::GetMeanValue(const int item, float value[MEA_MULTI], int obFetal)
 /*
  *item: 测量项的枚举号
  *sysValue: 0－返回用户设定的值（平均值或最后值），1－指定返回最后值, 2－获取所有值, 3-获取平均值
- *value:鐢ㄦ潵瑁呭钩鍧囧€兼垨鏈€鍚庡€硷紝濡傛灉瑕佹眰杩斿洖鎵€鏈夊€硷紝鍒欒涓篘ULL
- *allValue:鐢ㄦ潵瑁呮墍鏈夊€硷紝濡傛灉瑕佹眰杩斿洖骞冲潎鍊兼垨鏈€鍚庡€硷紝鍒欒涓篘ULL
+ *value:用来装平均值或最后值，如果要求返回所有值，则设为NULL
+ *allValue:用来装所有值，如果要求返回平均值或最后值，则设为NULL
  */
 int MeaResult::GetValue(const int item, float value[MEA_MULTI], float allValue[MEA_MULTI][MEA_TIMES], const int sysValue, int obFetal) {
     if (sysValue == IN_REPORT_MEAN) {
@@ -959,7 +959,7 @@ void MeaResult::ClearAllValue(void) {
 }
 
 /*
-//鍒ゆ柇涓€涓鍒槸鍚︿负浠ュ椤规祴閲忕殑娴嬮噺椤逛负涓荤殑绉戝埆
+//判断一个科别是否为以多项测量的测量项为主的科别
 int MeaResult::JudgeMultiSec(int section)
 {
 	if ((section == VS_M) || (section == TCD_M) || (section == ORTHO_M))
@@ -971,11 +971,11 @@ int MeaResult::JudgeMultiSec(int section)
 
 /*
  *输入：
- * item: 浼犲叆鐨剆ingle鎴杕ulti鐨刬tem
+ * item: 传入的single或multi的item
  * obFetal: 传入是胎儿1还是胎儿2
  *
  *输出：
- * item_tmp: 杩斿洖item涓庢湰绉戝埆璧峰浣嶇疆鐨勮窛绂伙紝涓篿tem - itemStart
+ * item_tmp: 返回item与本科别起始位置的距离，为item - itemStart
  * ptrResultMulti: 返回本科别multi结果的存储起始位置
  * ptrResultSingle：返回本科别single结果的存储起始位置
  * singleVolume: 返回本科别single项目的多少
@@ -985,7 +985,7 @@ int MeaResult::JudgeMultiSec(int section)
  */
 int MeaResult::ItemLabel(const int item, int *item_tmp, ResultMulti **ptrResultMulti, float (**ptrResultSingle)[MEA_TIMES], int *singleVolume, int *multiVolume, int *section, int obFetal) {
     int i;
-    int singleMulti = 0;//Single鎴朚ulti: 0-Single, 1-Multi
+    int singleMulti = 0;//Single或Multi: 0-Single, 1-Multi
 
     for (i=0; i<SECTION_END-SECTION_START; i++) {
         if ((item >= SecResultInfo[i].singleStart) && (item < SecResultInfo[i].singleEnd)) {

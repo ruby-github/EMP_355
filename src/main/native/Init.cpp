@@ -45,7 +45,7 @@ pthread_t pidInitTable;
 gboolean ReportInit = FALSE;
 bool g_authorizationOn = false;
 bool g_init = true;
-bool g_calcPwStatus = false; // false: 鏈繘琛屽寘缁滆绠楋紱 true: 鍖呯粶璁＄畻瀹屾垚
+bool g_calcPwStatus = false; // false: 未进行包络计算； true: 包络计算完成
 
 //for test
 using std::endl;
@@ -254,9 +254,9 @@ void Init::ProbeCheck() {
     const char *userName;
     userName = exam.ReadDefaultUserSelect(&ini).c_str();
 
-    if ((strcmp(userName, "System Default") != 0) && (strcmp(userName, "校屑芯谢褔邪薪 褋懈褋褌械屑褘") != 0) &&
-            (strcmp(userName, "绯荤粺榛樿") != 0) && (strcmp(userName, "Domy艣lne Systemu") != 0)  &&
-            (strcmp(userName, "Par d茅faut du sys.") != 0) && (strcmp(userName, "Systemvorgabe") != 0) && (strcmp(userName, "Sistema por defecto") !=0)) {
+    if ((strcmp(userName, "System Default") != 0) && (strcmp(userName, "Умолчан системы") != 0) &&
+            (strcmp(userName, "系统默认") != 0) && (strcmp(userName, "Domyślne Systemu") != 0)  &&
+            (strcmp(userName, "Par défaut du sys.") != 0) && (strcmp(userName, "Systemvorgabe") != 0) && (strcmp(userName, "Sistema por defecto") !=0)) {
         sprintf(user_configure, "%s%s%s", "userconfig/",userName, ".ini");
     } else {
 #ifdef VET

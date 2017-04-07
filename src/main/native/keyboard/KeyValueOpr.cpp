@@ -52,7 +52,7 @@ void KeyValueOpr::ListLighten() { //for debug
  * @brief 检查灯点亮或熄灭
  *
  * @para lightValue light value to be check
- * @retval on true-浜伅, false-鐏伅
+ * @retval on true-亮灯, false-灭灯
  * **************************/
 bool KeyValueOpr::IsLighten(unsigned char lightValue) {
     vector<unsigned char>::iterator iter = find(m_vecLighten.begin(), m_vecLighten.end(), lightValue);
@@ -64,7 +64,7 @@ bool KeyValueOpr::IsLighten(unsigned char lightValue) {
 }
 
 /*****************************
- * @brief 鍦ㄥ鍣ㄤ腑璁板綍鐐逛寒鐨勭伅
+ * @brief 在容器中记录点亮的灯
  * **************************/
 void KeyValueOpr::AddLighten(unsigned char lightValue) {
 //	printf("Add %d to vecotr\n", lightValue);
@@ -86,7 +86,7 @@ void KeyValueOpr::RemoveLighten(unsigned char lightValue) {
 /*****************************
  * @brief 控制灯,点亮或熄灭
  *
- * @para on true-浜伅, false-鐏伅
+ * @para on true-亮灯, false-灭灯
  * @para lightValue light value to be control
  * **************************/
 void KeyValueOpr::CtrlLight(bool on, unsigned char lightValue ) {
@@ -189,7 +189,7 @@ void KeyValueOpr::SendKeyValue( unsigned char *keyValue ) {
         }
         break;
 
-        //鎺ユ敹鍒板叾浠栧彂閫佺粰vector椤剁獥鍙ｅ嵆褰撳墠娲诲姩绐楀彛
+        //接收到其他发送给vector顶窗口即当前活动窗口
     case 0x0:
         WinOprStack[total-1]->KeyEvent(keyValue[1]);
         break;
@@ -245,7 +245,7 @@ void KeyValueOpr::SendKeyValue( unsigned char *keyValue ) {
 }
 
 /***************************
- *interface: KeyValueOpr瀵硅薄鎸囬拡
+ *interface: KeyValueOpr对象指针
  *fdcom:	 串口设备号
  * ***********************/
 gboolean GetKeyValue(GIOChannel *source, GIOCondition condition, gpointer data) {
@@ -303,7 +303,7 @@ gboolean GetKeyValue(GIOChannel *source, GIOCondition condition, gpointer data) 
     return TRUE;
 }
 
-//璁剧疆閿洏涓插彛骞跺涓插彛杩涜鐩戣
+//设置键盘串口并对串口进行监视
 void *KeyboardOversee( void *pKeyInterface, bool isHandShake) {
     portinfo_t portinfo = { '0', 19200, '8', '0', '0', '0', '0', '0', '1', 0 };
 
@@ -314,7 +314,7 @@ void *KeyboardOversee( void *pKeyInterface, bool isHandShake) {
 
     PRINTF("s_fdcom= %d\n", s_fdcom );
 
-    PortSet( s_fdcom, &portinfo );//閿洏涓插彛璁剧疆
+    PortSet( s_fdcom, &portinfo );//键盘串口设置
     PRINTF( "set serial port success" );
 
     if (isHandShake) {
@@ -323,7 +323,7 @@ void *KeyboardOversee( void *pKeyInterface, bool isHandShake) {
         }
     }
 
-    //閿洏鐩戣
+    //键盘监视
     UartOversee( s_fdcom, pKeyInterface );
 
     return NULL;

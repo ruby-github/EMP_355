@@ -64,7 +64,7 @@ const int Calc2D::TGC_FIEXD_35C60E[TGC_DOTS] = {
     256, 256, 256, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255
 };
-//楂橀寰嚫
+//高频微凸
 const int Calc2D::TGC_FIEXD_65C15D[TGC_DOTS] = {
     65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, 86, 88, 90, 92, 94, 96, 98,
     100, 102, 103, 105, 107, 109, 111, 112, 114, 116, 118, 119, 121, 123, 125,
@@ -83,7 +83,7 @@ const int Calc2D::TGC_FIEXD_65C15D[TGC_DOTS] = {
     254, 254, 254, 254, 254, 254, 255, 255, 255, 255, 255, 255, 256, 256, 256,
     256, 256, 257, 257, 257, 257, 258, 258, 258, 258, 259, 259
 };
-//绾块樀
+//线阵
 //#ifdef EMP_430
 const int Calc2D::TGC_FIEXD_65L40E[TGC_DOTS] = {
     84, 90, 95, 100, 106, 111, 115, 115,
@@ -154,7 +154,7 @@ const int Calc2D::TGC_FIEXD_65L40E[TGC_DOTS] = {
 };
 #endif
 */
-//鑵斾綋
+//腔体
 const int Calc2D::TGC_FIEXD_TV[TGC_DOTS] = {
     44, 50, 55, 60, 66, 71, 75, 80,
     85, 89, 94, 98, 102, 106, 110, 114,
@@ -290,7 +290,7 @@ void Calc2D::CalcDisplayScanRange(int range[2], int widthInDots) {
 /*
  * @brief change foucs sum
  *
- * note  杩欓噷涔堟病鏈夐噸鏂拌绠楋紝鐒︾偣鍒嗘锛團ocusChange),鍥犱负姣忔鍙樼劍鐐规暟鐩兘浼氭敼鍙樼劍鐐逛綅缃紝鑰岀劍鐐逛綅缃噷闈㈠凡缁忎細璋冪敤FocusChange
+ * note  这里么没有重新计算，焦点分段（FocusChange),因为每次变焦点数目都会改变焦点位置，而焦点位置里面已经会调用FocusChange
  */
 void Calc2D::CalcFocSum() {
     //send foucs sum to imging system
@@ -309,7 +309,7 @@ void Calc2D::CalcSample() {
     int depthDots = m_calcPara->depthDots;
     double speed = m_calcPara->soundSpeed;
 
-    int sample60 = (int)(INIT_SCALE * speed * SAMPLE_NUM * depthDots / 2 / FREQ / depth + 0.5);	//60MHz閲囨牱棰戠巼, 閲囨牱鏁版嵁
+    int sample60 = (int)(INIT_SCALE * speed * SAMPLE_NUM * depthDots / 2 / FREQ / depth + 0.5);	//60MHz采样频率, 采样数据
     //printf("######################calc sample: depthDots = %d", depthDots);
     int sampleAperture = (int)(speed * SAMPLE_NUM * DOTS_64 / 2 / FREQ / depth + 0.5);	//60MHz采样频率64点, 变迹
 
@@ -826,12 +826,12 @@ void Calc2D::Tgc(const int tgcX[8], int gain, int tgcYKey[8], const int fixedTgc
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_35C60E[i];
         break;
-        //浣庨寰嚫
+        //低频微凸
     case 'N':
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_35C60E[i];
         break;
-        //楂橀寰嚫
+        //高频微凸
     case 'n':
     case 'c':
         for (int i = 0; i < TGC_DOTS; i++)
@@ -843,7 +843,7 @@ void Calc2D::Tgc(const int tgcX[8], int gain, int tgcYKey[8], const int fixedTgc
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_65L40E[i];
         break;
-        //鑵斾綋
+        //腔体
     case 't':
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_TV[i];
@@ -1055,7 +1055,7 @@ void Calc2D::Tgc(const int tgcX[8], int gain, int tgcYKey[8], const int fixedTgc
 
     //for(x = 0; x < size - 2; x++)
     for(x = 0; x < size; x++) {
-        //convex probe 鍙鍑搁樀鎺㈠ご鍋氳澶勭悊
+        //convex probe 只对凸阵探头做该处理
         int x1 = x * maxDepth / 220.0;
         if (x1 >= TGC_DOTS)
             x1 = TGC_DOTS -1;
@@ -1136,12 +1136,12 @@ void Calc2D::TgcColor(const int tgcX[8], int gain, int tgcYKey[8], const int fix
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_35C60E[i];
         break;
-        //浣庨寰嚫
+        //低频微凸
     case 'N':
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_35C60E[i];
         break;
-        //楂橀寰嚫
+        //高频微凸
     case 'n':
     case 'c':
         adjustValue = 1.0;//1.6;
@@ -1155,7 +1155,7 @@ void Calc2D::TgcColor(const int tgcX[8], int gain, int tgcYKey[8], const int fix
         for (int i = 0; i < TGC_DOTS; i++)
             tgcFixedTemp[i] = TGC_FIEXD_65L40E[i];
         break;
-        //鑵斾綋
+        //腔体
     case 't':
         adjustValue = 1.0;//1.5;
         for (int i = 0; i < TGC_DOTS; i++)
@@ -1534,7 +1534,7 @@ void Calc2D::CReceiveDelay(bool compound) {
         m_fpga.SendReceiveDelayAnSpaceCompound2((short*)delayAn, sizeof(delayAn) / sizeof(short));
         m_fpga.SendReceiveDelayBnSpaceCompound2(delayBn, sizeof(delayBn) / sizeof(short));
     }
-    //璁＄畻鍙樿抗瀛斿緞
+    //计算变迹孔径
 #ifdef EMP_430
     CReceiveApertureU16(compound);
 #else
@@ -3414,7 +3414,7 @@ void Calc2D::CEmitDelayCalc(float probeFocPos, float steerAngle, const int CH_NU
     float activeMaxLength, activeLength, perAngle;
     int sendCh = APERTURE_HALF * 2;
     int noSendCh = 4;
-    ///> extern para used in calc璁＄畻涓娇鐢ㄧ殑澶栭儴鍙傛暟
+    ///> extern para used in calc计算中使用的外部参数
     float probeR = m_calcPara->probeR;
     int probeWidth = m_calcPara->probeWidth / 100;
     int probeArray = m_calcPara->probeArray;
@@ -3422,7 +3422,7 @@ void Calc2D::CEmitDelayCalc(float probeFocPos, float steerAngle, const int CH_NU
     float steer = steerAngle;
     float focPos = probeFocPos;
     int temp;
-    //璁＄畻瀹為檯鍙戝皠瀛斿緞
+    //计算实际发射孔径
     perAngle = ((float)probeWidth) / ((float)probeArray-1) * PI / 180.0;
 
     int sendChNum;
@@ -3550,7 +3550,7 @@ void Calc2D::CReceiveApertureCalcU16(float steerAngle,  short delayAperture[APER
     int delayDb[APERTURE_HALF * 2];
     double scale;
 
-    //鍙樿抗瀛斿緞
+    //变迹孔径
     endPix = APERTURE_DOTS;
     int firstpeak = 8192;//255;
     int span_no = 0;
@@ -3621,7 +3621,7 @@ void Calc2D::CReceiveApertureCalcU16(float steerAngle,  short delayAperture[APER
             delayDb[i] = delayDb[i] * MAX_SUM_VALUE / sumEven;
         }
         for( i = 0; i < APERTURE_HALF*2; i++ ) {
-            //淇濆瓨鍙樿抗
+            //保存变迹
             delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[i];
         }
     }
@@ -3636,7 +3636,7 @@ void Calc2D::CReceiveApertureCalc(float steerAngle, unsigned char delayAperture[
     int delayDb[APERTURE_HALF * 2];
     double scale;
 
-    //鍙樿抗瀛斿緞
+    //变迹孔径
     endPix = APERTURE_DOTS;
     int firstpeak = 255;
     int span_no = 0;
@@ -3673,7 +3673,7 @@ void Calc2D::CReceiveApertureCalc(float steerAngle, unsigned char delayAperture[
         }
 
         for( i = 0; i < APERTURE_HALF*2; i++ ) {
-            //淇濆瓨鍙樿抗
+            //保存变迹
             delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[i];
         }
     }
@@ -3733,14 +3733,14 @@ void Calc2D::LEmitDelayCalc(float probeFocPos, float steerAngle, const int CH_NU
     int sendCh = APERTURE_HALF * 2;
     int noSendCh = 4;
 
-    ///> extern para used in calc璁＄畻涓娇鐢ㄧ殑澶栭儴鍙傛暟
+    ///> extern para used in calc计算中使用的外部参数
     int probeWidth = m_calcPara->probeWidth / 100.0;
     int probeArray = m_calcPara->probeArray;
     double speed = m_calcPara->soundSpeedTsi / 1000;
     float steer = steerAngle;
     //float focPos = probeFocPos / cos(fabs(steer));
     float focPos = probeFocPos;
-    //calc emit delay璁＄畻瀹為檯鍙戝皠瀛斿緞
+    //calc emit delay计算实际发射孔径
     float sqFocPos = focPos * focPos;
     interval = (float)((float)probeWidth) / ((float)(probeArray - 1));
 
@@ -3878,7 +3878,7 @@ void Calc2D::LReceiveApertureCalcU16(float steerAngle, short delayAperture[APERT
     float span;
     int span_no;
 
-    //鍒濆鍙樿抗 0~startPix-1
+    //初始变迹 0~startPix-1
     int aaa,bbb;
     int   trackcenteroffset=0;
     float tempdepth;
@@ -3911,7 +3911,7 @@ void Calc2D::LReceiveApertureCalcU16(float steerAngle, short delayAperture[APERT
         if(span <=2) span = 2;
 
         for( i = 0; i < APERTURE_HALF*2; i++ ) {
-            temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//楂樻柉鍑芥暟
+            temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//高斯函数
             if (temp < 0)			temp = 0;
             //else if (temp > 255)	temp = 255;
 
@@ -3944,7 +3944,7 @@ void Calc2D::LReceiveApertureCalcU16(float steerAngle, short delayAperture[APERT
         }
 
         for( i = 0; i < APERTURE_HALF * 2; i++ ) {
-            //淇濆瓨鍙樿抗
+            //保存变迹
             delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[APERTURE_HALF * 2 - 1 - i];
         }
     }
@@ -3966,7 +3966,7 @@ void Calc2D::LReceiveApertureCalc(float steerAngle, unsigned char delayAperture[
     float span;
     int span_no;
 
-    //鍒濆鍙樿抗 0~startPix-1
+    //初始变迹 0~startPix-1
     int aaa,bbb;
     int   trackcenteroffset=0;
     float tempdepth;
@@ -4007,7 +4007,7 @@ void Calc2D::LReceiveApertureCalc(float steerAngle, unsigned char delayAperture[
         if(span <=2) span = 2;
 
         for( i = 0; i < APERTURE_HALF*2; i++ ) {
-            temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//楂樻柉鍑芥暟
+            temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//高斯函数
             if (temp < 0)			temp = 0;
             else if (temp > 255)	temp = 255;
 
@@ -4017,7 +4017,7 @@ void Calc2D::LReceiveApertureCalc(float steerAngle, unsigned char delayAperture[
             delayDb[i] = temp;
         }
         for( i = 0; i < APERTURE_HALF * 2; i++ ) {
-            //淇濆瓨鍙樿抗
+            //保存变迹
             delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[APERTURE_HALF * 2 - 1 - i];
         }
     }
@@ -4037,7 +4037,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
     int sendCh = APERTURE_HALF * 2;
     int noSendCh = 4;
 
-    ///> extern para used in calc璁＄畻涓娇鐢ㄧ殑澶栭儴鍙傛暟
+    ///> extern para used in calc计算中使用的外部参数
     int probeWidth = m_calcPara->probeWidthPhase / 100.0;
     int probeArray = m_calcPara->probeArray;
     int probeLines = m_calcPara->probeLines;
@@ -4051,7 +4051,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
     }
 
     float focPos = probeFocPos;
-    //calc emit delay璁＄畻瀹為檯鍙戝皠瀛斿緞
+    //calc emit delay计算实际发射孔径
     float sqFocPos = focPos * focPos;
     interval = (float)((float)probeWidth) / ((float)(probeArray - 1));
 
@@ -4130,7 +4130,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
                 //delay[j * APERTURE_HALF*2  + i] = temp;
                 b = b - interval;
             }
-            // 鍙暀涓嬫渶鍓嶇殑16涓欢杩熸暟鎹紝鍏朵粬缃浂
+            // 只留下最前的16个延迟数据，其他置零
             /*
                bool isCw = m_calcPara->modeCw;
                if (isCw)
@@ -4226,7 +4226,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
         scale = ((float)m_calcPara->depth / APERTURE_DOTS); //mm/s
         float span;
 
-        //鍒濆鍙樿抗 0~startPix-1
+        //初始变迹 0~startPix-1
         int aaa,bbb;
         int   trackcenteroffset=0;
         float tempdepth;
@@ -4247,7 +4247,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
             if(span <=2) span = 2;
 
             for( i = 0; i < APERTURE_HALF*2; i++ ) {
-                temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//楂樻柉鍑芥暟
+                temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//高斯函数
                 if (temp < 0)			temp = 0;
                 else if (temp > 255)	temp = 255;
 
@@ -4257,7 +4257,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
                 delayDb[i] = temp;
             }
             for( i = 0; i < APERTURE_HALF * 2; i++ ) {
-                //淇濆瓨鍙樿抗
+                //保存变迹
                 delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[APERTURE_HALF * 2 - 1 - i];
             }
 
@@ -4270,7 +4270,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
                 }
             } else {
                 for( i = 0; i < APERTURE_HALF * 2; i++ ) {
-                    //淇濆瓨鍙樿抗
+                    //保存变迹
                     delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[APERTURE_HALF * 2 - 1 - i];
                 }
             }
@@ -4293,7 +4293,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
         scale = ((float)m_calcPara->depth / APERTURE_DOTS); //mm/s
         float span;
 
-        //鍒濆鍙樿抗 0~startPix-1
+        //初始变迹 0~startPix-1
         int aaa,bbb;
         int   trackcenteroffset=0;
         float tempdepth;
@@ -4316,7 +4316,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
             if(span <=2) span = 2;
 
             for( i = 0; i < APERTURE_HALF*2; i++ ) {
-                temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//楂樻柉鍑芥暟
+                temp = 255.0*exp(  ( 0- (i-(APERTURE_HALF -1-trackcenteroffset))*(i-(APERTURE_HALF -1-trackcenteroffset) )*4     )/(span*span));		//高斯函数
                 if (temp < 0)			temp = 0;
                 //else if (temp > 255)	temp = 255;
 
@@ -4333,7 +4333,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
                 delayDb[i] =  delayDb[i] * MAX_SUM_VALUE / sumDelay;
 
             for( i = 0; i < APERTURE_HALF * 2; i++ ) {
-                //淇濆瓨鍙樿抗
+                //保存变迹
                 delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[APERTURE_HALF * 2 - 1 - i];
             }
 
@@ -4346,7 +4346,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
                 }
             } else {
                 for( i = 0; i < APERTURE_HALF * 2; i++ ) {
-                    //淇濆瓨鍙樿抗
+                    //保存变迹
                     delayAperture[APERTURE_HALF * 2 * j + i] = delayDb[APERTURE_HALF * 2 - 1 - i];
                 }
             }
@@ -4659,7 +4659,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
         float activeMaxLength, activeLength, perAngle;
         int sendCh = APERTURE_HALF * 2;
         int noSendCh = 4;
-        ///> extern para used in calc璁＄畻涓娇鐢ㄧ殑澶栭儴鍙傛暟
+        ///> extern para used in calc计算中使用的外部参数
         float probeR = m_calcPara->probeR;
         int probeWidth = m_calcPara->probeWidth;
         int probeArray = m_calcPara->probeArray;
@@ -4667,7 +4667,7 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
         float focPos = probeFocPos;
         int temp;
 
-        //璁＄畻瀹為檯鍙戝皠瀛斿緞
+        //计算实际发射孔径
         perAngle = ((float)probeWidth / 100.0) / ((float)probeArray-1) * PI / 180.0;
 
         int sendChNum;
@@ -4794,14 +4794,14 @@ void Calc2D::PEmitDelayCalc(float probeFocPos, EMODE mode, const int CH_NUM[], i
         int sendCh = APERTURE_HALF * 2;
         int noSendCh = 4;
 
-        ///> extern para used in calc璁＄畻涓娇鐢ㄧ殑澶栭儴鍙傛暟
+        ///> extern para used in calc计算中使用的外部参数
         int probeWidth = m_calcPara->probeWidth / 100.0;
         int probeArray = m_calcPara->probeArray;
         double speed = m_calcPara->soundSpeedTsi / 1000;
         //float steer = steerAngle;
         //float focPos = probeFocPos / cos(fabs(steer));
         float focPos = probeFocPos;
-        //calc emit delay璁＄畻瀹為檯鍙戝皠瀛斿緞
+        //calc emit delay计算实际发射孔径
         float sqFocPos = focPos * focPos;
         interval = (float)((float)probeWidth) / ((float)(probeArray - 1));
 

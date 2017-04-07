@@ -75,7 +75,7 @@ void ScreenSaver::Reset() {
 
 void ScreenSaver::EnterScreenSaver() {
 #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode()) { // 濡傛灉褰撳墠3D/4D杩涚▼鍦ㄨ繍琛岋紝鍒欎笉杩涘叆灞忎繚
+    if (D4FuncMan::GetInstance()->Get4DMode()) { // 如果当前3D/4D进程在运行，则不进入屏保
         return;
     }
 #endif
@@ -170,7 +170,7 @@ void ScreenSaver::DrawHintMessage() {
     XColor fg;
     GC gc;
 //	char *string = "Press any key to resume!";
-    char *string = "鎸変换鎰忛敭鎭㈠!";
+    char *string = "按任意键恢复!";
 
     screen = DefaultScreen(m_dpy);
     gc = XCreateGC(m_dpy, m_win, 0, &gcvalue);
@@ -247,7 +247,7 @@ void ScreenSaver::DrawHintMessage() {
 }
 
 /*
- * 灞忓箷璋冭妭
+ * 屏幕调节
  */
 void ScreenSaver::BlackScreen2() {
     char curs[] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -311,7 +311,7 @@ void ScreenSaver::BlackScreen2() {
 
 void ScreenSaver::EnterScreenSaver2() {
 #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode()) { // 濡傛灉褰撳墠3D/4D杩涚▼鍦ㄨ繍琛岋紝鍒欎笉杩涘叆灞忎繚
+    if (D4FuncMan::GetInstance()->Get4DMode()) { // 如果当前3D/4D进程在运行，则不进入屏保
         return;
     }
 #endif
@@ -389,7 +389,7 @@ void ScreenSaver::BlackScreen3() {
 
 void ScreenSaver::EnterScreenSaver3() {
 #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode()) { // 濡傛灉褰撳墠3D/4D杩涚▼鍦ㄨ繍琛岋紝鍒欎笉杩涘叆灞忎繚
+    if (D4FuncMan::GetInstance()->Get4DMode()) { // 如果当前3D/4D进程在运行，则不进入屏保
         return;
     }
 #endif

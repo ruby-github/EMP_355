@@ -345,7 +345,7 @@ void MultiFuncArrow::KnobArrowCreate() {
     KnobMenu::GetInstance()->SetValue(ARROW_COLOR, (char *)(arrowColorName[color]), GetKnobRetColor(color));
 }
 
-//emp5800 鎸夐敭鍒囨崲锛屾敼鍙樼澶寸殑褰㈢姸
+//emp5800 按键切换，改变箭头的形状
 EKnobReturn MultiFuncArrow::PressSetShape(void) {
     EKnobReturn ret = ERROR;
     if (m_pThis != NULL) {
@@ -408,7 +408,7 @@ EKnobReturn MultiFuncArrow::SetShape(EKnobOper opr) {
     return ret;
 }
 
-//鎸夐敭鍒囨崲锛屽疄鐜版敼鍙樼澶寸殑澶у皬锛堝綋temp = 3,鍒囨崲鍒板皬绠ご
+//按键切换，实现改变箭头的大小（当temp = 3,切换到小箭头
 EKnobReturn MultiFuncArrow::PressSetSize(void) {
     EKnobReturn ret = ERROR;
     int temp = 0;

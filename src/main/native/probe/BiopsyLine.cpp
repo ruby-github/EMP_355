@@ -289,7 +289,7 @@ void BiopsyLine::PositionChange(int offsetX) {
     int max=m_baseVal_x+25;
     int min=m_baseVal_x-25;
 
-    if(min<0) { //闃叉涓簃_biopx < 0
+    if(min<0) { //防止为m_biopx < 0
         min=0;
     }
     //----------------------------------//

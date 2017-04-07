@@ -32,7 +32,7 @@
 using namespace std;
 using std::vector;
 
-///>涓ょ偣娉曟祴璺濈, 娣卞害鏂瑰悜涓婃祴璺濈
+///>两点法测距离, 深度方向上测距离
 D2MeasureDistDot::D2MeasureDistDot(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -70,7 +70,7 @@ void D2MeasureDistDot::PressLeft(POINT p) {
         }
         m_draw.DrawCursor(m_tempP, FALSE);
         m_p1 = m_tempP;
-        if (m_itemInfo->meaType == DIST_DOT) { //涓ょ偣娉曟祴璺濈
+        if (m_itemInfo->meaType == DIST_DOT) { //两点法测距离
             m_tempP = m_draw.CalcNextP(m_tempP, 0);
             m_draw.SetCursor(m_tempP);
         }
@@ -87,10 +87,10 @@ void D2MeasureDistDot::PressLeft(POINT p) {
     case 1: {
         if (m_isDraw) {
             m_draw.DrawCursor(m_tempP);
-            m_draw.DrawDotLine(m_p1, m_tempP, TRUE); // modify:鎿﹀嚭姝ｅ湪缁樺埗鐨勭嚎
+            m_draw.DrawDotLine(m_p1, m_tempP, TRUE); // modify:擦出正在绘制的线
         }
         m_draw.DrawCursor(m_tempP, FALSE);
-        m_draw.DrawDotLine(m_p1, m_tempP, FALSE); // modify:淇敼褰撳墠绾块鑹蹭负纭鐨勭嚎
+        m_draw.DrawDotLine(m_p1, m_tempP, FALSE); // modify:修改当前线颜色为确认的线
 
         // save measure result
         vector<POINT> vec;
@@ -98,7 +98,7 @@ void D2MeasureDistDot::PressLeft(POINT p) {
         vec.push_back(m_p1);
         vec.push_back(m_tempP);
         if (m_itemInfo->meaType == DIST_DOT)
-            m_ptrMan->AddNew(DIST_DOT, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor()); // modify: 娣诲姞鍏夋爣绫诲瀷锛屽ぇ灏忥紝纭棰滆壊
+            m_ptrMan->AddNew(DIST_DOT, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor()); // modify: 添加光标类型，大小，确认颜色
         else
             m_ptrMan->AddNew(DEPTH_DIST, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 
@@ -109,7 +109,7 @@ void D2MeasureDistDot::PressLeft(POINT p) {
         m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
 
         //begin new dist measure
-        m_draw.ChangeCursorType(); // modify:鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // modify:更改鼠标类型
         Init();
 
         // change pointer
@@ -134,7 +134,7 @@ void D2MeasureDistDot::PressRight(POINT p) {
     case 1:
         if (m_isDraw) {
             m_draw.DrawCursor(m_tempP);
-            m_draw.DrawDotLine(m_p1, m_tempP, TRUE); // modify锛氭摝鍑哄綋鍓嶇嚎
+            m_draw.DrawDotLine(m_p1, m_tempP, TRUE); // modify：擦出当前线
         }
 
         m_tempP = m_p1;
@@ -235,7 +235,7 @@ void D2MeasureDistDot::Esc() {
     }
 }
 
-///> Dist-涓ょ嚎娉曟祴璺濈
+///> Dist-两线法测距离
 D2MeasureDistLine::D2MeasureDistLine(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -431,7 +431,7 @@ void D2MeasureDistLine::Esc() {
     }
 }
 
-///>杞ㄨ抗娉曟祴闀垮害
+///>轨迹法测长度
 D2MeasureLengthTrack::D2MeasureLengthTrack(const SingleItemInfo *ptrSingleItemInfo):MOUSE_INTERVAL(2) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -512,7 +512,7 @@ void D2MeasureLengthTrack::PressLeft(POINT p) {
 
         //m_update.D2LenTrack(m_length, attr, false);
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -551,7 +551,7 @@ void D2MeasureLengthTrack::PressRight(POINT p) {
             //m_draw.DrawTraceLine(m_track[i], m_track[i-1], TRUE);
             //	m_track.pop_back();
         }
-        m_track.clear();//娓呴櫎vector涓殑杞ㄨ抗璁板綍
+        m_track.clear();//清除vector中的轨迹记录
         m_trackTemp.clear();
 
         m_isDraw = TRUE;
@@ -704,7 +704,7 @@ void D2MeasureLengthTrack::Esc() {
     m_trackTemp.clear();
 }
 
-///>鎻忕偣娉曟祴闀垮害
+///>描点法测长度
 D2MeasureLengthDot::D2MeasureLengthDot(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -772,7 +772,7 @@ void D2MeasureLengthDot::PressLeft(POINT p) {
             m_length += m_calc.D2CalcDist(m_dot[i], m_dot[i+1]);
         }
 
-        //娓呴櫎鎺変腑闂村浣欑殑鍏夋爣
+        //清除掉中间多余的光标
         for(i=1; i!=vec_size-1; i++) {
             m_draw.DrawCursor(m_dot[i], FALSE);
         }
@@ -785,7 +785,7 @@ void D2MeasureLengthDot::PressLeft(POINT p) {
 
         //m_update.D2LenTrack(m_length, attr, false);
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -882,7 +882,7 @@ void D2MeasureLengthDot::Change() {
     }
 }
 
-///>杞ㄨ抗娉曟祴闈㈢Н
+///>轨迹法测面积
 D2MeasureAreaTrack::D2MeasureAreaTrack(const SingleItemInfo *ptrSingleItemInfo):MOUSE_INTERVAL(2) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -978,7 +978,7 @@ void D2MeasureAreaTrack::PressLeft(POINT p) {
         m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
 
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -1200,7 +1200,7 @@ void D2MeasureAreaTrack::Esc() {
     m_trackTemp.clear();
 }
 
-///>Simpson's娴婨DV鍜孍SV
+///>Simpson's测EDV和ESV
 D2MeasureSimpson::D2MeasureSimpson(const MultiItemInfo *ptrMultiItemInfo):MOUSE_INTERVAL(2) {
     m_item = ptrMultiItemInfo->item;
     m_itemInfo = ptrMultiItemInfo;
@@ -1344,7 +1344,7 @@ void D2MeasureSimpson::PressLeft(POINT p) {
         m_update.GenDisplayMulti(m_itemInfo, allData, attr, false, unit_coeffi);
 
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -1878,7 +1878,7 @@ void D2MeasureSimpson::Esc() {
     m_trackTemp.clear();
 }
 
-///>A/L娉曟祴EDV鍜孍SV
+///>A/L法测EDV和ESV
 D2MeasureAL::D2MeasureAL(const MultiItemInfo *ptrMultiItemInfo):MOUSE_INTERVAL(2) {
     m_item = ptrMultiItemInfo->item;
     m_itemInfo = ptrMultiItemInfo;
@@ -2016,7 +2016,7 @@ void D2MeasureAL::PressLeft(POINT p) {
         m_update.GenDisplayMulti(m_itemInfo, allData, attr, false, unit_coeffi);
 
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -2318,7 +2318,7 @@ void D2MeasureAL::Esc() {
     m_trackTemp.clear();
 }
 
-///>鎻忕偣娉曟祴闈㈢Н
+///>描点法测面积
 D2MeasureAreaDot::D2MeasureAreaDot(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -2400,7 +2400,7 @@ void D2MeasureAreaDot::PressLeft(POINT p) {
 
         //	m_update.D2AreaDot(m_area, attr, false);
         //begin new track length measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -2584,7 +2584,7 @@ void D2MeasureAreaRec::PressLeft(POINT p) {
         //m_update.D2AreaRec(m_area, attr, false);
 
         //begin new dist measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -2877,7 +2877,7 @@ void D2MeasureVol3Axis::PressLeft(POINT p) {
 
         m_z_len = m_calc.D2CalcDist(m_z_start, m_z_end);
         m_vol = PI * m_x_len * m_y_len * m_z_len / 6.0;
-        //	m_ptrMan->SetMeasureResult(m_vol, (float)0, m_item);//绉戝埆娴嬮噺淇濆瓨娴嬮噺缁撴灉
+        //	m_ptrMan->SetMeasureResult(m_vol, (float)0, m_item);//科别测量保存测量结果
 
         vector<POINT> vec;
         vec.clear();
@@ -2894,7 +2894,7 @@ void D2MeasureVol3Axis::PressLeft(POINT p) {
 
         m_update.D2Vol3Axis(m_name, m_x_len, m_y_len, m_z_len, m_vol, attr, false);
         //begin new vol 3 axis measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -3370,7 +3370,7 @@ void D2MeasureSac3Axis::PressLeft(POINT p) {
         m_ptrMan->AddNew(VOL_3AXIS, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 
         //begin new vol 3 axis measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -3704,7 +3704,7 @@ void D2MeasureSac3Axis::Esc() {
 }
 
 /**************这是基本测量中正式用的，为软件包测量的修改而保留一份****************/
-///> method = 0:妞渾娉曟祴闈㈢Н
+///> method = 0:椭圆法测面积
 ///> method = 1:椭圆法1测体积
 // D2MeasureVolEllipse1::D2MeasureVolEllipse1(int method)
 // {
@@ -3986,12 +3986,12 @@ void D2MeasureSac3Axis::Esc() {
 // 	return;
 // }
 
-///> method = 0:鍩烘湰娴嬮噺妞渾娉曟祴闈㈢Н
+///> method = 0:基本测量椭圆法测面积
 ///> method = 1:基本测量椭圆法1测体积
 ///> method = 2:基本测量椭圆法1测周长
 ///> method = 3:软件包测量AC、HC等估算胎龄
-///>re_display:鏈祴閲忛」鐨勫睘鎬э紝鍖呮嫭璁＄畻椤圭殑璁＄畻鍏紡
-///>item: 杞欢鍖呮祴閲忛」鐨勬爣鍙凤紝浼犵粰UpdateMeasure涓妸绉戝埆娴嬮噺缁撴灉淇濆瓨璧锋潵
+///>re_display:本测量项的属性，包括计算项的计算公式
+///>item: 软件包测量项的标号，传给UpdateMeasure中把科别测量结果保存起来
 D2MeasureVolEllipse1::D2MeasureVolEllipse1(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -4052,15 +4052,15 @@ void D2MeasureVolEllipse1::PressLeft(POINT p) {
         m_draw.SetCursor(m_s_start);
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         //	CalcResult();
-        if (m_itemInfo->meaType == AREA_ELLIPSE) { //闈㈢Н
+        if (m_itemInfo->meaType == AREA_ELLIPSE) { //面积
             m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);
             resultTmp = m_area;
             unit_coeffi = 1;
-        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //浣撶Н
+        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //体积
             m_vol = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 3);
             resultTmp = m_vol;
             unit_coeffi = 1;
-        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //鍛ㄩ暱
+        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //周长
             m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);
             resultTmp = m_perimeter;
             unit_coeffi = 1;
@@ -4086,19 +4086,19 @@ void D2MeasureVolEllipse1::PressLeft(POINT p) {
         vec.push_back(m_l_end);
         vec.push_back(m_s_start);
 
-        if (m_itemInfo->meaType == AREA_ELLIPSE) { //闈㈢Н
+        if (m_itemInfo->meaType == AREA_ELLIPSE) { //面积
             m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);
             resultTmp = m_area;
             unit_coeffi = 1;
             m_ptrMan->AddNew(AREA_ELLIPSE, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
-        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //浣撶Н
+        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //体积
             m_vol = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 3);
             //printf("%s-%s: l start=(%d,%d), l end=(%d,%d), s start=(%d,%d)\n", __FILE__, __FUNCTION__, m_l_start.x, m_l_start.y, m_l_end.x, m_l_end.y, m_s_start.x, m_s_start.y);
             resultTmp = m_vol;
             //printf("%s-%s: m_vol = %3.2f\n", __FILE__, __FUNCTION__, m_vol);
             unit_coeffi = 1;
             m_ptrMan->AddNew(VOL_ELLIPSE1, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
-        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //鍛ㄩ暱
+        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //周长
             m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);
             resultTmp = m_perimeter;
             unit_coeffi = 1;
@@ -4113,7 +4113,7 @@ void D2MeasureVolEllipse1::PressLeft(POINT p) {
         m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, unit_coeffi);
 
         //begin new vol ellipse1 measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -4203,15 +4203,15 @@ void D2MeasureVolEllipse1::MouseMove(POINT p) {
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_isDraw = TRUE;
 
-        if (m_itemInfo->meaType == AREA_ELLIPSE) { //闈㈢Н
+        if (m_itemInfo->meaType == AREA_ELLIPSE) { //面积
             m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);
             resultTmp = m_area;
             unit_coeffi = 1;
-        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //浣撶Н
+        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //体积
             m_vol = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 3);
             resultTmp = m_vol;
             unit_coeffi = 1;
-        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //鍛ㄩ暱
+        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //周长
             m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);
             resultTmp = m_perimeter;
             unit_coeffi = 1;
@@ -4259,17 +4259,17 @@ void D2MeasureVolEllipse1::MouseMove(POINT p) {
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_isDraw = TRUE;
 
-        if (m_itemInfo->meaType == AREA_ELLIPSE) { //闈㈢Н
+        if (m_itemInfo->meaType == AREA_ELLIPSE) { //面积
             m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);
             resultTmp = m_area;
             unit_coeffi = 1;
-        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //浣撶Н
+        } else if (m_itemInfo->meaType == VOL_ELLIPSE1) { //体积
             //printf("%s-%s: l start=(%d,%d), l end=(%d,%d), s start=(%d,%d)\n", __FILE__, __FUNCTION__, m_l_start.x, m_l_start.y, m_l_end.x, m_l_end.y, m_s_start.x, m_s_start.y);
             m_vol = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 3);
             //printf("%s-%s: m_vol = %3.2f\n", __FILE__, __FUNCTION__, m_vol);
             resultTmp = m_vol;
             unit_coeffi = 1;
-        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //鍛ㄩ暱
+        } else if (m_itemInfo->meaType == PERI_ELLIPSE) { //周长
             m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);
             resultTmp = m_perimeter;
             unit_coeffi = 1;
@@ -4433,7 +4433,7 @@ void D2MeasureVolEllipse2::PressLeft(POINT p) {
         m_draw.SetCursor(m_s_start);
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_draw.DrawCursor(m_l_end, FALSE);
-        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//璁＄畻闈㈢Н
+        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//计算面积
         m_update.D2VolEllipse2(m_area, 0, 0, attr);
 
         m_step = 2;
@@ -4444,7 +4444,7 @@ void D2MeasureVolEllipse2::PressLeft(POINT p) {
             m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         }
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, false);
-        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//璁＄畻闈㈢Н
+        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//计算面积
         m_update.D2VolEllipse2(m_area, 0, 0, attr);
         m_draw.DrawOrderNumber(m_s_start, m_draw.GetOrderNumber());
         m_draw.DrawCursor(m_tempP);
@@ -4490,7 +4490,7 @@ void D2MeasureVolEllipse2::PressLeft(POINT p) {
         m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
 
         //begin new dist measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -4605,7 +4605,7 @@ void D2MeasureVolEllipse2::MouseMove(POINT p) {
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_isDraw = TRUE;
 
-        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//璁＄畻闈㈢Н
+        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//计算面积
         m_update.D2VolEllipse2(m_area, 0, 0, attr);
         break;
 
@@ -4644,7 +4644,7 @@ void D2MeasureVolEllipse2::MouseMove(POINT p) {
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_isDraw = TRUE;
 
-        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//璁＄畻闈㈢Н
+        m_area = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 1);	//计算面积
         m_update.D2VolEllipse2(m_area, 0, 0, attr);
         break;
 
@@ -5891,7 +5891,7 @@ void D2MeasureHip::Esc() {
 }
 #endif
 
-///>璺濈姣斾緥娴嬮噺锛嶄袱鐐规硶
+///>距离比例测量－两点法
 D2MeasureRatioDistDot::D2MeasureRatioDistDot(int method,const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -6221,7 +6221,7 @@ void D2MeasureRatioDistDot::Esc() {
     }
 }
 
-///>璺濈鍛ㄩ暱姣斾緥娴嬮噺
+///>距离周长比例测量
 D2MeasureRatioDistPeri::D2MeasureRatioDistPeri(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -6324,7 +6324,7 @@ void D2MeasureRatioDistPeri::PressLeft(POINT p) {
         m_ptrMan->AddNew(RATIO_D_P, m_draw.GetCursorType(), vec, m_draw.GetCursorSize(), m_draw.GetConfirmColor());
 
         m_dist = m_calc.D2CalcDist(m_dist_start, m_dist_end);
-        m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);//璁＄畻闈㈢Н
+        m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);//计算面积
         if(m_perimeter>ZERO)
             m_ratio = m_dist / m_perimeter;
         //	m_update.D2RatioDistPeri(m_dist, m_perimeter, m_ratio, attr, false);//要显示比例
@@ -6333,7 +6333,7 @@ void D2MeasureRatioDistPeri::PressLeft(POINT p) {
         m_update.GenDisplaySingle(m_itemInfo, allData, attr, false, 1);
 
         //begin new dist measure
-        m_draw.ChangeCursorType(); // 鏇存敼榧犳爣绫诲瀷
+        m_draw.ChangeCursorType(); // 更改鼠标类型
         Init();
 
         // change pointer
@@ -6480,7 +6480,7 @@ void D2MeasureRatioDistPeri::MouseMove(POINT p) {
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_isDraw = TRUE;
 
-        m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);//璁＄畻闈㈢Н
+        m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);//计算面积
         m_ratio = m_dist / m_perimeter;
         m_update.D2RatioDistPeri(m_dist, m_perimeter, m_ratio, attr);//要显示比例
         break;
@@ -6512,7 +6512,7 @@ void D2MeasureRatioDistPeri::MouseMove(POINT p) {
         m_draw.DrawEllipse(m_l_start, m_l_end, m_s_start, true);
         m_isDraw = TRUE;
 
-        m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);//璁＄畻闈㈢Н
+        m_perimeter = m_calc.D2CalcEllipse(m_l_start, m_l_end, m_s_start, 2);//计算面积
         if(m_perimeter>ZERO)
             m_ratio = m_dist / m_perimeter;
         m_update.D2RatioDistPeri(m_dist, m_perimeter, m_ratio, attr);//要显示比例
@@ -7123,7 +7123,7 @@ void D2MeasureRatioArea::Esc() {
     m_update.ClearMeasure();
 }
 
-//瑙掑害姣斾緥銆侀珛鍏宠妭
+//角度比例、髋关节
 D2MeasureRatioAngle::D2MeasureRatioAngle(const MultiItemInfo *ptrMultiItemInfo) {
 //	m_item = ptrMultiItemInfo->item;
     m_itemInfo = ptrMultiItemInfo;
@@ -8448,9 +8448,9 @@ void D2MeasureProfile::DrawProfile(POINT start, POINT end, unsigned char *image_
             dir_sign = -1;
         slope = (double)(end.y - start.y) / (double)(end.x - start.x);
         for (i=0; i<abs(end.x-start.x); i++) {
-            //濂藉儚涓嶄細鍑虹幇姘村钩鎴栫珫鐩寸殑闂
+            //好像不会出现水平或竖直的问题
             tmp.x = start.x + dir_sign * i;
-            tmp.y = start.y + (int)((double)(i*dir_sign) * slope);//鍍忕礌鐐圭殑鍧愭爣
+            tmp.y = start.y + (int)((double)(i*dir_sign) * slope);//像素点的坐标
             //	m_draw.DrawPoint(tmp, FALSE);
             tmp.y = coor_origin.y - (*(image_p + BYTES_DOT * (IMAGE_W * tmp.y + tmp.x))) / 2;//断面图点的坐标
             m_draw.DrawPoint(tmp, FALSE, COPY);
@@ -8807,7 +8807,7 @@ void D2MeasureIMT::Esc() { //press point and other keyboard
         //CDrawIMT::GetInstance()->GetIMTStatus(m_ImtStatus);
 
         //clear measure result
-        m_update.ClearMeasure(); //鎿﹂櫎鍐荤粨鏃舵渶鍚庝竴甯х殑缁撴灉
+        m_update.ClearMeasure(); //擦除冻结时最后一帧的结果
 
     } else {
         if (m_isDraw) {

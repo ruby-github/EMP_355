@@ -833,7 +833,7 @@ void ConfigToHost::ToggleData(GtkCellRendererToggle *cell, gchar *path_str) {
     gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
 
     /* do something with the value */
-    checked ^= 1; //鎸変綅寮傛垨
+    checked ^= 1; //按位异或
 
     /* set new value */
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);

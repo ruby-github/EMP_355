@@ -62,8 +62,8 @@ int g_setFunc = 1; //1: no useful, 2: adjust is using, 3: finish to calc auto tr
 //current operation (1: start line of cycle, 2: ps positoin, 3: ed position, 4: end line of cycle)
 int g_curOper = 1;
 /**
- * 1: 銆怱et銆慽s 纭in pw freeze,
- * 2: 銆怱et銆慽s 鏍℃
+ * 1: 【Set】is 确认in pw freeze,
+ * 2: 【Set】is 校正
  * 3:  not in manual or trace in freeze pw
  */
 
@@ -434,7 +434,7 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
 #ifdef EMP_3410
         if (type == 'P' && CManRegister::GetInstance()->IsAuthorize("CW"))
 #elif EMP_355
-        if (0)        //G30鏆傛椂灞忚斀CW鍔熻兘
+        if (0)        //G30暂时屏蔽CW功能
 #else
         if (type == 'P')
 #endif

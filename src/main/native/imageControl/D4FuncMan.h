@@ -14,12 +14,12 @@ public:
     void GetDataFromUsb(const unsigned char *pData);
     void Exit4D();
 
-    // 璁剧疆4D mode鏍囪
+    // 设置4D mode标记
     void Set4DMode(bool flag) {
         m_d4_mode = flag;
     }
 
-    // 鑾峰緱4D mode鏍囪
+    // 获得4D mode标记
     bool Get4DMode() {
         return m_d4_mode;
     }

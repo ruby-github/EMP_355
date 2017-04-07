@@ -33,7 +33,7 @@ public:
     double CalcRatio(double dist1, double dist2);
     ///> M
     double MCalcDepthDist(POINT p1, POINT p2);
-    double MCalcLvTei(double dist);//M妯″紡涓婽eicholz鏂规硶璁＄畻宸﹀瀹圭Н
+    double MCalcLvTei(double dist);//M模式下Teicholz方法计算左室容积
     double CalcEf(double edv, double esv);
     double MCalcTime(POINT p1, POINT p2);
     double MCalcVel(POINT p1, POINT p2);

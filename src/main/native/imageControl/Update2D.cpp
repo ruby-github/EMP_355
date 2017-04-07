@@ -107,7 +107,7 @@ void Update2D::Freq(int freq, EKnobReturn status) {
 }
 
 void Update2D::ScanAngle(int angleIndex, EKnobReturn status) {
-    sprintf(m_str, "%d掳", angleIndex);
+    sprintf(m_str, "%d°", angleIndex);
     SyncKnobD2(D2_ANGLE, m_str, status);
 }
 
@@ -222,9 +222,9 @@ void  Update2D::EdgeEnhance(int edgeIndex, EKnobReturn status) {
 }
 
 void Update2D::Steer(int angle, EKnobReturn status) {
-    sprintf(m_str, "%d掳", angle);
+    sprintf(m_str, "%d°", angle);
     SyncKnobD2(D2_STEER, m_str, status);
-    //m_ptrImgDraw->Set2DSteerAngle(angle); 鍋忚浆鐨勬儏鍐典笅涓嶈兘杩涘叆localzoom
+    //m_ptrImgDraw->Set2DSteerAngle(angle); 偏转的情况下不能进入localzoom
 }
 
 void Update2D::Depth(int depth) {
@@ -360,7 +360,7 @@ void Update2D::Enter2DKnob(void) {
     KnobD2Create();
 }
 
-// update鍙傛暟涓簍rue鏃讹紝浣跨敤鍦ㄨ嚜鍔ㄤ紭鍖栨椂鐨勬竻灞忥紝瑙ｅ喅杩涘叆妯″紡鏃舵煇浜涢潪瀹炴椂鎯呭喌涓嬬殑鏍囧織缁樺埗
+// update参数为true时，使用在自动优化时的清屏，解决进入模式时某些非实时情况下的标志绘制
 // 默认参数为false, 切换模式时使用
 void Update2D::Enter2DImg(bool update) {
     // change to 2D image area
@@ -468,7 +468,7 @@ void Update2D::EFOVZoom(float scale, EKnobReturn status) {
 }
 
 void Update2D::EFOVRotate(int angle, EKnobReturn status) {
-    sprintf(m_str, "%d掳", angle);
+    sprintf(m_str, "%d°", angle);
     SyncKnobEFOV(EFOV_ROTATE, m_str, status);
 }
 
@@ -845,7 +845,7 @@ void Update2D::CompoundSpace(int angle, EKnobReturn status) {
     if (angle == 0)
         sprintf(m_str, "%s", Toggle[0]);
     else
-        //sprintf(m_str, "%d掳", angle);
+        //sprintf(m_str, "%d°", angle);
         sprintf(m_str, "%d", angle);
 
     SyncKnobD2(D2_SPACE_COMPOUND, m_str, status);

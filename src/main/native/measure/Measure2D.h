@@ -13,8 +13,8 @@
 
 using std::string;
 
-///>涓ょ偣娉曟祴璺濈
-//>娣卞害鏂瑰悜涓婃祴璺濈
+///>两点法测距离
+//>深度方向上测距离
 class D2MeasureDistDot: public AbsMeasure {
 public:
     D2MeasureDistDot(const SingleItemInfo *ptrSingleItemInfo);
@@ -43,7 +43,7 @@ private:
     int m_2DRotate;
 };
 
-//涓ょ嚎娉曟祴璺濈
+//两线法测距离
 class D2MeasureDistLine: public AbsMeasure {
 public:
     D2MeasureDistLine(const SingleItemInfo *ptrSingleItemInfo);
@@ -67,8 +67,8 @@ private:
     POINT m_tempP;
     POINT m_p1;
 
-    POINT m_p11;//娴嬮噺鑼冨洿宸︿笂椤剁偣鍧愭爣
-    POINT m_p22;//娴嬮噺鑼冨洿鍙充笅椤剁偣鍧愭爣
+    POINT m_p11;//测量范围左上顶点坐标
+    POINT m_p22;//测量范围右下顶点坐标
     //两线的端点
     POINT m_line1_start;
     POINT m_line1_end;
@@ -82,7 +82,7 @@ private:
 
 };
 
-//杞ㄨ抗娉曟祴闀垮害
+//轨迹法测长度
 class D2MeasureLengthTrack: public AbsMeasure {
 public:
     D2MeasureLengthTrack(const SingleItemInfo *ptrSingleItemInfo);
@@ -98,8 +98,8 @@ public:
 
 private:
     double m_length;
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
-    vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
+    vector<POINT> m_track;//存储轨迹用于擦除
+    vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -132,7 +132,7 @@ public:
 
 private:
     double m_length;
-    vector<POINT> m_dot;//瀛樺偍鎻忕偣浣嶇疆鐢ㄤ簬鎿﹂櫎
+    vector<POINT> m_dot;//存储描点位置用于擦除
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -164,8 +164,8 @@ public:
 private:
     double m_area;
     double m_perimeter;
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
-    vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
+    vector<POINT> m_track;//存储轨迹用于擦除
+    vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -200,8 +200,8 @@ public:
     int DiamLine(POINT lenStart, POINT lenEnd, int lenEndPosi, bool isCur);
 
 private:
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
-    vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
+    vector<POINT> m_track;//存储轨迹用于擦除
+    vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -246,8 +246,8 @@ public:
     void Esc();
 
 private:
-    vector<POINT> m_track;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
-    vector<POINT> m_trackTemp;//涓存椂瀛樺偍鎿﹂櫎浜嗙殑杞ㄨ抗,鐢ㄤ簬閲嶇粯
+    vector<POINT> m_track;//存储轨迹用于擦除
+    vector<POINT> m_trackTemp;//临时存储擦除了的轨迹,用于重绘
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -288,7 +288,7 @@ public:
 private:
     double m_area;
     double m_perimeter;
-    vector<POINT> m_dot;//瀛樺偍鎻忕偣浣嶇疆鐢ㄤ簬鎿﹂櫎
+    vector<POINT> m_dot;//存储描点位置用于擦除
 
     MeasureCalc m_calc;
     MeasureDraw m_draw;
@@ -471,7 +471,7 @@ private:
     POINT m_l_start;	//长轴起始点
     POINT m_l_end;		//长轴终止点
     POINT m_s_start;	//短轴起始点
-    double  m_SA_P;		//杞撮暱
+    double  m_SA_P;		//轴长
 //	int m_method;
 
 //	void CalcResult(void);
@@ -506,7 +506,7 @@ private:
     POINT m_l_start;	//长轴起始点
     POINT m_l_end;		//长轴终止点
     POINT m_s_start;	//短轴起始点
-    double  m_SA_P;		//杞撮暱
+    double  m_SA_P;		//轴长
     double m_area;
     double m_dist;
     double m_vol;
@@ -628,8 +628,8 @@ private:
     POINT m_rl_p1, m_rl_p2;
     POINT m_il_p1, m_il_p2;
     double m_theta;
-    double m_alpha;//伪
-    double m_beta;//尾
+    double m_alpha;//α
+    double m_beta;//β
     struct Record {
         POINT point;
         double angle;
@@ -665,7 +665,7 @@ private:
     int m_method;
 };
 
-//涓ょ偣娉曡窛绂荤嫮绐勬瘮
+//两点法距离狭窄比
 class D2MeasureRatioDistDot: public AbsMeasure {
 public:
     D2MeasureRatioDistDot(int method,const SingleItemInfo *ptrSingleItemInfo);
@@ -701,7 +701,7 @@ private:
     int m_method;
 };
 
-//璺濈鍛ㄩ暱姣斾緥娴嬮噺
+//距离周长比例测量
 class D2MeasureRatioDistPeri: public AbsMeasure {
 public:
     D2MeasureRatioDistPeri(const SingleItemInfo *ptrSingleItemInfo);
@@ -757,8 +757,8 @@ class D2MeasureRatioAreaTrack: public AbsMeasure
 	double m_area1;
 	double m_area2;
 	double m_ratio;
-	vector<POINT> Track1;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
-	vector<POINT> Track2;//瀛樺偍杞ㄨ抗鐢ㄤ簬鎿﹂櫎
+	vector<POINT> Track1;//存储轨迹用于擦除
+	vector<POINT> Track2;//存储轨迹用于擦除
 
 	MeasureCalc m_calc;
 	MeasureDraw m_draw;

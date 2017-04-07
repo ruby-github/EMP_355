@@ -4,8 +4,8 @@
 using namespace std;
 
 ///>method: 0－时间，1－心率
-///>re_display:鏈祴閲忛」鐨勫睘鎬э紝鍖呮嫭璁＄畻椤圭殑璁＄畻鍏紡
-///>item: 杞欢鍖呮祴閲忛」鐨勬爣鍙凤紝浼犵粰UpdateMeasure涓妸绉戝埆娴嬮噺缁撴灉淇濆瓨璧锋潵
+///>re_display:本测量项的属性，包括计算项的计算公式
+///>item: 软件包测量项的标号，传给UpdateMeasure中把科别测量结果保存起来
 MMeasureTime::MMeasureTime(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -194,7 +194,7 @@ void MMeasureTime::Esc() {
     }
 }
 
-//M妯″紡閫熷害娴嬮噺
+//M模式速度测量
 MMeasureVel::MMeasureVel(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;
@@ -369,7 +369,7 @@ void MMeasureVel::Esc() {
     }
 }
 
-//M妯″紡甯﹁窛绂荤殑鏂滅巼娴嬮噺
+//M模式带距离的斜率测量
 MMeasureDistSlope::MMeasureDistSlope(const MultiItemInfo *ptrMultiItemInfo) {
     m_itemInfo = ptrMultiItemInfo;
 
@@ -739,7 +739,7 @@ void MMeasureDepth::Esc() {
     m_update.ClearMeasure();
 }
 
-///> 灏勮鍒嗘暟-M妯″紡鐨凾eicholz鏂规硶
+///> 射血分数-M模式的Teicholz方法
 MMeasureEFTei::MMeasureEFTei(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
     m_itemInfo = ptrSingleItemInfo;

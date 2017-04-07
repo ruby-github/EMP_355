@@ -1144,7 +1144,7 @@ void ViewReport::InsertIndication(const char* text) {
     gtk_text_buffer_get_end_iter(m_buffer_indication, &iter_end);
     gtk_text_buffer_insert(m_buffer_indication, &iter_end, text, -1);
 
-    //鎻掑叆鎹㈣
+    //插入换行
     gtk_text_buffer_get_end_iter(m_buffer_indication, &iter_end);
     gtk_text_buffer_insert(m_buffer_indication, &iter_end, "\n\n", -1);
 }
@@ -1159,7 +1159,7 @@ void ViewReport::InsertComments(const char* text) {
     gtk_text_buffer_get_end_iter(m_buffer_comments, &iter_end);
     gtk_text_buffer_insert(m_buffer_comments, &iter_end, text, -1);
 
-    //鎻掑叆鎹㈣
+    //插入换行
     gtk_text_buffer_get_end_iter(m_buffer_comments, &iter_end);
     gtk_text_buffer_insert(m_buffer_comments, &iter_end, "\n\n", -1);
 }
@@ -2560,7 +2560,7 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data) {
                 id = AVERRES_START_ID + i*2;
             sprintf(title, "%s", "AUA");
             sprintf(value, " %dw%dd", ((int)calc_val[0])/7, ((int)calc_val[0])%7);
-            rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
+            rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
 
             if(0 == i)
                 id = AVERRES_START_ID + 1;
@@ -2579,7 +2579,7 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data) {
             else
                 sprintf(value, "%d/%d/%d", ((int)calc_val[1])/10000, ((int)calc_val[1])%10000/100, (int)calc_val[1]%100);
 
-            rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
+            rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
         }
     }
 
@@ -2590,14 +2590,14 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data) {
         sprintf(title, "%s", "GA(LMP)");
         sprintf(value, "%dw%dd",  ((int)calc_val[0])/7, ((int)calc_val[0])%7);
         id = AVERRES_START_ID +4;
-        rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
+        rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
 
         char edcb[20];
         MeaCalcFun::CalcEDCB_LMP(info.ob.LMPDate.year, info.ob.LMPDate.month, info.ob.LMPDate.day, edcb);
         sprintf(title, "%s", "EDD(LMP)");
         sprintf(value, "%s",  edcb);
         id = AVERRES_START_ID +5;
-        rows = AddResultToTree3(treeview, title, value, "卤 1w", id, rows);
+        rows = AddResultToTree3(treeview, title, value, "± 1w", id, rows);
 
     }
 
@@ -2638,7 +2638,7 @@ void ViewReport::AddAverRes(GtkWidget *fixed, guint *y, const char *data) {
     }
 }
 #ifdef VET
-//娣诲姞鑲岃叡 鐥呯伓闈㈢Н 缁撴灉鏄剧ず
+//添加肌腱 病灶面积 结果显示
 //hlx
 void ViewReport::AddTDRes(GtkWidget *fixed, guint *y, const char *title) {
     guint x1 = 120;
@@ -2741,9 +2741,9 @@ void ViewReport::AddOBEfwTable(GtkWidget *fixed, guint *y, const char *labstr, i
         MeasureMan::GetInstance()->GetMeasureUnit(coeffi, units,EfwInfo[i]->unitItem);
         sprintf(title, "%s%s%s%s", _("EFW"), "(", method[i], ")");
         sprintf(value, "%.2f%s", calc_val*coeffi, units.c_str());
-        sprintf(sd, "卤 %.2f%s", calc_val*0.1*coeffi, units.c_str());
+        sprintf(sd, "± %.2f%s", calc_val*0.1*coeffi, units.c_str());
         //sprintf(value, "%.2f%s", calc_val*1000, "g"); //units[EfwInfo[i]->unitItem]);
-        //sprintf(sd, "卤 %.2f%s", calc_val*1000*0.1, "g");
+        //sprintf(sd, "± %.2f%s", calc_val*1000*0.1, "g");
         rows = AddResultToTree3(treeview, title, value, sd, id, rows);
     }
 
@@ -3001,7 +3001,7 @@ static void draw_dash_line(GdkDrawable *drawable, GdkGC *gc, GdkFunction mode, i
 void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum[], int GWDate, char sign) {
 //	PRINTF("%s: StartDate=%d, MeasureNum 0=%d, 1=%d, GWDate=%d\n", __FUNCTION__, StartDate, MeasureNum[0], MeasureNum[1], GWDate);
 #if 1
-    //X杞翠唬琛ㄥぉ鏁帮紝Y杞翠唬琛ㄦ墍娴嬫寚鏍囩殑闀垮害
+    //X轴代表天数，Y轴代表所测指标的长度
     int i, j, x, y;
     int FormerX = 0;
     int FormerY = 0;
@@ -3009,7 +3009,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
     volatile int Coordinate_Len=280, Coordinate_Start_X=320, Coordinate_Start_Y=320;
     //	volatile int Table_data[280];
     volatile int Length_X, Length_Y;
-    //Unit_Len_X涓篨鍧愭爣涓婃瘡鏍间唬琛ㄧ殑鏁版嵁闀垮害锛孶nit_Len_X1涓篨鍧愭爣涓婃瘡鏍肩殑璞＄礌闀垮害
+    //Unit_Len_X为X坐标上每格代表的数据长度，Unit_Len_X1为X坐标上每格的象素长度
     volatile int Unit_Len_X, Unit_Len_Y, Unit_Len_X1, Unit_Len_Y1;
     volatile int StartNum_X, StartNum_Y;//坐标轴起始数据
     volatile int DataNum = 0;
@@ -3026,7 +3026,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
         else
             break;
     }
-    //=============璁＄畻鍧愭爣杞存暟鍊艰寖鍥达紝鐢诲潗鏍囪酱====================//
+    //=============计算坐标轴数值范围，画坐标轴====================//
     Length_Y = ObTable[DataNum-1][2] - ObTable[0][0];
     Length_X = DataNum;
 
@@ -3060,7 +3060,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
     for(i=1; i<=10; i++) {
         draw_dash_line (m_pixmapGC, gc, GDK_COPY, Coordinate_Start_X+i*Unit_Len_X1-1, Coordinate_Start_Y-5, Coordinate_Start_X+i*Unit_Len_X1-1, Coordinate_Start_Y);
         for(j=1; j<21; j++) {
-            //鍧愭爣杞寸偣
+            //坐标轴点
             gdk_draw_point (m_pixmapGC, gc, Coordinate_Start_X+i*Unit_Len_X1-1, Coordinate_Start_Y-j*Unit_Len_Y1/2);
         }
     }
@@ -3118,7 +3118,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
         FormerY = y;
     }
 
-    for(i=0; i<DataNum; i++) { //涓嬮檺鏇茬嚎
+    for(i=0; i<DataNum; i++) { //下限曲线
         x = Coordinate_Start_X + (i+StartDate-StartNum_X)*Unit_Len_X1/Unit_Len_X;
         y = Coordinate_Start_Y - (ObTable[i][0]-StartNum_Y)*Unit_Len_Y1/Unit_Len_Y;
 
@@ -3134,7 +3134,7 @@ void ViewReport::DrawGrowthCurve(int ObTable[][3], int StartDate, int MeasureNum
         FormerY = y;
     }
 
-    for(i=0; i<DataNum; i++) { //涓婇檺鏇茬嚎
+    for(i=0; i<DataNum; i++) { //上限曲线
         x = Coordinate_Start_X + (i+StartDate-StartNum_X)*Unit_Len_X1/Unit_Len_X;
         y = Coordinate_Start_Y - (ObTable[i][2]-StartNum_Y)*Unit_Len_Y1/Unit_Len_Y;
         gdk_draw_point (m_pixmapGC, gc, x, y);

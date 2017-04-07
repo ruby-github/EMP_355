@@ -4,7 +4,6 @@
 #define IMG_AREA_W 844 //ModLayout 844 PreLayout 804  /* 1024-180 */
 #define IMG_AREA_H 568 //ModLayout 560 PreLayout 540
 
-///////////////////
 #define IMAGE_X 110 //ModLayout 120 PreLayout 80
 #define IMAGE_Y 30 //ModLayout 30 PreLayout 20
 
@@ -272,7 +271,7 @@ private:
         int width;
     };
     std::vector<MeasurePos> m_meaResultPos;
-    int m_meaResultLineH; //娴嬮噺缁撴灉姣忚楂樺害锛堝儚绱狅級锛岄€氳繃pango_layout_get_size()寰楀埌锛屾敞鎰忥細璋冪敤璇ュ嚱鏁版椂濡傛灉layout涓棤瀛楃锛屽緱鍒扮殑缁撴灉鍙兘涓嶅
+    int m_meaResultLineH; //测量结果每行高度（像素），通过pango_layout_get_size()得到，注意：调用该函数时如果layout中无字符，得到的结果可能不对
     struct RectArea m_meaResultRect;
     int m_curCountLines;
 

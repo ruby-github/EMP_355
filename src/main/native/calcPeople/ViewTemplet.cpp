@@ -434,7 +434,7 @@ GtkTreeModel* ViewTemplet::CreateTreeModel(void) {
     CloseDB();
     return GTK_TREE_MODEL(store);
 }
-//treeview灞曞紑涔嬪墠鍋氱殑浜嬫儏锛屽睍寮€涔嬪墠鍏堟敹璧锋墍鏈夌殑鑿滃崟
+//treeview展开之前做的事情，展开之前先收起所有的菜单
 bool ViewTemplet::TempletTestRowExpandBefore(GtkTreeView *treeview, GtkTreeIter *iter, GtkTreePath *path) {
     gtk_tree_view_collapse_all(treeview);
     return FALSE; //必须要有返回值,才能触发事件
@@ -476,7 +476,7 @@ bool ViewTemplet::CloseDB(void) {
 void ViewTemplet::TreeSelectionChanged(GtkTreeSelection *selection) {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    //濡傛灉娌℃湁閫変腑浠讳綍缁撶偣,鐩存帴杩斿洖
+    //如果没有选中任何结点,直接返回
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE)
         return;
     //如果选中的结点不是叶子结点,设置indication和comment为空,返回
@@ -553,7 +553,7 @@ void ViewTemplet::TreeSelectionChanged(GtkTreeSelection *selection) {
 }
 
 void ViewTemplet::InsertClicked(GtkButton *button) {
-    char *new_string = _("New Item");//涓存椂鎻掑叆缁撶偣
+    char *new_string = _("New Item");//临时插入结点
 
     GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeView));
 
@@ -576,7 +576,7 @@ void ViewTemplet::InsertClicked(GtkButton *button) {
             GtkTreeIter iter_tmp = InsertUnique(model, &iter, new_string);
             gtk_tree_selection_select_iter(selected_node, &iter_tmp);
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                              _("Please rename the New Item!"), NULL); //璇烽噸鍛藉悕鏂板缁撶偣!
+                                              _("Please rename the New Item!"), NULL); //请重命名新增结点!
             return;
         }
         stream << "INSERT INTO templet VALUES('" << new_string << "', '', '', '', '', '')";
@@ -666,7 +666,7 @@ void ViewTemplet::InsertClicked(GtkButton *button) {
     GtkTreeIter iter_new;
     gtk_tree_store_append(GTK_TREE_STORE(model), &iter_new, &iter);
     gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, new_string, -1);
-    //閫変腑骞跺睍寮€鏂板鍔犵殑缁撶偣
+    //选中并展开新增加的结点
     GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
     gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_treeView), new_path);
 
@@ -690,7 +690,7 @@ void ViewTemplet::DeleteClicked(GtkButton *button) {
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select one node to be save!"), NULL); //璇峰厛閫夋嫨寰呭垹闄ょ殑缁撶偣!
+                                          _("Please select one node to be save!"), NULL); //请先选择待删除的结点!
         return;
     }
 
@@ -792,7 +792,7 @@ void ViewTemplet::DeleteClicked(GtkButton *button) {
     gtk_tree_model_iter_parent(model, &parent_iter, &iter);
     GtkTreePath *parent_path = gtk_tree_model_get_path(model, &parent_iter);
 
-    //鍒锋柊treeview
+    //刷新treeview
     gtk_tree_store_remove(GTK_TREE_STORE(model), &m_topIter);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeView), CreateTreeModel());
 
@@ -808,7 +808,7 @@ void ViewTemplet::CopyClicked(GtkButton *button) {
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select one node to be copy!"), NULL); //璇峰厛閫夋嫨寰呭鍒剁殑缁撶偣!
+                                          _("Please select one node to be copy!"), NULL); //请先选择待复制的结点!
         return;
     }
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -922,7 +922,7 @@ void ViewTemplet::CopyClicked(GtkButton *button) {
             indication.assign((const char *)sqlite3_column_text(stmt, 4));
         if (strcmp(sqlite3_column_name(stmt, 5), "comments") == 0)
             comments.assign((const char *)sqlite3_column_text(stmt, 5));
-        stream.str(""); // 娓呯┖stream
+        stream.str(""); // 清空stream
         stream << "INSERT INTO templet_copy VALUES('" << f1 << "', '" << f2 << "', '" << f3 << "', '" << f4 << "', '"
                << indication << "', '" << comments << "')";
         sql = stream.str();
@@ -940,7 +940,7 @@ void ViewTemplet::CopyClicked(GtkButton *button) {
 
     CloseDB();
 
-    //姹傜粨鐐圭殑楂樺害
+    //求结点的高度
     int max_height = 0;
     m_nodeHeight = 0;
 
@@ -976,7 +976,7 @@ void ViewTemplet::PasteClicked(GtkButton *button) {
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select one node to be paste!"), NULL);//璇峰厛閫夋嫨寰呯矘璐寸殑缁撶偣!
+                                          _("Please select one node to be paste!"), NULL);//请先选择待粘贴的结点!
         return;
     }
 
@@ -993,7 +993,7 @@ void ViewTemplet::PasteClicked(GtkButton *button) {
     gtk_tree_model_get(model, &iter, 0, &strtmp, -1);
     if (strcmp(strtmp, m_parentNode.c_str()) == 0) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Can not paste it in the same parent!"), NULL);//涓嶈兘鍦ㄥ悓涓€鐖剁粨鐐逛笅杩涜绮樿创!
+                                          _("Can not paste it in the same parent!"), NULL);//不能在同一父结点下进行粘贴!
         return;
     }
 
@@ -1032,7 +1032,7 @@ void ViewTemplet::PasteClicked(GtkButton *button) {
             indication.assign((const char *)sqlite3_column_text(stmt, 4));
         if (strcmp(sqlite3_column_name(stmt, 5), "comments") == 0)
             comments.assign((const char *)sqlite3_column_text(stmt, 5));
-        stream.str(""); // 娓呯┖stream
+        stream.str(""); // 清空stream
         switch (m_flagDepth) {
         case 2:
             if (tree_depth == 2) {
@@ -1235,7 +1235,7 @@ void ViewTemplet::SaveClicked(GtkButton *button) {
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select one node to be save!"), NULL);//璇峰厛閫夋嫨寰呬繚瀛樼殑缁撶偣!
+                                          _("Please select one node to be save!"), NULL);//请先选择待保存的结点!
         return;
     }
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -1266,7 +1266,7 @@ void ViewTemplet::SaveClicked(GtkButton *button) {
 
     if (strlen(text_comments) > maxTextLen) {
         ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("The comments are too long!"), NULL);//璇婃柇鎰忚瓒呭嚭瀛楁暟鑼冨洿闄愬埗
+                                          _("The comments are too long!"), NULL);//诊断意见超出字数范围限制
         return;
     }
 
@@ -1328,7 +1328,7 @@ static int DefaultTemplet(gpointer data) {
 void ViewTemplet::DefaultClicked(GtkButton *button) {
     ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                                       ViewDialog::QUESTION,
-                                      _("Default Factory will remove all the users modified data!"), // 鎭㈠鍑哄巶璁剧疆灏嗗垹闄ゆ墍鏈夌敤鎴蜂慨鏀圭殑鏁版嵁
+                                      _("Default Factory will remove all the users modified data!"), // 恢复出厂设置将删除所有用户修改的数据
                                       DefaultTemplet);
 }
 
@@ -1366,7 +1366,7 @@ void ViewTemplet::CellRendererEdited(GtkCellRendererText *renderer, gchar *path_
         return;
 
     if (strcmp(new_text, "") == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Node name can not be null!"), NULL); //缁撶偣鍚嶇О涓嶈兘涓虹┖
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Node name can not be null!"), NULL); //结点名称不能为空
         return;
     }
 
@@ -1377,7 +1377,7 @@ void ViewTemplet::CellRendererEdited(GtkCellRendererText *renderer, gchar *path_
     ostringstream stream;
 
     if (tree_depth == 1) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Can not rename the root!"), NULL); //涓嶈兘閲嶅懡鍚嶆牴缁撶偣
+        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Can not rename the root!"), NULL); //不能重命名根结点
         return;
     } else if (tree_depth == 2) {
         stream << "UPDATE templet SET f1 = '" << new_text << "' WHERE f1 = '" << old_text << "'";
@@ -1474,7 +1474,7 @@ bool ViewTemplet::UniqueItem(const char *str1, const char *str2, const char *str
 }
 
 //在一个指定结点下查找其儿子结点为str的结点
-//涓昏鏄伩鍏嶅湪鎻掑叆鎿嶄綔鏄彃鍏ラ噸澶嶇殑New_Item缁撶偣
+//主要是避免在插入操作是插入重复的New_Item结点
 GtkTreeIter ViewTemplet::InsertUnique(GtkTreeModel *model, GtkTreeIter *iter, const char *str) {
     GtkTreeIter tmp_iter;
     char *strtmp = NULL;
@@ -1570,7 +1570,7 @@ bool ViewTemplet::DefaultFactory(void) {
 
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                                               ViewDialog::INFO,
-                                              _("Recovery succeed! Restart request!"), // 鎭㈠鏁版嵁鎴愬姛锛岄渶瑕侀噸鏂板紑鍚鍔熻兘
+                                              _("Recovery succeed! Restart request!"), // 恢复数据成功，需要重新开启该功能
                                               RestartTemplet);
 
             return true;
@@ -1604,7 +1604,7 @@ bool ViewTemplet::DefaultFactory(void) {
 
             ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                                               ViewDialog::INFO,
-                                              _("Recovery succeed! Restart request!"), // 鎭㈠鏁版嵁鎴愬姛锛岄渶瑕侀噸鏂板紑鍚鍔熻兘
+                                              _("Recovery succeed! Restart request!"), // 恢复数据成功，需要重新开启该功能
                                               RestartTemplet);
 
             return true;

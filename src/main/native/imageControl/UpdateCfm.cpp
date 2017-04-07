@@ -153,7 +153,7 @@ void UpdateCfm::EnterCfmKnob(void) {
     KnobCfmCreate();
 }
 
-// update鍙傛暟涓簍rue鏃讹紝浣跨敤鍦ㄨ嚜鍔ㄤ紭鍖栨椂鐨勬竻灞忥紝瑙ｅ喅杩涘叆妯″紡鏃舵煇浜涢潪瀹炴椂鎯呭喌涓嬬殑鏍囧織缁樺埗
+// update参数为true时，使用在自动优化时的清屏，解决进入模式时某些非实时情况下的标志绘制
 // 默认参数为false, 切换模式时使用
 void UpdateCfm::EnterCfmImg(bool update) {
     // change to cfm image area
