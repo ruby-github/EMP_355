@@ -326,22 +326,26 @@ void MenuReview::UpdateSelectedColor() {
 }
 
 void MenuReview::LoadVideoToReplay(void) {
-    Replay::GetInstance()->EnterReadCine();
-    LoadVideoToMem(m_vecName[m_idShowed].c_str());
-    Replay::GetInstance()->PrepareForReplay();
-    if(ViewSuperuser::GetInstance()->GetDemoStatus()) { //init demo para
-        Replay::GetInstance()->ViewOneImg();
-    } else {
-        Replay::GetInstance()->ReviewOneImg();
-    }
+    if (m_vecName.size() > m_idShowed) {
+      Replay::GetInstance()->EnterReadCine();
+      LoadVideoToMem(m_vecName[m_idShowed].c_str());
+      Replay::GetInstance()->PrepareForReplay();
+      if(ViewSuperuser::GetInstance()->GetDemoStatus()) { //init demo para
+          Replay::GetInstance()->ViewOneImg();
+      } else {
+          Replay::GetInstance()->ReviewOneImg();
+      }
 
-    FreezeMode::GetInstance()->EnterReplayMode();
-    HintArea::GetInstance()->ClearHint();
+      FreezeMode::GetInstance()->EnterReplayMode();
+      HintArea::GetInstance()->ClearHint();
+    }
 }
 
 void MenuReview::LoadSnapToReview(void) {
-    PRINTF("%s: load snap file %s\n", __FUNCTION__, m_vecName[m_idShowed].c_str());
-    LoadSnapToScreen(m_vecName[m_idShowed].c_str());
+    if (m_vecName.size() > m_idShowed) {
+      PRINTF("%s: load snap file %s\n", __FUNCTION__, m_vecName[m_idShowed].c_str());
+      LoadSnapToScreen(m_vecName[m_idShowed].c_str());
+    }
 }
 
 void MenuReview::SetPatientID(unsigned int id) {

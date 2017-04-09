@@ -444,8 +444,8 @@ char* MenuBDMK::GetBdmkPath(const char *item) {
 }
 
 void MenuBDMK::BDMKClicked(GtkButton *button) {
-    char *path;
-    char *abspath;
+    char *path = NULL;
+    char *abspath = NULL;
     int no = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(button), "SNO"));
 #ifdef VET
     switch(m_study) {
@@ -506,13 +506,17 @@ void MenuBDMK::BDMKClicked(GtkButton *button) {
 
 #endif
 
-    abspath = g_build_filename(path, m_vecName[no+(m_pageCur-1)*MAX_IMAGE].c_str(), NULL);
-    if(!g_file_test(abspath, G_FILE_TEST_IS_DIR)) {
-        m_pixbufSel = gdk_pixbuf_new_from_file(abspath, NULL);
+    if (m_vecName.size() > no+(m_pageCur-1)*MAX_IMAGE) {
+      abspath = g_build_filename(path, m_vecName[no+(m_pageCur-1)*MAX_IMAGE].c_str(), NULL);
 
-        //add code to draw bdmk to image area
-        MultiFuncBodyMark::SetNewBodyMark(m_pixbufSel);
+      if(!g_file_test(abspath, G_FILE_TEST_IS_DIR)) {
+          m_pixbufSel = gdk_pixbuf_new_from_file(abspath, NULL);
+
+          //add code to draw bdmk to image area
+          MultiFuncBodyMark::SetNewBodyMark(m_pixbufSel);
+      }
     }
+
 #if 0
     //GdkPixbuf *pixbuf;
     image = gtk_button_get_image(button);
