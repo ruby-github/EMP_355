@@ -1,9 +1,12 @@
+#include "utils/CalcTime.h"
+
+
 #include <stdlib.h>
 #include <string.h>
 #include "imageControl/FpgaGeneral.h"
 #include "imageControl/UsbControl.h"
 #include "imageControl/PcieControl.h"
-#include "base/CalcTime.h"
+
 
 ///> /////////////////////////////////[private variable]////////////////////////////
 CFpgaGeneral* CFpgaGeneral::m_ptrInstance = NULL;

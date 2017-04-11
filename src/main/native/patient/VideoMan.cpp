@@ -1,5 +1,7 @@
 #include <string.h>
 #include <unistd.h>
+#include "utils/IniFile.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
@@ -12,7 +14,6 @@
 #include "display/gui_global.h"
 #include "imageProc/Replay.h"
 #include "patient/VideoMan.h"
-#include "base/IniFile.h"
 #include "patient/CreateAvi.h"
 #include "patient/CreateEmp.h"
 #include "display/HintArea.h"

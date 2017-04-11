@@ -1,8 +1,7 @@
 #ifndef _DEFAULTBIOPSYSETTING_H_
 #define _DEFAULTBIOPSYSETTING_H_
 
-#include "base/IniFile.h"
-using namespace std;
+#include "utils/IniFile.h"
 
 class DefaultBiopsySetting {
 public:

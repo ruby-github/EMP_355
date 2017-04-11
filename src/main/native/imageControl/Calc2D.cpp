@@ -1,13 +1,7 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: Calc2D.cpp
- * @brief: abstract class, in charge of 2D imaging calculation
- *
- * version: V1.0
- * date: 2009-5-11
- * @author: zhanglei
- */
+#include "utils/CalcTime.h"
+
+
+
 #include <gtk/gtk.h>
 #include <math.h>
 #include <string.h>
@@ -15,7 +9,7 @@
 #include "Def.h"
 #include "imageControl/FpgaCtrl2D.h"
 #include "imageProc/ModeStatus.h"
-#include "base/CalcTime.h"
+
 #include "probe/ProbeMan.h"
 #include "display/HintArea.h"
 

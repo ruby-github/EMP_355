@@ -1,5 +1,9 @@
 #include "display/ImageArea.h"
 #include "ViewMain.h"
+#include "utils/CalcTime.h"
+
+
+
 #include <math.h>
 #include "imageProc/Replay.h"
 #include "imageProc/MenuReview.h"
@@ -12,7 +16,6 @@
 #include <pango-1.0/pango/pangoft2.h>
 #include <ImageMix.h>
 #include <DSCTypes.h>
-#include "base/CalcTime.h"
 #include "measure/CDrawIMT.h"
 #include "sysMan/SysMeasurementSetting.h"
 #include "keyboard/KeyDef.h"

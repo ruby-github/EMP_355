@@ -1,13 +1,10 @@
 #ifndef PROBEMAN_H
 #define PROBEMAN_H
 
-#include <string>
-#include <vector>
-#include "probe/ProbeSocket.h"
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
-using std::string;
-using std::vector;
+
+#include "probe/ProbeSocket.h"
 
 class ProbeMan {
 public:

@@ -1,10 +1,9 @@
-#include <string>
+#include "utils/IniFile.h"
+
 
 #include "Def.h"
 #include "sysMan/SysDicomSetting.h"
-#include "base/IniFile.h"
 
-using std::string;
 
 SysDicomSetting::SysDicomSetting() {
     char path[256];

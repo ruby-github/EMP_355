@@ -1,17 +1,15 @@
 #ifndef __IMGMAN_H__
 #define __IMGMAN_H__
 
-#include <vector>
+#include "utils/IniFile.h"
+
 #include <list>
-#include <string>
-#include "base/IniFile.h"
 #include "patient/FileMan.h"
 #include "imageProc/ScanMode.h"
 #include "periDevice/DCMMan.h"
 
-using std::vector;
+
 using std::list;
-using std::string;
 
 class ImgMan: public FileMan {
 public:

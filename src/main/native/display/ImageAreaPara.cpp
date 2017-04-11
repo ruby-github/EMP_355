@@ -1,16 +1,7 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: ImageAreaPara.cpp
- * @brief: display image parameter on image area
- *
- * version: V1.0
- * date: 2009-7-23
- * @author: yangneng
- */
+#include "utils/CalcTime.h"
+
 #include "display/ImageArea.h"
 #include "display/ImageAreaPara.h"
-#include "base/CalcTime.h"
 #include "imageProc/ModeStatus.h"
 #include <stdlib.h>
 #include "keyboard/KeyDef.h"

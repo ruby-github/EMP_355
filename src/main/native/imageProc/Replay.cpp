@@ -1,13 +1,6 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: Replay.cpp
- * @brief: manage replay images and replay area
- *
- * version: V1.0
- * date: 2009-6-2
- * @author: zhanglei
- */
+#include "utils/CalcTime.h"
+
+
 
 #include "imageProc/Replay.h"
 #include "Def.h"
@@ -17,7 +10,6 @@
 #include "display/ImageArea.h"
 #include "display/TopArea.h"
 #include "display/HintArea.h"
-#include "base/CalcTime.h"
 #include "imageControl/KnobEFOV.h"
 #include "imageControl/Update2D.h"
 #include "patient/ImgMan.h"

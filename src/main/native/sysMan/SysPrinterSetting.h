@@ -1,7 +1,7 @@
 #ifndef _SYSPRINTERSETTING_H_
 #define _SYSPRINTERSETTING_H_
 
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
 class SysPrinterSetting {
 public:

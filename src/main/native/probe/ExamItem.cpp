@@ -1,18 +1,9 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: ExamItem.cpp
- * @brief: manage parameter of exam item and auto-optimizing image
- *
- * version: V1.0
- * date: 2009-6-7
- * @author: zhanglei
- */
+#include "utils/IniFile.h"
+
 #include "imageProc/ModeStatus.h"
 #include <stdio.h>
 #include <string.h>
 #include "probe/ExamItem.h"
-#include "base/IniFile.h"
 #include "Def.h"
 #include "probe/ViewProbe.h"
 #include "sysMan/ViewSystem.h"

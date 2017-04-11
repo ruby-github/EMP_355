@@ -14,13 +14,16 @@
 #ifndef __MULTIFUNCARROW_H__
 #define __MULTIFUNCARROW_H__
 
+#include "utils/CalcTime.h"
+
+
+
 #include "Def.h"
 #include "AbsUpdateArrow.h"
 #include "keyboard/KnobEvent.h"
 #include "AbsMultiFunc.h"
 #include "comment/Arrow.h"
 #include "display/KnobMenu.h"
-#include "base/CalcTime.h"
 
 class MultiFuncArrow: public CAbsUpdateArrow, public CKnobEvent, public AbsMultiFunc {
 public:

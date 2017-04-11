@@ -1,3 +1,5 @@
+#include "utils/IniFile.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -8,7 +10,6 @@
 #include "Def.h"
 #include "display/gui_global.h"
 #include "display/gui_func.h"
-#include "base/IniFile.h"
 #include "patient/FileMan.h"
 #include "periDevice/PeripheralMan.h"
 #include "sysMan/UpgradeMan.h"

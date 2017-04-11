@@ -1,13 +1,7 @@
 #ifndef __UPGRADEMAN_H__
 #define __UPGRADEMAN_H__
 
-#include <string>
-#include <vector>
-
-#include "base/IniFile.h"
-
-using std::string;
-using std::vector;
+#include "utils/IniFile.h"
 
 class UpgradeMan {
 public:

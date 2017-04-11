@@ -1,7 +1,7 @@
 #ifndef __SYSGENERALSETTING_H__
 #define __SYSGENERALSETTING_H__
 
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
 class SysGeneralSetting {
 public:

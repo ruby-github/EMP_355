@@ -1,6 +1,10 @@
 #ifndef IMG_CFM_H
 #define IMG_CFM_H
 
+#include "utils/CalcTime.h"
+
+
+
 #include "imageControl/CalcCfm.h"
 #include "AbsUpdateCfm.h"
 #include "AbsUpdate2D.h"
@@ -11,7 +15,6 @@
 #include "probe/ProbeMan.h"
 #include "probe/ExamItem.h"
 #include "imageProc/DscMan.h"
-#include "base/CalcTime.h"
 
 class ImgCfm {
 public:

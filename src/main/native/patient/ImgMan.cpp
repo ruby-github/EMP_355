@@ -1,3 +1,5 @@
+#include "utils/IniFile.h"
+
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -11,7 +13,6 @@
 #include "Def.h"
 #include "display/gui_global.h"
 #include "patient/ImgMan.h"
-#include "base/IniFile.h"
 #include "patient/CreateJpeg.h"
 #include "patient/CreateBitmap.h"
 #include "patient/CreateEmp.h"

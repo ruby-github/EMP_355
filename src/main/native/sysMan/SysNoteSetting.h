@@ -1,7 +1,7 @@
 #ifndef __SYSNOTESETTING_H__
 #define __SYSNOTESETTING_H__
 
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
 class SysNoteSetting {
 public:

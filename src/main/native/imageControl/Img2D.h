@@ -1,6 +1,10 @@
 #ifndef IMAGING2D_H
 #define IMAGING2D_H
 
+#include "utils/CalcTime.h"
+
+
+
 #include "probe/ProbeMan.h"
 #include "probe/ExamItem.h"
 #include "imageControl/Calc2D.h"
@@ -8,7 +12,6 @@
 #include "Def.h"
 #include <DSCTypes.h>
 #include <DSC.h>
-#include "base/CalcTime.h"
 #include "periDevice/ManRegister.h"
 
 /*

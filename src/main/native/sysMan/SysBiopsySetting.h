@@ -1,7 +1,7 @@
 #ifndef _SYSBIOPSYSETTING_H_
 #define _SYSBIOPSYSETTING_H_
 
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
 class SysBiopsySetting {
 public:

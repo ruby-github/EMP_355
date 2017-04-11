@@ -1,15 +1,12 @@
 #ifndef EXAM_ITEM_H
 #define EXAM_ITEM_H
 
-#include <string>
-#include <vector>
+#include "utils/IniFile.h"
+
 #include "Def.h"
-#include "base/IniFile.h"
 #include "probe/ProbeSocket.h"
 //#include "../imageProc/ScanMode.h"
 
-using std::string;
-using std::vector;
 
 #define DEFAULT_NOTE_FILE "res/DefaultNote.ini"
 ///> file path and name

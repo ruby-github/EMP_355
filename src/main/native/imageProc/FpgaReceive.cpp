@@ -1,3 +1,6 @@
+#include "utils/CalcTime.h"
+
+
 #include "imageProc/FpgaReceive.h"
 #include "imageProc/Format2D.h"
 #include <BDSC.h>
@@ -5,7 +8,7 @@
 #include "imageProc/DscMan.h"
 #include "imageControl/ImgPw.h"
 //for test
-#include "base/CalcTime.h"
+
 #include "imageProc/ModeStatus.h"
 #include "imageControl/D4FuncMan.h"
 #include "keyboard/MultiFuncMode.h"

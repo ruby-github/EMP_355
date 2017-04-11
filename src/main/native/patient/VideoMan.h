@@ -1,19 +1,16 @@
 #ifndef __VIDEOMAN_H__
 #define __VIDEOMAN_H__
 
+#include "utils/IniFile.h"
+
 #include <deque>
-#include <vector>
 #include <list>
-#include <string>
 #include "imageProc/Image.h"
-#include "base/IniFile.h"
 #include "patient/FileMan.h"
 #include "periDevice/DCMMan.h"
 
 using std::deque;
-using std::vector;
 using std::list;
-using std::string;
 
 class VideoMan: public FileMan {
 public:

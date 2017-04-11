@@ -24,6 +24,8 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <math.h>
+#include "utils/CalcTime.h"
+
 #include "display/ImageAreaDraw.h"
 #include "display/ImageArea.h"
 #include "display/gui_func.h"
@@ -36,7 +38,6 @@
 #include "measure/MeasureCalc.h"
 #include "measure/MeasureDraw.h"
 #include "measure/UpdateMeasure.h"
-#include "base/CalcTime.h"
 #include "imageProc/Zoom.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "imageProc/MenuPW.h"

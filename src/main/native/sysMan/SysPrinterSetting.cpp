@@ -1,6 +1,8 @@
-#include <string>
+#include "utils/IniFile.h"
+
+
 #include "sysMan/SysPrinterSetting.h"
-#include "base/IniFile.h"
+
 #include "Def.h"
 #include "periDevice/ViewPrintSetting.h"
 

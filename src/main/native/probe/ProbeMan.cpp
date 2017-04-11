@@ -1,13 +1,6 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: ProbeMan.cpp
- * @brief: Manage all socket in system. all operation on socket must delegate by class ProbeMan
- *
- * version: V1.0
- * date: 2009-5-9
- * @author: zhanglei
- */
+#include "utils/CalcTime.h"
+#include "utils/IniFile.h"
+
 
 #include "probe/ProbeMan.h"
 #include "Def.h"
@@ -17,11 +10,9 @@
 #include "probe/ProbeList-430.h"
 #include "probe/ProbeList-440.h"
 #include "probe/ProbeList-355.h"
-#include "base/CalcTime.h"
 #include "imageControl/FpgaGeneral.h"
-#include "base/IniFile.h"
 
-#include <string>
+
 
 using namespace std;
 

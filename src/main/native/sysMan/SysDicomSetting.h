@@ -1,7 +1,7 @@
 #ifndef __SYSDICOMSETTING_H__
 #define __SYSDICOMSETTING_H__
 
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
 class SysDicomSetting {
 public:

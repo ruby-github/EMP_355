@@ -1,7 +1,7 @@
 #ifndef __SYSMEASUREMENTSETTING_H__
 #define __SYSMEASUREMENTSETTING_H__
 
-#include "base/IniFile.h"
+#include "utils/IniFile.h"
 
 struct TraceItem {
     unsigned char psSet;
