@@ -1,5 +1,5 @@
-#ifndef __ini_file_h__
-#define __ini_file_h__
+#ifndef __INI_FILE_H__
+#define __INI_FILE_H__
 
 #include <glib.h>
 #include <string>

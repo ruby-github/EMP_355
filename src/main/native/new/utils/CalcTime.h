@@ -1,5 +1,5 @@
-#ifndef __calc_time_h__
-#define __calc_time_h__
+#ifndef __CALC_TIME_H__
+#define __CALC_TIME_H__
 
 #include <sys/time.h>
 
