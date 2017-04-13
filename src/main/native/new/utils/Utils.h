@@ -19,17 +19,19 @@ public:
 
   static GtkButton* create_button(const string label = "");
   static GtkButton* create_button_with_image(const string filename = "", const int width = 0, const int height = 0);
+  static void set_button_image(GtkButton* button, GtkImage* image, const GtkPositionType position = GTK_POS_LEFT);
+
+  static GtkImage* create_image(const string filename = "", const int width = 0, const int height = 0);
 
   static GtkEntry* create_entry();
-  static GtkComboBox* create_combobox();
+  static GtkComboBoxText* create_combobox_text();
   static GtkNotebook* create_notebook();
-  static GtkImage* create_image(const string filename = "", const int width = 0, const int height = 0);
 
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,
     const int size, const int max_width, const int max_height);
 
-  static void set_image(GtkImage* image, const string filename);
+private:
   static GdkColor* get_color(const string color_name);
 
 private:

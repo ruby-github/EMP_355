@@ -45,14 +45,9 @@ GtkDialog* Utils::create_dialog(GtkWindow* parent, const string title, const int
 GtkButton* Utils::add_dialog_button(GtkDialog* dialog, const string label, const GtkResponseType type, const string stock_id) {
   GtkButton* button = GTK_BUTTON(gtk_dialog_add_button(dialog, label.c_str(), type));
 
-  if (stock_id.empty()) {
-    GtkSettings* settings = gtk_widget_get_settings(GTK_WIDGET(button));
-    g_object_set(settings, "gtk-button-images", TRUE, NULL);
-
-    GtkWidget* image = gtk_image_new_from_stock(stock_id.c_str(), GTK_ICON_SIZE_BUTTON);
-
-    gtk_button_set_image(button, image);
-    gtk_button_set_image_position(button, GTK_POS_LEFT);
+  if (!stock_id.empty()) {
+    GtkImage* image = GTK_IMAGE(gtk_image_new_from_stock(stock_id.c_str(), GTK_ICON_SIZE_BUTTON));
+    set_button_image(button, image);
   }
 
   set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 12);
@@ -115,11 +110,7 @@ GtkButton* Utils::create_button_with_image(const string filename, const int widt
   GtkButton* button = GTK_BUTTON(gtk_button_new());
 
   if (!filename.empty()) {
-    GtkSettings* settings = gtk_widget_get_settings(GTK_WIDGET(button));
-    g_object_set(settings, "gtk-button-images", TRUE, NULL);
-
-    gtk_button_set_image(button, GTK_WIDGET(create_image(filename, width, height)));
-    gtk_button_set_image_position(button, GTK_POS_LEFT);
+    set_button_image(button, create_image(filename, width, height));
   }
 
   set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 12);
@@ -136,31 +127,12 @@ GtkButton* Utils::create_button_with_image(const string filename, const int widt
   return button;
 }
 
-GtkEntry* Utils::create_entry() {
-  GtkEntry* entry = GTK_ENTRY(gtk_entry_new());
+void Utils::set_button_image(GtkButton* button, GtkImage* image, const GtkPositionType position) {
+  GtkSettings* settings = gtk_widget_get_settings(GTK_WIDGET(button));
+  g_object_set(settings, "gtk-button-images", TRUE, NULL);
 
-  set_font(GTK_WIDGET(entry), "", "", 12);
-
-  return entry;
-}
-
-GtkComboBox* Utils::create_combobox() {
-  GtkComboBox* combobox = GTK_COMBO_BOX(gtk_combo_box_new());
-
-  set_font(GTK_WIDGET(combobox), "", "", 12);
-
-  return combobox;
-}
-
-GtkNotebook* Utils::create_notebook() {
-  GtkNotebook* notebook = GTK_NOTEBOOK(gtk_notebook_new());
-
-  gtk_notebook_set_scrollable(notebook, TRUE);
-  gtk_container_set_border_width(GTK_CONTAINER(notebook), 0);
-
-  gtk_widget_modify_bg(GTK_WIDGET(notebook), GTK_STATE_NORMAL, get_color("gray"));
-
-  return notebook;
+  gtk_button_set_image(button, GTK_WIDGET(image));
+  gtk_button_set_image_position(button, position);
 }
 
 GtkImage* Utils::create_image(const string filename, const int width, const int height) {
@@ -182,6 +154,33 @@ GtkImage* Utils::create_image(const string filename, const int width, const int 
   }
 
   return image;
+}
+
+GtkEntry* Utils::create_entry() {
+  GtkEntry* entry = GTK_ENTRY(gtk_entry_new());
+
+  set_font(GTK_WIDGET(entry), "", "", 12);
+
+  return entry;
+}
+
+GtkComboBoxText* Utils::create_combobox_text() {
+  GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
+
+  set_font(GTK_WIDGET(combobox), "", "", 12);
+
+  return combobox;
+}
+
+GtkNotebook* Utils::create_notebook() {
+  GtkNotebook* notebook = GTK_NOTEBOOK(gtk_notebook_new());
+
+  gtk_notebook_set_scrollable(notebook, TRUE);
+  gtk_container_set_border_width(GTK_CONTAINER(notebook), 0);
+
+  gtk_widget_modify_bg(GTK_WIDGET(notebook), GTK_STATE_NORMAL, get_color("gray"));
+
+  return notebook;
 }
 
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
@@ -265,14 +264,6 @@ void Utils::adjust_font_size(GtkWidget* widget, const string family, const strin
         pango_font_description_free(font);
       }
     }
-  }
-}
-
-void Utils::set_image(GtkImage* image, const string filename) {
-  if (filename.empty()) {
-    gtk_image_set_from_pixbuf(image, NULL);
-  } else {
-    gtk_image_set_from_file(image, filename.c_str());
   }
 }
 
