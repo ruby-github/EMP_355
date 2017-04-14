@@ -8,9 +8,9 @@
 #include "utils/MainWindowConfig.h"
 
 #define XK_PUBLISHING
+#include <X11/keysymdef.h>
 
 #include <gdk/gdkkeysyms.h>
-#include <X11/keysymdef.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
