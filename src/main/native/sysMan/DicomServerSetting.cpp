@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include "periDevice/DCMMan.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "sysMan/ViewSystem.h"
 
 DicomServerSetting* DicomServerSetting::m_ptrInstance = NULL;
@@ -213,14 +213,14 @@ void DicomServerSetting::ButtonPingClicked(GtkButton *button) {
     const char * ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
     const char * device = gtk_entry_get_text(GTK_ENTRY(m_entry_device));
     if(ip[0] == '\0' || device[0] == '\0') {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device or IP is empty, please input!"),
                                           NULL);
         return;
     }
 
-    ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+    MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                           _("Ping..."));
 
     g_timeout_add(2000, PingTimeout, this);
@@ -235,8 +235,8 @@ gboolean DicomServerSetting::PingTimeout(gpointer data) {
     else
         sprintf(strHint, "%s %s\n", _("Failed to ping ip"), ip);
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       strHint,
                                       NULL);
 
@@ -247,8 +247,8 @@ void DicomServerSetting::ButtonAddClicked(GtkButton *button) {
     const char * device = gtk_entry_get_text(GTK_ENTRY(m_entry_device));
     const char * ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
     if(strcmp(device,"localhost")==0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("'localhost' has been used, please input again!"),
                                           NULL);
         return;
@@ -256,8 +256,8 @@ void DicomServerSetting::ButtonAddClicked(GtkButton *button) {
     }
 
     if(ip[0] == '\0' || device[0] == '\0') {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device or IP is empty, please input!"),
                                           NULL);
         return;
@@ -270,8 +270,8 @@ void DicomServerSetting::ButtonAddClicked(GtkButton *button) {
         sprintf(ip_tmp,"%s",m_group_ip_server[i].c_str());
         if((strcmp(device,device_tmp)==0)||(strcmp(ip,ip_tmp)==0)) {
             PRINTF("------add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Add failed,device or IP has been existed\n"),
                                               NULL);
             return;
@@ -279,8 +279,8 @@ void DicomServerSetting::ButtonAddClicked(GtkButton *button) {
     }
 
     if(!CDCMMan::GetMe()->AddServer(device,ip)) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Add failed,device or IP has been existed\n"),
                                           NULL);
         return;

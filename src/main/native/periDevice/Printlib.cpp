@@ -23,7 +23,7 @@
 #include "periDevice/Printdefaults.h"
 #include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 
 #define GTKPRINTERACCEPTDIR "accept"
 #define GTKPRINTERDENYDIR "deny"

@@ -6,7 +6,7 @@
 #include "Def.h"
 #include "display/gui_global.h"
 #include "periDevice/CdBurn.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "periDevice/ViewCD.h"
 #include "periDevice/PeripheralMan.h"
 
@@ -50,14 +50,14 @@ CdBurn* CdBurn::GetInstance() {
 }
 
 static gboolean TimeoutHintDialog(gpointer data) {
-    ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()), _((char*)data));
+    MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()), _((char*)data));
 
     return FALSE;
 }
 
 static gboolean TimeoutInfoDialog(gpointer data) {
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       _((char*)data),
                                       NULL);
 
@@ -65,7 +65,7 @@ static gboolean TimeoutInfoDialog(gpointer data) {
 }
 
 static gboolean TimeoutUpdateDialog(gpointer data) {
-    ViewDialog *Dlg = ViewDialog::GetInstance();
+    MessageDialog *Dlg = MessageDialog::GetInstance();
     if(Dlg->Exist())
         Dlg->SetText(_((char*)data));
     else
@@ -75,9 +75,9 @@ static gboolean TimeoutUpdateDialog(gpointer data) {
 }
 
 void CdBurn::HintDialog(guint timeout, int type, const char *info) {
-    // if(type==ViewDialog::HINT)
+    // if(type==MessageDialog::HINT)
     // 	g_timeout_add(timeout, TimeoutHintDialog, (void*)info);
-    if(type==ViewDialog::INFO)
+    if(type==MessageDialog::DLG_INFO)
         g_timeout_add(timeout, TimeoutInfoDialog, (void*)info);
     else if(type < 0)
         g_timeout_add(timeout, TimeoutUpdateDialog, (void*)info);
@@ -106,7 +106,7 @@ gboolean CdBurn::StartBurn(const char* listPath) {
     PeripheralMan::DiscInfo info;
     if(!PeripheralMan::GetInstance()->GetDiscInfo(&info)) {
         PRINTF("**************Error: GetDiscInfo***************\n");
-        HintDialog(500, (int)ViewDialog::INFO, _(ERR_GETDISCINFO));
+        HintDialog(500, (int)MessageDialog::DLG_INFO, _(ERR_GETDISCINFO));
         return FALSE;
     }
 
@@ -114,25 +114,25 @@ gboolean CdBurn::StartBurn(const char* listPath) {
         HintDialog(100, -1, _(INFO_MKISO));
         if(!MakeIso()) {
             PRINTF("***********Error: MakeIso***********\n");
-            HintDialog(500, (int)ViewDialog::INFO, _(ERR_MKISO));
+            HintDialog(500, (int)MessageDialog::DLG_INFO, _(ERR_MKISO));
             return FALSE;
         }
         HintDialog(100, -1, _(INFO_BURN));
         if(!BurnCD(info.device.c_str())) {
             PRINTF("***********Error: BurnCD************\n");
-            HintDialog(500, (int)ViewDialog::INFO, _(ERR_BURN));
+            HintDialog(500, (int)MessageDialog::DLG_INFO, _(ERR_BURN));
             return FALSE;
         }
     } else if(info.disc_type.find("dvd") == 0) {
         HintDialog(100, -1, _(INFO_BURN));
         if(!BurnDVD(info.is_blank, info.device.c_str())) {
             PRINTF("***********Error: BurnDVD************\n");
-            HintDialog(500, (int)ViewDialog::INFO, _(ERR_BURN));
+            HintDialog(500, (int)MessageDialog::DLG_INFO, _(ERR_BURN));
             return FALSE;
         }
     } else {
         PRINTF("Error: The disc type is not supported!\nPlease insert a cd_rom, cd_r, cd_rw, or dvd_rom, dvd_ram, dvd_r, dvd_rw, dvd_plus_r, dvd_plus_rw type disc\n");
-        HintDialog(500, (int)ViewDialog::INFO, _(ERR_DISCTYPE));
+        HintDialog(500, (int)MessageDialog::DLG_INFO, _(ERR_DISCTYPE));
         return FALSE;
     }
 
@@ -142,7 +142,7 @@ gboolean CdBurn::StartBurn(const char* listPath) {
         UpdateSize();
 #endif
 
-    HintDialog(500, (int)ViewDialog::INFO, _(INFO_FINISH));
+    HintDialog(500, (int)MessageDialog::DLG_INFO, _(INFO_FINISH));
     return TRUE;
 }
 

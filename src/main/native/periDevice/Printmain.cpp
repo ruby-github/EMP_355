@@ -22,7 +22,7 @@
 #include "periDevice/Printfunctions.h"
 #include "keyboard/KeyValueOpr.h"
 #include "calcPeople/ViewReport.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 
 Printmain* Printmain::m_ptrInstance = NULL;
 Printmain* Printmain::GetInstance() {
@@ -105,7 +105,7 @@ void Printmain::ViewPrintWindowCreat(GtkWindow *parent) {
     if(DEF_PRN[0] == (uintptr_t)NULL) {
         gtk_widget_destroy(mainWindow);
         return
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(parent), ViewDialog::INFO, _("No printer found or specified."), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(parent), MessageDialog::DLG_INFO, _("No printer found or specified."), NULL);
     }
     Printfunctions::GetInstance()->GetPPDOpts(DEF_PRN);
     Printfunctions::GetInstance()->GetOptions(NULL, DEF_PRN,-1);

@@ -7,7 +7,7 @@
 #include "keyboard/KeyDef.h"
 #include "display/FakeXEvent.h"
 #include "periDevice/PeripheralMan.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "patient/ViewArchive.h"
 #include "patient/ViewArchiveImgMan.h"
 #include "sysMan/ViewSystem.h"
@@ -267,7 +267,7 @@ static void progress_callback(goffset current, goffset total, gpointer data) {
     //	PRINTF("prac = %f\n", prac);
     if(prac >= 0 && prac <= 1.0) {
         gdk_threads_enter();
-        ViewDialog::GetInstance()->SetProgressBar(prac);
+        MessageDialog::GetInstance()->SetProgressBar(prac);
         while(gtk_events_pending())
             gtk_main_iteration();
         gdk_threads_leave();
@@ -523,15 +523,15 @@ static gboolean LoadSelectedData(gpointer data) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
     vector<string> vec = ConfigToHost::GetInstance()->GetSelectedVec();
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return FALSE;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return FALSE;
@@ -551,8 +551,8 @@ static gboolean LoadSelectedData(gpointer data) {
         // only display .ini file
         if(fm.CompareSuffix(basename, "ini") != 0) {
             sprintf(str_info, "%s %s   %d/%d\n%s", _("Loading..."), basename, count, total, _("Please wait..."));
-            ViewDialog::GetInstance()->SetText(str_info);
-            ViewDialog::GetInstance()->SetProgressBar(0);
+            MessageDialog::GetInstance()->SetText(str_info);
+            MessageDialog::GetInstance()->SetProgressBar(0);
             count++;
         }
         //lhm20140925
@@ -648,19 +648,19 @@ static gboolean LoadSelectedData(gpointer data) {
     }
 
     ptr->UmountUsbStorage();
-    ViewDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Destroy();
 
     //Handle result
     if(!cond) {
         sprintf(result, _("Success to load data from USB storage."));
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           result,
                                           NULL);
         ViewSystem::GetInstance()->UpdateUserItem();
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           result,
                                           NULL);
     }
@@ -680,8 +680,8 @@ void ConfigToHost::BtnOKClicked(GtkButton *button) {
         g_timeout_add(1000, LoadSelectedData, NULL);
 
         PRINTF("Load From U disk!\n");
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::PRG_CANCEL,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_PROGRESS_CANCEL,
                                           _("Please wait, loading data from USB storage..."),
                                           CancelLoadHost);
     }

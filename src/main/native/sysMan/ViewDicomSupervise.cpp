@@ -9,7 +9,7 @@
 #include "keyboard/KeyValueOpr.h"
 #include "ViewMain.h"
 #include "sysMan/SysDicomSetting.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "periDevice/DCMRegister.h"
 #include "periDevice/PeripheralMan.h"
 

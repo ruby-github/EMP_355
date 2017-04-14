@@ -6,7 +6,7 @@
 #include "periDevice/Printer.h"
 #include "sysMan/ViewSystem.h"
 #include "periDevice/ViewPPDSelect.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "periDevice/PeripheralMan.h"
 
 using std::string;
@@ -172,15 +172,15 @@ void ViewPrinterAdd::BtnPPDNameClicked(GtkButton *button) {
 
 void ViewPrinterAdd::BtnAddClicked(GtkButton *button) {
     if (m_uriName.empty()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_ERROR,
                                           _("Add Printer Error: URI not found!"),
                                           NULL);
         return;
     }
     if (!gtk_entry_get_text_length(GTK_ENTRY(m_entry_printer_name))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_ERROR,
                                           _("Add Printer Error: Please enter printer name!"),
                                           NULL);
         gtk_widget_grab_focus(m_entry_printer_name);
@@ -188,8 +188,8 @@ void ViewPrinterAdd::BtnAddClicked(GtkButton *button) {
     }
 
     if (m_ppdFileName.empty()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_ERROR,
                                           _("Add Printer Error: Please select a PPD file!"),
                                           NULL);
         return ;

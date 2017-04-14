@@ -14,7 +14,7 @@
 #include "keyboard/KeyDef.h"
 #include "periDevice/ViewPrintPreview.h"
 #include "ViewMain.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "periDevice/Usblp.h"
 #include "periDevice/PeripheralMan.h"
@@ -183,8 +183,8 @@ void ViewPrintPreview::Printing(void) {
                 sprintf(print_command, "%s/epson_print.sh %s %s %s %s %d %s", PRINTDIR, PRINTDIR, device, ppd_filename, m_imgPath.c_str(), copies, grp_options);
             _system_(print_command);
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("No printer found."),
                                               NULL);
         }
@@ -213,13 +213,13 @@ void ViewPrintPreview::Printing(void) {
             int vet = prt.print(NULL, m_imgPath.c_str(), grp_options, copies);
             if (vet < 0) {
                 if(vet == -2) {
-                    ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                                      ViewDialog::INFO,
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                                      MessageDialog::DLG_INFO,
                                                       _("No printer found or specified."),
                                                       NULL);
                 } else {
-                    ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                                      ViewDialog::INFO,
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                                      MessageDialog::DLG_INFO,
                                                       _("Failed to print!"),
                                                       NULL);
                 }
@@ -660,7 +660,7 @@ void ViewPrintPreview::BtnPrintClicked(GtkButton *button) {
         // }
         //  else
         //  {
-        //     ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No printer found."), NULL);
+        //     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No printer found."), NULL);
         //  }
     } else
         Printing();
@@ -702,7 +702,7 @@ void ViewPrintPreview::BtnPrintWinClicked(GtkButton *button) {
             } else
                 Printing();
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No printer found."), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No printer found."), NULL);
         }
     } else {
         PRINTF("save file is error\n");
@@ -2257,7 +2257,7 @@ void ViewPrintPreview::ClickedPrintButton(GtkButton *button) {
     }
 #if 0
     else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No printer found."), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No printer found."), NULL);
     }
 #endif
 }

@@ -24,7 +24,7 @@
 #include "imageProc/Zoom.h"
 #include <UIS4DReceiveInterface.h>
 #include "imageControl/D4FuncMan.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "sysMan/ViewSystem.h"
 #include "ViewMain.h"
 #include "sysMan/SysOptions.h"
@@ -1347,8 +1347,8 @@ void ScanMode::Enter4D() {
 
     //if no probe exist, exit
     if(!ProbeMan::GetInstance()->IsProbeExist()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("Failed to Enter 3D/4D mode!\nNo Probe was found."),
                                           NULL);
         return;
@@ -1432,8 +1432,8 @@ void ScanMode::Enter4D() {
         if (execl(path,"11002",(char *)0) < 0)
             perror("execlp error\n");
     } else if (pid == -1) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("Failed to Enter 3D/4D mode!\nThe process cannot be created."),
                                           NULL);
         return;

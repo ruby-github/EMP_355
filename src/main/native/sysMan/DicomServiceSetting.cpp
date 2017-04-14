@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "periDevice/DCMMan.h"
 #include "sysMan/SysDicomSetting.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "sysMan/ViewSystem.h"
 
 vector<string> m_group_device_service;
@@ -1347,8 +1347,8 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button) {
     const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device ,AE or Port is empty, please input!"),
                                           NULL);
         return;
@@ -1381,8 +1381,8 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button) {
 
         if (strcmp(device_tmp0,device_tmp1)==0) {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Add failed,device has been existed\n"),
                                               NULL);
 
@@ -1393,8 +1393,8 @@ void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button) {
         exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddStorageService(device, tmp_serviceName, ae, atoi(port))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Add failed,device has been existed\n"),
                                           NULL);
 
@@ -1472,8 +1472,8 @@ void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button) {
         CDCMMan::GetMe()->SetDefaultStorageService(device);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1495,13 +1495,13 @@ void DicomServiceSetting::ButtonStorageConnectClicked(GtkButton *button) {
 
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+        MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                               _("Connect..."));
 
         g_timeout_add(2000, StorageConnectTimeout, this);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
 
@@ -1519,8 +1519,8 @@ gboolean DicomServiceSetting::StorageConnectTimeout(gpointer data) {
         PRINTF("Dicom test link FAIL!!\n");
         sprintf(info, _("Connection test fails!"));
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 }
@@ -1566,8 +1566,8 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button) {
     const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_worklist_name));
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device ,AE or Port is empty, please input!"),
                                           NULL);
         return;
@@ -1600,8 +1600,8 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button) {
 
         if (strcmp(device_tmp0,device_tmp1)==0) {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Add failed,device has been existed\n"),
                                               NULL);
 
@@ -1613,8 +1613,8 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button) {
     }
 
     if(!CDCMMan::GetMe()->AddWorklistService(device, tmp_serviceName, ae, atoi(port))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Add failed,device has been existed\n"),
                                           NULL);
 
@@ -1663,8 +1663,8 @@ void DicomServiceSetting::ButtonWorkListDeleteClicked(GtkButton *button) {
         gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1700,8 +1700,8 @@ void DicomServiceSetting::ButtonWorkListDefaultClicked(GtkButton *button) {
         CDCMMan::GetMe()->SetDefaultWorklistService(device);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1722,14 +1722,14 @@ void DicomServiceSetting::ButtonWorkListConnectClicked(GtkButton *button) {
                            -1);
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+        MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                               _("Connect..."));
 
         g_timeout_add(2000, WorklistConnectTimeout, this);
 
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1746,8 +1746,8 @@ gboolean DicomServiceSetting::WorklistConnectTimeout(gpointer data) {
         PRINTF("Dicom test link FAIL!!\n");
         sprintf(info, _("Connection test fails!"));
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 }
@@ -1755,7 +1755,7 @@ gboolean DicomServiceSetting::WorklistConnectTimeout(gpointer data) {
 void DicomServiceSetting::ChkBtnAutoQueryToggled(GtkToggleButton *togglebutton) {
     string device = CDCMMan::GetMe()->GetDefaultWorklistServiceDevice();
     if (device == "") {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default Worklist server in system setting"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default Worklist server in system setting"), NULL);
         return ;
     }
 
@@ -1791,8 +1791,8 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button) {
     const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_mpps_name));
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device ,AE or Port is empty, please input!"),
                                           NULL);
         return;
@@ -1825,8 +1825,8 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button) {
             return;
 
         if (strcmp(device_tmp0,device_tmp1)==0) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Add failed,device has been existed\n"),
                                               NULL);
 
@@ -1837,8 +1837,8 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button) {
         exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddMPPSService(device, tmp_serviceName, ae, atoi(port))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Add failed,device has been existed\n"),
                                           NULL);
 
@@ -1881,8 +1881,8 @@ void DicomServiceSetting::ButtonMPPSDeleteClicked(GtkButton *button) {
             gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1919,8 +1919,8 @@ void DicomServiceSetting::ButtonMPPSDefaultClicked(GtkButton *button) {
         CDCMMan::GetMe()->SetDefaultMPPSService(device);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1942,13 +1942,13 @@ void DicomServiceSetting::ButtonMPPSConnectClicked(GtkButton *button) {
 
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+        MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                               _("Connect..."));
 
         g_timeout_add(2000, MPPSConnectTimeout, this);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -1966,8 +1966,8 @@ gboolean DicomServiceSetting::MPPSConnectTimeout(gpointer data) {
         PRINTF("Dicom test link FAIL!!\n");
         sprintf(info, _("Connection test fails!"));
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 }
@@ -1976,7 +1976,7 @@ void DicomServiceSetting::ChkBtnMPPSToggled(GtkToggleButton *togglebutton) {
     /*   string device = CDCMMan::GetMe()->GetDefaultMPPSServiceDevice();
        if (device == "")
        {
-           ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default MPPS server in system setting"), NULL);
+           MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default MPPS server in system setting"), NULL);
            return ;
        }
     */
@@ -1986,7 +1986,7 @@ void DicomServiceSetting::ChkBtnMPPSToggled(GtkToggleButton *togglebutton) {
 
     string device = CDCMMan::GetMe()->GetDefaultMPPSServiceDevice();
     if (device == "") {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default MPPS server in system setting"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default MPPS server in system setting"), NULL);
         return ;
     }
 
@@ -2013,8 +2013,8 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button) {
     const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_storage_commitment_name));
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device ,AE or Port is empty, please input!"),
                                           NULL);
         return;
@@ -2048,8 +2048,8 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button) {
 
         if (strcmp(device_tmp0,device_tmp1)==0) {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Add failed,device has been existed\n"),
                                               NULL);
 
@@ -2060,8 +2060,8 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button) {
         exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddStorageCommitService(device, tmp_serviceName, ae, atoi(port))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Add failed,device has been existed\n"),
                                           NULL);
 
@@ -2104,8 +2104,8 @@ void DicomServiceSetting::ButtonStorageCommitmentDeleteClicked(GtkButton *button
             gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -2141,8 +2141,8 @@ void DicomServiceSetting::ButtonStorageCommitmentDefaultClicked(GtkButton *butto
         CDCMMan::GetMe()->SetDefaultStorageCommitService(device);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -2163,13 +2163,13 @@ void DicomServiceSetting::ButtonStorageCommitmentConnectClicked(GtkButton *butto
 
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+        MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                               _("Connect..."));
 
         g_timeout_add(2000, StorageCommitmentConnectTimeout, this);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -2186,8 +2186,8 @@ gboolean DicomServiceSetting::StorageCommitmentConnectTimeout(gpointer data) {
         PRINTF("Dicom test link FAIL!!\n");
         sprintf(info, _("Connection test fails!"));
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 }
@@ -2195,7 +2195,7 @@ gboolean DicomServiceSetting::StorageCommitmentConnectTimeout(gpointer data) {
 void DicomServiceSetting::ChkBtnStorageCommitmentToggled(GtkToggleButton *togglebutton) {
     string device = CDCMMan::GetMe()->GetDefaultStorageCommitServiceDevice();
     if (device == "") {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default Storage Commitment server in system setting"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default Storage Commitment server in system setting"), NULL);
         return ;
     }
 
@@ -2226,8 +2226,8 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button) {
     const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_query_retrieve_name));
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Device ,AE or Port is empty, please input!"),
                                           NULL);
         return;
@@ -2260,8 +2260,8 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button) {
 
         if (strcmp(device_tmp0,device_tmp1)==0) {
             //printf("Add failed\n");
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Add failed,device has been existed\n"),
                                               NULL);
 
@@ -2272,8 +2272,8 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button) {
         exist = gtk_tree_model_iter_next(model, &iter);
     }
     if(!CDCMMan::GetMe()->AddQueryRetrieveService(device, tmp_serviceName, ae, atoi(port))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Add failed,device has been existed\n"),
                                           NULL);
 
@@ -2351,8 +2351,8 @@ void DicomServiceSetting::ButtonQueryRetrieveDefaultClicked(GtkButton *button) {
         CDCMMan::GetMe()->SetDefaultQueryRetrieveService(device);
     } else {
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
     }
@@ -2375,13 +2375,13 @@ void DicomServiceSetting::ButtonQueryRetrieveConnectClicked(GtkButton *button) {
 
         m_selectedDevice = device;
 
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+        MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                               _("Connect..."));
 
         g_timeout_add(2000, QueryRetrieveConnectTimeout, this);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("No device is selected!"),
                                           NULL);
 
@@ -2400,8 +2400,8 @@ gboolean DicomServiceSetting::QueryRetrieveConnectTimeout(gpointer data) {
         PRINTF("Dicom test link FAIL!!\n");
         sprintf(info, _("Connection test fails!"));
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 }

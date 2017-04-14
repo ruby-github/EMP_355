@@ -1,45 +1,95 @@
-/*
- * =====================================================================================
- *
- *       Filename:  CalcSetting.cpp
- *
- *    Description:
- *
- *        Version:  1.0
- *        Created:  10/29/2012 04:09:16 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *        Company:
- *
- * =====================================================================================
- */
-
-#include <dirent.h>
 #include "sysMan/CalcSetting.h"
-#include "Def.h"
-#include "display/gui_global.h"
-#include "display/gui_func.h"
-#include "keyboard/KeyValueOpr.h"
-#include "keyboard/KeyDef.h"
-#include "calcPeople/MeasureDef.h"
-#include "calcPeople/MeaCalcFun.h"
-#include "ViewMain.h"
-#include "display/ViewDialog.h"
-#include "keyboard/KeyFunc.h"
-#include "patient/FileMan.h"
-#include "periDevice/PeripheralMan.h"
-#include "calcPeople/MenuCalcNew.h"
-#include "sysMan/ConfigToHost.h"
-#include "sysMan/UserSelect.h"
-#include "display/TopArea.h"
-#include "measure/MeasureMan.h"
-using std::vector;
+#include "utils/IniFile.h"
+#include "utils/Utils.h"
+#include "utils/StringUtils.h"
 
-char export_name[256];
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyFunc.h"
+
+#include "display/gui_func.h"
+#include "ViewMain.h"
+#include "utils/MessageDialog.h"
+
+static string METHOD_NAMES[] = {
+  {N_("Distance")},
+  {N_("Length")},
+  {N_("Peri")},
+  {N_("Area")},
+  {N_("Volume")},
+  {N_("Angle")},
+  {N_("Ratio")},
+  {N_("Depth")},
+  {N_("EF")},
+  {N_("Profile")},
+  {N_("Histogram")},
+  {N_("Time")},
+  {N_("Slope")},
+  {N_("Vel")},
+  {N_("HR")},
+  {N_("Acceleration")},
+  {N_("PG Mean")}
+};
+
+const CustomTypeAndMethod CUSTOM_TYPES[] = {
+  {0, N_("Dist-Dot"), DIST_DOT},
+  {0, N_("Dist-Line"), DIST_LINE},
+
+  #ifndef EMP_322
+    {1, N_("Length-Track"), LENGTH_TRACK},
+    {1, N_("Length-Dot"), LENGTH_DOT},
+  #endif
+
+  {1, N_("Integral-Track"), INTEGRAL_TRACK},
+  {2, N_("Peri-Track"), PERI_TRACK},
+  {2, N_("Peri-Ellipse"), PERI_ELLIPSE},
+  {3, N_("Area-Track"), AREA_TRACK},
+
+  #ifndef EMP_322
+    {3, N_("Area-Dot"), AREA_TRACK},
+  #endif
+
+  {3, N_("Area-Rectangle"), AREA_REC},
+  {3, N_("Area-Ellipse"), AREA_ELLIPSE},
+  {4, N_("Vol-3Axis"), VOL_3AXIS},
+  {4, N_("Vol-Ellipse1"), VOL_ELLIPSE1},
+  {4, N_("Vol-Ellipse2"), VOL_ELLIPSE2},
+  {5, N_("Angle-3Dot"), ANGLE_3DOT},
+  {5, N_("Angle-2Line"), ANGLE_2LINE},
+  {6, N_("Angusty-Dist-Dot"), ANGUSTY_DIST_DOT},
+  {6, N_("Ratio-Dist-Dot"), RATIO_DIST_DOT},
+  {6, N_("Angusty-Area"), ANGUSTY_AREA},
+  {6, N_("Ratio-Area"), RATIO_AREA},
+  {6, N_("Ratio-D-P"), RATIO_D_P},
+  {6, N_("Ratio-Vol"), RATIO_VOL},
+  {7, N_("Depth-Dist"), DEPTH_DIST},
+  {7, N_("Depth-Dist-M"), DEPTH_DIST_M},
+  {8, N_("EF"), EF},
+  {9, N_("Profile"), PROFILE},
+  {10, N_("Histogram"), HISTOGRAM},
+  {11, N_("Time-M"), TIME_M},
+
+  #ifndef EMP_322
+    {11, N_("Time-D"), TIME_D},
+  #endif
+
+  {12, N_("Slope"), SLOPE},
+  {13, N_("Vel-M"), VEL_M},
+
+  #ifdef EMP_322
+    {14, N_("HR-M"), HR_M}
+  #else
+    {13, N_("Vel-D"), VEL_D},
+    {14, N_("HR-M"), HR_M},
+  #endif
+
+  #ifndef EMP_322
+    {15, N_("Acceleration"), ACCEL},
+    {16, N_("PG Mean"), PGMEAN}
+  #endif
+};
+
 #ifdef EMP_322
-const string section[SECTION_NUM]= {
+  const string SECTION_NAMES[] = {
     N_("Abdomen-General") ,
     N_("Gynecology") ,
     N_("Obstetrics-General") ,
@@ -52,9 +102,9 @@ const string section[SECTION_NUM]= {
     N_("SmallPart-Testicle") ,
     N_("Cardiac") ,
     N_("Fetal Cardio")
-};
+  };
 
-const char* examType_calc[] = {
+  const string examType_calc[] = {
     N_("Adult Abdomen"),
     N_("Adult Liver"),
     N_("Kid Abdomen"),
@@ -63,7 +113,6 @@ const char* examType_calc[] = {
     N_("Mammary Glands"),
     N_("Thyroid"),
     N_("Eye Ball"),
-    //N_("Small Part"),
     N_("Testicle"),
     N_("Gynecology"),
     N_("Early Pregnancy"),
@@ -74,59 +123,539 @@ const char* examType_calc[] = {
     N_("Hip Joint"),
     N_("Meniscus"),
     N_("Joint Cavity"),
-    N_("Spine"),
-    NULL
-};
+    N_("Spine")
+  };
 #else
-#ifdef VET
-const string section[SECTION_NUM]= {
-    N_("Abdomen-General") ,
-    N_("Abdomen-Arterial") ,
-    N_("Abdomen-Venous") ,
-    N_("Obstetrics-Dog") ,
-    N_("Obstetrics-Cat") ,
-    N_("Obstetrics-Sheep") ,
-    N_("Obstetrics-Swine") ,
-    N_("Obstetrics-Bovine") ,
-    N_("Obstetrics-Equine") ,
-    N_("Urology") ,
-    N_("Orthopedic") ,
-    N_("SmallPart-Glands") ,
-    N_("SmallPart-Thyroid") ,
-    N_("SmallPart-Eye") ,
-    N_("SmallPart-Testicle") ,
-    N_("Vascular-LE") ,
-    N_("Vascular-UE") ,
-    N_("Vascular-Carotid") ,
-    N_("Cardiac") ,
-    N_("Fetal Cardio") ,
-    N_("TCD"),
-    N_("Tendon")
-};
+  #ifdef VET
+    const string SECTION_NAMES[] = {
+      N_("Abdomen-General") ,
+      N_("Abdomen-Arterial") ,
+      N_("Abdomen-Venous") ,
+      N_("Obstetrics-Dog") ,
+      N_("Obstetrics-Cat") ,
+      N_("Obstetrics-Sheep") ,
+      N_("Obstetrics-Swine") ,
+      N_("Obstetrics-Bovine") ,
+      N_("Obstetrics-Equine") ,
+      N_("Urology") ,
+      N_("Orthopedic") ,
+      N_("SmallPart-Glands") ,
+      N_("SmallPart-Thyroid") ,
+      N_("SmallPart-Eye") ,
+      N_("SmallPart-Testicle") ,
+      N_("Vascular-LE") ,
+      N_("Vascular-UE") ,
+      N_("Vascular-Carotid") ,
+      N_("Cardiac") ,
+      N_("Fetal Cardio") ,
+      N_("TCD"),
+      N_("Tendon")
+    };
+  #else
+    const string SECTION_NAMES[] = {
+      N_("Abdomen-General") ,
+      N_("Abdomen-Arterial") ,
+      N_("Abdomen-Venous") ,
+      N_("Gynecology") ,
+      N_("Obstetrics-General") ,
+      N_("Obstetrics-FetalHeart") ,
+      N_("Urology") ,
+      N_("Orthopedic") ,
+      N_("SmallPart-Glands") ,
+      N_("SmallPart-Thyroid") ,
+      N_("SmallPart-Eye") ,
+      N_("SmallPart-Testicle") ,
+      N_("Vascular-LE") ,
+      N_("Vascular-UE") ,
+      N_("Vascular-Carotid") ,
+      N_("Cardiac") ,
+      N_("Fetal Cardio") ,
+      N_("TCD")
+    };
+  #endif
+#endif
 
-#else
-const string section[SECTION_NUM]= {
-    N_("Abdomen-General") ,
-    N_("Abdomen-Arterial") ,
-    N_("Abdomen-Venous") ,
-    N_("Gynecology") ,
-    N_("Obstetrics-General") ,
-    N_("Obstetrics-FetalHeart") ,
-    N_("Urology") ,
-    N_("Orthopedic") ,
-    N_("SmallPart-Glands") ,
-    N_("SmallPart-Thyroid") ,
-    N_("SmallPart-Eye") ,
-    N_("SmallPart-Testicle") ,
-    N_("Vascular-LE") ,
-    N_("Vascular-UE") ,
-    N_("Vascular-Carotid") ,
-    N_("Cardiac") ,
-    N_("Fetal Cardio") ,
-    N_("TCD")
-};
-#endif
-#endif
+CustomCalc* CustomCalc::m_ptrInstance = NULL;
+
+extern int item_num_exist;
+
+// ---------------------------------------------------------
+
+CustomCalc* CustomCalc::GetInstance() {
+  if (m_ptrInstance == NULL) {
+    m_ptrInstance = new CustomCalc();
+  }
+
+  return m_ptrInstance;
+}
+
+CustomCalc::CustomCalc() {
+}
+
+CustomCalc::~CustomCalc() {
+  if (m_ptrInstance != NULL) {
+    delete m_ptrInstance;
+
+    m_ptrInstance = NULL;
+  }
+}
+
+void CustomCalc::CreateCalcSettingWin(GtkWidget* parent) {
+  GtkDialog* dialog = Utils::create_dialog(GTK_WINDOW(parent), _("CalcSetting"), 400, 300);
+
+  GtkButton* button_ok = Utils::add_dialog_button(dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_APPLY);
+  GtkButton* button_cancel = Utils::add_dialog_button(dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
+
+  g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
+  g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
+
+  GtkTable* table = GTK_TABLE(gtk_table_new(3, 3, TRUE));
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(table));
+
+  gtk_container_set_border_width(GTK_CONTAINER(table), 30);
+
+  gtk_table_set_row_spacings(table, 10);
+  gtk_table_set_col_spacings(table, 10);
+
+  // Item
+  GtkLabel* label_name = Utils::create_label(_("Item:"));
+  m_entry_name = Utils::create_entry(9679);
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_name), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_entry_name), 1, 3, 0, 1);
+
+  gtk_widget_grab_focus(GTK_WIDGET(m_entry_name));
+  g_signal_connect_after(G_OBJECT(m_entry_name), "focus-in-event", G_CALLBACK(signal_entry_focus_in), this);
+
+  // Type
+  GtkLabel* label_type = Utils::create_label(_("Type:"));
+  m_combobox_type = Utils::create_combobox_text();
+
+  gtk_widget_set_size_request(GTK_WIDGET(m_combobox_type), 0, 30);
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_type), 0, 1, 1, 2);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_type), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  size_t size = sizeof(METHOD_NAMES) / sizeof(string);
+
+  for(size_t i = 0; i < size; i++) {
+    gtk_combo_box_text_append_text(m_combobox_type, METHOD_NAMES[i].c_str());
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_type), 0);
+  g_signal_connect(m_combobox_type, "changed", G_CALLBACK(signal_combobox_changed_type), this);
+
+  // Method
+  GtkLabel* label_method = Utils::create_label(_("Method:"));
+  m_combobox_method = Utils::create_combobox_text();
+
+  gtk_widget_set_size_request(GTK_WIDGET(m_combobox_method), 0, 30);
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_method), 0, 1, 2, 3);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_method), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  size = sizeof(CUSTOM_TYPES) / sizeof(CustomTypeAndMethod);
+
+  for(size_t i = 0; i < size; i++) {
+    if (CUSTOM_TYPES[i].type == 0) {
+      gtk_combo_box_text_append_text(m_combobox_method, CUSTOM_TYPES[i].name.c_str());
+    }
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_method), 0);
+
+  m_window = GTK_WIDGET(dialog);
+  gtk_widget_show_all(m_window);
+  g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
+}
+
+void CustomCalc::CreateExportCalcSettingWin(GtkWidget* parent) {
+  GtkDialog* dialog = Utils::create_dialog(GTK_WINDOW(parent), _("Export"), 500, 375);
+
+  GtkButton* button_export = Utils::add_dialog_button(dialog, _("Export"), GTK_RESPONSE_OK, GTK_STOCK_OPEN);
+  GtkButton* button_cancel = Utils::add_dialog_button(dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
+
+  g_signal_connect(button_export, "clicked", G_CALLBACK(signal_button_clicked_export), this);
+  g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
+
+  GtkTable* table = GTK_TABLE(gtk_table_new(5, 3, TRUE));
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(table));
+
+  gtk_container_set_border_width(GTK_CONTAINER(table), 30);
+
+  gtk_table_set_row_spacings(table, 10);
+  gtk_table_set_col_spacings(table, 10);
+
+  // input notice
+  GtkLabel* label_input_notice = Utils::create_label(_("Please input name for exporting data:"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_input_notice), 0, 3, 0, 1);
+
+  // data name
+  GtkLabel* label_name = Utils::create_label(_("Data Name:"));
+  m_entry_export_name = Utils::create_entry(9679);
+
+  gtk_widget_set_size_request(GTK_WIDGET(m_entry_export_name), 0, 30);
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_name), 0, 1, 1, 2);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_export_name), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_export_name, 30);
+  gtk_entry_set_text(m_entry_export_name, GetCalcSetting()->GetExamName());
+  gtk_widget_grab_focus(GTK_WIDGET(m_entry_export_name));
+  g_signal_connect_after(G_OBJECT(m_entry_export_name), "focus-in-event", G_CALLBACK(signal_entry_focus_in), this);
+
+  // notice
+  GtkLabel* label_notice = Utils::create_label(_("Please insert USB storage before export! \nClick Export will export current exam data to USB storage!"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_notice), 0, 3, 2, 4);
+
+  // progress_bar
+  GtkTable* table_progress_bar = GTK_TABLE(gtk_table_new(1, 9, TRUE));
+  gtk_table_attach_defaults(table, GTK_WIDGET(table_progress_bar), 0, 3, 4, 5);
+
+  gtk_table_set_row_spacings(table_progress_bar, 20);
+
+  // GTK_STOCK_APPLY, GTK_STOCK_STOP, GTK_STOCK_YES
+  m_image = GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_APPLY, GTK_ICON_SIZE_BUTTON));
+  m_progress_bar = Utils::create_progress_bar();
+
+  gtk_widget_set_size_request(GTK_WIDGET(m_progress_bar), 0, 30);
+
+  gtk_table_attach_defaults(table_progress_bar, GTK_WIDGET(m_image), 0, 1, 0, 1);
+  gtk_table_attach(table_progress_bar, GTK_WIDGET(m_progress_bar), 1, 9, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  //
+
+
+    /*m_progress_bar = gtk_progress_bar_new();
+    gtk_widget_hide(m_progress_bar);
+    gtk_fixed_put(GTK_FIXED(fixed1), m_progress_bar, 60, 150);
+    gtk_widget_set_size_request(m_progress_bar, 280, 20);
+
+    img_right = gtk_image_new_from_stock (GTK_STOCK_APPLY, GTK_ICON_SIZE_BUTTON);
+    gtk_widget_hide (img_right);
+    gtk_fixed_put (GTK_FIXED (fixed1), img_right, 40, 180);
+
+    img_error = gtk_image_new_from_stock (GTK_STOCK_STOP, GTK_ICON_SIZE_BUTTON);
+    gtk_widget_hide (img_error);
+    gtk_fixed_put (GTK_FIXED (fixed1), img_error, 40, 180);
+
+    img_load = gtk_image_new_from_stock (GTK_STOCK_YES, GTK_ICON_SIZE_BUTTON);
+    gtk_widget_hide (img_load);
+    gtk_fixed_put (GTK_FIXED (fixed1), img_load, 40, 180);
+
+    m_label_notice = gtk_label_new ("");
+    gtk_widget_hide (m_label_notice);
+    gtk_fixed_put (GTK_FIXED (fixed1), m_label_notice, 55, 180);
+    gtk_widget_set_size_request (m_label_notice, 265, 30);
+
+
+    gtk_widget_show_all(window_calc_export);
+    gtk_widget_hide (img_right);
+    gtk_widget_hide (img_error);
+    gtk_widget_hide (img_load);
+    gtk_widget_hide(m_progress_bar);
+    */
+
+  m_window = GTK_WIDGET(dialog);
+  gtk_widget_show_all(m_window);
+  g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
+}
+
+void CustomCalc::DestroyWin(void) {
+    if (GTK_IS_WIDGET(m_window)) {
+        g_keyInterface.Pop();
+        gtk_widget_destroy(GTK_WIDGET(m_window));
+        if (g_keyInterface.Size() == 1)
+            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+    }
+}
+
+void CustomCalc::DelayDestroyWin(void) {
+    DestroyWin();
+}
+
+void CustomCalc::OKAndCancelClicked() {
+    gtk_widget_set_sensitive(button_ok, TRUE);
+    gtk_widget_set_sensitive(button_cancel, TRUE);
+
+}
+
+void CustomCalc::SetProgressBar(double fraction) {
+    //gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(m_progress_bar), 0.1);
+    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_progress_bar), fraction);
+    char text_buf[10];
+    sprintf(text_buf, "%d%%", (int)(fraction*100));
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_progress_bar), text_buf);
+    //gtk_widget_show(m_progress_bar);
+}
+
+void CustomCalc::ExportRightInfoNotice(char *result) {
+    gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
+    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
+    gtk_widget_hide (img_error);
+    gtk_widget_hide (img_load);
+    gtk_widget_show(m_label_notice);
+    gtk_widget_show(img_right);
+}
+
+void CustomCalc::ExportErrorInfoNotice(char *result) {
+    gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
+    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
+    gtk_widget_hide (img_right);
+    gtk_widget_hide (img_load);
+    gtk_widget_show(m_label_notice);
+    gtk_widget_show(img_error);
+}
+
+void CustomCalc::ExportLoadInfoNotice(char *result) {
+    gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
+    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
+    gtk_widget_hide (img_right);
+    gtk_widget_hide (img_error);
+    gtk_widget_show(m_label_notice);
+    gtk_widget_show(img_load);
+
+}
+
+//----------------------------------------------------------
+
+GtkWidget* CustomCalc::GetWindow() {
+  return m_window;
+}
+
+MessageDialog* CustomCalc::GetMessageDialog() {
+  return MessageDialog::GetInstance();
+}
+
+CalcSetting* CustomCalc::GetCalcSetting() {
+  return CalcSetting::GetInstance();
+}
+
+void CustomCalc::ButtonClickedOK(GtkButton* button) {
+    string name = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
+    trim(name);
+    const char *tmp_name = name.c_str();
+
+    if (tmp_name == NULL || strlen(tmp_name) == 0) {
+        gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("Please Input Name!"), NULL);
+        return;
+    }
+
+    int index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method));
+    if (index == -1) {
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+                                          _("Please select measure method!"), NULL);
+        return;
+    }
+
+    char path1[256];
+    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+    IniFile ini1(path1);
+    ExamItem exam;
+    string username;
+    username = exam.ReadDefaultUserSelect(&ini1);
+    char path[256];
+    if(strcmp(username.c_str(), "System Default") == 0) {
+        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+    } else {
+        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+    }
+    IniFile ini(path);
+    IniFile *ptrIni = &ini;
+
+    vector<string> useritemgroup;
+    useritemgroup = ptrIni->GetGroupName();
+    char src_group[256];
+    int group_length(0);
+    group_length = useritemgroup.size();
+    for (int i= 0 ; i <  group_length; i++) {
+        sprintf(src_group ,"%s", useritemgroup[i].c_str());
+        int number1;
+        number1 = ptrIni->ReadInt(src_group, "Number");
+
+        for(int i=1; i<=number1; i++) {
+            char CalcNumber[256];
+            sprintf(CalcNumber, "Calc%d", i);
+            int item_num = ptrIni->ReadInt(src_group, CalcNumber);
+            string item_name;
+            if(item_num < (USER_START - BASIC_MEA_END))
+                item_name= CalcSetting::GetInstance()->ItemMenuTransEnglish(item_num);
+            else {
+                item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num);
+            }
+            PRINTF("item_name= %s\n", item_name.c_str());
+            PRINTF("item_tmp_name =%s\n", tmp_name);
+            if((strcmp(tmp_name, item_name.c_str()) == 0) ||(strcmp(tmp_name, _(item_name.c_str())) == 0)) {
+                gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("The name has existed, please rename!"), NULL);
+                return;
+            }
+        }
+
+    }
+
+    int ItemDeleteNum=ptrIni->ReadInt("Delete", "Number");
+
+    int ItemAllNum;
+    ItemAllNum=ptrIni->ReadInt("MaxNumber", "Number");
+    if((ItemDeleteNum==0)&&(ItemAllNum >= (USER_START -BASIC_MEA_END + MAX_USER_CALC_NUM))) {
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+                                          _("The defined items have reached the maximum!"), NULL);
+        return;
+    }
+
+    int type_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_type));
+    if (type_index == -1) {
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+                                          _("Please select measure type!"), NULL);
+        return;
+    }
+
+    int type_method_index = 0;
+    gchar *method_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_method));
+    printf("method_name = %s\n", method_name);
+    for(int i=0; i<ETYPE_NUM; i++) {
+        if(strcmp(_(method_name), _(CUSTOM_TYPES[i].name.c_str())) == 0) {
+            type_method_index = CUSTOM_TYPES[i].etype;
+            break;
+        }
+    }
+
+    const gchar *department_name = CalcSetting::GetInstance()->GetDepartmentName();
+    char department[50];
+    for(int i=0; i<SECTION_NUM; i++) {
+        if(strcmp(department_name, _(SECTION_NAMES[i].c_str()))==0) {
+            strcpy(department, SECTION_NAMES[i].c_str());
+            break;
+        }
+    }
+
+    bool NewNumber = false;
+    if(ItemDeleteNum) {
+        char CalcNumber[256];
+        sprintf(CalcNumber, "Calc%d", ItemDeleteNum);
+        int item_num=ptrIni->ReadInt("Delete", CalcNumber);
+        ptrIni->RemoveString("Delete", CalcNumber);
+        ptrIni->WriteInt("Delete", "Number", ItemDeleteNum-1);
+        ptrIni->SyncConfigFile();
+
+        char CustomEtype[256];
+        sprintf(CustomEtype, "CustomEtype-%d",item_num);
+        ptrIni->WriteInt(CustomEtype, "Etype", item_num);
+        ptrIni->WriteString(CustomEtype, "Name", tmp_name);
+        ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
+        ptrIni->WriteInt(CustomEtype, "MeasureType", index);
+        ptrIni->WriteString(CustomEtype, "Department", department);
+        ptrIni->SyncConfigFile();
+        ItemAllNum = item_num;
+    } else {
+        NewNumber = true;
+        char CustomEtype[256];
+        sprintf(CustomEtype, "CustomEtype-%d",++ItemAllNum);
+        ptrIni->WriteInt(CustomEtype, "Etype", ItemAllNum);
+        ptrIni->WriteString(CustomEtype, "Name", tmp_name);
+        ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
+        ptrIni->WriteInt(CustomEtype, "MeasureType", index);
+        ptrIni->WriteInt("MaxNumber", "Number", ItemAllNum);
+        ptrIni->WriteString(CustomEtype, "Department", department);
+        ptrIni->SyncConfigFile();
+    }
+
+    int number;
+    char SelectNum[256];
+    number = ptrIni->ReadInt(department, "Number");
+    sprintf(SelectNum, "Calc%d",number+1);
+    ptrIni->WriteInt(department, SelectNum, ItemAllNum);
+    ptrIni->WriteInt(department, "Number", number+1);
+    ptrIni->SyncConfigFile();
+
+    DestroyWin();
+    CalcSetting::GetInstance()->ChangeModelAndLight(tmp_name);
+    CalcSetting::GetInstance()->ClearAllCalc();
+}
+
+void CustomCalc::ButtonClickedCancel(GtkButton* button) {
+  DestroyWin();
+}
+
+void CustomCalc::EntryFocusIn(GtkEditable* editable, GdkEventFocus* event) {
+    if (KeySwitchIM::m_imOn) {
+        KeySwitchIM ksim;
+        ksim.ExcuteChange(TRUE);
+    }
+}
+
+void CustomCalc::ComboboxChangedType(GtkComboBox* combobox) {
+
+    int active = gtk_combo_box_get_active(GTK_COMBO_BOX(combobox));
+    if (active ==-1)
+        return ;
+
+    int i = 0;
+    for(i = 5; i >= 0; i--)
+        gtk_combo_box_remove_text(GTK_COMBO_BOX(m_combobox_method), i);
+
+
+    for(int i=0; i<ETYPE_NUM; i++) {
+        if(active == CUSTOM_TYPES[i].type) {
+            gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(CUSTOM_TYPES[i].name.c_str()));
+        }
+    }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_method), 0);
+}
+
+void CustomCalc::ButtonImportNameOK() {
+    string item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num_exist);
+
+    char name_copy[256];
+    for(int i=1; i<100; i++) {
+        sprintf(name_copy, "%s(%d)", item_name.c_str(), i);
+        if(RenameCompare(name_copy)) {
+            break;
+        }
+        if(i==99) {
+            sprintf(name_copy, "%s(1)", item_name.c_str());
+        }
+    }
+    item_name = name_copy;
+
+    ImportRenameCopy(item_name);
+}
+
+//----------------------------------------------------------
+
+#include <dirent.h>
+#include "sysMan/CalcSetting.h"
+#include "Def.h"
+#include "display/gui_global.h"
+#include "display/gui_func.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/KeyDef.h"
+#include "calcPeople/MeasureDef.h"
+#include "calcPeople/MeaCalcFun.h"
+#include "ViewMain.h"
+#include "utils/MessageDialog.h"
+#include "keyboard/KeyFunc.h"
+#include "patient/FileMan.h"
+#include "periDevice/PeripheralMan.h"
+#include "calcPeople/MenuCalcNew.h"
+#include "sysMan/ConfigToHost.h"
+#include "sysMan/UserSelect.h"
+#include "display/TopArea.h"
+#include "measure/MeasureMan.h"
+using std::vector;
+
+char export_name[256];
+
+
+
 CalcSetting g_menuCalcExamType;
 CalcSetting* CalcSetting::m_ptrInstance = NULL;
 
@@ -581,8 +1110,8 @@ GtkTreeModel* CalcSetting::create_item_calc_model2() {
         return NULL;
     char department[50];
     for(int i=0; i<SECTION_NUM; i++) {
-        if(strcmp(department_name, _(section[i].c_str()))==0) {
-            strcpy(department, section[i].c_str());
+        if(strcmp(department_name, _(SECTION_NAMES[i].c_str()))==0) {
+            strcpy(department, SECTION_NAMES[i].c_str());
             break;
         }
     }
@@ -906,7 +1435,7 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget *parent) {
     gtk_widget_set_size_request (m_combobox_department_calc, 240, 30);
 
     for(int j = 0; j < SECTION_NUM; j++ ) {
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_calc), _(section[j].c_str()));
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_calc), _(SECTION_NAMES[j].c_str()));
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_calc), 0);
     g_signal_connect(m_combobox_department_calc, "changed", G_CALLBACK(HandleDepartmentCalcChanged), this);
@@ -1131,7 +1660,7 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before move!"), NULL);
         return;
     }
@@ -1167,7 +1696,7 @@ void CalcSetting::ButtonSelectOneCalcClicked(GtkButton *button) {
                 gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path_scroll, NULL, FALSE, 1.0, 1.0);
                 gtk_tree_path_free (path_scroll);
 
-                ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::INFO, _(" Item has existed. Please select item again!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
                 return;
             }
         }
@@ -1265,8 +1794,8 @@ void CalcSetting::ButtonSelectAllCalcClicked(GtkButton *button) {
     gchar *department= gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department_calc));
     char department_name[50];
     for(int i=0; i<SECTION_NUM; i++) {
-        if(strcmp(department, _(section[i].c_str()))==0) {
-            strcpy(department_name, section[i].c_str());
+        if(strcmp(department, _(SECTION_NAMES[i].c_str()))==0) {
+            strcpy(department_name, SECTION_NAMES[i].c_str());
             break;
         }
     }
@@ -1327,7 +1856,7 @@ void CalcSetting::ButtonBackOneClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before move!"), NULL);
         return;
     }
@@ -1440,7 +1969,7 @@ void CalcSetting::DeleteItem(void) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before delete!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -1456,7 +1985,7 @@ void CalcSetting::DeleteItem(void) {
     }
 
     if(select_num < USER_START - BASIC_MEA_END) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::INFO,  _(" Only Userdefined items can be deleted!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_INFO,  _(" Only Userdefined items can be deleted!"), NULL);
         return;
     }
     char path3[256];
@@ -1469,8 +1998,8 @@ void CalcSetting::DeleteItem(void) {
     const gchar *department_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department_calc));
     char department[50];
     for(int i=0; i<SECTION_NUM; i++) {
-        if(strcmp(department_name, _(section[i].c_str()))==0) {
-            strcpy(department, section[i].c_str());
+        if(strcmp(department_name, _(SECTION_NAMES[i].c_str()))==0) {
+            strcpy(department, SECTION_NAMES[i].c_str());
             break;
         }
     }
@@ -1554,7 +2083,7 @@ void CalcSetting::ButtonDeleteSelectClicked(GtkButton *button) {
     if(g_menuCalc.IsFlagExist()) {
         const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::QUESTION, _(info), DeleteCalc);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_QUESTION, _(info), DeleteCalc);
     } else
         DeleteItem();;
 
@@ -1568,7 +2097,7 @@ void CalcSetting::ButtonDownClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before down!"), NULL);
         return;
     }
@@ -1651,7 +2180,7 @@ void CalcSetting::ButtonUpClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before up!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -1973,15 +2502,15 @@ void CalcSetting::ButtonImportClicked(GtkButton *button) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return ;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(CalcSetting::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return ;
@@ -2035,7 +2564,7 @@ void CalcSetting::ButtonDefaultClicked(GtkButton *button) {
     if(g_menuCalc.IsFlagExist()) {
         const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::QUESTION, _(info), DefaultCalc);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_QUESTION, _(info), DefaultCalc);
     } else {
         UpdateAllCalc();
     }
@@ -2045,7 +2574,7 @@ void CalcSetting::ButtonAddClicked(GtkButton *button) {
     if(g_menuCalc.IsFlagExist()) {
         const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::QUESTION, _(info), AddCalc);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_QUESTION, _(info), AddCalc);
     } else
         AddItem();
 }
@@ -2187,481 +2716,10 @@ void CalcSetting::GetDepartmentForCustomMeasure(int Etype, string &department) {
     department=ptrIni->ReadString(CustomEtype, "Department");
 }
 
-static char type_null[][20]= {
-    {""}
-};
 
-static char method_name[][20]= {
-    {N_("Distance")},
-    {N_("Length")},
-    {N_("Peri")},
-    {N_("Area")},
-    {N_("Volume")},
-    {N_("Angle")},
-    {N_("Ratio")},
-    {N_("Depth")},
-    {N_("EF")},
-    {N_("Profile")},
-    {N_("Histogram")},
-    {N_("Time")},
-    {N_("Slope")},
-    {N_("Vel")},
-    {N_("HR")},
-    {N_("Acceleration")},
-    {N_("PG Mean")}
-};
 
-const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] = {
-    {0, N_("Dist-Dot"), DIST_DOT},
-    {0, N_("Dist-Line"), DIST_LINE},
-#ifndef EMP_322
-    {1, N_("Length-Track"), LENGTH_TRACK},
-    {1, N_("Length-Dot"), LENGTH_DOT},
-#endif
-    {1, N_("Integral-Track"), INTEGRAL_TRACK},
-    {2, N_("Peri-Track"), PERI_TRACK},
-    {2, N_("Peri-Ellipse"), PERI_ELLIPSE},
-    {3, N_("Area-Track"), AREA_TRACK},
-#ifndef EMP_322
-    {3, N_("Area-Dot"), AREA_TRACK},
-#endif
-    {3, N_("Area-Rectangle"), AREA_REC},
-    {3, N_("Area-Ellipse"), AREA_ELLIPSE},
-    {4, N_("Vol-3Axis"), VOL_3AXIS},
-    {4, N_("Vol-Ellipse1"), VOL_ELLIPSE1},
-    {4, N_("Vol-Ellipse2"), VOL_ELLIPSE2},
-    {5, N_("Angle-3Dot"), ANGLE_3DOT},
-    {5, N_("Angle-2Line"), ANGLE_2LINE},
-    {6, N_("Angusty-Dist-Dot"), ANGUSTY_DIST_DOT},
-    {6, N_("Ratio-Dist-Dot"), RATIO_DIST_DOT},
-    {6, N_("Angusty-Area"), ANGUSTY_AREA},
-    {6, N_("Ratio-Area"), RATIO_AREA},
-    {6, N_("Ratio-D-P"), RATIO_D_P},
-    {6, N_("Ratio-Vol"), RATIO_VOL},
-    {7, N_("Depth-Dist"), DEPTH_DIST},
-    {7, N_("Depth-Dist-M"), DEPTH_DIST_M},
-    {8, N_("EF"), EF},
-    {9, N_("Profile"), PROFILE},
-    {10, N_("Histogram"), HISTOGRAM},
-    {11, N_("Time-M"), TIME_M},
-#ifndef EMP_322
-    {11, N_("Time-D"), TIME_D},
-#endif
-    {12, N_("Slope"), SLOPE},
-    {13, N_("Vel-M"), VEL_M},
-#ifdef EMP_322
-    {14, N_("HR-M"), HR_M}
-#else
-    {13, N_("Vel-D"), VEL_D},
-    {14, N_("HR-M"), HR_M},
-#endif
-#ifndef EMP_322
-    {15, N_("Acceleration"), ACCEL},
-    {16, N_("PG Mean"), PGMEAN}
-#endif
-};
 
-/*
 
-const CustomTypeAndMethod CustomEtypeArray[ETYPE_NUM] =
-{
-    {0, N_("DIST_DOT"), DIST_DOT},
-    {0, N_("DIST_LINE"), DIST_LINE},
-    {1, N_("LENGTH_TRACK"), LENGTH_TRACK},
-    {1, N_("LENGTH_DOT"), LENGTH_DOT},
-    {1, N_("INTEGRAL_TRACK"), INTEGRAL_TRACK},
-    {2, N_("PERI_TRACK"), PERI_TRACK},
-    {2, N_("PERI_ELLIPSE"), PERI_ELLIPSE},
-    {3, N_("AREA_TRACK"), AREA_TRACK},
-    {3, N_("AREA_DOT"), AREA_TRACK},
-    {3, N_("AREA_REC"), AREA_REC},
-    {3, N_("AREA_ELLIPSE"), AREA_ELLIPSE},
-    {4, N_("VOL_3AXIS"), VOL_3AXIS},
-    {4, N_("VOL_ELLIPSE1"), VOL_ELLIPSE1},
-    {4, N_("VOL_ELLIPSE2"), VOL_ELLIPSE2},
-    {5, N_("ANGLE_3DOT"), ANGLE_3DOT},
-    {5, N_("ANGLE_2LINE"), ANGLE_2LINE},
-    {6, N_("ANGUSTY_DIST_DOT"), ANGUSTY_DIST_DOT},
-    {6, N_("RATIO_DIST_DOT"), RATIO_DIST_DOT},
-    {6, N_("ANGUSTY_AREA"), ANGUSTY_AREA},
-    {6, N_("RATIO_AREA"), RATIO_AREA},
-    {6, N_("RATIO_D_P"), RATIO_D_P},
-    {6, N_("RATIO_VOL"), RATIO_VOL},
-    {7, N_("DEPTH_DIST"), DEPTH_DIST},
-    {7, N_("DEPTH_DIST_M"), DEPTH_DIST_M},
-    {8, N_("EF"), EF},
-    {9, N_("PROFILE"), PROFILE},
-    {10, N_("HISTOGRAM"), HISTOGRAM},
-    {11, N_("TIME_M"), TIME_M},
-    {11, N_("TIME_D"), TIME_D},
-    {12, N_("SLOPE"), SLOPE},
-    {13, N_("VEL_M"), VEL_M},
-    {13, N_("VEL_D"), VEL_D},
-    {14, N_("HR_M"), HR_M},
-    {15, N_("ACCEL"), ACCEL},
-    {16, N_("PGMEAN"), PGMEAN},
-};
-*/
-
-/*
-
-const char *custom_method[][6]=
-{
-    {N_("DIST_DOT"),N_("DIST_LINE")},
-    {"LENGTH_TRACK", "LENGTH_DOT", "INTEGRAL_TRACK"},
-    {"PERI_TRACK", "PERI_ELLIPSE"},
-    {"AREA_TRACK", "AREA_DOT", "AREA_REC", "AREA_ELLIPSE" },
-    {"VOL_3AXIS", "VOL_ELLIPSE1", "VOL_ELLIPSE2" },
-    {"ANGLE_3DOT", "ANGLE_2LINE"},
-    {"ANGUSTY_DIST_DOT", "RATIO_DIST_DOT", "ANGUSTY_AREA", "RATIO_AREA", "RATIO_D_P", "RATIO_VOL"},
-    {"DEPTH_DIST", "DEPTH_DIST_M"},
-    {"EF"},
-    {"PROFILE"},
-    {"HISTOGRAM"},
-    {"TIME_M", "TIME_D"},
-    {"SLOPE"},
-    {"VEL_M", "VEL_D"},
-    {"HR_M"},
-    {"ACCEL"},
-    {"PGMEAN"}
-};
-
-const CustomEtype CustomEtypeArray[ETYPE_NUM] =
-{
-    {"DIST_DOT",DIST_DOT},
-    {"DIST_LINE",DIST_LINE},
-    {"LENGTH_TRACK", LENGTH_TRACK},
-    {"LENGTH_DOT",LENGTH_DOT},
-    {"INTEGRAL_TRACK", INTEGRAL_TRACK},
-    {"PERI_TRACK",PERI_TRACK},
-    {"PERI_ELLIPSE", PERI_ELLIPSE},
-    {"AREA_TRACK",AREA_TRACK},
-    {"AREA_DOT",AREA_TRACK},
-    {"AREA_REC",AREA_REC},
-    {"AREA_ELLIPSE", AREA_ELLIPSE},
-    {"VOL_3AXIS",VOL_3AXIS},
-    {"VOL_ELLIPSE1",VOL_ELLIPSE1},
-    {"VOL_ELLIPSE2",VOL_ELLIPSE2},
-    {"ANGLE_3DOT",ANGLE_3DOT},
-    {"ANGLE_2LINE", ANGLE_2LINE},
-    {"ANGUSTY_DIST_DOT",ANGUSTY_DIST_DOT},
-    {"RATIO_DIST_DOT",RATIO_DIST_DOT},
-    {"ANGUSTY_AREA", ANGUSTY_AREA},
-    {"RATIO_AREA", RATIO_AREA},
-    {"RATIO_D_P",RATIO_D_P},
-    {"RATIO_VOL", RATIO_VOL},
-    {"DEPTH_DIST",DEPTH_DIST},
-    {"DEPTH_DIST_M", DEPTH_DIST_M},
-    {"EF", EF},
-    {"PROFILE", PROFILE},
-    {"HISTOGRAM", HISTOGRAM},
-    {"TIME_M", TIME_M},
-    {"TIME_D",TIME_D},
-    {"SLOPE",SLOPE},
-    {"VEL_M",VEL_M},
-    {"VEL_D", VEL_D},
-    {"HR_M", HR_M},
-    {"ACCEL", ACCEL},
-    {"PGMEAN", PGMEAN},
-};
-*/
-CustomCalc* CustomCalc::m_ptrInstance = NULL;
-
-CustomCalc::CustomCalc() {
-}
-
-CustomCalc::~CustomCalc() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
-}
-
-CustomCalc* CustomCalc::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new CustomCalc;
-    return m_ptrInstance;
-}
-
-GtkWidget* CustomCalc::CreateExportCalcSettingWin(GtkWidget *parent) {
-    GtkWidget *window_calc_export;
-    GtkWidget *fixed1;
-    // GtkWidget *button_ok;
-    GtkWidget *alignment1;
-    GtkWidget *hbox2;
-    GtkWidget *image1;
-    GtkWidget *label_OK;
-    GtkWidget *hseparator1;
-    //  GtkWidget *button_cancel;
-    GtkWidget *alignment2;
-    GtkWidget *hbox3;
-    GtkWidget *image2;
-    GtkWidget *label_Cancel;
-    GtkWidget *label_type;
-    GtkWidget *label_method;
-    GtkWidget *label_name;
-    GtkWidget *label_name_notice;
-    GtkWidget *label_notice;
-
-    window_calc_export = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (window_calc_export, 400, 420-80-40);
-    gtk_window_set_title (GTK_WINDOW (window_calc_export), _("Export"));
-    gtk_window_set_transient_for(GTK_WINDOW(window_calc_export), GTK_WINDOW(parent));
-    gtk_window_set_modal(GTK_WINDOW(window_calc_export), TRUE);
-    gtk_window_set_position (GTK_WINDOW (window_calc_export), GTK_WIN_POS_CENTER);
-    gtk_window_set_resizable (GTK_WINDOW (window_calc_export), FALSE);
-
-    fixed1 = gtk_fixed_new ();
-    gtk_widget_show (fixed1);
-    gtk_container_add (GTK_CONTAINER (window_calc_export), fixed1);
-
-    label_name_notice = gtk_label_new (_("Please input name for exporting data:"));
-    gtk_misc_set_alignment (GTK_MISC(label_name_notice), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_name_notice), TRUE);
-    gtk_widget_show (label_name_notice);
-    gtk_fixed_put (GTK_FIXED (fixed1), label_name_notice, 20, 10);
-    gtk_widget_set_size_request (label_name_notice, 250, 30);
-
-    label_name = gtk_label_new (_("Data Name:"));
-    gtk_misc_set_alignment (GTK_MISC(label_name), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_name), TRUE);
-    gtk_widget_show (label_name);
-    gtk_fixed_put (GTK_FIXED (fixed1), label_name, 20, 50);
-    gtk_widget_set_size_request (label_name, 85, 30);
-
-    m_entry_export_name = gtk_entry_new ();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_export_name), CalcSetting::GetInstance()->GetExamName());
-    gtk_entry_set_max_length(GTK_ENTRY(m_entry_export_name), 30);
-    gtk_widget_show (m_entry_export_name);
-    gtk_fixed_put (GTK_FIXED (fixed1), m_entry_export_name, 115, 50);
-    gtk_widget_set_size_request (m_entry_export_name, 200, 30);
-    gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_export_name), 9679);
-    gtk_widget_grab_focus(m_entry_export_name);
-    g_signal_connect_after(G_OBJECT(m_entry_export_name), "focus-in-event", G_CALLBACK(on_entry_focus_in), this);
-
-    label_notice = gtk_label_new (_("Please insert USB storage before export! \nClick Export will export current exam data to USB storage!"));
-    gtk_misc_set_alignment (GTK_MISC(label_notice), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_notice), TRUE);
-    gtk_widget_show (label_notice);
-    gtk_fixed_put (GTK_FIXED (fixed1), label_notice, 20, 80);
-    gtk_widget_set_size_request (label_notice, 300, 60);
-
-    m_progress_bar = gtk_progress_bar_new();
-    gtk_widget_hide(m_progress_bar);
-    gtk_fixed_put(GTK_FIXED(fixed1), m_progress_bar, 60, 150);
-    gtk_widget_set_size_request(m_progress_bar, 280, 20);
-
-    img_right = gtk_image_new_from_stock (GTK_STOCK_APPLY, GTK_ICON_SIZE_BUTTON);
-    gtk_widget_hide (img_right);
-    gtk_fixed_put (GTK_FIXED (fixed1), img_right, 40, 180);
-
-    img_error = gtk_image_new_from_stock (GTK_STOCK_STOP, GTK_ICON_SIZE_BUTTON);
-    gtk_widget_hide (img_error);
-    gtk_fixed_put (GTK_FIXED (fixed1), img_error, 40, 180);
-
-    img_load = gtk_image_new_from_stock (GTK_STOCK_YES, GTK_ICON_SIZE_BUTTON);
-    gtk_widget_hide (img_load);
-    gtk_fixed_put (GTK_FIXED (fixed1), img_load, 40, 180);
-
-    m_label_notice = gtk_label_new ("");
-    gtk_widget_hide (m_label_notice);
-    gtk_fixed_put (GTK_FIXED (fixed1), m_label_notice, 55, 180);
-    gtk_widget_set_size_request (m_label_notice, 265, 30);
-
-    hseparator1 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator1);
-    gtk_fixed_put (GTK_FIXED (fixed1), hseparator1, 20, 220);
-    gtk_widget_set_size_request (hseparator1, 360, 16);
-
-    GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("Export"));
-    button_ok = create_button_icon(labelOK, imageOK);
-    gtk_fixed_put (GTK_FIXED (fixed1), button_ok, 136, 360-80-35);
-    gtk_widget_set_size_request (button_ok, 100, 30);
-    g_signal_connect ( G_OBJECT(button_ok), "clicked", G_CALLBACK(HandleButtonExportNameOKClicked), this);
-
-    GtkWidget *imageCancel = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *labelCancel = gtk_label_new_with_mnemonic (_("Cancel"));
-    button_cancel = create_button_icon(labelCancel, imageCancel);
-    gtk_fixed_put (GTK_FIXED (fixed1), button_cancel, 280, 360-80-35);
-    gtk_widget_set_size_request (button_cancel, 100, 30);
-    g_signal_connect ( G_OBJECT(button_cancel), "clicked", G_CALLBACK(HandleButtonCancelClicked), this);
-
-    gtk_widget_show_all(window_calc_export);
-    gtk_widget_hide (img_right);
-    gtk_widget_hide (img_error);
-    gtk_widget_hide (img_load);
-    m_window = window_calc_export;
-    g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
-    return window_calc_export;
-}
-
-GtkWidget* CustomCalc::CreateCalcSettingWin(GtkWidget *parent) {
-    GtkWidget *window_calc_add;
-    GtkWidget *button_ok;
-    GtkWidget *alignment1;
-    GtkWidget *hbox2;
-    GtkWidget *image1;
-    GtkWidget *label_OK;
-    GtkWidget *hseparator1;
-    GtkWidget *button_cancel;
-    GtkWidget *alignment2;
-    GtkWidget *hbox3;
-    GtkWidget *image2;
-    GtkWidget *label_Cancel;
-    GtkWidget *label_name;
-
-    window_calc_add = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (window_calc_add, 400, 280);
-    gtk_window_set_title (GTK_WINDOW (window_calc_add), _("CalcSetting"));
-    gtk_window_set_transient_for(GTK_WINDOW(window_calc_add), GTK_WINDOW(parent));
-    gtk_window_set_modal(GTK_WINDOW(window_calc_add), TRUE);
-    gtk_window_set_position (GTK_WINDOW (window_calc_add), GTK_WIN_POS_CENTER);
-    gtk_window_set_resizable (GTK_WINDOW (window_calc_add), FALSE);
-
-    fixed1 = gtk_fixed_new ();
-    gtk_widget_show (fixed1);
-    gtk_container_add (GTK_CONTAINER (window_calc_add), fixed1);
-
-    label_name = gtk_label_new (_("Item:"));
-    gtk_widget_show (label_name);
-    gtk_fixed_put (GTK_FIXED (fixed1), label_name, 8, 24);
-    gtk_widget_set_size_request (label_name, 120, 30);
-
-    m_entry_name = gtk_entry_new ();
-    gtk_entry_set_max_length(GTK_ENTRY(m_entry_name), 10);
-    gtk_widget_show (m_entry_name);
-    gtk_fixed_put (GTK_FIXED (fixed1), m_entry_name, 152, 24);
-    gtk_widget_set_size_request (m_entry_name, 200, 30);
-    gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_name), 9679);
-    gtk_widget_grab_focus(m_entry_name);
-    g_signal_connect_after(G_OBJECT(m_entry_name), "focus-in-event", G_CALLBACK(on_entry_focus_in), this);
-
-    label_type = gtk_label_new (_("Type:"));
-    gtk_widget_show (label_type);
-    gtk_fixed_put (GTK_FIXED (fixed1), label_type, 8, 80-8);
-    gtk_widget_set_size_request (label_type, 120, 30);
-
-    m_combobox_type = gtk_combo_box_new_text();
-    gtk_widget_show(m_combobox_type);
-    gtk_fixed_put (GTK_FIXED (fixed1), m_combobox_type, 152, 80-8);
-    gtk_widget_set_size_request (m_combobox_type, 200, 30);
-    for(int i=0; i<MAX_METHOD; i++) {
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_type), _(method_name[i]));
-    }
-    gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_type), 0);
-    g_signal_connect(m_combobox_type, "changed", G_CALLBACK(HandleComboboxTypeChanged), this);
-
-    label_method = gtk_label_new (_("Method:"));
-    gtk_widget_show (label_method);
-    gtk_fixed_put (GTK_FIXED (fixed1), label_method, 8, 136);
-    gtk_widget_set_size_request (label_method, 120, 30);
-
-    m_combobox_method = gtk_combo_box_new_text();
-    gtk_widget_show (m_combobox_method);
-    gtk_fixed_put (GTK_FIXED (fixed1), m_combobox_method, 152, 136);
-    gtk_widget_set_size_request (m_combobox_method, 200, 30);
-
-    for(int i=0; i<ETYPE_NUM; i++) {
-        if(0 == CustomEtypeArray[i].type) {
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(CustomEtypeArray[i].name.c_str()));
-        }
-    }
-    /*
-    for (int j = 0; j < 6; j++)
-    {
-    	if(custom_method[0][j]==NULL)
-    		break;
-    	gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(custom_method[0][j]));
-    }*/
-
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_method), 0);
-
-    button_ok = gtk_button_new ();
-    gtk_widget_show (button_ok);
-    gtk_fixed_put (GTK_FIXED (fixed1), button_ok, 136, 224);
-    gtk_widget_set_size_request (button_ok, 100, 30);
-    g_signal_connect(button_ok, "clicked", G_CALLBACK(HandleButtonOKClicked), this);
-
-    alignment1 = gtk_alignment_new (0.5, 0.5, 0, 0);
-    gtk_widget_show (alignment1);
-    gtk_container_add (GTK_CONTAINER (button_ok), alignment1);
-
-    hbox2 = gtk_hbox_new (FALSE, 2);
-    gtk_widget_show (hbox2);
-    gtk_container_add (GTK_CONTAINER (alignment1), hbox2);
-
-    image1 = gtk_image_new_from_stock ("gtk-apply", GTK_ICON_SIZE_BUTTON);
-    gtk_widget_show (image1);
-    gtk_box_pack_start (GTK_BOX (hbox2), image1, FALSE, FALSE, 0);
-
-    label_OK = gtk_label_new_with_mnemonic (_("OK"));
-    gtk_widget_show (label_OK);
-    gtk_box_pack_start (GTK_BOX (hbox2), label_OK, FALSE, FALSE, 0);
-
-    hseparator1 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator1);
-    gtk_fixed_put (GTK_FIXED (fixed1), hseparator1, 8, 200);
-    gtk_widget_set_size_request (hseparator1, 384, 16);
-
-    button_cancel = gtk_button_new ();
-    gtk_widget_show (button_cancel);
-    gtk_fixed_put (GTK_FIXED (fixed1), button_cancel, 280, 224);
-    gtk_widget_set_size_request (button_cancel, 100, 30);
-    g_signal_connect(button_cancel, "clicked", G_CALLBACK(HandleButtonCancelClicked), this);
-
-    alignment2 = gtk_alignment_new (0.5, 0.5, 0, 0);
-    gtk_widget_show (alignment2);
-    gtk_container_add (GTK_CONTAINER (button_cancel), alignment2);
-
-    hbox3 = gtk_hbox_new (FALSE, 2);
-    gtk_widget_show (hbox3);
-    gtk_container_add (GTK_CONTAINER (alignment2), hbox3);
-
-    image2 = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
-    gtk_widget_show (image2);
-    gtk_box_pack_start (GTK_BOX (hbox3), image2, FALSE, FALSE, 0);
-
-    label_Cancel = gtk_label_new_with_mnemonic (_("Cancel"));
-    gtk_widget_show (label_Cancel);
-    gtk_box_pack_start (GTK_BOX (hbox3), label_Cancel, FALSE, FALSE, 0);
-
-    gtk_widget_show_all(window_calc_add);
-    m_window = window_calc_add;
-    g_signal_connect(G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
-
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
-
-    return window_calc_add;
-}
-
-void CustomCalc::ComboboxTypeChanged(GtkComboBox *combobox) {
-
-    int active = gtk_combo_box_get_active(GTK_COMBO_BOX(combobox));
-    if (active ==-1)
-        return ;
-
-    int i = 0;
-    for(i = 5; i >= 0; i--)
-        gtk_combo_box_remove_text(GTK_COMBO_BOX(m_combobox_method), i);
-    /*
-        for (i = 0; i < 6; i++)
-        {
-            if(custom_method[active][i]==NULL)
-                break;
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(custom_method[active][i]));
-        }
-    */
-
-    for(int i=0; i<ETYPE_NUM; i++) {
-        if(active == CustomEtypeArray[i].type) {
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_method), _(CustomEtypeArray[i].name.c_str()));
-        }
-    }
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_method), 0);
-
-}
 
 void CustomCalc::EntryItemInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
     gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));
@@ -2670,67 +2728,21 @@ void CustomCalc::EntryItemInsert(GtkEditable *editable, gchar *new_text, gint ne
     }
 }
 
-void CustomCalc::EntryItemFocusIn(GtkEditable *editable, GdkEventFocus *event) {
-    if (KeySwitchIM::m_imOn) {
-        KeySwitchIM ksim;
-        ksim.ExcuteChange(TRUE);
-    }
-}
 
-void CustomCalc::ButtonCancelClicked(GtkButton *button) {
-    DestroyWin();
-}
+
+
 
 void CustomCalc::HideOKAndCancelClicked() {
     gtk_widget_set_sensitive(button_ok, FALSE);
     gtk_widget_set_sensitive(button_cancel, FALSE);
 }
 
-void CustomCalc::OKAndCancelClicked() {
-    gtk_widget_set_sensitive(button_ok, TRUE);
-    gtk_widget_set_sensitive(button_cancel, TRUE);
 
-}
 
-void CustomCalc::SetProgressBar(double fraction) {
-    //gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(m_progress_bar), 0.1);
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_progress_bar), fraction);
-    char text_buf[10];
-    sprintf(text_buf, "%d%%", (int)(fraction*100));
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_progress_bar), text_buf);
-    gtk_widget_show(m_progress_bar);
-}
 
-void CustomCalc::ExportRightInfoNotice(char *result) {
-    gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
-    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
-    gtk_widget_hide (img_error);
-    gtk_widget_hide (img_load);
-    gtk_widget_show(m_label_notice);
-    gtk_widget_show(img_right);
-}
-
-void CustomCalc::ExportErrorInfoNotice(char *result) {
-    gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
-    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
-    gtk_widget_hide (img_right);
-    gtk_widget_hide (img_load);
-    gtk_widget_show(m_label_notice);
-    gtk_widget_show(img_error);
-}
-
-void CustomCalc::ExportLoadInfoNotice(char *result) {
-    gtk_label_set_text(GTK_LABEL(m_label_notice), (_(result)));
-    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_notice), PANGO_WRAP_WORD);
-    gtk_widget_hide (img_right);
-    gtk_widget_hide (img_error);
-    gtk_widget_show(m_label_notice);
-    gtk_widget_show(img_load);
-
-}
 extern int num;
 extern vector<int> vecAdd;
-extern int item_num_exist;
+
 
 bool CustomCalc::RenameCompare(char * name_copy) {
     char path1[256];
@@ -3008,23 +3020,7 @@ void CustomCalc::ImportSuccess(void) {
 
 }
 
-void CustomCalc::ButtonImportNameOK() {
-    string item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num_exist);
 
-    char name_copy[256];
-    for(int i=1; i<100; i++) {
-        sprintf(name_copy, "%s(%d)", item_name.c_str(), i);
-        if(RenameCompare(name_copy)) {
-            break;
-        }
-        if(i==99) {
-            sprintf(name_copy, "%s(1)", item_name.c_str());
-        }
-    }
-    item_name = name_copy;
-
-    ImportRenameCopy(item_name);
-}
 
 void CustomCalc::ButtonExportNameOKClicked(GtkButton *button) {
     const char* tmp1_name = gtk_entry_get_text(GTK_ENTRY(m_entry_export_name));
@@ -3075,180 +3071,11 @@ void CustomCalc::ButtonExportNameOKClicked(GtkButton *button) {
     }
 }
 
-void CustomCalc::ButtonOKClicked(GtkButton *button) {
-    string name = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
-    trim(name);
-    const char *tmp_name = name.c_str();
 
-    if (tmp_name == NULL || strlen(tmp_name) == 0) {
-        gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("Please Input Name!"), NULL);
-        return;
-    }
 
-    int index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method));
-    if (index == -1) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select measure method!"), NULL);
-        return;
-    }
 
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
 
-    vector<string> useritemgroup;
-    useritemgroup = ptrIni->GetGroupName();
-    char src_group[256];
-    int group_length(0);
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        int number1;
-        number1 = ptrIni->ReadInt(src_group, "Number");
 
-        for(int i=1; i<=number1; i++) {
-            char CalcNumber[256];
-            sprintf(CalcNumber, "Calc%d", i);
-            int item_num = ptrIni->ReadInt(src_group, CalcNumber);
-            string item_name;
-            if(item_num < (USER_START - BASIC_MEA_END))
-                item_name= CalcSetting::GetInstance()->ItemMenuTransEnglish(item_num);
-            else {
-                item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num);
-            }
-            PRINTF("item_name= %s\n", item_name.c_str());
-            PRINTF("item_tmp_name =%s\n", tmp_name);
-            if((strcmp(tmp_name, item_name.c_str()) == 0) ||(strcmp(tmp_name, _(item_name.c_str())) == 0)) {
-                gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
-                ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("The name has existed, please rename!"), NULL);
-                return;
-            }
-        }
-
-    }
-
-    int ItemDeleteNum=ptrIni->ReadInt("Delete", "Number");
-
-    int ItemAllNum;
-    ItemAllNum=ptrIni->ReadInt("MaxNumber", "Number");
-    if((ItemDeleteNum==0)&&(ItemAllNum >= (USER_START -BASIC_MEA_END + MAX_USER_CALC_NUM))) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("The defined items have reached the maximum!"), NULL);
-        return;
-    }
-
-    int type_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_type));
-    if (type_index == -1) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR,
-                                          _("Please select measure type!"), NULL);
-        return;
-    }
-
-    int type_method_index = 0;
-    gchar *method_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_method));
-    printf("method_name = %s\n", method_name);
-    for(int i=0; i<ETYPE_NUM; i++) {
-        if(strcmp(_(method_name), _(CustomEtypeArray[i].name.c_str())) == 0) {
-            type_method_index = CustomEtypeArray[i].etype;
-            break;
-        }
-    }
-    /* for(int i=0;i<ETYPE_NUM;i++)
-    {
-        if(strcmp(custom_method[type_index][index], CustomEtypeArray[i].name.c_str()) == 0)
-        {
-            type_method_index = CustomEtypeArray[i].etype;
-            break;
-        }
-    }
-    */
-    const gchar *department_name = CalcSetting::GetInstance()->GetDepartmentName();
-    char department[50];
-    for(int i=0; i<SECTION_NUM; i++) {
-        if(strcmp(department_name, _(section[i].c_str()))==0) {
-            strcpy(department, section[i].c_str());
-            break;
-        }
-    }
-
-    bool NewNumber = false;
-    if(ItemDeleteNum) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", ItemDeleteNum);
-        int item_num=ptrIni->ReadInt("Delete", CalcNumber);
-        ptrIni->RemoveString("Delete", CalcNumber);
-        ptrIni->WriteInt("Delete", "Number", ItemDeleteNum-1);
-        ptrIni->SyncConfigFile();
-
-        char CustomEtype[256];
-        sprintf(CustomEtype, "CustomEtype-%d",item_num);
-        ptrIni->WriteInt(CustomEtype, "Etype", item_num);
-        ptrIni->WriteString(CustomEtype, "Name", tmp_name);
-        ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
-        ptrIni->WriteInt(CustomEtype, "MeasureType", index);
-        ptrIni->WriteString(CustomEtype, "Department", department);
-        ptrIni->SyncConfigFile();
-        ItemAllNum = item_num;
-    } else {
-        NewNumber = true;
-        char CustomEtype[256];
-        sprintf(CustomEtype, "CustomEtype-%d",++ItemAllNum);
-        ptrIni->WriteInt(CustomEtype, "Etype", ItemAllNum);
-        ptrIni->WriteString(CustomEtype, "Name", tmp_name);
-        ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
-        ptrIni->WriteInt(CustomEtype, "MeasureType", index);
-        ptrIni->WriteInt("MaxNumber", "Number", ItemAllNum);
-        ptrIni->WriteString(CustomEtype, "Department", department);
-        ptrIni->SyncConfigFile();
-    }
-
-    int number;
-    char SelectNum[256];
-    number = ptrIni->ReadInt(department, "Number");
-    sprintf(SelectNum, "Calc%d",number+1);
-    ptrIni->WriteInt(department, SelectNum, ItemAllNum);
-    ptrIni->WriteInt(department, "Number", number+1);
-    ptrIni->SyncConfigFile();
-
-    DestroyWin();
-    CalcSetting::GetInstance()->ChangeModelAndLight(tmp_name);
-    CalcSetting::GetInstance()->ClearAllCalc();
-}
-
-void CustomCalc::DestroyWin(void) {
-    if (GTK_IS_WIDGET(m_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(m_window);
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-    }
-}
-
-void CustomCalc::DelayDestroyWin(void) {
-    if (GTK_IS_WIDGET(m_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(m_window);
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-    }
-}
-
-gboolean CustomCalc::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
-    DestroyWin();
-    return FALSE;
-}
 
 static gboolean ExitCustomeCalc(gpointer data) {
     CustomCalc *tmp = (CustomCalc *)data;

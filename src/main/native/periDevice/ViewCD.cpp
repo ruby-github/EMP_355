@@ -6,7 +6,7 @@
 
 #include "keyboard/KeyValueOpr.h"
 #include "periDevice/ViewCD.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "patient/ViewArchive.h"
 #include "display/gui_global.h"
 #include "keyboard/KeyDef.h"
@@ -999,14 +999,14 @@ gboolean ViewCD::BurnDVD(gboolean is_blank, const char *device) {
 #endif
 // gboolean TimeoutHintDialog(gpointer data)
 // {
-//     ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()), _((char*)data));
+//     MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()), _((char*)data));
 
 //     return FALSE;
 // }
 
 gboolean TimeoutInfoDialog(gpointer data) {
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewCD::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       _((char*)data),
                                       NULL);
 
@@ -1014,15 +1014,15 @@ gboolean TimeoutInfoDialog(gpointer data) {
 }
 
 gboolean TimeoutUpdateDialog(gpointer data) {
-    ViewDialog::GetInstance()->SetText(_((char*)data));
+    MessageDialog::GetInstance()->SetText(_((char*)data));
 
     return FALSE;
 }
 
 void ViewCD::HintDialog(guint timeout, int type, const char *info) {
-    // if(type==ViewDialog::HINT)
+    // if(type==MessageDialog::HINT)
     // 	g_timeout_add(timeout, TimeoutHintDialog, (void*)info);
-    if(type==ViewDialog::INFO)
+    if(type==MessageDialog::DLG_INFO)
         g_timeout_add(timeout, TimeoutInfoDialog, (void*)info);
     else if(type < 0)
         g_timeout_add(timeout, TimeoutUpdateDialog, (void*)info);
@@ -1034,21 +1034,21 @@ void ViewCD::BtnBackupClicked(GtkButton *button) {
     if(m_vecFolder.size()==0 || m_vecPath.size()==0) {
         PRINTF("No file selected!\n");
         const char *buf_info = "No any files selected!\nPlease select files to export first.";
-        HintDialog(10, (int)ViewDialog::INFO, buf_info);
+        HintDialog(10, (int)MessageDialog::DLG_INFO, buf_info);
         return;
     }
 
     if(!PrepareData(m_vecFolder, m_vecPath)) {
         PRINTF("PrepareData Error!\n");
         const char *buf_info = "Failed to prepare data!";
-        HintDialog(10, (int)ViewDialog::INFO, buf_info);
+        HintDialog(10, (int)MessageDialog::DLG_INFO, buf_info);
         return;
     }
 
     if(m_remain <= 0) {
         PRINTF("The remain space not enough!\n");
         const char *buf_info = "No enough space!";
-        HintDialog(10, (int)ViewDialog::INFO, buf_info);
+        HintDialog(10, (int)MessageDialog::DLG_INFO, buf_info);
         return;
     }
 
@@ -1059,14 +1059,14 @@ void ViewCD::BtnExportClicked(GtkButton *button) {
     if(m_vecFolder.size()==0 || m_vecPath.size()==0) {
         PRINTF("No file selected!\n");
         const char *buf_info = "No any files selected!\nPlease select files to export first.";
-        HintDialog(10, (int)ViewDialog::INFO, buf_info);
+        HintDialog(10, (int)MessageDialog::DLG_INFO, buf_info);
         return;
     }
 
     if(m_remain <= 0) {
         PRINTF("The remain space not enough!\n");
         const char *buf_info = "No enough space!";
-        HintDialog(10, (int)ViewDialog::INFO, buf_info);
+        HintDialog(10, (int)MessageDialog::DLG_INFO, buf_info);
         return;
     }
 

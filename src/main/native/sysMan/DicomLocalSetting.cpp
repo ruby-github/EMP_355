@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "periDevice/DCMMan.h"
 #include "sysMan/SysDicomSetting.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "periDevice/NetworkMan.h"
 #include "sysMan/ViewSystem.h"
 
@@ -252,7 +252,7 @@ void DicomLocalSetting::ButtonSettingClicked(GtkButton *button) {
 
     //if(host_ae[0] == '\0' || host_port[0] == '\0' || local_ip[0] == '\0' || local_mask[0] == '\0' || local_ae[0] == '\0')
     if (strcmp(local_ip,"")==0 ||strcmp(local_mask,"")==0 ||strcmp(local_gateway,"")==0 ||strcmp(host_port,"")==0 ||strcmp(host_ae,"")==0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Local information must be not empty!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Local information must be not empty!"), NULL);
         return ;
     }
 
@@ -274,8 +274,8 @@ void DicomLocalSetting::ButtonSettingClicked(GtkButton *button) {
         sprintf(info, _("Fail to set the local network!"));
     }
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 

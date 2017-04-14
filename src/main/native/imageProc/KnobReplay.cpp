@@ -20,7 +20,7 @@
 #include "periDevice/PeripheralMan.h"
 #include "sysMan/SysOptions.h"
 #include "display/HintArea.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "ViewMain.h"
 #include "imageProc/ModeStatus.h"
 #include "sysMan/ViewSuperuser.h"
@@ -227,8 +227,8 @@ EKnobReturn ReplayChgSaveCine(void) {
     if(!so.GetCineAutoName()) {
         if(!ModeStatus::IsFreezeMode())
             FreezeMode::GetInstance()->PressFreeze();
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::FILENAME,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_FILENAME,
                                           _("Please input the file name(without suffix)"),
                                           &SaveCine);
     } else {
@@ -262,8 +262,8 @@ EKnobReturn ReplayChgSaveCine460(EKnobOper oper) {
     if(!so.GetCineAutoName()) {
         if(!ModeStatus::IsFreezeMode())
             FreezeMode::GetInstance()->PressFreeze();
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::FILENAME,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_FILENAME,
                                           _("Please input the file name(without suffix)"),
                                           &SaveCine);
     } else {

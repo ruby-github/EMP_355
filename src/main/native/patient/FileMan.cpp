@@ -316,11 +316,11 @@ int FileMan::CopyFile(const char *source, const char *dest, bool del) {
 }
 
 #if 0
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 static int cond;
 static double frac;
 gboolean UpdateProgressBar(gpointer data) {
-    ViewDialog::GetInstance()->SetProgressBar(frac);
+    MessageDialog::GetInstance()->SetProgressBar(frac);
     cond = 0;
     return false;
 }

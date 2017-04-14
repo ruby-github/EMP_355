@@ -46,6 +46,9 @@
 #include "periDevice/MonitorControl.h"
 #include "sysMan/UserSelect.h"           //addec by LL
 
+
+#include "utils/Utils.h"
+
 #include "imageControl/FpgaCtrl2D.h"
 extern MenuPW g_menuPW;
 // test_Artifact
@@ -2667,6 +2670,8 @@ void ViewMain::Create(void) {
     if(g_authorizationOn)
         CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 1);
 #endif
+
+  Utils::test(m_mainWindow);
 }
 
 void ViewMain::MySleep(int msecond) {

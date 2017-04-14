@@ -28,7 +28,7 @@
 #include "ViewMain.h"
 #include "patient/ViewArchiveImgMan.h"
 #include "patient/ViewUdiskDataSelect.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "sysMan/SysDicomSetting.h"
 #include "display/TopArea.h"
 #include "display/HintArea.h"
@@ -1089,17 +1089,17 @@ static gboolean LoadUdiskData(gpointer data) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Destroy();
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Destroy();
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage is found!"),
                                           NULL);
         return FALSE;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Destroy();
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Destroy();
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return FALSE;
@@ -1115,10 +1115,10 @@ static gboolean LoadUdiskData(gpointer data) {
     g_free(src);
     g_free(dest);
     ptr->UmountUsbStorage();
-    ViewDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Destroy();
     if(ret < 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           _("Failed to load data from USB storage!"),
                                           NULL);
         return FALSE;
@@ -1136,15 +1136,15 @@ void SelectUdiskData(void) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage is found!"),
                                           NULL);
         return;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return;
@@ -1166,7 +1166,7 @@ void ViewArchive::BtnUdiskClicked(GtkButton *button) {
 #endif
     {
         PRINTF("Load From U disk!\n");
-        ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+        MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
                                               _("Please wait, loading data from USB storage..."));
 
         g_timeout_add(500, LoadUdiskData, this);
@@ -1325,7 +1325,7 @@ void ViewArchive::BtnDisplayClicked(GtkButton *button) {
 
     // display image management dialog
     if (vecPatExamID.size() == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No record is selected!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No record is selected!"), NULL);
     } else {
         ViewArchiveImgMan::GetInstance()->CreateWindow(vecPatExamID);
         PRINTF("exit ViewArchive.cpp : displayClicked\n");
@@ -1335,7 +1335,7 @@ void ViewArchive::BtnDisplayClicked(GtkButton *button) {
 void ViewArchive::BtnQueryRetrieveClicked(GtkButton *button) {
     string device = CDCMMan::GetMe()->GetDefaultQueryRetrieveServiceDevice();
     if (device == "") {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default query/retrieve service in system setting"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default query/retrieve service in system setting"), NULL);
         return ;
     } else
         ViewQueryRetrieve::GetInstance()->CreateQueryRetrieveWin(m_window);
@@ -1398,10 +1398,10 @@ int SureToDelete(gpointer data) {
 void ViewArchive::BtnDeleteClicked(GtkButton *button) {
     vector<string> vecPatExamID = GetSelExamID();
     if (vecPatExamID.size() == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No Record is selected!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No Record is selected!"), NULL);
     } else {
         const char* info = N_("Warnning: The patient data will be permanently deleted!\nSure to delete?");
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _(info), SureToDelete);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _(info), SureToDelete);
     }
 }
 
@@ -1532,11 +1532,11 @@ gboolean SendToDicom(gpointer data) {
 void ViewArchive::BtnSendClicked(GtkButton *button) {
     vector<string> vecPatExamID = GetSelExamID();
     if (vecPatExamID.size() == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No Record is selected!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No Record is selected!"), NULL);
     } else {
-        // ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), _("Sending..."));
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::PRG_CANCEL,
+        // MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), _("Sending..."));
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_PROGRESS_CANCEL,
                                           _("Sending..."),
                                           CancelCopyToFlash);
 
@@ -1588,8 +1588,8 @@ void ViewArchive::SetStartDate(int year, int month, int day) {
     if (m_iEnd == 0)
         m_iEnd = icurrent;
     if ((m_iStart > m_iEnd) || (m_iStart > icurrent)) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("The time input is not correct!"),
                                           NULL);
         m_iStart = 0;
@@ -1636,8 +1636,8 @@ void ViewArchive::SetEndDate(int year, int month, int day) {
     iCurrent =  (tm_now->tm_year + 1900) * 10000 + (tm_now->tm_mon + 1) * 100 + tm_now->tm_mday * 1;
     m_iEnd = year * 10000 + month * 100 + day * 1;
     if (( m_iStart > m_iEnd) || (m_iEnd > iCurrent)) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("The time input is not correct!"),
                                           NULL);
         m_iEnd = 0;
@@ -2088,8 +2088,8 @@ void ViewArchive::MenuItemFlashActivate(GtkMenuItem *menuitem) {
     }
 
     if(vec.empty()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No record is selected!"),
                                           NULL);
         return;
@@ -2121,8 +2121,8 @@ void ViewArchive::MenuItemCDActivate(GtkMenuItem *menuitem) {
     }
 
     if(vec.empty()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("Please select the list you want to export the data!"),
                                           NULL);
         return;
@@ -2138,15 +2138,15 @@ void ViewArchive::MenuItemEmpActivate(GtkMenuItem *menuitem) {
 void ViewArchive::MenuItemDicomActivate(GtkMenuItem *menuitem) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return;
@@ -2169,7 +2169,7 @@ void ViewArchive::PROGRESSSTATUS(int nPos) {
     } else
         frac = nPos*0.01;
     gdk_threads_enter();
-    ViewDialog::GetInstance()->SetProgressBar(frac);
+    MessageDialog::GetInstance()->SetProgressBar(frac);
     while(gtk_events_pending())
         gtk_main_iteration();
     gdk_threads_leave();
@@ -2188,13 +2188,13 @@ void ViewArchive::GetSelToDicom() {
 
     string device = CDCMMan::GetMe()->GetDefaultStorageServiceDevice();
     if (device == "") {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default storage service in system setting"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default storage service in system setting"), NULL);
         return ;
     }
     Replay::GetInstance()->ClearCurReplayData();
     Replay::GetInstance()->DisplayReplayBar();
     m_selNum = 0;
-    //ViewDialog::GetInstance()->SetProgressBar(0);
+    //MessageDialog::GetInstance()->SetProgressBar(0);
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview));
     valid = gtk_tree_model_get_iter_first(model, &iter);
     while(valid) {
@@ -2273,12 +2273,12 @@ void ViewArchive::GetSelToDicom() {
         valid = gtk_tree_model_iter_next (model, &iter);
     }
 
-    ViewDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Destroy();
     char info[256];
     sprintf(info, "%s\n%s %d\n%s %d", _("Sending finished!"), _("Success:"), count_success,  _("Fail:"), count_failed);
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       info,
                                       NULL);
 
@@ -2295,7 +2295,7 @@ void ViewArchive::GetSelToDicom() {
     string device = CDCMMan::GetMe()->GetDefaultStorageServiceDevice();
     if (device == "")
     {
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default storage service in system setting"), NULL);
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default storage service in system setting"), NULL);
     return ;
     }
     #if 1
@@ -2442,9 +2442,9 @@ void ViewArchive::GetSelToDicom() {
 
      char info[256];
      sprintf(info, "%s\n%s %d\n%s %d", _("Sending finished!"), _("Success:"), count_success,  _("Fail:"), count_failed);
-     //	ViewDialog::GetInstance()->Destroy();
-     ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-             ViewDialog::INFO,
+     //	MessageDialog::GetInstance()->Destroy();
+     MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+             MessageDialog::DLG_INFO,
              info,
              NULL);
     #endif*/
@@ -2460,7 +2460,7 @@ static void progress_callback(goffset current, goffset total, gpointer data) {
     //	PRINTF("prac = %f\n", prac);
     if(prac >= 0 && prac <= 1.0) {
         gdk_threads_enter();
-        ViewDialog::GetInstance()->SetProgressBar(prac);
+        MessageDialog::GetInstance()->SetProgressBar(prac);
         while(gtk_events_pending())
             gtk_main_iteration();
         gdk_threads_leave();
@@ -2478,15 +2478,15 @@ static gboolean SendToFlash(gpointer data) {
     ViewArchive *ptrArch = ViewArchive::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return FALSE;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return FALSE;
@@ -2546,8 +2546,8 @@ static gboolean SendToFlash(gpointer data) {
 
                 //	sprintf(str_info, "%s %s   %d/%d\n%s", _("Exporting"), (*iteName).c_str(), count, total, _("Please wait..."));
                 sprintf(str_info, "%s %s   %d/%d\n%s", _("Exporting"), name, count, total, _("Please wait..."));
-                ViewDialog::GetInstance()->SetText(str_info);
-                ViewDialog::GetInstance()->SetProgressBar(0);
+                MessageDialog::GetInstance()->SetText(str_info);
+                MessageDialog::GetInstance()->SetProgressBar(0);
 
                 gchar *srcPath = g_build_filename(STORE_PATH, (*iteSid).c_str(), name, NULL);
                 gchar *destPath = g_build_filename(UDISK_DATA_PATH, (*iteSid).c_str(), name, NULL);
@@ -2587,7 +2587,7 @@ static gboolean SendToFlash(gpointer data) {
     }
 
     ptr->UmountUsbStorage();
-    ViewDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Destroy();
 
     if(!cond) {
         gchar *array = NULL;
@@ -2609,8 +2609,8 @@ static gboolean SendToFlash(gpointer data) {
         g_free(basePath);
         //	g_free(storePath);
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       result,
                                       NULL);
 
@@ -2651,8 +2651,8 @@ void ViewArchive::GetSelToFlash() {
     }
 
     if(m_vecFlashSid.empty()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("Please select the wanted data from the list  to be exported!"),
                                           NULL);
         return;
@@ -2660,8 +2660,8 @@ void ViewArchive::GetSelToFlash() {
 
     g_timeout_add(1000, SendToFlash, this);
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                      ViewDialog::PRG_CANCEL,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_PROGRESS_CANCEL,
                                       _("Please wait..."),
                                       CancelCopyToFlash);
 }
@@ -2676,15 +2676,15 @@ static gboolean ExportToFlash(gpointer data) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return FALSE;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return FALSE;
@@ -2758,8 +2758,8 @@ static gboolean ExportToFlash(gpointer data) {
 
             //	sprintf(str_info, "%s %s   %d/%d\n%s", _("Exporting"), (*iteName).c_str(), count, total, _("Please wait..."));
             sprintf(str_info, "%s %s   %d/%d\n%s", _("Exporting"), name, count, total, _("Please wait..."));
-            ViewDialog::GetInstance()->SetText(str_info);
-            ViewDialog::GetInstance()->SetProgressBar(0);
+            MessageDialog::GetInstance()->SetText(str_info);
+            MessageDialog::GetInstance()->SetProgressBar(0);
 
             //gchar *srcPath = g_build_filename(STORE_PATH, (*iteSid).c_str(), name, NULL);
             //gchar *destPath = g_build_filename(UDISK_DATA_PATH, (*iteSid).c_str(), name, NULL);
@@ -2796,7 +2796,7 @@ static gboolean ExportToFlash(gpointer data) {
     }
 
     ptr->UmountUsbStorage();
-    ViewDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Destroy();
 
     if(!cond) {
         gchar *array = NULL;
@@ -2818,8 +2818,8 @@ static gboolean ExportToFlash(gpointer data) {
         g_free(basepath);
         //	g_free(storepath);
     }
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       result,
                                       NULL);
 
@@ -2828,8 +2828,8 @@ static gboolean ExportToFlash(gpointer data) {
 
 void ViewArchive::StartUsbExport(GtkWidget *parent) {
     g_timeout_add(1000, ExportToFlash, this);
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(parent),
-                                      ViewDialog::PRG_CANCEL,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(parent),
+                                      MessageDialog::DLG_PROGRESS_CANCEL,
                                       _("Please wait..."),
                                       CancelCopyToFlash);
 }
@@ -2974,15 +2974,15 @@ void CustomType::ExportStudy(void) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return ;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return ;
@@ -3005,33 +3005,33 @@ void CustomType::ExportStudy(void) {
         EDCMReturnStatus status = CDCMMan::GetMe()->ExportStudy(studyNo,strSrcDir,destDirStorageMedia,PROGRESSSTATUS);
         //EDCMReturnStatus status = CDCMMan::GetMe()->ExportStudy(studyNo,strSrcDir,destDirStorageMedia,NULL);
         if(status == DCMSUCCESS) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Export data successfully!"),
                                               NULL);
         } else if(status == DCMSTUDYEXISTED) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Study Info has existed!"),
                                               NULL);
         } else if (status == DCMINVALIDSTORAGEDEVICE) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Invalid storage device!"),
                                               NULL);
         } else if (status == DCMEXPORTFAILURE) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Export data failure!"),
                                               NULL);
         } else if(status == DCMNOENOUGHSPACE) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("No enough space!"),
                                               NULL);
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_INFO,
                                               _("Export data failure!"),
                                               NULL);
         }
@@ -3045,7 +3045,7 @@ void CustomType::ExportStudy(void) {
             sprintf(strSrcDir,"%s/%s",STORE_PATH,vec[i].c_str());
             string destDirStorageMedia = UDISK_PATH;
             EDCMReturnStatus status = CDCMMan::GetMe()->ExportStudy(studyNo,strSrcDir,destDirStorageMedia,PROGRESSSTATUS);
-            //ViewDialog::GetInstance()->Destroy();
+            //MessageDialog::GetInstance()->Destroy();
             if(status == DCMSUCCESS) {
                 count_success++;
 
@@ -3056,8 +3056,8 @@ void CustomType::ExportStudy(void) {
         char info[256];
         sprintf(info, "%s\n%s %d\n%s %d", _("Exporting finished!"), _("Success:"), count_success,  _("Fail:"), count_failed);
 
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_INFO,
                                           info,
                                           NULL);
     }
@@ -3076,7 +3076,7 @@ void CustomType::PROGRESSSTATUS(int nPos) {
     } else
         frac = nPos*0.01;
     gdk_threads_enter();
-    ViewDialog::GetInstance()->SetProgressBar(frac);
+    MessageDialog::GetInstance()->SetProgressBar(frac);
     while(gtk_events_pending())
         gtk_main_iteration();
     gdk_threads_leave();
@@ -3093,8 +3093,8 @@ void CustomType::BtnOkClicked(GtkButton *button) {
 
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_dicom))) {
             g_timeout_add(100, ExportStudyForDicom, this);
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
-                                              ViewDialog::PROGRESS,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_PROGRESS,
                                               _("Please wait..."),
                                               NULL);
         } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_emp))) {

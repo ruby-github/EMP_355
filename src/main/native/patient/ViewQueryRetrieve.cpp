@@ -7,7 +7,7 @@
 #include "keyboard/KeyValueOpr.h"
 #include "ViewMain.h"
 #include "periDevice/DCMMan.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "patient/ImgMan.h"
 #include "patient/Database.h"
 #include "periDevice/ViewPrintPreview.h"
@@ -597,19 +597,19 @@ void ViewQueryRetrieve::ButtonQueryClicked(GtkButton *button) {
             gtk_tree_model_iter_next(model, &iter);
         }
     } else if(status == DCMNODEFALUTSERVER) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No default server!"),
                                           NULL);
 
     } else if(status == DCMCONNECTIONFAILURE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("Server connection is failed!"),
                                           NULL);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("Query unsuccessfully!"),
                                           NULL);
     }
@@ -1026,16 +1026,16 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button) {
             char info[256];
             sprintf(info, "%s\n%s %d\n%s %d", _("Retrieve finished!"), _("Success:"), m_count_success,  _("Fail:"), m_count_failed);
 
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               info,
                                               NULL);
             m_count_failed =0;
             m_count_success = 0;
         }
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No record or device is selected!"),
                                           NULL);
         return;
@@ -1049,8 +1049,8 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button) {
                 InsertPatInfo(i,(string)device);
             }
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("No record or server existed!"),
                                               NULL);
             return;
@@ -1082,8 +1082,8 @@ void ViewQueryRetrieve::ButtonRetrieveClicked(GtkButton *button) {
                 InsertPatInfo(vecIndex[i],device);
             }
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("No record or device is selected!"),
                                               NULL);
             return;
@@ -1165,39 +1165,39 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
 
             gtk_tree_model_iter_next(model, &iter);
         } else if(status == DCMINVALIDQRDESTSERVER) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("Destination server is invalid!"),
                                               NULL);
         } else if(status == DCMRETRIEVEFAILURE) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("Retrieve failedly!"),
                                               NULL);
         } else if(status == DCMNONSUPPORTSTUDYROOT) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("Not support study root!"),
                                               NULL);
         } else if(status == DCMNODEFALUTSERVER) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("No default server!"),
                                               NULL);
 
         } else if(status == DCMCONNECTIONFAILURE) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("Server connection is failed!"),
                                               NULL);
         } else if(status == DCMSTUDYEXISTED) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("Study has existed!"),
                                               NULL);
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("Retrieve unsuccessfully!"),
                                               NULL);
         }

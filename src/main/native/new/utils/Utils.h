@@ -23,9 +23,10 @@ public:
 
   static GtkImage* create_image(const string filename = "", const int width = 0, const int height = 0);
 
-  static GtkEntry* create_entry();
+  static GtkEntry* create_entry(gunichar ch = 0);
   static GtkComboBoxText* create_combobox_text();
   static GtkNotebook* create_notebook();
+  static GtkProgressBar* create_progress_bar();
 
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,

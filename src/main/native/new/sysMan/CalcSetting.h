@@ -1,23 +1,166 @@
-/*
- * =====================================================================================
- *
- *       Filename:  CalcSetting.h
- *
- *    Description:
- *
- *        Version:  1.0
- *        Created:  10/29/2012 04:09:21 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *        Company:
- *
- * =====================================================================================
- */
-
 #ifndef __CALC_SETTING_H__
 #define __CALC_SETTING_H__
+
+#include <gtk/gtk.h>
+#include <string>
+
+#include "display/FakeXEvent.h"
+
+class MessageDialog;
+class CalcSetting;
+
+using std::string;
+
+class CustomCalc:public FakeXEvent {
+public:
+  static CustomCalc* GetInstance();
+
+public:
+  CustomCalc();
+  ~CustomCalc();
+
+  void CreateCalcSettingWin(GtkWidget* parent);
+  void CreateExportCalcSettingWin(GtkWidget* parent);
+
+  void DestroyWin(void);
+  void DelayDestroyWin(void);
+
+  void OKAndCancelClicked();
+  void SetProgressBar(double fraction);
+
+  void ExportErrorInfoNotice(char *result);
+  void ExportLoadInfoNotice(char *result);
+  void ExportRightInfoNotice(char *result);
+
+  void ButtonImportNameOK();
+  void ImportWrite(string item_name, int &item_num);
+  void ImportSuccess(void);
+
+private:
+  // signal
+
+  static void signal_button_clicked_ok(GtkButton* button, CustomCalc* data) {
+    if (data != NULL) {
+      data->ButtonClickedOK(button);
+    }
+  }
+
+  static void signal_button_clicked_cancel(GtkButton* button, CustomCalc* data) {
+    if (data != NULL) {
+      data->ButtonClickedCancel(button);
+    }
+  }
+
+  static void signal_entry_focus_in(GtkEditable* editable, GdkEventFocus* event, CustomCalc* data) {
+    if (data != NULL) {
+      data->EntryFocusIn(editable, event);
+    }
+  }
+
+  static void signal_combobox_changed_type(GtkComboBox* combobox, CustomCalc* data) {
+    if (data != NULL) {
+      data->ComboboxChangedType(combobox);
+    }
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, CustomCalc* data) {
+    if (data != NULL) {
+      data->DestroyWin();
+    }
+
+    return FALSE;
+  }
+
+  static void signal_button_clicked_export(GtkButton* button, CustomCalc* data) {
+    if (data != NULL) {
+      data->ButtonExportNameOKClicked(button);
+    }
+  }
+
+private:
+  GtkWidget* GetWindow();
+
+  MessageDialog* GetMessageDialog();
+  CalcSetting* GetCalcSetting();
+
+  void ButtonClickedOK(GtkButton* button);
+  void ButtonClickedCancel(GtkButton* button);
+  void EntryFocusIn(GtkEditable* editable, GdkEventFocus* event);
+  void ComboboxChangedType(GtkComboBox* combobox);
+  void ButtonExportNameOKClicked(GtkButton *button);
+
+private:
+  GtkWidget* m_window;
+
+  GtkEntry* m_entry_name;
+  GtkComboBoxText* m_combobox_type;
+  GtkComboBoxText* m_combobox_method;
+
+  GtkEntry* m_entry_export_name;
+  GtkProgressBar* m_progress_bar;
+  GtkImage* m_image;
+
+private:
+
+
+static void HandleButtonRenameCancelClicked(GtkButton* button, CustomCalc* data) {
+  if (data != NULL) {
+    data->ButtonRenameCancelClicked(button);
+  }
+}
+
+
+
+private:
+
+    void HideOKAndCancelClicked();
+
+    bool RenameCompare(char * name_copy);
+
+    bool ImportCopy(int j);
+    void ImportRenameCopy(string item_name);
+
+
+
+private:
+
+    GtkWidget *label_type;
+    GtkWidget *label_method;
+
+    GtkWidget *fixed1;
+    GtkWidget *m_frame_new_notice;
+    GtkWidget *m_label_notice;
+    GtkWidget *fixed_new_notice;
+    GtkWidget *m_label_notice1;
+    GtkWidget *m_label_notice2;
+    GtkWidget *m_label_notice3;
+
+    GtkWidget *button_right;
+    GtkWidget *img_right;
+    GtkWidget *button_error;
+    GtkWidget *img_error;
+    GtkWidget *button_load;
+    GtkWidget *img_load;
+    GtkWidget *button_ok;
+    GtkWidget *button_cancel;
+
+    GtkTreeModel *CreateComboModel(char name[][20], int n);
+    void KeyEvent(unsigned char keyValue);
+    static CustomCalc* m_ptrInstance;
+
+    void ButtonRenameCancelClicked(GtkButton *button);
+
+
+    //      void ButtonImportNameOK();
+    void EntryItemInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
+
+
+
+};
+
+
+
+
 
 #include <gtk/gtk.h>
 #include "calcPeople/MeasureDef.h"
@@ -52,117 +195,7 @@ struct CustomTypeAndMethod {
     int etype;
 };
 
-class CustomCalc:public FakeXEvent {
 
-public:
-    enum {
-        N_COMBO_COL1,
-        N_COMBO_TOTAL
-    };
-    CustomCalc();
-    ~CustomCalc();
-    static CustomCalc* GetInstance();
-    GtkWidget* CreateImportRenameSettingWin(GtkWidget *parent);
-    GtkWidget* CreateExportCalcSettingWin(GtkWidget *parent);
-    GtkWidget* CreateCalcSettingWin(GtkWidget *parent);
-    void DestroyWin(void);
-
-    void DelayDestroyWin(void);
-    GtkWidget *GetWindow() {
-        return m_window;
-    }
-    void SetProgressBar(double fraction);
-    void ExportLoadInfoNotice(char *result);
-    void ExportRightInfoNotice(char *result);
-    void ExportErrorInfoNotice(char *result);
-    void HideOKAndCancelClicked();
-    void OKAndCancelClicked();
-    bool RenameCompare(char * name_copy);
-    void ImportSuccess(void);
-    bool ImportCopy(int j);
-    void ImportRenameCopy(string item_name);
-    void ButtonImportNameOK();
-    void ImportWrite(string item_name, int &item_num);
-private:
-    GtkWidget *m_entry_name;
-    GtkWidget *m_entry_export_name;
-    GtkWidget *m_combobox_type;
-    GtkWidget *m_combobox_method;
-    GtkWidget *label_type;
-    GtkWidget *label_method;
-    GtkWidget *m_window;
-    GtkWidget *fixed1;
-    GtkWidget *m_frame_new_notice;
-    GtkWidget *m_label_notice;
-    GtkWidget *fixed_new_notice;
-    GtkWidget *m_label_notice1;
-    GtkWidget *m_label_notice2;
-    GtkWidget *m_label_notice3;
-    GtkWidget *m_progress_bar;
-    GtkWidget *button_right;
-    GtkWidget *img_right;
-    GtkWidget *button_error;
-    GtkWidget *img_error;
-    GtkWidget *button_load;
-    GtkWidget *img_load;
-    GtkWidget *button_ok;
-    GtkWidget *button_cancel;
-
-    GtkTreeModel *CreateComboModel(char name[][20], int n);
-    void KeyEvent(unsigned char keyValue);
-    static CustomCalc* m_ptrInstance;
-    void ComboboxTypeChanged(GtkComboBox *combobox);
-    void ButtonRenameCancelClicked(GtkButton *button);
-    void ButtonCancelClicked(GtkButton *button);
-    void ButtonOKClicked(GtkButton *button);
-    void ButtonExportNameOKClicked(GtkButton *button);
-    //      void ButtonImportNameOK();
-    void EntryItemInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    void EntryItemFocusIn(GtkEditable *editable, GdkEventFocus *event);
-
-    static void HandleButtonRenameCancelClicked(GtkButton *button, CustomCalc *data) {
-        if (data)
-            data->ButtonRenameCancelClicked(button);
-    }
-
-    static void HandleButtonCancelClicked(GtkButton *button, CustomCalc *data) {
-        if (data)
-            data->ButtonCancelClicked(button);
-    }
-    static void HandleButtonOKClicked(GtkButton *button, CustomCalc *data) {
-        if (data)
-            data->ButtonOKClicked(button);
-    }
-
-    static void HandleButtonExportNameOKClicked(GtkButton *button, CustomCalc *data) {
-        if (data)
-            data->ButtonExportNameOKClicked(button);
-    }
-
-    /*      static void HandleButtonImportNameOKClicked(GtkButton *button, CustomCalc *data)
-          {
-              if (data)
-                  data->ButtonImportNameOKClicked(button);
-          }
-    */
-    static void on_entry_focus_in(GtkEditable *editable, GdkEventFocus *event, CustomCalc *data) {
-        data->EntryItemFocusIn(editable, event);
-    }
-
-    //signal handle
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
-
-    //signal
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, CustomCalc *data) {
-        return data->WindowDeleteEvent(widget, event);
-    }
-
-    static void HandleComboboxTypeChanged(GtkComboBox *combobox, CustomCalc *data) {
-        if (data)
-            data->ComboboxTypeChanged(combobox);
-    }
-
-};
 
 enum {
     NAME_COLUMN,

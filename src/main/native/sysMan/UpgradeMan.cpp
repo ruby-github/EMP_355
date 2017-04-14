@@ -14,7 +14,7 @@
 #include "periDevice/PeripheralMan.h"
 #include "sysMan/UpgradeMan.h"
 #include "sysMan/ViewSystem.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 
 #define FILE_MAX_NUM 50
 #define FILENAME_MAX_LEN 255
@@ -356,16 +356,16 @@ gboolean TimeoutUpgrade(gpointer data) {
     val = UpgradeMan::GetInstance()->SureToUpgrade();
     PeripheralMan::GetInstance()->UmountUsbStorage();
 
-//	ViewDialog::GetInstance()->Destroy();
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::INFO,
+//	MessageDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_INFO,
                                       _(UpgradeMan::m_info[val].c_str()),
                                       NULL);
     return FALSE;
 }
 
 int HandleOKUpgrade(gpointer data) {
-    ViewHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+    MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
                                           _(UpgradeMan::m_info[UpgradeMan::PROGRESS].c_str()));
 
     g_timeout_add(500, TimeoutUpgrade, NULL);
@@ -374,8 +374,8 @@ int HandleOKUpgrade(gpointer data) {
 }
 
 void UpgradeMan::Upgrade() {
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      ViewDialog::QUESTION,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
+                                      MessageDialog::DLG_QUESTION,
                                       _(m_info[QUESTION].c_str()),
                                       HandleOKUpgrade);
 }

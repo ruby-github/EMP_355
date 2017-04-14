@@ -19,7 +19,7 @@
 #include "calcPeople/MeaCalcFun.h"
 #include "measure/MeasureMan.h"
 #include "display/ViewCalendar.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "display/TopArea.h"
 #include "sysMan/ViewSystem.h"
 #include "patient/ViewWorkList.h"
@@ -718,9 +718,9 @@ void ViewNewPat::CheckPatID(const gchar *pat_id) {
         return ;
     } else {
 #ifdef VET
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _("Animal ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Animal ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
 #else
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
 #endif
 
     }
@@ -1937,7 +1937,7 @@ void ViewNewPat::BtnSearchClicked(GtkButton *button) {
     vector<Database::NewPatSearchResult> vecResult;
     db.NewPatSearch(term, vecResult);
     if (vecResult.empty()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::INFO, _("No result found!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No result found!"), NULL);
         return;
     }
     ViewPatSearch::GetInstance()->CreateWindow(GTK_WINDOW(m_window), vecResult);
@@ -1976,8 +1976,8 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
 
     Database db;
     if (!(db.GetPatIDExist(info.p.id.c_str())).empty() && GTK_WIDGET_IS_SENSITIVE(m_entryPatID)) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_ERROR,
                                           _("Please enter patient ID again!"),
                                           NULL);
         return ;
@@ -1998,7 +1998,7 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
             if(sysDicomSetting.GetMPPS()) {
                 if(!m_flagMPPS) {
                     if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
-                        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Please Set the default MPPS service in system setting"), NULL);
+                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
                         return ;
                     }
                     CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
@@ -2243,7 +2243,7 @@ void ViewNewPat::BtnExamPauseClicked(GtkButton *button)
 void ViewNewPat::BtnWorkListClicked(GtkButton *button) {
     string device = CDCMMan::GetMe()->GetDefaultWorklistServiceDevice();
     if (device == "") {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Please Set the default worklist service in system setting"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default worklist service in system setting"), NULL);
         return ;
     }
     ViewWorkList::GetInstance()->CreateWorkListWin(m_window);
@@ -2255,8 +2255,8 @@ void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
 
     Database db;
     if (!(db.GetPatIDExist(info.p.id.c_str())).empty() && GTK_WIDGET_IS_SENSITIVE(m_entryPatID)) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_ERROR,
                                           _("Please enter patient ID again!"),
                                           NULL);
         return ;
@@ -2277,7 +2277,7 @@ void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
             if(sysDicomSetting.GetMPPS()) {
                 if(!m_flagMPPS) {
                     if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
-                        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Please Set the default MPPS service in system setting"), NULL);
+                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
                         return ;
                     }
                     CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
@@ -2761,8 +2761,8 @@ void ViewNewPat::SetStartDate(int year, int month, int day) {
     iCurrent =  (tm_now->tm_year + 1900) * 10000 + (tm_now->tm_mon + 1) * 100 + tm_now->tm_mday * 1;
     int iTime = year * 10000 + month * 100 + day * 1;
     if (iTime > iCurrent) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("The time input is not correct!"),
                                           NULL);
     } else {
@@ -2815,7 +2815,7 @@ void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName
     Database db;
     if(!((db.GetPatIDExist(ID)).empty() && GTK_WIDGET_IS_SENSITIVE(m_entryPatID))) {
         gtk_widget_set_sensitive(m_entryPatID,false);
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
 
     } else {
         char name_last[m_pat_name_max_len+1] = {0};

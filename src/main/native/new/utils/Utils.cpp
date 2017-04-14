@@ -35,9 +35,9 @@ GtkDialog* Utils::create_dialog(GtkWindow* parent, const string title, const int
   gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
   gtk_dialog_set_has_separator(dialog, TRUE);
 
-  gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
+  gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
 
-  gtk_widget_modify_bg(GTK_WIDGET(dialog), GTK_STATE_NORMAL, get_color("DimGrey"));
+  gtk_widget_modify_bg(GTK_WIDGET(dialog), GTK_STATE_NORMAL, get_color("#363636"));
 
   return dialog;
 }
@@ -50,7 +50,7 @@ GtkButton* Utils::add_dialog_button(GtkDialog* dialog, const string label, const
     set_button_image(button, image);
   }
 
-  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 12);
+  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
   gtk_button_set_alignment(button, 0.5, 0.5);
 
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
@@ -67,8 +67,9 @@ GtkButton* Utils::add_dialog_button(GtkDialog* dialog, const string label, const
 GtkLabel* Utils::create_label(const string text) {
   GtkLabel* label = GTK_LABEL(gtk_label_new(text.c_str()));
 
-  set_font(GTK_WIDGET(label), "", "", 12);
+  set_font(GTK_WIDGET(label), "", "", 10);
   gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+  gtk_label_set_use_markup(label, TRUE);
 
   gtk_widget_modify_fg(GTK_WIDGET(label), GTK_STATE_NORMAL, get_color("white"));
 
@@ -84,7 +85,7 @@ GtkButton* Utils::create_button(const string label) {
     button = GTK_BUTTON(gtk_button_new_with_label(label.c_str()));
   }
 
-  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 12);
+  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
   gtk_button_set_alignment(button, 0.5, 0.5);
 
   /*
@@ -113,7 +114,7 @@ GtkButton* Utils::create_button_with_image(const string filename, const int widt
     set_button_image(button, create_image(filename, width, height));
   }
 
-  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 12);
+  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
   gtk_button_set_alignment(button, 0.5, 0.5);
 
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
@@ -156,10 +157,14 @@ GtkImage* Utils::create_image(const string filename, const int width, const int 
   return image;
 }
 
-GtkEntry* Utils::create_entry() {
+GtkEntry* Utils::create_entry(gunichar ch) {
   GtkEntry* entry = GTK_ENTRY(gtk_entry_new());
 
-  set_font(GTK_WIDGET(entry), "", "", 12);
+  set_font(GTK_WIDGET(entry), "", "", 10);
+
+  if (ch > 0) {
+    gtk_entry_set_invisible_char(entry, ch);
+  }
 
   return entry;
 }
@@ -167,7 +172,7 @@ GtkEntry* Utils::create_entry() {
 GtkComboBoxText* Utils::create_combobox_text() {
   GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
-  set_font(GTK_WIDGET(combobox), "", "", 12);
+  set_font(GTK_WIDGET(combobox), "", "", 10);
 
   return combobox;
 }
@@ -181,6 +186,12 @@ GtkNotebook* Utils::create_notebook() {
   gtk_widget_modify_bg(GTK_WIDGET(notebook), GTK_STATE_NORMAL, get_color("gray"));
 
   return notebook;
+}
+
+GtkProgressBar* Utils::create_progress_bar() {
+  GtkProgressBar* progress_bar = GTK_PROGRESS_BAR(gtk_progress_bar_new());
+
+  return progress_bar;
 }
 
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
@@ -201,7 +212,7 @@ void Utils::set_font(GtkWidget* widget, const string family, const string sytle,
   if (size > 0) {
     pango_font_description_set_size(font, size * PANGO_SCALE);
   } else {
-    pango_font_description_set_size(font, 12 * PANGO_SCALE);
+    pango_font_description_set_size(font, 10 * PANGO_SCALE);
   }
 
   gtk_widget_modify_font(widget, font);
@@ -282,7 +293,5 @@ GdkColor* Utils::get_color(const string color_name) {
 #include "sysMan/CalcSetting.h"
 
 void Utils::test(GtkWidget* widget) {
-  GtkWidget* win = CustomCalc::GetInstance()->CreateCalcSettingWin(widget);
-
-  gtk_widget_show_all(win);
+  CustomCalc::GetInstance()->CreateExportCalcSettingWin(widget);
 }

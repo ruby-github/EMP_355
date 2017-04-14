@@ -31,7 +31,8 @@
 #include "periDevice/Printppd.h"
 #include "periDevice/Printtext.h"
 #include "periDevice/PrintScreen.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
+
 GtkWidget *Printfunctions::button_inst_save = NULL;
 GtkWidget *Printfunctions::button_inst_remove = NULL;
 GtkWidget *Printfunctions::instwin = NULL;
@@ -235,7 +236,7 @@ void Printfunctions::GetOptions(GtkWindow *parent, char *printername, int which)
 
         if(act_printer == NULL) {
             //Printmain::GetInstance()->ButtonDestroy(NULL);
-            //ViewDialog::GetInstance()->Create(GTK_WINDOW(parent), ViewDialog::INFO, _("No printer found or specified."), NULL);
+            //MessageDialog::GetInstance()->Create(GTK_WINDOW(parent), MessageDialog::DLG_INFO, _("No printer found or specified."), NULL);
             return;
         }
 

@@ -5,7 +5,7 @@
 #include "imageProc/Replay.h"
 #include "sysMan/SysOptions.h"
 #include "display/HintArea.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "display/MenuArea.h"
 #include "patient/VideoMan.h"
 #include "ViewMain.h"
@@ -169,8 +169,8 @@ static int SaveCine(gpointer data) {
 
 EKnobReturn KnobEFOVSavePress(void) {
     if (Replay::GetInstance()->EFOVVideoOutOfRange()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::QUESTION,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_QUESTION,
                                           _("pScape cine is oversized. Intercept the cine automatically?"),
                                           &SaveCine);
         return PRESS;
@@ -181,8 +181,8 @@ EKnobReturn KnobEFOVSavePress(void) {
 
     // SysOptions so;
     // if(!so.GetCineAutoName()) {
-    // 	ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-    // 			ViewDialog::FILENAME,
+    // 	MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+    // 			MessageDialog::DLG_FILENAME,
     // 			_("Please input the file name(without suffix)"),
     // 			&SaveCine);
     // } else {

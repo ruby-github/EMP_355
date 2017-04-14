@@ -23,7 +23,7 @@
 #include "measure/MeasureMan.h"
 #include "measure/MeasureFactory.h"
 #include "display/HintArea.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "periDevice/PeripheralMan.h"
 #include "keyboard/KeyFunc.h"
 #include "bodymark/UpdateBodyMark.h"
@@ -687,7 +687,7 @@ static void progress_callback(goffset current, goffset total, gpointer data) {
 //	PRINTF("prac = %f\n", prac);
     if(prac >= 0 && prac <= 1.0) {
         gdk_threads_enter();
-        ViewDialog::GetInstance()->SetProgressBar(prac);
+        MessageDialog::GetInstance()->SetProgressBar(prac);
         while(gtk_events_pending())
             gtk_main_iteration();
         gdk_threads_leave();
@@ -727,15 +727,15 @@ static gboolean SendToFlash(gpointer data) {
     PeripheralMan *ptr = PeripheralMan::GetInstance();
 
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return FALSE;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return FALSE;
@@ -749,8 +749,8 @@ static gboolean SendToFlash(gpointer data) {
     if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
         if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
             PRINTF("g_file_make_directory %s error: %s\n", g_file_get_path(dir), err_mkdir->message);
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to export to USB storage!\nError: Failed to create directory."),
                                               NULL);
             g_object_unref(dir);
@@ -783,8 +783,8 @@ static gboolean SendToFlash(gpointer data) {
             }
 
             sprintf(str_info, "%s %s   %d/%d\n%s", _("Exporting"), name, count, total, _("Please wait..."));
-            ViewDialog::GetInstance()->SetText(str_info);
-            ViewDialog::GetInstance()->SetProgressBar(0);
+            MessageDialog::GetInstance()->SetText(str_info);
+            MessageDialog::GetInstance()->SetProgressBar(0);
 
             gchar *basename = g_path_get_basename(name);
             gchar *destPath = g_build_filename(UDISK_DATA_PATH, "0", basename, NULL);
@@ -826,7 +826,7 @@ static gboolean SendToFlash(gpointer data) {
         ite++;
     }
 
-    ViewDialog::GetInstance()->Destroy();
+    MessageDialog::GetInstance()->Destroy();
 
     if(!cond) {
         gchar *path = g_path_get_basename(UDISK_DATA_PATH);
@@ -844,8 +844,8 @@ static gboolean SendToFlash(gpointer data) {
 
     ptr->UmountUsbStorage();
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                      ViewDialog::INFO,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                      MessageDialog::DLG_INFO,
                                       result,
                                       NULL);
 
@@ -862,8 +862,8 @@ void MenuReview::SendClicked(GtkButton *button) {
     int size = m_vecNameSel.size();
 
     if(size == 0) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("Please select the wanted image/cine from the list to be exported!"),
                                           NULL);
         return;
@@ -871,8 +871,8 @@ void MenuReview::SendClicked(GtkButton *button) {
 
     g_timeout_add(1000, SendToFlash, NULL);
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                      ViewDialog::PRG_CANCEL,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                      MessageDialog::DLG_PROGRESS_CANCEL,
                                       _("Please wait..."),
                                       CancelCopyToFlash);
 }

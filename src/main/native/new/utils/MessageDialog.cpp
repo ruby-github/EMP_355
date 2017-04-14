@@ -1,36 +1,36 @@
 #include <gtk/gtk.h>
 #include "Def.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "keyboard/KeyValueOpr.h"
 #include "display/gui_global.h"
 #include "display/gui_func.h"
 #include "ViewMain.h"
 #include "keyboard/KeyDef.h"
 
-ViewDialog* ViewDialog::m_ptrInstance = NULL;
+MessageDialog* MessageDialog::m_ptrInstance = NULL;
 
-ViewDialog* ViewDialog::GetInstance() {
+MessageDialog* MessageDialog::GetInstance() {
     if (m_ptrInstance == NULL)
-        m_ptrInstance = new ViewDialog;
+        m_ptrInstance = new MessageDialog;
     return m_ptrInstance;
 }
 
-ViewDialog::ViewDialog(void) {
+MessageDialog::MessageDialog(void) {
     m_window = NULL;
     m_ptrFunc = NULL;
     m_ptrFuncCancel = NULL;
     m_preCursor = true;
 }
 
-ViewDialog::~ViewDialog(void) {
+MessageDialog::~MessageDialog(void) {
     if (m_ptrInstance != NULL)
         delete m_ptrInstance;
 }
 
-void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, pFuncDialog ptrFunc, pFuncDialog ptrFuncCancel) {
+void MessageDialog::Create(GtkWindow *parent, DialogType type, const char *info, pFuncDialog ptrFunc, pFuncDialog ptrFuncCancel) {
     GtkWidget *fixed_window;
     GtkWidget *image_icon;
-//    GtkWidget *label_text;
+    //    GtkWidget *label_text;
 
     GtkWidget *button_ok;
     GtkWidget *button_cancel;
@@ -44,8 +44,8 @@ void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, p
     m_preCursor = ViewMain::GetInstance()->GetCursorVisible();
     InvisibleCursor(false, false);
 
-    if (ViewHintDialog::GetInstance()->Exist())
-        ViewHintDialog::GetInstance()->Destroy();
+    if (MessageHintDialog::GetInstance()->Exist())
+        MessageHintDialog::GetInstance()->Destroy();
 
     GtkWidget *old_window = m_window;
     m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -112,17 +112,17 @@ void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, p
     gtk_container_add(GTK_CONTAINER(button_prg_cancel), image_prg_cancel);
 
     switch (m_type) {
-    case INFO:
+    case DLG_INFO:
         gtk_window_set_title (GTK_WINDOW (m_window), _("Information"));
         gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
         gtk_widget_show(button_close);
         break;
-    case WARNING:
+    case DLG_WARNING:
         gtk_window_set_title (GTK_WINDOW (m_window), _("Warning"));
         gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-warning", GTK_ICON_SIZE_DIALOG);
         gtk_widget_show(button_close);
         break;
-    case QUESTION:
+    case DLG_QUESTION:
         //	gtk_window_set_title (GTK_WINDOW (m_window), _("Question"));
         //	gtk_window_set_title (GTK_WINDOW (m_window), info);
         gtk_window_set_title (GTK_WINDOW (m_window), "");
@@ -130,7 +130,7 @@ void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, p
         gtk_widget_show(button_ok);
         gtk_widget_show(button_cancel);
         break;
-    case ERROR:
+    case DLG_ERROR:
         gtk_window_set_title (GTK_WINDOW (m_window), _("Error"));
         gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-error", GTK_ICON_SIZE_DIALOG);
         gtk_widget_show(button_close);
@@ -139,19 +139,19 @@ void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, p
         //     gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
         //     gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
         //     break;
-    case PROGRESS:
+    case DLG_PROGRESS:
         gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
         gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
         gtk_widget_show(m_progress_bar);
         break;
-    case PRG_CANCEL:
+    case DLG_PROGRESS_CANCEL:
         gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
         gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
         gtk_widget_show(m_progress_bar);
         gtk_widget_show(button_prg_cancel);
         gtk_widget_show(image_prg_cancel);
         break;
-    case FILENAME:
+    case DLG_FILENAME:
         gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
         gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
         gtk_widget_show(m_entry);
@@ -170,7 +170,7 @@ void ViewDialog::Create(GtkWindow *parent, EDialogType type, const char *info, p
     SetSystemCursorToCenter();
 }
 
-bool ViewDialog::Exist(void) {
+bool MessageDialog::Exist(void) {
     if (m_window != NULL && GTK_IS_WINDOW(m_window))
         return true;
     else
@@ -178,18 +178,18 @@ bool ViewDialog::Exist(void) {
 }
 
 static gboolean ExitWindow(gpointer data) {
-    ViewDialog *tmp;
-    tmp = (ViewDialog *)data;
+    MessageDialog *tmp;
+    tmp = (MessageDialog *)data;
     tmp->Destroy();
     return FALSE;
 }
 
-void ViewDialog::KeyEvent(unsigned char keyValue) {
+void MessageDialog::KeyEvent(unsigned char keyValue) {
     FakeXEvent::KeyEvent(keyValue);
 
     switch(keyValue) {
     case KEY_ESC:
-        if(m_type!=PRG_CANCEL && m_type!=PROGRESS) {
+        if(m_type!=DLG_PROGRESS_CANCEL && m_type!=DLG_PROGRESS) {
             // g_timeout_add(100, ExitWindow, this);
             // FakeEscKey();
             ExitWindow(this);
@@ -202,30 +202,30 @@ void ViewDialog::KeyEvent(unsigned char keyValue) {
     }
 }
 
-gboolean ViewDialog::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
+gboolean MessageDialog::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     Destroy();
     if (m_ptrFuncCancel)
         (*m_ptrFuncCancel)(NULL);
     return FALSE;
 }
 
-void ViewDialog::SetText(const char *info) {
+void MessageDialog::SetText(const char *info) {
     if(m_label_text)
         gtk_label_set_text(GTK_LABEL(m_label_text), info);
 }
 
 gboolean HandleFun(gpointer data) {
-    ViewDialog *tmp;
-    tmp = (ViewDialog *)data;
+    MessageDialog *tmp;
+    tmp = (MessageDialog *)data;
     if (tmp->m_ptrFunc)
         (*tmp->m_ptrFunc)(NULL);
     return false;
 }
 
-void ViewDialog::BtnOkClicked(GtkButton *button) {
+void MessageDialog::BtnOkClicked(GtkButton *button) {
     // gtk_widget_destroy (m_window);
     // g_keyInterface.Pop();
-    if(m_type == FILENAME) {
+    if(m_type == DLG_FILENAME) {
         char* name = (char*)malloc(256);
         sprintf(name, "%s", gtk_entry_get_text(GTK_ENTRY(m_entry)));
 
@@ -245,7 +245,7 @@ void ViewDialog::BtnOkClicked(GtkButton *button) {
     }
 }
 
-void ViewDialog::BtnCancelClicked(GtkButton *button) {
+void MessageDialog::BtnCancelClicked(GtkButton *button) {
     // gtk_widget_destroy (m_window);
     // g_keyInterface.Pop();
 
@@ -254,20 +254,20 @@ void ViewDialog::BtnCancelClicked(GtkButton *button) {
         (*m_ptrFuncCancel)(NULL);
 }
 
-void ViewDialog::BtnCloseClicked(GtkButton *button) {
+void MessageDialog::BtnCloseClicked(GtkButton *button) {
     Destroy();
     if (m_ptrFunc)
         (*m_ptrFunc)(NULL);
 }
 
-void ViewDialog::BtnPrgCancelClicked(GtkButton *button) {
+void MessageDialog::BtnPrgCancelClicked(GtkButton *button) {
     SetText(_("Cancelling..."));
 //	SetProgressBar(0);
     if (m_ptrFunc)
         (*m_ptrFunc)(NULL);
 }
 
-void ViewDialog::EntryInsertText(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
+void MessageDialog::EntryInsertText(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
     gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));
 
     if (g_ascii_ispunct(*new_text) || (old_text_length + new_text_length > gtk_entry_get_max_length(GTK_ENTRY(editable)))) {
@@ -275,7 +275,7 @@ void ViewDialog::EntryInsertText(GtkEditable *editable, gchar *new_text, gint ne
     }
 }
 
-void ViewDialog::Destroy(void) {
+void MessageDialog::Destroy(void) {
     if (GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_hide_all(m_window);
@@ -287,31 +287,31 @@ void ViewDialog::Destroy(void) {
     }
 }
 
-void ViewDialog::SetProgressBar(double fraction) {
+void MessageDialog::SetProgressBar(double fraction) {
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_progress_bar), fraction);
     char text_buf[10];
     sprintf(text_buf, "%d%%", (int)(fraction*100));
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_progress_bar), text_buf);
 }
 
-ViewHintDialog* ViewHintDialog::m_ptrInstance = NULL;
+MessageHintDialog* MessageHintDialog::m_ptrInstance = NULL;
 
-ViewHintDialog* ViewHintDialog::GetInstance() {
+MessageHintDialog* MessageHintDialog::GetInstance() {
     if (m_ptrInstance == NULL)
-        m_ptrInstance = new ViewHintDialog;
+        m_ptrInstance = new MessageHintDialog;
     return m_ptrInstance;
 }
 
-ViewHintDialog::ViewHintDialog(void) {
+MessageHintDialog::MessageHintDialog(void) {
     m_window = NULL;
 }
 
-ViewHintDialog::~ViewHintDialog(void) {
+MessageHintDialog::~MessageHintDialog(void) {
     if (m_ptrInstance != NULL)
         delete m_ptrInstance;
 }
 
-void ViewHintDialog::Create(GtkWindow *parent, const char *info) {
+void MessageHintDialog::Create(GtkWindow *parent, const char *info) {
     GtkWidget *fixed_window;
     GtkWidget *image_icon;
     GtkWidget *label_text;
@@ -347,14 +347,14 @@ void ViewHintDialog::Create(GtkWindow *parent, const char *info) {
     SetSystemCursorToCenter();
 }
 
-bool ViewHintDialog::Exist(void) {
+bool MessageHintDialog::Exist(void) {
     if (m_window != NULL && GTK_IS_WINDOW(m_window))
         return true;
     else
         return false;
 }
 
-void ViewHintDialog::Destroy(void) {
+void MessageHintDialog::Destroy(void) {
     if (GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy (m_window);

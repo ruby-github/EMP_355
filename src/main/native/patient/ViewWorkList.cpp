@@ -11,7 +11,7 @@
 #include <time.h>
 #include "keyboard/KeyFunc.h"
 #include "patient/PatientInfo.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "patient/Database.h"
 #include "display/TopArea.h"
 #include "calcPeople/MenuCalcNew.h"
@@ -612,7 +612,7 @@ int StartExam(gpointer data) {
         // ViewNewPat::GetInstance()->DestroyWindow();
     } else {
         if (GTK_IS_WIDGET(ViewWorkList::GetInstance()->GetWindow())) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewWorkList::GetInstance()->GetWindow()), ViewDialog::ERROR, _(errmsg.c_str()), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewWorkList::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _(errmsg.c_str()), NULL);
         }
 
     }
@@ -634,9 +634,9 @@ void ViewWorkList::InserPatInfo() {
 bool ViewWorkList::ArchiveWorkListPatInfo(bool startExam) {
     const char* info = N_("End Exam?");
     if(startExam)
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _(info), StartExam);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _(info), StartExam);
     else
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::QUESTION, _(info), InserInfo);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _(info), InserInfo);
 
     return TRUE;
 }
@@ -695,8 +695,8 @@ void ViewWorkList::ButtonNewExamClicked(GtkButton *button) {
             ImportPatInfo();
 
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No patient is selected!"),
                                           NULL);
     }
@@ -704,8 +704,8 @@ void ViewWorkList::ButtonNewExamClicked(GtkButton *button) {
 #endif
 void ViewWorkList::ImportPatInfo() {
     if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[selectedIndex])) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("The exam record  has exsited, please select other record again!"),
                                           NULL);
         return;
@@ -847,7 +847,7 @@ void ViewWorkList::GetSelectedPatInfo() {
         SysDicomSetting sysDicomSetting;
         if(sysDicomSetting.GetMPPS()) {
             if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
-                ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window), ViewDialog::ERROR, _("Please Set the default MPPS service in system setting"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
                 return ;
             }
             CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
@@ -887,13 +887,13 @@ void ViewWorkList::ButtonDetailClicked(GtkButton *button) {
         }
     } else {
 #ifdef VET
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No animal is selected!"),
                                           NULL);
 #else
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No patient is selected!"),
                                           NULL);
 #endif
@@ -921,8 +921,8 @@ void ViewWorkList::ButtonTransferClicked(GtkButton *button) {
         selectedIndex = path_num;
         //printf("----%s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str());
         if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[path_num])) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                              ViewDialog::INFO,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                              MessageDialog::DLG_INFO,
                                               _("The exam record  has exsited, please select other record again!"),
                                               NULL);
             return;
@@ -937,8 +937,8 @@ void ViewWorkList::ButtonTransferClicked(GtkButton *button) {
             DestroyWin();
         }
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No patient is selected!"),
                                           NULL);
         return;
@@ -1073,7 +1073,7 @@ void ViewWorkList::AutoQuery() {
     if(m_autoQueryFlag) {
 #if 0
         if(!(CDCMMan::GetMe()->TestLinkDefaultWorklist())) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), ViewDialog::ERROR, _("Test Link is failed"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Test Link is failed"), NULL);
             return;
         }
 #endif

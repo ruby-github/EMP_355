@@ -26,7 +26,7 @@
 #include "calcPeople/MeasureDef.h"
 #include "calcPeople/MeaCalcFun.h"
 #include "ViewMain.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "keyboard/KeyFunc.h"
 #include "patient/FileMan.h"
 #include "periDevice/PeripheralMan.h"
@@ -674,7 +674,7 @@ void MeasureSetting::ButtonSelectOneCalcClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before move!"), NULL);
         return;
     }
@@ -710,7 +710,7 @@ void MeasureSetting::ButtonSelectOneCalcClicked(GtkButton *button) {
                 gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_calc1), path_scroll, NULL, FALSE, 1.0, 1.0);
                 gtk_tree_path_free (path_scroll);
 
-                ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::INFO, _(" Item has existed. Please select item again!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
                 return;
             }
         }
@@ -857,7 +857,7 @@ void MeasureSetting::ButtonBackOneClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before move!"), NULL);
         return;
     }
@@ -969,7 +969,7 @@ void MeasureSetting::ButtonDownClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before down!"), NULL);
         return;
     }
@@ -1048,7 +1048,7 @@ void MeasureSetting::ButtonUpClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_calc1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_win_parent), MessageDialog::DLG_ERROR,
                                           _("Please select a item before up!"), NULL); //请先选择待插入结点的父结点
         return;
     }

@@ -7,7 +7,7 @@
 #include "patient/FileMan.h"
 #include "periDevice/DCMMan.h"
 #include "patient/ViewQueryRetrieve.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "patient/PatientInfo.h"
 #include "calcPeople/ViewReport.h"
 #include <glib.h>
@@ -402,7 +402,7 @@ void ViewDicomDataSelect::PROGRESSSTATUS(int nPos) {
     frac = nPos*0.01;
 
     gdk_threads_enter();
-    ViewDialog::GetInstance()->SetProgressBar(frac);
+    MessageDialog::GetInstance()->SetProgressBar(frac);
     while(gtk_events_pending())
         gtk_main_iteration();
     gdk_threads_leave();
@@ -720,15 +720,15 @@ void ViewDicomDataSelect::ImportStudy(void) {
 #if 1
     PeripheralMan *ptr = PeripheralMan::GetInstance();
     if(!ptr->CheckUsbStorageState()) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
+                                          MessageDialog::DLG_ERROR,
                                           _("No USB storage found!"),
                                           NULL);
         return;
     } else {
         if(!ptr->MountUsbStorage()) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
-                                              ViewDialog::ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewDicomDataSelect::GetInstance()->GetWindow()),
+                                              MessageDialog::DLG_ERROR,
                                               _("Failed to mount USB storage!"),
                                               NULL);
             return;
@@ -763,43 +763,43 @@ void ViewDicomDataSelect::ImportStudy(void) {
         //m_patientInfo.ClearAll();
         ViewReport::GetInstance()->ClearIndicationandComments();
 
-        ViewDialog::GetInstance()->Destroy();
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Destroy();
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("Import data successfully!"),
                                           NULL);
         //printf("Send Successfully\n");
         ptr->UmountUsbStorage();
     } else if(status == DCMSTUDYEXISTED) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("Study Info has existed!"),
                                           NULL);
     } else if (status == DCMNOENOUGHSPACE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("No enough space!"),
                                           NULL);
     }
 
     else if (status == DCMNONEXISTDICOMDIR) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("DICOMDIR is not existed!"),
                                           NULL);
     } else if (status == DCMNONENTIREDICOMDIR) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("File has lost in DICOMDIR !"),
                                           NULL);
     } else if (status == DCMIMPORTFAILURE) {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("Import data unsuccessfully!"),
                                           NULL);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::INFO,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_INFO,
                                           _("Import data unsuccessfully!"),
                                           NULL);
     }
@@ -814,13 +814,13 @@ void ViewDicomDataSelect::ButtonImportClicked(GtkButton *button) {
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeSrc));
     if (gtk_tree_selection_get_selected(selection, &model, &iter) == TRUE) {
         g_timeout_add(100, ImportStudyForDicom, this);
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::PROGRESS,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_PROGRESS,
                                           NULL,
                                           NULL);
     } else {
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(m_window),
-                                          ViewDialog::ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                                          MessageDialog::DLG_ERROR,
                                           _("No record is selected!"),
                                           NULL);
         return;

@@ -13,7 +13,7 @@
 #include "patient/ImgMan.h"
 #include "keyboard/LightDef.h"
 #include "display/ImageArea.h"
-#include "display/ViewDialog.h"
+#include "utils/MessageDialog.h"
 #include "comment/Arrow.h"
 #include "comment/NoteArea.h"
 #include "measure/MeasureMan.h"
@@ -95,7 +95,7 @@ bool KeyPowerOff::Execute() {
     //	const char* info = N_("Power OFF?");
     //const char* info = N_("Are you sure you want to close the program and shut down the computer?");
 
-    //ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), ViewDialog::QUESTION, _(info), PowerOff);
+    //MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), MessageDialog::DLG_QUESTION, _(info), PowerOff);
     PowerOff(NULL);
     return TRUE;
 }
@@ -571,8 +571,8 @@ bool KeySaveSnap::Execute() {
     if(!so.GetImageAutoName()) {
         if(!ModeStatus::IsFreezeMode())
             FreezeMode::GetInstance()->PressFreeze();
-        ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
-                                          ViewDialog::FILENAME,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+                                          MessageDialog::DLG_FILENAME,
                                           _("Please input the file name(without suffix)"),
                                           &SaveSnap);
     } else {
@@ -1175,9 +1175,9 @@ int EndExam(gpointer data) {
     } else {
 
         if (GTK_IS_WIDGET(ViewNewPat::GetInstance()->GetWindow())) {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), ViewDialog::ERROR, _(errmsg.c_str()), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _(errmsg.c_str()), NULL);
         } else {
-            ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), ViewDialog::ERROR, _(errmsg.c_str()), OpenNewPatWindow, OpenNewPatWindow);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), MessageDialog::DLG_ERROR, _(errmsg.c_str()), OpenNewPatWindow, OpenNewPatWindow);
         }
     }
     return 0;
@@ -1186,7 +1186,7 @@ int EndExam(gpointer data) {
 bool KeyEndExam::Execute() {
     const char* info = N_("End Exam?");
 
-    ViewDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), ViewDialog::QUESTION, _(info), EndExam);
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), MessageDialog::DLG_QUESTION, _(info), EndExam);
     PRINTF("end end exam execute\n");
 
     return TRUE;
