@@ -4,7 +4,7 @@
 
 #include <gtk/gtk.h>
 #include "probe/ProbeSelect.h"
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 
 class ViewProbe : public FakeXEvent {
 public:

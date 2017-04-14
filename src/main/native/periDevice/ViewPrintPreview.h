@@ -2,7 +2,7 @@
 #ifndef _VIEW_PRINT_PREVIEW_H_
 #define _VIEW_PRINT_PREVIEW_H_
 
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include <string>
 //GtkWidget *GetMainWindow(void);
 class ViewPrintPreview : public FakeXEvent {

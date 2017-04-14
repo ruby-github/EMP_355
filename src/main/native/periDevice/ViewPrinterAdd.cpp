@@ -9,6 +9,8 @@
 #include "utils/MessageDialog.h"
 #include "periDevice/PeripheralMan.h"
 
+#include "utils/FakeXUtils.h"
+
 using std::string;
 
 ViewPrinterAdd* ViewPrinterAdd::m_ptrInstance = NULL;

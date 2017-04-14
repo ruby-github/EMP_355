@@ -14,6 +14,10 @@
 #include "sysMan/SysGeneralSetting.h"
 #include "display/ImageAreaPara.h"
 #include "periDevice/MonitorControl.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using namespace std;
 
 #if defined(EMP_360)

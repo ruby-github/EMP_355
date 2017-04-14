@@ -21,6 +21,8 @@
 #include "probe/MenuBiopsy.h"
 #include "ViewMain.h"
 
+#include "utils/FakeXUtils.h"
+
 ///> private
 ///> focus
 void MultiFuncFocus::Value(EKnobOper opr) {
@@ -469,7 +471,7 @@ void MultiFuncBiopsyVerify::KeyDown() {
 }*/
 
 void MultiFuncBiopsy::Mouse(int offsetX, int offsetY) {
-    fakeXMotionEventMenuBiopsy(offsetX,offsetY);
+    FakeXMotionEventMenuBiopsy(offsetX,offsetY);
 }
 void MultiFuncBiopsy::Undo() {
     MultiFuncUndo();

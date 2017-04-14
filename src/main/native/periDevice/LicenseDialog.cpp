@@ -6,6 +6,10 @@
 #include "ViewMain.h"
 #include "keyboard/KeyDef.h"
 #include "sysMan/SysGeneralSetting.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 CLicenseDialog *CLicenseDialog::m_ptrInstance = NULL;
 const char *g_warnInfo[3] = {
     N_("Not inserted Ukey, please insert Ukey and click button 'OK' to try again.\nClick button 'Close' to power off."),

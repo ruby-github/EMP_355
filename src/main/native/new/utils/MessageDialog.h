@@ -3,7 +3,7 @@
 #define _VIEW_DIALOG_H_
 
 #include <gtk/gtk.h>
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 
 typedef int (*pFuncDialog)(gpointer data);
 

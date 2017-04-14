@@ -21,6 +21,9 @@
 #include "keyboard/KeyDef.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/ViewSystem.h"
+
+#include "utils/MainWindowConfig.h"
+
 namespace {
 //	const int MeasureResult_H = 17;	// 测量结果每行高度(像素)
 const int kHistogramWidth = 256+2;

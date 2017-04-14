@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include "AbsCalendarOpr.h"
 #include "patient/FileMan.h"
 #include "calcPeople/MeaResult.h"

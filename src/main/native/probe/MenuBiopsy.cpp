@@ -6,6 +6,7 @@
 #include "display/MenuArea.h"
 #include "probe/BiopsyMan.h"
 #include "display/HintArea.h"
+#include "utils/FakeXUtils.h"
 
 MenuBiopsy g_menuBiopsy;
 bool MenuBiopsy::m_isDraw=false;

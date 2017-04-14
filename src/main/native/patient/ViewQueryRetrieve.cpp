@@ -19,6 +19,10 @@
 #include "keyboard/KeyDef.h"
 #include "calcPeople/ViewReport.h"
 #include "sysMan/ViewSystem.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::vector;
 ViewQueryRetrieve* ViewQueryRetrieve::m_ptrInstance = NULL;
 PatientInfo ViewQueryRetrieve::m_patientInfo;

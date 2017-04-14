@@ -32,6 +32,8 @@
 #include "sysMan/SysGeneralSetting.h"
 #include "patient/AviEncDecH264.h"
 
+#include "utils/FakeXUtils.h"
+
 // global
 static gboolean TimerReviewCineAuto(gpointer data) {
     Replay::GetInstance()->ViewOneImg();

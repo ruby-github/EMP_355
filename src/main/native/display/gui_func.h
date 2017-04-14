@@ -8,7 +8,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
-Display * getXDisplay(void);
+
 
 using std::string;
 
@@ -55,26 +55,7 @@ PangoLayout * create_pango_text(GtkWidget *widget,
                                 PangoFontDescription *font,
                                 const GdkColor* const color);
 
-void doKeyEvent(const unsigned int keycode, int is_press);
-void doBtnEvent(const unsigned int button, int is_press);
-void doMotionEvent(int x, int y);
-void SetSystemCursor(int x, int y);
-void ResetIfOutOfRange(void);
-void SetSystemCursorToCenter();
 
-void fakeXMotionEvent(int offsetX, int offsetY);
-void fakeXMotionEventFullRange(int offsetX, int offsetY);
-void fakeXMotionEventImage(int &x0, int &y0, int offsetX, int offsetY);
-void fakeXMotionEventMenu(int &x0, int &y0, int offsetX, int offsetY);
-void fakeXMotionEventScreen(int &x0, int &y0, int offsetX, int offsetY);
-void SetMenuBiopsyCursorYRange(int y0,int y1);//2016.08.25
-void fakeXMotionEventMenuBiopsy(int offsetX, int offsetY);//2016.08.24
-
-void FakeEscKey(void);
-gboolean FakeMouseButton(unsigned char key);
-gboolean FakeNumKey(unsigned char key);
-gboolean FakeAlphabet(unsigned char key);
-gboolean FakePunctuation(unsigned char key);
 
 int CountLines(std::string& text);
 void trim(std::string& str);
@@ -92,8 +73,7 @@ template <typename T> T min_3(const T &a, const T &b, const T &c) {
 
 void SetTheme(const char *rc_path);
 
-void XRemapKey(Display *display, int old_keycode, KeySym new_keysym);
-void ChangeKeymap();
+
 
 void modify_widget_bg(GtkWidget* widget);
 

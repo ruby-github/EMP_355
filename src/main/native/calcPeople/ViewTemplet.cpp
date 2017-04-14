@@ -17,6 +17,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::string;
 using std::ostringstream;
 

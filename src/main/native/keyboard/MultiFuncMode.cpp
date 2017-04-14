@@ -24,6 +24,8 @@
 #include "sysMan/ViewSuperuser.h"
 #include "measure/MeasureD.h"
 
+#include "utils/FakeXUtils.h"
+
 bool updateoffsound=false;
 extern int soundstatus;
 int tempoffsound=0;
@@ -44,7 +46,7 @@ void MultiFuncNone::Do() {
 }
 
 void MultiFuncNone::Mouse(int offsetX, int offsetY) {
-    fakeXMotionEvent(offsetX, offsetY);
+    FakeXMotionEvent(offsetX, offsetY);
 }
 void MultiFuncNone::KeyLeft() {
     int offsetX = -1;

@@ -3,7 +3,7 @@
 #define VIEW_SYSTEM_H
 #include <gtk/gtk.h>
 
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include <string>
 #include <vector>
 #include "probe/ExamItem.h"
@@ -30,7 +30,6 @@ struct ExamPara {
     string name;
     ExamItem::EItem index;
 };
-enum {EN, ZH, RU, PL,FR,ES, DE, LANG_MAX};
 
 extern char user_configure[USERCONFIG_LEN];
 extern FILE *fp_user;

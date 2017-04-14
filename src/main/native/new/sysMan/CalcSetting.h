@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include <string>
 
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 
 class MessageDialog;
 class CalcSetting;
@@ -164,7 +164,6 @@ private:
 
 #include <gtk/gtk.h>
 #include "calcPeople/MeasureDef.h"
-#include "display/FakeXEvent.h"
 #include <vector>
 #include "probe/ExamItem.h"
 

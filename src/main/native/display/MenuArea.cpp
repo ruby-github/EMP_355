@@ -26,6 +26,8 @@
 #include "keyboard/KeyFunc.h"
 #include "keyboard/LightDef.h"
 
+#include "utils/MainWindowConfig.h"
+
 MenuArea* MenuArea::m_ptrInstance = NULL;
 
 MenuArea* MenuArea::GetInstance() {

@@ -2,7 +2,6 @@
 #define _DICOM_SERVER_SETTING_H_
 
 #include <gtk/gtk.h>
-#include "display/FakeXEvent.h"
 #include <string.h>
 #include <stdio.h>
 #include "periDevice/DCMMan.h"

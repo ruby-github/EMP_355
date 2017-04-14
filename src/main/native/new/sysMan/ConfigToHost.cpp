@@ -5,7 +5,7 @@
 #include "patient/FileMan.h"
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/KeyDef.h"
-#include "display/FakeXEvent.h"
+#include "utils/FakeXUtils.h"
 #include "periDevice/PeripheralMan.h"
 #include "utils/MessageDialog.h"
 #include "patient/ViewArchive.h"

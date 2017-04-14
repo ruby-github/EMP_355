@@ -21,7 +21,6 @@
 
 #include <gtk/gtk.h>
 #include "calcPeople/MeasureDef.h"
-#include "display/FakeXEvent.h"
 #include <vector>
 #include "probe/ExamItem.h"
 

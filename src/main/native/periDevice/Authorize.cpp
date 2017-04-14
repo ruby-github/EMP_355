@@ -11,6 +11,9 @@
 #include "periDevice/LicenseDialog.h"
 #include "display/gui_global.h"
 #include "sysMan/ViewSystem.h"
+
+#include "utils/FakeXUtils.h"
+
 //using namespace std;
 /*
 unsigned char vendor_code[] =

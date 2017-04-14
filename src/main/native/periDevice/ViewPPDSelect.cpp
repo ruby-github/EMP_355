@@ -2,10 +2,11 @@
 #include "display/gui_global.h"
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/KeyDef.h"
-#include "display/FakeXEvent.h"
 #include "periDevice/ViewPPDSelect.h"
 #include "patient/FileMan.h"
 #include "periDevice/ViewPrinterAdd.h"
+
+#include "utils/FakeXUtils.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

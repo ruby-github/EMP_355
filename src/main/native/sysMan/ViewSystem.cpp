@@ -61,6 +61,10 @@
 #include "Init.h"
 #include <errno.h>
 #include "patient/ViewNewPat.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::vector;
 using std::string;
 

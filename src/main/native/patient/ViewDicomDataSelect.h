@@ -5,7 +5,7 @@
 #include <vector>
 #include <gtk/gtk.h>
 #include <deque>
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include "periDevice/DCMDef.h"
 #include "patient/PatientInfo.h"
 #include "imageProc/Image.h"

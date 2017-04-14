@@ -38,6 +38,9 @@
 #include "periDevice/DCMRegister.h"
 #include "imageProc/Replay.h"
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::ostringstream;
 using std::cout;
 using std::endl;

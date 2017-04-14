@@ -60,16 +60,16 @@ gboolean PrintScreen::ScreenShotToFile() {
         height = SCREEN_HEIGHT;
         break;
     case 1:
-        src_x = KNOB_X;
+        src_x = KNOB_AREA_X;
         src_y = 0;
         width = TOP_AREA_W;
-        height = KNOB_Y;
+        height = KNOB_AREA_Y;
         break;
     case 2:
-        src_x = KNOB_X;
+        src_x = KNOB_AREA_X;
         src_y = TOP_AREA_H;
         width = TOP_AREA_W;
-        height = KNOB_Y - TOP_AREA_H;
+        height = KNOB_AREA_Y - TOP_AREA_H;
         break;
     }
     screen_pixbuf = gdk_pixbuf_get_from_drawable(NULL,

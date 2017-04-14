@@ -114,7 +114,7 @@ GtkWidget * KnobMenu::Create(void) {
 
     gtk_widget_modify_bg(btn_right, GTK_STATE_INSENSITIVE, g_deepGray);
 
-    gtk_widget_set_usize(m_tableKnob, WIDTH_KNOB_MENU, HEIGHT_KNOB_MENU);
+    gtk_widget_set_usize(m_tableKnob, KNOB_AREA_W, KNOB_AREA_Y);
 #elif defined (EMP_313)
     GtkWidget *m_tableKnob = gtk_table_new(1, 20, TRUE);
 
@@ -196,7 +196,7 @@ GtkWidget * KnobMenu::Create(void) {
 
     gtk_widget_modify_bg(btn_right, GTK_STATE_INSENSITIVE, g_deepGray);
 
-    gtk_widget_set_usize(m_tableKnob, WIDTH_KNOB_MENU, HEIGHT_KNOB_MENU);
+    gtk_widget_set_usize(m_tableKnob, KNOB_AREA_W, KNOB_AREA_Y);
 #else
 
     GtkWidget *m_tableKnob = gtk_table_new(1, 22, TRUE);
@@ -268,7 +268,7 @@ GtkWidget * KnobMenu::Create(void) {
 
     gtk_widget_modify_bg(btn_right, GTK_STATE_INSENSITIVE, g_deepGray);
 
-    gtk_widget_set_usize(m_tableKnob, WIDTH_KNOB_MENU, HEIGHT_KNOB_MENU);
+    gtk_widget_set_usize(m_tableKnob, KNOB_AREA_W, KNOB_AREA_Y);
 #endif
     return m_tableKnob;
 }

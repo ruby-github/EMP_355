@@ -12,6 +12,8 @@
 #include "sysMan/SysNoteSetting.h"
 #include "imageProc/ModeStatus.h"
 
+#include "utils/FakeXUtils.h"
+
 MultiFuncBodyMark* MultiFuncBodyMark::m_ptrThis = NULL;
 enum EKnobBodymark {BDMK_BODYSIZE, BDMK_PROBECOLOR};
 #if (defined (EMP_322) || defined(EMP_313))

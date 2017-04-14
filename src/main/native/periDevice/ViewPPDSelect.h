@@ -2,8 +2,9 @@
 #define _VIEWPPDSELECT_H_
 
 #include <gtk/gtk.h>
+#include "utils/FakeXEvent.h"
 
-class FakeXEvent;
+
 class ViewPPDSelect : public FakeXEvent {
 public:
     ~ViewPPDSelect();

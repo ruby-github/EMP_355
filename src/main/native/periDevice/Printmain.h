@@ -13,7 +13,6 @@
 #include <cups/ppd.h>
 #include <cups/http.h>
 
-#include "display/FakeXEvent.h"
 #include "periDevice/Printdefaults.h"
 #include "periDevice/Printlib.h"
 

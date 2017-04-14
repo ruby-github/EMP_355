@@ -7,6 +7,9 @@
 #include "display/gui_global.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "probe/ProbeMan.h"
+
+#include "utils/MainWindowConfig.h"
+
 using std::string;
 
 TopArea* TopArea::m_ptrInstance = NULL;

@@ -25,6 +25,8 @@
 #include <pango-1.0/pango/pangoft2.h>
 #include FT_FREETYPE_H
 
+#include "utils/FakeXUtils.h"
+
 #define IMAGE_WIDTH 400
 #define IMAGE_HEIGHT 288
 #define BITMAP_OFFSET 4

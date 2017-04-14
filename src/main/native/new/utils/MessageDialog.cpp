@@ -7,6 +7,9 @@
 #include "ViewMain.h"
 #include "keyboard/KeyDef.h"
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 MessageDialog* MessageDialog::m_ptrInstance = NULL;
 
 MessageDialog* MessageDialog::GetInstance() {

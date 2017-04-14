@@ -10,6 +10,8 @@
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/ViewSystem.h"
 
+#include "utils/FakeXUtils.h"
+
 using std::ostringstream;
 using std::string;
 

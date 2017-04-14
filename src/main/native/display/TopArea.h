@@ -5,8 +5,6 @@
 #include <gtk/gtk.h>
 #include <string>
 
-#define TOP_AREA_W 844 //ModLayout 844 PreLayout 804
-#define TOP_AREA_H 60
 /*
  *      Logo |    Hospital        |  Probe     |  TIS |  Time
  *           |                    |            |      |

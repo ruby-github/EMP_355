@@ -4,6 +4,8 @@
 #include "display/gui_func.h"
 #include "ViewMain.h"
 
+#include "utils/FakeXUtils.h"
+
 ViewCalcDialog* ViewCalcDialog::m_ptrInstance = NULL;
 
 ViewCalcDialog* ViewCalcDialog::GetInstance() {

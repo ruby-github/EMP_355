@@ -21,6 +21,9 @@
 #include "sysMan/ViewSystem.h"
 #include "sysMan/UpgradeMan.h"
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::vector;
 
 ViewWorkList* ViewWorkList::m_ptrInstance = NULL;

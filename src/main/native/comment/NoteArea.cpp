@@ -14,6 +14,9 @@
 #include "display/ImageArea.h"
 #include "display/KnobNone.h"
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 extern KeyValueOpr keyInterface;
 NoteArea* NoteArea::m_ptrInstance = NULL;
 
@@ -301,9 +304,9 @@ void NoteArea::KeyEvent(unsigned char keyValue) {
 
 void NoteArea::MouseEvent(char offsetX, char offsetY) {
     if (m_state == SELECT) {
-        fakeXMotionEventMenu(m_menuCursor.x, m_menuCursor.y, offsetX, offsetY);
+        FakeXMotionEventMenu(m_menuCursor.x, m_menuCursor.y, offsetX, offsetY);
     } else {
-        fakeXMotionEventImage(m_sysCursor.x, m_sysCursor.y, offsetX, offsetY);
+        FakeXMotionEventImage(m_sysCursor.x, m_sysCursor.y, offsetX, offsetY);
 
         if(m_state == EDITING) {
             EndEdit();
@@ -571,7 +574,6 @@ gboolean NoteArea::ImageItemButtonPress(GooCanvasItem *item,
     return FALSE;
 }
 
-extern unsigned char key_note;
 /*
  * @brief handle the key event
  */
@@ -584,18 +586,11 @@ gboolean NoteArea::ImageItemKeyPress(GooCanvasItem *item,
         {
             StartEdit(m_sysCursor.x-IMG_AREA_X-IMAGE_X, m_sysCursor.y-IMG_AREA_Y-IMAGE_Y-1);
 #ifdef EMP_322
-            /* if(!FakeAlphabet(key_note))
-              {
-                  if(!FakeNumKey(key_note))
-                  {
-                      FakePunctuation(key_note);//符号键
-                  }
-              }*/
 #else
             if(strcmp(gdk_keyval_name(event->keyval), "Shift_L") != 0) { // ||(strcmp(gdk_keyval_name(event->keyval), "Shift_L") != 0))
-                if(!FakeAlphabet(key_note)) {
-                    if(!FakeNumKey(key_note)) {
-                        FakePunctuation(key_note);//符号键
+                if(!FakeAlphabet(g_key_note)) {
+                    if(!FakeNumKey(g_key_note)) {
+                        FakePunctuation(g_key_note);//符号键
                     }
                 }
             }

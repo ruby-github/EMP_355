@@ -40,12 +40,9 @@
 #define ASSERT
 #endif
 
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 768
-
 ///> ultrasound define
-#define IMG_W 628
-#define IMG_H 440
+#define IMG_W       628
+#define IMG_H       440
 #define IMG_BPP 3 //bytes per pixels
 
 ///> bodymark size

@@ -34,6 +34,8 @@
 #include "periDevice/Printmain.h"
 #include "periDevice/Printfunctions.h"
 
+#include "utils/MainWindowConfig.h"
+
 #if (1)  //use NEW Print MODE
 #define MODE_PRINT_NEW (1)
 #else

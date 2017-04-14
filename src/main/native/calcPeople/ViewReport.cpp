@@ -30,6 +30,10 @@
 
 #include "patient/CreateBitmap.h"
 #include "keyboard/MultiFuncFactory.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 extern pthread_t pidInitTable;
 extern gboolean ReportInit;
 

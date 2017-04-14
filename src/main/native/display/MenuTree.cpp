@@ -2,6 +2,8 @@
 #include "display/MenuTree.h"
 #include "measure/MeasureMan.h"
 #include "sysMan/ViewSystem.h"
+#include "utils/FakeXUtils.h"
+
 TreeMenu::TreeMenu(void) : m_showTooltip(true) {
     m_treeView = 0;
 }
@@ -704,7 +706,7 @@ gboolean TreeMenu::TimeoutMoveCursor(gpointer data) {
             int x, y;
             gtk_widget_get_pointer(tree_view, &x, &y);
             int offsetY = rect.y + 5 - y;
-            fakeXMotionEvent(0, -offsetY);
+            FakeXMotionEvent(0, -offsetY);
         }
     }
     return FALSE;

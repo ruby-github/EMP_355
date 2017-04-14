@@ -9,6 +9,8 @@
 #include "display/gui_func.h"
 #include "ViewMain.h"
 #include "utils/MessageDialog.h"
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
 static string METHOD_NAMES[] = {
   {N_("Distance")},

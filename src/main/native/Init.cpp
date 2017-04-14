@@ -41,6 +41,8 @@
 #include "periDevice/DCMRegister.h"
 #include "imageControl/UsbControl.h"
 
+#include "utils/FakeXUtils.h"
+
 pthread_t pidInitTable;
 gboolean ReportInit = FALSE;
 bool g_authorizationOn = false;

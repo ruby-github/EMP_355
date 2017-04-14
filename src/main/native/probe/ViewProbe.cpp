@@ -20,6 +20,9 @@
 #include "imageProc/MenuPW.h"
 #include "probe/BiopsyMan.h"
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::vector;
 
 extern MenuPW g_menuPW;

@@ -48,6 +48,8 @@
 
 
 #include "utils/Utils.h"
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
 #include "imageControl/FpgaCtrl2D.h"
 extern MenuPW g_menuPW;
@@ -2591,24 +2593,24 @@ void ViewMain::Create(void) {
     // Knob Area
     GtkWidget *tableKnob;
     tableKnob = m_ptrKnob->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableKnob, KNOB_X, KNOB_Y);
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableKnob, KNOB_AREA_X, KNOB_AREA_Y);
 
 #if 0
     char tmp[20];
-    int detal_x = WIDTH_KNOB_MENU / 20;
-    int detal_y = HEIGHT_KNOB_MENU / 3;
+    int detal_x = KNOB_AREA_W / 20;
+    int detal_y = KNOB_AREA_H / 3;
     GtkWidget* label_tmp;
     for(int i = 0; i < 5; i++) {
         sprintf(tmp, "F%d", i+1);
         label_tmp = gtk_label_new_with_mnemonic(tmp);
-        gtk_fixed_put(GTK_FIXED(m_fixedWindow), label_tmp, KNOB_X + detal_x + i * detal_x * 18 / 5, KNOB_Y + detal_y);
+        gtk_fixed_put(GTK_FIXED(m_fixedWindow), label_tmp, KNOB_AREA_X + detal_x + i * detal_x * 18 / 5, KNOB_AREA_Y + detal_y);
     }
 #endif
 
     // hint
     GtkWidget *da_hintArea;
     da_hintArea = m_ptrHintArea->Create();
-    gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_hintArea, HINT_X, HINT_Y);
+    gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_hintArea, HINT_AREA_X, HINT_AREA_Y);
 
     // icon view
     ViewIcon::GetInstance()->Create();

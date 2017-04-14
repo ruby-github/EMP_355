@@ -6,6 +6,7 @@
 #include "probe/BiopsyMan.h"
 #include "probe/MenuBiopsy.h"
 #include "display/HintArea.h"
+#include "utils/FakeXUtils.h"
 
 MenuBiopsyBracket g_menuBiopsyBracket;
 

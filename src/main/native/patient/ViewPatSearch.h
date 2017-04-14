@@ -1,7 +1,7 @@
 #ifndef _VIEW_PAT_SEARCH_H_
 #define _VIEW_PAT_SEARCH_H_
 
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include <string>
 #include <vector>
 #include "patient/Database.h"

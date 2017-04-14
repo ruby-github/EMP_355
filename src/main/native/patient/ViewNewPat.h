@@ -2,7 +2,7 @@
 #ifndef VIEW_NEW_PAT_H
 #define VIEW_NEW_PAT_H
 
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include "AbsCalendarOpr.h"
 #include "patient/PatientInfo.h"
 #include "periDevice/DCMDef.h"

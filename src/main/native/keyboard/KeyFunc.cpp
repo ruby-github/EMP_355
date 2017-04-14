@@ -45,6 +45,8 @@
 #include "sysMan/ViewSystem.h"
 #include "measure/MenuMeasure.h"
 
+#include "utils/FakeXUtils.h"
+
 int g_count11 = 0;
 extern bool g_calcPwStatus;
 

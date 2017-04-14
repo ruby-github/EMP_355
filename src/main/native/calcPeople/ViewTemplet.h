@@ -1,7 +1,7 @@
 #ifndef _VIEW_TEMPLET_H_
 #define _VIEW_TEMPLET_H_
 
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include <sqlite3.h>
 
 #define TEMPLET_EN_DB "./res/glossary_en.db"

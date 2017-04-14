@@ -11,6 +11,8 @@
 #include "probe/ExamItem.h"
 #include "probe/ProbeSelect.h"
 
+#include "utils/MainWindowConfig.h"
+
 #ifdef VET
 #define BDMK_PATH "res/bdmk_vet"
 static const char* examItem[] = {N_("Animal"), N_("Part")};

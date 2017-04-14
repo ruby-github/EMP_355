@@ -10,9 +10,6 @@
 
 #define PI 3.1415926
 
-#define IMAGE_W IMG_W //628
-#define IMAGE_H IMG_H //440
-
 extern GdkColor* g_black;
 extern GdkColor* g_white;
 extern GdkColor* g_red;

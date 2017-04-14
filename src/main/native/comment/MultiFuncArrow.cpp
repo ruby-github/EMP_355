@@ -20,6 +20,8 @@
 #include "display/KnobNone.h"
 #include "comment/Arrow.h"
 
+#include "utils/FakeXUtils.h"
+
 MultiFuncArrow * MultiFuncArrow::m_pThis = NULL;
 
 enum EKnobArrow {ARROW_SHAPE, ARROW_SIZE, ARROW_COLOR};

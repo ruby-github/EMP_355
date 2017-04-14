@@ -2,7 +2,7 @@
 #define NOTEAREA_H_
 
 #include <goocanvas.h>
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include "Def.h"
 
 #include <string>

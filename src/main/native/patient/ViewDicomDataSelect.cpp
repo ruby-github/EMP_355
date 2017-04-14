@@ -20,6 +20,8 @@
 #include "periDevice/ViewPrintPreview.h"
 #include "imageProc/Replay.h"
 
+#include "utils/FakeXUtils.h"
+
 ViewDicomDataSelect* ViewDicomDataSelect::m_ptrInstance = NULL;
 
 PatientInfo ViewDicomDataSelect::m_patientInfo;

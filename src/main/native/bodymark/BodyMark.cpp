@@ -2,6 +2,7 @@
 #include "sysMan/SysNoteSetting.h"
 #include "display/ImageArea.h"
 #include "imageProc/ModeStatus.h"
+#include "utils/FakeXUtils.h"
 
 const double BodyMark::BODYMARK_SCALE[3] = {0.8, 1.2, BDMK_MAX_SCALE};
 const double BodyMark::PROBEMARK_SCALE[3] = {0.8, 1.0, BDMK_PROBE_MAX_SCALE};

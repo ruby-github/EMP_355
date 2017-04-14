@@ -3,7 +3,7 @@
 
 #include <gtk/gtk.h>
 #include "keyboard/KnobEvent.h"
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 #include "AbsMultiFunc.h"
 #include "bodymark/BodyMark.h"
 

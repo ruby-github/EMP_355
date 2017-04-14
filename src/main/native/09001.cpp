@@ -17,6 +17,8 @@
 #include "sysMan/ViewSystem.h"
 #include "periDevice/ManRegister.h"
 
+#include "utils/FakeXUtils.h"
+
 using namespace std;
 
 pthread_t pidDsc;

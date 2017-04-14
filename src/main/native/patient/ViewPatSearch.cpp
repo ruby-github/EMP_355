@@ -6,6 +6,8 @@
 #include "keyboard/KeyDef.h"
 #include "patient/ViewNewPat.h"
 
+#include "utils/FakeXUtils.h"
+
 using std::vector;
 
 ViewPatSearch* ViewPatSearch::m_ptrInstance = NULL;

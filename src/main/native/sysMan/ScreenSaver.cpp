@@ -12,6 +12,8 @@
 #include "sysMan/ViewSuperuser.h"
 #include "imageControl/D4FuncMan.h"
 
+#include "utils/FakeXUtils.h"
+
 ScreenSaver* ScreenSaver::m_ptrInstance = NULL;
 
 ScreenSaver* ScreenSaver::GetInstance() {

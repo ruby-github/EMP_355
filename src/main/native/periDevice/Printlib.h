@@ -18,7 +18,7 @@
 #include <cups/ppd.h>
 
 #include "periDevice/Printdefaults.h"
-#include "display/FakeXEvent.h"
+#include "utils/FakeXEvent.h"
 
 #define MAX_PRT 5
 

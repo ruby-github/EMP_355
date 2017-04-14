@@ -28,6 +28,9 @@
 #include "sysMan/SysDicomSetting.h"
 #include "periDevice/DCMRegister.h"
 
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+
 using std::ostringstream;
 using std::string;
 ViewNewPat* ViewNewPat::m_ptrInstance = NULL;
