@@ -110,8 +110,8 @@ vector<double> IniFile::ReadDoubleList(const string group, const string key) {
   return vec;
 }
 
-void IniFile::WriteDoubleList(const string group, const string key, const double value[], const int length) {
-  //g_key_file_set_double_list(m_keyfile, group.c_str(), key.c_str(), value, length);
+void IniFile::WriteDoubleList(const string group, const string key, double value[], const int length) {
+  g_key_file_set_double_list(m_keyfile, group.c_str(), key.c_str(), value, length);
 }
 
 void IniFile::RemoveString(const string group, const string key) {

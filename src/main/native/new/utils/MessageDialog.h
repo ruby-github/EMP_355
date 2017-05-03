@@ -1,100 +1,152 @@
-// -*- c++ -*-
-#ifndef _VIEW_DIALOG_H_
-#define _VIEW_DIALOG_H_
+#ifndef __MESSAGE_DIALOG_H__
+#define __MESSAGE_DIALOG_H__
 
 #include <gtk/gtk.h>
 #include "utils/FakeXEvent.h"
+
+#include <string>
+
+using std::string;
 
 typedef int (*pFuncDialog)(gpointer data);
 
 class MessageDialog: public FakeXEvent {
 public:
-    pFuncDialog m_ptrFunc;
+  static MessageDialog* GetInstance();
 
-    ~MessageDialog();
+  enum DialogType {
+    DLG_INFO,
+    DLG_WARNING,
+    DLG_ERROR,
+    DLG_QUESTION,
+    DLG_PROGRESS,
+    DLG_PROGRESS_CANCEL,
+    DLG_FILENAME
+  };
 
-    enum DialogType {
-      DLG_INFO,
-      DLG_WARNING,
-      DLG_QUESTION,
-      DLG_ERROR,
-      DLG_PROGRESS,
-      DLG_PROGRESS_CANCEL,
-      DLG_FILENAME
-    };
+public:
+  ~MessageDialog();
 
-    static MessageDialog* GetInstance();
+public:
+  void Create(GtkWindow* parent, DialogType type, const string text, pFuncDialog ptrFunc = NULL, pFuncDialog ptrFuncCancel = NULL);
+  void Destroy();
+  void SetProgressBar(double fraction);
+  bool Exist();
 
-    void Create(GtkWindow *parent, DialogType type, const char *info, pFuncDialog ptrFunc, pFuncDialog ptrFuncCancel=NULL);
-void Destroy(void);
-void SetProgressBar(double fraction);
-bool Exist(void);
-    void SetText(const char *info);
-
+  void SetText(const string text);
 
 private:
-    MessageDialog();
-    static MessageDialog* m_ptrInstance;
+  MessageDialog();
 
-    void KeyEvent(unsigned char keyValue);
+private:
+  // signal
 
-    GtkWidget *m_window;
-    pFuncDialog m_ptrFuncCancel;
-    GtkWidget *m_label_text;
-    GtkWidget *m_progress_bar;
-    GtkWidget *m_entry;
-    DialogType m_type;
-    bool m_preCursor;
+  static void signal_button_clicked_close(GtkButton* button, MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->ButtonClickedClose();
+    }
+  }
 
-    // signal handle
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
-    void BtnOkClicked(GtkButton *button);
-    void BtnCancelClicked(GtkButton *button);
-    void BtnCloseClicked(GtkButton *button);
-    void BtnPrgCancelClicked(GtkButton *button);
-    void EntryInsertText(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
+  static void signal_button_clicked_ok(GtkButton* button, MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->ButtonClickedOk();
+    }
+  }
 
-    // signal connect
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, MessageDialog *data) {
-        return data->WindowDeleteEvent(widget, event);
+  static void signal_button_clicked_cancel(GtkButton* button, MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->ButtonClickedCancel();
     }
-    static void on_button_ok_clicked(GtkButton *button, MessageDialog *data) {
-        data->BtnOkClicked(button);
+  }
+
+  static void signal_entry_insert_text(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->EntryInsertText(editable, new_text, new_text_length, position);
     }
-    static void on_button_cancel_clicked(GtkButton *button, MessageDialog *data) {
-        data->BtnCancelClicked(button);
+  }
+
+  static void signal_button_progress_clicked_cancel(GtkButton* button, MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->ButtonProgressClickedCancel();
     }
-    static void on_button_close_clicked(GtkButton *button, MessageDialog *data) {
-        data->BtnCloseClicked(button);
-    }
-    static void on_button_prg_cancel_clicked(GtkButton *button, MessageDialog *data) {
-        data->BtnPrgCancelClicked(button);
-    }
-    static void on_entry_insert_text(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, MessageDialog *data) {
-        data->EntryInsertText(editable, new_text, new_text_length, position);
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->WindowDeleteEvent();
     }
 
+    return FALSE;
+  }
+
+  static gboolean signal_exit_window(MessageDialog* dialog) {
+    if (dialog != NULL) {
+      dialog->Destroy();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_handle(gpointer data) {
+    MessageDialog* dialog = (MessageDialog*)data;
+
+    if (dialog != NULL) {
+      dialog->Handle();
+    }
+
+    return FALSE;
+  }
+
+private:
+  void ButtonClickedClose();
+  void ButtonClickedOk();
+  void ButtonClickedCancel();
+  void ButtonProgressClickedCancel();
+  void EntryInsertText(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void WindowDeleteEvent();
+  void Handle();
+
+  void KeyEvent(unsigned char key);
+
+private:
+  static MessageDialog* m_ptrInstance;
+
+  pFuncDialog m_ptrFunc;
+  pFuncDialog m_ptrFuncCancel;
+  DialogType m_type;
+  bool m_preCursor;
+
+  GtkDialog* m_dialog;
+  GtkLabel* m_label;
+  GtkEntry* m_entry;
+  GtkProgressBar* m_progress_bar;
 };
 
 /*
- *  Used for show info when something is processing, e.g. copying, sending. It is different from MessageDialog. In the normal case, using MessageDialog
+ *  Used for show info when something is processing, e.g. copying, sending.
+ *  It is different from MessageDialog. In the normal case, using MessageDialog
  *  to show info.
  */
-class MessageHintDialog : public FakeXEvent {
+class MessageHintDialog: public FakeXEvent {
 public:
-    ~MessageHintDialog();
-    static MessageHintDialog* GetInstance();
+  static MessageHintDialog* GetInstance();
 
-    void Create(GtkWindow *parent, const char *info);
+public:
+  ~MessageHintDialog();
 
+public:
+  void Create(GtkWindow* parent, const string text);
 
-    void Destroy(void);
-    bool Exist(void);
+  void Destroy();
+  bool Exist();
+
 private:
-    MessageHintDialog();
-    static MessageHintDialog* m_ptrInstance;
+  MessageHintDialog();
 
-    GtkWidget *m_window;
+private:
+  static MessageHintDialog* m_ptrInstance;
+
+  GtkDialog* m_dialog;
 };
 
 #endif

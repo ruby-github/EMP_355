@@ -26,7 +26,7 @@ public:
   void WriteBool(const string group, const string key, const bool value);
 
   vector<double> ReadDoubleList(const string group, const string key);
-  void WriteDoubleList(const string group, const string key, const double value[], const int length);
+  void WriteDoubleList(const string group, const string key, double value[], const int length);
 
   void RemoveString(const string group, const string key);
   void RemoveGroup(const string group);

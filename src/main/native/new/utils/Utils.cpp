@@ -71,6 +71,9 @@ GtkLabel* Utils::create_label(const string text) {
   gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
   gtk_label_set_use_markup(label, TRUE);
 
+  gtk_label_set_line_wrap(label, TRUE);
+  gtk_label_set_line_wrap_mode(label, PANGO_WRAP_WORD_CHAR);
+
   gtk_widget_modify_fg(GTK_WIDGET(label), GTK_STATE_NORMAL, get_color("white"));
 
   return label;
@@ -161,6 +164,7 @@ GtkEntry* Utils::create_entry(gunichar ch) {
   GtkEntry* entry = GTK_ENTRY(gtk_entry_new());
 
   set_font(GTK_WIDGET(entry), "", "", 10);
+  gtk_widget_set_size_request(GTK_WIDGET(entry), -1, 25);
 
   if (ch > 0) {
     gtk_entry_set_invisible_char(entry, ch);
@@ -173,6 +177,7 @@ GtkComboBoxText* Utils::create_combobox_text() {
   GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
   set_font(GTK_WIDGET(combobox), "", "", 10);
+  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 25);
 
   return combobox;
 }
@@ -190,6 +195,8 @@ GtkNotebook* Utils::create_notebook() {
 
 GtkProgressBar* Utils::create_progress_bar() {
   GtkProgressBar* progress_bar = GTK_PROGRESS_BAR(gtk_progress_bar_new());
+
+  gtk_widget_set_size_request(GTK_WIDGET(progress_bar), -1, 25);
 
   return progress_bar;
 }
@@ -291,7 +298,10 @@ GdkColor* Utils::get_color(const string color_name) {
 // ---------------------------------------------------------
 
 #include "sysMan/CalcSetting.h"
+#include "utils/MessageDialog.h"
 
 void Utils::test(GtkWidget* widget) {
-  CustomCalc::GetInstance()->CreateExportCalcSettingWin(widget);
+  //CustomCalc::GetInstance()->CreateExportCalcSettingWin(widget);
+  //MessageDialog::GetInstance()->Create(NULL, MessageDialog::DLG_PROGRESS_CANCEL, "test", NULL);
+  MessageHintDialog::GetInstance()->Create(NULL, "gdk_color_parse(color_name.c_str(), m_color); gdk_color_parse(color_name.c_str(), m_color);");
 }

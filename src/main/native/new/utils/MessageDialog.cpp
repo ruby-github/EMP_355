@@ -1,368 +1,420 @@
-#include <gtk/gtk.h>
-#include "Def.h"
 #include "utils/MessageDialog.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+#include "utils/Utils.h"
+
+#include <sstream>
+
+using namespace std;
+
+#include "Def.h"
+
 #include "keyboard/KeyValueOpr.h"
 #include "display/gui_global.h"
 #include "display/gui_func.h"
 #include "ViewMain.h"
 #include "keyboard/KeyDef.h"
 
-#include "utils/FakeXUtils.h"
-#include "utils/MainWindowConfig.h"
+////////////////////////////////////////
 
 MessageDialog* MessageDialog::m_ptrInstance = NULL;
 
+// ---------------------------------------------------------
+
 MessageDialog* MessageDialog::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new MessageDialog;
+    if (m_ptrInstance == NULL) {
+      m_ptrInstance = new MessageDialog();
+    }
+
     return m_ptrInstance;
 }
 
-MessageDialog::MessageDialog(void) {
-    m_window = NULL;
-    m_ptrFunc = NULL;
-    m_ptrFuncCancel = NULL;
-    m_preCursor = true;
+MessageDialog::MessageDialog() {
+  m_ptrFunc = NULL;
+  m_ptrFuncCancel = NULL;
+  m_type = DLG_INFO;
+  m_preCursor = true;
+
+  m_dialog = NULL;
+  m_label = NULL;
+  m_entry = NULL;
+  m_progress_bar = NULL;
 }
 
-MessageDialog::~MessageDialog(void) {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
+MessageDialog::~MessageDialog() {
+  if (m_ptrInstance != NULL) {
+    delete m_ptrInstance;
+
+    m_ptrInstance = NULL;
+  }
 }
 
-void MessageDialog::Create(GtkWindow *parent, DialogType type, const char *info, pFuncDialog ptrFunc, pFuncDialog ptrFuncCancel) {
-    GtkWidget *fixed_window;
-    GtkWidget *image_icon;
-    //    GtkWidget *label_text;
+void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text, pFuncDialog ptrFunc, pFuncDialog ptrFuncCancel) {
+  m_ptrFunc = ptrFunc;
+  m_ptrFuncCancel = ptrFuncCancel;
+  m_type = type;
+  m_preCursor = ViewMain::GetInstance()->GetCursorVisible();
+  InvisibleCursor(false, false);
 
-    GtkWidget *button_ok;
-    GtkWidget *button_cancel;
-    GtkWidget *button_prg_cancel;
-    GtkWidget *image_prg_cancel;
-    GtkWidget *button_close;
+  if (MessageHintDialog::GetInstance()->Exist()) {
+    MessageHintDialog::GetInstance()->Destroy();
+  }
 
-    m_ptrFunc = ptrFunc;
-    m_ptrFuncCancel = ptrFuncCancel;
-    m_type = type;
-    m_preCursor = ViewMain::GetInstance()->GetCursorVisible();
-    InvisibleCursor(false, false);
+  m_label = NULL;
+  m_entry = NULL;
+  m_progress_bar = NULL;
 
-    if (MessageHintDialog::GetInstance()->Exist())
-        MessageHintDialog::GetInstance()->Destroy();
+  GtkTable* table = GTK_TABLE(gtk_table_new(2, 5, TRUE));
+  gtk_container_set_border_width(GTK_CONTAINER(table), 10);
+  gtk_table_set_col_spacings(table, 10);
 
-    GtkWidget *old_window = m_window;
-    m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
-    gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-    gtk_widget_set_size_request (m_window, 420, 150);
-    gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
-    gtk_window_set_transient_for(GTK_WINDOW(m_window), parent);
-    g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
+  GtkImage* image = Utils::create_image();
 
-    fixed_window = gtk_fixed_new ();
-    gtk_widget_show (fixed_window);
-    gtk_container_add (GTK_CONTAINER (m_window), fixed_window);
+  switch (m_type) {
+  case DLG_INFO:
+    {
+      m_dialog = Utils::create_dialog(parent, _("Information"));
 
-    image_icon = gtk_image_new();
-    gtk_widget_show(image_icon);
-    gtk_fixed_put (GTK_FIXED (fixed_window), image_icon, 20, 20);
+      GtkButton* button_close = Utils::add_dialog_button(m_dialog, _("Close"), GTK_RESPONSE_CLOSE);
+      g_signal_connect(button_close, "clicked", G_CALLBACK(signal_button_clicked_close), this);
 
-    m_label_text = gtk_label_new (info);
-    gtk_widget_show(m_label_text);
-    gtk_fixed_put (GTK_FIXED (fixed_window), m_label_text, 85, 15);
-    gtk_widget_set_size_request (m_label_text, 320, 60);
-    gtk_misc_set_alignment (GTK_MISC (m_label_text), 0, 0.5);
-    gtk_label_set_line_wrap (GTK_LABEL(m_label_text), TRUE);
-    gtk_label_set_line_wrap_mode (GTK_LABEL(m_label_text), PANGO_WRAP_WORD_CHAR);
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG);
 
-    button_ok = gtk_button_new_from_stock ("gtk-ok");
-    gtk_widget_hide(button_ok);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_ok, 200, 100);
-    gtk_widget_set_size_request (button_ok, 100, 35);
-    g_signal_connect ((gpointer) button_ok, "clicked", G_CALLBACK (on_button_ok_clicked), this);
-
-    button_cancel = gtk_button_new_from_stock ("gtk-cancel");
-    gtk_widget_hide(button_cancel);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_cancel, 310, 100);
-    gtk_widget_set_size_request (button_cancel, 100, 35);
-    g_signal_connect ((gpointer) button_cancel, "clicked", G_CALLBACK (on_button_cancel_clicked), this);
-
-    button_close = gtk_button_new_from_stock ("gtk-close");
-    gtk_widget_hide(button_close);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_close, 310, 100);
-    gtk_widget_set_size_request (button_close, 100, 35);
-    g_signal_connect ((gpointer) button_close, "clicked", G_CALLBACK (on_button_close_clicked), this);
-
-    m_entry = gtk_entry_new_with_max_length(64);
-    gtk_widget_hide(m_entry);
-    gtk_fixed_put(GTK_FIXED(fixed_window), m_entry, 85, 70);
-    gtk_widget_set_size_request(m_entry, 250, 25);
-    g_signal_connect ((gpointer) m_entry, "insert_text", G_CALLBACK (on_entry_insert_text), this);
-
-    m_progress_bar = gtk_progress_bar_new();
-    gtk_widget_hide(m_progress_bar);
-    gtk_fixed_put(GTK_FIXED(fixed_window), m_progress_bar, 85, 90);
-    gtk_widget_set_size_request(m_progress_bar, 250, 30);
-
-    button_prg_cancel = gtk_button_new();
-    gtk_widget_hide(button_prg_cancel);
-    gtk_fixed_put(GTK_FIXED(fixed_window), button_prg_cancel, 350, 80);
-    gtk_widget_set_size_request(button_prg_cancel, 45, 45);
-    gtk_button_set_relief(GTK_BUTTON(button_prg_cancel), GTK_RELIEF_NONE);
-    g_signal_connect ((gpointer) button_prg_cancel, "clicked", G_CALLBACK (on_button_prg_cancel_clicked), this);
-    image_prg_cancel = gtk_image_new_from_stock("gtk-stop", GTK_ICON_SIZE_DND);
-    gtk_widget_hide(image_prg_cancel);
-    gtk_container_add(GTK_CONTAINER(button_prg_cancel), image_prg_cancel);
-
-    switch (m_type) {
-    case DLG_INFO:
-        gtk_window_set_title (GTK_WINDOW (m_window), _("Information"));
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(button_close);
-        break;
-    case DLG_WARNING:
-        gtk_window_set_title (GTK_WINDOW (m_window), _("Warning"));
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-warning", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(button_close);
-        break;
-    case DLG_QUESTION:
-        //	gtk_window_set_title (GTK_WINDOW (m_window), _("Question"));
-        //	gtk_window_set_title (GTK_WINDOW (m_window), info);
-        gtk_window_set_title (GTK_WINDOW (m_window), "");
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-question", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(button_ok);
-        gtk_widget_show(button_cancel);
-        break;
-    case DLG_ERROR:
-        gtk_window_set_title (GTK_WINDOW (m_window), _("Error"));
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-error", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(button_close);
-        break;
-        // case HINT:
-        //     gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
-        //     gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
-        //     break;
-    case DLG_PROGRESS:
-        gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(m_progress_bar);
-        break;
-    case DLG_PROGRESS_CANCEL:
-        gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(m_progress_bar);
-        gtk_widget_show(button_prg_cancel);
-        gtk_widget_show(image_prg_cancel);
-        break;
-    case DLG_FILENAME:
-        gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
-        gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
-        gtk_widget_show(m_entry);
-        gtk_widget_show(button_ok);
-        gtk_widget_show(button_cancel);
-        break;
+      break;
     }
-    gtk_widget_show(m_window);
+  case DLG_WARNING:
+    {
+      m_dialog = Utils::create_dialog(parent, _("Warning"));
 
-    if (GTK_IS_WIDGET(old_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy (old_window);
+      GtkButton* button_close = Utils::add_dialog_button(m_dialog, _("Close"), GTK_RESPONSE_CLOSE);
+      g_signal_connect(button_close, "clicked", G_CALLBACK(signal_button_clicked_close), this);
+
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_DIALOG);
+
+      break;
     }
+  case DLG_ERROR:
+    {
+      m_dialog = Utils::create_dialog(parent, _("Error"));
+
+      GtkButton* button_close = Utils::add_dialog_button(m_dialog, _("Close"), GTK_RESPONSE_CLOSE);
+      g_signal_connect(button_close, "clicked", G_CALLBACK(signal_button_clicked_close), this);
+
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_ERROR, GTK_ICON_SIZE_DIALOG);
+
+      break;
+    }
+  case DLG_QUESTION:
+    {
+      m_dialog = Utils::create_dialog(parent, "");
+
+      GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK);
+      g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
+
+      GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL);
+      g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
+
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
+
+      break;
+    }
+  case DLG_PROGRESS:
+    {
+      m_dialog = Utils::create_dialog(parent, "");
+      gtk_window_set_decorated(GTK_WINDOW(m_dialog), FALSE);
+
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG);
+
+      m_progress_bar = Utils::create_progress_bar();
+      gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 1, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+      break;
+    }
+  case DLG_PROGRESS_CANCEL:
+    {
+      m_dialog = Utils::create_dialog(parent, "");
+      gtk_window_set_decorated(GTK_WINDOW(m_dialog), FALSE);
+
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG);
+
+      m_progress_bar = Utils::create_progress_bar();
+
+      GtkButton* button_cancel = Utils::create_button();
+      gtk_widget_set_size_request(GTK_WIDGET(button_cancel), 38, 38);
+
+      Utils::set_button_image(button_cancel, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_STOP, GTK_ICON_SIZE_DND)));
+
+      gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 1, 4, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(button_cancel), 4, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+      break;
+    }
+  case DLG_FILENAME:
+    {
+      m_dialog = Utils::create_dialog(parent, "");
+      gtk_window_set_decorated(GTK_WINDOW(m_dialog), FALSE);
+
+      GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK);
+      g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
+
+      GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL);
+      g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
+
+      gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG);
+
+      m_entry = Utils::create_entry();
+      gtk_entry_set_max_length(m_entry, 64);
+      gtk_table_attach(table, GTK_WIDGET(m_entry), 1, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+      g_signal_connect((gpointer)m_entry, "insert_text", G_CALLBACK(signal_entry_insert_text), this);
+
+      break;
+    }
+  default:
+    {
+      m_dialog = NULL;
+
+      break;
+    }
+  }
+
+  if (m_dialog != NULL) {
+    gtk_widget_set_size_request(GTK_WIDGET(m_dialog), 400, 160);
+    gtk_dialog_set_has_separator(m_dialog, FALSE);
+
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
+
+    m_label = Utils::create_label(text);
+
+    gtk_table_attach_defaults(table, GTK_WIDGET(image), 0, 1, 0, 1);
+    gtk_table_attach_defaults(table, GTK_WIDGET(m_label), 1, 5, 0, 1);
+
+    gtk_widget_show_all(GTK_WIDGET(m_dialog));
 
     g_keyInterface.Push(this);
     SetSystemCursorToCenter();
+  }
 }
 
-bool MessageDialog::Exist(void) {
-    if (m_window != NULL && GTK_IS_WINDOW(m_window))
-        return true;
-    else
-        return false;
-}
+void MessageDialog::Destroy() {
+  if (GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
 
-static gboolean ExitWindow(gpointer data) {
-    MessageDialog *tmp;
-    tmp = (MessageDialog *)data;
-    tmp->Destroy();
-    return FALSE;
-}
+    gtk_widget_hide_all(GTK_WIDGET(m_dialog));
+    gtk_widget_destroy (GTK_WIDGET(m_dialog));
 
-void MessageDialog::KeyEvent(unsigned char keyValue) {
-    FakeXEvent::KeyEvent(keyValue);
+    m_dialog = NULL;
 
-    switch(keyValue) {
-    case KEY_ESC:
-        if(m_type!=DLG_PROGRESS_CANCEL && m_type!=DLG_PROGRESS) {
-            // g_timeout_add(100, ExitWindow, this);
-            // FakeEscKey();
-            ExitWindow(this);
-            if (m_ptrFuncCancel)
-                (*m_ptrFuncCancel)(NULL);
-        }
-        break;
-    default:
-        break;
+    InvisibleCursor(!m_preCursor);
+
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
     }
-}
-
-gboolean MessageDialog::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
-    Destroy();
-    if (m_ptrFuncCancel)
-        (*m_ptrFuncCancel)(NULL);
-    return FALSE;
-}
-
-void MessageDialog::SetText(const char *info) {
-    if(m_label_text)
-        gtk_label_set_text(GTK_LABEL(m_label_text), info);
-}
-
-gboolean HandleFun(gpointer data) {
-    MessageDialog *tmp;
-    tmp = (MessageDialog *)data;
-    if (tmp->m_ptrFunc)
-        (*tmp->m_ptrFunc)(NULL);
-    return false;
-}
-
-void MessageDialog::BtnOkClicked(GtkButton *button) {
-    // gtk_widget_destroy (m_window);
-    // g_keyInterface.Pop();
-    if(m_type == DLG_FILENAME) {
-        char* name = (char*)malloc(256);
-        sprintf(name, "%s", gtk_entry_get_text(GTK_ENTRY(m_entry)));
-
-        Destroy();
-
-        if(strlen(name)>0) {
-            if (m_ptrFunc)
-                (*m_ptrFunc)(name);
-        }
-    } else {
-        Destroy();
-        g_timeout_add(50, HandleFun, this); // 为了解决结束检查时出现白框的问题
-#if 0
-        if (m_ptrFunc)
-            (*m_ptrFunc)(NULL);
-#endif
-    }
-}
-
-void MessageDialog::BtnCancelClicked(GtkButton *button) {
-    // gtk_widget_destroy (m_window);
-    // g_keyInterface.Pop();
-
-    Destroy();
-    if (m_ptrFuncCancel)
-        (*m_ptrFuncCancel)(NULL);
-}
-
-void MessageDialog::BtnCloseClicked(GtkButton *button) {
-    Destroy();
-    if (m_ptrFunc)
-        (*m_ptrFunc)(NULL);
-}
-
-void MessageDialog::BtnPrgCancelClicked(GtkButton *button) {
-    SetText(_("Cancelling..."));
-//	SetProgressBar(0);
-    if (m_ptrFunc)
-        (*m_ptrFunc)(NULL);
-}
-
-void MessageDialog::EntryInsertText(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
-    gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));
-
-    if (g_ascii_ispunct(*new_text) || (old_text_length + new_text_length > gtk_entry_get_max_length(GTK_ENTRY(editable)))) {
-        gtk_signal_emit_stop(GTK_OBJECT(editable), g_signal_lookup("insert-text", GTK_TYPE_EDITABLE));
-    }
-}
-
-void MessageDialog::Destroy(void) {
-    if (GTK_IS_WIDGET(m_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_hide_all(m_window);
-        gtk_widget_destroy (m_window);
-        m_window = NULL;
-        InvisibleCursor(!m_preCursor);
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-    }
+  }
 }
 
 void MessageDialog::SetProgressBar(double fraction) {
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(m_progress_bar), fraction);
-    char text_buf[10];
-    sprintf(text_buf, "%d%%", (int)(fraction*100));
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(m_progress_bar), text_buf);
+  if (m_progress_bar != NULL) {
+    gtk_progress_bar_set_fraction(m_progress_bar, fraction);
+
+    stringstream ss;
+    ss << fraction * 100 << "%";
+
+    gtk_progress_bar_set_text(m_progress_bar, ss.str().c_str());
+  }
 }
+
+bool MessageDialog::Exist() {
+  if (m_dialog != NULL && GTK_IS_WINDOW(m_dialog)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void MessageDialog::SetText(const string text) {
+  if (m_label != NULL) {
+    gtk_label_set_text(m_label, text.c_str());
+  }
+}
+
+// ---------------------------------------------------------
+
+void MessageDialog::ButtonClickedClose() {
+  Destroy();
+
+  if (m_ptrFunc != NULL) {
+    (*m_ptrFunc)(NULL);
+
+    m_ptrFunc = NULL;
+  }
+}
+
+void MessageDialog::ButtonClickedOk() {
+  if (m_type == DLG_FILENAME) {
+    string name = "";
+
+    if (m_entry != NULL) {
+      name = gtk_entry_get_text(m_entry);
+    }
+
+    Destroy();
+
+    if (!name.empty()) {
+      if (m_ptrFunc != NULL) {
+        (*m_ptrFunc)((void*)name.c_str());
+
+        m_ptrFunc = NULL;
+      }
+    }
+
+  } else {
+    Destroy();
+
+    g_timeout_add(50, signal_handle, this);
+  }
+}
+
+void MessageDialog::ButtonClickedCancel() {
+  Destroy();
+
+  if (m_ptrFuncCancel != NULL) {
+    (*m_ptrFuncCancel)(NULL);
+
+    m_ptrFuncCancel = NULL;
+  }
+}
+
+void MessageDialog::ButtonProgressClickedCancel() {
+  SetText(_("Cancelling..."));
+
+  if (m_ptrFunc != NULL) {
+    (*m_ptrFunc)(NULL);
+
+    m_ptrFunc = NULL;
+  }
+}
+
+void MessageDialog::EntryInsertText(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position) {
+  string text = gtk_entry_get_text(GTK_ENTRY(editable));
+
+  if (g_ascii_ispunct(*new_text) || ((text.size() + new_text_length) > gtk_entry_get_max_length(GTK_ENTRY(editable)))) {
+    gtk_signal_emit_stop(GTK_OBJECT(editable), g_signal_lookup("insert-text", GTK_TYPE_EDITABLE));
+  }
+}
+
+void MessageDialog::WindowDeleteEvent() {
+  Destroy();
+
+  if (m_ptrFuncCancel != NULL) {
+    (*m_ptrFuncCancel)(NULL);
+
+    m_ptrFuncCancel = NULL;
+  }
+}
+
+void MessageDialog::Handle() {
+  if (m_ptrFunc != NULL) {
+    (*m_ptrFunc)(NULL);
+
+    m_ptrFunc = NULL;
+  }
+}
+
+void MessageDialog::KeyEvent(unsigned char key) {
+  FakeXEvent::KeyEvent(key);
+
+  switch (key) {
+  case KEY_ESC:
+    {
+      if (m_type!=DLG_PROGRESS_CANCEL && m_type!=DLG_PROGRESS) {
+        signal_exit_window(this);
+
+        if (m_ptrFuncCancel != NULL) {
+          (*m_ptrFuncCancel)(NULL);
+
+          m_ptrFuncCancel = NULL;
+        }
+      }
+
+      break;
+    }
+  default:
+    break;
+  }
+}
+
+////////////////////////////////////////////////////////////
 
 MessageHintDialog* MessageHintDialog::m_ptrInstance = NULL;
 
 MessageHintDialog* MessageHintDialog::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new MessageHintDialog;
-    return m_ptrInstance;
+  if (m_ptrInstance == NULL) {
+    m_ptrInstance = new MessageHintDialog();
+  }
+
+  return m_ptrInstance;
 }
 
-MessageHintDialog::MessageHintDialog(void) {
-    m_window = NULL;
+MessageHintDialog::MessageHintDialog() {
+  m_dialog = NULL;
 }
 
-MessageHintDialog::~MessageHintDialog(void) {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
+MessageHintDialog::~MessageHintDialog() {
+  if (m_ptrInstance != NULL) {
+    delete m_ptrInstance;
+  }
+
+  m_ptrInstance = NULL;
 }
 
-void MessageHintDialog::Create(GtkWindow *parent, const char *info) {
-    GtkWidget *fixed_window;
-    GtkWidget *image_icon;
-    GtkWidget *label_text;
+void MessageHintDialog::Create(GtkWindow* parent, const string text) {
+  m_dialog = Utils::create_dialog(parent, "", 400, 160);
 
-    m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
-    gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-    gtk_widget_set_size_request (m_window, 420, 150);
-    gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
-    gtk_window_set_transient_for(GTK_WINDOW(m_window), parent);
-    gtk_window_set_decorated (GTK_WINDOW(m_window), FALSE);
+  gtk_dialog_set_has_separator(m_dialog, FALSE);
+  gtk_window_set_decorated(GTK_WINDOW(m_dialog), FALSE);
 
-    fixed_window = gtk_fixed_new ();
-    gtk_widget_show (fixed_window);
-    gtk_container_add (GTK_CONTAINER (m_window), fixed_window);
+  GtkTable* table = GTK_TABLE(gtk_table_new(1, 1, TRUE));
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
-    label_text = gtk_label_new (info);
-    gtk_widget_show(label_text);
-    gtk_fixed_put (GTK_FIXED (fixed_window), label_text, 85, 15);
-    gtk_widget_set_size_request (label_text, 320, 60);
-    gtk_misc_set_alignment (GTK_MISC (label_text), 0, 0.5);
-    gtk_label_set_line_wrap (GTK_LABEL(label_text), TRUE);
-    gtk_label_set_line_wrap_mode (GTK_LABEL(label_text), PANGO_WRAP_WORD_CHAR);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 10);
 
-    image_icon = gtk_image_new();
-    gtk_widget_show(image_icon);
-    gtk_fixed_put (GTK_FIXED (fixed_window), image_icon, 20, 20);
+  GtkBox* box = GTK_BOX(gtk_hbox_new(FALSE, 10));
+  gtk_table_attach_defaults(table, GTK_WIDGET(box), 0, 1, 0, 1);
 
-    gtk_image_set_from_stock(GTK_IMAGE(image_icon), "gtk-dialog-info", GTK_ICON_SIZE_DIALOG);
-    gtk_widget_show(m_window);
+  GtkImage* image = Utils::create_image();
+  gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG);
 
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
+  GtkLabel* label = Utils::create_label(text);
+
+  gtk_box_pack_start(box, GTK_WIDGET(image), FALSE, FALSE, 0);
+  gtk_box_pack_start(box, GTK_WIDGET(label), TRUE, TRUE, 0);
+
+  gtk_widget_show_all(GTK_WIDGET(m_dialog));
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
 }
 
-bool MessageHintDialog::Exist(void) {
-    if (m_window != NULL && GTK_IS_WINDOW(m_window))
-        return true;
-    else
-        return false;
+bool MessageHintDialog::Exist() {
+  if (m_dialog != NULL && GTK_IS_WINDOW(m_dialog)) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
-void MessageHintDialog::Destroy(void) {
-    if (GTK_IS_WIDGET(m_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy (m_window);
-        m_window = NULL;
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+void MessageHintDialog::Destroy() {
+  if (GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
+
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
+    m_dialog = NULL;
+
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
     }
+  }
 }
