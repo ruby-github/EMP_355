@@ -4,30 +4,23 @@
 #include "utils/MainWindowConfig.h"
 #include "utils/Utils.h"
 
+#include "keyboard/KeyDef.h"
+#include "ViewMain.h"
+
 #include <sstream>
 
 using namespace std;
-
-#include "Def.h"
-
-#include "keyboard/KeyValueOpr.h"
-#include "display/gui_global.h"
-#include "display/gui_func.h"
-#include "ViewMain.h"
-#include "keyboard/KeyDef.h"
-
-////////////////////////////////////////
 
 MessageDialog* MessageDialog::m_ptrInstance = NULL;
 
 // ---------------------------------------------------------
 
 MessageDialog* MessageDialog::GetInstance() {
-    if (m_ptrInstance == NULL) {
-      m_ptrInstance = new MessageDialog();
-    }
+  if (m_ptrInstance == NULL) {
+    m_ptrInstance = new MessageDialog();
+  }
 
-    return m_ptrInstance;
+  return m_ptrInstance;
 }
 
 MessageDialog::MessageDialog() {
