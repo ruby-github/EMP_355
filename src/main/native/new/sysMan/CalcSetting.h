@@ -5,8 +5,9 @@
 #include <string>
 
 #include "utils/FakeXEvent.h"
+#include "utils/MessageDialog.h"
+#include "sysMan/ConfigToHost.h"
 
-class MessageDialog;
 class CalcSetting;
 
 using std::string;
@@ -25,12 +26,11 @@ public:
   void DestroyWin(void);
   void DelayDestroyWin(void);
 
-  void OKAndCancelClicked();
   void SetProgressBar(double fraction);
 
-  void ExportErrorInfoNotice(char *result);
-  void ExportLoadInfoNotice(char *result);
-  void ExportRightInfoNotice(char *result);
+  void ExportErrorInfoNotice(string result);
+  void ExportLoadInfoNotice(string result);
+  void ExportRightInfoNotice(string result);
 
   void ButtonImportNameOK();
   void ImportWrite(string item_name, int &item_num);
@@ -63,6 +63,12 @@ private:
     }
   }
 
+  static void signal_button_clicked_export(GtkButton* button, CustomCalc* data) {
+    if (data != NULL) {
+      data->ButtonClickedExport(button);
+    }
+  }
+
   static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, CustomCalc* data) {
     if (data != NULL) {
       data->DestroyWin();
@@ -71,15 +77,37 @@ private:
     return FALSE;
   }
 
-  static void signal_button_clicked_export(GtkButton* button, CustomCalc* data) {
-    if (data != NULL) {
-      data->ButtonExportNameOKClicked(button);
+  static gboolean signal_load_data(gpointer data) {
+    CustomCalc* calc = (CustomCalc*)data;
+
+    if (calc != NULL) {
+      calc->LoadData();
     }
+
+    return FALSE;
+  }
+
+  static gboolean signal_exit_customecalc(gpointer data) {
+    CustomCalc* calc = (CustomCalc*)data;
+
+    if (calc != NULL) {
+      calc->DestroyWin();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_destroy(gpointer data) {
+    ConfigToHost::GetInstance()->DestroyWindow();
+
+    return FALSE;
+  }
+
+  static void callback_progress(goffset current, goffset total, gpointer data) {
+    g_cancellable_is_cancelled(m_cancellable);
   }
 
 private:
-  GtkWidget* GetWindow();
-
   MessageDialog* GetMessageDialog();
   CalcSetting* GetCalcSetting();
 
@@ -87,10 +115,23 @@ private:
   void ButtonClickedCancel(GtkButton* button);
   void EntryFocusIn(GtkEditable* editable, GdkEventFocus* event);
   void ComboboxChangedType(GtkComboBox* combobox);
-  void ButtonExportNameOKClicked(GtkButton *button);
+  void ButtonClickedExport(GtkButton *button);
+  void LoadData();
+
+  void ClickedOKAndCancel();
+  void HideClickedOKAndCancel();
+
+  void ImportRenameCopy(string itemname);
+  bool RenameCompare(string name_copy);
+
+  void KeyEvent(unsigned char keyValue);
 
 private:
-  GtkWidget* m_window;
+  static CustomCalc* m_ptrInstance;
+  static GCancellable* m_cancellable;
+
+private:
+  GtkDialog* m_dialog;
 
   GtkEntry* m_entry_name;
   GtkComboBoxText* m_combobox_type;
@@ -99,63 +140,7 @@ private:
   GtkEntry* m_entry_export_name;
   GtkProgressBar* m_progress_bar;
   GtkImage* m_image;
-
-private:
-
-
-static void HandleButtonRenameCancelClicked(GtkButton* button, CustomCalc* data) {
-  if (data != NULL) {
-    data->ButtonRenameCancelClicked(button);
-  }
-}
-
-
-
-private:
-
-    void HideOKAndCancelClicked();
-
-    bool RenameCompare(char * name_copy);
-
-    bool ImportCopy(int j);
-    void ImportRenameCopy(string item_name);
-
-
-
-private:
-
-    GtkWidget *label_type;
-    GtkWidget *label_method;
-
-    GtkWidget *fixed1;
-    GtkWidget *m_frame_new_notice;
-    GtkWidget *m_label_notice;
-    GtkWidget *fixed_new_notice;
-    GtkWidget *m_label_notice1;
-    GtkWidget *m_label_notice2;
-    GtkWidget *m_label_notice3;
-
-    GtkWidget *button_right;
-    GtkWidget *img_right;
-    GtkWidget *button_error;
-    GtkWidget *img_error;
-    GtkWidget *button_load;
-    GtkWidget *img_load;
-    GtkWidget *button_ok;
-    GtkWidget *button_cancel;
-
-    GtkTreeModel *CreateComboModel(char name[][20], int n);
-    void KeyEvent(unsigned char keyValue);
-    static CustomCalc* m_ptrInstance;
-
-    void ButtonRenameCancelClicked(GtkButton *button);
-
-
-    //      void ButtonImportNameOK();
-    void EntryItemInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-
-
-
+  GtkLabel *m_label_notice;
 };
 
 
@@ -188,12 +173,6 @@ struct CustomEtype {
     int etype;
 };
 
-struct CustomTypeAndMethod {
-    int type;
-    std::string name;
-    int etype;
-};
-
 
 
 enum {
@@ -222,7 +201,7 @@ public:
     void ChangeExamBox(char *check_part);
     void ChangeExamBoxDelete(void);
     void ChangeExamBoxToDefault(void);
-    void ChangeModelAndLight(const char *name);
+    void ChangeModelAndLight(const string name);
     void GetCalcListEtype(char *exam_type, vector<int> &vecItemCalc);
     int GetCalcListNum(char *exam_type);
     int GetMeasureSequence(const char *exam_type);
