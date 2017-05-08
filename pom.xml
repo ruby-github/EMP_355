@@ -77,7 +77,7 @@
           <linkerExecutable>g++</linkerExecutable>
 
           <compilerEndOptions>
-            <compilerEndOption>-Wall -ggdb3 -DEMP_355 -DREPORTPICS_6 -D_IPP_PRIVATE_STRUCTURES</compilerEndOption>
+            <compilerEndOption>-w -ggdb3 -DEMP_355 -DREPORTPICS_6 -D_IPP_PRIVATE_STRUCTURES</compilerEndOption>
             <compilerEndOption>-Ithirdparty/include -Ithirdparty/include/hal</compilerEndOption>
 
             <compilerEndOption>-Isrc/main/native/new</compilerEndOption>
