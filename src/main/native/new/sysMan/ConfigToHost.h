@@ -51,6 +51,7 @@ private:
   }
 
   // signal
+
   gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
 
   void BtnOKClicked(GtkButton *button);
@@ -91,16 +92,6 @@ public:
     void OKAndCancelClicked();
 
 private:
-    enum {
-        COL_CHECKED,
-        COL_NAME,
-        NUM_COLS
-    };
-
-
-
-
-
     GtkWidget *m_window;
 
     GtkWidget *m_window1;

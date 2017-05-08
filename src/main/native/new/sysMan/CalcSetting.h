@@ -25,17 +25,6 @@
   #endif
 #endif
 
-struct CustomEtype {
-    std::string name;
-    int etype;
-};
-
-struct CustomTypeAndMethod {
-    int type;
-    std::string name;
-    int etype;
-};
-
 class CustomCalc: public FakeXEvent {
 public:
   static CustomCalc* GetInstance();
@@ -44,7 +33,6 @@ public:
   CustomCalc();
   ~CustomCalc();
 
-  GtkWidget* CreateImportRenameSettingWin(GtkWidget* parent);
   GtkWidget* CreateExportCalcSettingWin(GtkWidget* parent);
   GtkWidget* CreateCalcSettingWin(GtkWidget* parent);
 
@@ -85,6 +73,7 @@ private:
   }
 
   // signal
+
   gboolean WindowDeleteEvent(GtkWidget* widget, GdkEvent* event);
   void ComboboxTypeChanged(GtkComboBox *combobox);
   void ButtonRenameCancelClicked(GtkButton *button);
@@ -105,11 +94,6 @@ private:
 ////////////////////////////////////////////////////////////
 
 public:
-    enum {
-        N_COMBO_COL1,
-        N_COMBO_TOTAL
-    };
-
     void DestroyWin(void);
 
     void DelayDestroyWin(void);
@@ -156,11 +140,6 @@ private:
     GtkTreeModel *CreateComboModel(char name[][20], int n);
 };
 
-enum {
-    NAME_COLUMN,
-    N_COLUMNS
-};
-
 class CalcSetting {
 public:
   static CalcSetting* GetInstance();
@@ -169,7 +148,6 @@ public:
   CalcSetting();
   ~CalcSetting();
 
-  GtkWidget* CreateExportCalcWindow(GtkWidget *parent);
   GtkWidget* CreateCalcWindow(GtkWidget *parent);
 
 private:
@@ -265,7 +243,6 @@ private:
 ////////////////////////////////////////////////////////////
 
 public:
-
     GtkWidget* GetWindow(void);
 
     GtkWidget *m_win_parent;
@@ -322,7 +299,6 @@ private:
     GtkWidget *m_button_calc_import;
     GtkWidget *m_button_calc_default;
 
-
     CustomCalc m_custom_calc_win;
     GtkWidget* m_section_view;
     GtkWidget* m_section_combobox;
@@ -347,8 +323,5 @@ private:
     void CreateDefineItem_calc(vector<string>& vecExamItem_calc);
     int  create_exam_calc_model();
     int ItemNameTransEtype(char *select_name);
-
-
-
 };
 #endif

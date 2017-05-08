@@ -16,6 +16,12 @@
 #include "calcPeople/MenuCalcNew.h"
 #include "keyboard/KeyBoard.h"
 
+enum {
+        COL_CHECKED,
+        COL_NAME,
+        NUM_COLS
+    };
+
 extern int s_fdcom;
 ConfigToHost* ConfigToHost::m_ptrInstance = NULL;
 

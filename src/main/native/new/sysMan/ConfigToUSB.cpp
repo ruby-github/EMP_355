@@ -14,6 +14,12 @@
 
 ConfigToUSB* ConfigToUSB::m_ptrInstance = NULL;
 
+enum {
+        COL_CHECKED,
+        COL_NAME,
+        NUM_COLS
+    };
+
 ConfigToUSB::ConfigToUSB() {
     m_listBranch = NULL;
     m_vecPath.clear();

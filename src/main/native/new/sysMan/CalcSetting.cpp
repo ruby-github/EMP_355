@@ -8,6 +8,17 @@
 #include "utils/Utils.h"
 
 
+struct CustomEtype {
+    std::string name;
+    int etype;
+};
+
+struct CustomTypeAndMethod {
+    int type;
+    std::string name;
+    int etype;
+};
+
 
 #include <dirent.h>
 #include "sysMan/CalcSetting.h"

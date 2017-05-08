@@ -42,6 +42,7 @@ private:
   }
 
   // signal
+
   gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
   void BtnOKClicked(GtkButton *button);
   void BtnCancelClicked(GtkButton *button);
@@ -74,17 +75,6 @@ public:
     void DestroyWindow(void);
 
 private:
-    enum {
-        COL_CHECKED,
-        COL_NAME,
-        NUM_COLS
-    };
-
-
-
-
-
-
     GtkWidget *m_treeRoot;
     GtkWidget *m_treeBranch;
     GtkWidget *m_chkbtnDel;
