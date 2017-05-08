@@ -1,5 +1,7 @@
-#ifndef _CONFIGTOHOST_H_
-#define _CONFIGTOHOST_H_
+#ifndef __CONFIG_TO_HOST_H__
+#define __CONFIG_TO_HOST_H__
+
+#include "utils/FakeXEvent.h"
 
 #include <string>
 #include <vector>
@@ -7,13 +9,69 @@
 using std::string;
 using std::vector;
 
-class FakeXEvent;
 class ConfigToHost: public FakeXEvent {
 public:
-    ~ConfigToHost();
-    static ConfigToHost* GetInstance();
-    void CreateWindow(GtkWindow *parent);
-    void CreateCalcImportWindow(GtkWindow *parent);
+  static ConfigToHost* GetInstance();
+
+public:
+  ~ConfigToHost();
+
+  void CreateWindow(GtkWindow* parent);
+  void CreateCalcImportWindow(GtkWindow* parent);
+
+private:
+  // signal
+
+  static gboolean on_window_delete_event(GtkWidget* widget, GdkEvent* event, ConfigToHost* data) {
+    return data->WindowDeleteEvent(widget, event);
+  }
+
+  static void on_data_toggled(GtkCellRendererToggle* cell, gchar* path_str, ConfigToHost* data) {
+    data->ToggleData(cell, path_str);
+  }
+
+  static void on_root_calc_selection_changed(GtkTreeSelection* selction, ConfigToHost* data) {
+    data->RootCalcSelectionChanged(selction);
+  }
+
+  static void on_root_selection_changed(GtkTreeSelection* selction, ConfigToHost* data) {
+    data->RootSelectionChanged(selction);
+  }
+
+  static void on_button_ok_clicked(GtkButton* button, ConfigToHost* data) {
+    data->BtnOKClicked(button);
+  }
+
+  static void on_button_calc_ok_clicked(GtkButton* button, ConfigToHost* data) {
+    data->BtnCalcImportOKClicked(button);
+  }
+
+  static void on_button_cancel_clicked(GtkButton* button, ConfigToHost* data) {
+    data->BtnCancelClicked(button);
+  }
+
+  // signal
+  gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
+
+  void BtnOKClicked(GtkButton *button);
+  void BtnCalcImportOKClicked(GtkButton *button);
+  void BtnCancelClicked(GtkButton *button);
+  void ToggleData(GtkCellRendererToggle *cell, gchar *path_str);
+  void RootSelectionChanged(GtkTreeSelection *selection);
+  void RootCalcSelectionChanged(GtkTreeSelection *selection);
+
+private:
+  ConfigToHost();
+
+  void KeyEvent(unsigned char KeyValue);
+
+private:
+  static ConfigToHost* m_ptrInstance;
+
+private:
+
+////////////////////////////////////////////////////////////
+public:
     GtkWidget* GetWindow() {
         return m_window;
     }
@@ -39,9 +97,9 @@ private:
         NUM_COLS
     };
 
-    ConfigToHost(void);
-    static ConfigToHost* m_ptrInstance;
-    void KeyEvent(unsigned char KeyValue);
+
+
+
 
     GtkWidget *m_window;
 
@@ -71,44 +129,6 @@ private:
     gboolean GetAllCalcSelectPath(void);
 
     gboolean CheckBranchStauts(void);
-
-    //signal handle
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
-    //	void BtnSelectAllClicked(GtkButton *button);
-    //	void BtnDeselectClicked(GtkButton *button);
-    void BtnOKClicked(GtkButton *button);
-    void BtnCalcImportOKClicked(GtkButton *button);
-    void BtnCancelClicked(GtkButton *button);
-    void ToggleData(GtkCellRendererToggle *cell, gchar *path_str);
-    void RootSelectionChanged(GtkTreeSelection *selection);
-    void RootCalcSelectionChanged(GtkTreeSelection *selection);
-
-    //signal connect
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ConfigToHost* data) {
-        return data->WindowDeleteEvent(widget, event);
-    }
-    static void on_data_toggled(GtkCellRendererToggle *cell, gchar *path_str, ConfigToHost* data) {
-        data->ToggleData(cell, path_str);
-    }
-
-    static void on_root_calc_selection_changed(GtkTreeSelection *selction, ConfigToHost* data) {
-        data->RootCalcSelectionChanged(selction);
-    }
-
-    static void on_root_selection_changed(GtkTreeSelection *selction, ConfigToHost* data) {
-        data->RootSelectionChanged(selction);
-    }
-    static void on_button_ok_clicked(GtkButton *button, ConfigToHost* data) {
-        data->BtnOKClicked(button);
-    }
-    static void on_button_calc_ok_clicked(GtkButton *button, ConfigToHost* data) {
-        data->BtnCalcImportOKClicked(button);
-    }
-    static void on_button_cancel_clicked(GtkButton *button, ConfigToHost* data) {
-        data->BtnCancelClicked(button);
-    }
-    //	static void on_button_select_all_clicked(GtkButton *button, ConfigToHost* data) { data->BtnSelectAllClicked(button); }
-    //	static void on_button_deselect_clicked(GtkButton *button, ConfigToHost* data) { data->BtnSelectAllClicked(button); }
 };
 
 #endif
