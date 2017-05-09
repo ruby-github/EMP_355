@@ -23,7 +23,7 @@ extern GdkColor* g_blue;
 extern GdkColor* g_lightBlue;
 extern GdkColor* g_skyBlue;
 
-extern const char* examType[];
+//extern const char* examType[];
 extern const char* Toggle[2];
 
 #endif

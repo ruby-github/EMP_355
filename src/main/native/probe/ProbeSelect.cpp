@@ -44,6 +44,8 @@ ExamItem::EItem ProbeSelect::m_itemIndex = ExamItem::ABDO_ADULT;
 #endif
 int ProbeSelect::m_socketIndex = 0;
 
+extern const char* examType[];
+
 extern bool g_init;
 bool ProbeSelect::Execute() {
     PRINTF("probe select\n");

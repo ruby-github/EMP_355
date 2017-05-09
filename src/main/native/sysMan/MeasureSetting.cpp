@@ -36,9 +36,7 @@
 #include "display/TopArea.h"
 #include "sysMan/CalcSetting.h"
 using std::vector;
-#ifdef EMP_322
-extern const char *examType_calc[];
-#endif
+
 //MeasureSetting g_menuCalcExamType;
 MeasureSetting* MeasureSetting::m_ptrInstance = NULL;
 
@@ -415,16 +413,8 @@ void MeasureSetting::ChangeExamBox(char *check_part) {
 }
 
 void MeasureSetting::ChangeExamBoxDelete(void) {
-    vector<string> vecExamItem_calc;
-    vecExamItem_calc.clear();
-    //系统默认的检查部位
-    for (int i=0; i<= EXAM_NUM; i++) {
-#ifdef EMP_322
-        vecExamItem_calc.push_back(examType_calc[i]);
-#else
-        vecExamItem_calc.push_back(examType[i]);
-#endif
-    }
+    vector<string> vecExamItem_calc = CalcSetting::GetInstance()->GetExamItemsCalc();
+
     //用户自定义的检查部位
     CreateDefineItem_calc(vecExamItem_calc);
     int exam_size(0);
@@ -474,16 +464,9 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget *parent) {
     gtk_widget_show (m_combobox_exam_calc);
     gtk_fixed_put (GTK_FIXED (fixed_calc), m_combobox_exam_calc, 140, 10);
     gtk_widget_set_size_request (m_combobox_exam_calc, 180, 30);
-    vector<string> vecExamItem_calc;
-    vecExamItem_calc.clear();
-    //系统默认的检查部位
-    for (int i=0; i<= EXAM_NUM; i++) {
-#ifdef EMP_322
-        vecExamItem_calc.push_back(examType_calc[i]);
-#else
-        vecExamItem_calc.push_back(examType[i]);
-#endif
-    }
+
+    vector<string> vecExamItem_calc = CalcSetting::GetInstance()->GetExamItemsCalc();
+
     //用户自定义的检查部位
     CreateDefineItem_calc(vecExamItem_calc);
     int exam_size(0);

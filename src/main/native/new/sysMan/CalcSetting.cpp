@@ -19,6 +19,25 @@ struct CustomTypeAndMethod {
     int etype;
 };
 
+#ifdef VET
+  static const int EXAM_NUM = 9;
+  static const int SECTION_NUM = 22;
+#else
+  #ifdef EMP_322
+    static const int EXAM_NUM = 18;
+    static const int SECTION_NUM = 12;
+    static const int ETYPE_NUM = 28;
+    static const int MAX_METHOD = 15;
+  #else
+    static const int EXAM_NUM = 22;
+    static const int SECTION_NUM = 18;
+    static const int ETYPE_NUM = 35;
+    static const int MAX_METHOD = 17;
+  #endif
+#endif
+
+
+
 
 #include <dirent.h>
 #include "sysMan/CalcSetting.h"
@@ -131,21 +150,93 @@ const string section[SECTION_NUM]= {
 };
 #endif
 #endif
+
+#ifdef VET
+const char* examType[] = {
+    N_("User1"),
+    N_("User2"),
+    N_("User3"),
+    N_("User4"),
+    N_("User5"),
+    N_("User6"),
+    N_("User7"),
+    N_("User8"),
+    N_("User9"),
+    N_("User10"),
+    NULL
+};
+#else
+const char* examType[] = {
+    N_("Adult Abdomen"),
+    N_("Adult Liver"),
+    N_("Kid Abdomen"),
+    N_("Adult Cardio"),
+    N_("Kid Cardio"),
+    N_("Mammary Glands"),
+    N_("Thyroid"),
+    N_("Eye Ball"),
+    //N_("Small Part"),
+    N_("Testicle"),
+    N_("Gynecology"),
+    N_("Early Pregnancy"),
+    N_("Middle-late Pregnancy"),
+    N_("Fetal Cardio"),
+    N_("Kidney Ureter"),
+    N_("Bladder Prostate"),
+    N_("Carotid"),
+    N_("Jugular"),
+    N_("Periphery Artery"),
+    N_("Periphery Vein"),
+    N_("Hip Joint"),
+    N_("Meniscus"),
+    N_("Joint Cavity"),
+    N_("Spine"),
+    N_("User defined 1"),
+    N_("User defined 2"),
+    N_("User defined 3"),
+    N_("User defined 4"),
+    NULL
+};
+
+#endif
+
+vector<string> CalcSetting::GetExamItemsCalc() {
+  // 系统默认的检查部位
+
+  vector<string> vec;
+
+  #ifdef EMP_322
+    size_t size = sizeof(examType_calc) / sizeof(examType_calc[0]);
+
+    for (size_t i = 0; i < size; i++) {
+      vec.push_back(examType_calc[i]);
+    }
+  #else
+    size_t size = sizeof(examType) / sizeof(examType[0]);
+
+    for (size_t i = 0; i < size; i++) {
+      vec.push_back(examType[i]);
+    }
+  #endif
+
+  return vec;
+}
+
 CalcSetting g_menuCalcExamType;
-CalcSetting* CalcSetting::m_ptrInstance = NULL;
+CalcSetting* CalcSetting::m_instance = NULL;
 
 CalcSetting::CalcSetting() {
 }
 
 CalcSetting::~CalcSetting() {
-    m_ptrInstance = NULL;
+    m_instance = NULL;
 }
 
 CalcSetting* CalcSetting::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new CalcSetting;
+    if (m_instance == NULL)
+        m_instance = new CalcSetting;
 
-    return m_ptrInstance;
+    return m_instance;
 }
 
 GtkWidget* CalcSetting::GetWindow(void) {

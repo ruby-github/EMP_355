@@ -17,6 +17,8 @@
 #include "display/ImageArea.h"
 #include "imageControl/KnobEFOV.h"
 
+extern const char* examType[];
+
 const char * Toggle[2] = {
     N_("OFF"),
     N_("ON")

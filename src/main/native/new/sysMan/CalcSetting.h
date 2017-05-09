@@ -8,23 +8,6 @@
 #include <vector>
 #include "probe/ExamItem.h"
 
-#ifdef VET
-  static const int EXAM_NUM = 9;
-  static const int SECTION_NUM = 22;
-#else
-  #ifdef EMP_322
-    static const int EXAM_NUM = 18;
-    static const int SECTION_NUM = 12;
-    static const int ETYPE_NUM = 28;
-    static const int MAX_METHOD = 15;
-  #else
-    static const int EXAM_NUM = 22;
-    static const int SECTION_NUM = 18;
-    static const int ETYPE_NUM = 35;
-    static const int MAX_METHOD = 17;
-  #endif
-#endif
-
 class CustomCalc: public FakeXEvent {
 public:
   static CustomCalc* GetInstance();
@@ -150,6 +133,8 @@ public:
 
   GtkWidget* CreateCalcWindow(GtkWidget *parent);
 
+  vector<string> GetExamItemsCalc();
+
 private:
   // signal
 
@@ -234,7 +219,7 @@ private:
     void DepartmentCalcChanged(GtkComboBox *widget);
 
 private:
-  static CalcSetting* m_ptrInstance;
+  static CalcSetting* m_instance;
 
 private:
 

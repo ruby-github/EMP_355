@@ -29,6 +29,8 @@
 #include "patient/PatientInfo.h"
 #include "sysMan/ViewSystem.h"
 
+extern const char* examType[];
+
 FreezeMode* FreezeMode::m_ptrInstance = NULL;
 
 FreezeMode* FreezeMode::GetInstance() {

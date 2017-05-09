@@ -69,6 +69,7 @@ using std::vector;
 using std::string;
 
 extern bool g_authorizationOn;
+extern const char* examType[];
 
 int _system_(const char *cmd) {
     char str_cmd[20];
