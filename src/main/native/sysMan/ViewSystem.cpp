@@ -69,7 +69,7 @@ using std::vector;
 using std::string;
 
 extern bool g_authorizationOn;
-extern const char* examType[];
+#include "utils/Const.h"
 
 int _system_(const char *cmd) {
     char str_cmd[20];
@@ -12658,7 +12658,7 @@ void ViewSystem::UpdateHospitalandpart(int date_format, const char *hospital_nam
 #ifdef VET
         TopArea::GetInstance()->UpdateCheckPart(_(ExamItemArray[index].name.c_str()));
 #else
-        TopArea::GetInstance()->UpdateCheckPart(_(examType[index]));
+        TopArea::GetInstance()->UpdateCheckPart(_(EXAM_TYPES[index].c_str()));
 #endif
     }
 }

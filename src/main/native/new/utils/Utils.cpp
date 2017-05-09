@@ -285,6 +285,11 @@ void Utils::adjust_font_size(GtkWidget* widget, const string family, const strin
   }
 }
 
+void Utils::combobox_clear(GtkComboBox* combobox) {
+  GtkListStore* store = GTK_LIST_STORE(gtk_combo_box_get_model(combobox));
+  gtk_list_store_clear(store);
+}
+
 GdkColor* Utils::get_color(const string color_name) {
   if (m_color == NULL) {
     m_color = new GdkColor();

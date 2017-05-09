@@ -34,6 +34,8 @@ public:
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,
     const int size, const int max_width, const int max_height);
 
+  static void combobox_clear(GtkComboBox* combobox);
+
   static GdkColor* get_color(const string color_name);
 
 private:

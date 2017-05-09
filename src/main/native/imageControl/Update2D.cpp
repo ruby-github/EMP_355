@@ -17,7 +17,7 @@
 #include "display/ImageArea.h"
 #include "imageControl/KnobEFOV.h"
 
-extern const char* examType[];
+#include "utils/Const.h"
 
 const char * Toggle[2] = {
     N_("OFF"),
@@ -85,8 +85,8 @@ void Update2D::UserDefineExamItem(const char *useritem) {
 }
 
 void Update2D::ExamItem(int index) {
-    TopArea::GetInstance()->UpdateCheckPart(_(examType[index]));
-    const string examtype = _(examType[index]);
+    TopArea::GetInstance()->UpdateCheckPart(_(EXAM_TYPES[index].c_str()));
+    const string examtype = _(EXAM_TYPES[index].c_str());
     g_patientInfo.SetExamType(examtype);
 }
 

@@ -27,7 +27,7 @@ using std::vector;
 
 extern MenuPW g_menuPW;
 
-extern const char* examType[];
+#include "utils/Const.h"
 
 ViewProbe* ViewProbe::m_ptrInstance = NULL;
 
@@ -265,7 +265,7 @@ int ViewProbe::CreateAllExamType(const char *model, vector<ExamItem::EItem> item
     unsigned int i(0), j(0);
     if(item.size()>0) {
         for (i = 0; i < item.size(); i ++) {
-            strcpy((char*)exam_type[i], _(examType[item[i]]));
+            strcpy((char*)exam_type[i], _(EXAM_TYPES[item[i]].c_str()));
         }
     }
 
@@ -316,7 +316,7 @@ void ViewProbe::GetUserItemNameOfProbe(const char* model) {
 int ViewProbe::CreateExamType(vector<ExamItem::EItem> item, char exam_type[][50]) {
     unsigned int i = 0;
     for (i = 0; i < item.size(); i ++) {
-        strcpy((char*)exam_type[i], _(examType[item[i]]));
+        strcpy((char*)exam_type[i], _(EXAM_TYPES[item[i]].c_str()));
     }
 
     strcpy((char*)exam_type[i], " ");
@@ -714,7 +714,7 @@ void ViewProbe::TreeSelectionChanged(GtkTreeSelection *selection) {
             m_itemIndex = m_itemList[m_probeIndex][i];
             m_pKps.ProbeInit(m_probeIndex, (ExamItem::EItem)m_itemIndex);
             exam.WriteUserItemFlag(&ini, false);
-            exam.WriteDefaultProbeItemName(&ini, examType[m_itemIndex]);
+            exam.WriteDefaultProbeItemName(&ini, EXAM_TYPES[m_itemIndex].c_str());
         }
         gtk_tree_path_free (path);
         //m_pKps.ProbeInit(m_probeIndex, (ExamItem::EItem)m_itemIndex);
@@ -862,7 +862,7 @@ void ViewProbe::TreeViewBtnClicked(GtkWidget *widget, GdkEventButton *event) {
                     PRINTF("itemIndex:%d\n", m_itemIndex);
                     m_pKps.ProbeInit(m_probeIndex, (ExamItem::EItem)m_itemIndex);
                     exam.WriteUserItemFlag(&ini, false);
-                    exam.WriteDefaultProbeItemName(&ini, examType[m_itemIndex]);
+                    exam.WriteDefaultProbeItemName(&ini, EXAM_TYPES[m_itemIndex].c_str());
                 }
                 gtk_tree_path_free (path);
                 int counts = 0;

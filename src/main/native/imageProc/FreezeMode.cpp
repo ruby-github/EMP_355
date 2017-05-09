@@ -29,7 +29,7 @@
 #include "patient/PatientInfo.h"
 #include "sysMan/ViewSystem.h"
 
-extern const char* examType[];
+#include "utils/Const.h"
 
 FreezeMode* FreezeMode::m_ptrInstance = NULL;
 
@@ -258,7 +258,7 @@ void FreezeMode::UpdateHospitalandpart(int date_format, const char *hospital_nam
         ViewSystem::GetInstance()->UpdateExamName(probeIndex);
 #else
         ExamItem::EItem index = ProbeSelect::GetItemIndex();
-        TopArea::GetInstance()->UpdateCheckPart(_(examType[index]));
+        TopArea::GetInstance()->UpdateCheckPart(_(EXAM_TYPES[index].c_str()));
 #endif
     }
 }

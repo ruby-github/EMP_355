@@ -44,7 +44,7 @@ ExamItem::EItem ProbeSelect::m_itemIndex = ExamItem::ABDO_ADULT;
 #endif
 int ProbeSelect::m_socketIndex = 0;
 
-extern const char* examType[];
+#include "utils/Const.h"
 
 extern bool g_init;
 bool ProbeSelect::Execute() {
@@ -119,8 +119,8 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
         int probeIndex = indexSocket;
         if(probeIndex < ProbeMan::MAX_SOCKET) {
             for(int m = 0; m < (int)m_itemList[probeIndex].size(); m++) {
-                PRINTF("str_firesrt_item=%s,  examlist=%s\n",geninitfirstitem.c_str(),examType[m_itemList[probeIndex][m]]);
-                if(strcmp(geninitfirstitem.c_str(), examType[m_itemList[probeIndex][m]]) == 0)
+                PRINTF("str_firesrt_item=%s,  examlist=%s\n",geninitfirstitem.c_str(),EXAM_TYPES[m_itemList[probeIndex][m]].c_str());
+                if(strcmp(geninitfirstitem.c_str(), EXAM_TYPES[m_itemList[probeIndex][m]].c_str()) == 0)
                     m_itemIndex =(ExamItem::EItem)m_itemList[probeIndex][m];
             }
         } else {
@@ -135,8 +135,8 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
         int probeIndex = ViewProbe::GetInstance()->GetProbeIndex();
         if(probeIndex < ProbeMan::MAX_SOCKET) {
             for(int m = 0; m < (int)m_itemList[probeIndex].size(); m++) {
-                PRINTF("str_firesrt_item=%s,  examlist=%s\n",genfirstitem.c_str(),examType[m_itemList[probeIndex][m]]);
-                if(strcmp(genfirstitem.c_str(), examType[m_itemList[probeIndex][m]]) == 0) {
+                PRINTF("str_firesrt_item=%s,  examlist=%s\n",genfirstitem.c_str(),EXAM_TYPES[m_itemList[probeIndex][m]].c_str());
+                if(strcmp(genfirstitem.c_str(), EXAM_TYPES[m_itemList[probeIndex][m]].c_str()) == 0) {
                     m_itemIndex =(ExamItem::EItem)m_itemList[probeIndex][m];
                 }
             }
