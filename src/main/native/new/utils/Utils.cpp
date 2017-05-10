@@ -306,9 +306,11 @@ GdkColor* Utils::get_color(const string color_name) {
 #include "utils/MessageDialog.h"
 
 void Utils::test(GtkWidget* widget) {
-  GtkWidget* w = CalcSetting::GetInstance()->CreateCalcWindow(NULL);
+  CustomCalc::GetInstance()->CreateCalcSettingWin(widget);
 
-  GtkDialog* dialog = create_dialog(NULL, "", 800, 600);
-  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
-  gtk_widget_show_all(GTK_WIDGET(dialog));
+//  GtkWidget* w = CalcSetting::GetInstance()->CreateCalcWindow(NULL);
+//
+//  GtkDialog* dialog = create_dialog(NULL, "", 800, 600);
+//  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
+//  gtk_widget_show_all(GTK_WIDGET(dialog));
 }

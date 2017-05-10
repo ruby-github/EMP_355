@@ -6,6 +6,7 @@
 #include "utils/Utils.h"
 
 #include "patient/ViewArchive.h"
+#include "sysMan/ConfigToHost.h"
 
 class CalcSetting {
 public:
@@ -15,8 +16,8 @@ public:
   CalcSetting();
   ~CalcSetting();
 
-  GtkWidget* CreateCalcWindow(GtkWidget* parent);
   GtkWidget* GetWindow();
+  GtkWidget* CreateCalcWindow(GtkWidget* parent);
 
   vector<string> GetExamItemsCalc();
 
@@ -210,6 +211,11 @@ public:
   void ExportRightInfoNotice(string result);
   void ExportErrorInfoNotice(string result);
 
+  void ImportSuccess();
+  void ImportWrite(string item_name, int& item_num);
+
+  void ButtonImportNameOK();
+
 private:
   // signal
 
@@ -261,8 +267,24 @@ private:
     return FALSE;
   }
 
+  static gboolean signal_exit_customecalc(gpointer data) {
+    CustomCalc* calc = (CustomCalc*)data;
+
+    if (calc != NULL) {
+      calc->DestroyWin();
+    }
+
+    return FALSE;
+  }
+
   static void signal_progress_callback(goffset current, goffset total, gpointer data) {
     g_cancellable_is_cancelled(m_cancellable);
+  }
+
+  static gboolean Destroy(gpointer data) {
+    ConfigToHost::GetInstance()->DestroyWindow();
+
+    return FALSE;
   }
 
   // signal
@@ -277,6 +299,15 @@ private:
 
 private:
   void KeyEvent(unsigned char keyValue);
+
+  void ClickedOKAndCancel();
+  void HideClickedOKAndCancel();
+
+  void DestroyWin();
+  void DelayDestroyWin();
+
+  void ImportRenameCopy(string item_name);
+  bool RenameCompare(string name_copy);
 
 private:
   static CustomCalc* m_instance;
@@ -293,41 +324,7 @@ private:
   GtkImage* m_image;
   GtkLabel* m_label_notice;
 
-////////////////////////////////////////////////////////////
-
-public:
-    void DestroyWin(void);
-
-    void DelayDestroyWin(void);
-
-    void HideOKAndCancelClicked();
-    void OKAndCancelClicked();
-    bool RenameCompare(char * name_copy);
-    void ImportSuccess(void);
-    bool ImportCopy(int j);
-    void ImportRenameCopy(string item_name);
-    void ButtonImportNameOK();
-    void ImportWrite(string item_name, int &item_num);
-private:
-  GtkWidget* GetWindow(void);
-
-    /*GtkWidget *label_type;
-    GtkWidget *label_method;
-    GtkWidget *fixed1;
-    GtkWidget *m_frame_new_notice;
-    GtkWidget *fixed_new_notice;
-    GtkWidget *m_label_notice1;
-    GtkWidget *m_label_notice2;
-    GtkWidget *m_label_notice3;
-    GtkWidget *button_right;
-    GtkWidget *img_right;
-    GtkWidget *button_error;
-    GtkWidget *img_error;
-    GtkWidget *button_load;
-    GtkWidget *img_load;
-    GtkWidget *button_ok;
-    GtkWidget *button_cancel;
-    */
+  string m_export_name;
 };
 
 #endif

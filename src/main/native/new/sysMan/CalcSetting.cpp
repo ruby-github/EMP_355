@@ -16,7 +16,6 @@
 #include "patient/FileMan.h"
 #include "periDevice/PeripheralMan.h"
 #include "calcPeople/MenuCalcNew.h"
-#include "sysMan/ConfigToHost.h"
 #include "sysMan/UserSelect.h"
 
 #ifdef EMP_322
@@ -224,6 +223,10 @@ CalcSetting::~CalcSetting() {
   m_instance = NULL;
 }
 
+GtkWidget* CalcSetting::GetWindow() {
+  return m_win_parent;
+}
+
 GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   m_win_parent = parent;
 
@@ -428,10 +431,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   return fixed_calc;
 }
 
-GtkWidget* CalcSetting::GetWindow() {
-  return m_win_parent;
-}
-
 vector<string> CalcSetting::GetExamItemsCalc() {
   // 系统默认的检查部位
 
@@ -463,7 +462,8 @@ vector<string> CalcSetting::GetExamItemsCalc() {
 CustomCalc* CustomCalc::m_instance = NULL;
 GCancellable* CustomCalc::m_cancellable = NULL;
 
-char export_name[256];
+extern vector<int> vecAdd;
+extern int item_num_exist;
 
 // ---------------------------------------------------------
 
@@ -476,6 +476,15 @@ CustomCalc* CustomCalc::GetInstance() {
 }
 
 CustomCalc::CustomCalc() {
+  m_dialog = NULL;
+  m_entry_name = NULL;
+  m_combobox_type = NULL;
+  m_combobox_method = NULL;
+
+  m_entry_export_name = NULL;
+  m_progress_bar = NULL;
+  m_image = NULL;
+  m_label_notice = NULL;
 }
 
 CustomCalc::~CustomCalc() {
@@ -663,205 +672,384 @@ void CustomCalc::ExportErrorInfoNotice(string result) {
   }
 }
 
+void CustomCalc::ImportSuccess() {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char userselectname[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(userselectname, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  char exam_name[256];
+  char exam_type[256];
+  strcpy(exam_name, CalcSetting::GetInstance()->GetExamName().c_str());
+  exam.TransItemName(exam_name, exam_type);
+  IniFile ini_add3(userselectname);
+  IniFile *ptrIni_add3 = &ini_add3;
+  ptrIni_add3->RemoveGroup(exam_type);
+  ptrIni_add3->SyncConfigFile();
+
+  int item_length(0);
+  item_length = vecAdd.size();
+
+  for(int i=1; i<=item_length; i++) {
+    char CalcNumber1[256];
+    sprintf(CalcNumber1, "Calc%d", i);
+    ptrIni_add3->WriteInt(exam_type, CalcNumber1, vecAdd[(i-1)]);
+  }
+
+  ptrIni_add3->WriteInt(exam_type, "Number", item_length);
+  ptrIni_add3->SyncConfigFile();
+
+  char userselectname2[256];
+  sprintf(userselectname2, "%s", CALC_TMP_DATA_PATH);
+  FileMan f;
+
+  f.DelDirectory(userselectname2);
+
+  usleep(100000);
+
+  ConfigToHost::GetInstance()->ExportRightInfoNotice(_("Success to import from USB storage."));
+
+  ConfigToHost::GetInstance()->OKAndCancelClicked();
+
+  g_timeout_add(1000, Destroy, NULL);
+
+  usleep(400000);
+  CalcSetting::GetInstance()->ChangeModel2();
+
+  PeripheralMan *ptr = PeripheralMan::GetInstance();
+  ptr->UmountUsbStorage();
+  g_menuCalc.ClearAllFlag();
+  g_menuCalc.ChangeAllCalcItems();
+}
+
+void CustomCalc::ImportWrite(string item_name, int& item_num) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+  char path2[256];
+  char path3[256];
+  char userselectname[256];
+  char userselectname1[256];
+
+  #ifdef VET
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
+  #else
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
+  #endif
+
+  FileMan f;
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(userselectname, "%s%s", CFG_RES_PATH, CALC_FILE);
+    sprintf(userselectname1, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+    sprintf(userselectname1, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini_add2(userselectname1);
+  IniFile *ptrIni_add2 = &ini_add2;
+  int ItemAllNum;
+  ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
+  int ItemDeleteNum=ptrIni_add2->ReadInt("Delete", "Number");
+
+  IniFile ini_add1(path3);
+  IniFile *ptrIni_add1 = &ini_add1;
+  char CustomEtype[256];
+  sprintf(CustomEtype, "CustomEtype-%d",item_num);
+  int method_index = ptrIni_add1->ReadInt(CustomEtype, "Method");
+  int type_index = ptrIni_add1->ReadInt(CustomEtype, "MeasureType");
+  string department_tmp = ptrIni_add1->ReadString(CustomEtype, "Department");
+  char department_in[256];
+  strcpy(department_in, department_tmp.c_str());
+
+  if(ItemDeleteNum) {
+    char CalcNumber1[256];
+    sprintf(CalcNumber1, "Calc%d", ItemDeleteNum);
+    int item_num1=ptrIni_add2->ReadInt("Delete", CalcNumber1);
+    ptrIni_add2->RemoveString("Delete", CalcNumber1);
+    ptrIni_add2->WriteInt("Delete", "Number", ItemDeleteNum-1);
+    ptrIni_add2->SyncConfigFile();
+
+    char CustomEtype2[256];
+    sprintf(CustomEtype2, "CustomEtype-%d",item_num1);
+    ptrIni_add2->WriteInt(CustomEtype2, "Etype", item_num1);
+    ptrIni_add2->WriteString(CustomEtype2, "Name", item_name.c_str());
+    ptrIni_add2->WriteInt(CustomEtype2, "Method", method_index);
+    ptrIni_add2->WriteInt(CustomEtype2, "MeasureType", type_index);
+    ptrIni_add2->WriteString(CustomEtype2, "Department", department_in);
+    ptrIni_add2->SyncConfigFile();
+    ItemAllNum = item_num1;
+    item_num =item_num1;
+  } else {
+    char CustomEtype1[256];
+    sprintf(CustomEtype1, "CustomEtype-%d",++ItemAllNum);
+    ptrIni_add2->WriteInt(CustomEtype1, "Etype", ItemAllNum);
+    ptrIni_add2->WriteString(CustomEtype1, "Name", item_name.c_str());
+    ptrIni_add2->WriteInt(CustomEtype1, "Method", method_index);
+    ptrIni_add2->WriteInt(CustomEtype1, "MeasureType", type_index);
+    ptrIni_add2->WriteInt("MaxNumber", "Number", ItemAllNum);
+    ptrIni_add2->WriteString(CustomEtype1, "Department", department_in);
+    ptrIni_add2->SyncConfigFile();
+    item_num = ItemAllNum;
+  }
+
+  int number;
+  char SelectNum[256];
+  number = ptrIni_add2->ReadInt(department_in, "Number");
+  sprintf(SelectNum, "Calc%d",number+1);
+  ptrIni_add2->WriteInt(department_in, SelectNum, ItemAllNum);
+  ptrIni_add2->WriteInt(department_in, "Number", number+1);
+  ptrIni_add2->SyncConfigFile();
+
+  vecAdd.push_back(item_num);
+}
+
+void CustomCalc::ButtonImportNameOK() {
+  string item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num_exist);
+
+  char name_copy[256];
+  for(int i=1; i<100; i++) {
+    sprintf(name_copy, "%s(%d)", item_name.c_str(), i);
+
+    if(RenameCompare(name_copy)) {
+      break;
+    }
+
+    if(i==99) {
+      sprintf(name_copy, "%s(1)", item_name.c_str());
+    }
+  }
+
+  item_name = name_copy;
+
+  ImportRenameCopy(item_name);
+}
+
 // ---------------------------------------------------------
 
 void CustomCalc::ButtonClickedOK(GtkButton* button) {
-    string name = strip(gtk_entry_get_text(m_entry_name));
+  string name = strip(gtk_entry_get_text(m_entry_name));
+  const char *tmp_name = name.c_str();
 
-    const char *tmp_name = name.c_str();
+  if (tmp_name == NULL || strlen(tmp_name) == 0) {
+    gtk_entry_set_text(m_entry_name, "");
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("Please Input Name!"), NULL);
+    return;
+  }
 
-    if (tmp_name == NULL || strlen(tmp_name) == 0) {
-        gtk_entry_set_text(m_entry_name, "");
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("Please Input Name!"), NULL);
+  int index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method));
+  if (index == -1) {
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
+                                      _("Please select measure method!"), NULL);
+    return;
+  }
+
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni = &ini;
+
+  vector<string> useritemgroup;
+  useritemgroup = ptrIni->GetGroupName();
+
+  char src_group[256];
+  int group_length(0);
+  group_length = useritemgroup.size();
+
+  for (int i= 0 ; i <  group_length; i++) {
+    sprintf(src_group ,"%s", useritemgroup[i].c_str());
+    int number1;
+    number1 = ptrIni->ReadInt(src_group, "Number");
+
+    for(int i=1; i<=number1; i++) {
+      char CalcNumber[256];
+      sprintf(CalcNumber, "Calc%d", i);
+      int item_num = ptrIni->ReadInt(src_group, CalcNumber);
+
+      string item_name;
+      if(item_num < (USER_START - BASIC_MEA_END)) {
+        item_name= CalcSetting::GetInstance()->ItemMenuTransEnglish(item_num);
+      } else {
+        item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num);
+      }
+
+      PRINTF("item_name= %s\n", item_name.c_str());
+      PRINTF("item_tmp_name =%s\n", tmp_name);
+
+      if((strcmp(tmp_name, item_name.c_str()) == 0) ||(strcmp(tmp_name, _(item_name.c_str())) == 0)) {
+        gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("The name has existed, please rename!"), NULL);
         return;
+      }
     }
+  }
 
-    int index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method));
-    if (index == -1) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
-                                          _("Please select measure method!"), NULL);
-        return;
+  int ItemDeleteNum=ptrIni->ReadInt("Delete", "Number");
+
+  int ItemAllNum;
+  ItemAllNum=ptrIni->ReadInt("MaxNumber", "Number");
+  if((ItemDeleteNum==0)&&(ItemAllNum >= (USER_START -BASIC_MEA_END + MAX_USER_CALC_NUM))) {
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
+                                      _("The defined items have reached the maximum!"), NULL);
+    return;
+  }
+
+  int type_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_type));
+  if (type_index == -1) {
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
+                                      _("Please select measure type!"), NULL);
+    return;
+  }
+
+  int type_method_index = 0;
+  gchar *method_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_method));
+  printf("method_name = %s\n", method_name);
+
+  size_t size = sizeof(CUSTOM_TYPES) / sizeof(CUSTOM_TYPES[0]);
+
+  for(int i=0; i<size; i++) {
+    if(strcmp(_(method_name), CUSTOM_TYPES[i].name.c_str()) == 0) {
+      type_method_index = CUSTOM_TYPES[i].etype;
+      break;
     }
+  }
 
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  const gchar *department_name = CalcSetting::GetInstance()->GetDepartmentName().c_str();
+  char department[50];
+
+  size = sizeof(SECTIONS) / sizeof(SECTIONS[0]);
+
+  for(int i=0; i<size; i++) {
+    if(strcmp(department_name, _(SECTIONS[i].c_str()))==0) {
+      strcpy(department, SECTIONS[i].c_str());
+      break;
     }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
+  }
 
-    vector<string> useritemgroup;
-    useritemgroup = ptrIni->GetGroupName();
-    char src_group[256];
-    int group_length(0);
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        int number1;
-        number1 = ptrIni->ReadInt(src_group, "Number");
-
-        for(int i=1; i<=number1; i++) {
-            char CalcNumber[256];
-            sprintf(CalcNumber, "Calc%d", i);
-            int item_num = ptrIni->ReadInt(src_group, CalcNumber);
-            string item_name;
-            if(item_num < (USER_START - BASIC_MEA_END))
-                item_name= CalcSetting::GetInstance()->ItemMenuTransEnglish(item_num);
-            else {
-                item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num);
-            }
-            PRINTF("item_name= %s\n", item_name.c_str());
-            PRINTF("item_tmp_name =%s\n", tmp_name);
-            if((strcmp(tmp_name, item_name.c_str()) == 0) ||(strcmp(tmp_name, _(item_name.c_str())) == 0)) {
-                gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("The name has existed, please rename!"), NULL);
-                return;
-            }
-        }
-
-    }
-
-    int ItemDeleteNum=ptrIni->ReadInt("Delete", "Number");
-
-    int ItemAllNum;
-    ItemAllNum=ptrIni->ReadInt("MaxNumber", "Number");
-    if((ItemDeleteNum==0)&&(ItemAllNum >= (USER_START -BASIC_MEA_END + MAX_USER_CALC_NUM))) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
-                                          _("The defined items have reached the maximum!"), NULL);
-        return;
-    }
-
-    int type_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_type));
-    if (type_index == -1) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
-                                          _("Please select measure type!"), NULL);
-        return;
-    }
-
-    int type_method_index = 0;
-    gchar *method_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_method));
-    printf("method_name = %s\n", method_name);
-
-    size_t size = sizeof(CUSTOM_TYPES) / sizeof(CUSTOM_TYPES[0]);
-
-    for(int i=0; i<size; i++) {
-        if(strcmp(_(method_name), CUSTOM_TYPES[i].name.c_str()) == 0) {
-            type_method_index = CUSTOM_TYPES[i].etype;
-            break;
-        }
-    }
-
-    const gchar *department_name = CalcSetting::GetInstance()->GetDepartmentName().c_str();
-    char department[50];
-
-    size = sizeof(SECTIONS) / sizeof(SECTIONS[0]);
-
-    for(int i=0; i<size; i++) {
-        if(strcmp(department_name, _(SECTIONS[i].c_str()))==0) {
-            strcpy(department, SECTIONS[i].c_str());
-            break;
-        }
-    }
-
-    bool NewNumber = false;
-    if(ItemDeleteNum) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", ItemDeleteNum);
-        int item_num=ptrIni->ReadInt("Delete", CalcNumber);
-        ptrIni->RemoveString("Delete", CalcNumber);
-        ptrIni->WriteInt("Delete", "Number", ItemDeleteNum-1);
-        ptrIni->SyncConfigFile();
-
-        char CustomEtype[256];
-        sprintf(CustomEtype, "CustomEtype-%d",item_num);
-        ptrIni->WriteInt(CustomEtype, "Etype", item_num);
-        ptrIni->WriteString(CustomEtype, "Name", tmp_name);
-        ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
-        ptrIni->WriteInt(CustomEtype, "MeasureType", index);
-        ptrIni->WriteString(CustomEtype, "Department", department);
-        ptrIni->SyncConfigFile();
-        ItemAllNum = item_num;
-    } else {
-        NewNumber = true;
-        char CustomEtype[256];
-        sprintf(CustomEtype, "CustomEtype-%d",++ItemAllNum);
-        ptrIni->WriteInt(CustomEtype, "Etype", ItemAllNum);
-        ptrIni->WriteString(CustomEtype, "Name", tmp_name);
-        ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
-        ptrIni->WriteInt(CustomEtype, "MeasureType", index);
-        ptrIni->WriteInt("MaxNumber", "Number", ItemAllNum);
-        ptrIni->WriteString(CustomEtype, "Department", department);
-        ptrIni->SyncConfigFile();
-    }
-
-    int number;
-    char SelectNum[256];
-    number = ptrIni->ReadInt(department, "Number");
-    sprintf(SelectNum, "Calc%d",number+1);
-    ptrIni->WriteInt(department, SelectNum, ItemAllNum);
-    ptrIni->WriteInt(department, "Number", number+1);
+  bool NewNumber = false;
+  if(ItemDeleteNum) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", ItemDeleteNum);
+    int item_num=ptrIni->ReadInt("Delete", CalcNumber);
+    ptrIni->RemoveString("Delete", CalcNumber);
+    ptrIni->WriteInt("Delete", "Number", ItemDeleteNum-1);
     ptrIni->SyncConfigFile();
 
-    DestroyWin();
-    CalcSetting::GetInstance()->ChangeModelAndLight(tmp_name);
-    CalcSetting::GetInstance()->ClearAllCalc();
+    char CustomEtype[256];
+    sprintf(CustomEtype, "CustomEtype-%d",item_num);
+    ptrIni->WriteInt(CustomEtype, "Etype", item_num);
+    ptrIni->WriteString(CustomEtype, "Name", tmp_name);
+    ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
+    ptrIni->WriteInt(CustomEtype, "MeasureType", index);
+    ptrIni->WriteString(CustomEtype, "Department", department);
+    ptrIni->SyncConfigFile();
+    ItemAllNum = item_num;
+  } else {
+    NewNumber = true;
+    char CustomEtype[256];
+    sprintf(CustomEtype, "CustomEtype-%d",++ItemAllNum);
+    ptrIni->WriteInt(CustomEtype, "Etype", ItemAllNum);
+    ptrIni->WriteString(CustomEtype, "Name", tmp_name);
+    ptrIni->WriteInt(CustomEtype, "Method", type_method_index);
+    ptrIni->WriteInt(CustomEtype, "MeasureType", index);
+    ptrIni->WriteInt("MaxNumber", "Number", ItemAllNum);
+    ptrIni->WriteString(CustomEtype, "Department", department);
+    ptrIni->SyncConfigFile();
+  }
+
+  int number;
+  char SelectNum[256];
+  number = ptrIni->ReadInt(department, "Number");
+  sprintf(SelectNum, "Calc%d",number+1);
+  ptrIni->WriteInt(department, SelectNum, ItemAllNum);
+  ptrIni->WriteInt(department, "Number", number+1);
+  ptrIni->SyncConfigFile();
+
+  DestroyWin();
+  CalcSetting::GetInstance()->ChangeModelAndLight(tmp_name);
+  CalcSetting::GetInstance()->ClearAllCalc();
 }
 
 void CustomCalc::ButtonClickedExport(GtkButton* button) {
-    const char* tmp1_name = gtk_entry_get_text(GTK_ENTRY(m_entry_export_name));
+  m_export_name = gtk_entry_get_text(m_entry_export_name);
 
-    if (tmp1_name == NULL || strlen(tmp1_name) == 0) {
-        CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("Please Input Name!"));
-        return;
+  if (m_export_name.empty()) {
+    CustomCalc::GetInstance()->ExportErrorInfoNotice(_("Please Input Name!"));
 
+    return;
+  }
+
+  PeripheralMan *ptr = PeripheralMan::GetInstance();
+  vector<string> vec = CalcSetting::GetInstance()->GetSelectedVec();
+
+  if(!ptr->CheckUsbStorageState()) {
+    CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("No USB storage found!"));
+    return ;
+  } else {
+    if(!ptr->MountUsbStorage()) {
+      CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("Failed to mount USB storage!"));
+      return ;
     }
-    strcpy(export_name, tmp1_name);
-    PeripheralMan *ptr = PeripheralMan::GetInstance();
-    vector<string> vec = CalcSetting::GetInstance()->GetSelectedVec();
+  }
 
-    if(!ptr->CheckUsbStorageState()) {
-        CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("No USB storage found!"));
-        return ;
-    } else {
-        if(!ptr->MountUsbStorage()) {
-            CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("Failed to mount USB storage!"));
-            return ;
-        }
-    }
-    UserSelect::GetInstance()->create_udisk_data_dir();//addec by LL
+  UserSelect::GetInstance()->create_udisk_data_dir();//addec by LL
 
-    int tmp=0;
-    struct dirent *ent;
-    char udisk_path[256];
-    sprintf(udisk_path, "%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH);
-    DIR *dir = opendir(udisk_path);
-    while( (ent = readdir(dir)) != NULL) {
-        PRINTF("ent->name=%s\n", ent->d_name);
-        if(ent->d_name[0]=='.')
-            continue;
-        if(strcmp(ent->d_name, tmp1_name)==0) {
-            CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("The name has existed, please rename!"));
-            tmp=1;
-            break;
-        }
-    }
-    closedir(dir);
-    if(tmp)
-        return;
+  int tmp=0;
+  struct dirent *ent;
+  char udisk_path[256];
+  sprintf(udisk_path, "%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH);
+  DIR *dir = opendir(udisk_path);
 
-    if(CalcSetting::GetInstance()->GetSelectPath()) {
-        HideOKAndCancelClicked();
-        CustomCalc::GetInstance()-> ExportLoadInfoNotice(_("Loading......"));
-        g_timeout_add(1000, signal_load_data, this);
+  while( (ent = readdir(dir)) != NULL) {
+    PRINTF("ent->name=%s\n", ent->d_name);
+
+    if(ent->d_name[0]=='.') {
+      continue;
     }
+
+    if(strcmp(ent->d_name, m_export_name.c_str())==0) {
+      CustomCalc::GetInstance()-> ExportErrorInfoNotice(_("The name has existed, please rename!"));
+      tmp=1;
+      break;
+    }
+  }
+
+  closedir(dir);
+  if(tmp) {
+    return;
+  }
+
+  if(CalcSetting::GetInstance()->GetSelectPath()) {
+    HideClickedOKAndCancel();
+    CustomCalc::GetInstance()-> ExportLoadInfoNotice(_("Loading......"));
+    g_timeout_add(1000, signal_load_data, this);
+  }
 }
 
 void CustomCalc::ButtonClickedCancel(GtkButton* button) {
@@ -896,213 +1084,442 @@ void CustomCalc::ComboboxChangedType(GtkComboBox* combobox) {
 }
 
 void CustomCalc::LoadData() {
-    int cond = 0;
-    int total=1;
-    int count =0;
-    char str_info[256], result[256];
-    FileMan fm;
-    PeripheralMan *ptr = PeripheralMan::GetInstance();
-    vector<string> vec = CalcSetting::GetInstance()->GetSelectedVec();
+  int cond = 0;
+  int total=1;
+  int count =0;
+  char str_info[256], result[256];
+  FileMan fm;
+  PeripheralMan *ptr = PeripheralMan::GetInstance();
+  vector<string> vec = CalcSetting::GetInstance()->GetSelectedVec();
 
-    m_cancellable = g_cancellable_new();
+  m_cancellable = g_cancellable_new();
 
-    vector<string>::iterator ite = vec.begin();
-    total = vec.size();
-    while(ite < vec.end() && !cond) {
+  vector<string>::iterator ite = vec.begin();
+  total = vec.size();
 
-        GFile *fAbs = g_file_new_for_path((*ite).c_str());
-        GFile *fParent = g_file_get_parent(fAbs);
-        g_object_unref(fAbs);
-        gchar *strDestParent = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, g_file_get_basename(fParent), NULL);
-        g_object_unref(fParent);
-        GFile *fDest = g_file_new_for_path(strDestParent);
+  while(ite < vec.end() && !cond) {
+    GFile *fAbs = g_file_new_for_path((*ite).c_str());
+    GFile *fParent = g_file_get_parent(fAbs);
+    g_object_unref(fAbs);
+    gchar *strDestParent = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, g_file_get_basename(fParent), NULL);
+    g_object_unref(fParent);
+    GFile *fDest = g_file_new_for_path(strDestParent);
 
-        //create the parent directory
-        GError *err_mkdir = NULL;
-        if(!g_file_make_directory_with_parents(fDest, NULL, &err_mkdir)) {
-            if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
-                PRINTF("g_file_make_directory error: %s\n", err_mkdir->message);
-                sprintf(result, _("Failed to send data to USB storage!\nError: Failed to create directory."));
-                cond = -1;
-                g_error_free(err_mkdir);
-                g_object_unref(fDest);
-                g_free(strDestParent);
-                break;
-            }
-        }
+    //create the parent directory
+    GError *err_mkdir = NULL;
+    if(!g_file_make_directory_with_parents(fDest, NULL, &err_mkdir)) {
+      if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
+        PRINTF("g_file_make_directory error: %s\n", err_mkdir->message);
+        sprintf(result, _("Failed to send data to USB storage!\nError: Failed to create directory."));
+        cond = -1;
+        g_error_free(err_mkdir);
         g_object_unref(fDest);
-
-        gchar *basename = g_path_get_basename((*ite).c_str());
-        if(fm.CompareSuffix(basename, "ini") != 0) {
-            CustomCalc::GetInstance()->SetProgressBar(0);
-            count++;
-        }
-
-        //Perform copy operation
-
-        gchar *destPath = g_build_path(G_DIR_SEPARATOR_S, strDestParent, basename, NULL);
         g_free(strDestParent);
-        g_free(basename);
-        PRINTF("Dest Path: %s\n", destPath);
-        GFile *src = g_file_new_for_path((*ite).c_str());
-        GFile *dest = g_file_new_for_path(destPath);
-        g_free(destPath);
+        break;
+      }
+    }
+    g_object_unref(fDest);
 
-        GError *err = NULL;
-        int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, m_cancellable, signal_progress_callback, NULL, &err);
-        g_object_unref(src);
-        g_object_unref(dest);
-        if(!ret) {
-            PRINTF("g_file_copy error: %s\n", err->message);
-            switch(err->code) {
-            case G_IO_ERROR_NO_SPACE:
-                sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
-                break;
-            case G_IO_ERROR_CANCELLED:
-                sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
-                break;
-            default:
-                sprintf(result, _("Failed to send data to USB storage!"));
-                break;
-            }
-            cond = -1;
-            g_error_free(err);
-            break;
-        }
-        ite++;
+    gchar *basename = g_path_get_basename((*ite).c_str());
+    if(fm.CompareSuffix(basename, "ini") != 0) {
+      CustomCalc::GetInstance()->SetProgressBar(0);
+      count++;
     }
 
-    //Handle result
-    if(!cond) {
+    //Perform copy operation
 
-        UserSelect::GetInstance()->create_exportUSB_dir(export_name);
+    gchar *destPath = g_build_path(G_DIR_SEPARATOR_S, strDestParent, basename, NULL);
+    g_free(strDestParent);
+    g_free(basename);
+    PRINTF("Dest Path: %s\n", destPath);
+    GFile *src = g_file_new_for_path((*ite).c_str());
+    GFile *dest = g_file_new_for_path(destPath);
+    g_free(destPath);
 
-        char path4[256];
-        char path5[256];
-#ifdef VET
-        sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", export_name,"/", "VetCalcSetting.ini");
-        sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", export_name,"/", "VetCalcItemSetting.ini");
-#else
-        sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", export_name,"/", "CalcSetting.ini");
-        sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", export_name,"/", "CalcItemSetting.ini");
-#endif
-        char path1[256];
-        sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-        IniFile ini1(path1);
-        ExamItem exam;
-        string username;
-        username = exam.ReadDefaultUserSelect(&ini1);
+    GError *err = NULL;
+    int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, m_cancellable, signal_progress_callback, NULL, &err);
+    g_object_unref(src);
+    g_object_unref(dest);
 
-        char userselectname[256];
-        char userselectname1[256];
-        char userselectname2[256];
-        char userselectname3[256];
-        if(strcmp(username.c_str(), "System Default") == 0) {
-#ifdef VET
-            sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "VetDSCalcSetting.ini");
-            sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","VetDSCalcItemSetting.ini");
+    if(!ret) {
+      PRINTF("g_file_copy error: %s\n", err->message);
+      switch(err->code) {
+      case G_IO_ERROR_NO_SPACE:
+        sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
+        break;
+      case G_IO_ERROR_CANCELLED:
+        sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
+        break;
+      default:
+        sprintf(result, _("Failed to send data to USB storage!"));
+        break;
+      }
+      cond = -1;
+      g_error_free(err);
+      break;
+    }
 
-#else
-            sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "DSCalcSetting.ini");
-            sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","DSCalcItemSetting.ini");
-#endif
-        } else {
-            sprintf(userselectname, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/",username.c_str(),".ini");
-            sprintf(userselectname1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/",username.c_str(),".ini");
-        }
+    ite++;
+  }
 
-        char exam_type[256];
-        char exam_name[256];
-        strcpy(exam_name, CalcSetting::GetInstance()->GetExamName().c_str());
-        exam.TransItemName(exam_name, exam_type);
-        PRINTF("exam_type=%s\n", exam_type);
-        IniFile ini_tmp(userselectname);
-        IniFile *ptrIni_tmp = &ini_tmp;
+  //Handle result
+  if(!cond) {
+    UserSelect::GetInstance()->create_exportUSB_dir(m_export_name.c_str());
 
-        char src_group[256];
-        vector<string> itemgroup;
-        itemgroup = ptrIni_tmp->GetGroupName();
-        int group_size(0);
-        group_size =itemgroup.size();
-        for(int i=0; i<group_size; i++) {
-            sprintf(src_group ,"%s", itemgroup[i].c_str());
-            PRINTF("src_group=%s\n", src_group);
+    char path4[256];
+    char path5[256];
 
-            if(strcmp(src_group,exam_type) != 0) {
-                PRINTF("src_group_delete=%s\n", src_group);
-                ptrIni_tmp->RemoveGroup(src_group);
-                ptrIni_tmp->SyncConfigFile();
-            }
-        }
+    #ifdef VET
+      sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "VetCalcSetting.ini");
+      sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "VetCalcItemSetting.ini");
+    #else
+      sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "CalcSetting.ini");
+      sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "CalcItemSetting.ini");
+    #endif
 
-        FileMan f;
-        f.CopyFile(userselectname, path4);
-        f.CopyFile(userselectname1, path5);
+    char path1[256];
+    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+    IniFile ini1(path1);
+    ExamItem exam;
+    string username;
+    username = exam.ReadDefaultUserSelect(&ini1);
 
-        sprintf(userselectname2, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting");
-        sprintf(userselectname3, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting");
-        f.DelDirectory(userselectname2);
-        f.DelDirectory(userselectname3);
+    char userselectname[256];
+    char userselectname1[256];
+    char userselectname2[256];
+    char userselectname3[256];
 
-        ptr->UmountUsbStorage();
-        gdk_threads_enter();
-        CustomCalc::GetInstance()->SetProgressBar(0.2);
-        while(gtk_events_pending())
-            gtk_main_iteration();
-        gdk_threads_leave();
-        usleep(100000);
-        gdk_threads_enter();
-        CustomCalc::GetInstance()->SetProgressBar(0.4);
-        while(gtk_events_pending())
-            gtk_main_iteration();
-        gdk_threads_leave();
-        usleep(100000);
-        gdk_threads_enter();
-        CustomCalc::GetInstance()->SetProgressBar(0.6);
-        while(gtk_events_pending())
-            gtk_main_iteration();
-        gdk_threads_leave();
-
-        usleep(100000);
-        gdk_threads_enter();
-        CustomCalc::GetInstance()->SetProgressBar(0.8);
-        while(gtk_events_pending())
-            gtk_main_iteration();
-        gdk_threads_leave();
-
-        usleep(100000);
-        CustomCalc::GetInstance()-> ExportRightInfoNotice(_("Success to export to USB storage."));
-
-        gdk_threads_enter();
-        CustomCalc::GetInstance()->SetProgressBar(1.0);
-        while(gtk_events_pending())
-            gtk_main_iteration();
-        gdk_threads_leave();
-
-        usleep(1000000);
-        CustomCalc::GetInstance()->OKAndCancelClicked();
-        CustomCalc::GetInstance()-> DelayDestroyWin();
+    if(strcmp(username.c_str(), "System Default") == 0) {
+      #ifdef VET
+        sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "VetDSCalcSetting.ini");
+        sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","VetDSCalcItemSetting.ini");
+      #else
+        sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "DSCalcSetting.ini");
+        sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","DSCalcItemSetting.ini");
+      #endif
     } else {
-        CustomCalc::GetInstance()->OKAndCancelClicked();
-        CustomCalc::GetInstance()-> ExportErrorInfoNotice(result);
+      sprintf(userselectname, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/",username.c_str(),".ini");
+      sprintf(userselectname1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/",username.c_str(),".ini");
     }
+
+    char exam_type[256];
+    char exam_name[256];
+    strcpy(exam_name, CalcSetting::GetInstance()->GetExamName().c_str());
+    exam.TransItemName(exam_name, exam_type);
+    PRINTF("exam_type=%s\n", exam_type);
+    IniFile ini_tmp(userselectname);
+    IniFile *ptrIni_tmp = &ini_tmp;
+
+    char src_group[256];
+    vector<string> itemgroup;
+    itemgroup = ptrIni_tmp->GetGroupName();
+    int group_size(0);
+    group_size =itemgroup.size();
+
+    for(int i=0; i<group_size; i++) {
+      sprintf(src_group ,"%s", itemgroup[i].c_str());
+      PRINTF("src_group=%s\n", src_group);
+
+      if(strcmp(src_group,exam_type) != 0) {
+        PRINTF("src_group_delete=%s\n", src_group);
+        ptrIni_tmp->RemoveGroup(src_group);
+        ptrIni_tmp->SyncConfigFile();
+      }
+    }
+
+    FileMan f;
+    f.CopyFile(userselectname, path4);
+    f.CopyFile(userselectname1, path5);
+
+    sprintf(userselectname2, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting");
+    sprintf(userselectname3, "%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting");
+    f.DelDirectory(userselectname2);
+    f.DelDirectory(userselectname3);
+
+    ptr->UmountUsbStorage();
+    gdk_threads_enter();
+    CustomCalc::GetInstance()->SetProgressBar(0.2);
+
+    while(gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+
+    gdk_threads_leave();
+    usleep(100000);
+    gdk_threads_enter();
+    CustomCalc::GetInstance()->SetProgressBar(0.4);
+
+    while(gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+
+    gdk_threads_leave();
+    usleep(100000);
+    gdk_threads_enter();
+    CustomCalc::GetInstance()->SetProgressBar(0.6);
+
+    while(gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+
+    gdk_threads_leave();
+
+    usleep(100000);
+    gdk_threads_enter();
+    CustomCalc::GetInstance()->SetProgressBar(0.8);
+
+    while(gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+
+    gdk_threads_leave();
+
+    usleep(100000);
+    CustomCalc::GetInstance()-> ExportRightInfoNotice(_("Success to export to USB storage."));
+
+    gdk_threads_enter();
+    CustomCalc::GetInstance()->SetProgressBar(1.0);
+
+    while(gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+
+    gdk_threads_leave();
+
+    usleep(1000000);
+    CustomCalc::GetInstance()->ClickedOKAndCancel();
+    CustomCalc::GetInstance()-> DelayDestroyWin();
+  } else {
+    CustomCalc::GetInstance()->ClickedOKAndCancel();
+    CustomCalc::GetInstance()-> ExportErrorInfoNotice(result);
+  }
 }
 
-void CustomCalc::HideOKAndCancelClicked() {
-  //gtk_widget_set_sensitive(button_ok, FALSE);
-  //gtk_widget_set_sensitive(button_cancel, FALSE);
+void CustomCalc::KeyEvent(unsigned char keyValue) {
+  // FakeXEvent::KeyEvent(keyValue);
+
+  #if defined(EMP_322)
+    if (keyValue == KEY_CTRL_SHIFT_SPACE) {
+      KeySwitchIM ksim;
+      ksim.ExcuteChange(FALSE);
+
+      return;
+    }
+  #elif defined(EMP_313)
+    if (keyValue == KEY_ONE) {
+      KeySwitchIM ksim;
+      ksim.ExcuteChange(FALSE);
+
+      return;
+    }
+  #else
+    if (keyValue == KEY_SHIFT_CTRL) {
+      KeySwitchIM ksim;
+      ksim.ExcuteChange(FALSE);
+
+      return;
+    }
+  #endif
+
+  if (FakeMouseButton(keyValue)) {
+    return;
+  }
+
+  // 数字键
+  if (FakeNumKey(keyValue)) {
+    return;
+  }
+
+  // 字母键
+  if (FakeAlphabet(keyValue)) {
+    return;
+  }
+
+  // 符号键
+  if (FakePunctuation(keyValue)) {
+    return;
+  }
+
+  if (keyValue == KEY_ESC) {
+    g_timeout_add(100, signal_exit_customecalc, this);
+
+    FakeEscKey();
+  }
 }
 
-void CustomCalc::OKAndCancelClicked() {
-  //gtk_widget_set_sensitive(button_ok, TRUE);
-  //gtk_widget_set_sensitive(button_cancel, TRUE);
+void CustomCalc::ClickedOKAndCancel() {
+  if (m_dialog != NULL) {
+    gtk_widget_set_sensitive(gtk_dialog_get_widget_for_response(m_dialog, GTK_RESPONSE_OK), TRUE);
+    gtk_widget_set_sensitive(gtk_dialog_get_widget_for_response(m_dialog, GTK_RESPONSE_CANCEL), TRUE);
+  }
 }
 
+void CustomCalc::HideClickedOKAndCancel() {
+  if (m_dialog != NULL) {
+    gtk_widget_set_sensitive(gtk_dialog_get_widget_for_response(m_dialog, GTK_RESPONSE_OK), FALSE);
+    gtk_widget_set_sensitive(gtk_dialog_get_widget_for_response(m_dialog, GTK_RESPONSE_CANCEL), FALSE);
+  }
+}
 
+void CustomCalc::DestroyWin() {
+  if (GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
 
-extern int num;
-extern vector<int> vecAdd;
-extern int item_num_exist;
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+    }
+  }
+}
+
+void CustomCalc::DelayDestroyWin() {
+  if (GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
+
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+    }
+  }
+}
+
+void CustomCalc::ImportRenameCopy(string item_name) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+  char path2[256];
+  char path3[256];
+  char userselectname[256];
+  char userselectname1[256];
+
+  #ifdef VET
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
+  #else
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
+  #endif
+
+  FileMan f;
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(userselectname, "%s%s", CFG_RES_PATH, CALC_FILE);
+    sprintf(userselectname1, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+    sprintf(userselectname1, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini_add2(userselectname1);
+  IniFile *ptrIni_add2 = &ini_add2;
+  int ItemAllNum;
+  ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
+  int ItemDeleteNum=ptrIni_add2->ReadInt("Delete", "Number");
+
+  IniFile ini_add1(path3);
+  IniFile *ptrIni_add1 = &ini_add1;
+  char CustomEtype[256];
+  sprintf(CustomEtype, "CustomEtype-%d",item_num_exist);
+  int method_index = ptrIni_add1->ReadInt(CustomEtype, "Method");
+  int type_index = ptrIni_add1->ReadInt(CustomEtype, "MeasureType");
+  string department_tmp = ptrIni_add1->ReadString(CustomEtype, "Department");
+  char department_in[256];
+  strcpy(department_in, department_tmp.c_str());
+
+  if(ItemDeleteNum) {
+    char CalcNumber1[256];
+    sprintf(CalcNumber1, "Calc%d", ItemDeleteNum);
+    int item_num1=ptrIni_add2->ReadInt("Delete", CalcNumber1);
+    ptrIni_add2->RemoveString("Delete", CalcNumber1);
+    ptrIni_add2->WriteInt("Delete", "Number", ItemDeleteNum-1);
+    ptrIni_add2->SyncConfigFile();
+
+    char CustomEtype2[256];
+    sprintf(CustomEtype2, "CustomEtype-%d",item_num1);
+    ptrIni_add2->WriteInt(CustomEtype2, "Etype", item_num1);
+    ptrIni_add2->WriteString(CustomEtype2, "Name", item_name.c_str());
+    ptrIni_add2->WriteInt(CustomEtype2, "Method", method_index);
+    ptrIni_add2->WriteInt(CustomEtype2, "MeasureType", type_index);
+    ptrIni_add2->WriteString(CustomEtype2, "Department", department_in);
+    ptrIni_add2->SyncConfigFile();
+    ItemAllNum = item_num1;
+    item_num_exist =item_num1;
+  } else {
+    char CustomEtype1[256];
+    sprintf(CustomEtype1, "CustomEtype-%d",++ItemAllNum);
+    ptrIni_add2->WriteInt(CustomEtype1, "Etype", ItemAllNum);
+    ptrIni_add2->WriteString(CustomEtype1, "Name", item_name.c_str());
+    ptrIni_add2->WriteInt(CustomEtype1, "Method", method_index);
+    ptrIni_add2->WriteInt(CustomEtype1, "MeasureType", type_index);
+    ptrIni_add2->WriteInt("MaxNumber", "Number", ItemAllNum);
+    ptrIni_add2->WriteString(CustomEtype1, "Department", department_in);
+    ptrIni_add2->SyncConfigFile();
+    item_num_exist = ItemAllNum;
+  }
+
+  int number;
+  char SelectNum[256];
+  number = ptrIni_add2->ReadInt(department_in, "Number");
+  sprintf(SelectNum, "Calc%d",number+1);
+  ptrIni_add2->WriteInt(department_in, SelectNum, ItemAllNum);
+  ptrIni_add2->WriteInt(department_in, "Number", number+1);
+  ptrIni_add2->SyncConfigFile();
+
+  vecAdd.push_back(item_num_exist);
+}
+
+bool CustomCalc::RenameCompare(string name_copy) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char userselectname1[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(userselectname1, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(userselectname1, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini_add4(userselectname1);
+  IniFile *ptrIni_add4 = &ini_add4;
+  vector<string> useritemgroup;
+  useritemgroup = ptrIni_add4->GetGroupName();
+
+  char src_group[256];
+  int group_length(0);
+  group_length = useritemgroup.size();
+  for (int i= 0 ; i <  group_length; i++) {
+    sprintf(src_group ,"%s", useritemgroup[i].c_str());
+    int number1;
+    number1 = ptrIni_add4->ReadInt(src_group, "Number");
+
+    for(int i=1; i<=number1; i++) {
+      char CalcNumber[256];
+      sprintf(CalcNumber, "Calc%d", i);
+      int item_num2 = ptrIni_add4->ReadInt(src_group, CalcNumber);
+      string item_name1;
+
+      if(item_num2 < (USER_START - BASIC_MEA_END)) {
+        item_name1= CalcSetting::GetInstance()->ItemMenuTransEnglish(item_num2);
+      } else {
+        item_name1 = CalcSetting::GetInstance()->CustomItemTransName(item_num2);
+      }
+
+      if(strcmp(item_name1.c_str(),name_copy.c_str()) == 0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/////////////////////////////////////
 
 
 #include <dirent.h>
@@ -1119,7 +1536,7 @@ extern int item_num_exist;
 
 
 #include "measure/MeasureMan.h"
-using std::vector;
+
 
 
 
@@ -1835,14 +2252,20 @@ void CalcSetting::ChangeModelAndLight(const char *name) {
     gtk_tree_path_free (path_scroll);
 }
 
-
-
 const string CalcSetting::GetExamName() {
+  if (m_combobox_exam_calc != NULL) {
     return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_calc));
+  } else {
+    return "";
+  }
 }
 
-const string CalcSetting::GetDepartmentName(void) {
+const string CalcSetting::GetDepartmentName() {
+  if (m_combobox_department_calc != NULL) {
     return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department_calc));
+  } else {
+    return "";
+  }
 }
 
 int CalcSetting::GetSequence(const char *exam_type) {
@@ -2767,384 +3190,4 @@ void CalcSetting::GetDepartmentForCustomMeasure(int Etype, string &department) {
     char CustomEtype[256];
     sprintf(CustomEtype, "CustomEtype-%d",Etype-BASIC_MEA_END);
     department=ptrIni->ReadString(CustomEtype, "Department");
-}
-
-static char type_null[][20]= {
-    {""}
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-bool CustomCalc::RenameCompare(char * name_copy) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char userselectname1[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(userselectname1, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(userselectname1, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-
-    IniFile ini_add4(userselectname1);
-    IniFile *ptrIni_add4 = &ini_add4;
-    vector<string> useritemgroup;
-    useritemgroup = ptrIni_add4->GetGroupName();
-    char src_group[256];
-    int group_length(0);
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        int number1;
-        number1 = ptrIni_add4->ReadInt(src_group, "Number");
-
-        for(int i=1; i<=number1; i++) {
-            char CalcNumber[256];
-            sprintf(CalcNumber, "Calc%d", i);
-            int item_num2 = ptrIni_add4->ReadInt(src_group, CalcNumber);
-            string item_name1;
-            if(item_num2 < (USER_START - BASIC_MEA_END))
-                item_name1= CalcSetting::GetInstance()->ItemMenuTransEnglish(item_num2);
-            else {
-                item_name1 = CalcSetting::GetInstance()->CustomItemTransName(item_num2);
-            }
-            if(strcmp(item_name1.c_str(),name_copy) == 0) {
-                return false;
-
-            }
-        }
-    }
-    return true;
-}
-
-void CustomCalc::ImportWrite(string item_name, int &item_num) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path2[256];
-    char path3[256];
-    char userselectname[256];
-    char userselectname1[256];
-#ifdef VET
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
-#else
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
-#endif
-    FileMan f;
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(userselectname, "%s%s", CFG_RES_PATH, CALC_FILE);
-        sprintf(userselectname1, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-        sprintf(userselectname1, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-
-    IniFile ini_add2(userselectname1);
-    IniFile *ptrIni_add2 = &ini_add2;
-    int ItemAllNum;
-    ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
-    int ItemDeleteNum=ptrIni_add2->ReadInt("Delete", "Number");
-
-    IniFile ini_add1(path3);
-    IniFile *ptrIni_add1 = &ini_add1;
-    char CustomEtype[256];
-    sprintf(CustomEtype, "CustomEtype-%d",item_num);
-    int method_index = ptrIni_add1->ReadInt(CustomEtype, "Method");
-    int type_index = ptrIni_add1->ReadInt(CustomEtype, "MeasureType");
-    string department_tmp = ptrIni_add1->ReadString(CustomEtype, "Department");
-    char department_in[256];
-    strcpy(department_in, department_tmp.c_str());
-    if(ItemDeleteNum) {
-        char CalcNumber1[256];
-        sprintf(CalcNumber1, "Calc%d", ItemDeleteNum);
-        int item_num1=ptrIni_add2->ReadInt("Delete", CalcNumber1);
-        ptrIni_add2->RemoveString("Delete", CalcNumber1);
-        ptrIni_add2->WriteInt("Delete", "Number", ItemDeleteNum-1);
-        ptrIni_add2->SyncConfigFile();
-
-        char CustomEtype2[256];
-        sprintf(CustomEtype2, "CustomEtype-%d",item_num1);
-        ptrIni_add2->WriteInt(CustomEtype2, "Etype", item_num1);
-        ptrIni_add2->WriteString(CustomEtype2, "Name", item_name.c_str());
-        ptrIni_add2->WriteInt(CustomEtype2, "Method", method_index);
-        ptrIni_add2->WriteInt(CustomEtype2, "MeasureType", type_index);
-        ptrIni_add2->WriteString(CustomEtype2, "Department", department_in);
-        ptrIni_add2->SyncConfigFile();
-        ItemAllNum = item_num1;
-        item_num =item_num1;
-    } else {
-        char CustomEtype1[256];
-        sprintf(CustomEtype1, "CustomEtype-%d",++ItemAllNum);
-        ptrIni_add2->WriteInt(CustomEtype1, "Etype", ItemAllNum);
-        ptrIni_add2->WriteString(CustomEtype1, "Name", item_name.c_str());
-        ptrIni_add2->WriteInt(CustomEtype1, "Method", method_index);
-        ptrIni_add2->WriteInt(CustomEtype1, "MeasureType", type_index);
-        ptrIni_add2->WriteInt("MaxNumber", "Number", ItemAllNum);
-        ptrIni_add2->WriteString(CustomEtype1, "Department", department_in);
-        ptrIni_add2->SyncConfigFile();
-        item_num = ItemAllNum;
-    }
-    int number;
-    char SelectNum[256];
-    number = ptrIni_add2->ReadInt(department_in, "Number");
-    sprintf(SelectNum, "Calc%d",number+1);
-    ptrIni_add2->WriteInt(department_in, SelectNum, ItemAllNum);
-    ptrIni_add2->WriteInt(department_in, "Number", number+1);
-    ptrIni_add2->SyncConfigFile();
-
-    vecAdd.push_back(item_num);
-}
-
-void CustomCalc::ImportRenameCopy(string item_name) {
-
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path2[256];
-    char path3[256];
-    char userselectname[256];
-    char userselectname1[256];
-#ifdef VET
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
-
-#else
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
-#endif
-    FileMan f;
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(userselectname, "%s%s", CFG_RES_PATH, CALC_FILE);
-        sprintf(userselectname1, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-        sprintf(userselectname1, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-
-    IniFile ini_add2(userselectname1);
-    IniFile *ptrIni_add2 = &ini_add2;
-    int ItemAllNum;
-    ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
-    int ItemDeleteNum=ptrIni_add2->ReadInt("Delete", "Number");
-
-    IniFile ini_add1(path3);
-    IniFile *ptrIni_add1 = &ini_add1;
-    char CustomEtype[256];
-    sprintf(CustomEtype, "CustomEtype-%d",item_num_exist);
-    int method_index = ptrIni_add1->ReadInt(CustomEtype, "Method");
-    int type_index = ptrIni_add1->ReadInt(CustomEtype, "MeasureType");
-    string department_tmp = ptrIni_add1->ReadString(CustomEtype, "Department");
-    char department_in[256];
-    strcpy(department_in, department_tmp.c_str());
-    if(ItemDeleteNum) {
-        char CalcNumber1[256];
-        sprintf(CalcNumber1, "Calc%d", ItemDeleteNum);
-        int item_num1=ptrIni_add2->ReadInt("Delete", CalcNumber1);
-        ptrIni_add2->RemoveString("Delete", CalcNumber1);
-        ptrIni_add2->WriteInt("Delete", "Number", ItemDeleteNum-1);
-        ptrIni_add2->SyncConfigFile();
-
-        char CustomEtype2[256];
-        sprintf(CustomEtype2, "CustomEtype-%d",item_num1);
-        ptrIni_add2->WriteInt(CustomEtype2, "Etype", item_num1);
-        ptrIni_add2->WriteString(CustomEtype2, "Name", item_name.c_str());
-        ptrIni_add2->WriteInt(CustomEtype2, "Method", method_index);
-        ptrIni_add2->WriteInt(CustomEtype2, "MeasureType", type_index);
-        ptrIni_add2->WriteString(CustomEtype2, "Department", department_in);
-        ptrIni_add2->SyncConfigFile();
-        ItemAllNum = item_num1;
-        item_num_exist =item_num1;
-    } else {
-        char CustomEtype1[256];
-        sprintf(CustomEtype1, "CustomEtype-%d",++ItemAllNum);
-        ptrIni_add2->WriteInt(CustomEtype1, "Etype", ItemAllNum);
-        ptrIni_add2->WriteString(CustomEtype1, "Name", item_name.c_str());
-        ptrIni_add2->WriteInt(CustomEtype1, "Method", method_index);
-        ptrIni_add2->WriteInt(CustomEtype1, "MeasureType", type_index);
-        ptrIni_add2->WriteInt("MaxNumber", "Number", ItemAllNum);
-        ptrIni_add2->WriteString(CustomEtype1, "Department", department_in);
-        ptrIni_add2->SyncConfigFile();
-        item_num_exist = ItemAllNum;
-    }
-    int number;
-    char SelectNum[256];
-    number = ptrIni_add2->ReadInt(department_in, "Number");
-    sprintf(SelectNum, "Calc%d",number+1);
-    ptrIni_add2->WriteInt(department_in, SelectNum, ItemAllNum);
-    ptrIni_add2->WriteInt(department_in, "Number", number+1);
-    ptrIni_add2->SyncConfigFile();
-
-    vecAdd.push_back(item_num_exist);
-
-}
-
-static gboolean Destroy(gpointer data) {
-    ConfigToHost::GetInstance()->DestroyWindow();
-    return FALSE;
-}
-
-void CustomCalc::ImportSuccess(void) {
-
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char userselectname[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(userselectname, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-
-    char exam_name[256];
-    char exam_type[256];
-    strcpy(exam_name, CalcSetting::GetInstance()->GetExamName().c_str());
-    exam.TransItemName(exam_name, exam_type);
-    IniFile ini_add3(userselectname);
-    IniFile *ptrIni_add3 = &ini_add3;
-    ptrIni_add3->RemoveGroup(exam_type);
-    ptrIni_add3->SyncConfigFile();
-    int item_length(0);
-    item_length = vecAdd.size();
-    for(int i=1; i<=item_length; i++) {
-        char CalcNumber1[256];
-        sprintf(CalcNumber1, "Calc%d", i);
-        ptrIni_add3->WriteInt(exam_type, CalcNumber1, vecAdd[(i-1)]);
-    }
-    ptrIni_add3->WriteInt(exam_type, "Number", item_length);
-    ptrIni_add3->SyncConfigFile();
-
-    char userselectname2[256];
-    sprintf(userselectname2, "%s", CALC_TMP_DATA_PATH);
-    FileMan f;
-
-    f.DelDirectory(userselectname2);
-
-    usleep(100000);
-
-    ConfigToHost::GetInstance()->ExportRightInfoNotice(_("Success to import from USB storage."));
-
-    ConfigToHost::GetInstance()->OKAndCancelClicked();
-
-    g_timeout_add(1000, Destroy, NULL);
-
-    usleep(400000);
-    CalcSetting::GetInstance()->ChangeModel2();
-
-    PeripheralMan *ptr = PeripheralMan::GetInstance();
-    ptr->UmountUsbStorage();
-    g_menuCalc.ClearAllFlag();
-    g_menuCalc.ChangeAllCalcItems();
-
-}
-
-void CustomCalc::ButtonImportNameOK() {
-    string item_name = CalcSetting::GetInstance()->CustomItemTransName(item_num_exist);
-
-    char name_copy[256];
-    for(int i=1; i<100; i++) {
-        sprintf(name_copy, "%s(%d)", item_name.c_str(), i);
-        if(RenameCompare(name_copy)) {
-            break;
-        }
-        if(i==99) {
-            sprintf(name_copy, "%s(1)", item_name.c_str());
-        }
-    }
-    item_name = name_copy;
-
-    ImportRenameCopy(item_name);
-}
-
-
-
-void CustomCalc::DestroyWin(void) {
-    if (GTK_IS_WIDGET(m_dialog)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(GTK_WIDGET(m_dialog));
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-    }
-}
-
-void CustomCalc::DelayDestroyWin(void) {
-    if (GTK_IS_WIDGET(m_dialog)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(GTK_WIDGET(m_dialog));
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-    }
-}
-
-
-
-static gboolean ExitCustomeCalc(gpointer data) {
-    CustomCalc *tmp = (CustomCalc *)data;
-    tmp->DestroyWin();
-    return FALSE;
-}
-
-void CustomCalc::KeyEvent(unsigned char keyValue) {
-    //FakeXEvent::KeyEvent(keyValue);
-#if defined(EMP_322)
-    if(keyValue==KEY_CTRL_SHIFT_SPACE) {
-        KeySwitchIM ksim;
-        ksim.ExcuteChange(FALSE);
-        return;
-    }
-#elif defined(EMP_313)
-    {
-        if (keyValue == KEY_ONE) {
-            KeySwitchIM ksim;
-            ksim.ExcuteChange(FALSE);
-            return;
-        }
-    }
-#else
-    if(keyValue==KEY_SHIFT_CTRL) {
-        KeySwitchIM ksim;
-        ksim.ExcuteChange(FALSE);
-        return;
-    }
-#endif
-    if(FakeMouseButton(keyValue))
-        return;
-    if(FakeNumKey(keyValue))//数字键
-        return;
-    if(FakeAlphabet(keyValue))//字母键
-        return;
-    if(FakePunctuation(keyValue)) //符号键
-        return;
-
-    switch(keyValue) {
-    case KEY_ESC:
-        g_timeout_add(100, ExitCustomeCalc, this);
-        FakeEscKey();
-        break;
-    }
 }
