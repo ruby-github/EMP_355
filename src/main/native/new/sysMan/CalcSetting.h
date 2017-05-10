@@ -23,6 +23,29 @@ public:
 
   void ClearAll();
 
+  void ChangeModel2();
+
+  string GetExamName();
+  string GetDepartmentName();
+  bool GetSelectPath();
+
+  string CustomItemTransName(int item_num);
+  string ItemMenuTransEnglish(int item_num);
+
+  void ChangeExamBox(string check_part);
+  void ChangeExamBoxDelete();
+  void ChangeModelAndLight(const string name);
+
+  int GetCalcMaxEtype();
+  int GetMeasureSequence(const string exam_type);
+  void GetCustomCalcMeasure(int Etype, int& measure_type, string& calc_name);
+  void GetCalcListEtype(string exam_type, vector<int>& vecItemCalc);
+  void GetDepartmentForCustomMeasure(int Etype, string& department);
+
+  vector<string> GetSelectedVec() {
+    return m_vecPath;
+  }
+
 private:
   // signal
 
@@ -161,6 +184,19 @@ private:
   GtkTreeModel* CreateItemCalcModel1();
   GtkTreeModel* CreateItemCalcModel2();
 
+  void ChangeModel();
+
+  GtkTreeIter InsertUniqueCalc(GtkTreeModel* model, const string str);
+
+  int GetSequence(const string exam_type);
+  int ItemNameTransEtype(string select_name);
+
+  void CreateItemList_Calc(string department, vector<string>& vecItemCalc);
+  void CreateItemList_Calc1(string probe_exam, vector<string>& vecItemCalc);
+  void CreateItemList_Calc2(string probe_exam, vector<int>& vecItemCalc);
+  void CreateItemList_Delete_Calc(string select_name, string department, vector<int>& vecDeleteCalc, IniFile* ini);
+  void CreateItemList_Delete_Calc1(string select_name, string probe_exam, vector<int>& vecItemCalc);
+
 private:
   static CalcSetting* m_instance;
 
@@ -177,60 +213,7 @@ private:
   GtkScrolledWindow* m_scrolled_window_selected_item;
   GtkTreeView* m_treeview_selected_item;
 
-private:
-
-////////////////////////////////////////////////////////////
-
-public:
-    void ChangeModel(void);
-    void ChangeModel2(void);
-    void ChangeExamBox(char *check_part);
-    void ChangeExamBoxDelete(void);
-    void ChangeExamBoxToDefault(void);
-    void ChangeModelAndLight(const char *name);
-    void GetCalcListEtype(char *exam_type, vector<int> &vecItemCalc);
-    int GetCalcListNum(char *exam_type);
-    int GetMeasureSequence(const char *exam_type);
-    void GetCustomCalcMeasure(int Etype, int &measure_type, string &calc_name);
-    int GetCalcMaxEtype();
-    void GetDepartmentForCustomMeasure(int Etype, string &department);
-    vector<string> GetSelectedVec() {
-        return m_vecPath;
-    }
-    vector<string> GetSelectedVec1() {
-        return m_vecPath1;
-    }
-    gboolean GetSelectPath(void);
-    const string GetExamName(void);
-    const string GetDepartmentName(void);
-    string ItemMenuTransEnglish(int item_num);
-    string CustomItemTransName(int item_num);
-
-
-
-private:
-
-    vector<string> m_vecPath;
-    vector<string> m_vecPath1;
-
-    int GetSequence(const char *exam_type);
-
-    int  create_exam_calc_model(vector<string> &vecExamItem_calc);
-
-
-
-    void CreateDefaultItemList_Calc(char *department,vector<string>& vecItemCalc);
-    void CreateItemList_Calc(char *department,vector<string>& vecItemCalc);
-
-
-    void CreateItemList_Calc1(char *probe_exam,vector<string>& vecItemCalc1);
-    void CreateItemList_Calc2(char *probe_exam,vector<int>& vecItemCalc1);
-    void CreateItemList_Delete_Calc1(char *select_name, string probe_exam,vector<int>& vecItemCalc1);
-    void CreateItemList_Delete_Calc(char *select_name, char *department, vector<int>& vecDeleteCalc, IniFile *ini);
-    GtkTreeIter InsertUniqueCalc(GtkTreeModel *model, const char *str);
-
-    int  create_exam_calc_model();
-    int ItemNameTransEtype(char *select_name);
+  vector<string> m_vecPath;
 };
 
 class CustomCalc: public FakeXEvent {

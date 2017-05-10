@@ -7,17 +7,18 @@
 #include "utils/MessageDialog.h"
 #include "utils/StringUtils.h"
 
+#include "calcPeople/MeaCalcFun.h"
+#include "calcPeople/MeasureDef.h"
+#include "calcPeople/MenuCalcNew.h"
 #include "Def.h"
 #include "display/TopArea.h"
-#include "calcPeople/MeasureDef.h"
-#include "probe/ExamItem.h"
 #include "keyboard/KeyFunc.h"
 #include "keyboard/KeyValueOpr.h"
+#include "measure/MeasureMan.h"
 #include "patient/FileMan.h"
 #include "periDevice/PeripheralMan.h"
-#include "calcPeople/MenuCalcNew.h"
+#include "probe/ExamItem.h"
 #include "sysMan/UserSelect.h"
-#include "measure/MeasureMan.h"
 
 #ifdef VET
   static const int EXAM_NUM = 9;
@@ -431,11 +432,350 @@ void CalcSetting::ClearAll() {
   MeasureMan::GetInstance()->ClearAllValue();
   g_menuCalc.ClearAllData();
 
-  //clear screen
+  // clear screen
   KeyClearScreen kcs;
   kcs.Execute();
   g_menuCalc.ChangeAllCalcItems();
   g_menuCalc.ClearAllFlag();
+}
+
+void CalcSetting::ChangeModel2() {
+  if (m_treeview_item != NULL) {
+    gtk_tree_view_set_model(m_treeview_item, CreateItemCalcModel2());
+  }
+
+  if (m_treeview_selected_item != NULL) {
+    gtk_tree_view_set_model(m_treeview_selected_item, CreateItemCalcModel1());
+  }
+}
+
+string CalcSetting::GetExamName() {
+  if (m_combobox_exam_type != NULL) {
+    return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  } else {
+    return "";
+  }
+}
+
+string CalcSetting::GetDepartmentName() {
+  if (m_combobox_department != NULL) {
+    return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department));
+  } else {
+    return "";
+  }
+}
+
+bool CalcSetting::GetSelectPath() {
+  m_vecPath.clear();
+
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  char userselectname2[256];
+  char path3[256];
+  char userselectname3[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
+    sprintf(path3, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+    sprintf(path3, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  m_vecPath.push_back(path);
+  m_vecPath.push_back(path3);
+
+  if(!m_vecPath.empty()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+string CalcSetting::CustomItemTransName(int item_num) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni = &ini;
+  char CustomEtype[256];
+  sprintf(CustomEtype, "CustomEtype-%d",item_num);
+  string item_name = ptrIni->ReadString(CustomEtype, "Name");
+  return item_name;
+}
+
+string CalcSetting::ItemMenuTransEnglish(int item_num) {
+  item_num += BASIC_MEA_END;
+  string item_name("");
+
+  if((item_num >= ABD_MEA_START)&&(item_num < ABD_MEA_END)) {
+    for(int i=0; i < (ABD_MEA_END - ABD_MEA_START); i++) {
+      if(item_num == AbdoInfo[i].item) {
+        item_name = AbdoInfo[i].title;
+      }
+    }
+  } else if((item_num >= ADULT_MEA_START)&&(item_num < ADULT_MEA_END)) {
+    for(int i=0; i < (ADULT_MEA_END - ADULT_MEA_START); i++) {
+      if(item_num == AdultInfo[i].item) {
+        item_name = AdultInfo[i].title;
+      }
+    }
+  } else if((item_num >= UR_MEA_START)&&(item_num < UR_MEA_END)) {
+    for(int i=0; i < (UR_MEA_END - UR_MEA_START); i++) {
+      if(item_num == URInfo[i].item) {
+        item_name = URInfo[i].title;
+      }
+    }
+  } else if((item_num >= OB_MEA_START)&&(item_num < OB_MEA_END)) {
+    for(int i=0; i < (OB_MEA_END - OB_MEA_START); i++) {
+      if(item_num == OBInfo[i].item) {
+        item_name = OBInfo[i].title;
+      }
+    }
+  } else if((item_num >= GYN_MEA_START)&&(item_num < GYN_MEA_END)) {
+    for(int i=0; i < (GYN_MEA_END - GYN_MEA_START); i++) {
+      if(item_num == GYNInfo[i].item) {
+        item_name = GYNInfo[i].title;
+      }
+    }
+  } else if((item_num >= SP_MEA_START)&&(item_num < SP_MEA_END)) {
+    for(int i=0; i < (SP_MEA_END - SP_MEA_START); i++) {
+      if(item_num == SPInfo[i].item) {
+        item_name = SPInfo[i].title;
+      }
+    }
+  } else if((item_num >= VS_MEA_START)&&(item_num < VS_MEA_END)) {
+    for(int i=0; i < (VS_MEA_END - VS_MEA_START); i++) {
+      if(item_num == VSInfo[i].item) {
+        item_name = VSInfo[i].title;
+      }
+    }
+  } else  if((item_num >= FETAL_MEA_START)&&(item_num < FETAL_MEA_END)) {
+    for(int i=0; i < (FETAL_MEA_END - FETAL_MEA_START); i++) {
+      if(item_num == FetalInfo[i].item) {
+        item_name = FetalInfo[i].title;
+      }
+    }
+  } else if((item_num >= TCD_MEA_START)&&(item_num < TCD_MEA_END)) {
+    for(int i=0; i < (TCD_MEA_END - TCD_MEA_START); i++) {
+      if(item_num == TCDInfo[i].item) {
+        item_name = TCDInfo[i].title;
+      }
+    }
+  } else if((item_num >= ORTHO_MEA_START)&&(item_num < ORTHO_MEA_END)) {
+    for(int i=0; i < (ORTHO_MEA_END - ORTHO_MEA_START); i++) {
+      if(item_num == OrthoInfo[i].item) {
+        item_name = OrthoInfo[i].title;
+      }
+    }
+  } else if((item_num >= EFW_MEA_START)&&(item_num < EFW_MEA_END)) {
+    for(int i=0; i < (EFW_MEA_END - EFW_MEA_START); i++) {
+      if(item_num == EFWInfo[i].item) {
+        item_name = EFWInfo[i].title;
+      }
+    }
+  } else {
+    #ifdef VET
+      if((item_num >= TD_MEA_START)&&(item_num < TD_MEA_END)) {
+        for(int i=0; i < (TD_MEA_END - TD_MEA_START); i++) {
+          if(item_num == TDInfo[i].item) {
+              item_name = TDInfo[i].title;
+          }
+        }
+      } else if((item_num >= ANOB_MEA_START)&&(item_num < ANOB_MEA_END)) {
+        for(int i=0; i < (ANOB_MEA_END - ANOB_MEA_START); i++) {
+          if(item_num == AnOBInfo[i].item) {
+              item_name = AnOBInfo[i].title;
+          }
+        }
+      } else {
+      }
+    #endif
+  }
+
+  return item_name;
+}
+
+void CalcSetting::ChangeExamBox(string check_part) {
+  if (m_combobox_exam_type != NULL) {
+    gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_exam_type), check_part.c_str());
+  }
+}
+
+void CalcSetting::ChangeExamBoxDelete() {
+  if (m_combobox_exam_type != NULL) {
+    vector<string> vecExamItem_calc = GetExamItemsCalc();
+
+    // 用户自定义的检查部位
+    CreateDefineItemCalc(vecExamItem_calc);
+    int exam_size(0);
+    exam_size = vecExamItem_calc.size();
+
+    for(int i = exam_size; i >= 0; i--) {
+      gtk_combo_box_remove_text(GTK_COMBO_BOX(m_combobox_exam_type), i);
+    }
+
+    for (int i = 0; i <exam_size; i++) {
+      gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_exam_type), _(vecExamItem_calc[i].c_str()));
+    }
+  }
+}
+
+void CalcSetting::ChangeModelAndLight(const string name) {
+  if (m_treeview_item != NULL) {
+    GtkTreeModel* model = CreateItemCalcModel2();
+    gtk_tree_view_set_model(m_treeview_item, model);
+
+    GtkTreeSelection* selection = gtk_tree_view_get_selection(m_treeview_item);
+    GtkTreeIter iter_tmp= InsertUniqueCalc(model, name);
+    gtk_tree_selection_select_iter(selection, &iter_tmp);
+
+    GtkTreePath* path_scroll = gtk_tree_model_get_path(model, &iter_tmp);
+    gtk_tree_view_scroll_to_cell(m_treeview_item, path_scroll, NULL, FALSE, 1.0, 1.0);
+    gtk_tree_path_free (path_scroll);
+  }
+}
+
+// 返回自定义测量项的最大值
+int CalcSetting::GetCalcMaxEtype() {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni = &ini;
+  return ptrIni->ReadInt("MaxNumber", "Number");
+}
+
+// 获得exam_type测量的排序方法 0:none   1:repeat   2:next
+int CalcSetting::GetMeasureSequence(const string exam_type) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+
+  return  ptrIni->ReadInt(exam_type.c_str(), "Sequence");
+}
+
+// int Etype: 自定义的测量Etype
+// int measure_type: 通过Etype，需要得到的测量方式
+// string calc_name: 通过Etype，需要得到的自定义测量的名称
+void CalcSetting::GetCustomCalcMeasure(int Etype, int& measure_type, string& calc_name) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni = &ini;
+  char CustomEtype[256];
+  sprintf(CustomEtype, "CustomEtype-%d",Etype);
+  measure_type=ptrIni->ReadInt(CustomEtype, "Method");
+  calc_name=ptrIni->ReadString(CustomEtype, "Name");
+}
+
+// 获得exam_type检查部位下所有测量项的item，push到vector中
+void CalcSetting::GetCalcListEtype(string exam_type, vector<int>& vecItemCalc) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+
+  int number;
+  number = ptrIni->ReadInt(exam_type, "Number");
+
+  if(number ==0) {
+    return;
+  }
+
+  for(int i=1; i<=number; i++) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", i);
+    int item_num = ptrIni->ReadInt(exam_type, CalcNumber);
+    vecItemCalc.push_back(item_num);
+  }
+}
+
+// get department for custom measure
+void CalcSetting::GetDepartmentForCustomMeasure(int Etype, string& department) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni = &ini;
+  char CustomEtype[256];
+  sprintf(CustomEtype, "CustomEtype-%d",Etype-BASIC_MEA_END);
+  department=ptrIni->ReadString(CustomEtype, "Department");
 }
 
 // ---------------------------------------------------------
@@ -1382,6 +1722,373 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel2() {
   return GTK_TREE_MODEL(store);
 }
 
+void CalcSetting::ChangeModel() {
+  gtk_tree_view_set_model(m_treeview_item, CreateItemCalcModel2());
+}
+
+GtkTreeIter CalcSetting::InsertUniqueCalc(GtkTreeModel* model, const string str) {
+  GtkTreeIter tmp_iter;
+  char *strtmp = NULL;
+  gboolean has_node = gtk_tree_model_get_iter_first(model, &tmp_iter);
+
+  while (has_node == TRUE) {
+    gtk_tree_model_get(model, &tmp_iter, 0, &strtmp, -1);
+
+    if (strcmp(strtmp, str.c_str()) == 0) {
+      return tmp_iter;
+    } else {
+      has_node = gtk_tree_model_iter_next(model, &tmp_iter);
+    }
+  }
+
+  return tmp_iter;
+}
+
+int CalcSetting::GetSequence(const string exam_type) {
+  ExamItem exam;
+  char path11[256];
+  sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path11);
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+  string examType = exam.ReadDefaultProbeDefaultItemName(&ini1);
+
+  char path1[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path1, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path1);
+  IniFile *ptrIni_calc = &ini;
+  int squence = ptrIni_calc->ReadInt(exam_type, "Sequence");
+
+  return squence;
+}
+
+int CalcSetting::ItemNameTransEtype(string select_name) {
+  int select_num = -1;
+
+  for(int i=0; i < (ABD_MEA_END - ABD_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(AbdoInfo[i].title))==0 ) {
+      select_num = AbdoInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (ADULT_MEA_END - ADULT_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(AdultInfo[i].title))==0 ) {
+      select_num = AdultInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (UR_MEA_END - UR_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(URInfo[i].title))==0 ) {
+      select_num = URInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (OB_MEA_END - OB_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(OBInfo[i].title))==0 ) {
+      select_num = OBInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (GYN_MEA_END - GYN_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(GYNInfo[i].title))==0 ) {
+      select_num = GYNInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (SP_MEA_END - SP_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(SPInfo[i].title))==0 ) {
+      select_num = SPInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (VS_MEA_END - VS_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(VSInfo[i].title))==0 ) {
+      select_num = VSInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (FETAL_MEA_END - FETAL_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(FetalInfo[i].title))==0 ) {
+      select_num = FetalInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (TCD_MEA_END - TCD_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(TCDInfo[i].title))==0 ) {
+      select_num = TCDInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (ORTHO_MEA_END - ORTHO_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(OrthoInfo[i].title))==0 ) {
+      select_num = OrthoInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  for(int i=0; i < (EFW_MEA_END - EFW_MEA_START); i++) {
+    if(strcmp(select_name.c_str(), _(EFWInfo[i].title))==0 ) {
+      select_num = EFWInfo[i].item - BASIC_MEA_END;
+      return select_num;
+    }
+  }
+
+  #ifdef VET
+    for(int i=0; i < (TD_MEA_END - TD_MEA_START); i++) {
+      if(strcmp(select_name.c_str(), _(TDInfo[i].title))==0 ) {
+        select_num = TDInfo[i].item - BASIC_MEA_END;
+        return select_num;
+      }
+    }
+
+    for(int i=0; i < (ANOB_MEA_END - ANOB_MEA_START); i++) {
+      if(strcmp(select_name.c_str(), _(AnOBInfo[i].title))==0 ) {
+        select_num = AnOBInfo[i].item - BASIC_MEA_END;
+        return select_num;
+      }
+    }
+  #endif
+
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+  char path[256];
+
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni = &ini;
+  int number = ptrIni->ReadInt("MaxNumber", "Number");
+
+  for(int i=(USER_START - BASIC_MEA_END); i<=number; i++) {
+    char CustomEtype[256];
+    sprintf(CustomEtype, "CustomEtype-%d",i);
+    string item_name = ptrIni->ReadString(CustomEtype, "Name");
+
+    if(strcmp(select_name.c_str(), _(item_name.c_str()))==0 ) {
+      select_num = ptrIni->ReadInt(CustomEtype, "Etype");
+
+      return select_num;
+    }
+  }
+
+  return select_num;
+}
+
+void CalcSetting::CreateItemList_Calc(string department, vector<string>& vecItemCalc) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+  char path[256];
+
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+  int number;
+  number = ptrIni->ReadInt(department, "Number");
+
+  for(int i=1; i<=number; i++) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", i);
+    int item_num = ptrIni->ReadInt(department, CalcNumber);
+    string item_name("");
+
+    if(item_num < (USER_START - BASIC_MEA_END))
+      item_name= ItemMenuTransEnglish(item_num);
+    else {
+      item_name = CustomItemTransName(item_num);
+    }
+
+    if(strlen(item_name.c_str()) != 0) {
+      vecItemCalc.push_back(item_name.c_str());
+    }
+  }
+}
+
+void CalcSetting::CreateItemList_Calc1(string probe_exam, vector<string>& vecItemCalc) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+  char path[256];
+
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+
+  int number;
+  number = ptrIni->ReadInt(probe_exam, "Number");
+
+  if(number ==0) {
+    return;
+  }
+
+  for(int i=1; i<=number; i++) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", i);
+    int item_num = ptrIni->ReadInt(probe_exam, CalcNumber);
+    string item_name;
+
+    if(item_num < USER_START - BASIC_MEA_END) {
+      item_name= ItemMenuTransEnglish(item_num);
+    } else {
+      item_name = CustomItemTransName(item_num);
+    }
+
+    vecItemCalc.push_back(item_name);
+  }
+}
+
+void CalcSetting::CreateItemList_Calc2(string probe_exam, vector<int>& vecItemCalc) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+
+  int number;
+  number = ptrIni->ReadInt(probe_exam, "Number");
+
+  if(number ==0) {
+    return;
+  }
+
+  for(int i=1; i<=number; i++) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", i);
+    int item_num = ptrIni->ReadInt(probe_exam, CalcNumber);
+    vecItemCalc.push_back(item_num);
+  }
+}
+
+void CalcSetting::CreateItemList_Delete_Calc(string select_name, string department, vector<int>& vecDeleteCalc, IniFile* ini) {
+  IniFile *ptrIni= ini;
+  ExamItem examitem;
+
+  int number;
+  number = ptrIni->ReadInt(department, "Number");
+
+  if(number ==0) {
+    return;
+  }
+
+  for(int i=1; i<=number; i++) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", i);
+    int item_num= ptrIni->ReadInt(department, CalcNumber);
+    string item_name;
+
+    if(item_num < USER_START - BASIC_MEA_END)
+      item_name= ItemMenuTransEnglish(item_num);
+    else {
+      item_name = CustomItemTransName(item_num);
+    }
+
+    if(strcmp(select_name.c_str(), _(item_name.c_str()))!=0) {
+      vecDeleteCalc.push_back(item_num);
+    } else {
+      int deletenum;
+      char CalcNum[256];
+      deletenum = ptrIni->ReadInt("Delete", "Number");
+      sprintf(CalcNum, "Calc%d", (deletenum+1));
+      ptrIni->WriteInt("Delete", CalcNum, item_num);
+      ptrIni->WriteInt("Delete", "Number", (deletenum+1));
+      ptrIni->SyncConfigFile();
+    }
+  }
+}
+
+void CalcSetting::CreateItemList_Delete_Calc1(string select_name, string probe_exam, vector<int>& vecItemCalc) {
+  char path1[256];
+  sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
+  IniFile ini1(path1);
+  ExamItem exam;
+  string username;
+  username = exam.ReadDefaultUserSelect(&ini1);
+
+  char path[256];
+  if(strcmp(username.c_str(), "System Default") == 0) {
+    sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
+  } else {
+    sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
+  }
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+
+  const char *probeExam = probe_exam.c_str();
+
+  int number;
+  number = ptrIni->ReadInt(probeExam, "Number");
+
+  if(number ==0) {
+    return;
+  }
+
+  for(int i=1; i<=number; i++) {
+    char CalcNumber[256];
+    sprintf(CalcNumber, "Calc%d", i);
+
+    int item_num = ptrIni->ReadInt(probeExam, CalcNumber);
+    string item_name;
+    if(item_num < USER_START - BASIC_MEA_END)
+      item_name= ItemMenuTransEnglish(item_num);
+    else {
+      item_name = CustomItemTransName(item_num);
+    }
+
+    if(strcmp(select_name.c_str(), _(item_name.c_str()))!=0) {
+      vecItemCalc.push_back(item_num);
+    }
+  }
+}
 
 // ---------------------------------------------------------
 //
@@ -2454,771 +3161,4 @@ bool CustomCalc::RenameCompare(string name_copy) {
   }
 
   return true;
-}
-
-/////////////////////////////////////
-
-
-#include <dirent.h>
-
-#include "display/gui_global.h"
-#include "display/gui_func.h"
-
-#include "keyboard/KeyDef.h"
-
-#include "calcPeople/MeaCalcFun.h"
-#include "ViewMain.h"
-
-
-
-
-
-
-
-CalcSetting g_menuCalcExamType;
-
-
-
-
-
-
-
-void CalcSetting::CreateItemList_Calc(char *department,vector<string>& vecItemCalc) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-    int number;
-    number = ptrIni->ReadInt(department, "Number");
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-        int item_num = ptrIni->ReadInt(department, CalcNumber);
-        string item_name("");
-        if(item_num < (USER_START - BASIC_MEA_END))
-            item_name= ItemMenuTransEnglish(item_num);
-        else {
-            item_name = CustomItemTransName(item_num);
-        }
-        if(strlen(item_name.c_str()) != 0)
-            vecItemCalc.push_back(item_name.c_str());
-    }
-}
-
-void CalcSetting::CreateDefaultItemList_Calc(char *department,vector<string>& vecItemCalc) {
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, DEFAULT_CALC_ITEM_FILE);
-
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-    int number;
-    number = ptrIni->ReadInt(department, "Number");
-
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-        int item_num = ptrIni->ReadInt(department, CalcNumber);
-        string item_name;
-        if(item_num < USER_START - BASIC_MEA_END)
-            item_name= ItemMenuTransEnglish(item_num);
-        else {
-            item_name = CustomItemTransName(item_num);
-        }
-        vecItemCalc.push_back(item_name);
-    }
-}
-
-int CalcSetting::ItemNameTransEtype(char *select_name) {
-    int select_num = -1;
-    for(int i=0; i < (ABD_MEA_END - ABD_MEA_START); i++) {
-        if(strcmp(select_name, _(AbdoInfo[i].title))==0 ) {
-            select_num = AbdoInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-    }
-    for(int i=0; i < (ADULT_MEA_END - ADULT_MEA_START); i++) {
-        if(strcmp(select_name, _(AdultInfo[i].title))==0 ) {
-            select_num = AdultInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (UR_MEA_END - UR_MEA_START); i++) {
-        if(strcmp(select_name, _(URInfo[i].title))==0 ) {
-            select_num = URInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (OB_MEA_END - OB_MEA_START); i++) {
-        if(strcmp(select_name, _(OBInfo[i].title))==0 ) {
-            select_num = OBInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (GYN_MEA_END - GYN_MEA_START); i++) {
-        if(strcmp(select_name, _(GYNInfo[i].title))==0 ) {
-            select_num = GYNInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (SP_MEA_END - SP_MEA_START); i++) {
-        if(strcmp(select_name, _(SPInfo[i].title))==0 ) {
-            select_num = SPInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (VS_MEA_END - VS_MEA_START); i++) {
-        if(strcmp(select_name, _(VSInfo[i].title))==0 ) {
-            select_num = VSInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (FETAL_MEA_END - FETAL_MEA_START); i++) {
-        if(strcmp(select_name, _(FetalInfo[i].title))==0 ) {
-            select_num = FetalInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (TCD_MEA_END - TCD_MEA_START); i++) {
-        if(strcmp(select_name, _(TCDInfo[i].title))==0 ) {
-            select_num = TCDInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (ORTHO_MEA_END - ORTHO_MEA_START); i++) {
-        if(strcmp(select_name, _(OrthoInfo[i].title))==0 ) {
-            select_num = OrthoInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (EFW_MEA_END - EFW_MEA_START); i++) {
-        if(strcmp(select_name, _(EFWInfo[i].title))==0 ) {
-            select_num = EFWInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-
-#ifdef VET
-    for(int i=0; i < (TD_MEA_END - TD_MEA_START); i++) {
-        if(strcmp(select_name, _(TDInfo[i].title))==0 ) {
-            select_num = TDInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-    for(int i=0; i < (ANOB_MEA_END - ANOB_MEA_START); i++) {
-        if(strcmp(select_name, _(AnOBInfo[i].title))==0 ) {
-            select_num = AnOBInfo[i].item - BASIC_MEA_END;
-            return select_num;
-        }
-
-    }
-#endif
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
-    int number = ptrIni->ReadInt("MaxNumber", "Number");
-    for(int i=(USER_START - BASIC_MEA_END); i<=number; i++) {
-        char CustomEtype[256];
-        sprintf(CustomEtype, "CustomEtype-%d",i);
-        string item_name = ptrIni->ReadString(CustomEtype, "Name");
-        if(strcmp(select_name, _(item_name.c_str()))==0 ) {
-            select_num = ptrIni->ReadInt(CustomEtype, "Etype");
-
-            return select_num;
-        }
-
-    }
-
-    return select_num;
-}
-
-string CalcSetting::ItemMenuTransEnglish(int item_num) {
-    item_num += BASIC_MEA_END;
-    string item_name("");
-    if((item_num >= ABD_MEA_START)&&(item_num < ABD_MEA_END)) {
-        for(int i=0; i < (ABD_MEA_END - ABD_MEA_START); i++) {
-            if(item_num == AbdoInfo[i].item) {
-                item_name = AbdoInfo[i].title;
-            }
-        }
-    } else if((item_num >= ADULT_MEA_START)&&(item_num < ADULT_MEA_END)) {
-        for(int i=0; i < (ADULT_MEA_END - ADULT_MEA_START); i++) {
-            if(item_num == AdultInfo[i].item) {
-                item_name = AdultInfo[i].title;
-            }
-        }
-    } else if((item_num >= UR_MEA_START)&&(item_num < UR_MEA_END)) {
-        for(int i=0; i < (UR_MEA_END - UR_MEA_START); i++) {
-            if(item_num == URInfo[i].item) {
-                item_name = URInfo[i].title;
-            }
-        }
-    }
-
-    else if((item_num >= OB_MEA_START)&&(item_num < OB_MEA_END)) {
-        for(int i=0; i < (OB_MEA_END - OB_MEA_START); i++) {
-            if(item_num == OBInfo[i].item) {
-                item_name = OBInfo[i].title;
-            }
-        }
-    }
-
-    else if((item_num >= GYN_MEA_START)&&(item_num < GYN_MEA_END)) {
-        for(int i=0; i < (GYN_MEA_END - GYN_MEA_START); i++) {
-            if(item_num == GYNInfo[i].item) {
-                item_name = GYNInfo[i].title;
-            }
-        }
-    }
-
-    else if((item_num >= SP_MEA_START)&&(item_num < SP_MEA_END)) {
-        for(int i=0; i < (SP_MEA_END - SP_MEA_START); i++) {
-            if(item_num == SPInfo[i].item) {
-                item_name = SPInfo[i].title;
-            }
-        }
-    } else if((item_num >= VS_MEA_START)&&(item_num < VS_MEA_END)) {
-        for(int i=0; i < (VS_MEA_END - VS_MEA_START); i++) {
-            if(item_num == VSInfo[i].item) {
-                item_name = VSInfo[i].title;
-            }
-        }
-    } else  if((item_num >= FETAL_MEA_START)&&(item_num < FETAL_MEA_END)) {
-        for(int i=0; i < (FETAL_MEA_END - FETAL_MEA_START); i++) {
-            if(item_num == FetalInfo[i].item) {
-                item_name = FetalInfo[i].title;
-            }
-        }
-    } else if((item_num >= TCD_MEA_START)&&(item_num < TCD_MEA_END)) {
-        for(int i=0; i < (TCD_MEA_END - TCD_MEA_START); i++) {
-            if(item_num == TCDInfo[i].item) {
-                item_name = TCDInfo[i].title;
-            }
-        }
-    } else if((item_num >= ORTHO_MEA_START)&&(item_num < ORTHO_MEA_END)) {
-        for(int i=0; i < (ORTHO_MEA_END - ORTHO_MEA_START); i++) {
-            if(item_num == OrthoInfo[i].item) {
-                item_name = OrthoInfo[i].title;
-            }
-        }
-    } else if((item_num >= EFW_MEA_START)&&(item_num < EFW_MEA_END)) {
-        for(int i=0; i < (EFW_MEA_END - EFW_MEA_START); i++) {
-            if(item_num == EFWInfo[i].item) {
-                item_name = EFWInfo[i].title;
-            }
-        }
-    }
-#ifdef VET
-    else if((item_num >= TD_MEA_START)&&(item_num < TD_MEA_END)) {
-        for(int i=0; i < (TD_MEA_END - TD_MEA_START); i++) {
-            if(item_num == TDInfo[i].item) {
-                item_name = TDInfo[i].title;
-            }
-        }
-    }
-
-    else if((item_num >= ANOB_MEA_START)&&(item_num < ANOB_MEA_END)) {
-        for(int i=0; i < (ANOB_MEA_END - ANOB_MEA_START); i++) {
-            if(item_num == AnOBInfo[i].item) {
-                item_name = AnOBInfo[i].title;
-            }
-        }
-    }
-
-#endif
-    return item_name;
-}
-
-string CalcSetting::CustomItemTransName(int item_num) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
-    char CustomEtype[256];
-    sprintf(CustomEtype, "CustomEtype-%d",item_num);
-    string item_name = ptrIni->ReadString(CustomEtype, "Name");
-    return item_name;
-}
-
-void CalcSetting::CreateItemList_Calc1(char *probe_exam,vector<string>& vecItemCalc1) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-
-    int number;
-    number = ptrIni->ReadInt(probe_exam, "Number");
-
-    if(number ==0)
-        return;
-
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-        int item_num = ptrIni->ReadInt(probe_exam, CalcNumber);
-        string item_name;
-        if(item_num < USER_START - BASIC_MEA_END) {
-            item_name= ItemMenuTransEnglish(item_num);
-        } else {
-            item_name = CustomItemTransName(item_num);
-        }
-        vecItemCalc1.push_back(item_name);
-    }
-}
-
-void CalcSetting::CreateItemList_Calc2(char *probe_exam,vector<int>& vecItemCalc1) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-
-    int number;
-    number = ptrIni->ReadInt(probe_exam, "Number");
-
-    if(number ==0)
-        return;
-
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-        int item_num = ptrIni->ReadInt(probe_exam, CalcNumber);
-        vecItemCalc1.push_back(item_num);
-    }
-}
-
-
-
-void CalcSetting::CreateItemList_Delete_Calc(char *select_name, char *department, vector<int>& vecDeleteCalc, IniFile *ini) {
-    IniFile *ptrIni= ini;
-    ExamItem examitem;
-
-    int number;
-    number = ptrIni->ReadInt(department, "Number");
-
-    if(number ==0)
-        return;
-
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-        int item_num= ptrIni->ReadInt(department, CalcNumber);
-        string item_name;
-        if(item_num < USER_START - BASIC_MEA_END)
-            item_name= ItemMenuTransEnglish(item_num);
-        else {
-            item_name = CustomItemTransName(item_num);
-        }
-        if(strcmp(select_name, _(item_name.c_str()))!=0) {
-            vecDeleteCalc.push_back(item_num);
-        } else {
-            int deletenum;
-            char CalcNum[256];
-            deletenum = ptrIni->ReadInt("Delete", "Number");
-            sprintf(CalcNum, "Calc%d", (deletenum+1));
-            ptrIni->WriteInt("Delete", CalcNum, item_num);
-            ptrIni->WriteInt("Delete", "Number", (deletenum+1));
-            ptrIni->SyncConfigFile();
-        }
-    }
-}
-
-void CalcSetting::CreateItemList_Delete_Calc1(char *select_name, string probe_exam,vector<int>& vecItemCalc1) {
-
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-
-    const char *probeExam = probe_exam.c_str();
-
-    int number;
-    number = ptrIni->ReadInt(probeExam, "Number");
-
-    if(number ==0)
-        return;
-
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-
-        int item_num = ptrIni->ReadInt(probeExam, CalcNumber);
-        string item_name;
-        if(item_num < USER_START - BASIC_MEA_END)
-            item_name= ItemMenuTransEnglish(item_num);
-        else {
-            item_name = CustomItemTransName(item_num);
-        }
-
-        if(strcmp(select_name, _(item_name.c_str()))!=0) {
-            vecItemCalc1.push_back(item_num);
-        }
-    }
-}
-
-
-
-
-
-void CalcSetting::ChangeModel2(void) {
-    GtkTreeModel *model1 = CreateItemCalcModel1();
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_selected_item), model1);
-
-    GtkTreeModel *model = CreateItemCalcModel2();
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item), model);
-
-}
-
-void CalcSetting::ChangeModel(void) {
-    GtkTreeModel *model = CreateItemCalcModel2();
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item), model);
-
-}
-
-void CalcSetting::ChangeExamBox(char *check_part) {
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_type), check_part);
-}
-
-void CalcSetting::ChangeExamBoxDelete(void) {
-    vector<string> vecExamItem_calc = GetExamItemsCalc();
-
-    //用户自定义的检查部位
-    CreateDefineItemCalc(vecExamItem_calc);
-    int exam_size(0);
-    exam_size = vecExamItem_calc.size();
-    for(int i = exam_size; i >= 0; i--) {
-        gtk_combo_box_remove_text(GTK_COMBO_BOX (m_combobox_exam_type), i);
-    }
-
-    for (int i = 0; i <exam_size; i++) {
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_type), _(vecExamItem_calc[i].c_str()));
-    }
-}
-
-void CalcSetting::ChangeExamBoxToDefault(void) {
-    //gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_exam_type), 0);
-}
-
-void CalcSetting::ChangeModelAndLight(const char *name) {
-    GtkTreeModel *model = CreateItemCalcModel2();
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item), model);
-
-    GtkTreeSelection *selection;
-    GtkTreeIter iter_tmp;
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item));
-    iter_tmp= InsertUniqueCalc(model, name);
-    gtk_tree_selection_select_iter(selection, &iter_tmp);
-
-    GtkTreePath *path_scroll = gtk_tree_model_get_path(model, &iter_tmp);
-    gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item), path_scroll, NULL, FALSE, 1.0, 1.0);
-    gtk_tree_path_free (path_scroll);
-}
-
-const string CalcSetting::GetExamName() {
-  if (m_combobox_exam_type != NULL) {
-    return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
-  } else {
-    return "";
-  }
-}
-
-const string CalcSetting::GetDepartmentName() {
-  if (m_combobox_department != NULL) {
-    return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department));
-  } else {
-    return "";
-  }
-}
-
-int CalcSetting::GetSequence(const char *exam_type) {
-    ExamItem exam;
-    char path11[256];
-    sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path11);
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    string examType = exam.ReadDefaultProbeDefaultItemName(&ini1);
-    char path1[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path1, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path1, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path1);
-    IniFile *ptrIni_calc = &ini;
-    int squence = ptrIni_calc->ReadInt(exam_type, "Sequence");
-    //printf("===================squence=%d exam_type=%s\n", squence, exam_type);
-    return squence;
-}
-
-GtkTreeIter CalcSetting::InsertUniqueCalc(GtkTreeModel *model, const char *str) {
-    GtkTreeIter tmp_iter;
-    char *strtmp = NULL;
-    gboolean has_node = gtk_tree_model_get_iter_first(model, &tmp_iter);
-    while (has_node == TRUE) {
-        gtk_tree_model_get(model, &tmp_iter, 0, &strtmp, -1);
-        if (strcmp(strtmp, str) == 0)
-            return tmp_iter;
-        else
-            has_node = gtk_tree_model_iter_next(model, &tmp_iter);
-    }
-    return tmp_iter;
-}
-
-
-
-
-
-
-
-
-
-
-
-gboolean CalcSetting::GetSelectPath(void) {
-    m_vecPath.clear();
-
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-
-    char path[256];
-    char userselectname2[256];
-    char path3[256];
-    char userselectname3[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-        sprintf(path3, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-        sprintf(path3, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-
-    }
-
-    m_vecPath.push_back(path);
-    m_vecPath.push_back(path3);
-
-    if(!m_vecPath.empty())
-        return TRUE;
-    else
-        return FALSE;
-
-}
-
-
-
-
-
-
-
-//获得exam_type检查部位下所有测量项的item，push到vector中
-void CalcSetting::GetCalcListEtype(char *exam_type, vector<int> & vecItemCalc) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-
-    int number;
-    number = ptrIni->ReadInt(exam_type, "Number");
-
-    if(number ==0)
-        return;
-
-    for(int i=1; i<=number; i++) {
-        char CalcNumber[256];
-        sprintf(CalcNumber, "Calc%d", i);
-        int item_num = ptrIni->ReadInt(exam_type, CalcNumber);
-        vecItemCalc.push_back(item_num);
-    }
-}
-
-//获得exam_type检查部位下的测量项总数
-int CalcSetting::GetCalcListNum(char *exam_type) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-    return  ptrIni->ReadInt(exam_type, "Number");
-
-}
-
-//获得exam_type测量的排序方法 0:none   1:repeat   2:next
-int CalcSetting::GetMeasureSequence(const char *exam_type) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_FILE);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-    return  ptrIni->ReadInt(exam_type, "Sequence");
-
-}
-
-/*
- *int Etype: 自定义的测量Etype
- *int measure_type: 通过Etype，需要得到的测量方式
- *string calc_name: 通过Etype，需要得到的自定义测量的名称
- */
-void CalcSetting::GetCustomCalcMeasure(int Etype, int &measure_type, string &calc_name) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
-    char CustomEtype[256];
-    sprintf(CustomEtype, "CustomEtype-%d",Etype);
-    measure_type=ptrIni->ReadInt(CustomEtype, "Method");
-    calc_name=ptrIni->ReadString(CustomEtype, "Name");
-}
-
-// 返回自定义测量项的最大值
-int CalcSetting::GetCalcMaxEtype() {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
-    return ptrIni->ReadInt("MaxNumber", "Number");
-}
-
-//get department for custom measure
-void CalcSetting::GetDepartmentForCustomMeasure(int Etype, string &department) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    char path[256];
-    if(strcmp(username.c_str(), "System Default") == 0) {
-        sprintf(path, "%s%s", CFG_RES_PATH, CALC_ITEM_PATH);
-    } else {
-        sprintf(path, "%s%s%s%s", CFG_RES_PATH, CALC_ITEM_FILE, username.c_str(), ".ini");
-    }
-    IniFile ini(path);
-    IniFile *ptrIni = &ini;
-    char CustomEtype[256];
-    sprintf(CustomEtype, "CustomEtype-%d",Etype-BASIC_MEA_END);
-    department=ptrIni->ReadString(CustomEtype, "Department");
 }
