@@ -11,6 +11,12 @@
 #include "display/gui_func.h"
 #include "display/gui_global.h"
 
+enum {
+  COL_CHECKED,
+  COL_NAME,
+  NUM_COLS
+};
+
 ConfigToUSB* ConfigToUSB::m_instance = NULL;
 GCancellable* ConfigToUSB::m_cancellable = NULL;
 
@@ -25,6 +31,10 @@ ConfigToUSB* ConfigToUSB::GetInstance() {
 }
 
 ConfigToUSB::ConfigToUSB() {
+  m_dialog = NULL;
+  m_treeview_root = NULL;
+  m_treeview_branch = NULL;
+
   m_listBranch = NULL;
 }
 
@@ -37,100 +47,57 @@ ConfigToUSB::~ConfigToUSB() {
 void ConfigToUSB::CreateWindow(GtkWindow* parent) {
   m_dialog = Utils::create_dialog(GTK_WINDOW(parent), _("Data Selection"), 640, 480);
 
-  GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_APPLY);
+  GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OPEN);
   GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
 
   g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
+
+  GtkTable* table = GTK_TABLE(gtk_table_new(1, 3, TRUE));
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
+
+  gtk_container_set_border_width(GTK_CONTAINER(table), 30);
+
+  gtk_table_set_row_spacings(table, 10);
+  gtk_table_set_col_spacings(table, 10);
+
+  // scrolled_window
+  GtkScrolledWindow* scrolled_window_root = Utils::create_scrolled_window();
+  GtkScrolledWindow* scrolled_window_branch = Utils::create_scrolled_window();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window_root), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window_branch), 1, 3, 0, 1);
+
+  gtk_scrolled_window_set_shadow_type(scrolled_window_root, GTK_SHADOW_IN);
+  gtk_scrolled_window_set_shadow_type(scrolled_window_branch, GTK_SHADOW_IN);
+
+  // Root
+  m_treeview_root = CreateTreeview(0);
+  gtk_container_add(GTK_CONTAINER(scrolled_window_root), GTK_WIDGET(m_treeview_root));
+
+  GtkTreeSelection* selectionRoot = gtk_tree_view_get_selection(m_treeview_root);
+  gtk_tree_selection_set_mode(selectionRoot, GTK_SELECTION_SINGLE);
+  g_signal_connect(G_OBJECT(selectionRoot), "changed", G_CALLBACK(signal_treeselection_changed_root), this);
+
+  GtkTreeModel* modelRoot = CreateRootModel();
+
+  if (modelRoot != NULL) {
+    gtk_tree_view_set_model(m_treeview_root, modelRoot);
+  }
+
+  g_object_unref (modelRoot);
+
+  // Branch
+  m_treeview_branch = CreateTreeview(1);
+  gtk_container_add(GTK_CONTAINER(scrolled_window_branch), GTK_WIDGET(m_treeview_branch));
+
+  UpdateRootModel();
 
   gtk_widget_show_all(GTK_WIDGET(m_dialog));
   g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
 
   g_keyInterface.Push(this);
   SetSystemCursorToCenter();
-
-
-  /*
-
-  GtkWidget *fixed;
-  GtkWidget *btnOK, *btnCancel;
-  GtkWidget *swRoot, *swBranch;
-  GtkTreeModel *modelRoot;
-
-  m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (m_window, 640, 480);
-    gtk_window_set_title (GTK_WINDOW (m_window), _("Data Selection"));
-    gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER_ALWAYS);
-    gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
-    gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-    gtk_window_set_transient_for(GTK_WINDOW(m_window), parent);
-    g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
-
-
-  fixed = gtk_fixed_new ();
-  gtk_widget_show (fixed);
-  gtk_container_add (GTK_CONTAINER (m_window), fixed);
-
-  swRoot = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_show (swRoot);
-  gtk_fixed_put (GTK_FIXED (fixed), swRoot, 20, 10);
-  gtk_widget_set_size_request (swRoot, 200, 300);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swRoot), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swRoot), GTK_SHADOW_IN);
-
-  m_treeRoot = create_treeview(0);
-  gtk_widget_show (m_treeRoot);
-  gtk_container_add (GTK_CONTAINER (swRoot), m_treeRoot);
-  GtkTreeSelection *selectRoot = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
-  gtk_tree_selection_set_mode(selectRoot, GTK_SELECTION_SINGLE);
-  g_signal_connect(G_OBJECT(selectRoot), "changed", G_CALLBACK(on_root_selection_changed), this);
-
-  cout << 3 << endl;
-
-  modelRoot = create_root_model();
-  if (modelRoot != NULL)
-      gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeRoot), modelRoot);
-  g_object_unref (modelRoot);
-
-  swBranch = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_show (swBranch);
-  gtk_fixed_put (GTK_FIXED (fixed), swBranch, 220, 10);
-  gtk_widget_set_size_request (swBranch, 400, 300);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swBranch), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swBranch), GTK_SHADOW_IN);
-
-  cout << 4 << endl;
-
-  m_treeBranch = create_treeview(1);
-  gtk_widget_show (m_treeBranch);
-  gtk_container_add (GTK_CONTAINER (swBranch), m_treeBranch);
-
-  cout << 5 << endl;
-
-  GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
-  GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("OK"));
-  //btnOK = create_button_icon(labelOK, imageOK);
-  btnOK = create_button(labelOK, 30, 30, g_deep);
-  gtk_fixed_put (GTK_FIXED (fixed), btnOK, 360, 410);
-  g_signal_connect ( G_OBJECT(btnOK), "clicked", G_CALLBACK (on_button_ok_clicked), this);
-
-  cout << 6 << endl;
-
-  GtkWidget *imageCancel = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
-  GtkWidget *labelCancel = gtk_label_new_with_mnemonic (_("Cancel"));
-  //btnCancel = create_button_icon(labelCancel, imageCancel);
-  btnCancel = create_button(labelCancel, 30, 30, g_deep);
-  gtk_fixed_put (GTK_FIXED (fixed), btnCancel, 500, 410);
-  g_signal_connect ( G_OBJECT(btnCancel), "clicked", G_CALLBACK (on_button_cancel_clicked), this);
-
-
-
-  UpdateRootModel();
-
-  gtk_widget_show_all(m_window);
-
-  g_keyInterface.Push(this);
-  SetSystemCursorToCenter();*/
 }
 
 // ---------------------------------------------------------
@@ -296,6 +263,95 @@ void ConfigToUSB::CallbackProgress(goffset current, goffset total) {
   }
 }
 
+void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection) {
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  gchar *text;
+
+  if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    gtk_tree_model_get(model, &iter, COL_NAME, &text, -1);
+    GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+    //  PRINTF("Selection path: %s\n", gtk_tree_path_to_string(path));
+    UpdateBranchModel(atoi(gtk_tree_path_to_string(path)));
+    gtk_tree_path_free (path);
+    g_free(text);
+  }
+}
+
+void ConfigToUSB::ToggleData(GtkCellRendererToggle* cell, gchar* path_str) {
+  GtkTreeView *treeview;
+  gint type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "type"));
+
+  if(type == 0) {
+    treeview = m_treeview_root;
+  } else if(type == 1) {
+    treeview = m_treeview_branch;
+  } else {
+    return;
+  }
+
+  // PRINTF("Toggle path: %s\n", path_str);
+  GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(treeview));
+  GtkTreeIter iter;
+  GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
+  gboolean checked;
+
+  /* get toggled iter */
+  gtk_tree_model_get_iter (model, &iter, path);
+  gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
+
+  /* do something with the value */
+  checked ^= 1; //按位异或
+
+  /* set new value */
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);
+
+  if(type == 0 ) { //Root
+    gint rows = atoi(gtk_tree_path_to_string(path));
+    UpdateBranchModel(rows);
+    GList *list = g_list_first(m_listBranch);
+    SetAllToggleValue(GTK_TREE_MODEL(g_list_nth_data(list, rows)), checked);
+  } else if(type == 1) { //Branch
+    GtkTreeIter i;
+    GtkTreeModel *m;
+
+    if(!checked) {
+      GtkTreeSelection *s = gtk_tree_view_get_selection(m_treeview_root);
+
+      if(gtk_tree_selection_get_selected(s, &m, &i)) {
+        gtk_list_store_set(GTK_LIST_STORE(m), &i, COL_CHECKED, checked, -1);
+      }
+    } else {
+      //check all status
+      gboolean checkall = TRUE;
+      m = gtk_tree_view_get_model(m_treeview_branch);
+      gboolean valid = gtk_tree_model_get_iter_first(m, &i);
+
+      while(valid) {
+        gboolean val;
+        gtk_tree_model_get(m, &i, COL_CHECKED, &val, -1);
+
+        if(!val) {
+          checkall = FALSE;
+        }
+
+        valid = gtk_tree_model_iter_next(m, &i);
+      }
+
+      if(checkall) {
+        GtkTreeSelection *s = gtk_tree_view_get_selection(m_treeview_root);
+
+        if(gtk_tree_selection_get_selected(s, &m, &i)) {
+          gtk_list_store_set(GTK_LIST_STORE(m), &i, COL_CHECKED, TRUE, -1);
+        }
+      }
+    }
+  }
+
+  /* clean up */
+  gtk_tree_path_free (path);
+}
+
 void ConfigToUSB::KeyEvent(unsigned char keyValue) {
   FakeXEvent::KeyEvent(keyValue);
 
@@ -305,7 +361,7 @@ void ConfigToUSB::KeyEvent(unsigned char keyValue) {
 }
 
 void ConfigToUSB::DestroyWindow() {
-  if(g_list_length(m_listBranch) > 0) {
+  if(m_listBranch != NULL && g_list_length(m_listBranch) > 0) {
     // clean the data in list
     m_listBranch = g_list_first(m_listBranch);
 
@@ -333,288 +389,212 @@ void ConfigToUSB::DestroyWindow() {
   }
 
   m_dialog = NULL;
+  m_treeview_root = NULL;
+  m_treeview_branch = NULL;
 }
 
+// type: 0=root, 1=branch
+GtkTreeView* ConfigToUSB::CreateTreeview(gint type) {
+  GtkTreeView* treeview = Utils::create_tree_view();
 
+  g_object_set(G_OBJECT(treeview),
+    "enable-search", FALSE,
+    "headers-visible", FALSE,
+    "rules-hint", TRUE,
+    NULL);
 
-enum {
-        COL_CHECKED,
-        COL_NAME,
-        NUM_COLS
-    };
+  GtkCellRenderer* render = gtk_cell_renderer_toggle_new();
+  g_signal_connect(G_OBJECT(render), "toggled", G_CALLBACK(signal_callback_toggled), this);
 
+  GtkTreeViewColumn* col = gtk_tree_view_column_new_with_attributes("", render, "active", COL_CHECKED, NULL);
+  gtk_tree_view_append_column(treeview, col);
+  g_object_set_data(G_OBJECT(render), "type", GINT_TO_POINTER(type));
 
-//type: 0=root, 1=branch
-GtkWidget* ConfigToUSB::create_treeview(gint type) {
-    GtkWidget *treeview;
-    GtkCellRenderer *render;
-    GtkTreeViewColumn *col;
+  render = gtk_cell_renderer_text_new();
+  col = gtk_tree_view_column_new_with_attributes(_("Name"), render, "text", COL_NAME, NULL);
+  gtk_tree_view_append_column(treeview, col);
 
-    treeview = gtk_tree_view_new ();
-    g_object_set(G_OBJECT(treeview),
-                 "enable-search", FALSE,
-                 "headers-visible", FALSE,
-                 "rules-hint", TRUE,
-                 NULL);
-
-    render = gtk_cell_renderer_toggle_new();
-    g_signal_connect (G_OBJECT(render), "toggled", G_CALLBACK (on_data_toggled), this);
-    col = gtk_tree_view_column_new_with_attributes("", render, "active", COL_CHECKED, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col);
-    g_object_set_data(G_OBJECT(render), "type", GINT_TO_POINTER(type));
-
-    render = gtk_cell_renderer_text_new();
-    col = gtk_tree_view_column_new_with_attributes(_("Name"), render, "text", COL_NAME, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col);
-
-    return treeview;
+  return treeview;
 }
 
-GtkTreeModel* ConfigToUSB::create_root_model() {
-    GtkListStore *store;
+GtkTreeModel* ConfigToUSB::CreateRootModel() {
+  GtkListStore* store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
 
-    store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
-
-    return GTK_TREE_MODEL (store);
+  return GTK_TREE_MODEL (store);
 }
 
-void ConfigToUSB::ToggleData(GtkCellRendererToggle *cell, gchar *path_str) {
-    GtkWidget *treeview;
-    gint type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "type"));
-    if(type == 0)
-        treeview = m_treeRoot;
-    else if(type == 1)
-        treeview = m_treeBranch;
-    else
-        return;
+void ConfigToUSB::UpdateRootModel() {
+  DIR *dir;
+  struct dirent *ent;
 
-    //	PRINTF("Toggle path: %s\n", path_str);
-    GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(treeview));
-    GtkTreeIter iter;
-    GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
-    gboolean checked;
+  GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(m_treeview_root));
+  GtkTreeIter iter;
 
-    /* get toggled iter */
-    gtk_tree_model_get_iter (model, &iter, path);
-    gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
+  dir = opendir(USERCONFIG_PARENT_PATH);
+  if(!dir) {
+    perror("open path error");
+    return;
+  }
 
-    /* do something with the value */
-    checked ^= 1; //按位异或
+  while((ent = readdir(dir)) != NULL) {
+    PRINTF("DIR: %s\n", ent->d_name);
+    if(ent->d_name[0]=='.')
+        continue;
+    // if(ent->d_type==DT_DIR)
+    gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, ent->d_name, NULL);
+    //export file of default dir or  userconfig dir
 
-    /* set new value */
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHECKED, checked, -1);
-
-    if(type == 0 ) { //Root
-        gint rows = atoi(gtk_tree_path_to_string(path));
-        UpdateBranchModel(rows);
-        GList *list = g_list_first(m_listBranch);
-        SetAllToggleValue(GTK_TREE_MODEL(g_list_nth_data(list, rows)), checked);
-    } else if(type == 1) { //Branch
-        GtkTreeIter i;
-        GtkTreeModel *m;
-        if(!checked) {
-            GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
-            if(gtk_tree_selection_get_selected(s, &m, &i))
-                gtk_list_store_set(GTK_LIST_STORE(m), &i, COL_CHECKED, checked, -1);
-        } else {
-            //check all status
-            gboolean checkall = TRUE;
-            m = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeBranch));
-            gboolean valid = gtk_tree_model_get_iter_first(m, &i);
-            while(valid) {
-                gboolean val;
-                gtk_tree_model_get(m, &i, COL_CHECKED, &val, -1);
-                if(!val)
-                    checkall = FALSE;
-                valid = gtk_tree_model_iter_next(m, &i);
-            }
-            if(checkall) {
-                GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
-                if(gtk_tree_selection_get_selected(s, &m, &i))
-                    gtk_list_store_set(GTK_LIST_STORE(m), &i, COL_CHECKED, TRUE, -1);
-            }
-        }
+    if(g_file_test(tmpPath, G_FILE_TEST_IS_DIR) && ((strcmp(ent->d_name, "userconfig") == 0) || (strcmp(ent->d_name, "default") == 0))) {
+      // PRINTF("DIR: %s\n", ent->d_name);
+      gtk_list_store_append(store, &iter);
+      gtk_list_store_set(store, &iter,
+         COL_CHECKED, FALSE,
+         COL_NAME, ent->d_name,
+         -1);
+      GtkTreeModel *model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
+      m_listBranch = g_list_append(m_listBranch, model);
     }
 
-    /* clean up */
-    gtk_tree_path_free (path);
-}
+    g_free(tmpPath);
+  }
 
-void ConfigToUSB::UpdateRootModel(void) {
-    DIR *dir;
-    struct dirent *ent;
-
-    GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeRoot)));
-    GtkTreeIter iter;
-
-    dir = opendir(USERCONFIG_PARENT_PATH);
-    if(!dir) {
-        perror("open path error");
-        return;
-    }
-
-    while((ent = readdir(dir)) != NULL) {
-        PRINTF("DIR: %s\n", ent->d_name);
-        if(ent->d_name[0]=='.')
-            continue;
-        //	if(ent->d_type==DT_DIR)
-        gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, ent->d_name, NULL);
-        //export file of default dir or  userconfig dir
-        if(g_file_test(tmpPath, G_FILE_TEST_IS_DIR) && ((strcmp(ent->d_name, "userconfig") == 0) || (strcmp(ent->d_name, "default") == 0))) {
-            //	PRINTF("DIR: %s\n", ent->d_name);
-            gtk_list_store_append(store, &iter);
-            gtk_list_store_set(store, &iter,
-                               COL_CHECKED, FALSE,
-                               COL_NAME, ent->d_name,
-                               -1);
-            GtkTreeModel *model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
-            m_listBranch = g_list_append(m_listBranch, model);
-        }
-        g_free(tmpPath);
-    }
-    closedir(dir);
+  closedir(dir);
 }
 
 // rows: the row's number in the Root model
 void ConfigToUSB::UpdateBranchModel(gint rows) {
+  if (m_listBranch != NULL) {
     GList *list = g_list_first(m_listBranch);
-    gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeBranch), GTK_TREE_MODEL(g_list_nth_data(list, rows)));
+    gtk_tree_view_set_model (m_treeview_branch, GTK_TREE_MODEL(g_list_nth_data(list, rows)));
+  }
 }
 
-GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar *branch) {
-    DIR *dir;
-    struct dirent *ent;
-    gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, branch, NULL);
+GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar* branch) {
+  DIR *dir;
+  struct dirent *ent;
+  gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, branch, NULL);
 
-    GtkListStore *store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
-    gtk_list_store_clear(store);
-    GtkTreeIter iter;
+  GtkListStore *store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
+  gtk_list_store_clear(store);
+  GtkTreeIter iter;
 
-    dir = opendir(path);
-    if(!dir) {
-        perror("open path error");
-        return NULL;
+  dir = opendir(path);
+  if(!dir) {
+    perror("open path error");
+    return NULL;
+  }
+
+  FileMan fm;
+  gboolean flag = 0;
+
+  while((ent = readdir(dir)) != NULL) {
+    if(ent->d_name[0]=='.') {
+      continue;
     }
 
-    FileMan fm;
-    gboolean flag = 0;
-    while((ent = readdir(dir)) != NULL) {
-        if(ent->d_name[0]=='.')
-            continue;
-        //	if(ent->d_type==DT_REG)
-        gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, path, ent->d_name, NULL);
-        if(g_file_test(tmpPath, G_FILE_TEST_IS_REGULAR)) {
-            //	if(fm.CompareSuffix(ent->d_name, "jpg")==0 || fm.CompareSuffix(ent->d_name, "bmp")==0 || fm.CompareSuffix(ent->d_name, "emp")==0 || fm.CompareSuffix(ent->d_name, "avi")==0 || fm.CompareSuffix(ent->d_name, "cine")==0)
-            if (fm.CompareSuffix(ent->d_name, "ini")==0) {
-                //	PRINTF("	FILE: %s\n", ent->d_name);
-                gtk_list_store_append(store, &iter);
-                gtk_list_store_set(store, &iter,
-                                   COL_CHECKED, FALSE,
-                                   COL_NAME, ent->d_name,
-                                   -1);
-                flag = 1;
-            }
+    // if(ent->d_type==DT_REG)
+    gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, path, ent->d_name, NULL);
+    if(g_file_test(tmpPath, G_FILE_TEST_IS_REGULAR)) {
+      if (fm.CompareSuffix(ent->d_name, "ini")==0) {
+        // PRINTF("FILE: %s\n", ent->d_name);
+        gtk_list_store_append(store, &iter);
+        gtk_list_store_set(store, &iter,
+           COL_CHECKED, FALSE,
+           COL_NAME, ent->d_name,
+           -1);
+        flag = 1;
+      }
+    }
+
+    g_free(tmpPath);
+  }
+
+  closedir(dir);
+  g_free(path);
+
+  if(flag) {
+    return GTK_TREE_MODEL(store);
+  } else {
+    return NULL;
+  }
+}
+
+bool ConfigToUSB::GetAllSelectPath() {
+  m_vecPath.clear();
+
+  gchar *nameRoot, *nameBranch;
+  gboolean checkedRoot, checkedBranch;
+  gboolean validRoot, validBranch;
+  GtkTreeModel *modelRoot, *modelBranch;
+  GtkTreeIter iterRoot, iterBranch;
+  FileMan fm;
+
+  modelRoot = gtk_tree_view_get_model(m_treeview_root);
+  validRoot = gtk_tree_model_get_iter_first(modelRoot, &iterRoot);
+
+  if(m_listBranch != NULL && g_list_length(m_listBranch) > 0) {
+    GList *list = g_list_first(m_listBranch);
+
+    while(list) {
+      // PRINTF("New Branch\n");
+      if(!validRoot || !list->data) {
+        validRoot = gtk_tree_model_iter_next(modelRoot, &iterRoot);
+        list = list->next;
+        continue;
+      }
+
+      gtk_tree_model_get(modelRoot, &iterRoot, COL_CHECKED, &checkedRoot, COL_NAME, &nameRoot, -1);
+      // PRINTF("Root Name=%s\n", nameRoot);
+
+      modelBranch = GTK_TREE_MODEL(list->data);
+      validBranch = gtk_tree_model_get_iter_first(modelBranch, &iterBranch);
+
+      //check all iter in branch list
+      while(validBranch) {
+        gtk_tree_model_get(modelBranch, &iterBranch, COL_CHECKED, &checkedBranch, COL_NAME, &nameBranch, -1);
+        //PRINTF("Branch Name=%s, Checked=%d\n", nameBranch, checkedBranch);
+
+        if(checkedBranch) {
+          gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, nameRoot, nameBranch, NULL);
+          // PRINTF("Push to vector: %s\n", path);
+          m_vecPath.push_back(path);
+          gchar pathIni[255];
+          fm.GetIniFilePath(path, pathIni);
+          // PRINTF("Ini path is: %s\n", pathIni);
+          m_vecPath.push_back(pathIni);
+
+          g_free(path);
         }
-        g_free(tmpPath);
-    }
-    closedir(dir);
-    g_free(path);
 
-    if(flag)
-        return GTK_TREE_MODEL(store);
-    else
-        return NULL;
+        validBranch = gtk_tree_model_iter_next(modelBranch, &iterBranch);
+        g_free(nameBranch);
+      }
+
+      validRoot = gtk_tree_model_iter_next(modelRoot, &iterRoot);
+      g_free(nameRoot);
+      list = list->next;
+    }
+  }
+
+  if(!m_vecPath.empty()) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection) {
-    GtkTreeIter iter;
-    GtkTreeModel *model;
-    gchar *text;
+void ConfigToUSB::SetAllToggleValue(GtkTreeModel* model, gboolean value) {
+  gboolean valid;
+  GtkTreeIter iter;
 
-    if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
-        gtk_tree_model_get(model, &iter, COL_NAME, &text, -1);
-        GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
-        //	PRINTF("Selection path: %s\n", gtk_tree_path_to_string(path));
-        UpdateBranchModel(atoi(gtk_tree_path_to_string(path)));
-        gtk_tree_path_free (path);
-        g_free(text);
-    }
-}
+  if(!model) {
+    return;
+  }
 
-void ConfigToUSB::SetAllToggleValue(GtkTreeModel *model, gboolean value) {
-    gboolean valid;
-    GtkTreeIter iter;
+  valid = gtk_tree_model_get_iter_first(model, &iter);
 
-    if(!model)
-        return;
-
-    valid = gtk_tree_model_get_iter_first(model, &iter);
-
-    while(valid) {
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_CHECKED, value, -1);
-        valid = gtk_tree_model_iter_next(model, &iter);
-    }
-}
-
-gboolean ConfigToUSB::CheckBranchStauts(void) {
-    return FALSE;
-}
-
-gboolean ConfigToUSB::GetAllSelectPath(void) {
-    m_vecPath.clear();
-
-    gchar *nameRoot, *nameBranch;
-    gboolean checkedRoot, checkedBranch;
-    gboolean validRoot, validBranch;
-    GtkTreeModel *modelRoot, *modelBranch;
-    GtkTreeIter iterRoot, iterBranch;
-    FileMan fm;
-
-    modelRoot = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeRoot));
-    validRoot = gtk_tree_model_get_iter_first(modelRoot, &iterRoot);
-
-    if(g_list_length(m_listBranch) > 0) {
-        GList *list = g_list_first(m_listBranch);
-        while(list) {
-            //	PRINTF("New Branch\n");
-            if(!validRoot || !list->data) {
-                validRoot = gtk_tree_model_iter_next(modelRoot, &iterRoot);
-                list = list->next;
-                continue;
-            }
-
-            gtk_tree_model_get(modelRoot, &iterRoot, COL_CHECKED, &checkedRoot, COL_NAME, &nameRoot, -1);
-            //	PRINTF("Root Name=%s\n", nameRoot);
-
-            modelBranch = GTK_TREE_MODEL(list->data);
-            validBranch = gtk_tree_model_get_iter_first(modelBranch, &iterBranch);
-            //check all iter in branch list
-            while(validBranch) {
-                gtk_tree_model_get(modelBranch, &iterBranch, COL_CHECKED, &checkedBranch, COL_NAME, &nameBranch, -1);
-                //	PRINTF("Branch Name=%s, Checked=%d\n", nameBranch, checkedBranch);
-                if(checkedBranch) {
-                    gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, nameRoot, nameBranch, NULL);
-                    //		PRINTF("Push to vector: %s\n", path);
-                    m_vecPath.push_back(path);
-                    gchar pathIni[255];
-                    fm.GetIniFilePath(path, pathIni);
-                    //			PRINTF("Ini path is: %s\n", pathIni);
-                    m_vecPath.push_back(pathIni);
-
-                    g_free(path);
-                }
-                validBranch = gtk_tree_model_iter_next(modelBranch, &iterBranch);
-                g_free(nameBranch);
-            }
-
-            validRoot = gtk_tree_model_iter_next(modelRoot, &iterRoot);
-            g_free(nameRoot);
-            list = list->next;
-        }
-    }
-
-    if(!m_vecPath.empty())
-        return TRUE;
-    else
-        return FALSE;
+  while(valid) {
+    gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_CHECKED, value, -1);
+    valid = gtk_tree_model_iter_next(model, &iter);
+  }
 }

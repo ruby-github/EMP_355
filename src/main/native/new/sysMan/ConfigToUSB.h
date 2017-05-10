@@ -60,12 +60,27 @@ private:
     ConfigToUSB::GetInstance()->CallbackProgress(current, total);
   }
 
+  static void signal_treeselection_changed_root(GtkTreeSelection* selction, ConfigToUSB* data) {
+    if (data != NULL) {
+      data->RootSelectionChanged(selction);
+    }
+  }
+
+  static void signal_callback_toggled(GtkCellRendererToggle* cell, gchar* path_str, ConfigToUSB* data) {
+    if (data != NULL) {
+      data->ToggleData(cell, path_str);
+    }
+  }
+
   // signal
 
   void ButtonClickedOK(GtkButton* button);
   void ButtonClickedCancel(GtkButton* button);
   bool LoadSelectedData();
   void CallbackProgress(goffset current, goffset total);
+
+  void RootSelectionChanged(GtkTreeSelection* selection);
+  void ToggleData(GtkCellRendererToggle* cell, gchar* path_str);
 
 private:
   ConfigToUSB();
@@ -78,44 +93,28 @@ private:
     return m_vecPath;
   }
 
+  GtkTreeView* CreateTreeview(gint type);
+  GtkTreeModel* CreateRootModel();
+
+  void UpdateRootModel();
+  void UpdateBranchModel(gint rows);
+
+  GtkTreeModel* LoadBranchModel(gchar* branch);
+  bool GetAllSelectPath();
+  void SetAllToggleValue(GtkTreeModel* model, gboolean value);
+
 private:
   static ConfigToUSB* m_instance;
   static GCancellable* m_cancellable;
 
 private:
   GtkDialog* m_dialog;
+  GtkTreeView* m_treeview_root;
+  GtkTreeView* m_treeview_branch;
+
+  GList* m_listBranch;
 
   vector<string> m_vecPath;
-
-private:
-  static void on_data_toggled(GtkCellRendererToggle* cell, gchar* path_str, ConfigToUSB* data) {
-    data->ToggleData(cell, path_str);
-  }
-
-  static void on_root_selection_changed(GtkTreeSelection* selction, ConfigToUSB* data) {
-    data->RootSelectionChanged(selction);
-  }
-
-  // signal
-
-  void ToggleData(GtkCellRendererToggle *cell, gchar *path_str);
-  void RootSelectionChanged(GtkTreeSelection *selection);
-
-private:
-    GtkWidget *m_treeRoot;
-    GtkWidget *m_treeBranch;
-    GtkWidget *m_chkbtnDel;
-    GList *m_listBranch;
-
-
-    GtkWidget* create_treeview(gint type);
-    GtkTreeModel* create_root_model(void);
-    void UpdateRootModel(void);
-    void UpdateBranchModel(gint rows);
-    GtkTreeModel* LoadBranchModel(gchar *branch);
-    void SetAllToggleValue(GtkTreeModel *model, gboolean value);
-    gboolean GetAllSelectPath(void);
-    gboolean CheckBranchStauts(void);
 };
 
 #endif
