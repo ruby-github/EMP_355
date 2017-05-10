@@ -324,9 +324,8 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "sysMan/CalcSetting.h"
-#include "utils/MessageDialog.h"
+#include "sysMan/ConfigToUSB.h"
 
 void Utils::test(GtkWidget* widget) {
-  CustomCalc::GetInstance()->CreateExportCalcSettingWin(widget);
+  ConfigToUSB::GetInstance()->CreateWindow(NULL);
 }

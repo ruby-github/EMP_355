@@ -1,49 +1,63 @@
-#include <dirent.h>
+#include "sysMan/ConfigToUSB.h"
+
+#include "utils/FakeXUtils.h"
+#include "utils/MessageDialog.h"
+
+#include "keyboard/KeyDef.h"
+#include "keyboard/KeyValueOpr.h"
+#include "patient/FileMan.h"
+#include "periDevice/PeripheralMan.h"
+
 #include "display/gui_func.h"
 #include "display/gui_global.h"
-#include "patient/FileMan.h"
-#include "keyboard/KeyValueOpr.h"
-#include "keyboard/KeyDef.h"
-#include "utils/FakeXUtils.h"
-#include "periDevice/PeripheralMan.h"
-#include "utils/MessageDialog.h"
-#include "patient/ViewArchive.h"
-#include "patient/ViewArchiveImgMan.h"
-#include "sysMan/ConfigToUSB.h"
-#include "sysMan/ViewSystem.h"
 
-ConfigToUSB* ConfigToUSB::m_ptrInstance = NULL;
+ConfigToUSB* ConfigToUSB::m_instance = NULL;
+GCancellable* ConfigToUSB::m_cancellable = NULL;
 
-enum {
-        COL_CHECKED,
-        COL_NAME,
-        NUM_COLS
-    };
+// ---------------------------------------------------------
+
+ConfigToUSB* ConfigToUSB::GetInstance() {
+  if (m_instance == NULL) {
+    m_instance = new ConfigToUSB();
+  }
+
+  return m_instance;
+}
 
 ConfigToUSB::ConfigToUSB() {
-    m_listBranch = NULL;
-    m_vecPath.clear();
+  m_listBranch = NULL;
 }
 
 ConfigToUSB::~ConfigToUSB() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
 }
 
-ConfigToUSB* ConfigToUSB::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new ConfigToUSB;
+void ConfigToUSB::CreateWindow(GtkWindow* parent) {
+  m_dialog = Utils::create_dialog(GTK_WINDOW(parent), _("Data Selection"), 640, 480);
 
-    return m_ptrInstance;
-}
+  GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_APPLY);
+  GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
 
-void ConfigToUSB::CreateWindow(GtkWindow *parent) {
-    GtkWidget *fixed;
-    GtkWidget *btnOK, *btnCancel;
-    GtkWidget *swRoot, *swBranch;
-    GtkTreeModel *modelRoot;
+  g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
+  g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
 
-    m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_widget_show_all(GTK_WIDGET(m_dialog));
+  g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
+
+
+  /*
+
+  GtkWidget *fixed;
+  GtkWidget *btnOK, *btnCancel;
+  GtkWidget *swRoot, *swBranch;
+  GtkTreeModel *modelRoot;
+
+  m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_widget_set_size_request (m_window, 640, 480);
     gtk_window_set_title (GTK_WINDOW (m_window), _("Data Selection"));
     gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER_ALWAYS);
@@ -52,263 +66,283 @@ void ConfigToUSB::CreateWindow(GtkWindow *parent) {
     gtk_window_set_transient_for(GTK_WINDOW(m_window), parent);
     g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
 
-    fixed = gtk_fixed_new ();
-    gtk_widget_show (fixed);
-    gtk_container_add (GTK_CONTAINER (m_window), fixed);
 
-    swRoot = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (swRoot);
-    gtk_fixed_put (GTK_FIXED (fixed), swRoot, 20, 10);
-    gtk_widget_set_size_request (swRoot, 200, 300);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swRoot), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swRoot), GTK_SHADOW_IN);
+  fixed = gtk_fixed_new ();
+  gtk_widget_show (fixed);
+  gtk_container_add (GTK_CONTAINER (m_window), fixed);
 
-    m_treeRoot = create_treeview(0);
-    gtk_widget_show (m_treeRoot);
-    gtk_container_add (GTK_CONTAINER (swRoot), m_treeRoot);
-    GtkTreeSelection *selectRoot = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
-    gtk_tree_selection_set_mode(selectRoot, GTK_SELECTION_SINGLE);
-    g_signal_connect(G_OBJECT(selectRoot), "changed", G_CALLBACK(on_root_selection_changed), this);
+  swRoot = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_show (swRoot);
+  gtk_fixed_put (GTK_FIXED (fixed), swRoot, 20, 10);
+  gtk_widget_set_size_request (swRoot, 200, 300);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swRoot), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swRoot), GTK_SHADOW_IN);
 
-    modelRoot = create_root_model();
-    if (modelRoot != NULL)
-        gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeRoot), modelRoot);
-    g_object_unref (modelRoot);
+  m_treeRoot = create_treeview(0);
+  gtk_widget_show (m_treeRoot);
+  gtk_container_add (GTK_CONTAINER (swRoot), m_treeRoot);
+  GtkTreeSelection *selectRoot = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeRoot));
+  gtk_tree_selection_set_mode(selectRoot, GTK_SELECTION_SINGLE);
+  g_signal_connect(G_OBJECT(selectRoot), "changed", G_CALLBACK(on_root_selection_changed), this);
 
-    swBranch = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (swBranch);
-    gtk_fixed_put (GTK_FIXED (fixed), swBranch, 220, 10);
-    gtk_widget_set_size_request (swBranch, 400, 300);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swBranch), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swBranch), GTK_SHADOW_IN);
+  cout << 3 << endl;
 
-    m_treeBranch = create_treeview(1);
-    gtk_widget_show (m_treeBranch);
-    gtk_container_add (GTK_CONTAINER (swBranch), m_treeBranch);
+  modelRoot = create_root_model();
+  if (modelRoot != NULL)
+      gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeRoot), modelRoot);
+  g_object_unref (modelRoot);
 
-    GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("OK"));
-    btnOK = create_button_icon(labelOK, imageOK);
-    gtk_fixed_put (GTK_FIXED (fixed), btnOK, 360, 410);
-    g_signal_connect ( G_OBJECT(btnOK), "clicked", G_CALLBACK (on_button_ok_clicked), this);
+  swBranch = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_show (swBranch);
+  gtk_fixed_put (GTK_FIXED (fixed), swBranch, 220, 10);
+  gtk_widget_set_size_request (swBranch, 400, 300);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (swBranch), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (swBranch), GTK_SHADOW_IN);
 
-    GtkWidget *imageCancel = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *labelCancel = gtk_label_new_with_mnemonic (_("Cancel"));
-    btnCancel = create_button_icon(labelCancel, imageCancel);
-    gtk_fixed_put (GTK_FIXED (fixed), btnCancel, 500, 410);
-    g_signal_connect ( G_OBJECT(btnCancel), "clicked", G_CALLBACK (on_button_cancel_clicked), this);
+  cout << 4 << endl;
 
-    UpdateRootModel();
+  m_treeBranch = create_treeview(1);
+  gtk_widget_show (m_treeBranch);
+  gtk_container_add (GTK_CONTAINER (swBranch), m_treeBranch);
 
-    gtk_widget_show_all(m_window);
+  cout << 5 << endl;
 
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
+  GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
+  GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("OK"));
+  //btnOK = create_button_icon(labelOK, imageOK);
+  btnOK = create_button(labelOK, 30, 30, g_deep);
+  gtk_fixed_put (GTK_FIXED (fixed), btnOK, 360, 410);
+  g_signal_connect ( G_OBJECT(btnOK), "clicked", G_CALLBACK (on_button_ok_clicked), this);
 
+  cout << 6 << endl;
+
+  GtkWidget *imageCancel = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
+  GtkWidget *labelCancel = gtk_label_new_with_mnemonic (_("Cancel"));
+  //btnCancel = create_button_icon(labelCancel, imageCancel);
+  btnCancel = create_button(labelCancel, 30, 30, g_deep);
+  gtk_fixed_put (GTK_FIXED (fixed), btnCancel, 500, 410);
+  g_signal_connect ( G_OBJECT(btnCancel), "clicked", G_CALLBACK (on_button_cancel_clicked), this);
+
+
+
+  UpdateRootModel();
+
+  gtk_widget_show_all(m_window);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();*/
 }
 
-void ConfigToUSB::DestroyWindow(void) {
-    if(g_list_length(m_listBranch) > 0) {
-        //clean the data in list
-        m_listBranch = g_list_first(m_listBranch);
-        while(m_listBranch) {
-            GtkTreeModel *model = NULL;
-            if(m_listBranch->data)
-                model = GTK_TREE_MODEL(m_listBranch->data);
-            m_listBranch = g_list_remove(m_listBranch, GTK_TREE_MODEL(m_listBranch->data));
-            if(model)
-                g_object_unref(model);
-        }
-        //	PRINTF("%s: List length is %d\n", __FUNCTION__, g_list_length(m_listBranch));
-        g_list_free(m_listBranch);
-        m_listBranch = NULL;
-    }
+// ---------------------------------------------------------
 
-    //	m_vecPath.clear();
+void ConfigToUSB::ButtonClickedOK(GtkButton* button) {
+  // Copy the selected file to SLIDE_PATH
+  if(GetAllSelectPath()) {
+    g_timeout_add(1000, signal_load_selected_data, this);
 
-    if(GTK_IS_WIDGET(m_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(m_window);
-        m_window = NULL;
-    }
+    // PRINTF("Load From U disk!\n");
+    MessageDialog::GetInstance()->Create(
+      GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_PROGRESS_CANCEL,
+      _("Please wait, sending data to USB storage..."),
+      signal_callback_cancelloadusb);
+  }
+
+  DestroyWindow();
 }
 
-gboolean ConfigToUSB::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
-    DestroyWindow();
+void ConfigToUSB::ButtonClickedCancel(GtkButton* button) {
+  DestroyWindow();
+}
+
+bool ConfigToUSB::LoadSelectedData() {
+  int cond = 0;
+  int count = 1;
+  int total = 0;
+  char str_info[256], result[256];
+  FileMan fm;
+  PeripheralMan *ptr = PeripheralMan::GetInstance();
+
+  vector<string> vec = GetSelectedVec();
+
+  if(!ptr->CheckUsbStorageState()) {
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
+
     return FALSE;
+  } else {
+    if(!ptr->MountUsbStorage()) {
+      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+        MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
+
+      return FALSE;
+    }
+  }
+
+  m_cancellable = g_cancellable_new();
+
+  // list all string for test
+  vector<string>::iterator ite = vec.begin();
+  total = vec.size() / 2; // 1 image = 1 pic + 1 ini
+
+  while(ite < vec.end() && !cond) {
+    PRINTF("Send file: %s\n", (*ite).c_str());
+    GFile *fAbs = g_file_new_for_path((*ite).c_str());
+    GFile *fParent = g_file_get_parent(fAbs);
+    g_object_unref(fAbs);
+    gchar *strDestParent = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, g_file_get_basename(fParent), NULL);
+    g_object_unref(fParent);
+    GFile *fDest = g_file_new_for_path(strDestParent);
+
+    //create the parent directory
+    GError *err_mkdir = NULL;
+    if(!g_file_make_directory_with_parents(fDest, NULL, &err_mkdir)) {
+      if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
+        PRINTF("g_file_make_directory error: %s\n", err_mkdir->message);
+        sprintf(result, _("Failed to send data to USB storage!\nError: Failed to create directory."));
+        cond = -1;
+        g_error_free(err_mkdir);
+        g_object_unref(fDest);
+        g_free(strDestParent);
+
+        break;
+      }
+    }
+
+    g_object_unref(fDest);
+
+    //Update info
+    gchar *basename = g_path_get_basename((*ite).c_str());
+    if(fm.CompareSuffix(basename, "ini") != 0) {
+      sprintf(str_info, "%s %s   %d/%d\n%s", _("Loading..."), basename, count, total, _("Please wait..."));
+      MessageDialog::GetInstance()->SetText(str_info);
+      MessageDialog::GetInstance()->SetProgressBar(0);
+      count++;
+    }
+
+    //Perform copy operation
+    gchar *destPath = g_build_path(G_DIR_SEPARATOR_S, strDestParent, basename, NULL);
+    g_free(strDestParent);
+    g_free(basename);
+    PRINTF("Dest Path: %s\n", destPath);
+    GFile *src = g_file_new_for_path((*ite).c_str());
+    GFile *dest = g_file_new_for_path(destPath);
+    g_free(destPath);
+
+    GError *err = NULL;
+    int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, m_cancellable, signal_callback_progress, NULL, &err);
+    g_object_unref(src);
+    g_object_unref(dest);
+
+    if(!ret) {
+      PRINTF("g_file_copy error: %s\n", err->message);
+
+      switch(err->code) {
+      case G_IO_ERROR_NO_SPACE:
+          sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
+          break;
+      case G_IO_ERROR_CANCELLED:
+          sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
+          break;
+      default:
+          sprintf(result, _("Failed to send data to USB storage!"));
+          break;
+      }
+
+      cond = -1;
+      g_error_free(err);
+
+      break;
+    }
+
+    ite++;
+  }
+
+  ptr->UmountUsbStorage();
+  MessageDialog::GetInstance()->Destroy();
+
+  // Handle result
+  if(!cond) {
+    sprintf(result, _("Success to export to USB storage."));
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_INFO, result, NULL);
+  } else {
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_INFO, result, NULL);
+  }
+
+  return FALSE;
+}
+
+void ConfigToUSB::CallbackProgress(goffset current, goffset total) {
+  if(g_cancellable_is_cancelled(m_cancellable)) {
+    return;
+  }
+
+  double prac = (double)current/total;
+
+  if(prac >= 0 && prac <= 1.0) {
+    gdk_threads_enter();
+
+    MessageDialog::GetInstance()->SetProgressBar(prac);
+
+    while(gtk_events_pending()) {
+      gtk_main_iteration();
+    }
+
+    gdk_threads_leave();
+  } else {
+    PRINTF("fraction out of range!\n");
+  }
 }
 
 void ConfigToUSB::KeyEvent(unsigned char keyValue) {
-    FakeXEvent::KeyEvent(keyValue);
+  FakeXEvent::KeyEvent(keyValue);
 
-    switch(keyValue) {
-    case KEY_ESC:
-        BtnCancelClicked(NULL);
-        break;
-    default:
-        break;
-    }
+  if (keyValue == KEY_ESC) {
+    ButtonClickedCancel(NULL);
+  }
 }
 
-static GCancellable* cancellable = NULL;
+void ConfigToUSB::DestroyWindow() {
+  if(g_list_length(m_listBranch) > 0) {
+    // clean the data in list
+    m_listBranch = g_list_first(m_listBranch);
 
-static void progress_callback(goffset current, goffset total, gpointer data) {
-    if(g_cancellable_is_cancelled(cancellable))
-        return;
+    while(m_listBranch) {
+      GtkTreeModel* model = NULL;
 
-    double prac = (double)current/total;
-    //	PRINTF("prac = %f\n", prac);
-    if(prac >= 0 && prac <= 1.0) {
-        gdk_threads_enter();
-        MessageDialog::GetInstance()->SetProgressBar(prac);
-        while(gtk_events_pending())
-            gtk_main_iteration();
-        gdk_threads_leave();
-    } else
-        PRINTF("fraction out of range!\n");
-}
+      if(m_listBranch->data) {
+        model = GTK_TREE_MODEL(m_listBranch->data);
+      }
 
-static gboolean LoadSelectedData(gpointer data) {
-    int cond = 0;
-    int count = 1;
-    int total = 0;
-    char str_info[256], result[256];
-    FileMan fm;
-    PeripheralMan *ptr = PeripheralMan::GetInstance();
+      m_listBranch = g_list_remove(m_listBranch, GTK_TREE_MODEL(m_listBranch->data));
 
-    vector<string> vec = ConfigToUSB::GetInstance()->GetSelectedVec();
-
-    if(!ptr->CheckUsbStorageState()) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          MessageDialog::DLG_ERROR,
-                                          _("No USB storage found!"),
-                                          NULL);
-        return FALSE;
-    } else {
-        if(!ptr->MountUsbStorage()) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                              MessageDialog::DLG_ERROR,
-                                              _("Failed to mount USB storage!"),
-                                              NULL);
-            return FALSE;
-        }
+      if(model) {
+        g_object_unref(model);
+      }
     }
 
-    cancellable = g_cancellable_new();
+    g_list_free(m_listBranch);
+    m_listBranch = NULL;
+  }
 
-    //list all string for test
-    vector<string>::iterator ite = vec.begin();
-    total = vec.size() / 2; // 1 image = 1 pic + 1 ini
-    while(ite < vec.end() && !cond) {
-        PRINTF("Send file: %s\n", (*ite).c_str());
-        GFile *fAbs = g_file_new_for_path((*ite).c_str());
-        GFile *fParent = g_file_get_parent(fAbs);
-        g_object_unref(fAbs);
-        gchar *strDestParent = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, g_file_get_basename(fParent), NULL);
-        g_object_unref(fParent);
-        GFile *fDest = g_file_new_for_path(strDestParent);
+  if(GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
+  }
 
-        //create the parent directory
-        GError *err_mkdir = NULL;
-        if(!g_file_make_directory_with_parents(fDest, NULL, &err_mkdir)) {
-            if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
-                PRINTF("g_file_make_directory error: %s\n", err_mkdir->message);
-                sprintf(result, _("Failed to send data to USB storage!\nError: Failed to create directory."));
-                cond = -1;
-                g_error_free(err_mkdir);
-                g_object_unref(fDest);
-                g_free(strDestParent);
-                break;
-            }
-        }
-        g_object_unref(fDest);
-
-        //Update info
-        gchar *basename = g_path_get_basename((*ite).c_str());
-        if(fm.CompareSuffix(basename, "ini") != 0) {
-            sprintf(str_info, "%s %s   %d/%d\n%s", _("Loading..."), basename, count, total, _("Please wait..."));
-            MessageDialog::GetInstance()->SetText(str_info);
-            MessageDialog::GetInstance()->SetProgressBar(0);
-            count++;
-        }
-
-        //Perform copy operation
-        gchar *destPath = g_build_path(G_DIR_SEPARATOR_S, strDestParent, basename, NULL);
-        g_free(strDestParent);
-        g_free(basename);
-        PRINTF("Dest Path: %s\n", destPath);
-        GFile *src = g_file_new_for_path((*ite).c_str());
-        GFile *dest = g_file_new_for_path(destPath);
-        g_free(destPath);
-
-        GError *err = NULL;
-        int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, cancellable, progress_callback, NULL, &err);
-        g_object_unref(src);
-        g_object_unref(dest);
-        if(!ret) {
-            PRINTF("g_file_copy error: %s\n", err->message);
-            switch(err->code) {
-            case G_IO_ERROR_NO_SPACE:
-                sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
-                break;
-            case G_IO_ERROR_CANCELLED:
-                sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
-                break;
-            default:
-                sprintf(result, _("Failed to send data to USB storage!"));
-                break;
-            }
-            cond = -1;
-            g_error_free(err);
-            break;
-        }
-        ite++;
-    }
-
-    ptr->UmountUsbStorage();
-    MessageDialog::GetInstance()->Destroy();
-
-    //Handle result
-    if(!cond) {
-        sprintf(result, _("Success to export to USB storage."));
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          MessageDialog::DLG_INFO,
-                                          result,
-                                          NULL);
-
-    } else {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          MessageDialog::DLG_INFO,
-                                          result,
-                                          NULL);
-    }
-
-    return FALSE;
+  m_dialog = NULL;
 }
 
-static int CancelLoadUSB(gpointer data) {
-    PRINTF("Cancel copy!\n");
-    g_cancellable_cancel(cancellable);
-    return 0;
-}
 
-void ConfigToUSB::BtnOKClicked(GtkButton *button) {
-    //Copy the selected file to SLIDE_PATH
-    if(GetAllSelectPath()) {
-        g_timeout_add(1000, LoadSelectedData, NULL);
 
-        //	PRINTF("Load From U disk!\n");
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          MessageDialog::DLG_PROGRESS_CANCEL,
-                                          _("Please wait, sending data to USB storage..."),
-                                          CancelLoadUSB);
-    }
-    DestroyWindow();
-}
+enum {
+        COL_CHECKED,
+        COL_NAME,
+        NUM_COLS
+    };
 
-void ConfigToUSB::BtnCancelClicked(GtkButton *button) {
-    DestroyWindow();
-}
 
 //type: 0=root, 1=branch
 GtkWidget* ConfigToUSB::create_treeview(gint type) {
@@ -584,11 +618,3 @@ gboolean ConfigToUSB::GetAllSelectPath(void) {
     else
         return FALSE;
 }
-
-#if 0
-void ConfigToUSB::BtnSelectAllClicked(GtkButton *button) {
-}
-
-void ConfigToUSB::BtnDeselectClicked(GtkButton *button) {
-}
-#endif
