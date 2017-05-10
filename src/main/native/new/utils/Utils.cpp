@@ -164,7 +164,7 @@ GtkEntry* Utils::create_entry(gunichar ch) {
   GtkEntry* entry = GTK_ENTRY(gtk_entry_new());
 
   set_font(GTK_WIDGET(entry), "", "", 10);
-  gtk_widget_set_size_request(GTK_WIDGET(entry), -1, 25);
+  gtk_widget_set_size_request(GTK_WIDGET(entry), -1, 30);
 
   if (ch > 0) {
     gtk_entry_set_invisible_char(entry, ch);
@@ -177,7 +177,7 @@ GtkComboBoxText* Utils::create_combobox_text() {
   GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
   set_font(GTK_WIDGET(combobox), "", "", 10);
-  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 25);
+  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 30);
 
   return combobox;
 }
@@ -196,9 +196,31 @@ GtkNotebook* Utils::create_notebook() {
 GtkProgressBar* Utils::create_progress_bar() {
   GtkProgressBar* progress_bar = GTK_PROGRESS_BAR(gtk_progress_bar_new());
 
-  gtk_widget_set_size_request(GTK_WIDGET(progress_bar), -1, 25);
+  gtk_widget_set_size_request(GTK_WIDGET(progress_bar), -1, 30);
 
   return progress_bar;
+}
+
+GtkScrolledWindow* Utils::create_scrolled_window() {
+  GtkScrolledWindow* scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(NULL, NULL));
+
+  gtk_scrolled_window_set_policy(scrolled_window, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+  return scrolled_window;
+}
+
+GtkTreeView* Utils::create_tree_view(GtkTreeModel* mode) {
+  GtkTreeView* tree_view = NULL;
+
+  if (mode == NULL) {
+    tree_view = GTK_TREE_VIEW(gtk_tree_view_new());
+  } else {
+    tree_view = GTK_TREE_VIEW(gtk_tree_view_new_with_model(mode));
+  }
+
+  gtk_tree_selection_set_mode(gtk_tree_view_get_selection(tree_view), GTK_SELECTION_BROWSE);
+
+  return tree_view;
 }
 
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
@@ -306,11 +328,9 @@ GdkColor* Utils::get_color(const string color_name) {
 #include "utils/MessageDialog.h"
 
 void Utils::test(GtkWidget* widget) {
-  CustomCalc::GetInstance()->CreateCalcSettingWin(widget);
+  GtkWidget* w = CalcSetting::GetInstance()->CreateCalcWindow(NULL);
 
-//  GtkWidget* w = CalcSetting::GetInstance()->CreateCalcWindow(NULL);
-//
-//  GtkDialog* dialog = create_dialog(NULL, "", 800, 600);
-//  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
-//  gtk_widget_show_all(GTK_WIDGET(dialog));
+  GtkDialog* dialog = create_dialog(NULL, "", 800, 600);
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
+  gtk_widget_show_all(GTK_WIDGET(dialog));
 }
