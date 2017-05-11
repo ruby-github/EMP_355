@@ -11,16 +11,22 @@
 
 using namespace std;
 
-MessageDialog* MessageDialog::m_ptrInstance = NULL;
+// ---------------------------------------------------------
+//
+//  MessageDialog
+//
+// ---------------------------------------------------------
+
+MessageDialog* MessageDialog::m_instance = NULL;
 
 // ---------------------------------------------------------
 
 MessageDialog* MessageDialog::GetInstance() {
-  if (m_ptrInstance == NULL) {
-    m_ptrInstance = new MessageDialog();
+  if (m_instance == NULL) {
+    m_instance = new MessageDialog();
   }
 
-  return m_ptrInstance;
+  return m_instance;
 }
 
 MessageDialog::MessageDialog() {
@@ -36,10 +42,10 @@ MessageDialog::MessageDialog() {
 }
 
 MessageDialog::~MessageDialog() {
-  if (m_ptrInstance != NULL) {
-    delete m_ptrInstance;
+  if (m_instance != NULL) {
+    delete m_instance;
 
-    m_ptrInstance = NULL;
+    m_instance = NULL;
   }
 }
 
@@ -52,6 +58,10 @@ void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text
 
   if (MessageHintDialog::GetInstance()->Exist()) {
     MessageHintDialog::GetInstance()->Destroy();
+  }
+
+  if (Exist()) {
+    Destroy();
   }
 
   m_label = NULL;
@@ -134,6 +144,8 @@ void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text
       m_progress_bar = Utils::create_progress_bar();
 
       GtkButton* button_cancel = Utils::create_button();
+      g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_progress_clicked_cancel), this);
+
       gtk_widget_set_size_request(GTK_WIDGET(button_cancel), 38, 38);
 
       Utils::set_button_image(button_cancel, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_STOP, GTK_ICON_SIZE_DND)));
@@ -195,9 +207,7 @@ void MessageDialog::Destroy() {
     g_keyInterface.Pop();
 
     gtk_widget_hide_all(GTK_WIDGET(m_dialog));
-    gtk_widget_destroy (GTK_WIDGET(m_dialog));
-
-    m_dialog = NULL;
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
 
     InvisibleCursor(!m_preCursor);
 
@@ -205,6 +215,11 @@ void MessageDialog::Destroy() {
       SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
     }
   }
+
+  m_dialog = NULL;
+  m_label = NULL;
+  m_entry = NULL;
+  m_progress_bar = NULL;
 }
 
 void MessageDialog::SetProgressBar(double fraction) {
@@ -338,16 +353,22 @@ void MessageDialog::KeyEvent(unsigned char key) {
   }
 }
 
-////////////////////////////////////////////////////////////
+// ---------------------------------------------------------
+//
+//  MessageHintDialog
+//
+// ---------------------------------------------------------
 
-MessageHintDialog* MessageHintDialog::m_ptrInstance = NULL;
+MessageHintDialog* MessageHintDialog::m_instance = NULL;
+
+// ---------------------------------------------------------
 
 MessageHintDialog* MessageHintDialog::GetInstance() {
-  if (m_ptrInstance == NULL) {
-    m_ptrInstance = new MessageHintDialog();
+  if (m_instance == NULL) {
+    m_instance = new MessageHintDialog();
   }
 
-  return m_ptrInstance;
+  return m_instance;
 }
 
 MessageHintDialog::MessageHintDialog() {
@@ -355,11 +376,11 @@ MessageHintDialog::MessageHintDialog() {
 }
 
 MessageHintDialog::~MessageHintDialog() {
-  if (m_ptrInstance != NULL) {
-    delete m_ptrInstance;
+  if (m_instance != NULL) {
+    delete m_instance;
   }
 
-  m_ptrInstance = NULL;
+  m_instance = NULL;
 }
 
 void MessageHintDialog::Create(GtkWindow* parent, const string text) {
@@ -404,10 +425,11 @@ void MessageHintDialog::Destroy() {
     g_keyInterface.Pop();
 
     gtk_widget_destroy(GTK_WIDGET(m_dialog));
-    m_dialog = NULL;
 
     if (g_keyInterface.Size() == 1) {
       SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
     }
   }
+
+  m_dialog = NULL;
 }

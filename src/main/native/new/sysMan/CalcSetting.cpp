@@ -226,7 +226,6 @@ CalcSetting* CalcSetting::GetInstance() {
 
 CalcSetting::CalcSetting() {
   m_parent = NULL;
-  m_dialog = NULL;
 
   m_combobox_exam_type = NULL;
   m_combobox_department = NULL;
@@ -244,10 +243,6 @@ CalcSetting::~CalcSetting() {
   }
 
   m_instance = NULL;
-}
-
-GtkWidget* CalcSetting::GetWindow() {
-  return m_parent;
 }
 
 GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
@@ -852,7 +847,7 @@ void CalcSetting::ButtonClickedSelectOne(GtkButton* button) {
   model = gtk_tree_view_get_model(m_treeview_item);
 
   if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("Please select a item before move!"), NULL);
 
     return;
@@ -893,7 +888,7 @@ void CalcSetting::ButtonClickedSelectOne(GtkButton* button) {
         gtk_tree_view_scroll_to_cell(m_treeview_selected_item, path_scroll, NULL, FALSE, 1.0, 1.0);
         gtk_tree_path_free (path_scroll);
 
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
           MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
 
         return;
@@ -1067,7 +1062,7 @@ void CalcSetting::ButtonClickedBackOne(GtkButton* button) {
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_selected_item));
 
   if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("Please select a item before move!"), NULL);
 
     return;
@@ -1186,7 +1181,7 @@ void CalcSetting::ButtonClickedAdd(GtkButton* button) {
   if(g_menuCalc.IsFlagExist()) {
     const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
 
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_QUESTION, _(info), signal_callback_add);
   } else {
     AddItem();
@@ -1197,7 +1192,7 @@ void CalcSetting::ButtonClickedDelete(GtkButton* button) {
   if(g_menuCalc.IsFlagExist()) {
     const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
 
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_QUESTION, _(info), signal_callback_delete);
   } else {
       DeleteItem();
@@ -1212,7 +1207,7 @@ void CalcSetting::ButtonClickedUp(GtkButton* button) {
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_selected_item));
 
   if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("Please select a item before up!"), NULL); //请先选择待插入结点的父结点
 
     return;
@@ -1302,7 +1297,7 @@ void CalcSetting::ButtonClickedDown(GtkButton* button) {
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_selected_item));
 
   if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("Please select a item before down!"), NULL);
 
     return;
@@ -1382,34 +1377,34 @@ void CalcSetting::ButtonClickedDown(GtkButton* button) {
 }
 
 void CalcSetting::ButtonClickedExport(GtkButton* button) {
-  CustomCalc::GetInstance()->CreateExportCalcSettingWin(GetWindow());
+  CustomCalc::GetInstance()->CreateExportCalcSettingWin(m_parent);
 }
 
 void CalcSetting::ButtonClickedImport(GtkButton* button) {
   PeripheralMan *ptr = PeripheralMan::GetInstance();
 
   if(!ptr->CheckUsbStorageState()) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
 
     return ;
   } else {
     if(!ptr->MountUsbStorage()) {
-      MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
         MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
 
       return ;
     }
   }
 
-  ConfigToHost::GetInstance()->CreateCalcImportWindow(GTK_WINDOW(GetWindow()));
+  ConfigToHost::GetInstance()->CreateCalcImportWindow(GTK_WINDOW(m_parent));
 }
 
 void CalcSetting::ButtonClickedDefault(GtkButton* button) {
   if(g_menuCalc.IsFlagExist()) {
     const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
 
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_QUESTION, _(info), signal_callback_default);
   } else {
     UpdateAll();
@@ -1417,7 +1412,7 @@ void CalcSetting::ButtonClickedDefault(GtkButton* button) {
 }
 
 void CalcSetting::AddItem() {
-  CustomCalc::GetInstance()->CreateCalcSettingWin(GetWindow());
+  CustomCalc::GetInstance()->CreateCalcSettingWin(m_parent);
 }
 
 void CalcSetting::DeleteItem() {
@@ -1428,7 +1423,7 @@ void CalcSetting::DeleteItem() {
   model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item));
 
   if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("Please select a item before delete!"), NULL); //请先选择待插入结点的父结点
 
     return;
@@ -1447,7 +1442,7 @@ void CalcSetting::DeleteItem() {
   }
 
   if(select_num < USER_START - BASIC_MEA_END) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(GetWindow()),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO,  _(" Only Userdefined items can be deleted!"), NULL);
 
     return;
@@ -2497,14 +2492,17 @@ void CustomCalc::ButtonClickedOK(GtkButton* button) {
 
   if (tmp_name == NULL || strlen(tmp_name) == 0) {
     gtk_entry_set_text(m_entry_name, "");
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("Please Input Name!"), NULL);
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_INFO, _("Please Input Name!"), NULL);
+
     return;
   }
 
   int index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method));
   if (index == -1) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
-                                      _("Please select measure method!"), NULL);
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_ERROR, _("Please select measure method!"), NULL);
+
     return;
   }
 
@@ -2554,7 +2552,9 @@ void CustomCalc::ButtonClickedOK(GtkButton* button) {
 
       if((strcmp(tmp_name, item_name.c_str()) == 0) ||(strcmp(tmp_name, _(item_name.c_str())) == 0)) {
         gtk_entry_set_text(GTK_ENTRY(m_entry_name), "");
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("The name has existed, please rename!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+          MessageDialog::DLG_INFO, _("The name has existed, please rename!"), NULL);
+
         return;
       }
     }
@@ -2565,15 +2565,17 @@ void CustomCalc::ButtonClickedOK(GtkButton* button) {
   int ItemAllNum;
   ItemAllNum=ptrIni->ReadInt("MaxNumber", "Number");
   if((ItemDeleteNum==0)&&(ItemAllNum >= (USER_START -BASIC_MEA_END + MAX_USER_CALC_NUM))) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
-                                      _("The defined items have reached the maximum!"), NULL);
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_ERROR, _("The defined items have reached the maximum!"), NULL);
+
     return;
   }
 
   int type_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_type));
   if (type_index == -1) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
-                                      _("Please select measure type!"), NULL);
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::DLG_ERROR, _("Please select measure type!"), NULL);
+
     return;
   }
 

@@ -16,7 +16,6 @@ public:
   CalcSetting();
   ~CalcSetting();
 
-  GtkWidget* GetWindow();
   GtkWidget* CreateCalcWindow(GtkWidget* parent);
 
   vector<string> GetExamItemsCalc();
@@ -202,7 +201,6 @@ private:
 
 private:
   GtkWidget* m_parent;
-  GtkDialog* m_dialog;
 
   GtkComboBoxText* m_combobox_exam_type;
   GtkComboBoxText* m_combobox_department;

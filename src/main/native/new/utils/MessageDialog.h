@@ -109,7 +109,7 @@ private:
   void KeyEvent(unsigned char key);
 
 private:
-  static MessageDialog* m_ptrInstance;
+  static MessageDialog* m_instance;
 
   pFuncDialog m_ptrFunc;
   pFuncDialog m_ptrFuncCancel;
@@ -144,7 +144,7 @@ private:
   MessageHintDialog();
 
 private:
-  static MessageHintDialog* m_ptrInstance;
+  static MessageHintDialog* m_instance;
 
   GtkDialog* m_dialog;
 };

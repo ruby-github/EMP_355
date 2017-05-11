@@ -325,7 +325,8 @@ GdkColor* Utils::get_color(const string color_name) {
 // ---------------------------------------------------------
 
 #include "sysMan/ConfigToUSB.h"
+#include "utils/MessageDialog.h"
 
 void Utils::test(GtkWidget* widget) {
-  ConfigToUSB::GetInstance()->CreateWindow(NULL);
+  ConfigToUSB::GetInstance()->CreateWindow(GTK_WINDOW(widget));
 }

@@ -31,6 +31,7 @@ ConfigToUSB* ConfigToUSB::GetInstance() {
 }
 
 ConfigToUSB::ConfigToUSB() {
+  m_parent = NULL;
   m_dialog = NULL;
   m_treeview_root = NULL;
   m_treeview_branch = NULL;
@@ -45,7 +46,8 @@ ConfigToUSB::~ConfigToUSB() {
 }
 
 void ConfigToUSB::CreateWindow(GtkWindow* parent) {
-  m_dialog = Utils::create_dialog(GTK_WINDOW(parent), _("Data Selection"), 640, 480);
+  m_parent = parent;
+  m_dialog = Utils::create_dialog(m_parent, _("Data Selection"), 640, 480);
 
   GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OPEN);
   GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
@@ -108,8 +110,7 @@ void ConfigToUSB::ButtonClickedOK(GtkButton* button) {
     g_timeout_add(1000, signal_load_selected_data, this);
 
     // PRINTF("Load From U disk!\n");
-    MessageDialog::GetInstance()->Create(
-      GTK_WINDOW(m_dialog),
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
       MessageDialog::DLG_PROGRESS_CANCEL,
       _("Please wait, sending data to USB storage..."),
       signal_callback_cancelloadusb);
@@ -133,13 +134,13 @@ bool ConfigToUSB::LoadSelectedData() {
   vector<string> vec = GetSelectedVec();
 
   if(!ptr->CheckUsbStorageState()) {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+    MessageDialog::GetInstance()->Create(m_parent,
       MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
 
     return FALSE;
   } else {
     if(!ptr->MountUsbStorage()) {
-      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+      MessageDialog::GetInstance()->Create(m_parent,
         MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
 
       return FALSE;
@@ -206,14 +207,14 @@ bool ConfigToUSB::LoadSelectedData() {
 
       switch(err->code) {
       case G_IO_ERROR_NO_SPACE:
-          sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
-          break;
+        sprintf(result, _("Failed to send data to USB storage!\nError: No space left on storage."));
+        break;
       case G_IO_ERROR_CANCELLED:
-          sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
-          break;
+        sprintf(result, _("Failed to send data to USB storage!\nError: Operation was cancelled."));
+        break;
       default:
-          sprintf(result, _("Failed to send data to USB storage!"));
-          break;
+        sprintf(result, _("Failed to send data to USB storage!"));
+        break;
       }
 
       cond = -1;
@@ -231,10 +232,10 @@ bool ConfigToUSB::LoadSelectedData() {
   // Handle result
   if(!cond) {
     sprintf(result, _("Success to export to USB storage."));
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+    MessageDialog::GetInstance()->Create(m_parent,
       MessageDialog::DLG_INFO, result, NULL);
   } else {
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
+    MessageDialog::GetInstance()->Create(m_parent,
       MessageDialog::DLG_INFO, result, NULL);
   }
 

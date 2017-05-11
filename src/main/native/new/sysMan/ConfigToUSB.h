@@ -108,6 +108,7 @@ private:
   static GCancellable* m_cancellable;
 
 private:
+  GtkWindow* m_parent;
   GtkDialog* m_dialog;
   GtkTreeView* m_treeview_root;
   GtkTreeView* m_treeview_branch;
