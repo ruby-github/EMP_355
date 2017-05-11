@@ -139,6 +139,29 @@ void Utils::set_button_image(GtkButton* button, GtkImage* image, const GtkPositi
   gtk_button_set_image_position(button, position);
 }
 
+GtkCheckButton* Utils::create_check_button(const string label) {
+  GtkCheckButton* button = NULL;
+
+  if (label.empty()) {
+    button = GTK_CHECK_BUTTON(gtk_check_button_new());
+  } else {
+    button = GTK_CHECK_BUTTON(gtk_check_button_new_with_label(label.c_str()));
+  }
+
+  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
+  gtk_button_set_alignment(GTK_BUTTON(button), 0, 0.5);
+
+  gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
+  gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_PRELIGHT, get_color("green"));
+  gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_SELECTED, get_color("green"));
+
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_ACTIVE, get_color("white"));
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_PRELIGHT, get_color("white"));
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_SELECTED, get_color("white"));
+
+  return button;
+}
+
 GtkImage* Utils::create_image(const string filename, const int width, const int height) {
   GtkImage* image = NULL;
 
@@ -196,7 +219,7 @@ GtkNotebook* Utils::create_notebook() {
 GtkProgressBar* Utils::create_progress_bar() {
   GtkProgressBar* progress_bar = GTK_PROGRESS_BAR(gtk_progress_bar_new());
 
-  gtk_widget_set_size_request(GTK_WIDGET(progress_bar), -1, 30);
+  gtk_widget_set_size_request(GTK_WIDGET(progress_bar), -1, 25);
 
   return progress_bar;
 }
@@ -324,9 +347,8 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "sysMan/ConfigToUSB.h"
-#include "utils/MessageDialog.h"
+#include "sysMan/ConfigToHost.h"
 
 void Utils::test(GtkWidget* widget) {
-  ConfigToUSB::GetInstance()->CreateWindow(GTK_WINDOW(widget));
+  ConfigToHost::GetInstance()->CreateWindow(GTK_WINDOW(widget));
 }

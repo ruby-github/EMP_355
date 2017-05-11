@@ -28,6 +28,12 @@ private:
     }
   }
 
+  static void signal_treeselection_changed_root(GtkTreeSelection* selction, ConfigToUSB* data) {
+    if (data != NULL) {
+      data->RootSelectionChanged(selction);
+    }
+  }
+
   static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ConfigToUSB* data) {
     if (data != NULL) {
       data->DestroyWindow();
@@ -36,15 +42,11 @@ private:
     return FALSE;
   }
 
-  static gboolean signal_load_selected_data(gpointer data) {
+  static gboolean signal_callback_load_selected_data(gpointer data) {
     ConfigToUSB* config = (ConfigToUSB*)data;
 
     if (config != NULL) {
-      if (config->LoadSelectedData()) {
-        return TRUE;
-      } else {
-        return FALSE;
-      }
+      config->LoadSelectedData();
     }
 
     return FALSE;
@@ -60,12 +62,6 @@ private:
     ConfigToUSB::GetInstance()->CallbackProgress(current, total);
   }
 
-  static void signal_treeselection_changed_root(GtkTreeSelection* selction, ConfigToUSB* data) {
-    if (data != NULL) {
-      data->RootSelectionChanged(selction);
-    }
-  }
-
   static void signal_callback_toggled(GtkCellRendererToggle* cell, gchar* path_str, ConfigToUSB* data) {
     if (data != NULL) {
       data->ToggleData(cell, path_str);
@@ -76,10 +72,10 @@ private:
 
   void ButtonClickedOK(GtkButton* button);
   void ButtonClickedCancel(GtkButton* button);
-  bool LoadSelectedData();
-  void CallbackProgress(goffset current, goffset total);
-
   void RootSelectionChanged(GtkTreeSelection* selection);
+
+  void LoadSelectedData();
+  void CallbackProgress(goffset current, goffset total);
   void ToggleData(GtkCellRendererToggle* cell, gchar* path_str);
 
 private:

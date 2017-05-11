@@ -23,6 +23,8 @@ public:
   static GtkButton* create_button_with_image(const string filename = "", const int width = 0, const int height = 0);
   static void set_button_image(GtkButton* button, GtkImage* image, const GtkPositionType position = GTK_POS_LEFT);
 
+  static GtkCheckButton* create_check_button(const string label = "");
+
   static GtkImage* create_image(const string filename = "", const int width = 0, const int height = 0);
 
   static GtkEntry* create_entry(gunichar ch = 0);

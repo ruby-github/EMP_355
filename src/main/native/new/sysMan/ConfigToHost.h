@@ -2,12 +2,7 @@
 #define __CONFIG_TO_HOST_H__
 
 #include "utils/FakeXEvent.h"
-
-#include <string>
-#include <vector>
-
-using std::string;
-using std::vector;
+#include "utils/Utils.h"
 
 class ConfigToHost: public FakeXEvent {
 public:
@@ -19,107 +14,153 @@ public:
   void CreateWindow(GtkWindow* parent);
   void CreateCalcImportWindow(GtkWindow* parent);
 
+  void DestroyWindow();
+
+  void ClickedOKAndCancel();
+  void ExportRightInfoNotice(string result);
+
 private:
   // signal
 
-  static gboolean on_window_delete_event(GtkWidget* widget, GdkEvent* event, ConfigToHost* data) {
-    return data->WindowDeleteEvent(widget, event);
+  static void signal_button_clicked_ok(GtkButton* button, ConfigToHost* data) {
+    if (data != NULL) {
+      data->ButtonClickedOK(button);
+    }
   }
 
-  static void on_data_toggled(GtkCellRendererToggle* cell, gchar* path_str, ConfigToHost* data) {
-    data->ToggleData(cell, path_str);
+  static void signal_button_clicked_import(GtkButton* button, ConfigToHost* data) {
+    data->ButtonClickedImport(button);
   }
 
-  static void on_root_calc_selection_changed(GtkTreeSelection* selction, ConfigToHost* data) {
-    data->RootCalcSelectionChanged(selction);
+  static void signal_button_clicked_cancel(GtkButton* button, ConfigToHost* data) {
+    if (data != NULL) {
+      data->ButtonClickedCancel(button);
+    }
   }
 
-  static void on_root_selection_changed(GtkTreeSelection* selction, ConfigToHost* data) {
-    data->RootSelectionChanged(selction);
+  static void signal_treeselection_changed_root(GtkTreeSelection* selction, ConfigToHost* data) {
+    if (data != NULL) {
+      data->RootSelectionChanged(selction);
+    }
   }
 
-  static void on_button_ok_clicked(GtkButton* button, ConfigToHost* data) {
-    data->BtnOKClicked(button);
+  static void signal_treeselection_changed_root_calc(GtkTreeSelection* selction, ConfigToHost* data) {
+    if (data != NULL) {
+      data->RootSelectionChangedCalc(selction);
+    }
   }
 
-  static void on_button_calc_ok_clicked(GtkButton* button, ConfigToHost* data) {
-    data->BtnCalcImportOKClicked(button);
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ConfigToHost* data) {
+    if (data != NULL) {
+      data->DestroyWindow();
+    }
+
+    return FALSE;
   }
 
-  static void on_button_cancel_clicked(GtkButton* button, ConfigToHost* data) {
-    data->BtnCancelClicked(button);
+  static gboolean signal_callback_load_selected_data(gpointer data) {
+    ConfigToHost* config = (ConfigToHost*)data;
+
+    if (config != NULL) {
+      config->LoadSelectedData();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_load_selected_data_calc(gpointer data) {
+    ConfigToHost* config = (ConfigToHost*)data;
+
+    if (config != NULL) {
+      config->LoadSelectedDataCalc();
+    }
+
+    return FALSE;
+  }
+
+  static int signal_callback_cancelloadhost(gpointer data) {
+    g_cancellable_cancel(m_cancellable);
+
+    return 0;
+  }
+
+  static void signal_callback_progress(goffset current, goffset total, gpointer data) {
+    ConfigToHost::GetInstance()->CallbackProgress(current, total);
+  }
+
+  static void signal_callback_toggled(GtkCellRendererToggle* cell, gchar* path_str, ConfigToHost* data) {
+    if (data != NULL) {
+      data->ToggleData(cell, path_str);
+    }
   }
 
   // signal
 
-  gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
+  void ButtonClickedOK(GtkButton* button);
+  void ButtonClickedImport(GtkButton *button);
+  void ButtonClickedCancel(GtkButton* button);
+  void RootSelectionChanged(GtkTreeSelection* selection);
+  void RootSelectionChangedCalc(GtkTreeSelection* selection);
 
-  void BtnOKClicked(GtkButton *button);
-  void BtnCalcImportOKClicked(GtkButton *button);
-  void BtnCancelClicked(GtkButton *button);
-  void ToggleData(GtkCellRendererToggle *cell, gchar *path_str);
-  void RootSelectionChanged(GtkTreeSelection *selection);
-  void RootCalcSelectionChanged(GtkTreeSelection *selection);
+  void LoadSelectedData();
+  void LoadSelectedDataCalc();
+  void CallbackProgress(goffset current, goffset total);
+  void ToggleData(GtkCellRendererToggle* cell, gchar* path_str);
 
 private:
   ConfigToHost();
 
   void KeyEvent(unsigned char KeyValue);
 
-private:
-  static ConfigToHost* m_ptrInstance;
+  GtkTreeView* CreateTreeview(gint type);
+  GtkTreeModel* CreateRootModel();
+
+  GtkTreeView* CreateTreeviewCalc();
+  GtkTreeModel* CreateRootModelCalc();
+
+  void HideClickedOKAndCancel();
+
+  void ExportErrorInfoNotice(string result);
+  void ExportLoadInfoNotice(string result);
+
+  void DeleteUdiskFile();
+
+  void UpdateRootModel();
+  void UpdateRootModelCalc();
+  void UpdateBranchModel(gint rows);
+
+  GtkTreeModel* LoadBranchModel(gchar* branch);
+
+  bool GetAllSelectPath();
+  bool GetAllSelectPathCalc();
+
+  void SetAllToggleValue(GtkTreeModel* model, gboolean value);
+
+  void SetProgressBar(double fraction);
+
+  vector<string> GetSelectedVec() {
+    return m_vecPath;
+  }
 
 private:
-
-////////////////////////////////////////////////////////////
-public:
-    GtkWidget* GetWindow() {
-        return m_window;
-    }
-    vector<string> GetSelectedVec() {
-        return m_vecPath;
-    }
-    void ClearData() {
-        m_vecPath.clear();
-    }
-    void DestroyWindow(void);
-    void SetProgressBar(double fraction);
-    void ExportLoadInfoNotice(char *result);
-    void ExportRightInfoNotice(char *result);
-    void ExportErrorInfoNotice(char *result);
-    void DeleteUdiskFile();
-    void HideOKAndCancelClicked();
-    void OKAndCancelClicked();
+  static ConfigToHost* m_instance;
+  static GCancellable* m_cancellable;
 
 private:
-    GtkWidget *m_window;
+  GtkWindow* m_parent;
+  GtkDialog* m_dialog;
 
-    GtkWidget *m_window1;
-    GtkWidget *m_treeRoot;
-    GtkWidget *m_treeBranch;
-    GtkWidget *m_chkbtnDel;
-    GtkWidget *btnOK;
-    GtkWidget *btnCancel;
-    GList *m_listBranch;
-    GtkWidget *label_calc_notice1;
-    vector<string> m_vecPath;
-    GtkWidget *m_progress_bar;
-    GtkWidget *img_right;
-    GtkWidget *img_error;
-    GtkWidget *img_load;
-    GtkWidget* create_calc_treeview();
-    GtkWidget* create_treeview(gint type);
-    GtkTreeModel* create_root_model(void);
-    GtkTreeModel* create_calc_root_model();
-    void UpdateRootModel(void);
-    void UpdateCalcRootModel(void);
-    void UpdateBranchModel(gint rows);
-    GtkTreeModel* LoadBranchModel(gchar *branch);
-    void SetAllToggleValue(GtkTreeModel *model, gboolean value);
-    gboolean GetAllSelectPath(void);
-    gboolean GetAllCalcSelectPath(void);
+  GtkTreeView* m_treeview_root;
+  GtkTreeView* m_treeview_branch;
 
-    gboolean CheckBranchStauts(void);
+  GtkCheckButton* m_check_button_del;
+  GtkProgressBar* m_progress_bar;
+  GtkImage* m_image;
+  GtkLabel* m_label_notice;
+
+  GList* m_listBranch;
+
+  vector<string> m_vecPath;
 };
 
 #endif

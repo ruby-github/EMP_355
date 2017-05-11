@@ -249,7 +249,7 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   m_parent = parent;
 
   GtkTable* table = GTK_TABLE(gtk_table_new(10, 8, TRUE));
-  gtk_container_set_border_width(GTK_CONTAINER(table), 30);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
 
   gtk_table_set_row_spacings(table, 10);
   gtk_table_set_col_spacings(table, 10);
@@ -2152,7 +2152,7 @@ void CustomCalc::CreateCalcSettingWin(GtkWidget* parent) {
   GtkTable* table = GTK_TABLE(gtk_table_new(3, 3, TRUE));
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
-  gtk_container_set_border_width(GTK_CONTAINER(table), 30);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
 
   gtk_table_set_row_spacings(table, 10);
   gtk_table_set_col_spacings(table, 10);
@@ -2247,7 +2247,7 @@ void CustomCalc::CreateExportCalcSettingWin(GtkWidget* parent) {
 
   // progress_bar
   m_progress_bar = Utils::create_progress_bar();
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_progress_bar), 0, 6, 4, 5);
+  gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 0, 6, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
 
   // image, notice
 
@@ -2363,7 +2363,7 @@ void CustomCalc::ImportSuccess() {
 
   ConfigToHost::GetInstance()->ExportRightInfoNotice(_("Success to import from USB storage."));
 
-  ConfigToHost::GetInstance()->OKAndCancelClicked();
+  ConfigToHost::GetInstance()->ClickedOKAndCancel();
 
   g_timeout_add(1000, Destroy, NULL);
 

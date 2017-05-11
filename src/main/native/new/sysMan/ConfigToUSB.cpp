@@ -8,9 +8,6 @@
 #include "patient/FileMan.h"
 #include "periDevice/PeripheralMan.h"
 
-#include "display/gui_func.h"
-#include "display/gui_global.h"
-
 enum {
   COL_CHECKED,
   COL_NAME,
@@ -58,10 +55,7 @@ void ConfigToUSB::CreateWindow(GtkWindow* parent) {
   GtkTable* table = GTK_TABLE(gtk_table_new(1, 3, TRUE));
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
-  gtk_container_set_border_width(GTK_CONTAINER(table), 30);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
 
   // scrolled_window
   GtkScrolledWindow* scrolled_window_root = Utils::create_scrolled_window();
@@ -87,7 +81,7 @@ void ConfigToUSB::CreateWindow(GtkWindow* parent) {
     gtk_tree_view_set_model(m_treeview_root, modelRoot);
   }
 
-  g_object_unref (modelRoot);
+  g_object_unref(modelRoot);
 
   // Branch
   m_treeview_branch = CreateTreeview(1);
@@ -107,7 +101,7 @@ void ConfigToUSB::CreateWindow(GtkWindow* parent) {
 void ConfigToUSB::ButtonClickedOK(GtkButton* button) {
   // Copy the selected file to SLIDE_PATH
   if(GetAllSelectPath()) {
-    g_timeout_add(1000, signal_load_selected_data, this);
+    g_timeout_add(1000, signal_callback_load_selected_data, this);
 
     // PRINTF("Load From U disk!\n");
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
@@ -123,7 +117,22 @@ void ConfigToUSB::ButtonClickedCancel(GtkButton* button) {
   DestroyWindow();
 }
 
-bool ConfigToUSB::LoadSelectedData() {
+void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection) {
+  GtkTreeIter iter;
+  GtkTreeModel* model;
+  gchar* text;
+
+  if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    gtk_tree_model_get(model, &iter, COL_NAME, &text, -1);
+    GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+    //  PRINTF("Selection path: %s\n", gtk_tree_path_to_string(path));
+    UpdateBranchModel(atoi(gtk_tree_path_to_string(path)));
+    gtk_tree_path_free (path);
+    g_free(text);
+  }
+}
+
+void ConfigToUSB::LoadSelectedData() {
   int cond = 0;
   int count = 1;
   int total = 0;
@@ -137,13 +146,13 @@ bool ConfigToUSB::LoadSelectedData() {
     MessageDialog::GetInstance()->Create(m_parent,
       MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
 
-    return FALSE;
+    return;
   } else {
     if(!ptr->MountUsbStorage()) {
       MessageDialog::GetInstance()->Create(m_parent,
         MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
 
-      return FALSE;
+      return;
     }
   }
 
@@ -238,8 +247,6 @@ bool ConfigToUSB::LoadSelectedData() {
     MessageDialog::GetInstance()->Create(m_parent,
       MessageDialog::DLG_INFO, result, NULL);
   }
-
-  return FALSE;
 }
 
 void ConfigToUSB::CallbackProgress(goffset current, goffset total) {
@@ -261,21 +268,6 @@ void ConfigToUSB::CallbackProgress(goffset current, goffset total) {
     gdk_threads_leave();
   } else {
     PRINTF("fraction out of range!\n");
-  }
-}
-
-void ConfigToUSB::RootSelectionChanged(GtkTreeSelection *selection) {
-  GtkTreeIter iter;
-  GtkTreeModel *model;
-  gchar *text;
-
-  if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
-    gtk_tree_model_get(model, &iter, COL_NAME, &text, -1);
-    GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
-    //  PRINTF("Selection path: %s\n", gtk_tree_path_to_string(path));
-    UpdateBranchModel(atoi(gtk_tree_path_to_string(path)));
-    gtk_tree_path_free (path);
-    g_free(text);
   }
 }
 
