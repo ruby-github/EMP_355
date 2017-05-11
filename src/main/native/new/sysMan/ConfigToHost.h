@@ -161,6 +161,7 @@ private:
   GList* m_listBranch;
 
   vector<string> m_vecPath;
+  string m_rootName;
 };
 
 #endif

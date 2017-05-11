@@ -22,7 +22,6 @@ enum {
 
 vector<int> vecAdd;
 int item_num_exist = 0;
-char RootName[256] = {0};
 
 ConfigToHost* ConfigToHost::m_instance = NULL;
 GCancellable* ConfigToHost::m_cancellable = NULL;
@@ -304,7 +303,7 @@ void ConfigToHost::RootSelectionChangedCalc(GtkTreeSelection* selection) {
     gtk_tree_model_get(model, &iter, 0, &text, -1);
 
     PRINTF("Selection path: %s\n", text);
-    strcpy(RootName, text);
+    m_rootName = text;
     g_free(text);
   }
 }
@@ -912,7 +911,7 @@ void ConfigToHost::DeleteUdiskFile() {
   if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_check_button_del))) {
     FileMan f;
     char path4[256];
-    sprintf(path4, "%s%s%s%s", UDISK_DATA_PATH,"/", RootName, "/");
+    sprintf(path4, "%s%s%s%s", UDISK_DATA_PATH,"/", m_rootName.c_str(), "/");
     PRINTF("PATH4=%s\n", path4);
     f.DelDirectory(path4);
   }
@@ -1114,16 +1113,16 @@ bool ConfigToHost::GetAllSelectPath() {
 bool ConfigToHost::GetAllSelectPathCalc() {
   m_vecPath.clear();
 
-  PRINTF("Root Name=%s\n", RootName);
+  PRINTF("Root Name=%s\n", m_rootName.c_str());
   char path[256];
   char path1[256];
 
   #ifdef VET
-    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/VetCalcSetting.ini");
-    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/VetCalcItemSetting.ini");
+    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/VetCalcSetting.ini");
+    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/VetCalcItemSetting.ini");
   #else
-    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/CalcSetting.ini");
-    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", RootName, "/CalcItemSetting.ini");
+    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/CalcSetting.ini");
+    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/CalcItemSetting.ini");
   #endif
 
   m_vecPath.push_back(path);
