@@ -65,10 +65,10 @@ void ConfigToHost::CreateWindow(GtkWindow* parent) {
   g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(1, 3, TRUE));
+  GtkTable* table = Utils::create_table(1, 3);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
+  gtk_table_set_col_spacings(table, 0);
 
   // scrolled_window
   GtkScrolledWindow* scrolled_window_root = Utils::create_scrolled_window();
@@ -116,13 +116,8 @@ void ConfigToHost::CreateCalcImportWindow(GtkWindow* parent) {
   g_signal_connect(button_import, "clicked", G_CALLBACK(signal_button_clicked_import), this);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(9, 6, TRUE));
+  GtkTable* table = Utils::create_table(9, 6);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
-
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
 
   // item
   GtkLabel* label_item = Utils::create_label(_("Plsease select one item:"));
@@ -313,14 +308,14 @@ void ConfigToHost::ToggleData(GtkCellRendererToggle* cell, gchar* path_str) {
   }
 
   //  PRINTF("Toggle path: %s\n", path_str);
-  GtkTreeModel *model = gtk_tree_view_get_model (treeview);
+  GtkTreeModel* model = gtk_tree_view_get_model(treeview);
   GtkTreeIter iter;
-  GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
+  GtkTreePath* path = gtk_tree_path_new_from_string(path_str);
   gboolean checked;
 
   /* get toggled iter */
   gtk_tree_model_get_iter (model, &iter, path);
-  gtk_tree_model_get (model, &iter, COL_CHECKED, &checked, -1);
+  gtk_tree_model_get(model, &iter, COL_CHECKED, &checked, -1);
 
   /* do something with the value */
   checked ^= 1; //按位异或
@@ -743,19 +738,19 @@ void ConfigToHost::LoadSelectedDataCalc() {
                 char renametrans[256];
                 strcpy(renametrans,  _("Item has existed, \nClicked Import will rename the item and continue, \nClicked Cancel will quit and continue!"));
                 sprintf(rename , "%s %s", item_name.c_str(), renametrans);
-                GtkWidget *dialog = gtk_dialog_new_with_buttons("Rename",
-                  GTK_WINDOW(m_dialog),
-                  GTK_DIALOG_MODAL ,
-                  GTK_STOCK_OK, GTK_RESPONSE_OK,
-                  GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
-                  NULL);
-                gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
-                GtkWidget *notice = gtk_label_new(rename);
-                gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(dialog)->vbox), notice);
-                gtk_widget_show_all(dialog);
+                GtkDialog* dialog = Utils::create_dialog(GTK_WINDOW(m_dialog), _("Rename"));
 
-                gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+                Utils::add_dialog_button(dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OK);
+                Utils::add_dialog_button(dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
+
+                gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
+
+                GtkLabel* notice = Utils::create_label(rename);
+                gtk_box_pack_start_defaults(GTK_BOX(dialog->vbox), GTK_WIDGET(notice));
+                gtk_widget_show_all(GTK_WIDGET(dialog));
+
+                gint result = gtk_dialog_run(dialog);
 
                 switch (result) {
                 case GTK_RESPONSE_OK:
@@ -766,7 +761,7 @@ void ConfigToHost::LoadSelectedDataCalc() {
                   break;
                 }
 
-                gtk_widget_destroy(dialog);
+                gtk_widget_destroy(GTK_WIDGET(dialog));
               }
             }
           }
@@ -993,9 +988,9 @@ void ConfigToHost::UpdateBranchModel(gint rows) {
 GtkTreeModel* ConfigToHost::LoadBranchModel(gchar* branch) {
   DIR *dir;
   struct dirent *ent;
-  gchar *path = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, branch, NULL);
+  gchar* path = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, branch, NULL);
 
-  GtkListStore *store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
+  GtkListStore* store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
   gtk_list_store_clear(store);
   GtkTreeIter iter;
 

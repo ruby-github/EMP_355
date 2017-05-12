@@ -248,11 +248,7 @@ CalcSetting::~CalcSetting() {
 GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   m_parent = parent;
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(10, 8, TRUE));
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
+  GtkTable* table = Utils::create_table(10, 8);
 
   // Exam Type
   GtkLabel* label_exam_type = Utils::create_label(_("Exam Type:"));
@@ -329,7 +325,7 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
 
   char exam_type[256] = {0};
   exam.TransItemNameEng(examType.c_str(), exam_type);
-  int sequence = GetSequence(exam_type);
+  int sequence = GetSequence(examType);
 
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
   g_signal_connect(m_combobox_sequence, "changed", G_CALLBACK(signal_combobox_changed_sequence), this);
@@ -917,10 +913,8 @@ void CalcSetting::ButtonClickedSelectOne(GtkButton* button) {
   gtk_tree_view_set_model(m_treeview_selected_item, new_model1);
 
   // 高亮插入的词条，并更新滚动条
-  GtkTreeSelection *new_selection;
-  GtkTreeIter iter_new;
-  new_selection = gtk_tree_view_get_selection(m_treeview_selected_item);
-  iter_new= InsertUniqueCalc(new_model1, select_name);
+  GtkTreeSelection* new_selection = gtk_tree_view_get_selection(m_treeview_selected_item);
+  GtkTreeIter iter_new= InsertUniqueCalc(new_model1, select_name);
   gtk_tree_selection_select_iter(new_selection, &iter_new);
 
   GtkTreePath *path_scroll = gtk_tree_model_get_path(new_model1, &iter_new);
@@ -1633,7 +1627,7 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel1() {
   }
 
   GtkTreeIter iter;
-  GtkTreeStore *store = gtk_tree_store_new(1, G_TYPE_STRING);
+  GtkTreeStore* store = gtk_tree_store_new(1, G_TYPE_STRING);
 
   for (int i = 0; i<item_size; i++) {
     gtk_tree_store_append(store, &iter, NULL);
@@ -1704,7 +1698,7 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel2() {
   }
 
   GtkTreeIter iter;
-  GtkTreeStore *store = gtk_tree_store_new(1, G_TYPE_STRING);
+  GtkTreeStore* store = gtk_tree_store_new(1, G_TYPE_STRING);
 
   for (int i = 0; i<(item_size-pos_num); i++) {
     gtk_tree_store_append(store, &iter, NULL);
@@ -2135,13 +2129,8 @@ void CustomCalc::CreateCalcSettingWin(GtkWidget* parent) {
   g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(3, 3, TRUE));
+  GtkTable* table = Utils::create_table(3, 3);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
-
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
 
   // Item
   GtkLabel* label_name = Utils::create_label(_("Item:"));
@@ -2203,13 +2192,10 @@ void CustomCalc::CreateExportCalcSettingWin(GtkWidget* parent) {
   g_signal_connect(button_export, "clicked", G_CALLBACK(signal_button_clicked_export), this);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(6, 6, TRUE));
+  GtkTable* table = Utils::create_table(6, 6);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
   gtk_container_set_border_width(GTK_CONTAINER(table), 10);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
 
   // input notice
   GtkLabel* label_input_notice = Utils::create_label(_("Please input name for exporting data:"));

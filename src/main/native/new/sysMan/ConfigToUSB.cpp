@@ -40,6 +40,8 @@ ConfigToUSB::~ConfigToUSB() {
   if (m_instance != NULL) {
     delete m_instance;
   }
+
+  m_instance = NULL;
 }
 
 void ConfigToUSB::CreateWindow(GtkWindow* parent) {
@@ -52,10 +54,10 @@ void ConfigToUSB::CreateWindow(GtkWindow* parent) {
   g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
   g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(1, 3, TRUE));
+  GtkTable* table = Utils::create_table(1, 3);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
+  gtk_table_set_col_spacings(table, 0);
 
   // scrolled_window
   GtkScrolledWindow* scrolled_window_root = Utils::create_scrolled_window();
@@ -281,9 +283,9 @@ void ConfigToUSB::ToggleData(GtkCellRendererToggle* cell, gchar* path_str) {
   }
 
   // PRINTF("Toggle path: %s\n", path_str);
-  GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW(treeview));
+  GtkTreeModel* model = gtk_tree_view_get_model(treeview);
   GtkTreeIter iter;
-  GtkTreePath *path = gtk_tree_path_new_from_string (path_str);
+  GtkTreePath* path = gtk_tree_path_new_from_string (path_str);
   gboolean checked;
 
   /* get toggled iter */
@@ -461,10 +463,10 @@ void ConfigToUSB::UpdateBranchModel(gint rows) {
 
 GtkTreeModel* ConfigToUSB::LoadBranchModel(gchar* branch) {
   DIR *dir;
-  struct dirent *ent;
+  struct dirent* ent;
   gchar *path = g_build_path(G_DIR_SEPARATOR_S, USERCONFIG_PARENT_PATH, branch, NULL);
 
-  GtkListStore *store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
+  GtkListStore* store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
   gtk_list_store_clear(store);
   GtkTreeIter iter;
 

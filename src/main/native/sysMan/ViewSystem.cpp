@@ -8623,7 +8623,7 @@ GtkWidget* ViewSystem::create_note_dicom(void) {
     // fixed_local = Create_note_local();
     fixed_local = DicomLocalSetting::GetInstance()->CreateDicomWindow(m_window);
     gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_local);
-    DicomLocalSetting::GetInstance()->init_local_setting();
+    DicomLocalSetting::GetInstance()->InitLocalSetting();
 
     label_local = gtk_label_new (_("Local"));
     gtk_widget_show (label_local);
@@ -8632,7 +8632,7 @@ GtkWidget* ViewSystem::create_note_dicom(void) {
     // create note server
     fixed_server = DicomServerSetting::GetInstance()->CreateDicomWindow(m_window);
     gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_server);
-    // DicomServerSetting::GetInstance()-> init_server_setting();
+    // DicomServerSetting::GetInstance()-> InitServerSetting();
 
     label_server = gtk_label_new (_("Server"));
     gtk_widget_show (label_server);
@@ -8656,10 +8656,10 @@ void ViewSystem::DicomnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *pa
     m_page_num = page_num;
     switch(page_num) {
     case 0:
-        DicomLocalSetting::GetInstance()->init_local_setting();
+        DicomLocalSetting::GetInstance()->InitLocalSetting();
         break;
     case 1:
-        DicomServerSetting::GetInstance()-> init_server_setting();
+        DicomServerSetting::GetInstance()-> InitServerSetting();
         break;
     case 2:
         DicomServiceSetting::GetInstance()->init_service_setting();

@@ -75,7 +75,7 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent) {
     // create note MPPS
     fixed_mpps = Create_note_mpps();
     gtk_container_add (GTK_CONTAINER (m_service_notebook), fixed_mpps);
-    //  init_server_setting(NULL);
+    //  InitServerSetting(NULL);
 
     label_mpps = gtk_label_new (_("MPPS"));
     gtk_widget_show (label_mpps);
@@ -84,7 +84,7 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent) {
     // create note storage commitment
     fixed_storage_commitment = Create_note_storage_commitment();
     gtk_container_add (GTK_CONTAINER (m_service_notebook), fixed_storage_commitment);
-    //  init_server_setting(NULL);
+    //  InitServerSetting(NULL);
 
     label_storage_commitment = gtk_label_new (_("Storage Commitment"));
     gtk_widget_show (label_storage_commitment);
@@ -93,7 +93,7 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget *parent) {
 // create note query/retrieve
     fixed_query_retrieve = Create_note_query_retrieve();
     gtk_container_add (GTK_CONTAINER (m_service_notebook), fixed_query_retrieve);
-    //  init_server_setting(NULL);
+    //  InitServerSetting(NULL);
 
     label_query_retrieve = gtk_label_new (_(" Query/Retrieve"));
     gtk_widget_show (label_query_retrieve);

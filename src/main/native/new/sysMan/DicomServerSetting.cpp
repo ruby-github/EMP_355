@@ -32,16 +32,17 @@ DicomServerSetting::DicomServerSetting() {
 }
 
 DicomServerSetting::~DicomServerSetting() {
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
 }
 
 GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
   m_parent = parent;
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(11, 1, TRUE));
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
+  GtkTable* table = Utils::create_table(11, 1);
 
   GtkFrame* frame_device = Utils::create_frame(_("Device"));
   GtkFrame* frame_device_list = Utils::create_frame(_("Device List"));
@@ -50,13 +51,10 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
   gtk_table_attach_defaults(table, GTK_WIDGET(frame_device_list), 0, 1, 5, 11);
 
   // Device
-  GtkTable* table_device = GTK_TABLE(gtk_table_new(3, 6, TRUE));
+  GtkTable* table_device = Utils::create_table(3, 6);
   gtk_container_set_border_width(GTK_CONTAINER(table_device), 10);
 
   gtk_container_add(GTK_CONTAINER(frame_device), GTK_WIDGET(table_device));
-
-  gtk_table_set_row_spacings(table_device, 10);
-  gtk_table_set_col_spacings(table_device, 10);
 
   // Device
   GtkLabel* label_device = Utils::create_label(_("Device:"));
@@ -89,13 +87,10 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
   gtk_table_attach(table_device, GTK_WIDGET(button_add), 1, 2, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
 
   // Device List
-  GtkTable* table_device_list = GTK_TABLE(gtk_table_new(4, 6, TRUE));
+  GtkTable* table_device_list = Utils::create_table(4, 6);
   gtk_container_set_border_width(GTK_CONTAINER(table_device_list), 10);
 
   gtk_container_add(GTK_CONTAINER(frame_device_list), GTK_WIDGET(table_device_list));
-
-  gtk_table_set_row_spacings(table_device_list, 10);
-  gtk_table_set_col_spacings(table_device_list, 10);
 
   // scrolled_window
   GtkScrolledWindow* scrolled_window = Utils::create_scrolled_window();

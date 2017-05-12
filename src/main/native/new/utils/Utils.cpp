@@ -206,7 +206,7 @@ GtkComboBoxText* Utils::create_combobox_text() {
   GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
   set_font(GTK_WIDGET(combobox), "", "", 10);
-  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 25);
+  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 30);
 
   return combobox;
 }
@@ -228,6 +228,16 @@ GtkProgressBar* Utils::create_progress_bar() {
   gtk_widget_set_size_request(GTK_WIDGET(progress_bar), -1, 25);
 
   return progress_bar;
+}
+
+GtkTable* Utils::create_table(guint rows, guint columns) {
+  GtkTable* table = GTK_TABLE(gtk_table_new(rows, columns, TRUE));
+  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
+
+  gtk_table_set_row_spacings(table, 10);
+  gtk_table_set_col_spacings(table, 10);
+
+  return table;
 }
 
 GtkScrolledWindow* Utils::create_scrolled_window() {
@@ -364,11 +374,11 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "sysMan/DicomServerSetting.h"
+#include "sysMan/MeasureSetting.h"
 
 void Utils::test(GtkWidget* widget) {
   GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 800, 600);
-  GtkWidget* w = DicomServerSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(dialog));
+  GtkWidget* w = MeasureSetting::GetInstance()->CreateMeasureWindow(GTK_WIDGET(dialog));
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
   gtk_widget_show_all(GTK_WIDGET(dialog));
 }

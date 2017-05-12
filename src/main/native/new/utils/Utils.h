@@ -32,9 +32,10 @@ public:
   static GtkNotebook* create_notebook();
   static GtkProgressBar* create_progress_bar();
 
+  static GtkTable* create_table(guint rows, guint columns);
+
   static GtkScrolledWindow* create_scrolled_window();
   static GtkTreeView* create_tree_view(GtkTreeModel* mode = NULL);
-
   static GtkFrame* create_frame(const string label = "");
 
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);

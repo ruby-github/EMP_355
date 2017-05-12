@@ -15,7 +15,7 @@ MenuSystem::MenuSystem(void) {
 }
 
 GtkWidget* MenuSystem::Create(void) {
-    m_table = gtk_table_new(16, 1, TRUE);
+    m_table = (GtkWidget*)Utils::create_table(16, 1);
 
     m_labelGeneral = create_label("", 0, 0, g_lightGray, NULL);
     GtkWidget *btn_general = gtk_button_new();

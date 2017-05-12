@@ -33,16 +33,17 @@ DicomLocalSetting::DicomLocalSetting() {
 }
 
 DicomLocalSetting::~DicomLocalSetting() {
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
 }
 
 GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   m_parent = parent;
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(8, 6, TRUE));
-  gtk_container_set_border_width(GTK_CONTAINER(table), 20);
-
-  gtk_table_set_row_spacings(table, 10);
-  gtk_table_set_col_spacings(table, 10);
+  GtkTable* table = Utils::create_table(8, 6);
 
   GtkFrame* frame_network = Utils::create_frame(_("NetWork Property"));
   GtkFrame* frame_host = Utils::create_frame(_("Host"));
@@ -55,13 +56,10 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   g_signal_connect(button_setting, "clicked", G_CALLBACK(signal_button_clicked_setting), this);
 
   // NetWork Property
-  GtkTable* table_network = GTK_TABLE(gtk_table_new(6, 3, TRUE));
+  GtkTable* table_network = Utils::create_table(6, 3);
   gtk_container_set_border_width(GTK_CONTAINER(table_network), 10);
 
   gtk_container_add(GTK_CONTAINER(frame_network), GTK_WIDGET(table_network));
-
-  gtk_table_set_row_spacings(table_network, 10);
-  gtk_table_set_col_spacings(table_network, 10);
 
   // ip
   GtkLabel* label_network_ip = Utils::create_label(_("IP Address:"));
@@ -100,13 +98,10 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   gtk_misc_set_alignment(GTK_MISC(label_network_gateway_style), 0.5, 0);
 
   // Host
-  GtkTable* table_host = GTK_TABLE(gtk_table_new(3, 3, TRUE));
+  GtkTable* table_host = Utils::create_table(3, 3);
   gtk_container_set_border_width(GTK_CONTAINER(table_host), 10);
 
   gtk_container_add(GTK_CONTAINER(frame_host), GTK_WIDGET(table_host));
-
-  gtk_table_set_row_spacings(table_host, 10);
-  gtk_table_set_col_spacings(table_host, 10);
 
   // AE Title
   GtkLabel* label_host_ae = Utils::create_label(_("AE Title:"));
