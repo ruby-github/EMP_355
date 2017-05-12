@@ -13,7 +13,6 @@ public:
   static CalcSetting* GetInstance();
 
 public:
-  CalcSetting();
   ~CalcSetting();
 
   GtkWidget* CreateCalcWindow(GtkWidget* parent);
@@ -175,6 +174,8 @@ private:
   void UpdateAll();
 
 private:
+  CalcSetting();
+
   void CreateDefineItemCalc(vector<string>& vecExamItem);
 
   void AddColumnsCalc(GtkTreeView* treeview);
@@ -219,7 +220,6 @@ public:
   static CustomCalc* GetInstance();
 
 public:
-  CustomCalc();
   ~CustomCalc();
 
   void CreateCalcSettingWin(GtkWidget* parent);
@@ -317,6 +317,8 @@ private:
   void LoadData();
 
 private:
+  CustomCalc();
+
   void KeyEvent(unsigned char keyValue);
 
   void ClickedOKAndCancel();

@@ -1,63 +1,85 @@
-#ifndef _DICOM_SERVER_SETTING_H_
-#define _DICOM_SERVER_SETTING_H_
+#ifndef __DICOM_SERVER_SETTING_H__
+#define __DICOM_SERVER_SETTING_H__
 
-#include <gtk/gtk.h>
-#include <string.h>
-#include <stdio.h>
-#include "periDevice/DCMMan.h"
-#include <vector>
+#include "utils/Utils.h"
 
 class DicomServerSetting {
 public:
+  static DicomServerSetting* GetInstance();
 
-    static DicomServerSetting* GetInstance();
-    GtkWidget* CreateDicomWindow(GtkWidget *parent);
+public:
+  ~DicomServerSetting();
 
-    enum {
-        COL_DEVICE,
-        COL_IP,
-        NUM_COLS
-    };
+  GtkWidget* CreateDicomWindow(GtkWidget* parent);
 
-    void init_server_setting(void);
+  void InitServerSetting();
 
-    vector<string> m_group_device_server;
-    vector<string> m_group_ip_server;
 private:
-    DicomServerSetting();
-    ~DicomServerSetting();
+  // signal
 
-    static DicomServerSetting* m_ptrInstance;
+  static void signal_button_clicked_ping(GtkButton* button, DicomServerSetting* data) {
+    if (data != NULL) {
+      data->ButtonClickedPing(button);
+    }
+  }
 
-    //server
-    GtkWidget *m_entry_device;
-    GtkWidget *m_entry_ip;
-    GtkWidget *m_treeview;
+  static void signal_button_clicked_add(GtkButton* button, DicomServerSetting* data) {
+    if (data != NULL) {
+      data->ButtonClickedAdd(button);
+    }
+  }
 
-    GtkWidget* create_server_treeview();
-    GtkTreeModel* create_device_model();
+  static void signal_button_clicked_delete(GtkButton* button, DicomServerSetting* data) {
+    if (data != NULL) {
+      data->ButtonClickedDelete(button);
+    }
+  }
 
-    void ButtonPingClicked(GtkButton *button);
-    void ButtonAddClicked(GtkButton *button);
-    void ButtonDeleteClicked(GtkButton *button);
+  static gboolean signal_callback_pingtimeout(gpointer data) {
+    DicomServerSetting* setting = (DicomServerSetting*)data;
 
-    static void HandleButtonPingClicked(GtkButton *button, DicomServerSetting *data) {
-        if (data)
-            data->ButtonPingClicked(button);
+    if (setting != NULL) {
+      setting->PingTimeout();
     }
 
-    static void HandleButtonAddClicked(GtkButton *button, DicomServerSetting *data) {
-        if (data)
-            data->ButtonAddClicked(button);
+    return FALSE;
+  }
+
+  static void signal_callback_attribute(string device, string ip, void* data) {
+    DicomServerSetting* setting = (DicomServerSetting*)data;
+
+    if (setting != NULL) {
+      setting->GetSingleServerAttribute(device, ip);
     }
+  }
 
-    static void HandleButtonDeleteClicked(GtkButton *button, DicomServerSetting *data) {
-        if (data)
-            data->ButtonDeleteClicked(button);
-    }
+  // signal
 
-    static void GetSingleServerAttribute(string device, string ip, void *data);
+  void ButtonClickedPing(GtkButton* button);
+  void ButtonClickedAdd(GtkButton* button);
+  void ButtonClickedDelete(GtkButton* button);
 
-    static gboolean PingTimeout(gpointer data);
+  void PingTimeout();
+  void GetSingleServerAttribute(string device, string ip);
+
+private:
+  DicomServerSetting();
+
+  GtkTreeView* CreateServerTreeview();
+  GtkTreeModel* CreateDeviceModel();
+
+private:
+  static DicomServerSetting* m_instance;
+
+private:
+  GtkWidget* m_parent;
+
+  GtkEntry* m_entry_device;
+  GtkEntry* m_entry_ip;
+  GtkTreeView* m_treeview;
+
+  vector<string> m_group_device_server;
+  vector<string> m_group_ip_server;
 };
+
 #endif

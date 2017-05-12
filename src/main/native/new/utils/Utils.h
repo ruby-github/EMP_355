@@ -35,6 +35,8 @@ public:
   static GtkScrolledWindow* create_scrolled_window();
   static GtkTreeView* create_tree_view(GtkTreeModel* mode = NULL);
 
+  static GtkFrame* create_frame(const string label = "");
+
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,
     const int size, const int max_width, const int max_height);

@@ -1,41 +1,62 @@
 #ifndef _DICOM_LOCAL_SETTING_H_
 #define _DICOM_LOCAL_SETTING_H_
 
-#include <gtk/gtk.h>
-#include <string.h>
-#include <stdio.h>
+#include "utils/Utils.h"
 
 class DicomLocalSetting {
 public:
+  static DicomLocalSetting* GetInstance();
 
-    static DicomLocalSetting* GetInstance();
-    GtkWidget* CreateDicomWindow(GtkWidget *parent);
+public:
+  ~DicomLocalSetting();
 
-    void init_local_setting(void);
+  GtkWidget* CreateDicomWindow(GtkWidget* parent);
+
+  void InitLocalSetting();
+
 private:
-    DicomLocalSetting();
-    ~DicomLocalSetting();
+  // signal
 
-    static DicomLocalSetting* m_ptrInstance;
+  static void signal_button_clicked_setting(GtkButton* button, DicomLocalSetting* data) {
+    if (data != NULL) {
+      data->ButtonClickedSetting(button);
+    }
+  }
 
-    //Local
-    GtkWidget *m_entry_network_ip;
-    GtkWidget *m_entry_network_mask;
-    GtkWidget *m_entry_network_gateway;
+  static gboolean signal_entry_keyfilter(GtkWidget* entry, GdkEventKey* event, gpointer data) {
+    DicomLocalSetting* setting = (DicomLocalSetting*)data;
 
-    GtkWidget *m_entry_host_port;
-    GtkWidget *m_entry_host_ae;
-
-    void ButtonSettingClicked(GtkButton *button);
-    gboolean KeyFilter(GtkWidget *entry, GdkEventKey *event);
-
-    static void HandleButtonSettingClicked(GtkButton *button, DicomLocalSetting *data) {
-        if (data)
-            data->ButtonSettingClicked(button);
+    if (setting != NULL) {
+      if (setting->EntryKeyFilter(entry, event)) {
+        return TRUE;
+      } else {
+        return FALSE;
+      }
     }
 
-    static gboolean HandleKeyFilter(GtkWidget *entry, GdkEventKey *event, gpointer data) {
-        ((DicomLocalSetting *)data)->KeyFilter(entry, event);
-    }
+    return FALSE;
+  }
+
+  // signal
+
+  void ButtonClickedSetting(GtkButton* button);
+  bool EntryKeyFilter(GtkWidget* entry, GdkEventKey* event);
+
+private:
+  DicomLocalSetting();
+
+private:
+  static DicomLocalSetting* m_instance;
+
+private:
+  GtkWidget* m_parent;
+
+  GtkEntry* m_entry_network_ip;
+  GtkEntry* m_entry_network_mask;
+  GtkEntry* m_entry_network_gateway;
+
+  GtkEntry* m_entry_host_port;
+  GtkEntry* m_entry_host_ae;
 };
+
 #endif

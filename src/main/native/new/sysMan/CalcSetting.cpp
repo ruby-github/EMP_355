@@ -366,13 +366,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   GtkButton* button_delete = Utils::create_button(_("Delete"));
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_delete), this);
 
-  gtk_widget_set_size_request(GTK_WIDGET(button_select_one), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_select_all), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_back_one), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_back_all), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_add), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_delete), -1, 30);
-
   gtk_table_attach(table, GTK_WIDGET(button_select_one), 3, 4, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
   gtk_table_attach(table, GTK_WIDGET(button_select_all), 3, 4, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
   gtk_table_attach(table, GTK_WIDGET(button_back_one), 3, 4, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
@@ -392,11 +385,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   GtkButton* button_import = Utils::create_button(_("Import"));
   g_signal_connect(button_import, "clicked", G_CALLBACK(signal_button_clicked_import), this);
 
-  gtk_widget_set_size_request(GTK_WIDGET(button_up), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_down), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_export), -1, 30);
-  gtk_widget_set_size_request(GTK_WIDGET(button_import), -1, 30);
-
   gtk_table_attach(table, GTK_WIDGET(button_up), 7, 8, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
   gtk_table_attach(table, GTK_WIDGET(button_down), 7, 8, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
   gtk_table_attach(table, GTK_WIDGET(button_export), 7, 8, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
@@ -404,8 +392,6 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
 
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_default), this);
-
-  gtk_widget_set_size_request(GTK_WIDGET(button_default), -1, 30);
 
   gtk_table_attach(table, GTK_WIDGET(button_default), 5, 7, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
 

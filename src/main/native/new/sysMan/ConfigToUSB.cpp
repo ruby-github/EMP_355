@@ -64,9 +64,6 @@ void ConfigToUSB::CreateWindow(GtkWindow* parent) {
   gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window_root), 0, 1, 0, 1);
   gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window_branch), 1, 3, 0, 1);
 
-  gtk_scrolled_window_set_shadow_type(scrolled_window_root, GTK_SHADOW_IN);
-  gtk_scrolled_window_set_shadow_type(scrolled_window_branch, GTK_SHADOW_IN);
-
   // Root
   m_treeview_root = CreateTreeview(0);
   gtk_container_add(GTK_CONTAINER(scrolled_window_root), GTK_WIDGET(m_treeview_root));

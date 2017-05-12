@@ -99,6 +99,8 @@ GtkButton* Utils::create_button(const string label) {
     GTK_STATE_INSENSITIVE // 失去功能时的状态
   */
 
+  gtk_widget_set_size_request(GTK_WIDGET(button), -1, 30);
+
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_PRELIGHT, get_color("green"));
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_SELECTED, get_color("green"));
@@ -119,6 +121,8 @@ GtkButton* Utils::create_button_with_image(const string filename, const int widt
 
   set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
   gtk_button_set_alignment(button, 0.5, 0.5);
+
+  gtk_widget_set_size_request(GTK_WIDGET(button), -1, 30);
 
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_PRELIGHT, get_color("green"));
@@ -150,6 +154,8 @@ GtkCheckButton* Utils::create_check_button(const string label) {
 
   set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
   gtk_button_set_alignment(GTK_BUTTON(button), 0, 0.5);
+
+  gtk_widget_set_size_request(GTK_WIDGET(button), -1, 30);
 
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_PRELIGHT, get_color("green"));
@@ -187,7 +193,7 @@ GtkEntry* Utils::create_entry(gunichar ch) {
   GtkEntry* entry = GTK_ENTRY(gtk_entry_new());
 
   set_font(GTK_WIDGET(entry), "", "", 10);
-  gtk_widget_set_size_request(GTK_WIDGET(entry), -1, 30);
+  gtk_widget_set_size_request(GTK_WIDGET(entry), -1, 25);
 
   if (ch > 0) {
     gtk_entry_set_invisible_char(entry, ch);
@@ -200,7 +206,7 @@ GtkComboBoxText* Utils::create_combobox_text() {
   GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
 
   set_font(GTK_WIDGET(combobox), "", "", 10);
-  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 30);
+  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 25);
 
   return combobox;
 }
@@ -228,6 +234,7 @@ GtkScrolledWindow* Utils::create_scrolled_window() {
   GtkScrolledWindow* scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(NULL, NULL));
 
   gtk_scrolled_window_set_policy(scrolled_window, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+  gtk_scrolled_window_set_shadow_type(scrolled_window, GTK_SHADOW_IN);
 
   return scrolled_window;
 }
@@ -244,6 +251,16 @@ GtkTreeView* Utils::create_tree_view(GtkTreeModel* mode) {
   gtk_tree_selection_set_mode(gtk_tree_view_get_selection(tree_view), GTK_SELECTION_BROWSE);
 
   return tree_view;
+}
+
+GtkFrame* Utils::create_frame(const string label) {
+  GtkFrame* frame = GTK_FRAME(gtk_frame_new(label.c_str()));
+
+  gtk_label_set_use_markup(GTK_LABEL(gtk_frame_get_label_widget(frame)), TRUE);
+  gtk_frame_set_label_align(frame, 0.5, 0.5);
+  gtk_frame_set_shadow_type(frame, GTK_SHADOW_IN);
+
+  return frame;
 }
 
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
@@ -347,8 +364,11 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "sysMan/ConfigToHost.h"
+#include "sysMan/DicomServerSetting.h"
 
 void Utils::test(GtkWidget* widget) {
-  ConfigToHost::GetInstance()->CreateWindow(GTK_WINDOW(widget));
+  GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 800, 600);
+  GtkWidget* w = DicomServerSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(dialog));
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
+  gtk_widget_show_all(GTK_WIDGET(dialog));
 }
