@@ -1377,7 +1377,7 @@ void CalcSetting::ButtonClickedImport(GtkButton* button) {
     }
   }
 
-  ConfigToHost::GetInstance()->CreateCalcImportWindow(GTK_WINDOW(m_parent));
+  ConfigToHost::GetInstance()->CreateCalcImportWindow(m_parent);
 }
 
 void CalcSetting::ButtonClickedDefault(GtkButton* button) {

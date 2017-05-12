@@ -1,14 +1,46 @@
-#ifndef _MENU_SYSTEM_H_
-#define _MENU_SYSTEM_H_
+#ifndef __MENU_SYSTEM_H__
+#define __MENU_SYSTEM_H__
 
-#define WIDTH_SYSTEM_MENU  220
-#define HEIGHT_SYSTEM_MENU  635
+#include "utils/Utils.h"
 
 class MenuSystem {
 public:
-    MenuSystem();
-    ~MenuSystem() {}
-    GtkWidget * Create(void);
+  MenuSystem();
+  ~MenuSystem();
+
+  GtkWidget* Create();
+
+public:
+
+private:
+  // signal
+
+  static void HandleBtnGeneral(GtkButton* button, MenuSystem* data) {
+    if (data != NULL) {
+      data->BtnGeneral(button);
+    }
+  }
+
+  static void HandleBtnBiopsy(GtkButton* button, MenuSystem* data) {
+    if (data != NULL) {
+      data->BtnBiopsy(button);
+    }
+  }
+
+  // signal
+
+  void BtnGeneral(GtkButton* button);
+  void BtnBiopsy(GtkButton* button);
+
+private:
+
+private:
+
+private:
+
+public:
+
+
     void UpdateLabel(void);
     void Show(void);
     void Hide(void);
@@ -17,17 +49,8 @@ private:
     GtkWidget *m_labelGeneral;
     GtkWidget *m_labelBiopsy;
 
-//signal handle
-    void BtnGeneral(GtkButton *button);
-    void BtnBiopsy(GtkButton *button);
-//signal connect
-    static void HandleBtnGeneral(GtkButton *button, MenuSystem *data) {
-        data->BtnGeneral(button);
-    }
-    static void HandleBtnBiopsy(GtkButton *button, MenuSystem *data) {
-        data->BtnBiopsy(button);
-    }
 };
 
 extern MenuSystem g_menuSystem;
+
 #endif

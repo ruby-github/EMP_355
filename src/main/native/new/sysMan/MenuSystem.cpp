@@ -1,5 +1,7 @@
-#include <gtk/gtk.h>
 #include "sysMan/MenuSystem.h"
+
+#include <gtk/gtk.h>
+
 #include "display/gui_global.h"
 #include "display/gui_func.h"
 #include "display/MenuArea.h"
@@ -9,6 +11,9 @@
 #include "keyboard/KeyFunc.h"
 
 MenuSystem g_menuSystem;
+
+#define WIDTH_SYSTEM_MENU  220
+#define HEIGHT_SYSTEM_MENU  635
 
 MenuSystem::MenuSystem(void) {
     m_table = 0;

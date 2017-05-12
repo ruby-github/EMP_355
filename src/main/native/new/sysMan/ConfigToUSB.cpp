@@ -44,9 +44,9 @@ ConfigToUSB::~ConfigToUSB() {
   m_instance = NULL;
 }
 
-void ConfigToUSB::CreateWindow(GtkWindow* parent) {
+void ConfigToUSB::CreateWindow(GtkWidget* parent) {
   m_parent = parent;
-  m_dialog = Utils::create_dialog(m_parent, _("Data Selection"), 640, 480);
+  m_dialog = Utils::create_dialog(GTK_WINDOW(m_parent), _("Data Selection"), 640, 480);
 
   GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OPEN);
   GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
@@ -142,13 +142,13 @@ void ConfigToUSB::LoadSelectedData() {
   vector<string> vec = GetSelectedVec();
 
   if(!ptr->CheckUsbStorageState()) {
-    MessageDialog::GetInstance()->Create(m_parent,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
 
     return;
   } else {
     if(!ptr->MountUsbStorage()) {
-      MessageDialog::GetInstance()->Create(m_parent,
+      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
         MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
 
       return;
@@ -240,10 +240,10 @@ void ConfigToUSB::LoadSelectedData() {
   // Handle result
   if(!cond) {
     sprintf(result, _("Success to export to USB storage."));
-    MessageDialog::GetInstance()->Create(m_parent,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, result, NULL);
   } else {
-    MessageDialog::GetInstance()->Create(m_parent,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, result, NULL);
   }
 }

@@ -55,9 +55,9 @@ ConfigToHost::~ConfigToHost() {
   m_instance = NULL;
 }
 
-void ConfigToHost::CreateWindow(GtkWindow* parent) {
+void ConfigToHost::CreateWindow(GtkWidget* parent) {
   m_parent = parent;
-  m_dialog = Utils::create_dialog(m_parent, _("Data Selection"), 640, 480);
+  m_dialog = Utils::create_dialog(GTK_WINDOW(m_parent), _("Data Selection"), 640, 480);
 
   GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OPEN);
   GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
@@ -106,7 +106,7 @@ void ConfigToHost::CreateWindow(GtkWindow* parent) {
   SetSystemCursorToCenter();
 }
 
-void ConfigToHost::CreateCalcImportWindow(GtkWindow* parent) {
+void ConfigToHost::CreateCalcImportWindow(GtkWidget* parent) {
   m_parent = parent;
   m_dialog = Utils::create_dialog(GTK_WINDOW(parent), _("Import"), 400, 450);
 
@@ -379,13 +379,13 @@ void ConfigToHost::LoadSelectedData() {
   vector<string> vec = ConfigToHost::GetInstance()->GetSelectedVec();
 
   if(!ptr->CheckUsbStorageState()) {
-    MessageDialog::GetInstance()->Create(m_parent,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
 
     return;
   } else {
     if(!ptr->MountUsbStorage()) {
-      MessageDialog::GetInstance()->Create(m_parent,
+      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
         MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
 
       return;
@@ -525,12 +525,12 @@ void ConfigToHost::LoadSelectedData() {
   if(!cond) {
     sprintf(result, _("Success to load data from USB storage."));
 
-    MessageDialog::GetInstance()->Create(m_parent,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, result, NULL);
 
     ViewSystem::GetInstance()->UpdateUserItem();
   } else {
-    MessageDialog::GetInstance()->Create(m_parent,
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, result, NULL);
   }
 }

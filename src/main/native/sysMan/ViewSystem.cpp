@@ -13141,16 +13141,7 @@ void ViewSystem::BtnImageNewClicked(GtkButton *button) {
 }
 
 void ViewSystem::BtnImageExportToUSBClicked(GtkButton *button) {
-
-    /* char path[256];
-     char defaultuser[256];
-     sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE);
-     sprintf(defaultuser, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR,"userconfig/ItemPara.ini");
-
-     FileMan f;
-     f.CopyFile(path,defaultuser);
-    */
-    ConfigToUSB::GetInstance()->CreateWindow(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()));
+    ConfigToUSB::GetInstance()->CreateWindow(GetWindow());
 }
 
 void ViewSystem::BtnImageImportFromUSBClicked(GtkButton *button) {
@@ -13172,7 +13163,7 @@ void ViewSystem::BtnImageImportFromUSBClicked(GtkButton *button) {
         }
     }
 
-    ConfigToHost::GetInstance()->CreateWindow(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()));
+    ConfigToHost::GetInstance()->CreateWindow(GetWindow());
     ptr->UmountUsbStorage();
 
 }

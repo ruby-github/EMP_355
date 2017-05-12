@@ -26,6 +26,15 @@ MeasureSetting* MeasureSetting::GetInstance() {
 }
 
 MeasureSetting::MeasureSetting() {
+  m_parent = NULL;
+
+  m_combobox_exam_type = NULL;
+  m_combobox_sequence = NULL;
+
+  m_scrolled_window_selected_item = NULL;
+
+  m_treeview_item = NULL;
+  m_treeview_selected_item = NULL;
 }
 
 MeasureSetting::~MeasureSetting() {

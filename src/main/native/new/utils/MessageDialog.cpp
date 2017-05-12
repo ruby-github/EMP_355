@@ -68,9 +68,9 @@ void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text
   m_entry = NULL;
   m_progress_bar = NULL;
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(2, 5, TRUE));
+  GtkTable* table = Utils::create_table(2, 5);
   gtk_container_set_border_width(GTK_CONTAINER(table), 10);
-  gtk_table_set_col_spacings(table, 10);
+  gtk_table_set_row_spacings(table, 0);
 
   GtkImage* image = Utils::create_image();
 
@@ -389,7 +389,7 @@ void MessageHintDialog::Create(GtkWindow* parent, const string text) {
   gtk_dialog_set_has_separator(m_dialog, FALSE);
   gtk_window_set_decorated(GTK_WINDOW(m_dialog), FALSE);
 
-  GtkTable* table = GTK_TABLE(gtk_table_new(1, 1, TRUE));
+  GtkTable* table = Utils::create_table(1, 1);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
   gtk_container_set_border_width(GTK_CONTAINER(table), 10);

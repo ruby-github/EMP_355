@@ -374,11 +374,18 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
+#include "sysMan/CalcSetting.h"
+#include "sysMan/ConfigToHost.h"
+#include "sysMan/ConfigToUSB.h"
+#include "sysMan/DicomLocalSetting.h"
+#include "sysMan/DicomServerSetting.h"
 #include "sysMan/MeasureSetting.h"
 
 void Utils::test(GtkWidget* widget) {
-  GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 800, 600);
-  GtkWidget* w = MeasureSetting::GetInstance()->CreateMeasureWindow(GTK_WIDGET(dialog));
+  /*GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 800, 600);
+  GtkWidget* w = CalcSetting::GetInstance()->CreateCalcWindow(GTK_WIDGET(dialog));
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
-  gtk_widget_show_all(GTK_WIDGET(dialog));
+  gtk_widget_show_all(GTK_WIDGET(dialog));*/
+
+  ConfigToUSB::GetInstance()->CreateWindow(widget);
 }
