@@ -5,52 +5,44 @@
 
 class MenuSystem {
 public:
-  MenuSystem();
+  static MenuSystem* GetInstance();
+
+public:
   ~MenuSystem();
 
   GtkWidget* Create();
 
-public:
+  void Show();
+  void Hide();
 
 private:
   // signal
 
-  static void HandleBtnGeneral(GtkButton* button, MenuSystem* data) {
+  static void signal_button_clicked_general(GtkButton* button, MenuSystem* data) {
     if (data != NULL) {
-      data->BtnGeneral(button);
+      data->ButtonClickedGeneral(button);
     }
   }
 
-  static void HandleBtnBiopsy(GtkButton* button, MenuSystem* data) {
+  static void signal_button_clicked_biopsy(GtkButton* button, MenuSystem* data) {
     if (data != NULL) {
-      data->BtnBiopsy(button);
+      data->ButtonClickedBiopsy(button);
     }
   }
 
   // signal
 
-  void BtnGeneral(GtkButton* button);
-  void BtnBiopsy(GtkButton* button);
-
-private:
-
-private:
-
-private:
+  void ButtonClickedGeneral(GtkButton* button);
+  void ButtonClickedBiopsy(GtkButton* button);
 
 public:
+  MenuSystem();
 
-
-    void UpdateLabel(void);
-    void Show(void);
-    void Hide(void);
 private:
-    GtkWidget *m_table;
-    GtkWidget *m_labelGeneral;
-    GtkWidget *m_labelBiopsy;
+  static MenuSystem* m_instance;
 
+private:
+  GtkTable* m_table;
 };
-
-extern MenuSystem g_menuSystem;
 
 #endif

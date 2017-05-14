@@ -3573,9 +3573,9 @@ void doBtnEvent(const unsigned int button, int is_press) {
   unsigned long delay = 0;
 
   if (is_press) {
-    XTestFakeButtonEvent(display, button, True, delay);
+    XTestFakeButtonEvent(display, button, TRUE, delay);
   } else {
-    XTestFakeButtonEvent(display, button, False, delay);
+    XTestFakeButtonEvent(display, button, FALSE, delay);
   }
 
   XCloseDisplay(display);
@@ -3587,9 +3587,9 @@ void doKeyEvent(const unsigned int keycode, int is_press) {
   unsigned long delay = 0;
 
   if (is_press) {
-    XTestFakeKeyEvent(display, keycode, True, delay);
+    XTestFakeKeyEvent(display, keycode, TRUE, delay);
   } else {
-    XTestFakeKeyEvent(display, keycode, False, delay);
+    XTestFakeKeyEvent(display, keycode, FALSE, delay);
   }
 
   usleep(20000);
@@ -3668,7 +3668,7 @@ Display* getXDisplay() {
     exit(1);
   }
 
-  XSync(display, True);
+  XSync(display, TRUE);
 
   return display;
 }
@@ -3680,9 +3680,9 @@ void doKeysymEvent(const unsigned int keysym, int is_press) {
   unsigned long delay = 0;
 
   if (is_press) {
-    XTestFakeKeyEvent(display, keycode, True, delay);
+    XTestFakeKeyEvent(display, keycode, TRUE, delay);
   } else {
-    XTestFakeKeyEvent(display, keycode, False, delay);
+    XTestFakeKeyEvent(display, keycode, FALSE, delay);
   }
 
   usleep(20000);

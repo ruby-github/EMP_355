@@ -157,7 +157,7 @@ GtkWidget* MenuArea::Create(void) {
     gtk_widget_set_usize(tableEFOV, widthMax, heightMaxNB);
     gtk_container_add (GTK_CONTAINER (m_noteBook), tableEFOV);
 
-    GtkWidget *tableSystem = g_menuSystem.Create();
+    GtkWidget *tableSystem = MenuSystem::GetInstance()->Create();
     gtk_widget_set_usize(tableSystem, widthMax, heightMaxNB);
     gtk_container_add (GTK_CONTAINER (m_noteBook), tableSystem);
 
@@ -310,7 +310,6 @@ void MenuArea::UpdateLabel(void) {
     g_menuCalc.UpdateLabel();
     g_menuNote.UpdateLabel();
     g_menuBiopsy.UpdateLabel();
-    g_menuSystem.UpdateLabel();
     g_menuEFOV.UpdateLabel();
     g_menuBiopsy.UpdateLabel();//2016.11.02
     g_menuBiopsyVerify.UpdateLabel();//2016.11.02
@@ -355,7 +354,7 @@ void MenuArea::HideCurMenuChild(void) {
         g_menuNote.Hide();
         break;
     case SYSTEM:
-        g_menuSystem.Hide();
+        MenuSystem::GetInstance()->Hide();
         break;
     default:
         break;
@@ -621,7 +620,7 @@ void MenuArea::ShowSystemMenu(void) {
     m_menuType = SYSTEM;
     HideAllOtherMenu();
     gtk_label_set_text(GTK_LABEL(m_labelSub), _("System Setting"));
-    g_menuSystem.Show();
+    MenuSystem::GetInstance()->Show();
     PRINTF("-------------------------------show system menu\n");
 
     gtk_notebook_set_current_page(GTK_NOTEBOOK(m_noteBook), 14);
@@ -653,7 +652,7 @@ void MenuArea::HideAllOtherMenu(void) {
     if(m_menuType != BIOPSY)
         g_menuBiopsy.Hide();
     if(m_menuType != SYSTEM)
-        g_menuSystem.Hide();
+        MenuSystem::GetInstance()->Hide();
     if (m_menuType != EFOV)
         g_menuEFOV.Hide();
     //-----------------------------//
