@@ -68,6 +68,30 @@
 using std::vector;
 using std::string;
 
+#if defined(EMP_322)
+  const string KeyFunctionList[] = {
+    N_("NULL"),
+    N_("TSI"),
+    N_("Save Video"),
+    N_("Print Screen"),
+    N_("PIP"),
+    N_("Biopsy")
+  };
+#else
+  const string KeyFunctionList[] = {
+    N_("NULL"),
+    N_("TSI"),
+    N_("Save Video"),
+    N_("Print Screen"),
+    N_("Steer"),
+    N_("PIP"),
+    N_("Spectrum Sound"),
+    N_("HPRF"),
+    N_("Image Preset"),
+    N_("Biopsy")
+  };
+#endif
+
 extern bool g_authorizationOn;
 #include "utils/Const.h"
 
@@ -11098,10 +11122,10 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
     gtk_widget_show (fixed_key_p1);
     gtk_container_add (GTK_CONTAINER (frame_key_p1), fixed_key_p1);
     for(int i=0; i<MAX_KEY; i++) {
-        if(strcmp(UserDefineKey::KeyFunctionList[i].c_str(), "Print Screen") == 0)
+        if(strcmp(KeyFunctionList[i].c_str(), "Print Screen") == 0)
             m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _("Print"));
         else
-            m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _(UserDefineKey::KeyFunctionList[i].c_str()));
+            m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
         gtk_widget_show (m_radiobutton_key_p1[i]);
         gtk_fixed_put (GTK_FIXED (fixed_key_p1), m_radiobutton_key_p1[i], 20+(i%5)*150, 20+(i/5)*40);
         gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p1[i]), radiobutton_key_p1_group);
@@ -11127,7 +11151,7 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
     gtk_widget_show (fixed_key_p2);
     gtk_container_add (GTK_CONTAINER (frame_key_p2), fixed_key_p2);
     for(int i=0; i<MAX_KEY; i++) {
-        m_radiobutton_key_p2[i] = gtk_radio_button_new_with_mnemonic (NULL, _(UserDefineKey::KeyFunctionList[i].c_str()));
+        m_radiobutton_key_p2[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
         gtk_widget_show (m_radiobutton_key_p2[i]);
         gtk_fixed_put (GTK_FIXED (fixed_key_p2), m_radiobutton_key_p2[i], 20+(i%5)*150, 20+(i/5)*40);
         gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p2[i]), radiobutton_key_p2_group);
@@ -11154,7 +11178,7 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
     gtk_widget_show (fixed_key_p3);
     gtk_container_add (GTK_CONTAINER (frame_key_p3), fixed_key_p3);
     for(int i=0; i<MAX_KEY; i++) {
-        m_radiobutton_key_p3[i] = gtk_radio_button_new_with_mnemonic (NULL, _(UserDefineKey::KeyFunctionList[i].c_str()));
+        m_radiobutton_key_p3[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
         gtk_widget_show (m_radiobutton_key_p3[i]);
         gtk_fixed_put (GTK_FIXED (fixed_key_p3), m_radiobutton_key_p3[i], 20+(i%5)*150, 20+(i/5)*40);
         gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p3[i]), radiobutton_key_p3_group);
@@ -11185,8 +11209,8 @@ void ViewSystem::init_key_config(void) {
     m_p1_func_index = sysDefine.GetFuncP1();
     m_p2_func_index = sysDefine.GetFuncP2();
 
-    gtk_entry_set_text(GTK_ENTRY(m_entry_function_p1), _(UserDefineKey::KeyFunctionList[m_p1_func_index].c_str()));
-    gtk_entry_set_text(GTK_ENTRY(m_entry_function_p2), _(UserDefineKey::KeyFunctionList[m_p2_func_index].c_str()));
+    gtk_entry_set_text(GTK_ENTRY(m_entry_function_p1), _(KeyFunctionList[m_p1_func_index].c_str()));
+    gtk_entry_set_text(GTK_ENTRY(m_entry_function_p2), _(KeyFunctionList[m_p2_func_index].c_str()));
     m_p1Selected = true;
 #endif
 }

@@ -5,7 +5,7 @@
 #include "sysMan/ViewSystem.h"
 #include "patient/FileMan.h"
 #include <locale.h>
-#include <glib/gi18n.h> // define the label of "_" in this head file
+#include <glib/gi18n.h>
 
 const char* listname[] = {};
 #define LIST_COUNT (sizeof(listname)/sizeof(listname[0]))
@@ -21,7 +21,6 @@ UserSelect::~UserSelect() {
 
 UserSelect::UserSelect() {
     active_user_id = 0;
-    // strcpy(cur_username,"System Default");
 }
 
 UserSelect* UserSelect:: GetInstance() {
@@ -162,27 +161,6 @@ void UserSelect::create_usercalcdefined_dir(void) {
 
 }
 
-/*
-void UserSelect::create_userdefault_dir(void)
-{
-    // make directory if not exist
-    char dirpath[256];
-    sprintf(dirpath, "%s%s", CFG_RES_PATH, EXAM_FILE_OTHER);
-    GFile *dir = g_file_new_for_path(dirpath);
-    GError *err_mkdir = NULL;
-    if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir))
-    {
-        if(err_mkdir->code!=G_IO_ERROR_EXISTS)
-        {
-            // PRINTF("g_file_make_directory error: %s\n", err_mkdir->message);
-            //printf("g_file_make_directory error: %s\n", err_mkdir->message);
-            g_error_free(err_mkdir);
-            g_object_unref(dir);
-        }
-    }
-
-}
-*/
 bool UserSelect::creat_username_db(const char *db_dbname) {
     if(access(db_dbname, F_OK)) {
         sqlite3 *db = 0;
