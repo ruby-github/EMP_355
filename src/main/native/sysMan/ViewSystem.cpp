@@ -3703,8 +3703,7 @@ void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
     if (sysGeneralSetting == NULL)
         sysGeneralSetting = new SysGeneralSetting;
 
-    string hospital_name;
-    sysGeneralSetting->GetHospital(hospital_name);
+    string hospital_name = sysGeneralSetting->GetHospital();
     gtk_entry_set_text(GTK_ENTRY(m_entry_hospital), hospital_name.c_str());
 
     int index_lang = sysGeneralSetting->GetLanguage();
@@ -8698,19 +8697,19 @@ void ViewSystem::init_dicom_setting(void) {
     string local_ip, local_netmask, local_gateway, local_AE;
     string remote_ip, remote_port, remote_AE;
 
-    sysDicomSetting->GetLocalIP(local_ip);
+    local_ip = sysDicomSetting->GetLocalIP();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_ip), local_ip.c_str());
-    sysDicomSetting->GetLocalNetMask(local_netmask);
+    local_netmask = sysDicomSetting->GetLocalNetMask();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_mask), local_netmask.c_str());
-    sysDicomSetting->GetLocalGateWay(local_gateway);
+    local_gateway = sysDicomSetting->GetLocalGateWay();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_gateway), local_gateway.c_str());
-    sysDicomSetting->GetLocalAE(local_AE);
+    local_AE = sysDicomSetting->GetLocalAE();
     gtk_entry_set_text(GTK_ENTRY(m_entry_equipment_ae), local_AE.c_str());
-    sysDicomSetting->GetRemoteIP(remote_ip);
+    remote_ip = sysDicomSetting->GetRemoteIP();
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_dicom), remote_ip.c_str());
-    sysDicomSetting->GetRemotePort(remote_port);
+    remote_port = sysDicomSetting->GetRemotePort();
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_port), remote_port.c_str());
-    sysDicomSetting->GetRemoteAE(remote_AE);
+    remote_AE = sysDicomSetting->GetRemoteAE();
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_ae), remote_AE.c_str());
 
     delete sysDicomSetting;

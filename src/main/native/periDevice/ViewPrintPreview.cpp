@@ -805,9 +805,8 @@ void ViewPrintPreview::Item_To_Get() {
     else
         sprintf(check_date, "%s-%s-%s", yearTmp, monthTmp, dayTmp);
 
-    string hospital;
     SysGeneralSetting get_hospital;
-    get_hospital.GetHospital(hospital);
+    string hospital = get_hospital.GetHospital();
     sprintf(tmp, "%s", hospital.c_str());
 
     strcpy(check_doctor, report_info.e.examDoctor.c_str());
@@ -1481,9 +1480,8 @@ void ViewPrintPreview::CreatePages(char *path) {
         sprintf(check_datestr, "%s-%s-%s", yearTmp, monthTmp, dayTmp);
     }
 
-    string hospital;
     SysGeneralSetting get_hospital;
-    get_hospital.GetHospital(hospital);
+    string hospital = get_hospital.GetHospital();
     sprintf(tmp, "%s", hospital.c_str());
     strcpy(check_doctorstr, report_info.e.examDoctor.c_str());
     strcpy(report_doctorstr, report_info.e.reportDoctor.c_str());
@@ -1904,9 +1902,8 @@ void ViewPrintPreview::CreatePagesForRetrieve(char *path,string indication,strin
         sprintf(check_datestr, "%s-%s-%s", yearTmp, monthTmp, dayTmp);
     }
 
-    string hospital;
     SysGeneralSetting get_hospital;
-    get_hospital.GetHospital(hospital);
+    string hospital = get_hospital.GetHospital();
     sprintf(tmp, "%s", hospital.c_str());
     strcpy(check_doctorstr, report_info.e.examDoctor.c_str());
     strcpy(report_doctorstr, report_info.e.reportDoctor.c_str());

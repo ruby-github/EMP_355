@@ -1,49 +1,48 @@
-#ifndef __SYSDICOMSETTING_H__
-#define __SYSDICOMSETTING_H__
+#ifndef __SYS_DICOM_SETTING_H__
+#define __SYS_DICOM_SETTING_H__
 
 #include "utils/IniFile.h"
 
 class SysDicomSetting {
 public:
+  SysDicomSetting();
+  ~SysDicomSetting();
 
-    SysDicomSetting();
-    ~SysDicomSetting();
+public:
+  string GetRemoteAE();
+  string GetRemoteIP();
+  string GetRemotePort();
+  string GetLocalAE();
+  string GetLocalIP();
+  string GetLocalGateWay();
+  string GetLocalNetMask();
+  string GetLocalPort();
+  int GetVideoFrames();
+  bool GetAutoQuery();
+  bool GetSendReport();
+  bool GetSendVideo();
+  bool GetMPPS();
+  bool GetStorageCommitment();
 
-    void GetRemoteAE(std::string& remoteAE);
-    void GetRemoteIP(std::string& remoteIP);
-    void GetRemotePort(std::string& remotePort);
-    void GetLocalAE(std::string& localAE);
-    void GetLocalIP(std::string& loclaIP);
-    void GetLocalGateWay(std::string& localGateway);
-    void GetLocalNetMask(std::string& localNetmask);
-    void GetLocalPort(std::string& localPort);
+  void SetRemoteAE(string remoteAE);
+  void SetRemoteIP(string remoteIP);
+  void SetRemotePort(string remotePort);
+  void SetLocalAE(string localAE);
+  void SetLocalIP(string localIP);
+  void SetLocalGateWay(string localGateway);
+  void SetLocalNetMask(string localNetmask);
+  void SetLocalPort(string localPort);
+  void SetVideoFrames(int frames);
+  void SetAutoQuery(bool autoQuery);
+  void SetSendReport(bool report);
+  void SetSendVideo(bool video);
+  void SetMPPS(bool mpps);
+  void SetStorageCommitment(bool storageCommit);
 
-    void SetRemoteAE(const char *remoteAE);
-    void SetRemoteIP(const char *remoteIP);
-    void SetRemotePort(const char *remotePort);
-    void SetLocalAE(const char *localAE);
-    void SetLocalIP(const char *localIP);
-    void SetLocalGateWay(const char *localGateway);
-    void SetLocalNetMask(const char *localNetmask);
-    void SetLocalPort(const char *localPort);
+  void SyncFile();
 
-    void SetSendReport(bool report);
-    void SetSendVideo(bool Video);
-    void SetVideoFrames(int frames);
-    bool GetAutoQuery(void);
-    void SetAutoQuery(bool autoQuery);
-    bool GetSendReport(void);
-    bool GetSendVideo(void);
-    int GetVideoFrames(void);
-
-    bool GetMPPS(void);
-    void SetMPPS(bool mpps);
-    bool GetStorageCommitment(void);
-    void SetStorageCommitment(bool storageCommit);
-
-    void SyncFile(void);
 private:
-    IniFile *ptrIni;
+  IniFile* m_inifile;
 };
 
 #endif

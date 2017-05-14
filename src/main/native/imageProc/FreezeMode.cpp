@@ -211,10 +211,9 @@ void FreezeMode::UnFreeze() {
 
     if(review_pic) {
         if(system_save) {
-            string m_hospitalname;
             SysGeneralSetting sys;
             int date_format = sys.GetDateFormat();
-            sys.GetHospital(m_hospitalname);
+            string m_hospitalname = sys.GetHospital();
             UpdateHospitalandpart(date_format, m_hospitalname.c_str());
             system_save = false;
         }

@@ -276,9 +276,8 @@ void D4FuncMan::GetDepth() {
 }
 
 void D4FuncMan::GetHospitalName() {
-    string m_hospitalname;
-    TopArea::GetInstance()->GetHospitalName(m_hospitalname);
-    m_Para4d.hospital_name = m_hospitalname;
+    string hospitalname = TopArea::GetInstance()->GetHospitalName();
+    m_Para4d.hospital_name = hospitalname;
     return;
 }
 #ifndef VET

@@ -685,9 +685,8 @@ int print_report( int size_x, int size_y, gint8 language) {
     else
         sprintf(diag_date, "%s-%s-%s", yearTmp, monthTmp, dayTmp);
 
-    string hospital;
     SysGeneralSetting get_hospital;
-    get_hospital.GetHospital(hospital);
+    string hospital = get_hospital.GetHospital();
 
     strcpy(diag_doctor, report_info.e.examDoctor.c_str());
     strcpy(report_doctor, report_info.e.reportDoctor.c_str());

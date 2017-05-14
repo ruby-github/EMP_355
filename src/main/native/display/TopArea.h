@@ -5,6 +5,8 @@
 #include <gtk/gtk.h>
 #include <string>
 
+using std::string;
+
 /*
  *      Logo |    Hospital        |  Probe     |  TIS |  Time
  *           |                    |            |      |
@@ -46,7 +48,7 @@ public:
     void GetTIS(std::string& TIS);
     void GetCheckPart(std::string& ExamType);
     void GetDepth(int& Depth);
-    void GetHospitalName(std::string &name);
+    string GetHospitalName();
     void SetDateFormat(int DateFormat) {
         m_dateFormat = DateFormat;
     }

@@ -1739,7 +1739,9 @@ int MeaCalcFun::CalcGWMan(CalcInfoTmp *calcInfo, float data[], int item, int sav
     (*position)++;//在测量结束时自动把计算结果存放位置移后一个
 
     normValue = data[parPosi];
-    const int method = GetGWMethod(item);//传入item, 返回EOBGwMethod值
+
+    SysCalculateSetting setting;
+    const int method = setting.GetGWMethod(item);//传入item, 返回EOBGwMethod值
 
     switch(method + 1) {
     case CER_USER:
@@ -2732,7 +2734,8 @@ int MeaCalcFun::EFWCalc(CalcInfoTmp *calcInfo, float data[], int item, int save,
     (*position)++;//在测量结束时自动把计算结果存放位置移后一个
 
     m_ptrMeaResult = MeaResult::GetInstance();
-    const int method = GetCurEfwMethod();//获取 EFW的方法
+    SysCalculateSetting setting;
+    int method = setting.GetCurEfwMethod();//获取 EFW的方法
 //	printf("EFW method= %d\n", method);
     if (method + OB_EFW != calcInfo->item)//如果当前方法不是本EFW，则直接返回
         return MEA_FAIL;

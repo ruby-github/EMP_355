@@ -825,8 +825,7 @@ string ViewReport::GetExamDoctor() {
 
 string ViewReport::GetHospitalName() {
     SysGeneralSetting sgs;
-    string hospital;
-    sgs.GetHospital(hospital);
+    string hospital = sgs.GetHospital();
     return hospital;
 }
 
@@ -1272,7 +1271,6 @@ void ViewReport::SetPatientInfo(void) {
     PRINTF("%s, %s, %s)\n", info.p.name.first.c_str(), info.p.name.mid.c_str(), info.p.name.last.c_str());
 
     string name;
-    string hospital;
     string sex;
     string examDate;
     string age;
@@ -1289,7 +1287,8 @@ void ViewReport::SetPatientInfo(void) {
     else
         name = info.p.name.last + " " + info.p.name.first + " " + info.p.name.mid;
 #endif
-    sgs.GetHospital(hospital);
+
+    string hospital = sgs.GetHospital();
     gtk_entry_set_text (GTK_ENTRY(m_entryHos), hospital.c_str());
     gtk_entry_set_text (GTK_ENTRY(m_entryName), name.c_str());
     gtk_entry_set_text (GTK_ENTRY(m_entryID), info.p.id.c_str());
@@ -2728,7 +2727,9 @@ void ViewReport::AddOBEfwTable(GtkWidget *fixed, guint *y, const char *labstr, i
                                       };
     const char method[][20] = { "Hadlock1", "Hadlock2", "Hadlock3", "Hadlock4", "Shepard", "Hansmenn", "Tokyo" };
 
-    int i = GetCurEfwMethod();
+
+    SysCalculateSetting setting;
+    int i = setting.GetCurEfwMethod();
 
     float calc_val;
     if(ptrRes->CalcGetValue(&calc_val, EfwInfo[i]->item, OB_M, fetal)==MEA_SUCCESS) {

@@ -2111,9 +2111,9 @@ void ViewNewPat::EditStudyInfo(PatientInfo::Info &info) {
     m_studyInfo.stPatientWeight =(string)weight;
     m_studyInfo.stStudyDescription =info.e.comment;
     m_studyInfo.stStudyDoctor = info.e.examDoctor;
-    string hospital;
+
     string machine;
-    TopArea::GetInstance()->GetHospitalName(hospital);
+    string hospital = TopArea::GetInstance()->GetHospitalName();
     UpgradeMan::GetInstance()->GetMachineType(machine);
 
     ChangeDateFormatToString(info.e.examDate.year, info.e.examDate.month, info.e.examDate.day, year, mon, day);

@@ -1,135 +1,131 @@
-#include "utils/IniFile.h"
-
-
-#include "Def.h"
 #include "sysMan/SysDicomSetting.h"
 
+#include "Def.h"
 
 SysDicomSetting::SysDicomSetting() {
-    char path[256];
-    sprintf(path, "%s/%s", CFG_RES_PATH, SYS_SETTING_FILE);
-    ptrIni = new IniFile(path);
+  m_inifile = new IniFile(string(CFG_RES_PATH) + string(SYS_SETTING_FILE));
 }
 
 SysDicomSetting::~SysDicomSetting() {
-    if (ptrIni != NULL) {
-        delete ptrIni;
-        ptrIni = NULL;
-    }
+  if (m_inifile != NULL) {
+    delete m_inifile;
+  }
+
+  m_inifile = NULL;
 }
 
-void SysDicomSetting::GetRemoteAE(string& remoteAE) {
-    remoteAE = ptrIni->ReadString("DicomSetting", "RemoteAE");
+string SysDicomSetting::GetRemoteAE() {
+  return m_inifile->ReadString("DicomSetting", "RemoteAE");
 }
 
-void SysDicomSetting::GetRemoteIP(string& remoteIP) {
-    remoteIP  = ptrIni->ReadString("DicomSetting", "RemoteIP");
+string SysDicomSetting::GetRemoteIP() {
+  return m_inifile->ReadString("DicomSetting", "RemoteIP");
 }
 
-void SysDicomSetting::GetRemotePort(string& remotePort) {
-    remotePort = ptrIni->ReadString("DicomSetting", "RemotePort");
+string SysDicomSetting::GetRemotePort() {
+  return m_inifile->ReadString("DicomSetting", "RemotePort");
 }
 
-void SysDicomSetting::GetLocalAE(string& localAE) {
-    localAE = ptrIni->ReadString("DicomSetting", "LocalAE");
+string SysDicomSetting::GetLocalAE() {
+  return m_inifile->ReadString("DicomSetting", "LocalAE");
 }
 
-void SysDicomSetting::GetLocalIP(string& localIP) {
-    localIP = ptrIni->ReadString("DicomSetting", "LocalIP");
+string SysDicomSetting::GetLocalIP() {
+  return m_inifile->ReadString("DicomSetting", "LocalIP");
 }
 
-void SysDicomSetting::GetLocalGateWay(string& localGateway) {
-    localGateway = ptrIni->ReadString("DicomSetting", "LocalGateWay");
+string SysDicomSetting::GetLocalGateWay() {
+  return m_inifile->ReadString("DicomSetting", "LocalGateWay");
 }
 
-void SysDicomSetting::GetLocalNetMask(string& localNetmask) {
-    localNetmask = ptrIni->ReadString("DicomSetting", "LocalNetMask");
+string SysDicomSetting::GetLocalNetMask() {
+  return m_inifile->ReadString("DicomSetting", "LocalNetMask");
 }
 
-void SysDicomSetting::GetLocalPort(string& localPort) {
-    localPort = ptrIni->ReadString("DicomSetting", "LocalPort");
+string SysDicomSetting::GetLocalPort() {
+  return m_inifile->ReadString("DicomSetting", "LocalPort");
 }
 
-void SysDicomSetting::SetRemoteAE(const char* remoteAE) {
-    ptrIni->WriteString("DicomSetting", "RemoteAE", remoteAE);
+int SysDicomSetting::GetVideoFrames() {
+  return m_inifile->ReadInt("DicomSetting", "VideoFrames");
 }
 
-void SysDicomSetting::SetRemoteIP(const char* remoteIP) {
-    ptrIni->WriteString("DicomSetting", "RemoteIP", remoteIP);
+bool SysDicomSetting::GetAutoQuery() {
+  return m_inifile->ReadBool("DicomSetting", "AutoQuery");
 }
 
-void SysDicomSetting::SetRemotePort(const char* remotePort) {
-    ptrIni->WriteString("DicomSetting", "RemotePort", remotePort);
+bool SysDicomSetting::GetSendReport() {
+  return m_inifile->ReadBool("DicomSetting", "SendReport");
 }
 
-void SysDicomSetting::SetLocalAE(const char* localAE) {
-    ptrIni->WriteString("DicomSetting", "LocalAE", localAE);
+bool SysDicomSetting::GetSendVideo() {
+  return m_inifile->ReadBool("DicomSetting", "SendVideo");
 }
 
-void SysDicomSetting::SetLocalIP(const char* localIP) {
-    ptrIni->WriteString("DicomSetting", "LocalIP", localIP);
+bool SysDicomSetting::GetMPPS() {
+  return m_inifile->ReadBool("DicomSetting", "MPPS");
 }
 
-void SysDicomSetting::SetLocalGateWay(const char* localGateway) {
-    ptrIni->WriteString("DicomSetting", "LocalGateWay", localGateway);
+bool SysDicomSetting::GetStorageCommitment() {
+  return m_inifile->ReadBool("DicomSetting", "StorageCommitment");
 }
 
-void SysDicomSetting::SetLocalNetMask(const char* localNetmask) {
-    ptrIni->WriteString("DicomSetting", "LocalNetMask", localNetmask);
+void SysDicomSetting::SetRemoteAE(string remoteAE) {
+  m_inifile->WriteString("DicomSetting", "RemoteAE", remoteAE);
 }
 
-void SysDicomSetting::SetLocalPort(const char* localPort) {
-    ptrIni->WriteString("DicomSetting", "LocalPort", localPort);
+void SysDicomSetting::SetRemoteIP(string remoteIP) {
+  m_inifile->WriteString("DicomSetting", "RemoteIP", remoteIP);
 }
 
-bool SysDicomSetting::GetAutoQuery(void) {
-    return ptrIni->ReadBool("DicomSetting", "AutoQuery");
-
+void SysDicomSetting::SetRemotePort(string remotePort) {
+  m_inifile->WriteString("DicomSetting", "RemotePort", remotePort);
 }
-void SysDicomSetting::SetSendReport(bool report) {
-    ptrIni->WriteBool("DicomSetting", "SendReport", report);
+
+void SysDicomSetting::SetLocalAE(string localAE) {
+  m_inifile->WriteString("DicomSetting", "LocalAE", localAE);
+}
+
+void SysDicomSetting::SetLocalIP(string localIP) {
+  m_inifile->WriteString("DicomSetting", "LocalIP", localIP);
+}
+
+void SysDicomSetting::SetLocalGateWay(string localGateway) {
+  m_inifile->WriteString("DicomSetting", "LocalGateWay", localGateway);
+}
+
+void SysDicomSetting::SetLocalNetMask(string localNetmask) {
+  m_inifile->WriteString("DicomSetting", "LocalNetMask", localNetmask);
+}
+
+void SysDicomSetting::SetLocalPort(string localPort) {
+  m_inifile->WriteString("DicomSetting", "LocalPort", localPort);
 }
 
 void SysDicomSetting::SetVideoFrames(int frames) {
-    ptrIni->WriteInt("DicomSetting", "VideoFrames", frames);
-}
-
-void SysDicomSetting::SetSendVideo(bool video) {
-    ptrIni->WriteBool("DicomSetting", "SendVideo", video);
+  m_inifile->WriteInt("DicomSetting", "VideoFrames", frames);
 }
 
 void SysDicomSetting::SetAutoQuery(bool autoQuery) {
-    ptrIni->WriteBool("DicomSetting", "AutoQuery", autoQuery);
+  m_inifile->WriteBool("DicomSetting", "AutoQuery", autoQuery);
 }
 
-bool SysDicomSetting::GetMPPS(void) {
-    return ptrIni->ReadBool("DicomSetting", "MPPS");
+void SysDicomSetting::SetSendReport(bool report) {
+  m_inifile->WriteBool("DicomSetting", "SendReport", report);
+}
+
+void SysDicomSetting::SetSendVideo(bool video) {
+  m_inifile->WriteBool("DicomSetting", "SendVideo", video);
 }
 
 void SysDicomSetting::SetMPPS(bool mpps) {
-    ptrIni->WriteBool("DicomSetting", "MPPS", mpps);
-}
-
-bool SysDicomSetting::GetStorageCommitment(void) {
-    return ptrIni->ReadBool("DicomSetting", "StorageCommitment");
+  m_inifile->WriteBool("DicomSetting", "MPPS", mpps);
 }
 
 void SysDicomSetting::SetStorageCommitment(bool storageCommit) {
-    ptrIni->WriteBool("DicomSetting", "StorageCommitment", storageCommit);
+  m_inifile->WriteBool("DicomSetting", "StorageCommitment", storageCommit);
 }
 
-bool SysDicomSetting::GetSendReport(void) {
-    return ptrIni->ReadBool("DicomSetting", "SendReport");
-}
-
-bool SysDicomSetting::GetSendVideo(void) {
-    return ptrIni->ReadBool("DicomSetting", "SendVideo");
-}
-
-int SysDicomSetting::GetVideoFrames(void) {
-    return ptrIni->ReadInt("DicomSetting", "VideoFrames");
-}
-
-void SysDicomSetting::SyncFile(void) {
-    ptrIni->SyncConfigFile();
+void SysDicomSetting::SyncFile() {
+  m_inifile->SyncConfigFile();
 }

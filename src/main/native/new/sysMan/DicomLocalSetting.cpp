@@ -128,24 +128,21 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
 void DicomLocalSetting::InitLocalSetting() {
   if (m_entry_network_ip != NULL) {
     SysDicomSetting* sysDicomSetting = new SysDicomSetting();
-    string local_ip, local_netmask, local_gateway, local_AE;
-    int host_port;
-    string host_ae;
-    char tmp[256];
 
-    sysDicomSetting->GetLocalIP(local_ip);
+    string local_ip = sysDicomSetting->GetLocalIP();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_ip), local_ip.c_str());
 
-    sysDicomSetting->GetLocalNetMask(local_netmask);
+    string local_netmask = sysDicomSetting->GetLocalNetMask();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_mask), local_netmask.c_str());
 
-    sysDicomSetting->GetLocalGateWay(local_gateway);
+    string local_gateway = sysDicomSetting->GetLocalGateWay();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_gateway), local_gateway.c_str());
 
-    host_ae = CDCMMan::GetMe()->GetLocalAE();
+    string host_ae = CDCMMan::GetMe()->GetLocalAE();
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_ae), host_ae.c_str());
 
-    host_port = CDCMMan::GetMe()->GetLocalPort();
+    int host_port = CDCMMan::GetMe()->GetLocalPort();
+    char tmp[256] = {0};
     sprintf(tmp,"%d",host_port);
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_port), tmp);
 

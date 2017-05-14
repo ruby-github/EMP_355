@@ -237,8 +237,8 @@ void TopArea::GetDepth(int& Depth) {
     Depth = m_depth;
 }
 
-void TopArea::GetHospitalName(string &name) {
-    name = m_hospital;
+string TopArea::GetHospitalName() {
+    return m_hospital;
 }
 
 void TopArea::DrawDateTime(void) {

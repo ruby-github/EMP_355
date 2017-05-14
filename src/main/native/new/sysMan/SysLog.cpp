@@ -1,81 +1,55 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: SysLog.cpp
- * @brief: Print system info to file log/sys.log, and this file will be save when power off
- * and clear when power on.
- *
- * version: V1.0
- * date: 2009-5-6
- * @author: zhanglei
- */
-
-#include <stdexcept>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <time.h>
-#include <string>
 #include "sysMan/SysLog.h"
 
-using std::cout;
-using std::endl;
-using std::stringstream;
-using std::ofstream;
-using std::string;
+#include <ctime>
 
-///> init static variable
-class SysLog* SysLog::m_ptrInstance = NULL;
+using namespace std;
 
-///>realize funtion member of class
+#define FILENAME "./res/log/sys.log"
+
+SysLog* SysLog::m_instance = NULL;
+
+// ---------------------------------------------------------
+
+class SysLog* SysLog::Instance() {
+  if (m_instance == NULL) {
+    m_instance = new SysLog();
+  }
+
+  return m_instance;
+}
+
 SysLog::SysLog() {
-    Open();
+  Open();
 }
 
 SysLog::~SysLog() {
-    if (is_open()) close();
+  if (is_open()) {
+    close();
+  }
 
-    if (m_ptrInstance != NULL)
-        delete (m_ptrInstance);
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
 }
 
-/*
- * @brief: open a file to save system info, and add some head info at the begin of file.
- */
+// ---------------------------------------------------------
+
 void SysLog::Open() {
-    ///> write date and time at begin of log file
-    time_t at; //absolut time
-    at = time (&at);
+  time_t t = time(NULL);
+  struct tm* timeinfo = localtime(&t);
 
-    struct tm* ct; //current time
-    ct = localtime(&at);
+  char buffer[80] = {0};
+  strftime (buffer, 80, "%F %T", timeinfo);
 
-    stringstream s;
-    s.clear();
-    s << "***** Log Name: Project(09001) " << endl
-      << "***** Log Time: "
-      << (ct->tm_year + 1900) << "-"
-      << (ct->tm_mon+1) << "-"
-      << ct->tm_mday << " "
-      << ct->tm_hour << ":"
-      << ct->tm_min << ":"
-      << ct->tm_sec << endl
-      << endl;
+  ofstream ofs;
+  ofs.open(FILENAME, ofstream::out | ofstream::trunc);
 
-    ofstream outfile;
-    outfile.open(FILENAME, ofstream::out | ofstream::trunc);
-    outfile << s.str();
-    outfile.close();
+  ofs << "***** Log Name: 09001" << endl;
+  ofs << "***** Log Time: " << buffer << endl;
 
-    ///> open log file and clear all data in it
-    open(FILENAME, ofstream::app);
-}
+  ofs.close();
 
-class SysLog* SysLog::Instance() {
-    if (m_ptrInstance == NULL) {
-        //class SysLog log;
-        m_ptrInstance = new (class SysLog);
-    }
-
-    return (m_ptrInstance);
+  open(FILENAME, ofstream::app);
 }

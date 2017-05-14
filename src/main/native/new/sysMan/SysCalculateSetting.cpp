@@ -1,276 +1,299 @@
-#include <stdio.h>
-#include <string>
-#include "Def.h"
-#include "calcPeople/MeaCalcFun.h"
 #include "sysMan/SysCalculateSetting.h"
 
-OBSetting g_obSetting;
+#include "Def.h"
+#include "calcPeople/MeaCalcFun.h"
+#include "calcPeople/MeasureDef.h"
+
+struct OBSetting {
+  int cer;
+  int hl;
+  int bpd;
+  int fl;
+  int crl;
+  int gs;
+  int ac;
+  int hc;
+  int tad;
+  int apad;
+  int thd;
+  int ofd;
+  int efw;
+};
+
+OBSetting obSetting;
+
+// ---------------------------------------------------------
 
 SysCalculateSetting::SysCalculateSetting() {
-    char path[256];
-    sprintf(path, "%s/%s", CFG_RES_PATH, SYS_SETTING_FILE);
-    ptrIni = new IniFile(path);
+  m_inifile = new IniFile(string(CFG_RES_PATH) + string(SYS_SETTING_FILE));
 }
 
 SysCalculateSetting::~SysCalculateSetting() {
-    if (ptrIni != NULL) {
-        delete ptrIni;
-        ptrIni = NULL;
-    }
+  if (m_inifile != NULL) {
+    delete m_inifile;
+  }
+
+  m_inifile = NULL;
 }
 
-const int GetCurEfwMethod(void) {
-    int method = 0;
-
-    method = g_obSetting.efw;
-    method += EFW_START;
-    return method;
+int SysCalculateSetting::GetBSAMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "BSA");
 }
 
-const int GetGWMethod(const int item) {
-    int method = 0;
-
-    switch(item) {
-    case OB_CER:
-        method = g_obSetting.cer;
-        method += CER_START - 1;
-        break;
-
-    case OB_HL:
-        method = g_obSetting.hl;
-        method += HL_START - 1;
-        break;
-
-    case OB_BPD:
-        method = g_obSetting.bpd;
-        method += BPD_START - 1;
-        break;
-
-    case OB_FL:
-        method = g_obSetting.fl;
-        method += FL_START - 1;
-        break;
-
-    case OB_CRL:
-        method = g_obSetting.crl;
-        method += CRL_START - 1;
-        break;
-
-    case OB_GS:
-        method = g_obSetting.gs;
-        method += GS_START - 1;
-        break;
-
-    case OB_AC:
-        method = g_obSetting.ac;
-        method += AC_START - 1;
-        break;
-
-    case OB_HC:
-        method = g_obSetting.hc;
-        method += HC_START - 1;
-        break;
-
-    case OB_TAD:
-        method = g_obSetting.tad;
-        method += TAD_START - 1;
-        break;
-
-    case OB_APAD:
-        method = g_obSetting.apad;
-        method += APAD_START - 1;
-        break;
-
-    case OB_THD:
-        method = g_obSetting.thd;
-        method += THD_START - 1;
-        break;
-
-    case OB_OFD:
-        method = g_obSetting.ofd;
-        method += OFD_START - 1;
-        break;
-
-    case OB_OOD:
-        //	method = GetOodMethod();
-        //	method += OOD_START - 1;
-        method = OOD_START - 1;
-        break;
-
-    case OB_TIBIA:
-        //	method = GetTibiaMethod();
-        //	method += TIBIA_START - 1;
-        method = TIBIA_START - 1;
-        break;
-
-    case OB_TTD:
-        //	method = GetTtdMethod();
-        //	method += TTD_START - 1;
-        method = TTD_START - 1;
-        break;
-
-    case OB_ULNA:
-        //	method = GetUlnaMethod();
-        //	method += ULNA_START - 1;
-        method = ULNA_START - 1;
-        break;
-    case OB_FTA:
-        method = FTA_START - 1;
-        break;
-
-    default:
-        break;
-    }
-
-    return(method);
+int SysCalculateSetting::GetCerMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Cer");
 }
 
-int SysCalculateSetting::GetBSAMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "BSA");
+int SysCalculateSetting::GetHlMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Hl");
 }
 
-int SysCalculateSetting::GetCerMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Cer");
-}
-int SysCalculateSetting::GetHlMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Hl");
-}
-int SysCalculateSetting::GetBpdMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Bpd");
-}
-int SysCalculateSetting::GetFlMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Fl");
-}
-int SysCalculateSetting::GetCrlMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Crl");
-}
-int SysCalculateSetting::GetGsMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Gs");
-}
-int SysCalculateSetting::GetAcMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Ac");
-}
-int SysCalculateSetting::GetHcMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Hc");
-}
-int SysCalculateSetting::GetTadMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Tad");
-}
-int SysCalculateSetting::GetApadMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Apad");
-}
-int SysCalculateSetting::GetThdMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Thd");
-}
-int SysCalculateSetting::GetOfdMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Ofd");
-}
-int SysCalculateSetting::GetEfwMethod(void) {
-    return ptrIni->ReadInt("CalculateSetting", "Efw");
+int SysCalculateSetting::GetBpdMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Bpd");
 }
 
-void SysCalculateSetting::UpdateOBSetting(void) {
-    g_obSetting.cer = GetCerMethod();
-    g_obSetting.hl = GetHlMethod();
-    g_obSetting.bpd = GetBpdMethod();
-    g_obSetting.fl = GetFlMethod();
-    g_obSetting.crl = GetCrlMethod();
-    g_obSetting.gs = GetGsMethod();
-    g_obSetting.ac = GetAcMethod();
-    g_obSetting.hc = GetHcMethod();
-    g_obSetting.tad = GetTadMethod();
-    g_obSetting.apad = GetApadMethod();
-    g_obSetting.thd = GetThdMethod();
-    g_obSetting.ofd = GetOfdMethod();
-    g_obSetting.efw = GetEfwMethod();
+int SysCalculateSetting::GetFlMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Fl");
+}
+
+int SysCalculateSetting::GetCrlMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Crl");
+}
+
+int SysCalculateSetting::GetGsMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Gs");
+}
+int SysCalculateSetting::GetAcMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Ac");
+}
+
+int SysCalculateSetting::GetHcMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Hc");
+}
+
+int SysCalculateSetting::GetTadMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Tad");
+}
+
+int SysCalculateSetting::GetApadMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Apad");
+}
+
+int SysCalculateSetting::GetThdMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Thd");
+}
+
+int SysCalculateSetting::GetOfdMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Ofd");
+}
+
+int SysCalculateSetting::GetEfwMethod() {
+  return m_inifile->ReadInt("CalculateSetting", "Efw");
+}
+
+int SysCalculateSetting::GetCurEfwMethod() {
+  return obSetting.efw + EFW_START;
+}
+
+int SysCalculateSetting::GetGWMethod(int item) {
+  int method = 0;
+
+  switch(item) {
+  case OB_CER:
+    method = obSetting.cer;
+    method += CER_START - 1;
+    break;
+  case OB_HL:
+    method = obSetting.hl;
+    method += HL_START - 1;
+    break;
+  case OB_BPD:
+    method = obSetting.bpd;
+    method += BPD_START - 1;
+    break;
+  case OB_FL:
+    method = obSetting.fl;
+    method += FL_START - 1;
+    break;
+  case OB_CRL:
+    method = obSetting.crl;
+    method += CRL_START - 1;
+    break;
+  case OB_GS:
+    method = obSetting.gs;
+    method += GS_START - 1;
+    break;
+  case OB_AC:
+    method = obSetting.ac;
+    method += AC_START - 1;
+    break;
+  case OB_HC:
+    method = obSetting.hc;
+    method += HC_START - 1;
+    break;
+  case OB_TAD:
+    method = obSetting.tad;
+    method += TAD_START - 1;
+    break;
+  case OB_APAD:
+    method = obSetting.apad;
+    method += APAD_START - 1;
+    break;
+  case OB_THD:
+    method = obSetting.thd;
+    method += THD_START - 1;
+    break;
+  case OB_OFD:
+    method = obSetting.ofd;
+    method += OFD_START - 1;
+    break;
+  case OB_OOD:
+    // method = GetOodMethod();
+    // method += OOD_START - 1;
+    method = OOD_START - 1;
+    break;
+  case OB_TIBIA:
+    // method = GetTibiaMethod();
+    // method += TIBIA_START - 1;
+    method = TIBIA_START - 1;
+    break;
+  case OB_TTD:
+    // method = GetTtdMethod();
+    // method += TTD_START - 1;
+    method = TTD_START - 1;
+    break;
+  case OB_ULNA:
+    // method = GetUlnaMethod();
+    // method += ULNA_START - 1;
+    method = ULNA_START - 1;
+    break;
+  case OB_FTA:
+    method = FTA_START - 1;
+    break;
+  default:
+    break;
+  }
+
+  return(method);
 }
 
 void SysCalculateSetting::SetBSAMethod(int BSA) {
-    ptrIni->WriteInt("CalculateSetting", "BSA", BSA);
+  m_inifile->WriteInt("CalculateSetting", "BSA", BSA);
 }
 
+// cer 0-goldstein 1-custom
 void SysCalculateSetting::SetCerMethod(int cer) {
-    ptrIni->WriteInt("CalculateSetting", "Cer", cer);
+  m_inifile->WriteInt("CalculateSetting", "Cer", cer);
 }
+
+// hl 0-jeanty 1-custom
 void SysCalculateSetting::SetHlMethod(int hl) {
-    ptrIni->WriteInt("CalculateSetting", "Hl", hl);
+  m_inifile->WriteInt("CalculateSetting", "Hl", hl);
 }
+
+// bpd 0-hadlock 1-merz 2-lasser 3-rempen 4-tokyo 5-custom
 void SysCalculateSetting::SetBpdMethod(int bpd) {
-    ptrIni->WriteInt("CalculateSetting", "Bpd", bpd);
+  m_inifile->WriteInt("CalculateSetting", "Bpd", bpd);
 }
 
+// fl 0-hadlock 1-merz 2-jeanty 3-tokyo 4-custom
 void SysCalculateSetting::SetFlMethod(int fl) {
-    ptrIni->WriteInt("CalculateSetting", "Fl", fl);
+  m_inifile->WriteInt("CalculateSetting", "Fl", fl);
 }
 
+// crl 0-hadlock 2-robinson 3-hansmenn 4-lasser 5-tokyo 6-custom
 void SysCalculateSetting::SetCrlMethod(int crl) {
-    ptrIni->WriteInt("CalculateSetting", "Crl", crl);
+  m_inifile->WriteInt("CalculateSetting", "Crl", crl);
 }
 
+// gs 0-hellman 1-rempen 2-tokyo 3-custom
 void SysCalculateSetting::SetGsMethod(int gs) {
-    ptrIni->WriteInt("CalculateSetting", "Gs", gs);
+  m_inifile->WriteInt("CalculateSetting", "Gs", gs);
 }
 
+// ac 0-hadlock 1-merz 2-lasser 3-tokyo 4-custom
 void SysCalculateSetting::SetAcMethod(int ac) {
-    ptrIni->WriteInt("CalculateSetting", "Ac", ac);
+  m_inifile->WriteInt("CalculateSetting", "Ac", ac);
 }
 
+// hc 0-hadlock 1-merz 2-lasser 3-custom
 void SysCalculateSetting::SetHcMethod(int hc) {
-    ptrIni->WriteInt("CalculateSetting", "Hc", hc);
+  m_inifile->WriteInt("CalculateSetting", "Hc", hc);
 }
 
+// tad 0-merz 1-custom
 void SysCalculateSetting::SetTadMethod(int tad) {
-    ptrIni->WriteInt("CalculateSetting", "Tad", tad);
+  m_inifile->WriteInt("CalculateSetting", "Tad", tad);
 }
 
+// apad 0-merz 1-custom
 void SysCalculateSetting::SetApadMethod(int apad) {
-    ptrIni->WriteInt("CalculateSetting", "Apad", apad);
+  m_inifile->WriteInt("CalculateSetting", "Apad", apad);
 }
 
+// thd 0-hansmenn 1-custom
 void SysCalculateSetting::SetThdMethod(int thd) {
-    ptrIni->WriteInt("CalculateSetting", "Thd", thd);
+  m_inifile->WriteInt("CalculateSetting", "Thd", thd);
 }
 
+// ofd 0-korean 1-custom
 void SysCalculateSetting::SetOfdMethod(int ofd) {
-    ptrIni->WriteInt("CalculateSetting", "Ofd", ofd);
+  m_inifile->WriteInt("CalculateSetting", "Ofd", ofd);
 }
 
+// efw 0-hadlock1 2-hadlock2 3-hadlock3 4-hadlock4 5-shepard 6hansmenn 7-tokyo
 void SysCalculateSetting::SetEfwMethod(int efw) {
-    ptrIni->WriteInt("CalculateSetting", "Efw", efw);
+  m_inifile->WriteInt("CalculateSetting", "Efw", efw);
 }
 
-void SysCalculateSetting::SyncFile(void) {
-    ptrIni->SyncConfigFile();
+void SysCalculateSetting::DefaultFactory() {
+  int BSA=0;
+  int Cer=0;
+  int Hl=0;
+  int Bpd=0;
+  int Fl=0;
+  int Crl=0;
+  int Gs=0;
+  int Ac=0;
+  int Hc=0;
+  int Tad=0;
+  int Apad=0;
+  int Thd=0;
+  int Ofd=0;
+  int Efw=0;
+
+  m_inifile->WriteInt("CalculateSetting", "BSA", BSA);
+  m_inifile->WriteInt("CalculateSetting", "Cer", Cer);
+  m_inifile->WriteInt("CalculateSetting", "Hl", Hl);
+  m_inifile->WriteInt("CalculateSetting", "Bpd", Bpd);
+  m_inifile->WriteInt("CalculateSetting", "Fl", Fl);
+  m_inifile->WriteInt("CalculateSetting", "Crl", Crl);
+  m_inifile->WriteInt("CalculateSetting", "Gs", Gs);
+  m_inifile->WriteInt("CalculateSetting", "Ac", Ac);
+  m_inifile->WriteInt("CalculateSetting", "Hc", Hc);
+  m_inifile->WriteInt("CalculateSetting", "Tad", Tad);
+  m_inifile->WriteInt("CalculateSetting", "Apad", Apad);
+  m_inifile->WriteInt("CalculateSetting", "Thd", Thd);
+  m_inifile->WriteInt("CalculateSetting", "Ofd", Ofd);
+  m_inifile->WriteInt("CalculateSetting", "Efw", Efw);
 }
 
-void SysCalculateSetting::DefaultFactory(void) {
-    int BSA=0;
-    int Cer=0;
-    int Hl=0;
-    int Bpd=0;
-    int Fl=0;
-    int Crl=0;
-    int Gs=0;
-    int Ac=0;
-    int Hc=0;
-    int Tad=0;
-    int Apad=0;
-    int Thd=0;
-    int Ofd=0;
-    int Efw=0;
+void SysCalculateSetting::UpdateOBSetting() {
+  obSetting.cer = GetCerMethod();
+  obSetting.hl = GetHlMethod();
+  obSetting.bpd = GetBpdMethod();
+  obSetting.fl = GetFlMethod();
+  obSetting.crl = GetCrlMethod();
+  obSetting.gs = GetGsMethod();
+  obSetting.ac = GetAcMethod();
+  obSetting.hc = GetHcMethod();
+  obSetting.tad = GetTadMethod();
+  obSetting.apad = GetApadMethod();
+  obSetting.thd = GetThdMethod();
+  obSetting.ofd = GetOfdMethod();
+  obSetting.efw = GetEfwMethod();
+}
 
-    ptrIni->WriteInt("CalculateSetting", "BSA", BSA);
-    ptrIni->WriteInt("CalculateSetting", "Cer", Cer);
-    ptrIni->WriteInt("CalculateSetting", "Hl", Hl);
-    ptrIni->WriteInt("CalculateSetting", "Bpd", Bpd);
-    ptrIni->WriteInt("CalculateSetting", "Fl", Fl);
-    ptrIni->WriteInt("CalculateSetting", "Crl", Crl);
-    ptrIni->WriteInt("CalculateSetting", "Gs", Gs);
-    ptrIni->WriteInt("CalculateSetting", "Ac", Ac);
-    ptrIni->WriteInt("CalculateSetting", "Hc", Hc);
-    ptrIni->WriteInt("CalculateSetting", "Tad", Tad);
-    ptrIni->WriteInt("CalculateSetting", "Apad", Apad);
-    ptrIni->WriteInt("CalculateSetting", "Thd", Thd);
-    ptrIni->WriteInt("CalculateSetting", "Ofd", Ofd);
-    ptrIni->WriteInt("CalculateSetting", "Efw", Efw);
+void SysCalculateSetting::SyncFile() {
+  m_inifile->SyncConfigFile();
 }

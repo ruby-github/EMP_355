@@ -2644,8 +2644,7 @@ void ViewMain::Create(void) {
 
     // update top area
     SysGeneralSetting *sysGeneralSetting = new SysGeneralSetting;
-    string hospital_name;
-    sysGeneralSetting->GetHospital(hospital_name);
+    string hospital_name = sysGeneralSetting->GetHospital();
     delete sysGeneralSetting;
 
     m_ptrTopArea->UpdateHospitalName(hospital_name.c_str());
