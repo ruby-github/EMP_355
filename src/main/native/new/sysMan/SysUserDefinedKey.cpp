@@ -1,59 +1,43 @@
-#include "Def.h"
 #include "sysMan/SysUserDefinedKey.h"
 
+#include "Def.h"
+
 SysUserDefinedKey::SysUserDefinedKey() {
-    char path[256];
-    sprintf(path, "%s/%s", CFG_RES_PATH, SYS_SETTING_FILE);
-    ptrIni = new IniFile(path);
+  m_inifile = new IniFile(string(CFG_RES_PATH) + string(SYS_SETTING_FILE));
 }
 
 SysUserDefinedKey::~SysUserDefinedKey() {
-    if (ptrIni != NULL) {
-        delete ptrIni;
-        ptrIni = NULL;
-    }
-}
-#if 0
-void SysUserDefinedKey::SetFuncGain(int func) {
-    ptrIni->WriteInt("UserDefinedKey", "Gain", func);
+  if (m_inifile != NULL) {
+    delete m_inifile;
+  }
+
+  m_inifile = NULL;
 }
 
-int SysUserDefinedKey::GetFuncGain(void) {
-    return ptrIni->ReadInt("UserDefinedKey", "Gain");
+int SysUserDefinedKey::GetFuncP1() {
+  return m_inifile->ReadInt("UserDefinedKey", "P1");
 }
 
-void SysUserDefinedKey::SetFuncValue(int func) {
-    ptrIni->WriteInt("UserDefinedKey", "Value", func);
+int SysUserDefinedKey::GetFuncP2() {
+  return m_inifile->ReadInt("UserDefinedKey", "P2");
 }
 
-int SysUserDefinedKey::GetFuncValue(void) {
-    return ptrIni->ReadInt("UserDefinedKey", "Value");
+int SysUserDefinedKey::GetFuncP3() {
+  return m_inifile->ReadInt("UserDefinedKey", "P3");
 }
-#endif
+
 void SysUserDefinedKey::SetFuncP1(int func) {
-    ptrIni->WriteInt("UserDefinedKey", "P1", func);
-}
-
-int SysUserDefinedKey::GetFuncP1(void) {
-    return ptrIni->ReadInt("UserDefinedKey", "P1");
+  m_inifile->WriteInt("UserDefinedKey", "P1", func);
 }
 
 void SysUserDefinedKey::SetFuncP2(int func) {
-    ptrIni->WriteInt("UserDefinedKey", "P2", func);
-}
-
-int SysUserDefinedKey::GetFuncP2(void) {
-    return ptrIni->ReadInt("UserDefinedKey", "P2");
+  m_inifile->WriteInt("UserDefinedKey", "P2", func);
 }
 
 void SysUserDefinedKey::SetFuncP3(int func) {
-    ptrIni->WriteInt("UserDefinedKey", "P3", func);
+  m_inifile->WriteInt("UserDefinedKey", "P3", func);
 }
 
-int SysUserDefinedKey::GetFuncP3(void) {
-    return ptrIni->ReadInt("UserDefinedKey", "P3");
-}
-
-void SysUserDefinedKey::SyncFile(void) {
-    ptrIni->SyncConfigFile();
+void SysUserDefinedKey::SyncFile() {
+  m_inifile->SyncConfigFile();
 }

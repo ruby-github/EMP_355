@@ -2112,9 +2112,8 @@ void ViewNewPat::EditStudyInfo(PatientInfo::Info &info) {
     m_studyInfo.stStudyDescription =info.e.comment;
     m_studyInfo.stStudyDoctor = info.e.examDoctor;
 
-    string machine;
     string hospital = TopArea::GetInstance()->GetHospitalName();
-    UpgradeMan::GetInstance()->GetMachineType(machine);
+    string machine = UpgradeMan::GetInstance()->GetMachineType();
 
     ChangeDateFormatToString(info.e.examDate.year, info.e.examDate.month, info.e.examDate.day, year, mon, day);
     studyDate = year+mon+day;

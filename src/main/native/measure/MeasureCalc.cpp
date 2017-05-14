@@ -461,13 +461,14 @@ double MeasureCalc::DCalcTraceAutoOther(char buf[], vector<POINT> vec, POINT ps,
     POINT psPoint, edPoint;
     double psv=0.0, edv=0.0, sd=0.0, ri=0.0, tamax=0.0, pi=0.0, time=0.0, hr=0.0, pgmax=0.0, pgmean=0.0;
     int vecSize;
-    TraceItem TraceCalcItem;
 
     vecSize = vec.size();
     if (vecSize < 2)//至少有2个描迹点才进行计算
         return 0.0;
 
-    GetTraceItem(TraceCalcItem);
+    SysMeasurementSetting setting;
+
+    TraceItem TraceCalcItem = setting.GetTraceItem();
     if (!GetPsEdInVec(vec, psPoint, edPoint, baseLine, 0, true))
         return 0.0;
 
@@ -612,13 +613,14 @@ double MeasureCalc::DCalcTraceOther(char buf[], vector<POINT> vec, POINT ps, POI
     POINT psPoint, edPoint;
     double psv=0.0, edv=0.0, sd=0.0, ri=0.0, tamax=0.0, pi=0.0, time=0.0, hr=0.0, pgmax=0.0, pgmean=0.0;
     int vecSize;
-    TraceItem TraceCalcItem;
 
     vecSize = vec.size();
     if (vecSize < 2)//至少有2个描迹点才进行计算
         return 0.0;
 
-    GetTraceItem(TraceCalcItem);
+    SysMeasurementSetting setting;
+
+    TraceItem TraceCalcItem = setting.GetTraceItem();
     if (!GetPsEdInVec(vec, psPoint, edPoint, baseLine, 0))
         return 0.0;
 
@@ -764,13 +766,14 @@ double MeasureCalc::DCalcTraceAuto(char buf[], vector<POINT> vec, POINT &ps, POI
     POINT psPoint, edPoint;
     double psv=0.0, edv=0.0, sd=0.0, ri=0.0, tamax=0.0, pi=0.0, time=0.0, hr=0.0, pgmax=0.0, pgmean=0.0;
     int vecSize;
-    TraceItem TraceCalcItem;
 
     vecSize = vec.size();
     if (vecSize < 2)//至少有2个描迹点才进行计算
         return 0.0;
 
-    GetTraceItem(TraceCalcItem);
+    SysMeasurementSetting setting;
+
+    TraceItem TraceCalcItem = setting.GetTraceItem();
     if (!GetPsEdInVec(vec, psPoint, edPoint, baseLine, auto_manual, true)) {
         ps = psPoint;
         ed= edPoint;
@@ -866,7 +869,6 @@ double MeasureCalc::DCalcTrace(char buf[], vector<POINT> vec, POINT &ps, POINT &
     psPoint.x = edPoint.y = 0;
     double psv=0.0, edv=0.0, sd=0.0, ri=0.0, tamax=0.0, pi=0.0, time=0.0, hr=0.0, pgmax=0.0, pgmean=0.0;
     int vecSize;
-    TraceItem TraceCalcItem;
 
     vecSize = vec.size();
     if (vecSize < 2) { //至少有2个描迹点才进行计算
@@ -875,7 +877,9 @@ double MeasureCalc::DCalcTrace(char buf[], vector<POINT> vec, POINT &ps, POINT &
         return 0.0;
     }
 
-    GetTraceItem(TraceCalcItem);
+    SysMeasurementSetting setting;
+
+    TraceItem TraceCalcItem = setting.GetTraceItem();
     if (!GetPsEdInVec(vec, psPoint, edPoint, baseLine, auto_manual)) {
         ps = psPoint;
         ed = edPoint;

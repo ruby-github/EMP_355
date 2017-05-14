@@ -1297,9 +1297,8 @@ DCMSTUDYELEMENT ViewWorkList::EditStudyInfo(PatientInfo::Info &info) {
     char studyTime[125];
 #endif
 
-    string machine;
     string hospital = TopArea::GetInstance()->GetHospitalName();
-    UpgradeMan::GetInstance()->GetMachineType(machine);
+    string machine = UpgradeMan::GetInstance()->GetMachineType();
 
     //sprintf(studyDate,"%d%d%d",examYear,examMonth,examDay);
     //sprintf(studyTime,"%d%d%d",examHour,examMin,examSec);

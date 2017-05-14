@@ -12076,12 +12076,9 @@ GtkWidget* ViewSystem::create_note_info(void) {
 }
 
 void ViewSystem::init_info_setting(void) {
-    //    SysSystemInfo sys;
-    string machine, soft, fpga;
-
-    UpgradeMan::GetInstance()->GetMachineType(machine);
-    UpgradeMan::GetInstance()->GetSoftVersion(soft);
-    UpgradeMan::GetInstance()->GetFpgaVersion(fpga);
+    string machine = UpgradeMan::GetInstance()->GetMachineType();
+    string soft = UpgradeMan::GetInstance()->GetSoftVersion();
+    string fpga = UpgradeMan::GetInstance()->GetFpgaVersion();
 
     gchar *buf;
     gchar *b1 = _("Software version");

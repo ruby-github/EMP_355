@@ -1,63 +1,66 @@
-#include "Def.h"
 #include "sysMan/SysNoteSetting.h"
 
+#include "Def.h"
+
 SysNoteSetting::SysNoteSetting() {
-    char path[256];
-    sprintf(path, "%s/%s", CFG_RES_PATH, SYS_SETTING_FILE);
-    ptrIni = new IniFile(path);
+  m_inifile = new IniFile(string(CFG_RES_PATH) + string(SYS_SETTING_FILE));
 }
 
 SysNoteSetting::~SysNoteSetting() {
-    if (ptrIni != NULL) {
-        delete ptrIni;
-        ptrIni = NULL;
-    }
+  if (m_inifile != NULL) {
+    delete m_inifile;
+  }
+
+  m_inifile = NULL;
 }
 
-int SysNoteSetting::GetFontSize(void) {
-    return ptrIni->ReadInt("NoteSetting", "FontSize");
+int SysNoteSetting::GetFontSize() {
+  return m_inifile->ReadInt("NoteSetting", "FontSize");
 }
 
-int SysNoteSetting::GetBodyMarkSize(void) {
-    return ptrIni->ReadInt("NoteSetting", "BodyMarkSize");
+int SysNoteSetting::GetBodyMarkSize() {
+  return m_inifile->ReadInt("NoteSetting", "BodyMarkSize");
 }
 
-int SysNoteSetting::GetFontColor(void) {
-    return ptrIni->ReadInt("NoteSetting", "FontColor");
+int SysNoteSetting::GetFontColor() {
+  return m_inifile->ReadInt("NoteSetting", "FontColor");
 }
 
-int SysNoteSetting::GetBodyMarkColor(void) {
-    return ptrIni->ReadInt("NoteSetting", "BodyMarkColor");
+int SysNoteSetting::GetBodyMarkColor() {
+  return m_inifile->ReadInt("NoteSetting", "BodyMarkColor");
 }
 
+// fontSize: 0-big 1-normal 2-small
 void SysNoteSetting::SetFontSize(int fontSize) {
-    ptrIni->WriteInt("NoteSetting", "FontSize", fontSize);
+  m_inifile->WriteInt("NoteSetting", "FontSize", fontSize);
 }
 
+// bodyMark: 0-big 1-mid 2-small
 void SysNoteSetting::SetBodyMarkSize(int bodyMarkSize) {
-    ptrIni->WriteInt("NoteSetting", "BodyMarkSize", bodyMarkSize);
+  m_inifile->WriteInt("NoteSetting", "BodyMarkSize", bodyMarkSize);
 }
 
 void SysNoteSetting::SetFontColor(int fontColor) {
-    ptrIni->WriteInt("NoteSetting", "FontColor", fontColor);
+  m_inifile->WriteInt("NoteSetting", "FontColor", fontColor);
 }
 
+// bodyMarkColor: 0-white, 1-gray, 2-red, 3-green, 4-yellow, 5-blue
 void SysNoteSetting::SetBodyMarkColor(int bodyMarkColor) {
-    ptrIni->WriteInt("NoteSetting", "BodyMarkColor", bodyMarkColor);
+  m_inifile->WriteInt("NoteSetting", "BodyMarkColor", bodyMarkColor);
 }
 
-void SysNoteSetting::SyncFile(void) {
-    ptrIni->SyncConfigFile();
+void SysNoteSetting::DefaultFactory() {
+  int fontSize = 1;
+  int bodyMarkSize = 1;
+  int fontColor = 1;
+  int bodyMarkColor = 1;
+
+  m_inifile->WriteInt("NoteSetting", "FontSize", fontSize);
+  m_inifile->WriteInt("NoteSetting", "BodyMarkSize", bodyMarkSize);
+  m_inifile->WriteInt("NoteSetting", "FontColor", fontColor);
+  m_inifile->WriteInt("NoteSetting", "BodyMarkColor", bodyMarkColor);
 }
 
-void SysNoteSetting::DefaultFactory(void) {
-    int fontSize = 1;
-    int bodyMarkSize = 1;
-    int fontColor = 1;
-    int bodyMarkColor = 1;
-
-    ptrIni->WriteInt("NoteSetting", "FontSize", fontSize);
-    ptrIni->WriteInt("NoteSetting", "BodyMarkSize", bodyMarkSize);
-    ptrIni->WriteInt("NoteSetting", "FontColor", fontColor);
-    ptrIni->WriteInt("NoteSetting", "BodyMarkColor", bodyMarkColor);
+void SysNoteSetting::SyncFile() {
+  m_inifile->SyncConfigFile();
 }

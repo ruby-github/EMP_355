@@ -1,32 +1,26 @@
-#ifndef __SYSUSERDEFINEDKEY_H__
-#define __SYSUSERDEFINEDKEY_H__
+#ifndef __SYS_USER_DEFINED_KEY_H__
+#define __SYS_USER_DEFINED_KEY_H__
 
 #include "utils/IniFile.h"
 
 class SysUserDefinedKey {
 public:
+  SysUserDefinedKey();
+  ~SysUserDefinedKey();
 
-    SysUserDefinedKey();
-    ~SysUserDefinedKey();
-#if 0
-    void SetFuncGain(int func);
-    int GetFuncGain(void);
+public:
+  int GetFuncP1();
+  int GetFuncP2();
+  int GetFuncP3();
 
-    void SetFuncValue(int func);
-    int GetFuncValue(void);
-#endif
+  void SetFuncP1(int func);
+  void SetFuncP2(int func);
+  void SetFuncP3(int func);
 
-    void SetFuncP1(int func);
-    int GetFuncP1(void);
+  void SyncFile();
 
-    void SetFuncP2(int func);
-    int GetFuncP2(void);
-
-    void SetFuncP3(int func);
-    int GetFuncP3(void);
-    void SyncFile(void);
 private:
-    IniFile *ptrIni;
+  IniFile* m_inifile;
 };
 
 #endif

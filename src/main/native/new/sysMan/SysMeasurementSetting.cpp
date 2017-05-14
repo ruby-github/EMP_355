@@ -1,308 +1,334 @@
-#include <string>
-#include "Def.h"
 #include "sysMan/SysMeasurementSetting.h"
 
-using std::string;
+#include "Def.h"
 
-TraceItem g_traceCalcItem;
+TraceItem traceCalcItem;
 
-void GetTraceItem(struct TraceItem &calcItem) {
-    calcItem= g_traceCalcItem;
-}
+// ---------------------------------------------------------
 
 SysMeasurementSetting::SysMeasurementSetting() {
-    char path[256];
-    sprintf(path, "%s/%s", CFG_RES_PATH, SYS_SETTING_FILE);
-    ptrIni = new IniFile(path);
+  m_inifile = new IniFile(string(CFG_RES_PATH) + string(SYS_SETTING_FILE));
 }
 
 SysMeasurementSetting::~SysMeasurementSetting() {
-    if (ptrIni != NULL) {
-        delete ptrIni;
-        ptrIni = NULL;
-    }
+  if (m_inifile != NULL) {
+    delete m_inifile;
+  }
+
+  m_inifile = NULL;
 }
 
-int SysMeasurementSetting::GetMeasureResult(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureResult");
+bool SysMeasurementSetting::GetAutoCalcPS() {
+  return m_inifile->ReadBool("MeasurementSetting", "PS");
 }
 
-int SysMeasurementSetting::GetMeasureLineDisplay(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureLineDisplay");
+bool SysMeasurementSetting::GetAutoCalcED() {
+  return m_inifile->ReadBool("MeasurementSetting", "ED");
 }
 
-int SysMeasurementSetting::GetMeasureCursorSize(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureCursorSize");
+bool SysMeasurementSetting::GetAutoCalcRI() {
+  return m_inifile->ReadBool("MeasurementSetting", "RI");
 }
 
-int SysMeasurementSetting::GetMeasureSequence(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureSequence");
+bool SysMeasurementSetting::GetAutoCalcSD() {
+  return m_inifile->ReadBool("MeasurementSetting", "SD");
 }
 
-int SysMeasurementSetting::GetMeasureLineDensity(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureLineDensity");
+bool SysMeasurementSetting::GetAutoCalcTAmax() {
+  return m_inifile->ReadBool("MeasurementSetting", "TAmax");
 }
 
-int SysMeasurementSetting::GetMeasureColorCur(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureColorCur");
+bool SysMeasurementSetting::GetAutoCalcPI() {
+  return m_inifile->ReadBool("MeasurementSetting", "PI");
 }
 
-int SysMeasurementSetting::GetMeasureColorConfirm(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "MeasureColorConfirm");
+bool SysMeasurementSetting::GetAutoCalcTime() {
+  return m_inifile->ReadBool("MeasurementSetting", "Time");
 }
 
-int SysMeasurementSetting::GetTraceMethod(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "TraceMethod");
+bool SysMeasurementSetting::GetAutoCalcHR() {
+  return m_inifile->ReadBool("MeasurementSetting", "HR");
 }
 
-int SysMeasurementSetting::GetReportResult(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "ReportResult");
+bool SysMeasurementSetting::GetAutoCalcPGmax() {
+  return m_inifile->ReadBool("MeasurementSetting", "PGmax");
 }
 
-bool SysMeasurementSetting::GetAutoCalcPS(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "PS");
-}
-bool SysMeasurementSetting::GetAutoCalcED(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "ED");
-}
-bool SysMeasurementSetting::GetAutoCalcRI(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "RI");
-}
-bool SysMeasurementSetting::GetAutoCalcSD(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "SD");
-}
-bool SysMeasurementSetting::GetAutoCalcTAmax(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "TAmax");
-}
-bool SysMeasurementSetting::GetAutoCalcPI(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "PI");
-}
-bool SysMeasurementSetting::GetAutoCalcTime(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "Time");
-}
-bool SysMeasurementSetting::GetAutoCalcHR(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "HR");
-}
-bool SysMeasurementSetting::GetAutoCalcPGmax(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "PGmax");
-}
-bool SysMeasurementSetting::GetAutoCalcPGmean(void) {
-    return ptrIni->ReadBool("MeasurementSetting", "PGmean");
+bool SysMeasurementSetting::GetAutoCalcPGmean() {
+  return m_inifile->ReadBool("MeasurementSetting", "PGmean");
 }
 
-int SysMeasurementSetting::GetHeartBeatCycle(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "HeartBeatCycle");
+int SysMeasurementSetting::GetMeasureResult() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureResult");
 }
 
-int SysMeasurementSetting::GetUnitDist(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitDist");
+int SysMeasurementSetting::GetMeasureLineDisplay() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureLineDisplay");
 }
 
-int SysMeasurementSetting::GetUnitArea(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitArea");
+int SysMeasurementSetting::GetMeasureCursorSize() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureCursorSize");
 }
 
-int SysMeasurementSetting::GetUnitVol(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitVol");
+int SysMeasurementSetting::GetMeasureSequence() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureSequence");
 }
 
-int SysMeasurementSetting::GetUnitTime(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitTime");
+int SysMeasurementSetting::GetMeasureLineDensity() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureLineDensity");
 }
 
-int SysMeasurementSetting::GetUnitVel(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitVel");
+int SysMeasurementSetting::GetMeasureColorCur() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureColorCur");
 }
 
-int SysMeasurementSetting::GetUnitSlope(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitSlope");
+int SysMeasurementSetting::GetMeasureColorConfirm() {
+  return m_inifile->ReadInt("MeasurementSetting", "MeasureColorConfirm");
 }
 
-int SysMeasurementSetting::GetUnitAccel(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitAccel");
+int SysMeasurementSetting::GetTraceMethod() {
+  return m_inifile->ReadInt("MeasurementSetting", "TraceMethod");
 }
 
-int SysMeasurementSetting::GetUnitEfw(void) {
-    return ptrIni->ReadInt("MeasurementSetting", "UnitEfw");
+int SysMeasurementSetting::GetReportResult() {
+  return m_inifile->ReadInt("MeasurementSetting", "ReportResult");
 }
 
-void SysMeasurementSetting::SetMeasureResult(int mearesult) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureResult", mearesult);
+int SysMeasurementSetting::GetHeartBeatCycle() {
+  return m_inifile->ReadInt("MeasurementSetting", "HeartBeatCycle");
 }
 
-void SysMeasurementSetting::SetMeasureLineDisplay(int measureLineDisplay) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureLineDisplay", measureLineDisplay);
+int SysMeasurementSetting::GetUnitDist() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitDist");
 }
 
-void SysMeasurementSetting::SetMeasureSequence(int measureSequence) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureSequence", measureSequence);
+int SysMeasurementSetting::GetUnitArea() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitArea");
 }
 
-void SysMeasurementSetting::SetMeasureCursorSize(int measureCursor) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureCursorSize", measureCursor);
+int SysMeasurementSetting::GetUnitVol() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitVol");
 }
 
-void SysMeasurementSetting::SetMeasureLineDensity(int measureLineDensity) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureLineDensity", measureLineDensity);
+int SysMeasurementSetting::GetUnitTime() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitTime");
 }
 
-void SysMeasurementSetting::SetMeasureColorCur(int measureColorCur) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureColorCur", measureColorCur);
+int SysMeasurementSetting::GetUnitVel() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitVel");
 }
 
-void SysMeasurementSetting::SetMeasureColorConfirm(int measureColorConfirm) {
-    ptrIni->WriteInt("MeasurementSetting", "MeasureColorConfirm", measureColorConfirm);
+int SysMeasurementSetting::GetUnitSlope() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitSlope");
 }
 
-void SysMeasurementSetting::SetTraceMethod(int manualTrace) {
-    ptrIni->WriteInt("MeasurementSetting", "TraceMethod", manualTrace);
+int SysMeasurementSetting::GetUnitAccel() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitAccel");
 }
 
-void SysMeasurementSetting::SetReportResult(int reportResult) {
-    ptrIni->WriteInt("MeasurementSetting", "ReportResult", reportResult);
+int SysMeasurementSetting::GetUnitEfw() {
+  return m_inifile->ReadInt("MeasurementSetting", "UnitEfw");
+}
+
+TraceItem SysMeasurementSetting::GetTraceItem() {
+  return traceCalcItem;
 }
 
 void SysMeasurementSetting::SetAutoCalcPS(bool ps) {
-    ptrIni->WriteBool("MeasurementSetting", "PS", ps);
+  m_inifile->WriteBool("MeasurementSetting", "PS", ps);
 }
+
 void SysMeasurementSetting::SetAutoCalcED(bool ed) {
-    ptrIni->WriteBool("MeasurementSetting", "ED", ed);
+  m_inifile->WriteBool("MeasurementSetting", "ED", ed);
 }
+
 void SysMeasurementSetting::SetAutoCalcRI(bool ri) {
-    ptrIni->WriteBool("MeasurementSetting", "RI", ri);
+  m_inifile->WriteBool("MeasurementSetting", "RI", ri);
 }
+
 void SysMeasurementSetting::SetAutoCalcSD(bool sd) {
-    ptrIni->WriteBool("MeasurementSetting", "SD", sd);
+  m_inifile->WriteBool("MeasurementSetting", "SD", sd);
 }
+
 void SysMeasurementSetting::SetAutoCalcTAmax(bool tamax) {
-    ptrIni->WriteBool("MeasurementSetting", "TAmax", tamax);
+  m_inifile->WriteBool("MeasurementSetting", "TAmax", tamax);
 }
+
 void SysMeasurementSetting::SetAutoCalcPI(bool pi) {
-    ptrIni->WriteBool("MeasurementSetting", "PI", pi);
+  m_inifile->WriteBool("MeasurementSetting", "PI", pi);
 }
+
 void SysMeasurementSetting::SetAutoCalcTime(bool time) {
-    ptrIni->WriteBool("MeasurementSetting", "Time", time);
+  m_inifile->WriteBool("MeasurementSetting", "Time", time);
 }
+
 void SysMeasurementSetting::SetAutoCalcHR(bool hr) {
-    ptrIni->WriteBool("MeasurementSetting", "HR", hr);
+  m_inifile->WriteBool("MeasurementSetting", "HR", hr);
 }
+
 void SysMeasurementSetting::SetAutoCalcPGmax(bool pgmax) {
-    ptrIni->WriteBool("MeasurementSetting", "PGmax", pgmax);
+  m_inifile->WriteBool("MeasurementSetting", "PGmax", pgmax);
 }
+
 void SysMeasurementSetting::SetAutoCalcPGmean(bool pgmean) {
-    ptrIni->WriteBool("MeasurementSetting", "PGmean", pgmean);
+  m_inifile->WriteBool("MeasurementSetting", "PGmean", pgmean);
+}
+
+// measureReulst font size: 0-10 1-15
+void SysMeasurementSetting::SetMeasureResult(int mearesult) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureResult", mearesult);
+}
+
+// measureLineDisplay: 0-OFF 1-ON
+void SysMeasurementSetting::SetMeasureLineDisplay(int measureLineDisplay) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureLineDisplay", measureLineDisplay);
+}
+
+// easureCursor: 0-Big 1-Mid 2-Small
+void SysMeasurementSetting::SetMeasureCursorSize(int measureCursor) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureCursorSize", measureCursor);
+}
+
+// measureSequence: 0-Default 1-Repeat 2-None
+void SysMeasurementSetting::SetMeasureSequence(int measureSequence) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureSequence", measureSequence);
+}
+
+// measureLineDensity: 0-High 1-Mid 2-Low
+void SysMeasurementSetting::SetMeasureLineDensity(int measureLineDensity) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureLineDensity", measureLineDensity);
+}
+
+// measureColorCur: 0-Red, 1-Yellow, 2-Green, 3-Blue, 4-White
+void SysMeasurementSetting::SetMeasureColorCur(int measureColorCur) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureColorCur", measureColorCur);
+}
+
+// measureColorConfirm: 0-Red, 1-Yellow, 2-Green, 3-Blue, 4-White
+void SysMeasurementSetting::SetMeasureColorConfirm(int measureColorConfirm) {
+  m_inifile->WriteInt("MeasurementSetting", "MeasureColorConfirm", measureColorConfirm);
+}
+
+// TraceMethod 0-Point 1-Track 2-Auto
+void SysMeasurementSetting::SetTraceMethod(int manualTrace) {
+  m_inifile->WriteInt("MeasurementSetting", "TraceMethod", manualTrace);
+}
+
+// reportResult 0-last 1-average
+void SysMeasurementSetting::SetReportResult(int reportResult) {
+  m_inifile->WriteInt("MeasurementSetting", "ReportResult", reportResult);
 }
 
 void SysMeasurementSetting::SetHeartBeatCycle(int cycle) {
-    ptrIni->WriteInt("MeasurementSetting", "HeartBeatCycle", cycle);
+  m_inifile->WriteInt("MeasurementSetting", "HeartBeatCycle", cycle);
 }
 
 void SysMeasurementSetting::SetUnitDist(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitDist", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitDist", unit);
 }
 
 void SysMeasurementSetting::SetUnitArea(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitArea", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitArea", unit);
 }
 
 void SysMeasurementSetting::SetUnitVol(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitVol", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitVol", unit);
 }
 
 void SysMeasurementSetting::SetUnitTime(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitTime", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitTime", unit);
 }
 
 void SysMeasurementSetting::SetUnitVel(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitVel", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitVel", unit);
 }
 
 void SysMeasurementSetting::SetUnitSlope(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitSlope", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitSlope", unit);
 }
 
 void SysMeasurementSetting::SetUnitAccel(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitAccel", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitAccel", unit);
 }
 
 void SysMeasurementSetting::SetUnitEfw(int unit) {
-    ptrIni->WriteInt("MeasurementSetting", "UnitEfw", unit);
+  m_inifile->WriteInt("MeasurementSetting", "UnitEfw", unit);
 }
 
-void SysMeasurementSetting::SyncFile(void) {
-    ptrIni->SyncConfigFile();
+void SysMeasurementSetting::DefaultFactory() {
+  int measureLineDisplay=0;
+  int measureSequence = 0;
+  int measureCursorSize=2;
+  int measureLineDensity=1;
+  int measureColorCur=2;
+  int measureColorConfirm=4;
+  int traceInMeasure=0;
+  int manualTrace=0;
+  int reportResult = 0;
+  bool ps = false;
+  bool ed = false;
+  bool ri = false;
+  bool sd = false;
+  bool tamax = false;
+  bool pi = false;
+  bool time = false;
+  bool hr = false;
+  bool pgmax = false;
+  bool pgmean = false;
+  int heartBeatCycle = 2;
+  int dist=0;
+  int area=0;
+  int vol=0;
+  int tm=0;
+  int vel=0;
+  int accel=0;
+  int efw=0;
+
+  m_inifile->WriteInt("MeasurementSetting", "MeasureLineDisplay", measureLineDisplay);
+  m_inifile->WriteInt("MeasurementSetting", "MeasureSequence", measureSequence);
+  m_inifile->WriteInt("MeasurementSetting", "MeasureCursorSize", measureCursorSize);
+  m_inifile->WriteInt("MeasurementSetting", "MeasureLineDensity", measureLineDensity);
+  m_inifile->WriteInt("MeasurementSetting", "MeasureColorCur", measureColorCur);
+  m_inifile->WriteInt("MeasurementSetting", "MeasureColorConfirm", measureColorConfirm);
+  m_inifile->WriteInt("MeasurementSetting", "TraceInMeasure", traceInMeasure);
+  m_inifile->WriteInt("MeasurementSetting", "TraceMethod", manualTrace);
+  m_inifile->WriteInt("MeasurementSetting", "ReportResult", reportResult);
+
+  m_inifile->WriteBool("MeasurementSetting", "PS", ps);
+  m_inifile->WriteBool("MeasurementSetting", "ED", ed);
+  m_inifile->WriteBool("MeasurementSetting", "RI", ri);
+  m_inifile->WriteBool("MeasurementSetting", "SD", sd);
+  m_inifile->WriteBool("MeasurementSetting", "TAmax", tamax);
+  m_inifile->WriteBool("MeasurementSetting", "PI", pi);
+  m_inifile->WriteBool("MeasurementSetting", "Time", time);
+  m_inifile->WriteBool("MeasurementSetting", "HR", hr);
+  m_inifile->WriteBool("MeasurementSetting", "PGmax", pgmax);
+  m_inifile->WriteBool("MeasurementSetting", "PGmean", pgmean);
+
+  m_inifile->WriteInt("MeasurementSetting", "UnitDist", dist);
+  m_inifile->WriteInt("MeasurementSetting", "UnitArea", area);
+  m_inifile->WriteInt("MeasurementSetting", "UnitVol", vol);
+  m_inifile->WriteInt("MeasurementSetting", "UnitTime", tm);
+  m_inifile->WriteInt("MeasurementSetting", "UnitVel", vel);
+  m_inifile->WriteInt("MeasurementSetting", "UnitAccel", accel);
+  m_inifile->WriteInt("MeasurementSetting", "UnitEfw", efw);
+
+  m_inifile->WriteInt("MeasurementSetting", "HeartBeatCycle", heartBeatCycle);
 }
 
-void SysMeasurementSetting::DefaultFactory(void) {
-    int measureLineDisplay=0;
-    int measureSequence = 0;
-    int measureCursorSize=2;
-    int measureLineDensity=1;
-    int measureColorCur=2;
-    int measureColorConfirm=4;
-    int traceInMeasure=0;
-    int manualTrace=0;
-    int reportResult = 0;
-    bool ps = false;
-    bool ed = false;
-    bool ri = false;
-    bool sd = false;
-    bool tamax = false;
-    bool pi = false;
-    bool time = false;
-    bool hr = false;
-    bool pgmax = false;
-    bool pgmean = false;
-    int heartBeatCycle = 2;
-    int dist=0;
-    int area=0;
-    int vol=0;
-    int tm=0;
-    int vel=0;
-    int accel=0;
-    int efw=0;
-
-    ptrIni->WriteInt("MeasurementSetting", "MeasureLineDisplay", measureLineDisplay);
-    ptrIni->WriteInt("MeasurementSetting", "MeasureSequence", measureSequence);
-    ptrIni->WriteInt("MeasurementSetting", "MeasureCursorSize", measureCursorSize);
-    ptrIni->WriteInt("MeasurementSetting", "MeasureLineDensity", measureLineDensity);
-    ptrIni->WriteInt("MeasurementSetting", "MeasureColorCur", measureColorCur);
-    ptrIni->WriteInt("MeasurementSetting", "MeasureColorConfirm", measureColorConfirm);
-    ptrIni->WriteInt("MeasurementSetting", "TraceInMeasure", traceInMeasure);
-    ptrIni->WriteInt("MeasurementSetting", "TraceMethod", manualTrace);
-    ptrIni->WriteInt("MeasurementSetting", "ReportResult", reportResult);
-
-    ptrIni->WriteBool("MeasurementSetting", "PS", ps);
-    ptrIni->WriteBool("MeasurementSetting", "ED", ed);
-    ptrIni->WriteBool("MeasurementSetting", "RI", ri);
-    ptrIni->WriteBool("MeasurementSetting", "SD", sd);
-    ptrIni->WriteBool("MeasurementSetting", "TAmax", tamax);
-    ptrIni->WriteBool("MeasurementSetting", "PI", pi);
-    ptrIni->WriteBool("MeasurementSetting", "Time", time);
-    ptrIni->WriteBool("MeasurementSetting", "HR", hr);
-    ptrIni->WriteBool("MeasurementSetting", "PGmax", pgmax);
-    ptrIni->WriteBool("MeasurementSetting", "PGmean", pgmean);
-
-    ptrIni->WriteInt("MeasurementSetting", "UnitDist", dist);
-    ptrIni->WriteInt("MeasurementSetting", "UnitArea", area);
-    ptrIni->WriteInt("MeasurementSetting", "UnitVol", vol);
-    ptrIni->WriteInt("MeasurementSetting", "UnitTime", tm);
-    ptrIni->WriteInt("MeasurementSetting", "UnitVel", vel);
-    ptrIni->WriteInt("MeasurementSetting", "UnitAccel", accel);
-    ptrIni->WriteInt("MeasurementSetting", "UnitEfw", efw);
-
-    ptrIni->WriteInt("MeasurementSetting", "HeartBeatCycle", heartBeatCycle);
+void SysMeasurementSetting::UpdateTraceItemSetting() {
+  traceCalcItem.psSet = GetAutoCalcPS();
+  traceCalcItem.edSet = GetAutoCalcED();
+  traceCalcItem.riSet = GetAutoCalcRI();
+  traceCalcItem.sdSet = GetAutoCalcSD();
+  traceCalcItem.tamaxSet = GetAutoCalcTAmax();
+  traceCalcItem.piSet = GetAutoCalcPI();
+  traceCalcItem.timeSet = GetAutoCalcTime();
+  traceCalcItem.hrSet = GetAutoCalcHR();
+  traceCalcItem.pgmaxSet = GetAutoCalcPGmax();
+  traceCalcItem.pgmeanSet = GetAutoCalcPGmean();
 }
 
-void SysMeasurementSetting::UpdateTraceItemSetting(void) {
-    g_traceCalcItem.psSet = GetAutoCalcPS();
-    g_traceCalcItem.edSet = GetAutoCalcED();
-    g_traceCalcItem.riSet = GetAutoCalcRI();
-    g_traceCalcItem.sdSet = GetAutoCalcSD();
-    g_traceCalcItem.tamaxSet = GetAutoCalcTAmax();
-    g_traceCalcItem.piSet = GetAutoCalcPI();
-    g_traceCalcItem.timeSet = GetAutoCalcTime();
-    g_traceCalcItem.hrSet = GetAutoCalcHR();
-    g_traceCalcItem.pgmaxSet = GetAutoCalcPGmax();
-    g_traceCalcItem.pgmeanSet = GetAutoCalcPGmean();
+void SysMeasurementSetting::SyncFile() {
+  m_inifile->SyncConfigFile();
 }

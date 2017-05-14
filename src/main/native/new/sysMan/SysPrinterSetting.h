@@ -1,34 +1,35 @@
-#ifndef _SYSPRINTERSETTING_H_
-#define _SYSPRINTERSETTING_H_
+#ifndef __SYS_PRINTER_SETTING_H__
+#define __SYS_PRINTER_SETTING_H__
 
 #include "utils/IniFile.h"
 
 class SysPrinterSetting {
 public:
+  SysPrinterSetting();
+  ~SysPrinterSetting();
 
-    SysPrinterSetting();
-    ~SysPrinterSetting();
+public:
+  int GetCopies();
+  int GetGamma();
+  int GetBrightness();
+  int GetMediaSize();
+  int GetLandscape();
+  int GetPageSize();
+  int GetSonyGamma();
 
-    int GetCopies(void);
-    int GetGamma(void);
-    int GetBrightness(void);
-    int GetMediaSize(void);
-    int GetLandscape(void);
-    int GetPageSize(void);
-    int GetSonyGamma(void);
+  void SetCopies(int copies);
+  void SetGamma(int gamma);
+  void SetBrightness(int brightness);
+  void SetMediaSize(int media_size);
+  void SetLandscape(int landscape_ang);
+  void SetPageSize(int pagesize);
+  void SetSonyGamma(int sonygamma);
 
-    void SetCopies(int copies);
-    void SetGamma(int gamma);
-    void SetBrightness(int brightness);
-    void SetMediaSize(int media_size);
-    void SetLandscape(int landscape_ang);
-    void SetPageSize(int pagesize);
-    void SetSonyGamma(int sonygamma);
+  void DefaultFactory();
+  void SyncFile();
 
-    void SyncFile(void);
-    void DefaultFactory(void);
 private:
-    IniFile *ptrIni;
+  IniFile* m_inifile;
 };
 
-#endif /* _SYSPRINTERSETTING_H_ */
+#endif

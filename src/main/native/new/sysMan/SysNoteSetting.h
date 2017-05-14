@@ -1,34 +1,29 @@
-#ifndef __SYSNOTESETTING_H__
-#define __SYSNOTESETTING_H__
+#ifndef __SYS_NOTE_SETTING_H__
+#define __SYS_NOTE_SETTING_H__
 
 #include "utils/IniFile.h"
 
 class SysNoteSetting {
 public:
+  SysNoteSetting();
+  ~SysNoteSetting();
 
-    SysNoteSetting();
-    ~SysNoteSetting();
+public:
+  int GetFontSize();
+  int GetBodyMarkSize();
+  int GetFontColor();
+  int GetBodyMarkColor();
 
-    // param fontSize: 0-big 1-normal 2-small
-    int GetFontSize(void);
-    void SetFontSize(int fontSize);
+  void SetFontSize(int fontSize);
+  void SetBodyMarkSize(int bodyMark);
+  void SetFontColor(int fontColor);
+  void SetBodyMarkColor(int bodyMarkColor);
 
-    // param bodyMark: 0-big 1-mid 2-small
-    int GetBodyMarkSize(void);
-    void SetBodyMarkSize(int bodyMark);
-
-    // param fontColor:
-    int GetFontColor(void);
-    void SetFontColor(int fontColor);
-
-    // param bodyMarkColor: 0-white, 1-gray, 2-red, 3-green, 4-yellow, 5-blue
-    int GetBodyMarkColor(void);
-    void SetBodyMarkColor(int bodyMarkColor);
-    void SyncFile(void);
-    void DefaultFactory(void);
+  void DefaultFactory();
+  void SyncFile();
 
 private:
-    IniFile *ptrIni;
+  IniFile* m_inifile;
 };
 
 #endif
