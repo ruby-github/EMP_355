@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static int g_cursorRangeY0 = 128;
-static int g_cursorRangeY1 = 213;
+static int g_cursorRangeY0 = BIOPSY_CURSOR_START_Y;
+static int g_cursorRangeY1 = BIOPSY_CURSOR_FINISHT_Y;
 
 unsigned char g_key_note = 0;
 static POINT g_sysCursor;
@@ -41,9 +41,6 @@ void FakeXMotionEventFullRange(int offsetx, int offsety) {
 }
 
 void FakeXMotionEventImage(int &x, int &y, int offsetx, int offsety) {
-  int x_start = IMG_AREA_X + IMAGE_X;
-  int y_start = IMG_AREA_Y + IMAGE_Y;
-
   int adjust = 0;
 
   SysNoteSetting sysNoteSetting;
@@ -76,11 +73,11 @@ void FakeXMotionEventImage(int &x, int &y, int offsetx, int offsety) {
   }
 
   // Mouse x direction Move
-  if (((x + offsetx) > x_start) && (x + offsetx) < (x_start + IMAGE_W)) {
+  if ((x + offsetx) >= IMAGE_CURSOR_START_X && (x + offsetx) <= IMAGE_CURSOR_FINISH_X) {
     x += offsetx;
   }
 
-  if (((y - offsety) > y_start) && ((y - offsety) < (y_start + IMAGE_H - adjust))) {
+  if ((y - offsety) >= IMAGE_CURSOR_START_Y && (y - offsety) <= (IMAGE_CURSOR_FINISH_Y - adjust)) {
     y -= offsety;
   }
 
@@ -92,15 +89,12 @@ void FakeXMotionEventImage(int &x, int &y, int offsetx, int offsety) {
 }
 
 void FakeXMotionEventMenu(int &x, int &y, int offsetx, int offsety) {
-  int x_start = 0;
-  int y_start = 0;
-
   // Mouse x direction Move
-  if (((x + offsetx) > x_start) && (x + offsetx) < (x_start + MENU_AREA_W)) {
+  if ((x + offsetx) >= NENU_CURSOR_START_X && (x + offsetx) <= NENU_CURSOR_FINISH_X) {
     x += offsetx;
   }
 
-  if (((y - offsety) > y_start) && ((y - offsety) < (y_start + MENU_AREA_H))) {
+  if ((y - offsety) >= NENU_CURSOR_START_Y && (y - offsety) <= NENU_CURSOR_FINISH_Y) {
     y -= offsety;
   }
 
@@ -112,17 +106,15 @@ void FakeXMotionEventMenu(int &x, int &y, int offsetx, int offsety) {
 }
 
 void FakeXMotionEventMenuBiopsy(int offsetx, int offsety) {
-  int x_start = 0;
-
   int x = g_sysCursor.x;
   int y = g_sysCursor.y;
 
   // Mouse x direction Move
-  if (((x + offsetx) > x_start) && (x + offsetx) < (x_start + MENU_AREA_W)) {
+  if ((x + offsetx) >= NENU_CURSOR_START_X && (x + offsetx) <= NENU_CURSOR_FINISH_X) {
     x += offsetx;
   }
 
-  if (((y - offsety) > g_cursorRangeY0) && ((y - offsety) < g_cursorRangeY1)) {
+  if ((y - offsety) >= g_cursorRangeY0 && (y - offsety) <= g_cursorRangeY1) {
     y -= offsety;
   }
 
@@ -137,20 +129,15 @@ void FakeXMotionEventMenuBiopsy(int offsetx, int offsety) {
 }
 
 void FakeXMotionEventScreen(int &x, int &y, int offsetx, int offsety) {
-  int x_start = 0;
-  int y_start = 0;
-  int w = SCREEN_WIDTH;
-  int h = SCREEN_HEIGHT;
-
   // 将鼠标移动范围锁定在SCREEN_WIDTH, SCREEN_HEIGHT之内
   // Mouse x direction Move
   Display* display = getXDisplay();
 
-  if (((x + offsetx) > x_start) && (x + offsetx) < (x_start + w)) {
+  if ((x + offsetx) > SCREEN_CURSOR_START_X && (x + offsetx) < SCREEN_CURSOR_FINISH_X) {
     x += offsetx;
   }
 
-  if (((y - offsety) > y_start) && ((y - offsety) < (y_start + h))) {
+  if ((y - offsety) > SCREEN_CURSOR_START_Y && (y - offsety) < SCREEN_CURSOR_FINISH_Y) {
     y -= offsety;
   }
 
@@ -3636,7 +3623,7 @@ void ChangeKeymap() {
 }
 
 void ResetIfOutOfRange() {
-  if ((g_sysCursor.x > MENU_AREA_W) || (g_sysCursor.y > MENU_AREA_H)) {
+  if ((g_sysCursor.x < NENU_CURSOR_START_X) || (g_sysCursor.y > NENU_CURSOR_FINISH_Y)) {
     SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
   }
 }
