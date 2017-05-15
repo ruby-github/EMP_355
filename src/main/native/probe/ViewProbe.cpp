@@ -327,12 +327,11 @@ GtkWidget* ViewProbe::CreateProbe(const char *probe_name, const char probeType,
                                   char exam_type[][50], int probe_index) {
     GtkWidget *vbox = gtk_vbox_new (FALSE, 0);
     gtk_widget_set_size_request (vbox, 150, 500);
-    char m_probe_name[128];
     GtkWidget *label_name;
 
     if (probe_name) {
-        ProbeMan::GetInstance()->VerifyProbeName(probe_name, m_probe_name);
-        label_name = gtk_label_new (m_probe_name);
+        string m_probe_name = ProbeMan::GetInstance()->VerifyProbeName(probe_name);
+        label_name = gtk_label_new (m_probe_name.c_str());
     } else
         label_name = gtk_label_new (_("No Probe"));
 

@@ -54,7 +54,7 @@ public:
         return m_defaultSocket;
     }
     void WriteDefaultProbe(const char *probeModel, IniFile* ptrIni);
-    void VerifyProbeName(const char *fromType, char *toType);
+    string VerifyProbeName(string fromType);
 
 private:
     ProbeMan();

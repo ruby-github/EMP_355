@@ -206,7 +206,7 @@ void ImageArea::UpdateMeaResultArea(int fontsize) {
     int measure_line_max = 14;
     if(fontsize == 14) {
         measure_line_max =10;
-        if(m_meaResultLineH > 25;
+        if(m_meaResultLineH > 25)
                 m_meaResultLineH = 25;
     } else {
     if(m_meaResultLineH > 18)

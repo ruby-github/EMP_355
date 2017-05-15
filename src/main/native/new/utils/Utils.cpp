@@ -273,6 +273,18 @@ GtkFrame* Utils::create_frame(const string label) {
   return frame;
 }
 
+GtkHSeparator* Utils::create_hseparator() {
+  GtkHSeparator* separator = GTK_HSEPARATOR(gtk_hseparator_new());
+
+  return separator;
+}
+
+GtkVSeparator* Utils::create_vseparator() {
+  GtkVSeparator* separator = GTK_VSEPARATOR(gtk_vseparator_new());
+
+  return separator;
+}
+
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
   PangoFontDescription* font = NULL;
 
@@ -374,8 +386,8 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "sysMan/CalcSetting.h"
-#include "sysMan/MenuSystem.h"
+#include "sysMan/ViewDicomSupervise.h"
+#include "sysMan/ViewSuperuser.h"
 
 void Utils::test(GtkWidget* widget) {
   /*GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 400, 300);
@@ -383,5 +395,5 @@ void Utils::test(GtkWidget* widget) {
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
   gtk_widget_show_all(GTK_WIDGET(dialog));*/
 
-  //ConfigToUSB::GetInstance()->CreateWindow(widget);
+  ViewSuperuser::GetInstance()->CreateWindow();
 }

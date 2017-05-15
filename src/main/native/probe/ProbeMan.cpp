@@ -857,7 +857,7 @@ string ProbeMan::ReadDefaultProbe(IniFile* ptrIni) {
     return (ptrIni->ReadString("ProbeModel", "ProbeModel"));
 }
 
-void ProbeMan::VerifyProbeName(const char *fromType, char *toType) {
+string ProbeMan::VerifyProbeName(string fromType) {
     // "35C50L",  "70L40J", "65C10L", "35C20I", "65C15E", "30P16B", "10L25K"
     // "C35",     "L75",    "C65",    "C35-20", "C65-15", "P30",    "L10"
 
@@ -880,5 +880,5 @@ void ProbeMan::VerifyProbeName(const char *fromType, char *toType) {
     } else {
     }
 
-    sprintf(toType, "%s", probe_name.c_str());
+    return probe_name;
 }

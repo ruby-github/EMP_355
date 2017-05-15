@@ -23,8 +23,8 @@ TopArea* TopArea::GetInstance() {
 TopArea::TopArea(void) {
     m_pixmapTop = 0;
     sprintf(m_freq, " ");
-    sprintf(m_probeType, " ");
-    sprintf(m_probeType_old, " ");
+    m_probeType = " ";
+    m_probeType_old = " ";
     sprintf(m_checkPart, " ");
 #ifdef VET
     sprintf(m_hospital, " ");
@@ -124,8 +124,8 @@ void TopArea::UpdatePatInfo(const char *name, const char *sex, const char *age, 
 }
 #endif
 void TopArea::UpdateProbeType(const char *type) {
-    sprintf(m_probeType_old, "%s", type);
-    ProbeMan::GetInstance()->VerifyProbeName(type, m_probeType);
+    m_probeType_old = type;
+    m_probeType = ProbeMan::GetInstance()->VerifyProbeName(type);
     UpdateSysInfo();
 }
 
@@ -158,7 +158,7 @@ void TopArea::UpdateSysInfo(void) {
     char probe_info[100];
     char other_info[100];
     string probe_type;
-    if (strlen(m_probeType) == 0) {
+    if (m_probeType.empty()) {
         probe_type = _("No Probe");
     } else {
         probe_type = m_probeType;
@@ -180,7 +180,7 @@ void TopArea::UpdateSysInfo(void) {
     if (tis < 0.0001) {
         sprintf(other_info, "          ");
     } else {
-        if (strlen(m_probeType) == 0) {
+        if (m_probeType.empty()) {
             sprintf(m_freq, "   ");
         } else {
             sprintf(m_freq,"   ");

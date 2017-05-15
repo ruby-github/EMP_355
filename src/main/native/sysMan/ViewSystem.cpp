@@ -5158,9 +5158,8 @@ GtkWidget* ViewSystem::create_note_image(void) {
     //gtk_fixed_put (GTK_FIXED (fixed_image), m_combobox_probe_type, 110+20, 40+10);
     gtk_widget_set_size_request (m_combobox_probe_type, 120+25+25, 30);
     for (i = 0; i < NUM_PROBE; i++) {
-        char newProbeName[256];
-        ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i].c_str(), newProbeName);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_type), newProbeName);
+        string  newProbeName = ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_type), newProbeName.c_str());
     }
 #ifdef VET
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), 0);
@@ -8059,11 +8058,11 @@ void ViewSystem::init_image_setting(void) {
     string probe_type = TopArea::GetInstance()->GetProbeType();
     for (int i = 0; i < NUM_PROBE; ++i) {
         if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0) {
-            char newProbeName[256];
-            ProbeMan::GetInstance()->VerifyProbeName(probe_type.c_str(), newProbeName);
+            string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(probe_type);
             gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), i);
         }
     }
+
     set_image_item_sensitive(false);
 }
 
@@ -8802,9 +8801,8 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_probe_comment, 110+20+20+20-30, 10+10+5);
     gtk_widget_set_size_request (m_combobox_probe_comment, 120, 30);
     for (int i = 0; i < NUM_PROBE; i++) {
-        char newProbeName[256];
-        ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i].c_str(), newProbeName);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_comment), newProbeName);
+        string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_comment), newProbeName.c_str());
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_comment), probe_comment_index);//-1);
     g_signal_connect(m_combobox_probe_comment, "changed", G_CALLBACK(HandleProbeCommentChanged), this);

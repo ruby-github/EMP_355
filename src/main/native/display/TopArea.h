@@ -73,8 +73,8 @@ private:
     bool m_inReadImg;
     guint m_timeout;
 
-    char m_probeType_old[30];
-    char m_probeType[30];
+    string m_probeType_old;
+    string m_probeType;
     char m_freq[30];
     char m_checkPart[30];
     // std::string m_hospital;

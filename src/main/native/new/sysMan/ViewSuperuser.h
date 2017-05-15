@@ -22,7 +22,55 @@ public:
 private:
   // signal
 
-  static gboolean HandleWindowDeleteEvent(GtkWidget* widget, GdkEvent* event, ViewSuperuser* data) {
+  static void signal_combobox_changed_machine(GtkComboBox* combobox, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ComboBoxChangedMachine(combobox);
+    }
+  }
+
+  static void signal_combobox_changed_probe(GtkComboBox* combobox, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ComboBoxChangedProbe(combobox);
+    }
+  }
+
+  static void signal_combobox_changed_aperture(GtkComboBox* combobox, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ComboBoxChangedAperture(combobox);
+    }
+  }
+
+  static void signal_button_clicked_probe_write(GtkButton* button, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ButtonClickedProbeWrite(button);
+    }
+  }
+
+  static void signal_button_clicked_exit(GtkButton* button, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ButtonClickedExit(button);
+    }
+  }
+
+  static void signal_button_clicked_monitor(GtkButton* button, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ButtonClickedMonitor(button);
+    }
+  }
+
+  static void signal_button_clicked_monitor2(GtkButton* button, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ButtonClickedMonitor2(button);
+    }
+  }
+
+  static void signal_button_clicked_demo(GtkButton* button, ViewSuperuser* data) {
+    if (data != NULL) {
+      return data->ButtonClickedDemo(button);
+    }
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ViewSuperuser* data) {
     if (data != NULL) {
       data->DestroyWindow();
     }
@@ -30,55 +78,7 @@ private:
     return FALSE;
   }
 
-  static void HandleMachineChanged(GtkComboBox* combobox, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->MachineChanged(combobox);
-    }
-  }
-
-  static void HandleProbeChanged(GtkComboBox* combobox, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->ProbeChanged(combobox);
-    }
-  }
-
-  static void HandleChgAperture(GtkComboBox* combobox, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->ChgAperture(combobox);
-    }
-  }
-
-  static void HandleBtnWriteClicked(GtkButton* button, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->BtnExitClicked(button);
-    }
-  }
-
-  static void HandleBtnExitClicked(GtkButton* button, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->BtnExitClicked(button);
-    }
-  }
-
-  static void HandleBtnChgMonitorClicked(GtkButton* button, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->BtnChgMonitorClicked(button);
-    }
-  }
-
-  static void HandleBtnChgMonitorClicked2(GtkButton* button, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->BtnChgMonitorClicked2(button);
-    }
-  }
-
-  static void HandleBtnEnterDemoClicked(GtkButton* button, ViewSuperuser* data) {
-    if (data != NULL) {
-      return data->BtnEnterDemoClicked(button);
-    }
-  }
-
-  static gboolean HandleAuthen(gpointer data) {
+  static gboolean signal_callback_authen(gpointer data) {
     if (ViewSuperuser::GetInstance()->IsAuthenValid()) {
       return TRUE;
     } else {
@@ -86,13 +86,13 @@ private:
     }
   }
 
-  static gboolean HandleWriteProbe(gpointer data) {
+  static gboolean signal_callback_probe_write(gpointer data) {
     ViewSuperuser::GetInstance()->WriteProbe();
 
     return FALSE;
   }
 
-  static gboolean ExitWindow(gpointer data) {
+  static gboolean signal_callback_exit_window(gpointer data) {
     ViewSuperuser* superuser = (ViewSuperuser*)data;
 
     if (superuser != NULL) {
@@ -102,29 +102,16 @@ private:
     return FALSE;
   }
 
-  #ifdef TRANSDUCER
-    static void on_spinbutton_press_adjust(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewSuperuser* data) {
-      data->SpinbuttonPressAdjust(editable, new_text, new_text_length, position);
-    }
-  #endif
-
   // signal
 
-  void MachineChanged(GtkComboBox* combobox);
-  void ProbeChanged(GtkComboBox* combobox);
-  void ChgAperture(GtkComboBox* combobox);
-  void BtnWriteClicked(GtkButton* button);
-  void BtnExitClicked(GtkButton* button);
-  void BtnChgMonitorClicked(GtkButton* button);
-  void BtnChgMonitorClicked2(GtkButton* button);
-  void BtnEnterDemoClicked(GtkButton* button);
-
-  bool IsAuthenValid();
-  void WriteProbe();
-
-  #ifdef TRANSDUCER
-    void SpinbuttonPressAdjust(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
-  #endif
+  void ComboBoxChangedMachine(GtkComboBox* combobox);
+  void ComboBoxChangedProbe(GtkComboBox* combobox);
+  void ComboBoxChangedAperture(GtkComboBox* combobox);
+  void ButtonClickedProbeWrite(GtkButton* button);
+  void ButtonClickedExit(GtkButton* button);
+  void ButtonClickedMonitor(GtkButton* button);
+  void ButtonClickedMonitor2(GtkButton* button);
+  void ButtonClickedDemo(GtkButton* button);
 
 private:
   ViewSuperuser();
@@ -136,29 +123,27 @@ private:
 
   void UpdateProbeStatus(string socket, string status);
 
-  GtkWidget* CreateProbeTreeview();
+  GtkTreeView* CreateProbeTreeview();
   GtkTreeModel* CreateProbeModel();
+
+  bool IsAuthenValid();
+  void WriteProbe();
 
 private:
   static ViewSuperuser* m_instance;
 
 private:
+  GtkDialog* m_dialog;
+  GtkLabel* m_label_hint;
+  GtkTreeView* m_treeview_probe;
 
-private:
-    GtkWidget *m_window;
-    GtkWidget *m_labelHint;
-    GtkWidget *m_treeviewProbe;
+  int m_timer;
+  int m_probeType;
 
-    // anthen
-    std::vector<unsigned char> m_vecAuthenInfo;
-    bool m_statusAuthen;
-    bool m_statusDemo;
-    int m_timer;
+  bool m_statusAuthen;
+  bool m_statusDemo;
 
-    //probe
-    int m_probeType;
-    //transducer press value correct
-    int m_tranPressCorrect;
+  vector<unsigned char> m_vecAuthenInfo;
 };
 
 #endif

@@ -44,44 +44,47 @@ void ViewDicomSupervise::CreateWindow() {
   GtkButton* button_exit = Utils::add_dialog_button(m_dialog, _("Exit"), GTK_RESPONSE_CLOSE, GTK_STOCK_QUIT);
   g_signal_connect(button_exit, "clicked", G_CALLBACK(signal_button_clicked_exit), this);
 
-  GtkTable* table = Utils::create_table(11, 1);
+  GtkTable* table = Utils::create_table(10, 1);
   gtk_container_set_border_width(GTK_CONTAINER(table), 0);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
-  GtkTable* table_export = Utils::create_table(7, 3);
+  GtkTable* table_export = Utils::create_table(6, 3);
   GtkHSeparator* hseparator = Utils::create_hseparator();
   GtkTable* table_register = Utils::create_table(2, 3);
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(table_export), 0, 1, 0, 7);
-  gtk_table_attach(table, GTK_WIDGET(hseparator), 0, 1, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach_defaults(table, GTK_WIDGET(table_register), 0, 1, 8, 11);
+  gtk_table_attach_defaults(table, GTK_WIDGET(table_export), 0, 1, 0, 6);
+  gtk_table_attach(table, GTK_WIDGET(hseparator), 0, 1, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table, GTK_WIDGET(table_register), 0, 1, 7, 10);
 
   gtk_container_set_border_width(GTK_CONTAINER(table_export), 10);
   gtk_container_set_border_width(GTK_CONTAINER(table_register), 10);
 
   // export
   GtkLabel* label_note = Utils::create_label(_("Note: According to the license file,the manufacturer will generate a unique\nregister key for every machine, you can register DICOM function by inputting\nthist register key. If register is successful, you can use the DICOM function.\n\nPlease insert Udisk, and click button 'Export License File'. You will find this\nfile named 'license' in Udisk. Please send this file to manufacturer."));
+  GtkButton* button_export = Utils::create_button(_("Export License File"));
   m_label_export = Utils::create_label("");
-  GtkButton* button_export = Utils::create_button("Export License File");
 
   gtk_label_set_line_wrap(label_note, FALSE);
+  gtk_misc_set_alignment(GTK_MISC(label_note), 0, 0);
 
   gtk_table_attach_defaults(table_export, GTK_WIDGET(label_note), 0, 3, 0, 5);
-  gtk_table_attach_defaults(table_export, GTK_WIDGET(m_label_export), 0, 3, 5, 6);
-  gtk_table_attach(table_export, GTK_WIDGET(button_export), 0, 1, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_export, GTK_WIDGET(button_export), 0, 1, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_export, GTK_WIDGET(m_label_export), 1, 3, 5, 6);
 
   g_signal_connect(button_export, "clicked", G_CALLBACK(signal_button_clicked_export), this);
 
   // register
   GtkLabel* label_key = Utils::create_label(_("Register Key:"));
   m_entry_key = Utils::create_entry(9679);
-  m_label_register = Utils::create_label("");
-  GtkButton* button_register = Utils::create_button("Register");
 
   gtk_table_attach_defaults(table_register, GTK_WIDGET(label_key), 0, 1, 0, 1);
   gtk_table_attach(table_register, GTK_WIDGET(m_entry_key), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach_defaults(table_register, GTK_WIDGET(m_label_register), 1, 3, 1, 2);
+
+  GtkButton* button_register = Utils::create_button(_("Register"));
+  m_label_register = Utils::create_label("");
+
   gtk_table_attach(table_register, GTK_WIDGET(button_register), 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_register, GTK_WIDGET(m_label_register), 1, 3, 1, 2);
 
   g_signal_connect(button_register, "clicked", G_CALLBACK(signal_button_clicked_register), this);
 

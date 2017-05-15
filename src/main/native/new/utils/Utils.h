@@ -38,6 +38,9 @@ public:
   static GtkTreeView* create_tree_view(GtkTreeModel* mode = NULL);
   static GtkFrame* create_frame(const string label = "");
 
+  static GtkHSeparator* create_hseparator();
+  static GtkVSeparator* create_vseparator();
+
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,
     const int size, const int max_width, const int max_height);
