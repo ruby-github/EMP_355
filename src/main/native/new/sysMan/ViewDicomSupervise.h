@@ -1,59 +1,100 @@
-#ifndef VIEW_DICOM_SUPERVISE_H
-#define VIEW_DICOM_SUPERVISE_H
+#ifndef __VIEW_DICOM_SUPERVISE_H__
+#define __VIEW_DICOM_SUPERVISE_H__
 
-#include <gtk/gtk.h>
-#include <vector>
-#include <string>
 #include "utils/FakeXEvent.h"
+#include "utils/Utils.h"
 
-class ViewDicomSupervise:public FakeXEvent {
+class ViewDicomSupervise: public FakeXEvent {
 public:
-    ~ViewDicomSupervise();
-    static ViewDicomSupervise* GetInstance();
-    void Authenticate(void);
-    //GtkWidget* CreateWindow(GtkWidget *parent);
-    void CreateWindow();
-    void DestroyWindow(void);
+  static ViewDicomSupervise* GetInstance();
+
+public:
+  ~ViewDicomSupervise();
+
+  void CreateWindow();
+
+  void Authenticate();
+
 private:
-    ViewDicomSupervise();
-    static ViewDicomSupervise* m_ptrInstance;
+  // signal
 
-    static std::string noticeInfo;
-    static std::string noticeInfo1;
-    static const unsigned int AUTHEN_NUM = 5;
-    GtkWidget *m_window;
-    GtkWidget *m_labelExport;
-    GtkWidget *m_labelRegister;
-    // anthen
-    std::vector<unsigned char> m_vecAuthenInfo;
-    bool m_statusAuthen;
-    int m_timer;
-    GtkWidget *m_entry_key;
-    bool m_flagDICOM;
-    void ConfirmAuthen(void);
-    void Exit(void);
+  static void signal_button_clicked_export(GtkButton* button, ViewDicomSupervise* data) {
+    if (data != NULL) {
+      data->ButtonClickedExport(button);
+    }
+  }
 
-    virtual void KeyEvent(unsigned char keyValue);
-    gboolean IsAuthenValid(void);
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
-    void BtnExportClicked(GtkButton *button);
-    void BtnRegisterClicked(GtkButton *button);
-    void BtnExitClicked(GtkButton *button);
+  static void signal_button_clicked_register(GtkButton* button, ViewDicomSupervise* data) {
+    if (data != NULL) {
+      data->ButtonClickedRegister(button);
+    }
+  }
 
-    static gboolean HandleAuthen(gpointer data) {
-        return m_ptrInstance->IsAuthenValid();
+  static void signal_button_clicked_exit(GtkButton* button, ViewDicomSupervise* data) {
+    if (data != NULL) {
+      data->ButtonClickedExit(button);
     }
-    static gboolean HandleWindowDeleteEvent(GtkWidget *widget, GdkEvent *event, ViewDicomSupervise *data) {
-        return data->WindowDeleteEvent(widget, event);
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ViewDicomSupervise* data) {
+    if (data != NULL) {
+      data->DestroyWindow();
     }
-    static void HandleBtnExportClicked(GtkButton *widget, ViewDicomSupervise *data) {
-        return data->BtnExportClicked(widget);
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_authen(gpointer data) {
+    ViewDicomSupervise* dicom = (ViewDicomSupervise*)data;
+
+    if (dicom != NULL) {
+      if (dicom->IsAuthenValid()) {
+        return TRUE;
+      } else {
+        return FALSE;
+      }
     }
-    static void HandleBtnRegisterClicked(GtkButton *widget, ViewDicomSupervise *data) {
-        return data->BtnRegisterClicked(widget);
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_exitwindow(gpointer data) {
+    ViewDicomSupervise* dicom = (ViewDicomSupervise*)data;
+
+    if (data != NULL) {
+      dicom->DestroyWindow();
     }
-    static void HandleBtnExitClicked(GtkButton *widget, ViewDicomSupervise *data) {
-        return data->BtnExitClicked(widget);
-    }
+
+    return FALSE;
+  }
+
+  // signal
+
+  void ButtonClickedExport(GtkButton* button);
+  void ButtonClickedRegister(GtkButton* button);
+  void ButtonClickedExit(GtkButton* button);
+
+  bool IsAuthenValid();
+
+private:
+  ViewDicomSupervise();
+
+  void KeyEvent(unsigned char keyValue);
+
+  void DestroyWindow();
+  void Exit();
+
+private:
+  static ViewDicomSupervise* m_instance;
+
+private:
+  GtkDialog* m_dialog;
+  GtkLabel* m_label_export;
+  GtkLabel* m_label_register;
+  GtkEntry* m_entry_key;
+
+  int m_timer;
+  std::vector<unsigned char> m_vecAuthenInfo;
 };
+
 #endif

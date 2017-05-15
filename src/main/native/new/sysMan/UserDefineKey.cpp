@@ -12,7 +12,6 @@
 #include "sysMan/SysUserDefinedKey.h"
 #include "sysMan/ViewSystem.h"
 
-
 UserDefineKey::UserDefineKey() {
 }
 
