@@ -121,8 +121,8 @@ void DicomServerSetting::InitServerSetting() {
 // ---------------------------------------------------------
 
 void DicomServerSetting::ButtonClickedPing(GtkButton* button) {
-  const char * ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
-  const char * device = gtk_entry_get_text(GTK_ENTRY(m_entry_device));
+  const char* ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
+  const char* device = gtk_entry_get_text(GTK_ENTRY(m_entry_device));
 
   if(ip[0] == '\0' || device[0] == '\0') {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
@@ -192,16 +192,15 @@ void DicomServerSetting::ButtonClickedAdd(GtkButton* button) {
 }
 
 void DicomServerSetting::ButtonClickedDelete(GtkButton* button) {
-  GtkTreeModel *model;
   GtkTreeIter iter;
-  GtkTreeSelection *selection;
-  char *device;
-  char *ip;
+
+  char* device;
+  char* ip;
 
   vector<string>::iterator Iter;
 
-  selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview));
-  model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview));
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview));
+  GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview));
 
   if(gtk_tree_selection_get_selected(selection,NULL,&iter)) {
     gtk_tree_model_get(model, &iter, COL_DEVICE,&device, COL_IP, &ip, -1);
@@ -219,10 +218,10 @@ void DicomServerSetting::ButtonClickedDelete(GtkButton* button) {
 }
 
 void DicomServerSetting::PingTimeout() {
-  const char * ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
+  const char* ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
   char strHint[256] = {0};
 
-  if (CDCMMan::GetMe()->Ping((char *)ip)) {
+  if (CDCMMan::GetMe()->Ping((char*)ip)) {
     sprintf(strHint, "%s %s\n", _("Success to ping ip"), ip);
   } else {
     sprintf(strHint, "%s %s\n", _("Failed to ping ip"), ip);

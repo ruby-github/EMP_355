@@ -296,7 +296,7 @@ void ConfigToHost::RootSelectionChangedCalc(GtkTreeSelection* selection) {
 }
 
 void ConfigToHost::ToggleData(GtkCellRendererToggle* cell, gchar* path_str) {
-  GtkTreeView *treeview;
+  GtkTreeView* treeview;
   gint type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "type"));
 
   if(type == 0) {
@@ -326,11 +326,11 @@ void ConfigToHost::ToggleData(GtkCellRendererToggle* cell, gchar* path_str) {
   if(type == 0 ) { //Root
     gint rows = atoi(gtk_tree_path_to_string(path));
     UpdateBranchModel(rows);
-    GList *list = g_list_first(m_listBranch);
+    GList* list = g_list_first(m_listBranch);
     SetAllToggleValue(GTK_TREE_MODEL(g_list_nth_data(list, rows)), checked);
   } else if(type == 1) { //Branch
     GtkTreeIter i;
-    GtkTreeModel *m;
+    GtkTreeModel* m;
 
     if(!checked) {
       GtkTreeSelection* s = gtk_tree_view_get_selection(m_treeview_root);
@@ -373,18 +373,19 @@ void ConfigToHost::LoadSelectedData() {
   int cond = 0;
   int count = 1;
   int total = 0;
-  char str_info[256], result[256];
+  char str_info[256];
+  char result[256];
   FileMan fm;
-  PeripheralMan *ptr = PeripheralMan::GetInstance();
+
   vector<string> vec = ConfigToHost::GetInstance()->GetSelectedVec();
 
-  if(!ptr->CheckUsbStorageState()) {
+  if(!PeripheralMan::GetInstance()->CheckUsbStorageState()) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("No USB storage found!"), NULL);
 
     return;
   } else {
-    if(!ptr->MountUsbStorage()) {
+    if(!PeripheralMan::GetInstance()->MountUsbStorage()) {
       MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
         MessageDialog::DLG_ERROR, _("Failed to mount USB storage!"), NULL);
 
@@ -401,7 +402,7 @@ void ConfigToHost::LoadSelectedData() {
 
   while(ite < vec.end() && !cond) {
     //Update info
-    gchar *basename = g_path_get_basename((*ite).c_str());
+    gchar* basename = g_path_get_basename((*ite).c_str());
     PRINTF("basename:%s\n", basename);
 
     // only display .ini file
@@ -413,8 +414,8 @@ void ConfigToHost::LoadSelectedData() {
     }
 
     //lhm20140925
-    gchar *destPath;
-    gchar *destPath_other = NULL;
+    gchar* destPath;
+    gchar* destPath_other = NULL;
 
     #ifdef VET
       sprintf(usb_file_path, "%s/default/VetItemPara.ini",UDISK_DATA_PATH);
@@ -450,18 +451,18 @@ void ConfigToHost::LoadSelectedData() {
 
     g_free(basename);
 
-    //  PRINTF("Dest Path: %s\n", destPath);
-    GFile *src = g_file_new_for_path((*ite).c_str());
-    GFile *dest = g_file_new_for_path(destPath);
+    // PRINTF("Dest Path: %s\n", destPath);
+    GFile* src = g_file_new_for_path((*ite).c_str());
+    GFile* dest = g_file_new_for_path(destPath);
     g_free(destPath);
-    GFile *dest_other = NULL;
+    GFile* dest_other = NULL;
 
     if(destPath_other != NULL) {
       dest_other = g_file_new_for_path(destPath_other);
       g_free(destPath_other);
     }
 
-    GError *err = NULL;
+    GError* err = NULL;
     int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, m_cancellable, signal_callback_progress, NULL, &err);
 
     if(dest_other != NULL) {
@@ -518,7 +519,7 @@ void ConfigToHost::LoadSelectedData() {
     ite++;
   }
 
-  ptr->UmountUsbStorage();
+  PeripheralMan::GetInstance()->UmountUsbStorage();
   MessageDialog::GetInstance()->Destroy();
 
   // Handle result
@@ -543,22 +544,21 @@ void ConfigToHost::LoadSelectedDataCalc() {
   int total = 0;
   char str_info[256],result1[256];
   FileMan fm;
-  PeripheralMan *ptr = PeripheralMan::GetInstance();
 
   vector<string> vec = ConfigToHost::GetInstance()->GetSelectedVec();
 
   m_cancellable = g_cancellable_new();
 
-  //list all string for test
+  // list all string for test
   vector<string>::iterator ite = vec.begin();
   total = vec.size() / 2;
 
   while(ite < vec.end() && !cond) {
-    //Update info
-    gchar *basename = g_path_get_basename((*ite).c_str());
+    // Update info
+    gchar* basename = g_path_get_basename((*ite).c_str());
 
-    gchar *destPath;
-    gchar *destPath_other = NULL;
+    gchar* destPath;
+    gchar* destPath_other = NULL;
     char name[50]= {0};
 
     destPath = g_build_path(G_DIR_SEPARATOR_S, CALC_TMP_DATA_PATH, basename, NULL);
@@ -575,17 +575,17 @@ void ConfigToHost::LoadSelectedDataCalc() {
 
     g_free(basename);
 
-    //  PRINTF("Dest Path: %s\n", destPath);
-    GFile *src = g_file_new_for_path((*ite).c_str());
-    GFile *dest = g_file_new_for_path(destPath);
+    // PRINTF("Dest Path: %s\n", destPath);
+    GFile* src = g_file_new_for_path((*ite).c_str());
+    GFile* dest = g_file_new_for_path(destPath);
     g_free(destPath);
-    GFile *dest_other = NULL;
+    GFile* dest_other = NULL;
     if(destPath_other != NULL) {
       dest_other = g_file_new_for_path(destPath_other);
       g_free(destPath_other);
     }
 
-    GError *err = NULL;
+    GError* err = NULL;
     int ret = g_file_copy(src, dest, G_FILE_COPY_OVERWRITE, m_cancellable, NULL, NULL, &err);
 
     if(dest_other != NULL) {
@@ -675,12 +675,12 @@ void ConfigToHost::LoadSelectedDataCalc() {
     }
 
     IniFile ini_add2(userselectname1);
-    IniFile *ptrIni_add2 = &ini_add2;
+    IniFile* ptrIni_add2 = &ini_add2;
     int ItemAllNum;
     ItemAllNum=ptrIni_add2->ReadInt("MaxNumber", "Number");
 
     IniFile ini_add(path2);
-    IniFile *ptrIni_add = &ini_add;
+    IniFile* ptrIni_add = &ini_add;
 
     vector<string> itemgroup_name;
     itemgroup_name = ptrIni_add->GetGroupName();
@@ -699,7 +699,7 @@ void ConfigToHost::LoadSelectedDataCalc() {
         } else {
           bool rename_no = true;
           IniFile ini_add1(path3);
-          IniFile *ptrIni_add1 = &ini_add1;
+          IniFile* ptrIni_add1 = &ini_add1;
           char CustomEtype[256];
           sprintf(CustomEtype, "CustomEtype-%d",item_num);
           string item_name = ptrIni_add1->ReadString(CustomEtype, "Name");
@@ -708,7 +708,7 @@ void ConfigToHost::LoadSelectedDataCalc() {
           string department_in = ptrIni_add1->ReadString(CustomEtype, "Department");
 
           IniFile ini_add4(userselectname1);
-          IniFile *ptrIni_add4 = &ini_add4;
+          IniFile* ptrIni_add4 = &ini_add4;
           vector<string> useritemgroup;
           useritemgroup = ptrIni_add4->GetGroupName();
           char src_group[256];
@@ -905,13 +905,12 @@ void ConfigToHost::DeleteUdiskFile() {
 }
 
 void ConfigToHost::UpdateRootModel() {
-  DIR *dir;
-  struct dirent *ent;
+  struct dirent* ent;
 
   GtkListStore* store = GTK_LIST_STORE(gtk_tree_view_get_model(m_treeview_root));
   GtkTreeIter iter;
 
-  dir = opendir(UDISK_DATA_PATH);
+  DIR* dir = opendir(UDISK_DATA_PATH);
 
   if(!dir) {
     perror("open udisk path error");
@@ -924,14 +923,14 @@ void ConfigToHost::UpdateRootModel() {
     }
 
     // if(ent->d_type==DT_DIR)
-    gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, ent->d_name, NULL);
+    gchar* tmpPath = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, ent->d_name, NULL);
     PRINTF("DIR: %s\n", tmpPath);
 
     if(g_file_test(tmpPath, G_FILE_TEST_IS_DIR)) {
       PRINTF("DIR: %s\n", ent->d_name);
       gtk_list_store_append(store, &iter);
       gtk_list_store_set(store, &iter, COL_CHECKED, FALSE, COL_NAME, ent->d_name, -1);
-      GtkTreeModel *model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
+      GtkTreeModel* model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
       m_listBranch = g_list_append(m_listBranch, model);
     }
 
@@ -942,13 +941,12 @@ void ConfigToHost::UpdateRootModel() {
 }
 
 void ConfigToHost::UpdateRootModelCalc() {
-  DIR *dir;
-  struct dirent *ent;
+  struct dirent* ent;
 
   GtkListStore* store = GTK_LIST_STORE(gtk_tree_view_get_model(m_treeview_root));
   GtkTreeIter iter;
 
-  dir = opendir(UDISK_DATA_PATH);
+  DIR* dir = opendir(UDISK_DATA_PATH);
 
   if(!dir) {
     perror("open udisk path error");
@@ -961,7 +959,7 @@ void ConfigToHost::UpdateRootModelCalc() {
     }
 
     // if(ent->d_type==DT_DIR)
-    gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, ent->d_name, NULL);
+    gchar* tmpPath = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, ent->d_name, NULL);
     PRINTF("DIR: %s\n", tmpPath);
 
     if(g_file_test(tmpPath, G_FILE_TEST_IS_DIR)) {
@@ -969,7 +967,7 @@ void ConfigToHost::UpdateRootModelCalc() {
       gtk_list_store_append(store, &iter);
       gtk_list_store_set(store, &iter, 0, ent->d_name, -1);
 
-      // GtkTreeModel *model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
+      // GtkTreeModel* model = GTK_TREE_MODEL(LoadBranchModel(ent->d_name));
       // m_listBranch = g_list_append(m_listBranch, model);
     }
 
@@ -981,20 +979,19 @@ void ConfigToHost::UpdateRootModelCalc() {
 
 // rows: the row's number in the Root model
 void ConfigToHost::UpdateBranchModel(gint rows) {
-  GList *list = g_list_first(m_listBranch);
+  GList* list = g_list_first(m_listBranch);
   gtk_tree_view_set_model (m_treeview_branch, GTK_TREE_MODEL(g_list_nth_data(list, rows)));
 }
 
 GtkTreeModel* ConfigToHost::LoadBranchModel(gchar* branch) {
-  DIR *dir;
-  struct dirent *ent;
+  struct dirent* ent;
   gchar* path = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, branch, NULL);
 
   GtkListStore* store = gtk_list_store_new(NUM_COLS, G_TYPE_BOOLEAN, G_TYPE_STRING);
   gtk_list_store_clear(store);
   GtkTreeIter iter;
 
-  dir = opendir(path);
+  DIR* dir = opendir(path);
   if(!dir) {
     perror("open path error");
     return NULL;
@@ -1009,7 +1006,7 @@ GtkTreeModel* ConfigToHost::LoadBranchModel(gchar* branch) {
     }
 
     // if(ent->d_type==DT_REG)
-    gchar *tmpPath = g_build_path(G_DIR_SEPARATOR_S, path, ent->d_name, NULL);
+    gchar* tmpPath = g_build_path(G_DIR_SEPARATOR_S, path, ent->d_name, NULL);
 
     if(g_file_test(tmpPath, G_FILE_TEST_IS_REGULAR)) {
       if(fm.CompareSuffix(ent->d_name, "ini")==0) {
@@ -1036,18 +1033,18 @@ GtkTreeModel* ConfigToHost::LoadBranchModel(gchar* branch) {
 bool ConfigToHost::GetAllSelectPath() {
   m_vecPath.clear();
 
-  gchar *nameRoot, *nameBranch;
-  gboolean checkedRoot, checkedBranch;
-  gboolean validRoot, validBranch;
-  GtkTreeModel *modelRoot, *modelBranch;
+  gchar* nameRoot;
+  gchar* nameBranch;
+  gboolean checkedRoot;
+  gboolean checkedBranch;
   GtkTreeIter iterRoot, iterBranch;
   FileMan fm;
 
-  modelRoot = gtk_tree_view_get_model(m_treeview_root);
-  validRoot = gtk_tree_model_get_iter_first(modelRoot, &iterRoot);
+  GtkTreeModel* modelRoot = gtk_tree_view_get_model(m_treeview_root);
+  gboolean validRoot = gtk_tree_model_get_iter_first(modelRoot, &iterRoot);
 
   if(g_list_length(m_listBranch) > 0) {
-    GList *list = g_list_first(m_listBranch);
+    GList* list = g_list_first(m_listBranch);
 
     while(list) {
       // PRINTF("New Branch\n");
@@ -1060,8 +1057,8 @@ bool ConfigToHost::GetAllSelectPath() {
       gtk_tree_model_get(modelRoot, &iterRoot, COL_CHECKED, &checkedRoot, COL_NAME, &nameRoot, -1);
       //  PRINTF("Root Name=%s\n", nameRoot);
 
-      modelBranch = GTK_TREE_MODEL(list->data);
-      validBranch = gtk_tree_model_get_iter_first(modelBranch, &iterBranch);
+      GtkTreeModel* modelBranch = GTK_TREE_MODEL(list->data);
+      gboolean validBranch = gtk_tree_model_get_iter_first(modelBranch, &iterBranch);
 
       //check all iter in branch list
       while(validBranch) {
@@ -1069,7 +1066,7 @@ bool ConfigToHost::GetAllSelectPath() {
         // PRINTF("Branch Name=%s, Checked=%d\n", nameBranch, checkedBranch);
 
         if(checkedBranch) {
-          gchar *path = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, nameRoot, nameBranch, NULL);
+          gchar* path = g_build_path(G_DIR_SEPARATOR_S, UDISK_DATA_PATH, nameRoot, nameBranch, NULL);
           PRINTF("Push to vector: %s\n", path);
           m_vecPath.push_back(path);
           gchar pathIni[255];

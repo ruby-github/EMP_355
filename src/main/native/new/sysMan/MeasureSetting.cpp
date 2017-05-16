@@ -183,9 +183,8 @@ int MeasureSetting::GetMeasureSequence(string exam_type) {
   }
 
   IniFile ini(path);
-  IniFile *ptrIni= &ini;
 
-  return  ptrIni->ReadInt(exam_type, "Sequence");
+  return  ini.ReadInt(exam_type, "Sequence");
 }
 
 // 获得exam_type检查部位下所有测量项的item，push到vector中
@@ -205,7 +204,7 @@ void MeasureSetting::GetMeasureListEtype(string exam_type, vector<int> & vecItem
   }
 
   IniFile ini(path);
-  IniFile *ptrIni= &ini;
+  IniFile* ptrIni= &ini;
 
   int number;
   number = ptrIni->ReadInt(exam_type, "Number");
@@ -290,9 +289,8 @@ void MeasureSetting::ComboBoxChangedMeasureSequence(GtkComboBox* combobox) {
   }
 
   IniFile ini(path1);
-  IniFile *ptrIni = &ini;
-  ptrIni->WriteInt(exam_type, "Sequence", number);
-  ptrIni->SyncConfigFile();
+  ini.WriteInt(exam_type, "Sequence", number);
+  ini.SyncConfigFile();
 }
 
 void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
@@ -329,16 +327,15 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
   if(!vecItem_Calc.empty()) {
     for(int i=0; i<item_length; i++) {
       if(strcmp(select_name, _(vecItem_Calc[i].c_str())) == 0) {
-        GtkTreeModel *model_tmp;
-        GtkTreeSelection *selection;
         GtkTreeIter iter_tmp;
-        selection = gtk_tree_view_get_selection(m_treeview_selected_item);
-        model_tmp= gtk_tree_view_get_model(m_treeview_selected_item);
+
+        GtkTreeSelection* selection = gtk_tree_view_get_selection(m_treeview_selected_item);
+        GtkTreeModel* model_tmp= gtk_tree_view_get_model(m_treeview_selected_item);
         //高亮要插入的词条，并更新滚动条
         iter_tmp= InsertUniqueCalc(model_tmp, select_name);
         gtk_tree_selection_select_iter(selection, &iter_tmp);
 
-        GtkTreePath *path_scroll = gtk_tree_model_get_path(model_tmp, &iter_tmp);
+        GtkTreePath* path_scroll = gtk_tree_model_get_path(model_tmp, &iter_tmp);
         gtk_tree_view_scroll_to_cell(m_treeview_selected_item, path_scroll, NULL, FALSE, 1.0, 1.0);
         gtk_tree_path_free (path_scroll);
 
@@ -364,7 +361,7 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
   }
 
   IniFile ini(path1);
-  IniFile *ptrIni = &ini;
+  IniFile* ptrIni = &ini;
   int number;
   char SelectNum[256];
   number = ptrIni->ReadInt(exam_type, "Number");
@@ -380,13 +377,12 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
   ptrIni->WriteInt(exam_type, "Number", number+1);
   ptrIni->SyncConfigFile();
 
-  GtkTreeModel *new_model1 = CreateItemCalcModel1();
+  GtkTreeModel* new_model1 = CreateItemCalcModel1();
   gtk_tree_view_set_model(m_treeview_selected_item, new_model1);
 
-  //高亮插入的词条，并更新滚动条
-  GtkTreeSelection *new_selection;
+  // 高亮插入的词条，并更新滚动条
   GtkTreeIter iter_new;
-  new_selection = gtk_tree_view_get_selection(m_treeview_selected_item);
+  GtkTreeSelection* new_selection = gtk_tree_view_get_selection(m_treeview_selected_item);
   iter_new= InsertUniqueCalc(new_model1, select_name);
   gtk_tree_selection_select_iter(new_selection, &iter_new);
 
@@ -394,7 +390,7 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
   gtk_tree_view_scroll_to_cell(m_treeview_selected_item, path_scroll, NULL, TRUE, 1.0, 1.0);
   gtk_tree_path_free (path_scroll);
 
-  //更新departent列表
+  // 更新departent列表
   GtkTreeStore* calculate_store = GTK_TREE_STORE(gtk_tree_view_get_model(m_treeview_item));
   gtk_tree_store_remove(calculate_store, &iter);
 
@@ -411,7 +407,7 @@ void MeasureSetting::ButtonClickedSelectAll(GtkButton* button) {
   }
 
   // if m_treeview_item is empty
-  GtkTreeModel *model = gtk_tree_view_get_model(m_treeview_item);
+  GtkTreeModel* model = gtk_tree_view_get_model(m_treeview_item);
   if (gtk_tree_model_iter_n_children(model, NULL) == 0) {
     PRINTF("=========== tree view department items is empty!\n");
     return;
@@ -435,7 +431,7 @@ void MeasureSetting::ButtonClickedSelectAll(GtkButton* button) {
   }
 
   IniFile ini(path);
-  IniFile *ptrIni = &ini;
+  IniFile* ptrIni = &ini;
 
   int Num = ptrIni->ReadInt(exam_type, "Number");
 
@@ -454,7 +450,7 @@ void MeasureSetting::ButtonClickedSelectAll(GtkButton* button) {
   }
 
   IniFile new_ini(path12);
-  IniFile *new_ptrIni= &new_ini;
+  IniFile* new_ptrIni= &new_ini;
   int number = new_ptrIni->ReadInt("Measure", "Number");
 
   for(int i=1; i<=number; i++) {
@@ -504,7 +500,7 @@ void MeasureSetting::ButtonClickedBackOne(GtkButton* button) {
     return;
   }
 
-  GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+  GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
 
   char* select_name;
   gtk_tree_model_get(model, &iter, 0, &select_name, -1);
@@ -532,7 +528,7 @@ void MeasureSetting::ButtonClickedBackOne(GtkButton* button) {
   }
 
   IniFile ini(path1);
-  IniFile *ptrIni_calc = &ini;
+  IniFile* ptrIni_calc = &ini;
 
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
@@ -555,7 +551,7 @@ void MeasureSetting::ButtonClickedBackOne(GtkButton* button) {
   ptrIni_calc->WriteInt(exam_type, "Sequence", squence_copy);
   ptrIni_calc->SyncConfigFile();
 
-  GtkTreeModel *new_model1 = CreateItemCalcModel1();
+  GtkTreeModel* new_model1 = CreateItemCalcModel1();
   gtk_tree_view_set_model(m_treeview_selected_item, new_model1);
   //设置光标，更新滚动条的值
   gtk_tree_view_set_cursor(m_treeview_selected_item, path, NULL, TRUE);
@@ -593,7 +589,7 @@ void MeasureSetting::ButtonClickedBackAll(GtkButton* button) {
   }
 
   IniFile ini(path1);
-  IniFile *ptrIni = &ini;
+  IniFile* ptrIni = &ini;
 
   int squence_copy;
   squence_copy= ptrIni->ReadInt(exam_type, "Sequence");
@@ -624,8 +620,8 @@ void MeasureSetting::ButtonClickedUp(GtkButton* button) {
     return;
   }
 
-  GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-  char *path_string = gtk_tree_path_to_string(path);
+  GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+  char* path_string = gtk_tree_path_to_string(path);
   int path_num = atoi(path_string);
   PRINTF("---path_string:%s %d\n",path_string,path_num);
 
@@ -659,7 +655,7 @@ void MeasureSetting::ButtonClickedUp(GtkButton* button) {
   }
 
   IniFile ini(path1);
-  IniFile *ptrIni_calc = &ini;
+  IniFile* ptrIni_calc = &ini;
 
   int squence_copy;
   squence_copy= ptrIni_calc->ReadInt(exam_type, "Sequence");
@@ -678,7 +674,7 @@ void MeasureSetting::ButtonClickedUp(GtkButton* button) {
   ptrIni_calc->WriteInt(exam_type, "Sequence", squence_copy);
   ptrIni_calc->SyncConfigFile();
 
-  GtkTreeModel *new_model1 = CreateItemCalcModel1();
+  GtkTreeModel* new_model1 = CreateItemCalcModel1();
   gtk_tree_view_set_model(m_treeview_selected_item, new_model1);
 
   g_free(path_string);
@@ -713,8 +709,8 @@ void MeasureSetting::ButtonClickedDown(GtkButton* button) {
     return;
   }
 
-  GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-  char *path_string = gtk_tree_path_to_string(path);
+  GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+  char* path_string = gtk_tree_path_to_string(path);
   int path_num = atoi(path_string);
 
   gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
@@ -746,7 +742,7 @@ void MeasureSetting::ButtonClickedDown(GtkButton* button) {
     }
 
     IniFile ini(path1);
-    IniFile *ptrIni_calc = &ini;
+    IniFile* ptrIni_calc = &ini;
 
     int squence_copy;
     squence_copy= ptrIni_calc->ReadInt(exam_type, "Sequence");
@@ -766,7 +762,7 @@ void MeasureSetting::ButtonClickedDown(GtkButton* button) {
     ptrIni_calc->SyncConfigFile();
 
     //更新树
-    GtkTreeModel *new_model1 = CreateItemCalcModel1();
+    GtkTreeModel* new_model1 = CreateItemCalcModel1();
     gtk_tree_view_set_model(m_treeview_selected_item, new_model1);
 
     g_free(path_string);
@@ -979,8 +975,7 @@ int MeasureSetting::GetSequence(const string exam_type) {
   }
 
   IniFile ini(path1);
-  IniFile *ptrIni_calc = &ini;
-  int squence = ptrIni_calc->ReadInt(exam_type, "Sequence");
+  int squence = ini.ReadInt(exam_type, "Sequence");
   return squence;
 }
 
@@ -1043,7 +1038,7 @@ void MeasureSetting::CreateItemListCalc2(string probe_exam, vector<int>& vec) {
   }
 
   IniFile ini(path);
-  IniFile *ptrIni= &ini;
+  IniFile* ptrIni= &ini;
 
   int number = ptrIni->ReadInt(probe_exam, "Number");
 
@@ -1074,7 +1069,7 @@ void MeasureSetting::CreateItemListForMeasure(vector<string>& vec) {
   }
 
   IniFile ini(path);
-  IniFile *ptrIni= &ini;
+  IniFile* ptrIni= &ini;
   int number = ptrIni->ReadInt("Measure", "Number");
 
   for(int i=1; i<=number; i++) {
@@ -1102,7 +1097,7 @@ void MeasureSetting::CreateItemListForMeasureed(string probe_exam, vector<string
   }
 
   IniFile ini(path);
-  IniFile *ptrIni= &ini;
+  IniFile* ptrIni= &ini;
 
   int number = ptrIni->ReadInt(probe_exam, "Number");
 
@@ -1136,11 +1131,8 @@ void MeasureSetting::CreateItemListForDeleteMeasureed(string select_name, string
   }
 
   IniFile ini(path);
-  IniFile *ptrIni= &ini;
 
-  const char *probeExam = probe_exam.c_str();
-
-  int number = ptrIni->ReadInt(probeExam, "Number");
+  int number = ini.ReadInt(probe_exam, "Number");
 
   if(number ==0) {
     return;
@@ -1150,7 +1142,7 @@ void MeasureSetting::CreateItemListForDeleteMeasureed(string select_name, string
     char CalcNumber[256];
     sprintf(CalcNumber, "Calc%d", i);
 
-    int item_num = ptrIni->ReadInt(probeExam, CalcNumber);
+    int item_num = ini.ReadInt(probe_exam, CalcNumber);
     string item_name = ItemMenuTransEnglish(item_num);
 
     if(strcmp(select_name.c_str(), _(item_name.c_str()))!=0) {

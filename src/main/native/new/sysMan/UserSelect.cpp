@@ -37,8 +37,8 @@ void UserSelect::create_usercalcdefined_dir() {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s%s", CFG_RES_PATH, CALC_ITEM_FILE);
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -53,8 +53,8 @@ void UserSelect::create_commentdefined_dir() {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s%s", CFG_RES_PATH, COMMENT_PATH);
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -70,8 +70,8 @@ void UserSelect::create_userdefined_dir() {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s%s", CFG_RES_PATH, EXAM_ITEM_FILE);
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -87,8 +87,8 @@ void UserSelect::create_import_tmp_dir() {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s", CALC_TMP_DATA_PATH );
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -102,8 +102,8 @@ void UserSelect::create_udisk_data_dir() {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s", UDISK_DATA_PATH );
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -117,8 +117,8 @@ void UserSelect::create_userconfig_dir() {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s", USERCONFIG_PATH );
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -132,8 +132,8 @@ void UserSelect::create_exportUSB_dir(string name) {
   // make directory if not exist
   char dirpath[256];
   sprintf(dirpath, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", name.c_str());
-  GFile *dir = g_file_new_for_path(dirpath);
-  GError *err_mkdir = NULL;
+  GFile* dir = g_file_new_for_path(dirpath);
+  GError* err_mkdir = NULL;
 
   if(!g_file_make_directory_with_parents(dir, NULL, &err_mkdir)) {
     if(err_mkdir->code!=G_IO_ERROR_EXISTS) {
@@ -145,7 +145,7 @@ void UserSelect::create_exportUSB_dir(string name) {
 
 bool UserSelect::creat_username_db(string db_dbname) {
   if(access(db_dbname.c_str(), F_OK)) {
-    sqlite3 *db = 0;
+    sqlite3* db = 0;
     int max_count = sizeof(listname)/sizeof(listname[0]);
 
     if (sqlite3_open(db_dbname.c_str(), &db) != SQLITE_OK) {
@@ -154,7 +154,7 @@ bool UserSelect::creat_username_db(string db_dbname) {
       return false;
     }
 
-    char *errmsg = NULL;
+    char* errmsg = NULL;
     char buffer[1024*10], buf[1024];
     memset(buffer, 0, sizeof(buffer));
     //create table
@@ -182,7 +182,7 @@ bool UserSelect::creat_username_db(string db_dbname) {
 
 bool UserSelect::read_username_db(string db_dbname, GtkWidget* widget) {
   char buf[1024];
-  sqlite3 *db = 0;
+  sqlite3* db = 0;
   int t = 0;
 
   if (sqlite3_open(db_dbname.c_str(), &db) != SQLITE_OK) {
@@ -190,7 +190,7 @@ bool UserSelect::read_username_db(string db_dbname, GtkWidget* widget) {
     return false;
   }
 
-  sqlite3_stmt *stmt_f1 = NULL;
+  sqlite3_stmt* stmt_f1 = NULL;
   sprintf(buf, "SELECT DISTINCT username FROM userlist;");
 
   if(sqlite3_prepare(db, buf, strlen(buf), &stmt_f1, 0) != SQLITE_OK) {
@@ -200,13 +200,16 @@ bool UserSelect::read_username_db(string db_dbname, GtkWidget* widget) {
 
   int count = 0;
   while(sqlite3_step(stmt_f1) != SQLITE_DONE) {
-    const char *name = (const char *)sqlite3_column_text(stmt_f1, 0);
-    PRINTF("name:%s\n", name);
-    if (strcmp(name, "") == 0) continue;
-    gtk_combo_box_append_text (GTK_COMBO_BOX (widget), name);
+    string name = (char*)sqlite3_column_text(stmt_f1, 0);
+    PRINTF("name:%s\n", name.c_str());
+    if (name.empty()) {
+      continue;
+    }
+
+    gtk_combo_box_append_text(GTK_COMBO_BOX(widget), name.c_str());
     count++;
 
-    if (strcmp(name, cur_username.c_str()) == 0) {
+    if (name == cur_username) {
       save_active_user_id(count);
     }
   }
@@ -218,8 +221,8 @@ bool UserSelect::read_username_db(string db_dbname, GtkWidget* widget) {
 }
 
 bool UserSelect::insert_username_db(string db_dbname, string record) {
-  sqlite3 *db = 0;
-  char *errmsg = NULL;
+  sqlite3* db = 0;
+  char* errmsg = NULL;
   char buf[1024];
 
   if (sqlite3_open(db_dbname.c_str(), &db) != SQLITE_OK) {
@@ -242,8 +245,8 @@ bool UserSelect::insert_username_db(string db_dbname, string record) {
 }
 
 bool UserSelect::delete_username_db(string db_dbname, string record) {
-  sqlite3 *db = 0;
-  char *errmsg = NULL;
+  sqlite3* db = 0;
+  char* errmsg = NULL;
   char buf[1024];
 
   if (sqlite3_open(db_dbname.c_str(), &db) != SQLITE_OK) {
@@ -269,9 +272,9 @@ bool UserSelect::delete_username_db(string db_dbname, string record) {
 
 bool UserSelect::username_unique_db(string db_dbname, string record) {
   bool result = false;
-  sqlite3_stmt *stmt = NULL;
+  sqlite3_stmt* stmt = NULL;
   char buf[1024];
-  sqlite3 *db = 0;
+  sqlite3* db = 0;
 
   if (sqlite3_open(db_dbname.c_str(), &db) != SQLITE_OK) {
     PRINTF("Open Database Error!\n");

@@ -132,7 +132,7 @@ int UpgradeMan::SureToUpgrade() {
   PRINTF("\n%s: Begin to check the file in the list\n", __FUNCTION__);
   int i;
   string value;
-  char *listPath = g_build_path(G_DIR_SEPARATOR_S, UPGRADE_SRC_PATH, UPGRADE_LIST, NULL);
+  char* listPath = g_build_path(G_DIR_SEPARATOR_S, UPGRADE_SRC_PATH, UPGRADE_LIST, NULL);
   if (!g_file_test(listPath, G_FILE_TEST_EXISTS)) {
     g_free(listPath);
 
@@ -160,8 +160,10 @@ int UpgradeMan::SureToUpgrade() {
   }
 
   FileMan fm;
-  char *src, *dest;
-  vector<string> vecSrc, vecDest;
+  char* src;
+  char* dest;
+  vector<string> vecSrc;
+  vector<string> vecDest;
   vecSrc.clear();
   vecDest.clear();
   IniFile ini(listPath);
@@ -245,8 +247,8 @@ int UpgradeMan::UpgradeFile(vector<string> src, vector<string> dest) {
       return E_COPY;
     }
 
-    gchar *basename = g_path_get_basename((*iteDest).c_str());
-    gchar *name2 = g_path_get_basename(UPGRADE_INI_PATH);
+    gchar* basename = g_path_get_basename((*iteDest).c_str());
+    gchar* name2 = g_path_get_basename(UPGRADE_INI_PATH);
 
     if(strcmp(basename, APP_NAME)==0 || strcmp(basename, name2)==0) {
       if (strcmp(basename, name2)==0) {

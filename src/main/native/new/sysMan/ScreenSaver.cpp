@@ -102,7 +102,7 @@ void ScreenSaver::Timer() {
     m_count = 0;
     DrawHintMessage();
   } else {
-    //if(m_count * m_interval == 20) //for test
+    // if(m_count * m_interval == 20) //for test
     if(m_count * m_interval == m_period) {
       // m_timer = 0;
       m_count = 0;
@@ -314,16 +314,16 @@ void ScreenSaver::BlackScreen3() {
 }
 
 void ScreenSaver::DrawHintMessage() {
-  const char *string = N_("Press any key to resume!");
+  string info = N_("Press any key to resume!");
   int screen;
   Colormap colormap;
-  Visual *visual;
-  XftDraw *xftDraw = NULL;
+  Visual* visual;
+  XftDraw* xftDraw = NULL;
   XftColor xftColor;
   XRenderColor renderColor;
-  XftPattern *pattern = NULL;
+  XftPattern* pattern = NULL;
   XftResult result;
-  XftFont *xftFont = NULL;
+  XftFont* xftFont = NULL;
   SysGeneralSetting sysGS;
 
   renderColor.red = 0xFFFF;
@@ -370,8 +370,8 @@ void ScreenSaver::DrawHintMessage() {
   XftDrawStringUtf8 (xftDraw, &xftColor, xftFont,
     i < 100 ? 100 : i,
     j < 50 ? 50 : j,
-    (XftChar8 *)(_(string)), strlen (_(string)));
-  //	PRINTF("random num %d %d\n", i, j);
+    (XftChar8*)info.c_str(), info.size());
+  // PRINTF("random num %d %d\n", i, j);
 
   XFlush(m_dpy);
   XftPatternDestroy(pattern);

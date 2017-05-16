@@ -166,7 +166,7 @@ bool IniFile::SyncConfigFile() {
   GError* error = NULL;
   gsize length = 0;
 
-  gchar *contents = g_key_file_to_data(m_keyfile, &length, NULL);
+  gchar* contents = g_key_file_to_data(m_keyfile, &length, NULL);
 
   if (!g_file_set_contents(m_filename.c_str(), contents, length, &error)) {
     free_error(error);

@@ -1,6 +1,7 @@
 #include "sysMan/DicomLocalSetting.h"
 
 #include <stdlib.h>
+#include <iostream>
 #include <gdk/gdkkeysyms.h>
 #include "utils/MessageDialog.h"
 
@@ -8,6 +9,8 @@
 #include "periDevice/DCMMan.h"
 #include "periDevice/NetworkMan.h"
 #include "sysMan/SysDicomSetting.h"
+
+using namespace std;
 
 DicomLocalSetting* DicomLocalSetting::m_instance = NULL;
 
@@ -153,30 +156,33 @@ void DicomLocalSetting::InitLocalSetting() {
 // ---------------------------------------------------------
 
 void DicomLocalSetting::ButtonClickedSetting(GtkButton* button) {
-  char info[256];
-  const char *local_ip, *local_mask, *local_gateway, *local_ae, *host_port, *host_ae;
+  string local_ip = gtk_entry_get_text(m_entry_network_ip);
+  string local_mask = gtk_entry_get_text(m_entry_network_mask);
+  string local_gateway = gtk_entry_get_text(m_entry_network_gateway);
+  string host_port = gtk_entry_get_text(m_entry_host_port);
+  string host_ae = gtk_entry_get_text(m_entry_host_ae);
 
-  local_ip = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_network_ip));
-  local_mask = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_network_mask));
-  local_gateway = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_network_gateway));
-  host_port = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_host_port));
-  host_ae = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_host_ae));
+  cout << "Setting: "
+    << local_ip << " "
+    << local_mask << " "
+    << local_gateway << " "
+    << host_port << " "
+    << host_ae << endl;
 
-  printf("------Setting:%s %s %s %s %s\n", local_ip,local_mask,local_gateway,host_port,host_ae);
-
-  if (strcmp(local_ip,"")==0 || strcmp(local_mask,"")==0
-    || strcmp(local_gateway,"")==0 || strcmp(host_port,"")==0 || strcmp(host_ae,"")==0) {
+  if (local_ip.empty() || local_mask.empty() || local_gateway.empty() || host_port.empty() || host_ae.empty()) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_ERROR, _("Local information must be not empty!"), NULL);
 
     return ;
   }
 
+  string info;
+
   CNetworkMan localIP;
   if(localIP.SetLocalIP(local_ip, local_gateway, local_mask)) {
     CDCMMan::GetMe()->SetLocalAE(host_ae);
-    CDCMMan::GetMe()->SetLocalPort(atoi(host_port));
-    sprintf(info, _("Sucess to set the local network!"));
+    CDCMMan::GetMe()->SetLocalPort(atoi(host_port.c_str()));
+    info = _("Sucess to set the local network!");
 
     SysDicomSetting sysDicomSetting;
     sysDicomSetting.SetLocalIP(local_ip);
@@ -185,7 +191,7 @@ void DicomLocalSetting::ButtonClickedSetting(GtkButton* button) {
 
     sysDicomSetting.SyncFile();
   } else {
-    sprintf(info, _("Fail to set the local network!"));
+    info = _("Fail to set the local network!");
   }
 
   MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),

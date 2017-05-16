@@ -97,7 +97,7 @@ private:
   // signal
 
   void ButtonClickedOK(GtkButton* button);
-  void ButtonClickedImport(GtkButton *button);
+  void ButtonClickedImport(GtkButton* button);
   void ButtonClickedCancel(GtkButton* button);
   void RootSelectionChanged(GtkTreeSelection* selection);
   void RootSelectionChangedCalc(GtkTreeSelection* selection);

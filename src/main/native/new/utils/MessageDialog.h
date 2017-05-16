@@ -122,11 +122,9 @@ private:
   GtkProgressBar* m_progress_bar;
 };
 
-/*
- *  Used for show info when something is processing, e.g. copying, sending.
- *  It is different from MessageDialog. In the normal case, using MessageDialog
- *  to show info.
- */
+// Used for show info when something is processing, e.g. copying, sending.
+// It is different from MessageDialog. In the normal case, using MessageDialog
+// to show info.
 class MessageHintDialog: public FakeXEvent {
 public:
   static MessageHintDialog* GetInstance();

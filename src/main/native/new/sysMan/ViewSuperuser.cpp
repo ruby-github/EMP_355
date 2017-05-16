@@ -94,12 +94,12 @@ ViewSuperuser::~ViewSuperuser() {
 void ViewSuperuser::CreateWindow() {
   MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
 
-  m_dialog = Utils::create_dialog(NULL, _("超级用户工具"), 480, 640);
+  m_dialog = Utils::create_dialog(NULL, _("超级用户工具"), 480, 360);
 
   GtkButton* button_exit = Utils::add_dialog_button(m_dialog, _("退出"), GTK_RESPONSE_CLOSE, GTK_STOCK_QUIT);
   g_signal_connect(button_exit, "clicked", G_CALLBACK(signal_button_clicked_exit), this);
 
-  GtkTable* table = Utils::create_table(5, 2);
+  GtkTable* table = Utils::create_table(6, 2);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
   GtkFrame* frame_probe = Utils::create_frame(_("探头工具"));
@@ -108,18 +108,18 @@ void ViewSuperuser::CreateWindow() {
   GtkButton* button_monitor2 = Utils::create_button(_("显示器测试 2"));
   GtkLabel* m_label_hint = Utils::create_label("");
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_probe), 0, 2, 0, 2);
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_aperutre), 0, 1, 2, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(button_monitor), 1, 2, 2, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(button_monitor2), 1, 2, 3, 4);
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_hint), 0, 2, 4, 5);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_probe), 0, 2, 0, 3);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_aperutre), 0, 1, 3, 5);
+  gtk_table_attach_defaults(table, GTK_WIDGET(button_monitor), 1, 2, 3, 4);
+  gtk_table_attach_defaults(table, GTK_WIDGET(button_monitor2), 1, 2, 4, 5);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_hint), 0, 2, 5, 6);
 
   g_signal_connect(G_OBJECT(button_monitor), "clicked", G_CALLBACK(signal_button_clicked_monitor), this);
   g_signal_connect(G_OBJECT(button_monitor2), "clicked", G_CALLBACK(signal_button_clicked_monitor2), this);
 
   // 探头工具
   GtkTable* table_probe = Utils::create_table(2, 4);
-  gtk_container_set_border_width(GTK_CONTAINER(table_probe), 5);
+  gtk_container_set_border_width(GTK_CONTAINER(table_probe), 10);
 
   gtk_container_add(GTK_CONTAINER(frame_probe), GTK_WIDGET(table_probe));
 
@@ -167,13 +167,18 @@ void ViewSuperuser::CreateWindow() {
   g_signal_connect(G_OBJECT(button_probe), "clicked", G_CALLBACK(signal_button_clicked_probe_write), this);
 
   // 暗道测试工具
+  GtkTable* table_aperutre = Utils::create_table(1, 1);
+  gtk_container_set_border_width(GTK_CONTAINER(table_aperutre), 10);
+
+  gtk_container_add(GTK_CONTAINER(frame_aperutre), GTK_WIDGET(table_aperutre));
+
   GtkComboBoxText* combobox_aperutre = Utils::create_combobox_text();
-  gtk_container_add(GTK_CONTAINER(frame_aperutre), GTK_WIDGET(combobox_aperutre));
+  gtk_table_attach_defaults(table_aperutre, GTK_WIDGET(combobox_aperutre), 0, 1, 0, 1);
 
   gtk_combo_box_text_append_text(combobox_aperutre, "OFF");
   gtk_combo_box_text_append_text(combobox_aperutre, "ON");
 
-  gtk_combo_box_set_active(GTK_COMBO_BOX(combobox_aperutre), -1);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(combobox_aperutre), 0);
   g_signal_connect(G_OBJECT(combobox_aperutre), "changed", G_CALLBACK(signal_combobox_changed_aperture), this);
 
   gtk_widget_show_all(GTK_WIDGET(m_dialog));
