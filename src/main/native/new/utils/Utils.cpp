@@ -397,11 +397,5 @@ void Utils::test(GtkWidget* widget) {
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
   gtk_widget_show_all(GTK_WIDGET(dialog));
 
-  #ifdef VET
-    cout << "VET" << endl;
-  #else
-    cout << "NO VET" << endl;
-  #endif
-
   //DicomServiceSetting::GetInstance()->CreateDicomWindow(widget);
 }

@@ -48,10 +48,10 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget* parent) {
   m_notebook = Utils::create_notebook();
 
   gtk_notebook_append_page(m_notebook, CreateNoteStorage(), GTK_WIDGET(Utils::create_label(_("Storage"))));
-  //gtk_notebook_append_page(m_notebook, CreateNoteWorklist(), GTK_WIDGET(Utils::create_label(_("Worklist"))));
-  //gtk_notebook_append_page(m_notebook, CreateNoteMpps(), GTK_WIDGET(Utils::create_label(_("MPPS"))));
-  //gtk_notebook_append_page(m_notebook, CreateNoteStorageCommitment(), GTK_WIDGET(Utils::create_label(_("Storage Commitment"))));
-  //gtk_notebook_append_page(m_notebook, CreateNoteQueryRetrieve(), GTK_WIDGET(Utils::create_label(_("Query/Retrieve"))));
+  gtk_notebook_append_page(m_notebook, CreateNoteWorklist(), GTK_WIDGET(Utils::create_label(_("Worklist"))));
+  gtk_notebook_append_page(m_notebook, CreateNoteMpps(), GTK_WIDGET(Utils::create_label(_("MPPS"))));
+  gtk_notebook_append_page(m_notebook, CreateNoteStorageCommitment(), GTK_WIDGET(Utils::create_label(_("Storage Commitment"))));
+  gtk_notebook_append_page(m_notebook, CreateNoteQueryRetrieve(), GTK_WIDGET(Utils::create_label(_("Query/Retrieve"))));
 
   g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
 
@@ -70,31 +70,31 @@ void DicomServiceSetting::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage
   switch(page_num) {
   case 0:
     {
-      InitStorageSetting();
+      //InitStorageSetting();
 
       break;
     }
   case 1:
     {
-      InitWorklistSetting();
+      //InitWorklistSetting();
 
       break;
     }
   case 2:
     {
-      InitMppsSetting();
+      //InitMppsSetting();
 
       break;
     }
   case 3:
     {
-      InitStorageCommitmentSetting();
+      //InitStorageCommitmentSetting();
 
       break;
     }
   case 4:
     {
-      InitQueryRetrieveSetting();
+      //InitQueryRetrieveSetting();
 
       break;
     }
@@ -304,18 +304,14 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
   }
 }
 
-#include <iostream>
-
-using namespace std;
-
 GtkWidget* DicomServiceSetting::CreateNoteStorage() {
-  GtkTable* table = Utils::create_table(9, 5);
+  GtkTable* table = Utils::create_table(9, 7);
 
   GtkFrame* frame_device = Utils::create_frame(_("Device Property"));
   GtkFrame* frame_service = Utils::create_frame(_("Service List"));
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 5, 0, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 5, 3, 8);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 7, 0, 3);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 7, 3, 8);
 
   // Device Property
   GtkTable* table_device = Utils::create_table(2, 7);
@@ -404,6 +400,11 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   GtkLabel* label_frames = Utils::create_label(_("Max number of frames:"));
   m_combobox_storage_frames = Utils::create_combobox_text();
 
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_report), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_frame), 2, 4, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_frames), 4, 6, 8, 9);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_storage_frames), 6, 7, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+
   size_t size = sizeof(frames) / sizeof(frames[0]);
 
   for (int i = 0; i < size; i++) {
@@ -420,13 +421,13 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
 }
 
 GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
-  GtkTable* table = Utils::create_table(9, 5);
+  GtkTable* table = Utils::create_table(9, 7);
 
   GtkFrame* frame_device = Utils::create_frame(_("Device Property"));
   GtkFrame* frame_service = Utils::create_frame(_("Service List"));
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 5, 0, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 5, 3, 8);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 7, 0, 3);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 7, 3, 8);
 
   // Device Property
   GtkTable* table_device = Utils::create_table(2, 7);
@@ -512,19 +513,21 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   // Check Button
   GtkCheckButton* m_checkbutton_worklist_auto = Utils::create_check_button(_("Auto Query"));
 
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_worklist_auto), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+
   g_signal_connect(G_OBJECT(m_checkbutton_worklist_auto), "toggled", G_CALLBACK(signal_checkbutton_toggled_worklist_auto), this);
 
   return GTK_WIDGET(table);
 }
 
 GtkWidget* DicomServiceSetting::CreateNoteMpps() {
-  GtkTable* table = Utils::create_table(9, 5);
+  GtkTable* table = Utils::create_table(9, 7);
 
   GtkFrame* frame_device = Utils::create_frame(_("Device Property"));
   GtkFrame* frame_service = Utils::create_frame(_("Service List"));
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 5, 0, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 5, 3, 8);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 7, 0, 3);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 7, 3, 8);
 
   // Device Property
   GtkTable* table_device = Utils::create_table(2, 7);
@@ -610,19 +613,21 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   // Check Button
   GtkCheckButton* m_checkbutton_mpps_send = Utils::create_check_button(_("Send MPPS after start exam and end exam"));
 
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_mpps_send), 0, 3, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+
   g_signal_connect(G_OBJECT(m_checkbutton_mpps_send), "toggled", G_CALLBACK(signal_checkbutton_toggled_mpps_send), this);
 
   return GTK_WIDGET(table);
 }
 
 GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
-  GtkTable* table = Utils::create_table(9, 5);
+  GtkTable* table = Utils::create_table(9, 7);
 
   GtkFrame* frame_device = Utils::create_frame(_("Device Property"));
   GtkFrame* frame_service = Utils::create_frame(_("Service List"));
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 5, 0, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 5, 3, 8);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 7, 0, 3);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 7, 3, 8);
 
   // Device Property
   GtkTable* table_device = Utils::create_table(2, 7);
@@ -708,19 +713,21 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   // Check Button
   GtkCheckButton* m_checkbutton_storage_commitment_send = Utils::create_check_button(_("Send storage commitment after storage"));
 
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_commitment_send), 0, 3, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+
   g_signal_connect(G_OBJECT(m_checkbutton_storage_commitment_send), "toggled", G_CALLBACK(signal_checkbutton_toggled_storage_commitment_send), this);
 
   return GTK_WIDGET(table);
 }
 
 GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
-  GtkTable* table = Utils::create_table(9, 5);
+  GtkTable* table = Utils::create_table(9, 7);
 
   GtkFrame* frame_device = Utils::create_frame(_("Device Property"));
   GtkFrame* frame_service = Utils::create_frame(_("Service List"));
 
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 5, 0, 3);
-  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 5, 3, 8);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_device), 0, 7, 0, 3);
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_service), 0, 7, 3, 8);
 
   // Device Property
   GtkTable* table_device = Utils::create_table(2, 7);
@@ -822,7 +829,7 @@ void DicomServiceSetting::InitStorageSetting() {
 
   vector<string> vec = CDCMMan::GetMe()->GetAllDevice();
 
-  for(int i = 0; i< vec.size(); i++) {
+  for(int i = 0; i < vec.size(); i++) {
     gtk_combo_box_text_append_text(m_combobox_storage_device, vec[i].c_str());
   }
 
@@ -834,25 +841,25 @@ void DicomServiceSetting::InitStorageSetting() {
 
   switch(frames) {
   case 10:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),0);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 0);
       break;
   case 20:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),1);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 1);
       break;
   case 50:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),2);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 2);
       break;
   case 100:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),3);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 3);
       break;
   case 200:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),4);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 4);
       break;
   case 300:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),6);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 6);
       break;
   default:
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames),0);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_frames), 0);
       break;
   }
 

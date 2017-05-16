@@ -401,59 +401,15 @@ private:
   GtkTreeView* m_treeview_query_retrieve;
 
 private:
-    /*GtkWidget *m_service_notebook;
+  bool show_storage;
+  bool show_worklist;
+  string m_selectedDevice;
 
-    //service
-    GtkWidget *m_combobox_device;
-    GtkWidget *m_entry_name;
-    GtkWidget *m_entry_AE;
-    GtkWidget *m_entry_port;
-    GtkWidget *m_treeview_storage;
-    GtkWidget *m_checkbutton_report;
-    GtkWidget *m_checkbutton_video;
-    GtkWidget *m_combobox_video_frames;
-
-    GtkWidget *m_combobox_worklist_device;
-    GtkWidget *m_entry_worklist_name;
-    GtkWidget *m_entry_worklist_AE;
-    GtkWidget *m_entry_worklist_port;
-    GtkWidget *m_treeview_worklist;
-    GtkWidget *m_checkbutton_auto_query;
-
-    //mpps
-    GtkWidget *m_combobox_mpps_device;
-    GtkWidget *m_entry_mpps_name;
-    GtkWidget *m_entry_mpps_AE;
-    GtkWidget *m_entry_mpps_port;
-    GtkWidget *m_treeview_mpps;
-    GtkWidget *m_checkbutton_mpps;
-
-    GtkWidget *m_combobox_storage_commitment_device;
-    GtkWidget *m_entry_storage_commitment_name;
-    GtkWidget *m_entry_storage_commitment_AE;
-    GtkWidget *m_entry_storage_commitment_port;
-    GtkWidget *m_treeview_storage_commitment;
-    GtkWidget *m_checkbutton_storage_commitment;
-
-    GtkWidget *m_combobox_query_retrieve_device;
-    GtkWidget *m_entry_query_retrieve_name;
-    GtkWidget *m_entry_query_retrieve_AE;
-    GtkWidget *m_entry_query_retrieve_port;
-    GtkWidget *m_treeview_query_retrieve;
-    */
-
-    bool show_storage;
-    bool show_worklist;
-    string m_selectedDevice;
-
-
-    static gboolean StorageConnectTimeout(gpointer data);
-    static gboolean WorklistConnectTimeout(gpointer data);
-    static gboolean MPPSConnectTimeout(gpointer data);
-    static gboolean StorageCommitmentConnectTimeout(gpointer data);
-    static gboolean QueryRetrieveConnectTimeout(gpointer data);
-
-
+  static gboolean StorageConnectTimeout(gpointer data);
+  static gboolean WorklistConnectTimeout(gpointer data);
+  static gboolean MPPSConnectTimeout(gpointer data);
+  static gboolean StorageCommitmentConnectTimeout(gpointer data);
+  static gboolean QueryRetrieveConnectTimeout(gpointer data);
 };
 
 #endif
