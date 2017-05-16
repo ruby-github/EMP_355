@@ -48,10 +48,10 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget* parent) {
   m_notebook = Utils::create_notebook();
 
   gtk_notebook_append_page(m_notebook, CreateNoteStorage(), GTK_WIDGET(Utils::create_label(_("Storage"))));
-  gtk_notebook_append_page(m_notebook, CreateNoteWorklist(), GTK_WIDGET(Utils::create_label(_("Worklist"))));
-  gtk_notebook_append_page(m_notebook, CreateNoteMpps(), GTK_WIDGET(Utils::create_label(_("MPPS"))));
-  gtk_notebook_append_page(m_notebook, CreateNoteStorageCommitment(), GTK_WIDGET(Utils::create_label(_("Storage Commitment"))));
-  gtk_notebook_append_page(m_notebook, CreateNoteQueryRetrieve(), GTK_WIDGET(Utils::create_label(_("Query/Retrieve"))));
+  //gtk_notebook_append_page(m_notebook, CreateNoteWorklist(), GTK_WIDGET(Utils::create_label(_("Worklist"))));
+  //gtk_notebook_append_page(m_notebook, CreateNoteMpps(), GTK_WIDGET(Utils::create_label(_("MPPS"))));
+  //gtk_notebook_append_page(m_notebook, CreateNoteStorageCommitment(), GTK_WIDGET(Utils::create_label(_("Storage Commitment"))));
+  //gtk_notebook_append_page(m_notebook, CreateNoteQueryRetrieve(), GTK_WIDGET(Utils::create_label(_("Query/Retrieve"))));
 
   g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
 
@@ -303,6 +303,10 @@ void DicomServiceSetting::GetSingleServiceAttribute(string device, string servic
     break;
   }
 }
+
+#include <iostream>
+
+using namespace std;
 
 GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   GtkTable* table = Utils::create_table(9, 5);
@@ -823,8 +827,8 @@ void DicomServiceSetting::InitStorageSetting() {
   }
 
   SysDicomSetting sysDicomSetting;
-  gtk_toggle_button_set_active(m_checkbutton_storage_report, sysDicomSetting.GetSendReport());
-  gtk_toggle_button_set_active(m_checkbutton_storage_frame, sysDicomSetting.GetSendVideo());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_storage_report), sysDicomSetting.GetSendReport());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_storage_frame), sysDicomSetting.GetSendVideo());
 
   int frames = sysDicomSetting.GetVideoFrames();
 
@@ -876,7 +880,7 @@ void DicomServiceSetting::InitWorklistSetting() {
   }
 
   SysDicomSetting sysDicomSetting;
-  gtk_toggle_button_set_active(m_checkbutton_worklist_auto, sysDicomSetting.GetAutoQuery());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_worklist_auto), sysDicomSetting.GetAutoQuery());
 
   CDCMMan::GetMe()->GetAllWorklistService(signal_callback_attribute, this);
 }
@@ -902,7 +906,7 @@ void DicomServiceSetting::InitMppsSetting() {
   }
 
   SysDicomSetting sysDicomSetting;
-  gtk_toggle_button_set_active(m_checkbutton_mpps_send, sysDicomSetting.GetMPPS());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_mpps_send), sysDicomSetting.GetMPPS());
 
   CDCMMan::GetMe()->GetAllMPPSService(signal_callback_attribute, this);
 }
@@ -911,7 +915,7 @@ void DicomServiceSetting::InitStorageCommitmentSetting() {
   GtkTreeIter iter;
 
   GtkTreeModel* model = gtk_combo_box_get_model(GTK_COMBO_BOX(m_combobox_storage_commitment_device));
-  boolexist = gtk_tree_model_get_iter_first(model, &iter);
+  bool exist = gtk_tree_model_get_iter_first(model, &iter);
 
   while(exist) {
     char* path_string = gtk_tree_model_get_string_from_iter(model,&iter);
@@ -928,7 +932,7 @@ void DicomServiceSetting::InitStorageCommitmentSetting() {
   }
 
   SysDicomSetting sysDicomSetting;
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_storage_commitment), sysDicomSetting.GetStorageCommitment());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_storage_commitment_send), sysDicomSetting.GetStorageCommitment());
 
   CDCMMan::GetMe()->GetAllStorageCommitService(signal_callback_attribute, this);
 }
@@ -1014,24 +1018,24 @@ GtkTreeModel* DicomServiceSetting::CreateServiceModel() {
 
 
 void DicomServiceSetting::StorageDeviceChanged(GtkComboBox *combobox) {
-    char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_device));
+    char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_storage_device));
     if(device != NULL) {
-        const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
+        const char *serviceName = gtk_entry_get_text(m_entry_storage_service);
         char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0') {
             sprintf(tmp_serviceName,"%s",device);
             strcat(tmp_serviceName,"-");
             strcat(tmp_serviceName,_("Storage"));
         }
-        gtk_entry_set_text(GTK_ENTRY(m_entry_name),tmp_serviceName);
+        gtk_entry_set_text(m_entry_storage_service,tmp_serviceName);
     }
 }
 
 void DicomServiceSetting::ButtonStorageAddClicked(GtkButton *button) {
-    char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_device));
-    const char *ae = gtk_entry_get_text(GTK_ENTRY(m_entry_AE));
-    const char *port = gtk_entry_get_text(GTK_ENTRY(m_entry_port));
-    const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_name));
+    char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_storage_device));
+    const char *ae = gtk_entry_get_text(m_entry_storage_ae);
+    const char *port = gtk_entry_get_text(m_entry_storage_port);
+    const char *serviceName = gtk_entry_get_text(m_entry_storage_service);
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
@@ -1120,10 +1124,10 @@ void DicomServiceSetting::ButtonStorageDeleteClicked(GtkButton *button) {
 }
 
 void DicomServiceSetting::ButtonStorageClearClicked(GtkButton *button) {
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_device),-1);
-    gtk_entry_set_text(GTK_ENTRY(m_entry_AE),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_name),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_port),"");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_device), -1);
+    gtk_entry_set_text(m_entry_storage_ae,"");
+    gtk_entry_set_text(m_entry_storage_service,"");
+    gtk_entry_set_text(m_entry_storage_port,"");
 }
 
 void DicomServiceSetting::ButtonStorageDefaultClicked(GtkButton *button) {
@@ -1233,22 +1237,22 @@ void DicomServiceSetting::BtnComboboxVideoFrames(GtkComboBox *combobox) {
 void DicomServiceSetting::WorklistDeviceChanged(GtkComboBox *combobox) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_worklist_device));
     if(device != NULL) {
-        const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_worklist_name));
+        const char *serviceName = gtk_entry_get_text(m_entry_worklist_service);
         char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0') {
             sprintf(tmp_serviceName,"%s",device);
             strcat(tmp_serviceName,"-");
             strcat(tmp_serviceName,_("Worklist"));
         }
-        gtk_entry_set_text(GTK_ENTRY(m_entry_worklist_name),tmp_serviceName);
+        gtk_entry_set_text(m_entry_worklist_service, tmp_serviceName);
     }
 }
 
 void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_worklist_device));
-    const char *ae = gtk_entry_get_text(GTK_ENTRY(m_entry_worklist_AE));
-    const char *port = gtk_entry_get_text(GTK_ENTRY(m_entry_worklist_port));
-    const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_worklist_name));
+    const char *ae = gtk_entry_get_text(m_entry_worklist_ae);
+    const char *port = gtk_entry_get_text(m_entry_worklist_port);
+    const char *serviceName = gtk_entry_get_text(m_entry_worklist_service);
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
@@ -1322,9 +1326,9 @@ void DicomServiceSetting::ButtonWorkListAddClicked(GtkButton *button) {
 
 void DicomServiceSetting::ButtonWorkListClearClicked(GtkButton *button) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_worklist_device),-1);
-    gtk_entry_set_text(GTK_ENTRY(m_entry_worklist_name),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_worklist_AE),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_worklist_port),"");
+    gtk_entry_set_text(m_entry_worklist_service,"");
+    gtk_entry_set_text(m_entry_worklist_ae,"");
+    gtk_entry_set_text(m_entry_worklist_port,"");
 
 }
 
@@ -1452,22 +1456,22 @@ void DicomServiceSetting::ChkBtnAutoQueryToggled(GtkToggleButton *togglebutton) 
 void DicomServiceSetting::MPPSDeviceChanged(GtkComboBox *combobox) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_mpps_device));
     if(device != NULL) {
-        const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_mpps_name));
+        const char *serviceName = gtk_entry_get_text(m_entry_mpps_service);
         char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0') {
             sprintf(tmp_serviceName,"%s",device);
             strcat(tmp_serviceName,"-");
             strcat(tmp_serviceName,_("MPPS"));
         }
-        gtk_entry_set_text(GTK_ENTRY(m_entry_mpps_name),tmp_serviceName);
+        gtk_entry_set_text(m_entry_mpps_service, tmp_serviceName);
     }
 }
 
 void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_mpps_device));
-    const char *ae = gtk_entry_get_text(GTK_ENTRY(m_entry_mpps_AE));
-    const char *port = gtk_entry_get_text(GTK_ENTRY(m_entry_mpps_port));
-    const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_mpps_name));
+    const char *ae = gtk_entry_get_text(m_entry_mpps_ae);
+    const char *port = gtk_entry_get_text(m_entry_mpps_port);
+    const char *serviceName = gtk_entry_get_text(m_entry_mpps_service);
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
@@ -1539,9 +1543,9 @@ void DicomServiceSetting::ButtonMPPSAddClicked(GtkButton *button) {
 
 void DicomServiceSetting::ButtonMPPSClearClicked(GtkButton *button) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_mpps_device),-1);
-    gtk_entry_set_text(GTK_ENTRY(m_entry_mpps_name),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_mpps_AE),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_mpps_port),"");
+    gtk_entry_set_text(m_entry_mpps_service,"");
+    gtk_entry_set_text(m_entry_mpps_ae,"");
+    gtk_entry_set_text(m_entry_mpps_port,"");
 }
 
 void DicomServiceSetting::ButtonMPPSDeleteClicked(GtkButton *button) {
@@ -1667,22 +1671,22 @@ void DicomServiceSetting::ChkBtnMPPSToggled(GtkToggleButton *togglebutton) {
 void DicomServiceSetting::StorageCommitmentDeviceChanged(GtkComboBox *combobox) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_storage_commitment_device));
     if(device != NULL) {
-        const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_storage_commitment_name));
+        const char *serviceName = gtk_entry_get_text(m_entry_storage_commitment_service);
         char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0') {
             sprintf(tmp_serviceName,"%s",device);
             strcat(tmp_serviceName,"-");
             strcat(tmp_serviceName,_("StorageCommitment"));
         }
-        gtk_entry_set_text(GTK_ENTRY(m_entry_storage_commitment_name),tmp_serviceName);
+        gtk_entry_set_text(m_entry_storage_commitment_service,tmp_serviceName);
     }
 }
 
 void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_storage_commitment_device));
-    const char *ae = gtk_entry_get_text(GTK_ENTRY(m_entry_storage_commitment_AE));
-    const char *port = gtk_entry_get_text(GTK_ENTRY(m_entry_storage_commitment_port));
-    const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_storage_commitment_name));
+    const char *ae = gtk_entry_get_text(m_entry_storage_commitment_ae);
+    const char *port = gtk_entry_get_text(m_entry_storage_commitment_port);
+    const char *serviceName = gtk_entry_get_text(m_entry_storage_commitment_service);
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
@@ -1755,9 +1759,9 @@ void DicomServiceSetting::ButtonStorageCommitmentAddClicked(GtkButton *button) {
 
 void DicomServiceSetting::ButtonStorageCommitmentClearClicked(GtkButton *button) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_storage_commitment_device),-1);
-    gtk_entry_set_text(GTK_ENTRY(m_entry_storage_commitment_name),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_storage_commitment_AE),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_storage_commitment_port),"");
+    gtk_entry_set_text(m_entry_storage_commitment_service,"");
+    gtk_entry_set_text(m_entry_storage_commitment_ae,"");
+    gtk_entry_set_text(m_entry_storage_commitment_port,"");
 }
 
 void DicomServiceSetting::ButtonStorageCommitmentDeleteClicked(GtkButton *button) {
@@ -1880,22 +1884,22 @@ void DicomServiceSetting::ChkBtnStorageCommitmentToggled(GtkToggleButton *toggle
 void DicomServiceSetting::QueryRetrieveDeviceChanged(GtkComboBox *combobox) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_query_retrieve_device));
     if(device != NULL) {
-        const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_query_retrieve_name));
+        const char *serviceName = gtk_entry_get_text(m_entry_query_retrieve_service);
         char tmp_serviceName[256]="\0";
         if(serviceName[0] == '\0') {
             sprintf(tmp_serviceName,"%s",device);
             strcat(tmp_serviceName,"-");
             strcat(tmp_serviceName,_("QueryRetrieve"));
         }
-        gtk_entry_set_text(GTK_ENTRY(m_entry_query_retrieve_name),tmp_serviceName);
+        gtk_entry_set_text(m_entry_query_retrieve_service,tmp_serviceName);
     }
 }
 
 void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button) {
     char *device = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_query_retrieve_device));
-    const char *ae = gtk_entry_get_text(GTK_ENTRY(m_entry_query_retrieve_AE));
-    const char *port = gtk_entry_get_text(GTK_ENTRY(m_entry_query_retrieve_port));
-    const char *serviceName = gtk_entry_get_text(GTK_ENTRY(m_entry_query_retrieve_name));
+    const char *ae = gtk_entry_get_text(m_entry_query_retrieve_ae);
+    const char *port = gtk_entry_get_text(m_entry_query_retrieve_port);
+    const char *serviceName = gtk_entry_get_text(m_entry_query_retrieve_service);
 
     if(ae[0] == '\0' ||port[0] == '\0'||device == NULL) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
@@ -1967,9 +1971,9 @@ void DicomServiceSetting::ButtonQueryRetrieveAddClicked(GtkButton *button) {
 
 void DicomServiceSetting::ButtonQueryRetrieveClearClicked(GtkButton *button) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_query_retrieve_device),-1);
-    gtk_entry_set_text(GTK_ENTRY(m_entry_query_retrieve_name),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_query_retrieve_AE),"");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_query_retrieve_port),"");
+    gtk_entry_set_text(m_entry_query_retrieve_service,"");
+    gtk_entry_set_text(m_entry_query_retrieve_ae,"");
+    gtk_entry_set_text(m_entry_query_retrieve_port,"");
 
 }
 

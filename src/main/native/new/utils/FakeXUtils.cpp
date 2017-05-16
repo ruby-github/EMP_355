@@ -156,1727 +156,837 @@ bool FakeAlphabet(unsigned char key) {
 
   int language = GetLanguage();
 
-  #if defined(EMP_355) || defined(EMP_322)
-    if (language == FR) {
-      switch (key) {
-      case 0x61:  // a
-        {
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
+  if (language == FR) {
+    switch (key) {
+    case 0x61:  // a
+      {
+        doKeyEvent(38, 1);
+        doKeyEvent(38, 0);
 
-          return true;
-        }
-      case 0x41:  // A
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x62:  // b
-        {
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
-
-          return true;
-        }
-      case 0x42:  // B
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x63:  // c
-        {
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
-
-          return true;
-        }
-      case 0x43:  // C
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x64:  // d
-        {
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
-
-          return true;
-        }
-      case 0x44:  // D
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x65:  // e
-        {
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
-
-          return true;
-        }
-      case 0x45:  // E
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x66:  // f
-        {
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
-
-          return true;
-        }
-      case 0x46:  // F
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x67:  // g
-        {
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
-
-          return true;
-        }
-      case 0x47:  // G
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x68:  // h
-        {
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
-
-          return true;
-        }
-      case 0x48:  // H
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x69:  // i
-        {
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
-
-          return true;
-        }
-      case 0x49:  // I
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6A:  // j
-        {
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
-
-          return true;
-        }
-      case 0x4A:  // J
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6B:  // k
-        {
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
-
-          return true;
-        }
-      case 0x4B:  // K
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6C:  // l
-        {
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
-
-          return true;
-        }
-      case 0x4C:  // L
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x4D:  // M
-      case 0x6D:  // m
-        {
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
-
-          return true;
-        }
-      case 0x6E:  // n
-        {
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
-
-          return true;
-        }
-      case 0x4E:  // N
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6F:  // o
-        {
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
-
-          return true;
-        }
-      case 0x4F:  // O
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x70:  // p
-        {
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
-
-          return true;
-        }
-      case 0x50:  // P
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x71:  // q
-        {
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
-
-          return true;
-        }
-      case 0x51:  // Q
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x72:  // r
-        {
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
-
-          return true;
-        }
-      case 0x52:  // R
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x73:  // s
-        {
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
-
-          return true;
-        }
-      case 0x53:  // S
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x74:  // t
-        {
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
-
-          return true;
-        }
-      case 0x54:  // T
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x75:  // u
-        {
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
-
-          return true;
-        }
-      case 0x55:  // U
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x76:  // v
-        {
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
-
-          return true;
-        }
-      case 0x56:  // V
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x77:  // w
-        {
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
-
-          return true;
-        }
-      case 0x57:  // W
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x78:  // x
-        {
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
-
-          return true;
-        }
-      case 0x58:  // X
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x79:  // y
-        {
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
-
-          return true;
-        }
-      case 0x59:  // Y
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x7A:  // z
-        {
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-
-          return true;
-        }
-      case 0x5A:  // Z
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
+        return true;
       }
-    } else {
-      switch (key) {
-      case 0x61:  // a
-        {
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
+    case 0x41:  // A
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(38, 1);
+        doKeyEvent(38, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x41:  // A
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x62:  // b
+      {
+        doKeyEvent(56, 1);
+        doKeyEvent(56, 0);
 
-          return true;
-        }
-      case 0x62:  // b
-        {
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
+        return true;
+      }
+    case 0x42:  // B
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(56, 1);
+        doKeyEvent(56, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x42:  // B
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x63:  // c
+      {
+        doKeyEvent(54, 1);
+        doKeyEvent(54, 0);
 
-          return true;
-        }
-      case 0x63:  // c
-        {
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
+        return true;
+      }
+    case 0x43:  // C
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(54, 1);
+        doKeyEvent(54, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x43:  // C
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x64:  // d
+      {
+        doKeyEvent(40, 1);
+        doKeyEvent(40, 0);
 
-          return true;
-        }
-      case 0x64:  // d
-        {
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
+        return true;
+      }
+    case 0x44:  // D
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(40, 1);
+        doKeyEvent(40, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x44:  // D
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x65:  // e
+      {
+        doKeyEvent(26, 1);
+        doKeyEvent(26, 0);
 
-          return true;
-        }
-      case 0x65:  // e
-        {
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
+        return true;
+      }
+    case 0x45:  // E
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(26, 1);
+        doKeyEvent(26, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x45:  // E
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x66:  // f
+      {
+        doKeyEvent(41, 1);
+        doKeyEvent(41, 0);
 
-          return true;
-        }
-      case 0x66:  // f
-        {
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
+        return true;
+      }
+    case 0x46:  // F
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(41, 1);
+        doKeyEvent(41, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x46:  // F
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x67:  // g
+      {
+        doKeyEvent(42, 1);
+        doKeyEvent(42, 0);
 
-          return true;
-        }
-      case 0x67:  // g
-        {
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
+        return true;
+      }
+    case 0x47:  // G
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(42, 1);
+        doKeyEvent(42, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x47:  // G
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x68:  // h
+      {
+        doKeyEvent(43, 1);
+        doKeyEvent(43, 0);
 
-          return true;
-        }
-      case 0x68:  // h
-        {
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
+        return true;
+      }
+    case 0x48:  // H
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(43, 1);
+        doKeyEvent(43, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x48:  // H
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x69:  // i
+      {
+        doKeyEvent(31, 1);
+        doKeyEvent(31, 0);
 
-          return true;
-        }
-      case 0x69:  // i
-        {
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
+        return true;
+      }
+    case 0x49:  // I
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(31, 1);
+        doKeyEvent(31, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x49:  // I
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6A:  // j
+      {
+        doKeyEvent(44, 1);
+        doKeyEvent(44, 0);
 
-          return true;
-        }
-      case 0x6A:  // j
-        {
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
+        return true;
+      }
+    case 0x4A:  // J
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(44, 1);
+        doKeyEvent(44, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4A:  // J
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6B:  // k
+      {
+        doKeyEvent(45, 1);
+        doKeyEvent(45, 0);
 
-          return true;
-        }
-      case 0x6B:  // k
-        {
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
+        return true;
+      }
+    case 0x4B:  // K
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(45, 1);
+        doKeyEvent(45, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4B:  // K
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6C:  // l
+      {
+        doKeyEvent(46, 1);
+        doKeyEvent(46, 0);
 
-          return true;
-        }
-      case 0x6C:  // l
-        {
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
+        return true;
+      }
+    case 0x4C:  // L
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(46, 1);
+        doKeyEvent(46, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4C:  // L
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x4D:  // M
+    case 0x6D:  // m
+      {
+        doKeyEvent(58, 1);
+        doKeyEvent(58, 0);
 
-          return true;
-        }
-      case 0x6D:  // m
-        {
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
+        return true;
+      }
+    case 0x6E:  // n
+      {
+        doKeyEvent(57, 1);
+        doKeyEvent(57, 0);
 
-          return true;
-        }
-      case 0x4D:  // M
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x4E:  // N
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(57, 1);
+        doKeyEvent(57, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x6E:  // n
-        {
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
+        return true;
+      }
+    case 0x6F:  // o
+      {
+        doKeyEvent(32, 1);
+        doKeyEvent(32, 0);
 
-          return true;
-        }
-      case 0x4E:  // N
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x4F:  // O
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(32, 1);
+        doKeyEvent(32, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x6F:  // o
-        {
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
+        return true;
+      }
+    case 0x70:  // p
+      {
+        doKeyEvent(33, 1);
+        doKeyEvent(33, 0);
 
-          return true;
-        }
-      case 0x4F:  // O
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x50:  // P
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(33, 1);
+        doKeyEvent(33, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x70:  // p
-        {
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
+        return true;
+      }
+    case 0x71:  // q
+      {
+        doKeyEvent(24, 1);
+        doKeyEvent(24, 0);
 
-          return true;
-        }
-      case 0x50:  // P
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x51:  // Q
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(24, 1);
+        doKeyEvent(24, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x71:  // q
-        {
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
+        return true;
+      }
+    case 0x72:  // r
+      {
+        doKeyEvent(27, 1);
+        doKeyEvent(27, 0);
 
-          return true;
-        }
-      case 0x51:  // Q
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x52:  // R
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(27, 1);
+        doKeyEvent(27, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x72:  // r
-        {
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
+        return true;
+      }
+    case 0x73:  // s
+      {
+        doKeyEvent(39, 1);
+        doKeyEvent(39, 0);
 
-          return true;
-        }
-      case 0x52:  // R
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x53:  // S
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(39, 1);
+        doKeyEvent(39, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x73:  // s
-        {
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
+        return true;
+      }
+    case 0x74:  // t
+      {
+        doKeyEvent(28, 1);
+        doKeyEvent(28, 0);
 
-          return true;
-        }
-      case 0x53:  // S
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x54:  // T
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(28, 1);
+        doKeyEvent(28, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x74:  // t
-        {
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
+        return true;
+      }
+    case 0x75:  // u
+      {
+        doKeyEvent(30, 1);
+        doKeyEvent(30, 0);
 
-          return true;
-        }
-      case 0x54:  // T
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x55:  // U
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(30, 1);
+        doKeyEvent(30, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x75:  // u
-        {
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
+        return true;
+      }
+    case 0x76:  // v
+      {
+        doKeyEvent(55, 1);
+        doKeyEvent(55, 0);
 
-          return true;
-        }
-      case 0x55:  // U
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x56:  // V
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(55, 1);
+        doKeyEvent(55, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x76:  // v
-        {
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
+        return true;
+      }
+    case 0x77:  // w
+      {
+        doKeyEvent(25, 1);
+        doKeyEvent(25, 0);
 
-          return true;
-        }
-      case 0x56:  // V
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x57:  // W
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(25, 1);
+        doKeyEvent(25, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x77:  // w
-        {
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
+        return true;
+      }
+    case 0x78:  // x
+      {
+        doKeyEvent(53, 1);
+        doKeyEvent(53, 0);
 
-          return true;
-        }
-      case 0x57:  // W
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x58:  // X
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(53, 1);
+        doKeyEvent(53, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x78:  // x
-        {
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
+        return true;
+      }
+    case 0x79:  // y
+      {
+        doKeyEvent(29, 1);
+        doKeyEvent(29, 0);
 
-          return true;
-        }
-      case 0x58:  // X
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x59:  // Y
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(29, 1);
+        doKeyEvent(29, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x79:  // y
-        {
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
+        return true;
+      }
+    case 0x7A:  // z
+      {
+        doKeyEvent(52, 1);
+        doKeyEvent(52, 0);
 
-          return true;
-        }
-      case 0x59:  // Y
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x5A:  // Z
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(52, 1);
+        doKeyEvent(52, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x7A:  // z
-        {
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-
-          return true;
-        }
-      case 0x5A:  // Z
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
+        return true;
       }
     }
-  #else
-    if (language == FR) {
-      switch (key) {
-      case 0x61:  // a
-        {
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
+  } else {
+    switch (key) {
+    case 0x61:  // a
+      {
+        doKeyEvent(38, 1);
+        doKeyEvent(38, 0);
 
-          return true;
-        }
-      case 0x41:  // A
-      case 0xA1:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x62:  // b
-        {
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
-
-          return true;
-        }
-      case 0x42:  // B
-      case 0xA2:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x63:  // c
-        {
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
-
-          return true;
-        }
-      case 0x43:  // C
-      case 0xA3:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x64:  // d
-        {
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
-
-          return true;
-        }
-      case 0x44:  // D
-      case 0xA4:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x65:  // e
-        {
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
-
-          return true;
-        }
-      case 0x45:  // E
-      case 0xA5:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x66:  // f
-        {
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
-
-          return true;
-        }
-      case 0x46:  // F
-      case 0xA6:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x67:  // g
-        {
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
-
-          return true;
-        }
-      case 0x47:  // G
-      case 0xA7:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x68:  // h
-        {
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
-
-          return true;
-        }
-      case 0x48:  // H
-      case 0xA8:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x69:  // i
-        {
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
-
-          return true;
-        }
-      case 0x49:  // I
-      case 0xB0:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6A:  // j
-        {
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
-
-          return true;
-        }
-      case 0x4A:  // J
-      case 0xB1:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6B:  // k
-        {
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
-
-          return true;
-        }
-      case 0x4B:  // K
-      case 0xB2:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6C:  // l
-        {
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
-
-          return true;
-        }
-      case 0x4C:  // L
-      case 0xB4:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x4D:  // M
-      case 0x6D:  // m
-        {
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
-
-          return true;
-        }
-      case 0xB5:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6E:  // n
-        {
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
-
-          return true;
-        }
-      case 0x4E:  // N
-      case 0xB7:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x6F:  // o
-        {
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
-
-          return true;
-        }
-      case 0x4F:  // O
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x70:  // p
-        {
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
-
-          return true;
-        }
-      case 0x50:  // P
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x71:  // q
-        {
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
-
-          return true;
-        }
-      case 0x51:  // Q
-      case 0xC1:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x72:  // r
-        {
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
-
-          return true;
-        }
-      case 0x52:  // R
-      case 0xC2:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x73:  // s
-        {
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
-
-          return true;
-        }
-      case 0x53:  // S
-      case 0xC3:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x74:  // t
-        {
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
-
-          return true;
-        }
-      case 0x54:  // T
-      case 0xC4:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x75:  // u
-        {
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
-
-          return true;
-        }
-      case 0x55:  // U
-      case 0xC5:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x76:  // v
-        {
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
-
-          return true;
-        }
-      case 0x56:  // V
-      case 0xC6:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x77:  // w
-        {
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
-
-          return true;
-        }
-      case 0x57:  // W
-      case 0xC7:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x78:  // x
-        {
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
-
-          return true;
-        }
-      case 0x58:  // X
-      case 0xC8:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x79:  // y
-        {
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
-
-          return true;
-        }
-      case 0x59:  // Y
-      case 0xC9:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
-      case 0x7A:  // z
-        {
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-
-          return true;
-        }
-      case 0x5A:  // Z
-      case 0xCA:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
+        return true;
       }
-    } else {
-      switch (key) {
-      case 0x61:  // a
-        {
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
+    case 0x41:  // A
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(38, 1);
+        doKeyEvent(38, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x41:  // A
-      case 0xA1:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(38, 1);
-          doKeyEvent(38, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x62:  // b
+      {
+        doKeyEvent(56, 1);
+        doKeyEvent(56, 0);
 
-          return true;
-        }
-      case 0x62:  // b
-        {
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
+        return true;
+      }
+    case 0x42:  // B
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(56, 1);
+        doKeyEvent(56, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x42:  // B
-      case 0xA2:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(56, 1);
-          doKeyEvent(56, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x63:  // c
+      {
+        doKeyEvent(54, 1);
+        doKeyEvent(54, 0);
 
-          return true;
-        }
-      case 0x63:  // c
-        {
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
+        return true;
+      }
+    case 0x43:  // C
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(54, 1);
+        doKeyEvent(54, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x43:  // C
-      case 0xA3:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(54, 1);
-          doKeyEvent(54, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x64:  // d
+      {
+        doKeyEvent(40, 1);
+        doKeyEvent(40, 0);
 
-          return true;
-        }
-      case 0x64:  // d
-        {
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
+        return true;
+      }
+    case 0x44:  // D
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(40, 1);
+        doKeyEvent(40, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x44:  // D
-      case 0xA4:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(40, 1);
-          doKeyEvent(40, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x65:  // e
+      {
+        doKeyEvent(26, 1);
+        doKeyEvent(26, 0);
 
-          return true;
-        }
-      case 0x65:  // e
-        {
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
+        return true;
+      }
+    case 0x45:  // E
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(26, 1);
+        doKeyEvent(26, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x45:  // E
-      case 0xA5:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(26, 1);
-          doKeyEvent(26, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x66:  // f
+      {
+        doKeyEvent(41, 1);
+        doKeyEvent(41, 0);
 
-          return true;
-        }
-      case 0x66:  // f
-        {
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
+        return true;
+      }
+    case 0x46:  // F
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(41, 1);
+        doKeyEvent(41, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x46:  // F
-      case 0xA6:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(41, 1);
-          doKeyEvent(41, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x67:  // g
+      {
+        doKeyEvent(42, 1);
+        doKeyEvent(42, 0);
 
-          return true;
-        }
-      case 0x67:  // g
-        {
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
+        return true;
+      }
+    case 0x47:  // G
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(42, 1);
+        doKeyEvent(42, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x47:  // G
-      case 0xA7:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(42, 1);
-          doKeyEvent(42, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x68:  // h
+      {
+        doKeyEvent(43, 1);
+        doKeyEvent(43, 0);
 
-          return true;
-        }
-      case 0x68:  // h
-        {
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
+        return true;
+      }
+    case 0x48:  // H
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(43, 1);
+        doKeyEvent(43, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x48:  // H
-      case 0xA8:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(43, 1);
-          doKeyEvent(43, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x69:  // i
+      {
+        doKeyEvent(31, 1);
+        doKeyEvent(31, 0);
 
-          return true;
-        }
-      case 0x69:  // i
-        {
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
+        return true;
+      }
+    case 0x49:  // I
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(31, 1);
+        doKeyEvent(31, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x49:  // I
-      case 0xB0:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(31, 1);
-          doKeyEvent(31, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6A:  // j
+      {
+        doKeyEvent(44, 1);
+        doKeyEvent(44, 0);
 
-          return true;
-        }
-      case 0x6A:  // j
-        {
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
+        return true;
+      }
+    case 0x4A:  // J
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(44, 1);
+        doKeyEvent(44, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4A:  // J
-      case 0xB1:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(44, 1);
-          doKeyEvent(44, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6B:  // k
+      {
+        doKeyEvent(45, 1);
+        doKeyEvent(45, 0);
 
-          return true;
-        }
-      case 0x6B:  // k
-        {
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
+        return true;
+      }
+    case 0x4B:  // K
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(45, 1);
+        doKeyEvent(45, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4B:  // K
-      case 0xB2:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(45, 1);
-          doKeyEvent(45, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6C:  // l
+      {
+        doKeyEvent(46, 1);
+        doKeyEvent(46, 0);
 
-          return true;
-        }
-      case 0x6C:  // l
-        {
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
+        return true;
+      }
+    case 0x4C:  // L
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(46, 1);
+        doKeyEvent(46, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4C:  // L
-      case 0xB4:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(46, 1);
-          doKeyEvent(46, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6D:  // m
+      {
+        doKeyEvent(58, 1);
+        doKeyEvent(58, 0);
 
-          return true;
-        }
-      case 0x6D:  // m
-        {
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
+        return true;
+      }
+    case 0x4D:  // M
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(58, 1);
+        doKeyEvent(58, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4D:  // M
-      case 0xB5:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(58, 1);
-          doKeyEvent(58, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6E:  // n
+      {
+        doKeyEvent(57, 1);
+        doKeyEvent(57, 0);
 
-          return true;
-        }
-      case 0x6E:  // n
-        {
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
+        return true;
+      }
+    case 0x4E:  // N
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(57, 1);
+        doKeyEvent(57, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4E:  // N
-      case 0xB7:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(57, 1);
-          doKeyEvent(57, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x6F:  // o
+      {
+        doKeyEvent(32, 1);
+        doKeyEvent(32, 0);
 
-          return true;
-        }
-      case 0x6F:  // o
-        {
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
+        return true;
+      }
+    case 0x4F:  // O
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(32, 1);
+        doKeyEvent(32, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x4F:  // O
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(32, 1);
-          doKeyEvent(32, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x70:  // p
+      {
+        doKeyEvent(33, 1);
+        doKeyEvent(33, 0);
 
-          return true;
-        }
-      case 0x70:  // p
-        {
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
+        return true;
+      }
+    case 0x50:  // P
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(33, 1);
+        doKeyEvent(33, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x50:  // P
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(33, 1);
-          doKeyEvent(33, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x71:  // q
+      {
+        doKeyEvent(24, 1);
+        doKeyEvent(24, 0);
 
-          return true;
-        }
-      case 0x71:  // q
-        {
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
+        return true;
+      }
+    case 0x51:  // Q
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(24, 1);
+        doKeyEvent(24, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x51:  // Q
-      case 0xC1:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(24, 1);
-          doKeyEvent(24, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x72:  // r
+      {
+        doKeyEvent(27, 1);
+        doKeyEvent(27, 0);
 
-          return true;
-        }
-      case 0x72:  // r
-        {
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
+        return true;
+      }
+    case 0x52:  // R
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(27, 1);
+        doKeyEvent(27, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x52:  // R
-      case 0xC2:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(27, 1);
-          doKeyEvent(27, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x73:  // s
+      {
+        doKeyEvent(39, 1);
+        doKeyEvent(39, 0);
 
-          return true;
-        }
-      case 0x73:  // s
-        {
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
+        return true;
+      }
+    case 0x53:  // S
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(39, 1);
+        doKeyEvent(39, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x53:  // S
-      case 0xC3:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(39, 1);
-          doKeyEvent(39, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x74:  // t
+      {
+        doKeyEvent(28, 1);
+        doKeyEvent(28, 0);
 
-          return true;
-        }
-      case 0x74:  // t
-        {
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
+        return true;
+      }
+    case 0x54:  // T
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(28, 1);
+        doKeyEvent(28, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x54:  // T
-      case 0xC4:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(28, 1);
-          doKeyEvent(28, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x75:  // u
+      {
+        doKeyEvent(30, 1);
+        doKeyEvent(30, 0);
 
-          return true;
-        }
-      case 0x75:  // u
-        {
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
+        return true;
+      }
+    case 0x55:  // U
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(30, 1);
+        doKeyEvent(30, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x55:  // U
-      case 0xC5:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(30, 1);
-          doKeyEvent(30, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x76:  // v
+      {
+        doKeyEvent(55, 1);
+        doKeyEvent(55, 0);
 
-          return true;
-        }
-      case 0x76:  // v
-        {
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
+        return true;
+      }
+    case 0x56:  // V
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(55, 1);
+        doKeyEvent(55, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x56:  // V
-      case 0xC6:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(55, 1);
-          doKeyEvent(55, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x77:  // w
+      {
+        doKeyEvent(25, 1);
+        doKeyEvent(25, 0);
 
-          return true;
-        }
-      case 0x77:  // w
-        {
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
+        return true;
+      }
+    case 0x57:  // W
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(25, 1);
+        doKeyEvent(25, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x57:  // W
-      case 0xC7:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(25, 1);
-          doKeyEvent(25, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x78:  // x
+      {
+        doKeyEvent(53, 1);
+        doKeyEvent(53, 0);
 
-          return true;
-        }
-      case 0x78:  // x
-        {
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
+        return true;
+      }
+    case 0x58:  // X
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(53, 1);
+        doKeyEvent(53, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x58:  // X
-      case 0xC8:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(53, 1);
-          doKeyEvent(53, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x79:  // y
+      {
+        doKeyEvent(29, 1);
+        doKeyEvent(29, 0);
 
-          return true;
-        }
-      case 0x79:  // y
-        {
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
+        return true;
+      }
+    case 0x59:  // Y
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(29, 1);
+        doKeyEvent(29, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x59:  // Y
-      case 0xC9:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(29, 1);
-          doKeyEvent(29, 0);
-          doKeyEvent(50, 0);
+        return true;
+      }
+    case 0x7A:  // z
+      {
+        doKeyEvent(52, 1);
+        doKeyEvent(52, 0);
 
-          return true;
-        }
-      case 0x7A:  // z
-        {
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
+        return true;
+      }
+    case 0x5A:  // Z
+      {
+        doKeyEvent(50, 1);
+        doKeyEvent(52, 1);
+        doKeyEvent(52, 0);
+        doKeyEvent(50, 0);
 
-          return true;
-        }
-      case 0x5A:  // Z
-      case 0xCA:  // shift+
-        {
-          doKeyEvent(50, 1);
-          doKeyEvent(52, 1);
-          doKeyEvent(52, 0);
-          doKeyEvent(50, 0);
-
-          return true;
-        }
+        return true;
       }
     }
-  #endif
+  }
 
   return false;
 }
@@ -2344,37 +1454,20 @@ bool FakePunctuation(unsigned char key) {
 
         return true;
       }
-    #if defined(EMP_313)
-      case 0xE7:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
+    case 0xE0:  // page up
+      {
+        doKeyEvent(112, 1);
+        doKeyEvent(112, 0);
 
-          return true;
-        }
-      case 0xE0:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
+        return true;
+      }
+    case 0xE7:  // page down
+      {
+        doKeyEvent(117, 1);
+        doKeyEvent(117, 0);
 
-          return true;
-        }
-    #else
-      case 0xE0:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
-
-          return true;
-        }
-      case 0xE7:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
-
-          return true;
-        }
-    #endif
+        return true;
+      }
     }
   } else if (language == DE) {
     switch (key) {
@@ -2735,37 +1828,20 @@ bool FakePunctuation(unsigned char key) {
 
         return true;
       }
-    #if defined(EMP_313)
-      case 0xE7:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
+    case 0xE0:  // page up
+      {
+        doKeyEvent(112, 1);
+        doKeyEvent(112, 0);
 
-          return true;
-        }
-      case 0xE0:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
+        return true;
+      }
+    case 0xE7:  // page down
+      {
+        doKeyEvent(117, 1);
+        doKeyEvent(117, 0);
 
-          return true;
-        }
-    #else
-      case 0xE0:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
-
-          return true;
-        }
-      case 0xE7:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
-
-          return true;
-        }
-    #endif
+        return true;
+      }
     }
   } else if (language == RU) {
     switch (key) {
@@ -3129,37 +2205,20 @@ bool FakePunctuation(unsigned char key) {
 
         return true;
       }
-    #if defined(EMP_313)
-      case 0xE7:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
+    case 0xE0:  // page up
+      {
+        doKeyEvent(112, 1);
+        doKeyEvent(112, 0);
 
-          return true;
-        }
-      case 0xE0:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
+        return true;
+      }
+    case 0xE7:  // page down
+      {
+        doKeyEvent(117, 1);
+        doKeyEvent(117, 0);
 
-          return true;
-        }
-    #else
-      case 0xE0:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
-
-          return true;
-        }
-      case 0xE7:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
-
-          return true;
-        }
-    #endif
+        return true;
+      }
     }
   } else {
     switch (key) {
@@ -3517,37 +2576,20 @@ bool FakePunctuation(unsigned char key) {
 
         return true;
       }
-    #if defined(EMP_313)
-      case 0xE7:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
+    case 0xE0:  // page up
+      {
+        doKeyEvent(112, 1);
+        doKeyEvent(112, 0);
 
-          return true;
-        }
-      case 0xE0:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
+        return true;
+      }
+    case 0xE7:  // page down
+      {
+        doKeyEvent(117, 1);
+        doKeyEvent(117, 0);
 
-          return true;
-        }
-    #else
-      case 0xE0:  // page up
-        {
-          doKeyEvent(112, 1);
-          doKeyEvent(112, 0);
-
-          return true;
-        }
-      case 0xE7:  // page down
-        {
-          doKeyEvent(117, 1);
-          doKeyEvent(117, 0);
-
-          return true;
-        }
-    #endif
+        return true;
+      }
     }
   }
 

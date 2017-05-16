@@ -8,28 +8,12 @@ FakeXEvent::~FakeXEvent() {
 }
 
 void FakeXEvent::KeyEvent(unsigned char keyvalue) {
-  #if defined(EMP_322)
-    if(keyvalue == KEY_CTRL_SHIFT_SPACE) {
-      KeySwitchIM ksim;
-      ksim.ExcuteChange(TRUE);
+  if(keyvalue == KEY_SHIFT_CTRL) {
+    KeySwitchIM ksim;
+    ksim.ExcuteChange(TRUE);
 
-      return;
-    }
-  #elif defined(EMP_313)
-    if (keyvalue == KEY_ONE) {
-      KeySwitchIM ksim;
-      ksim.ExcuteChange(TRUE);
-
-      return;
-    }
-  #else
-    if(keyvalue == KEY_SHIFT_CTRL) {
-      KeySwitchIM ksim;
-      ksim.ExcuteChange(TRUE);
-
-      return;
-    }
-  #endif
+    return;
+  }
 
   if(FakeMouseButton(keyvalue)) {
     return;

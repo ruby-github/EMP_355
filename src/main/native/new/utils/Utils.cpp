@@ -387,12 +387,21 @@ GdkColor* Utils::get_color(const string color_name) {
 // ---------------------------------------------------------
 
 #include "sysMan/DicomServiceSetting.h"
+#include <iostream>
+
+using namespace std;
 
 void Utils::test(GtkWidget* widget) {
   GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 800, 600);
   GtkWidget* w = DicomServiceSetting::GetInstance()->CreateDicomWindow(widget);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
   gtk_widget_show_all(GTK_WIDGET(dialog));
+
+  #ifdef VET
+    cout << "VET" << endl;
+  #else
+    cout << "NO VET" << endl;
+  #endif
 
   //DicomServiceSetting::GetInstance()->CreateDicomWindow(widget);
 }
