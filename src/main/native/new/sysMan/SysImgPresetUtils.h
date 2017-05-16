@@ -1,5 +1,5 @@
-#ifndef __SYS_IMG_PRESET_H__
-#define __SYS_IMG_PRESET_H__
+#ifndef __SYS_IMG_PRESET_UTILS_H__
+#define __SYS_IMG_PRESET_UTILS_H__
 
 void SetAdultAbdo();
 void SetAdultLiver();
