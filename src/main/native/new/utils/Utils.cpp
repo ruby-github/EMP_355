@@ -397,5 +397,7 @@ void Utils::test(GtkWidget* widget) {
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
   gtk_widget_show_all(GTK_WIDGET(dialog));
 
+  //DicomServiceSetting::GetInstance()->InitServiceSetting();
+
   //DicomServiceSetting::GetInstance()->CreateDicomWindow(widget);
 }

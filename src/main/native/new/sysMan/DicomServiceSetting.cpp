@@ -61,6 +61,10 @@ GtkWidget* DicomServiceSetting::CreateDicomWindow(GtkWidget* parent) {
 }
 
 void DicomServiceSetting::InitServiceSetting() {
+  if (gtk_notebook_get_current_page(m_notebook) == 1) {
+    InitWorklistSetting();
+  }
+
   gtk_notebook_set_current_page(m_notebook, 1);
 }
 
@@ -70,31 +74,31 @@ void DicomServiceSetting::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage
   switch(page_num) {
   case 0:
     {
-      //InitStorageSetting();
+      InitStorageSetting();
 
       break;
     }
   case 1:
     {
-      //InitWorklistSetting();
+      InitWorklistSetting();
 
       break;
     }
   case 2:
     {
-      //InitMppsSetting();
+      InitMppsSetting();
 
       break;
     }
   case 3:
     {
-      //InitStorageCommitmentSetting();
+      InitStorageCommitmentSetting();
 
       break;
     }
   case 4:
     {
-      //InitQueryRetrieveSetting();
+      InitQueryRetrieveSetting();
 
       break;
     }
@@ -395,8 +399,8 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   g_signal_connect(button_connect, "clicked", G_CALLBACK(signal_button_clicked_storage_connect), this);
 
   // Check Button
-  GtkCheckButton* m_checkbutton_storage_report = Utils::create_check_button(_("Attach Structured Report"));
-  GtkCheckButton* m_checkbutton_storage_frame = Utils::create_check_button(_("Allow Multiframe"));
+  m_checkbutton_storage_report = Utils::create_check_button(_("Attach Structured Report"));
+  m_checkbutton_storage_frame = Utils::create_check_button(_("Allow Multiframe"));
   GtkLabel* label_frames = Utils::create_label(_("Max number of frames:"));
   m_combobox_storage_frames = Utils::create_combobox_text();
 
@@ -416,6 +420,8 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   g_signal_connect(G_OBJECT(m_checkbutton_storage_report), "toggled", G_CALLBACK(signal_checkbutton_toggled_report), this);
   g_signal_connect(G_OBJECT(m_checkbutton_storage_frame), "toggled", G_CALLBACK(signal_checkbutton_toggled_frame), this);
   g_signal_connect(G_OBJECT(m_combobox_storage_frames), "changed", G_CALLBACK(signal_combobox_changed_storage_frames), this);
+
+  gtk_widget_show_all(GTK_WIDGET(table));
 
   return GTK_WIDGET(table);
 }
@@ -511,11 +517,13 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   g_signal_connect(button_connect, "clicked", G_CALLBACK(signal_button_clicked_worklist_connect), this);
 
   // Check Button
-  GtkCheckButton* m_checkbutton_worklist_auto = Utils::create_check_button(_("Auto Query"));
+  m_checkbutton_worklist_auto = Utils::create_check_button(_("Auto Query"));
 
   gtk_table_attach(table, GTK_WIDGET(m_checkbutton_worklist_auto), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_checkbutton_worklist_auto), "toggled", G_CALLBACK(signal_checkbutton_toggled_worklist_auto), this);
+
+  gtk_widget_show_all(GTK_WIDGET(table));
 
   return GTK_WIDGET(table);
 }
@@ -611,11 +619,13 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   g_signal_connect(button_connect, "clicked", G_CALLBACK(signal_button_clicked_mpps_connect), this);
 
   // Check Button
-  GtkCheckButton* m_checkbutton_mpps_send = Utils::create_check_button(_("Send MPPS after start exam and end exam"));
+  m_checkbutton_mpps_send = Utils::create_check_button(_("Send MPPS after start exam and end exam"));
 
   gtk_table_attach(table, GTK_WIDGET(m_checkbutton_mpps_send), 0, 3, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_checkbutton_mpps_send), "toggled", G_CALLBACK(signal_checkbutton_toggled_mpps_send), this);
+
+  gtk_widget_show_all(GTK_WIDGET(table));
 
   return GTK_WIDGET(table);
 }
@@ -711,11 +721,13 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   g_signal_connect(button_connect, "clicked", G_CALLBACK(signal_button_clicked_storage_commitment_connect), this);
 
   // Check Button
-  GtkCheckButton* m_checkbutton_storage_commitment_send = Utils::create_check_button(_("Send storage commitment after storage"));
+  m_checkbutton_storage_commitment_send = Utils::create_check_button(_("Send storage commitment after storage"));
 
   gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_commitment_send), 0, 3, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_checkbutton_storage_commitment_send), "toggled", G_CALLBACK(signal_checkbutton_toggled_storage_commitment_send), this);
+
+  gtk_widget_show_all(GTK_WIDGET(table));
 
   return GTK_WIDGET(table);
 }
@@ -809,6 +821,8 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_delete), this);
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_default), this);
   g_signal_connect(button_connect, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_connect), this);
+
+  gtk_widget_show_all(GTK_WIDGET(table));
 
   return GTK_WIDGET(table);
 }
