@@ -8663,7 +8663,7 @@ GtkWidget* ViewSystem::create_note_dicom(void) {
     //create note service
     fixed_service = DicomServiceSetting::GetInstance()->CreateDicomWindow(m_window);
     gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_service);
-    // DicomServiceSetting::GetInstance()->init_service_setting();
+    // DicomServiceSetting::GetInstance()->InitServiceSetting();
 
     label_service = gtk_label_new (_("Service"));
     gtk_widget_show (label_service);
@@ -8684,7 +8684,7 @@ void ViewSystem::DicomnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *pa
         DicomServerSetting::GetInstance()-> InitServerSetting();
         break;
     case 2:
-        DicomServiceSetting::GetInstance()->init_service_setting();
+        DicomServiceSetting::GetInstance()->InitServiceSetting();
         break;
     default:
         break;

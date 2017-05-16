@@ -8,6 +8,7 @@
 #include "keyboard/KeyValueOpr.h"
 #include "patient/FileMan.h"
 #include "periDevice/PeripheralMan.h"
+#include "sysMan/CalcSetting.h"
 #include "sysMan/UserSelect.h"
 #include "sysMan/ViewSystem.h"
 

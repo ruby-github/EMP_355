@@ -30,6 +30,7 @@
 
 #include "patient/CreateBitmap.h"
 #include "keyboard/MultiFuncFactory.h"
+#include "sysMan/CalcSetting.h"
 
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"

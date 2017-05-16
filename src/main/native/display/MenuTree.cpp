@@ -4,6 +4,8 @@
 #include "sysMan/ViewSystem.h"
 #include "utils/FakeXUtils.h"
 
+#include "sysMan/CalcSetting.h"
+
 TreeMenu::TreeMenu(void) : m_showTooltip(true) {
     m_treeView = 0;
 }

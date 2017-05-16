@@ -12,7 +12,6 @@
 #include "sysMan/SysGeneralSetting.h"
 
 #include "ViewMain.h"
-#include "display/gui_func.h"
 
 #if defined(EMP_360)
   string probeName[] = {

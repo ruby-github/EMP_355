@@ -1,13 +1,11 @@
-// -*- c++ -*-
-#ifndef VIEW_SYSTEM_H
-#define VIEW_SYSTEM_H
-#include <gtk/gtk.h>
+#ifndef __VIEW_SYSTEM_H__
+#define __VIEW_SYSTEM_H__
 
 #include "utils/FakeXEvent.h"
-#include <string>
-#include <vector>
+#include "utils/Utils.h"
+
 #include "probe/ExamItem.h"
-#include "sysMan/CalcSetting.h"
+
 #define NUM_KB 10
 #include <sqlite3.h>
 //typedef void (*pSetExamPara)(void);
