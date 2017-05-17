@@ -451,7 +451,8 @@ bool ViewSystem::LocalizationDB(void) {
     OpenDB();
 
     if (sqlite3_prepare(CustomReport_db, sql_f1.c_str(), sql_f1.size(), &stmt_f1, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+          MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
         PRINTF("LocalizationDB 1:%s\n", sqlite3_errmsg(CustomReport_db));
         CloseDB();
         return false;
@@ -464,18 +465,13 @@ bool ViewSystem::LocalizationDB(void) {
 
         if(StrCmpCustomString(f1, &language)) {
             if(language > LANG_MAX) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                  MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
                 sqlite3_finalize(stmt_f1);
                 CloseDB();
                 return false;
             }
-#if 0
-            if(language == init_language) {
-                sqlite3_finalize(stmt_f1);
-                CloseDB();
-                return true;
-            }
-#endif
+
             sections = Customstr[init_language];
         } else {
             sections = f1;
@@ -499,20 +495,14 @@ bool ViewSystem::LocalizationDB(void) {
 
             if(StrCmpTemplet1String(f2, &language)) {
                 if(language > LANG_MAX) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                      MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
                     sqlite3_finalize(stmt_f2);
                     sqlite3_finalize(stmt_f1);
                     CloseDB();
                     return false;
                 }
-#if 0
-                if(language == init_language) {
-                    sqlite3_finalize(stmt_f2);
-                    sqlite3_finalize(stmt_f1);
-                    CloseDB();
-                    return true;
-                }
-#endif
+
                 templet = templet1str[init_language];
             } else {
                 templet = f2;
@@ -544,22 +534,15 @@ bool ViewSystem::LocalizationDB(void) {
                 for(section = 0; section < maxsection; section++) {
                     if(StrCmpSectionString(section, f3, &language)) {
                         if(language > LANG_MAX) {
-                            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+                            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                              MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
                             sqlite3_finalize(stmt_f3);
                             sqlite3_finalize(stmt_f2);
                             sqlite3_finalize(stmt_f1);
                             CloseDB();
                             return false;
                         }
-#if 0
-                        if(language == init_language) {
-                            sqlite3_finalize(stmt_f3);
-                            sqlite3_finalize(stmt_f2);
-                            sqlite3_finalize(stmt_f1);
-                            CloseDB();
-                            return true;
-                        }
-#endif
+
                         childsection = sectionstr[section][init_language];
                         break;
                     }
@@ -574,7 +557,8 @@ bool ViewSystem::LocalizationDB(void) {
                 string sql = stream.str();
 
                 if (sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                      MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
                     PRINTF("SELECT ERROR:%s!\n", sqlite3_errmsg(CustomReport_db));
                     CloseDB();
                     return false;
@@ -623,7 +607,8 @@ bool ViewSystem::LocalizationDB(void) {
 
     sqlite3_close(CustomReport_db_bak);
     if(rename(CustomReport_PATH_BAK, CustomReport_PATH) != 0) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+          MessageDialog::DLG_ERROR, _("Database error!"), NULL);
         PRINTF("rename(%s, %s) error\n", CustomReport_PATH_BAK, CustomReport_PATH);
         return false;
     }
@@ -643,7 +628,8 @@ GtkTreeModel *ViewSystem:: CreateTreeModel(void) {
     string sql = stream.str();
 
     if(sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+          MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
         PRINTF("SELECT ERROR:%s!\n", sqlite3_errmsg(CustomReport_db));
         return false;
     }
@@ -660,7 +646,8 @@ GtkTreeModel *ViewSystem:: CreateTreeModel(void) {
         string sql2 = stream2.str();
 
         if(sqlite3_prepare(CustomReport_db, sql2.c_str(), sql2.size(), &stmt2, 0) != SQLITE_OK) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+              MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
             return false;
         }
         while (sqlite3_step(stmt2) != SQLITE_DONE) {

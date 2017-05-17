@@ -525,10 +525,8 @@ void ConfigToHost::LoadSelectedData() {
 
   // Handle result
   if(!cond) {
-    sprintf(result, _("Success to load data from USB storage."));
-
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-      MessageDialog::DLG_INFO, result, NULL);
+      MessageDialog::DLG_INFO, _("Success to load data from USB storage."), NULL);
 
     ViewSystem::GetInstance()->UpdateUserItem();
   } else {

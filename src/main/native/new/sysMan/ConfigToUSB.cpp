@@ -238,9 +238,8 @@ void ConfigToUSB::LoadSelectedData() {
 
   // Handle result
   if(!cond) {
-    sprintf(result, _("Success to export to USB storage."));
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-      MessageDialog::DLG_INFO, result, NULL);
+      MessageDialog::DLG_INFO, _("Success to export to USB storage."), NULL);
   } else {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, result, NULL);

@@ -1181,10 +1181,8 @@ void CalcSetting::ButtonClickedBackAll(GtkButton* button) {
 
 void CalcSetting::ButtonClickedAdd(GtkButton* button) {
   if(g_menuCalc.IsFlagExist()) {
-    const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
-
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-      MessageDialog::DLG_QUESTION, _(info), signal_callback_add);
+      MessageDialog::DLG_QUESTION, _("Clicking OK will clear calculated value, whether to cotunue?"), signal_callback_add);
   } else {
     AddItem();
   }
@@ -1192,10 +1190,8 @@ void CalcSetting::ButtonClickedAdd(GtkButton* button) {
 
 void CalcSetting::ButtonClickedDelete(GtkButton* button) {
   if(g_menuCalc.IsFlagExist()) {
-    const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
-
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-      MessageDialog::DLG_QUESTION, _(info), signal_callback_delete);
+      MessageDialog::DLG_QUESTION, _("Clicking OK will clear calculated value, whether to cotunue?"), signal_callback_delete);
   } else {
       DeleteItem();
   }
@@ -1408,10 +1404,8 @@ void CalcSetting::ButtonClickedImport(GtkButton* button) {
 
 void CalcSetting::ButtonClickedDefault(GtkButton* button) {
   if(g_menuCalc.IsFlagExist()) {
-    const char* info = N_("Clicking OK will clear calculated value, whether to cotunue?");
-
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-      MessageDialog::DLG_QUESTION, _(info), signal_callback_default);
+      MessageDialog::DLG_QUESTION, _("Clicking OK will clear calculated value, whether to cotunue?"), signal_callback_default);
   } else {
     UpdateAll();
   }

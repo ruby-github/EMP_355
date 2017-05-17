@@ -349,7 +349,7 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
         gtk_tree_path_free (path_scroll);
 
         MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-          MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
+          MessageDialog::DLG_INFO, _("Item has existed. Please select item again!"), NULL);
 
         return;
       }
@@ -359,8 +359,7 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
   char path[256];
   sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path);
-  string username;
-  username = exam.ReadDefaultUserSelect(&ini1);
+  string username = exam.ReadDefaultUserSelect(&ini1);
   char path1[256];
 
   if(strcmp(username.c_str(), "System Default") == 0) {

@@ -165,7 +165,7 @@ void DicomServerSetting::ButtonClickedAdd(GtkButton* button) {
     if((strcmp(device,device_tmp)==0)||(strcmp(ip,ip_tmp)==0)) {
       PRINTF("------add failed\n");
       MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-        MessageDialog::DLG_INFO, _("Add failed,device or IP has been existed\n"), NULL);
+        MessageDialog::DLG_INFO, _("Add failed,device or IP has been existed"), NULL);
 
       return;
     }
@@ -173,7 +173,7 @@ void DicomServerSetting::ButtonClickedAdd(GtkButton* button) {
 
   if(!CDCMMan::GetMe()->AddServer(device,ip)) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
-      MessageDialog::DLG_INFO, _("Add failed,device or IP has been existed\n"), NULL);
+      MessageDialog::DLG_INFO, _("Add failed,device or IP has been existed"), NULL);
 
     return;
   }
