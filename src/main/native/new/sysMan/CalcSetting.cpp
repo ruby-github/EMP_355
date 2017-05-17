@@ -438,16 +438,16 @@ void CalcSetting::ChangeModel2() {
 }
 
 string CalcSetting::GetExamName() {
-  if (m_combobox_exam_type != NULL) {
-    return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    return gtk_combo_box_text_get_active_text(m_combobox_exam_type);
   } else {
     return "";
   }
 }
 
 string CalcSetting::GetDepartmentName() {
-  if (m_combobox_department != NULL) {
-    return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department));
+  if (m_combobox_department != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department)) >= 0) {
+    return gtk_combo_box_text_get_active_text(m_combobox_department);
   } else {
     return "";
   }
@@ -772,14 +772,19 @@ void CalcSetting::ComboBoxChangedExamType(GtkComboBox* combobox) {
   ChangeModel2();
 
   // update measur sequence
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
-  if(!exam_type_name) {
+  string exam_type_name;
+
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   int sequence = GetSequence(exam_type);
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
 }
@@ -790,15 +795,19 @@ void CalcSetting::ComboBoxChangedDepartment(GtkComboBox* combobox) {
 }
 
 void CalcSetting::ComboBoxChangedSequence(GtkComboBox* combobox) {
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
 
-  if(!exam_type_name) {
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
 
   int number = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sequence));
 
@@ -836,15 +845,20 @@ void CalcSetting::ButtonClickedSelectOne(GtkButton* button) {
 
   char* select_name;
   gtk_tree_model_get(model, &iter, 0, &select_name, -1);
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
 
-  if(!exam_type_name) {
+  string exam_type_name;
+
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   vector<string> vecItem_Calc;
   vecItem_Calc.clear();
   CreateItemList_Calc1(exam_type, vecItem_Calc);
@@ -929,9 +943,13 @@ void CalcSetting::ButtonClickedSelectOne(GtkButton* button) {
 }
 
 void CalcSetting::ButtonClickedSelectAll(GtkButton* button) {
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
 
-  if(!exam_type_name) {
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return;
   }
 
@@ -944,7 +962,7 @@ void CalcSetting::ButtonClickedSelectAll(GtkButton* button) {
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   char path11[256];
   sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini11(path11);
@@ -970,13 +988,18 @@ void CalcSetting::ButtonClickedSelectAll(GtkButton* button) {
   int select_length(0);
   select_length = vecSelect_Calc.size();
 
-  gchar* department= gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department));
+  string department;
+
+  if (m_combobox_department != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department)) >= 0) {
+    department = gtk_combo_box_text_get_active_text(m_combobox_department);
+  }
+
   char department_name[50];
 
   size_t size = sizeof(SECTIONS) / sizeof(SECTIONS[0]);
 
   for(int i=0; i<size; i++) {
-    if(strcmp(department, _(SECTIONS[i].c_str()))==0) {
+    if(strcmp(department.c_str(), _(SECTIONS[i].c_str()))==0) {
       strcpy(department_name, SECTIONS[i].c_str());
       break;
     }
@@ -1050,15 +1073,19 @@ void CalcSetting::ButtonClickedBackOne(GtkButton* button) {
   char* select_name;
   gtk_tree_model_get(model, &iter, 0, &select_name, -1);
 
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
 
-  if(!exam_type_name) {
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   char path11[256];
   sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path11);
@@ -1112,15 +1139,19 @@ void CalcSetting::ButtonClickedBackOne(GtkButton* button) {
 }
 
 void CalcSetting::ButtonClickedBackAll(GtkButton* button) {
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
 
-  if(!exam_type_name) {
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   char path[256];
   sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path);
@@ -1198,10 +1229,15 @@ void CalcSetting::ButtonClickedUp(GtkButton* button) {
     return;
   }
 
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
+
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
 
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
@@ -1282,10 +1318,15 @@ void CalcSetting::ButtonClickedDown(GtkButton* button) {
   char* path_string = gtk_tree_path_to_string(path);
   int path_num = atoi(path_string);
 
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
+
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
   CreateItemList_Calc2(exam_type, vecDelete_Calc);
@@ -1427,12 +1468,17 @@ void CalcSetting::DeleteItem() {
   string username;
   username = exam.ReadDefaultUserSelect(&ini1);
 
-  const gchar* department_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department));
+  string department_name;
+
+  if (m_combobox_department != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department)) >= 0) {
+    department_name = gtk_combo_box_text_get_active_text(m_combobox_department);
+  }
+
   char department[50];
   size_t size = sizeof(SECTIONS) / sizeof(SECTIONS[0]);
 
   for(int i=0; i<size; i++) {
-    if(strcmp(department_name, _(SECTIONS[i].c_str()))==0) {
+    if(strcmp(department_name.c_str(), _(SECTIONS[i].c_str()))==0) {
       strcpy(department, SECTIONS[i].c_str());
       break;
     }
@@ -1596,15 +1642,19 @@ void CalcSetting::AddColumnsCalc1(GtkTreeView* treeview) {
 }
 
 GtkTreeModel* CalcSetting::CreateItemCalcModel1() {
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
 
-  if(!exam_type_name) {
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return NULL;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
   int sequence = GetSequence(exam_type);
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
 
@@ -1630,9 +1680,13 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel1() {
 }
 
 GtkTreeModel* CalcSetting::CreateItemCalcModel2() {
-  gchar* department_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_department));
+  string department_name;
 
-  if(department_name== NULL) {
+  if (m_combobox_department != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department)) >= 0) {
+    department_name = gtk_combo_box_text_get_active_text(m_combobox_department);
+  }
+
+  if (department_name.empty()) {
     return NULL;
   }
 
@@ -1641,7 +1695,7 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel2() {
   size_t size = sizeof(SECTIONS) / sizeof(SECTIONS[0]);
 
   for(int i=0; i<size; i++) {
-    if(strcmp(department_name, _(SECTIONS[i].c_str()))==0) {
+    if(strcmp(department_name.c_str(), _(SECTIONS[i].c_str()))==0) {
       strcpy(department, SECTIONS[i].c_str());
       break;
     }
@@ -1653,15 +1707,19 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel2() {
   int item_size(0);
   item_size = vecItemCalc.size();
 
-  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_type));
+  string exam_type_name;
 
-  if(!exam_type_name) {
+  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
+    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
+  }
+
+  if(exam_type_name.empty()) {
     return NULL;
   }
 
   char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name, exam_type);
+  exam.TransItemName(exam_type_name.c_str(), exam_type);
 
   vector<string> vecItemCalc1;
   vecItemCalc1.clear();
@@ -2541,13 +2599,19 @@ void CustomCalc::ButtonClickedOK(GtkButton* button) {
   }
 
   int type_method_index = 0;
-  gchar* method_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_method));
-  printf("method_name = %s\n", method_name);
+
+  string method_name;
+
+  if (m_combobox_method != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_method)) >= 0) {
+    method_name = gtk_combo_box_text_get_active_text(m_combobox_method);
+  }
+
+  printf("method_name = %s\n", method_name.c_str());
 
   size_t size = sizeof(CUSTOM_TYPES) / sizeof(CUSTOM_TYPES[0]);
 
   for(int i=0; i<size; i++) {
-    if(strcmp(_(method_name), CUSTOM_TYPES[i].name.c_str()) == 0) {
+    if(strcmp(method_name.c_str(), CUSTOM_TYPES[i].name.c_str()) == 0) {
       type_method_index = CUSTOM_TYPES[i].etype;
       break;
     }
