@@ -40,55 +40,55 @@ private:
   // storage
   static void signal_combobox_changed_storage_device(GtkComboBox* combobox, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->StorageDeviceChanged(combobox);
+      data->ComboBoxChangedDeviceStorage(combobox);
     }
   }
 
   static void signal_button_clicked_storage_add(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageAddClicked(button);
+      data->ButtonClickedAddStorage(button);
     }
   }
 
   static void signal_button_clicked_storage_clear(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageClearClicked(button);
+      data->ButtonClickedClearStorage(button);
     }
   }
 
   static void signal_button_clicked_storage_delete(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageDeleteClicked(button);
+      data->ButtonClickedDeleteStorage(button);
     }
   }
 
   static void signal_button_clicked_storage_default(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageDefaultClicked(button);
+      data->ButtonClickedDefaultStorage(button);
     }
   }
 
   static void signal_button_clicked_storage_connect(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageConnectClicked(button);
+      data->ButtonClickedConnectStorage(button);
     }
   }
 
   static void signal_checkbutton_toggled_report(GtkToggleButton* togglebutton, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ChkBtnSendReportToggled(togglebutton);
+      data->CheckButtonToggledReportStorage(togglebutton);
     }
   }
 
   static void signal_checkbutton_toggled_frame(GtkToggleButton* togglebutton, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ChkBtnSendVideoToggled(togglebutton);
+      data->CheckButtonToggledFrameStorage(togglebutton);
     }
   }
 
   static void signal_combobox_changed_storage_frames(GtkComboBox* combobox, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->BtnComboboxVideoFrames(combobox);
+      data->ComboBoxChangedFramesStorage(combobox);
     }
   }
 
@@ -96,42 +96,42 @@ private:
 
   static void signal_combobox_changed_worklist_device(GtkComboBox* combobox, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->WorklistDeviceChanged(combobox);
+      data->ComboBoxChangedDeviceWorklist(combobox);
     }
   }
 
   static void signal_button_clicked_worklist_add(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonWorkListAddClicked(button);
+      data->ButtonClickedAddWorklist(button);
     }
   }
 
   static void signal_button_clicked_worklist_clear(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonWorkListClearClicked(button);
+      data->ButtonClickedClearWorklist(button);
     }
   }
 
   static void signal_button_clicked_worklist_delete(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL)
-        data->ButtonWorkListDeleteClicked(button);
+        data->ButtonClickedDeleteWorklist(button);
   }
 
   static void signal_button_clicked_worklist_default(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonWorkListDefaultClicked(button);
+      data->ButtonClickedDefaultWorklist(button);
     }
   }
 
   static void signal_button_clicked_worklist_connect(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonWorkListConnectClicked(button);
+      data->ButtonClickedConnectWorklist(button);
     }
   }
 
   static void signal_checkbutton_toggled_worklist_auto(GtkToggleButton* togglebutton, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ChkBtnAutoQueryToggled(togglebutton);
+      data->CheckButtonToggledAutoWorklist(togglebutton);
     }
   }
 
@@ -139,43 +139,43 @@ private:
 
   static void signal_combobox_changed_mpps_device(GtkComboBox* combobox, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->MPPSDeviceChanged(combobox);
+      data->ComboBoxChangedDeviceMpps(combobox);
     }
   }
 
   static void signal_button_clicked_mpps_add(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonMPPSAddClicked(button);
+      data->ButtonClickedAddMpps(button);
     }
   }
 
   static void signal_button_clicked_mpps_clear(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonMPPSClearClicked(button);
+      data->ButtonClickedClearMpps(button);
     }
   }
 
   static void signal_button_clicked_mpps_delete(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonMPPSDeleteClicked(button);
+      data->ButtonClickedDeleteMpps(button);
     }
   }
 
   static void signal_button_clicked_mpps_default(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonMPPSDefaultClicked(button);
+      data->ButtonClickedDefaultMpps(button);
     }
   }
 
   static void signal_button_clicked_mpps_connect(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonMPPSConnectClicked(button);
+      data->ButtonClickedConnectMpps(button);
     }
   }
 
   static void signal_checkbutton_toggled_mpps_send(GtkToggleButton* togglebutton, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ChkBtnMPPSToggled(togglebutton);
+      data->CheckButtonToggledSendMpps(togglebutton);
     }
   }
 
@@ -183,43 +183,43 @@ private:
 
   static void signal_combobox_changed_storage_commitment_device(GtkComboBox* combobox,DicomServiceSetting* data) {
     if (data != NULL) {
-      data->StorageCommitmentDeviceChanged(combobox);
+      data->ComboBoxChangedDeviceStorageCommitment(combobox);
     }
   }
 
   static void signal_button_clicked_storage_commitment_add(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageCommitmentAddClicked(button);
+      data->ButtonClickedAddStorageCommitment(button);
     }
   }
 
   static void signal_button_clicked_storage_commitment_clear(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageCommitmentClearClicked(button);
+      data->ButtonClickedClearStorageCommitment(button);
     }
   }
 
   static void signal_button_clicked_storage_commitment_delete(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageCommitmentDeleteClicked(button);
+      data->ButtonClickedDeleteStorageCommitment(button);
     }
   }
 
   static void signal_button_clicked_storage_commitment_default(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageCommitmentDefaultClicked(button);
+      data->ButtonClickedDefaultStorageCommitment(button);
     }
   }
 
   static void signal_button_clicked_storage_commitment_connect(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonStorageCommitmentConnectClicked(button);
+      data->ButtonClickedConnectStorageCommitment(button);
     }
   }
 
   static void signal_checkbutton_toggled_storage_commitment_send(GtkToggleButton* togglebutton, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ChkBtnStorageCommitmentToggled(togglebutton);
+      data->CheckButtonToggledSendStorageCommitment(togglebutton);
     }
   }
 
@@ -227,45 +227,97 @@ private:
 
   static void signal_combobox_changed_query_retrieve_device(GtkComboBox* combobox, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->QueryRetrieveDeviceChanged(combobox);
+      data->ComboBoxChangedDeviceQueryRetrieve(combobox);
       }
   }
 
   static void signal_button_clicked_query_retrieve_add(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonQueryRetrieveAddClicked(button);
+      data->ButtonClickedAddQueryRetrieve(button);
     }
   }
 
   static void signal_button_clicked_query_retrieve_clear(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonQueryRetrieveClearClicked(button);
+      data->ButtonClickedClearQueryRetrieve(button);
     }
   }
 
   static void signal_button_clicked_query_retrieve_delete(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonQueryRetrieveDeleteClicked(button);
+      data->ButtonClickedDeleteQueryRetrieve(button);
     }
   }
 
   static void signal_button_clicked_query_retrieve_default(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonQueryRetrieveDefaultClicked(button);
+      data->ButtonClickedDefaultQueryRetrieve(button);
     }
   }
 
   static void signal_button_clicked_query_retrieve_connect(GtkButton* button, DicomServiceSetting* data) {
     if (data != NULL) {
-      data->ButtonQueryRetrieveConnectClicked(button);
+      data->ButtonClickedConnectQueryRetrieve(button);
     }
   }
 
-  static void signal_callback_attribute(string device, string serviceName, string aeTitle, int port, bool isDefault, void* data) {
+  // timeout
+
+  static gboolean signal_callback_timeout_connect_storage(gpointer data) {
     DicomServiceSetting* setting = (DicomServiceSetting*)data;
 
     if (setting != NULL) {
-      setting->GetSingleServiceAttribute(device, serviceName, aeTitle, port, isDefault);
+      setting->TimeoutConnectStorage();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_timeout_connect_worklist(gpointer data) {
+    DicomServiceSetting* setting = (DicomServiceSetting*)data;
+
+    if (setting != NULL) {
+      setting->TimeoutConnectWorklist();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_timeout_connect_mpps(gpointer data) {
+    DicomServiceSetting* setting = (DicomServiceSetting*)data;
+
+    if (setting != NULL) {
+      setting->TimeoutConnectMpps();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_timeout_connect_storage_commitment(gpointer data) {
+    DicomServiceSetting* setting = (DicomServiceSetting*)data;
+
+    if (setting != NULL) {
+      setting->TimeoutConnectStorageCommitment();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_timeout_connect_query_retrieve(gpointer data) {
+    DicomServiceSetting* setting = (DicomServiceSetting*)data;
+
+    if (setting != NULL) {
+      setting->TimeoutConnectQueryRetrieve();
+    }
+
+    return FALSE;
+  }
+
+  static void signal_callback_get_service_attribute(string device, string serviceName, string aeTitle, int port, bool isDefault, void* data) {
+    DicomServiceSetting* setting = (DicomServiceSetting*)data;
+
+    if (setting != NULL) {
+      setting->GetServiceAttribute(device, serviceName, aeTitle, port, isDefault);
     }
   }
 
@@ -276,60 +328,68 @@ private:
 
   // storage
 
-  void BtnComboboxVideoFrames(GtkComboBox* combobox);
-  void ButtonStorageAddClicked(GtkButton* button);
-  void ButtonStorageClearClicked(GtkButton* button);
-  void ButtonStorageDeleteClicked(GtkButton* button);
-  void ButtonStorageDefaultClicked(GtkButton* button);
-  void ButtonStorageConnectClicked(GtkButton* button);
+  void ComboBoxChangedDeviceStorage(GtkComboBox* combobox);
+  void ButtonClickedAddStorage(GtkButton* button);
+  void ButtonClickedClearStorage(GtkButton* button);
+  void ButtonClickedDeleteStorage(GtkButton* button);
+  void ButtonClickedDefaultStorage(GtkButton* button);
+  void ButtonClickedConnectStorage(GtkButton* button);
 
-  void ChkBtnSendReportToggled(GtkToggleButton* togglebutton);
-  void ChkBtnSendVideoToggled(GtkToggleButton* togglebutton);
-  void StorageDeviceChanged(GtkComboBox* combobox);
+  void CheckButtonToggledReportStorage(GtkToggleButton* togglebutton);
+  void CheckButtonToggledFrameStorage(GtkToggleButton* togglebutton);
+  void ComboBoxChangedFramesStorage(GtkComboBox* combobox);
 
   // worklist
 
-  void WorklistDeviceChanged(GtkComboBox* combobox);
-  void ButtonWorkListAddClicked(GtkButton* button);
-  void ButtonWorkListClearClicked(GtkButton* button);
-  void ButtonWorkListDeleteClicked(GtkButton* button);
-  void ButtonWorkListDefaultClicked(GtkButton* button);
-  void ButtonWorkListConnectClicked(GtkButton* button);
+  void ComboBoxChangedDeviceWorklist(GtkComboBox* combobox);
+  void ButtonClickedAddWorklist(GtkButton* button);
+  void ButtonClickedClearWorklist(GtkButton* button);
+  void ButtonClickedDeleteWorklist(GtkButton* button);
+  void ButtonClickedDefaultWorklist(GtkButton* button);
+  void ButtonClickedConnectWorklist(GtkButton* button);
 
-  void ChkBtnAutoQueryToggled(GtkToggleButton* togglebutton);
+  void CheckButtonToggledAutoWorklist(GtkToggleButton* togglebutton);
 
   // mpps
 
-  void MPPSDeviceChanged(GtkComboBox* combobox);
-  void ButtonMPPSAddClicked(GtkButton* button);
-  void ButtonMPPSClearClicked(GtkButton* button);
-  void ButtonMPPSDeleteClicked(GtkButton* button);
-  void ButtonMPPSDefaultClicked(GtkButton* button);
-  void ButtonMPPSConnectClicked(GtkButton* button);
+  void ComboBoxChangedDeviceMpps(GtkComboBox* combobox);
+  void ButtonClickedAddMpps(GtkButton* button);
+  void ButtonClickedClearMpps(GtkButton* button);
+  void ButtonClickedDeleteMpps(GtkButton* button);
+  void ButtonClickedDefaultMpps(GtkButton* button);
+  void ButtonClickedConnectMpps(GtkButton* button);
 
-  void ChkBtnMPPSToggled(GtkToggleButton* togglebutton);
+  void CheckButtonToggledSendMpps(GtkToggleButton* togglebutton);
 
   // storage commitment
 
-  void StorageCommitmentDeviceChanged(GtkComboBox* combobox);
-  void ButtonStorageCommitmentAddClicked(GtkButton* button);
-  void ButtonStorageCommitmentClearClicked(GtkButton* button);
-  void ButtonStorageCommitmentDeleteClicked(GtkButton* button);
-  void ButtonStorageCommitmentDefaultClicked(GtkButton* button);
-  void ButtonStorageCommitmentConnectClicked(GtkButton* button);
+  void ComboBoxChangedDeviceStorageCommitment(GtkComboBox* combobox);
+  void ButtonClickedAddStorageCommitment(GtkButton* button);
+  void ButtonClickedClearStorageCommitment(GtkButton* button);
+  void ButtonClickedDeleteStorageCommitment(GtkButton* button);
+  void ButtonClickedDefaultStorageCommitment(GtkButton* button);
+  void ButtonClickedConnectStorageCommitment(GtkButton* button);
 
-  void ChkBtnStorageCommitmentToggled(GtkToggleButton* togglebutton);
+  void CheckButtonToggledSendStorageCommitment(GtkToggleButton* togglebutton);
 
   // query/retrieve
 
-  void QueryRetrieveDeviceChanged(GtkComboBox* combobox);
-  void ButtonQueryRetrieveAddClicked(GtkButton* button);
-  void ButtonQueryRetrieveClearClicked(GtkButton* button);
-  void ButtonQueryRetrieveDeleteClicked(GtkButton* button);
-  void ButtonQueryRetrieveDefaultClicked(GtkButton* button);
-  void ButtonQueryRetrieveConnectClicked(GtkButton* button);
+  void ComboBoxChangedDeviceQueryRetrieve(GtkComboBox* combobox);
+  void ButtonClickedAddQueryRetrieve(GtkButton* button);
+  void ButtonClickedClearQueryRetrieve(GtkButton* button);
+  void ButtonClickedDeleteQueryRetrieve(GtkButton* button);
+  void ButtonClickedDefaultQueryRetrieve(GtkButton* button);
+  void ButtonClickedConnectQueryRetrieve(GtkButton* button);
 
-  void GetSingleServiceAttribute(string device, string serviceName, string aeTitle, int port, bool isDefault);
+  // timeout
+
+  void TimeoutConnectStorage();
+  void TimeoutConnectWorklist();
+  void TimeoutConnectMpps();
+  void TimeoutConnectStorageCommitment();
+  void TimeoutConnectQueryRetrieve();
+
+  void GetServiceAttribute(string device, string serviceName, string aeTitle, int port, bool isDefault);
 
 private:
   DicomServiceSetting();
@@ -353,6 +413,7 @@ private:
   static DicomServiceSetting* m_instance;
 
 private:
+  GtkWidget* m_parent;
   GtkNotebook* m_notebook;
 
   // storage
@@ -400,16 +461,7 @@ private:
   GtkEntry* m_entry_query_retrieve_port;
   GtkTreeView* m_treeview_query_retrieve;
 
-private:
-  bool show_storage;
-  bool show_worklist;
-  string m_selectedDevice;
-
-  static gboolean StorageConnectTimeout(gpointer data);
-  static gboolean WorklistConnectTimeout(gpointer data);
-  static gboolean MPPSConnectTimeout(gpointer data);
-  static gboolean StorageCommitmentConnectTimeout(gpointer data);
-  static gboolean QueryRetrieveConnectTimeout(gpointer data);
+  string m_selected_device;
 };
 
 #endif
