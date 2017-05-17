@@ -1,85 +1,352 @@
-#include "utils/IniFile.h"
+#include "probe/ExamItem.h"
+
+#include <sstream>
+
+#include "Def.h"
+#include "sysMan/ViewSystem.h"
+
+using namespace std;
+
+// 0: AdultAbdo         - 成人腹部
+// 1: AdultLiver        - 成人肝胆脾
+// 2: KidAbdo           - 小儿腹部
+// 3: AdultCardio       - 成人心脏
+// 4: KidCardio         - 小儿心脏
+// 5: MammaryGlands     - 乳腺
+// 6: Thyroid           - 甲状腺
+// 7: EyeBall           - 眼球
+// 8: Testicle          - 浅表器官
+// 9: Gyn               - 妇科
+// 10: EarlyPreg        - 早孕
+// 11: MiddleLaterPreg  - 中晚孕
+// 12: FetusCardio      - 胎儿心脏
+// 13: KidneyUreter     - 双肾输尿管
+// 14: BladderProstate  - 膀胱前列腺
+// 15: Carotid          - 颈动脉
+// 16: Jugular          - 颈静脉
+// 17: PeripheryArtery  - 外周动脉
+// 18: PeripheryVein    - 外周静脉
+// 19: HipJoint         - 髋关节
+// 20: Meniscus         - 半月板
+// 21: JointCavity      - 关节腔
+// 22: Spine            - 脊柱
+// 23: TCD              - 经颅多普勒
+// 24: User1            - 用户自定义1
+// 25: User2            - 用户自定义2
+// 26: User3            - 用户自定义3
+// 27: User4            - 用户自定义4
+
+const string ExamItem::ITEM_LIB[NUM_ITEM] = {
+  "AdultAbdo",      "AdultLiver",       "KidAbdo",          "AdultCardio",    "KidCardio",
+  "MammaryGlands",  "Thyroid",          "EyeBall",          "Testicle",       "Gyn",
+  "EarlyPreg",      "MiddleLaterPreg",  "FetusCardio",      "KidneyUreter",   "BladderProstate",
+  "Carotid",        "Jugular",          "PeripheryArtery",  "PeripheryVein",  "HipJoint",
+  "Meniscus",       "JointCavity",      "Spine",            "TCD",            "User1",
+  "User2",          "User3",            "User4"
+};
+
+const string ExamItem::KEY_COMMON = "Common";
+
+// ---------------------------------------------------------
+
+ExamItem::ExamItem() {
+  m_probeIndex = 0;
+
+  m_itemIndex = ABDO_ADULT;
+  InitItemPara(&m_paraItem);
+  InitItemPara(&m_paraOptimize);
+
+  int i;
+  for (i = 0; i < NUM_PROBE; i ++) {
+    m_vecItemIndex[i].clear();
+  }
+
+  InitItemOfProbe();
+  m_genFirstItem = "Carotid";
+}
+
+ExamItem::~ExamItem() {
+}
+
+vector<string> ExamItem::GetUserGroup() {
+  IniFile ini(string(CFG_RES_PATH) + string(EXAM_ITEM_FILE));
+
+  return ini.GetGroupName();
+}
+
+vector<string> ExamItem::GetCurrentUserGroup() {
+  string username = ViewSystem::GetInstance()->GetUserName();
+
+  if (username == "System Default") {
+    username = "SystemDefault";
+  }
+
+  stringstream ss;
+  ss << CFG_RES_PATH << EXAM_ITEM_FILE << username << ".ini";
+
+  vector<string> vec;
+
+  FILE* fp = fopen(ss.str().c_str(), "r");
+
+  if (fp != NULL) {
+    fclose(fp);
+
+    IniFile ini(ss.str());
+    vec = ini.GetGroupName();
+  }
+
+  return vec;
+}
+
+vector<string> ExamItem::GetDefaultUserGroup() {
+  stringstream ss;
+  ss << CFG_RES_PATH << STORE_DEFAULT_ITEM_PATH;
+
+  IniFile ini_default(ss.str());
+  string username = ReadDefaultUserSelect(&ini_default);
+
+  if (username == "System Default") {
+    username = "SystemDefault";
+  }
+
+  ss.str("");
+  ss << CFG_RES_PATH << EXAM_ITEM_FILE << username << ".ini";
+
+  vector<string> vec;
+
+  FILE* fp = fopen(ss.str().c_str(), "r");
+
+  if (fp != NULL) {
+    fclose(fp);
+
+    IniFile ini(ss.str());
+    vec = ini.GetGroupName();
+  }
+
+  return vec;
+}
+
+void ExamItem::GetUserItem(const string group, string& userselect, string& probelist_value,
+  string& useritem_value, string& department_value, string& genFirstItem) {
+  string username = ViewSystem::GetInstance()->GetUserName();
+
+  if (username == "System Default") {
+    username = "SystemDefault";
+  }
+
+  stringstream ss;
+  ss << CFG_RES_PATH << EXAM_ITEM_FILE << username << ".ini";
+
+  IniFile ini(ss.str());
+
+  userselect = ini.ReadString(group, "UserSelect");
+  probelist_value = ini.ReadString(group, "ProbeType");
+  useritem_value = ini.ReadString(group, "ExamItem");
+  department_value = ini.ReadString(group, "Department");
+  genFirstItem = ini.ReadString(group, "GenFirstItem");
+}
+
+void ExamItem::GetDefaultUserItem(const string group, string& userselect, string& probelist_value,
+  string& useritem_value, string& department_value, string& genFirstItem) {
+  stringstream ss;
+  ss << CFG_RES_PATH << STORE_DEFAULT_ITEM_PATH;
+
+  IniFile ini_default(ss.str());
+  string username = ReadDefaultUserSelect(&ini_default);
+
+  if (username == "System Default") {
+    username = "SystemDefault";
+  }
+
+  ss.str("");
+  ss << CFG_RES_PATH << EXAM_ITEM_FILE << username << ".ini";
+
+  FILE* fp = fopen(ss.str().c_str(), "r");
+
+  if (fp != NULL) {
+    fclose(fp);
+
+    IniFile ini(ss.str());
+
+    userselect = ini.ReadString(group, "UserSelect");
+    probelist_value = ini.ReadString(group, "ProbeType");
+    useritem_value = ini.ReadString(group, "ExamItem");
+    department_value = ini.ReadString(group, "Department");
+    genFirstItem = ini.ReadString(group, "GenFirstItem");
+  } else {
+    userselect = "";
+    probelist_value = "";
+    useritem_value = "";
+    department_value = "";
+    genFirstItem = "";
+  }
+}
+
+void ExamItem::DeleteUserItem(const string group) {
+  stringstream ss;
+  ss << CFG_RES_PATH << STORE_DEFAULT_ITEM_PATH;
+
+  IniFile ini_default(ss.str());
+  string username = ReadDefaultUserSelect(&ini_default);
+
+  if (username == "System Default") {
+    username = "SystemDefault";
+  }
+
+  ss.str("");
+  ss << CFG_RES_PATH << EXAM_ITEM_FILE << username << ".ini";
+
+  FILE* fp = fopen(ss.str().c_str(), "r");
+
+  if (fp != NULL) {
+    fclose(fp);
+
+    IniFile ini(ss.str());
+
+    ini.RemoveGroup(group);
+    ini.SyncConfigFile();
+  }
+}
+
+string ExamItem::TransItemName(const string str) {
+  if (str == _("Adult Abdomen")) {
+    return "AdultAbdo";
+  } else if (str == _("Adult Liver")) {
+    return "AdultLiver";
+  } else if (str == _("Kid Abdomen")) {
+    return "KidAbdo";
+  } else if (str == _("Adult Cardio")) {
+    return "AdultCardio";
+  } else if (str == _("Kid Cardio")) {
+    return "KidCardio";
+  } else if (str == _("Mammary Glands")) {
+    return "MammaryGlands";
+  } else if (str == _("Thyroid")) {
+    return "Thyroid";
+  } else if (str == _("Eye Ball")) {
+    return "EyeBall";
+  } else if (str == _("Testicle")) {
+    return "Testicle";
+  } else if (str == _("Gynecology")) {
+    return "Gyn";
+  } else if (str == _("Early Pregnancy")) {
+    return "EarlyPreg";
+  } else if (str == _("Middle-late Pregnancy")) {
+    return "MiddleLaterPreg";
+  } else if (str == _("Fetal Cardio")) {
+    return "FetusCardio";
+  } else if (str == _("Kidney Ureter")) {
+    return "KidneyUreter";
+  } else if (str == _("Bladder Prostate")) {
+    return "BladderProstate";
+  } else if (str == _("Carotid")) {
+    return "Carotid";
+  } else if (str == _("Jugular")) {
+    return "Jugular";
+  } else if (str == _("Periphery Artery")) {
+    return "PeripheryArtery";
+  } else if (str == _("Periphery Vein")) {
+    return "PeripheryVein";
+  } else if (str == _("Hip Joint")) {
+    return "HipJoint";
+  } else if (str == _("Meniscus")) {
+    return "Meniscus";
+  } else if (str == _("Joint Cavity")) {
+    return "JointCavity";
+  } else if (str == _("Spine")) {
+    return "Spine";
+  } else if (str == _("TCD")) {
+    return "TCD";
+  } else {
+    return str;
+  }
+}
+
+string ExamItem::TransItemNameEng(const string str) {
+  if (str == "Adult Abdomen") {
+    return "AdultAbdo";
+  } else if (str == "Adult Liver") {
+    return "AdultLiver";
+  } else if (str == "Kid Abdomen") {
+    return "KidAbdo";
+  } else if (str == "Adult Cardio") {
+    return "AdultCardio";
+  } else if (str == "Kid Cardio") {
+    return "KidCardio";
+  } else if (str == "Mammary Glands") {
+    return "MammaryGlands";
+  } else if (str == "Thyroid") {
+    return "Thyroid";
+  } else if (str == "Eye Ball") {
+    return "EyeBall";
+  } else if (str == "Testicle") {
+    return "Testicle";
+  } else if (str == "Gynecology") {
+    return "Gyn";
+  } else if (str == "Early Pregnancy") {
+    return "EarlyPreg";
+  } else if (str == "Middle-late Pregnancy") {
+    return "MiddleLaterPreg";
+  } else if (str == "Fetal Cardio") {
+    return "FetusCardio";
+  } else if (str == "Kidney Ureter") {
+    return "KidneyUreter";
+  } else if (str == "Bladder Prostate") {
+    return "BladderProstate";
+  } else if (str == "Carotid") {
+    return "Carotid";
+  } else if (str == "Jugular") {
+    return "Jugular";
+  } else if (str == "Periphery Artery") {
+    return "PeripheryArtery";
+  } else if (str == "Periphery Vein") {
+    return "PeripheryVein";
+  } else if (str == "Hip Joint") {
+    return "HipJoint";
+  } else if (str == "Meniscus") {
+    return "Meniscus";
+  } else if (str == "Joint Cavity") {
+    return "JointCavity";
+  } else if (str == "Spine") {
+    return "Spine";
+  } else if (str == "TCD") {
+    return "TCD";
+  } else {
+    return str;
+  }
+}
+
+string ExamItem::TransUserSelectForEng(const string name) {
+  if (name == _("System Default")) {
+    return "System Default";
+  } else {
+    return name;
+  }
+}
+
+// ---------------------------------------------------------
 
 #include "imageProc/ModeStatus.h"
 #include <stdio.h>
 #include <string.h>
-#include "probe/ExamItem.h"
-#include "Def.h"
+
+
 #include "probe/ViewProbe.h"
-#include "sysMan/ViewSystem.h"
+
 #include <locale.h>
 #include <libintl.h>
 #include "imageControl/ImgPw.h"
 #include "patient/FileMan.h"
 //#include "ScanMode.h"
 
-// 0: "AdultAbdo": 成人腹部
-// 1: "AdultLiver": 成人肝胆脾
-// 2: "KidAbdo": 小儿腹部
-// 3: "AdultCardio": 成人心脏
-// 4: "KidCardio": 小儿心脏
-// 5: "MammaryGlands": 乳腺
-// 6: "Thyroid": 甲状腺
-// 7: "EyeBall": 眼球
-// 8: "SmallPart": 浅表器官
-// 9: "Gyn": 妇科
-// 10: "EarlyPreg": 早孕
-// 11: "MiddleLaterPreg": 中晚孕
-// 12: "FetusCardio": 胎儿心脏
-// 13: "KidneyUreter": 双肾输尿管
-// 14: "BladderProstate": 膀胱前列腺
-// 15: "Carotid": 颈动脉
-// 16: "Jugular": 颈静脉
-// 17: "PeripheryArtery": 外周动脉
-// 18: "PeripheryVein": 外周静脉
-// 19: "HipJoint": 髋关节
-// 20: "Meniscus": 半月板
-// 21: "JointCavity": 关节腔
-// 22: "Spine": 脊柱
-// 23: "TCD": 经颅多普勒
-// 24: "User1": 用户自定义1
-// 25: "User2": 用户自定义2
-// 26: "User3": 用户自定义3
-// 27: "User4": 用户自定义4
 
-#ifdef VET
-const string ExamItem::ITEM_LIB[NUM_ITEM] = {
-    "User1","User2","User3","User4","User5","User6","User7","User8","User9","User10"
-};
-#else
 
-const string ExamItem::ITEM_LIB[NUM_ITEM] = {
-    "AdultAbdo","AdultLiver","KidAbdo", "AdultCardio", "KidCardio", "MammaryGlands",
-    //"Thyroid", "EyeBall", "SmallPart", "Gyn", "EarlyPreg", "MiddleLaterPreg",
-    "Thyroid", "EyeBall", "Testicle", "Gyn", "EarlyPreg", "MiddleLaterPreg",
-    "FetusCardio", "KidneyUreter", "BladderProstate", "Carotid", "Jugular", "PeripheryArtery",
-    "PeripheryVein", "HipJoint", "Meniscus", "JointCavity", "Spine", "TCD",
-    "User1", "User2", "User3", "User4"
-};
-#endif
-const string ExamItem::KEY_COMMON = "Common";
+
+
+
+
 ///> public func
-ExamItem::ExamItem() {
-    m_probeIndex = 0;
-#ifdef VET
-    m_itemIndex = (EItem)0;
-#else
-    m_itemIndex = ABDO_ADULT;
-#endif
-    InitItemPara(&m_paraItem);
-    InitItemPara(&m_paraOptimize);
 
-    int i;
-    for (i = 0; i < NUM_PROBE; i ++) {
-        m_vecItemIndex[i].clear();
-    }
-
-    InitItemOfProbe();
-    m_genFirstItem = "Carotid";
-}
-
-ExamItem::~ExamItem() {
-}
 
 /*
  * @brief get item list of designated probe
@@ -108,99 +375,86 @@ void ExamItem::GetUserItemListOfProbe(char* probeModel, vector<string> &ItemList
     ItemList = m_vecUserItemName;
 }
 
-/*
- * @brief get user item info
- *
- * @para probeModel[in] designamted probe model, in
- */
 void ExamItem::GetUserItemInfo(char* probeModel, string &genfirstitem) {
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char genFirstItem[256];
-    char src_group[256];
-    char userselect[256];
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini(path);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini);
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
 
-    vector<string> useritemgroup;
-    vector<string> vecExamItem;
-    ExamItem examitem;
-    useritemgroup = GetDefaultUserGroup();
+  ExamItem exam;
+  string username = exam.ReadDefaultUserSelect(&ini);
 
-    int group_length(0);
-    group_length = useritemgroup.size();
-    int num = 0;
-    string str_user_item_name =  ViewProbe::GetInstance()->GetItemNameUserDef();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        examitem.GetDefaultUserItem(src_group, userselect, probelist, useritem, department, genFirstItem);
-        ExamPara exampara;
-        exampara.dept_name=department;
-        exampara.name = useritem;
-        exampara.index = ExamItem::USERNAME;
-        if(strcmp(username.c_str(), userselect) == 0) {
-            if (strcmp(probeModel, probelist)==0) {
-                m_vecUserItemName.push_back(exampara.name);
+  ExamItem examitem;
+  vector<string> useritemgroup = GetDefaultUserGroup();
 
-                if(strcmp(str_user_item_name.c_str(), useritem) == 0) {
-                    m_genFirstItem = genFirstItem;
-                    genfirstitem = m_genFirstItem;
-                    break;
-                }
-            }
+  int num = 0;
+  string str_user_item_name =  ViewProbe::GetInstance()->GetItemNameUserDef();
+
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+
+    examitem.GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, genfirstitem);
+
+    ExamPara exampara;
+
+    exampara.dept_name=department;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if(username == userselect) {
+      if (probeModel == probelist) {
+        m_vecUserItemName.push_back(exampara.name);
+
+        if(str_user_item_name == useritem) {
+          m_genFirstItem = genfirstitem;
+          genfirstitem = m_genFirstItem;
+
+          break;
         }
-        PRINTF("----------------probemodel = %s\n", probeModel);
+      }
     }
+  }
 }
 
 void ExamItem::GetInitUserItemInfo(char* probeModel, string inituseritem, string &geninitfirstitem) {
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char genFirstItem[256];
-    char src_group[256];
-    char userselect[256];
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini(path);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini);
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
 
-    vector<string> useritemgroup;
-    vector<string> vecExamItem;
-    ExamItem examitem;
-    useritemgroup = examitem.GetDefaultUserGroup();
+  ExamItem exam;
+  string username = exam.ReadDefaultUserSelect(&ini);
 
-    int group_length(0);
-    group_length = useritemgroup.size();
-    int num = 0;
-    string str_user_item_name =  inituseritem;
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        examitem.GetDefaultUserItem(src_group, userselect, probelist, useritem, department, genFirstItem);
-        ExamPara exampara;
-        exampara.dept_name=department;
-        exampara.name = useritem;
-        exampara.index = ExamItem::USERNAME;
-        PRINTF("probeMODL=%s, probelist=%s\n",probeModel, probelist);
-        if(strcmp(username.c_str(), userselect) == 0) {
-            if (strcmp(probeModel, probelist)==0) {
-                m_vecUserItemName.push_back(exampara.name);
-                if(strcmp(str_user_item_name.c_str(), useritem) == 0) {
-                    m_genFirstItem = genFirstItem;
-                    geninitfirstitem = m_genFirstItem;
-                    break;
-                }
-            }
+  vector<string> vecExamItem;
+
+  ExamItem examitem;
+  vector<string> useritemgroup = examitem.GetDefaultUserGroup();
+
+  string str_user_item_name = inituseritem;
+
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+
+    examitem.GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, geninitfirstitem);
+
+    ExamPara exampara;
+    exampara.dept_name=department;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if (username == userselect) {
+      if (probeModel == probelist) {
+        m_vecUserItemName.push_back(exampara.name);
+
+        if(str_user_item_name == useritem) {
+          m_genFirstItem = geninitfirstitem;
+          geninitfirstitem = m_genFirstItem;
+
+          break;
         }
-        PRINTF("----------------probemodel = %s\n", probeModel);
+      }
     }
+  }
 }
 
 /*
@@ -407,146 +661,7 @@ void ExamItem::WriteExamItemPara(int probeIndex, int itemIndex, ParaItem* paraIt
     }
 }
 
-vector <string> ExamItem::GetUserGroup(void) {
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, EXAM_ITEM_FILE);
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-    return ptrIni->GetGroupName();
-}
 
-vector <string> ExamItem::GetCurrentUserGroup(void) {
-    char path[256];
-    const gchar *username = ViewSystem::GetInstance()->GetUserName();
-    char name[256];
-    strcpy(name,username);
-    if(strcmp(name,_("System Default"))==0) {
-        strcpy(name, "SystemDefault");
-    }
-    sprintf(path, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE,name, ".ini");
-
-    FILE *fp;
-    if((fp = fopen(path, "r")) == NULL) {
-        vector<string> tmp;
-        tmp.clear();
-        return tmp;
-    } else {
-        IniFile ini(path);
-        IniFile *ptrIni= &ini;
-        return ptrIni->GetGroupName();
-    }
-    fclose(fp);
-}
-
-vector <string> ExamItem::GetDefaultUserGroup(void) {
-    char path[256];
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    if(strcmp(username.c_str(),"System Default")==0) {
-        username="SystemDefault";
-    }
-    sprintf(path, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, username.c_str(), ".ini");
-    int fd;
-    FILE *fp;
-    if((fp = fopen(path, "r")) == NULL) {
-        vector<string> tmp;
-        tmp.clear();
-        return tmp;
-    } else {
-        IniFile ini(path);
-        IniFile *ptrIni= &ini;
-        return ptrIni->GetGroupName();
-    }
-    fclose(fp);
-}
-
-void ExamItem::GetDefaultUserItem(const char * group, char *userselect, char *probelist_value, char *useritem_value, char * department_value, char *genFirstItem) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    if(strcmp(username.c_str(),"System Default")==0) {
-        username="SystemDefault";
-    }
-
-    char path[256];
-
-    sprintf(path, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE,username.c_str(), ".ini");
-    int fd;
-    FILE *fp;
-    if((fp = fopen(path, "r")) == NULL) {
-        printf("file is error\n");
-    } else {
-        IniFile ini(path);
-        IniFile *ptrIni= &ini;
-
-        strcpy(userselect,(char*)ptrIni->ReadString(group, "UserSelect").c_str());
-        strcpy(probelist_value,(char*)ptrIni->ReadString(group, "ProbeType").c_str());
-        strcpy(useritem_value,(char*)ptrIni->ReadString(group, "ExamItem").c_str());
-#ifndef VET
-        strcpy(department_value,(char*)ptrIni->ReadString(group, "Department").c_str());
-        strcpy(genFirstItem,(char*)ptrIni->ReadString(group, "GenFirstItem").c_str());
-#endif
-        PRINTF("first item:%s\n", genFirstItem);
-    }
-    fclose(fp);
-}
-
-void ExamItem::GetUserItem(const char * group, char *userselect, char *probelist_value, char *useritem_value, char * department_value, char *genFirstItem) {
-    char path[256];
-    const gchar *username = ViewSystem::GetInstance()->GetUserName();
-    char name[256];
-    strcpy(name,username);
-    if(strcmp(name,_("System Default"))==0) {
-        strcpy(name, "SystemDefault");
-    }
-    sprintf(path, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE,name, ".ini");
-
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-
-    strcpy(userselect,(char*)ptrIni->ReadString(group, "UserSelect").c_str());
-    strcpy(probelist_value,(char*)ptrIni->ReadString(group, "ProbeType").c_str());
-    strcpy(useritem_value,(char*)ptrIni->ReadString(group, "ExamItem").c_str());
-#ifndef VET
-    strcpy(department_value,(char*)ptrIni->ReadString(group, "Department").c_str());
-    strcpy(genFirstItem,(char*)ptrIni->ReadString(group, "GenFirstItem").c_str());
-#endif
-    PRINTF("first item:%s\n", genFirstItem);
-}
-
-void ExamItem::DeleteUserItem(const char * group) {
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini1(path1);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini1);
-    if(strcmp(username.c_str(),"System Default")==0) {
-        username="SystemDefault";
-    }
-
-    char path[256];
-    sprintf(path, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE,username.c_str(), ".ini");
-    int fd;
-    FILE *fp;
-    if((fp = fopen(path, "r")) == NULL) {
-        printf("error");
-    } else {
-        IniFile ini(path);
-        IniFile *ptrIni= &ini;
-        ptrIni->RemoveGroup(group);
-        ptrIni->SyncConfigFile();
-
-    }
-    fclose(fp);
-}
 
 void ExamItem::DeleteNewItemForCalcFile(int probeIndex, const char *old_string, const char *str) {
     const gchar *username = ViewSystem::GetInstance()->GetUserName();
@@ -1284,217 +1399,10 @@ void ExamItem::WriteConfigCommon(ParaItem* paraItem, string section, IniFile* pt
     ptrIni->SyncConfigFile();
 }
 
-void ExamItem::TransUserSelectForEng(char *name, char *username) {
-    string system_default =_("System Default");
-    if (strcmp(name, system_default.c_str())==0) {
-        strcpy(username, "System Default");
-    } else {
-        strcpy(username, name);
-    }
-}
 
-void ExamItem::TransItemNameEng(const char *str_index,char str_name[256]) {
-
-    string adbo ="Adult Abdomen";
-    string gyn ="Gynecology";
-    string earlypreg ="Early Pregnancy";
-    string kidney ="Kidney Ureter";
-    string hipjoint ="Hip Joint";
-    string mammary ="Mammary Glands";
-    string kidabdo ="Kid Abdomen";
-    string adultcar ="Adult Cardio";
-    string fetus ="Fetal Cardio";
-    string thyroid ="Thyroid";
-    string carotid ="Carotid";
-
-    string liver ="Adult Liver";
-    string laterpreg ="Middle-late Pregnancy";
-    string ureter ="Kidney Ureter";
-    string bladder ="Bladder Prostate";
-    string joint ="Joint Cavity";
-    string eye ="Eye Ball";
-    string small ="Small Part";
-    string perart ="Periphery Artery";
-    string pervein ="Periphery Vein";
-    string kidcar ="Kid Cardio";
-
-    if (strcmp(str_index, liver.c_str())==0) {
-        strcpy(str_name, "AdultLiver");
-    } else if (strcmp(str_index, laterpreg.c_str())==0) {
-        strcpy(str_name, "MiddleLaterPreg");
-    } else if (strcmp(str_index, ureter.c_str())==0) {
-        strcpy(str_name, "KidneyUreter");
-    } else if (strcmp(str_index, bladder.c_str())==0) {
-        strcpy(str_name, "BladderProstate");
-    } else if (strcmp(str_index, joint.c_str())==0) {
-        strcpy(str_name, "JointCavity");
-    } else if (strcmp(str_index, eye.c_str())==0) {
-        strcpy(str_name, "EyeBall");
-    } else if (strcmp(str_index, small.c_str())==0) {
-        strcpy(str_name, "SmallPart");
-    } else if (strcmp(str_index, perart.c_str())==0) {
-        strcpy(str_name, "PeripheryArtery");
-    } else if (strcmp(str_index, pervein.c_str())==0) {
-        strcpy(str_name, "PeripheryVein");
-
-    } else if (strcmp(str_index, kidcar.c_str())==0) {
-        strcpy(str_name, "KidCardio");
-
-    } else if (strcmp(str_index, adbo.c_str())==0) {
-        strcpy(str_name, "AdultAbdo");
-    } else if (strcmp(str_index, gyn.c_str())==0) {
-        strcpy(str_name, "Gyn");
-    } else if (strcmp(str_index,earlypreg.c_str())==0) {
-        strcpy(str_name, "EarlyPreg");
-    } else if (strcmp(str_index, kidney.c_str())==0) {
-        strcpy(str_name, "KidneyUreter");
-    } else if (strcmp(str_index,hipjoint.c_str())==0) {
-        strcpy(str_name, "HipJoint");
-    } else if (strcmp(str_index,mammary.c_str())==0) {
-        strcpy(str_name, "MammaryGlands");
-    } else if (strcmp(str_index,kidabdo.c_str())==0) {
-        strcpy(str_name, "KidAbdo");
-    } else if (strcmp(str_index,adultcar.c_str())==0) {
-        strcpy(str_name, "AdultCardio");
-    } else if (strcmp(str_index,fetus.c_str())==0) {
-        strcpy(str_name, "FetusCardio");
-
-    } else if (strcmp(str_index,thyroid.c_str())==0) {
-        strcpy(str_name, "Thyroid");
-
-    } else if (strcmp(str_index,carotid.c_str())==0) {
-        strcpy(str_name, "Carotid");
-
-    } else {
-        strcpy(str_name,str_index);
-    }
-}
-
-void ExamItem::TransItemName(const char *str_index,char str_name[256]) {
-
-#ifndef VET
-    string adbo =_("Adult Abdomen");
-    string gyn =_("Gynecology");
-    string earlypreg =_("Early Pregnancy");
-    string kidney =_("Kidney Ureter");
-    string hipjoint =_("Hip Joint");
-    string mammary =_("Mammary Glands");
-    string kidabdo =_("Kid Abdomen");
-    string adultcar =_("Adult Cardio");
-    string fetus =_("Fetal Cardio");
-    string thyroid =_("Thyroid");
-    string carotid =_("Carotid");
-
-    string liver =_("Adult Liver");
-    string laterpreg =_("Middle-late Pregnancy");
-    string ureter =_("Kidney Ureter");
-    string bladder =_("Bladder Prostate");
-    string joint =_("Joint Cavity");
-    string eye =_("Eye Ball");
-    //string small =_("Small Part");
-    string small =_("Testicle");
-    string perart =_("Periphery Artery");
-    string pervein =_("Periphery Vein");
-    string kidcar =_("Kid Cardio");
-    string spine=_("Spine");
-    string tcd=_("TCD");
-    string meniscus=_("Meniscus");
-    string jugular=_("Jugular");
-
-    if (strcmp(str_index, liver.c_str())==0) {
-        strcpy(str_name, "AdultLiver");
-    } else if (strcmp(str_index, laterpreg.c_str())==0) {
-        strcpy(str_name, "MiddleLaterPreg");
-    } else if (strcmp(str_index, ureter.c_str())==0) {
-        strcpy(str_name, "KidneyUreter");
-    } else if (strcmp(str_index, bladder.c_str())==0) {
-        strcpy(str_name, "BladderProstate");
-    } else if (strcmp(str_index, joint.c_str())==0) {
-        strcpy(str_name, "JointCavity");
-    } else if (strcmp(str_index, eye.c_str())==0) {
-        strcpy(str_name, "EyeBall");
-    } else if (strcmp(str_index, small.c_str())==0) {
-        //strcpy(str_name, "SmallPart");
-        strcpy(str_name, "Testicle");
-    } else if (strcmp(str_index, perart.c_str())==0) {
-        strcpy(str_name, "PeripheryArtery");
-    } else if (strcmp(str_index, pervein.c_str())==0) {
-        strcpy(str_name, "PeripheryVein");
-    } else if (strcmp(str_index, kidcar.c_str())==0) {
-        strcpy(str_name, "KidCardio");
-    } else if (strcmp(str_index, adbo.c_str())==0) {
-        strcpy(str_name, "AdultAbdo");
-    } else if (strcmp(str_index, gyn.c_str())==0) {
-        strcpy(str_name, "Gyn");
-    } else if (strcmp(str_index,earlypreg.c_str())==0) {
-        strcpy(str_name, "EarlyPreg");
-    } else if (strcmp(str_index, kidney.c_str())==0) {
-        strcpy(str_name, "KidneyUreter");
-    } else if (strcmp(str_index,hipjoint.c_str())==0) {
-        strcpy(str_name, "HipJoint");
-    } else if (strcmp(str_index,mammary.c_str())==0) {
-        strcpy(str_name, "MammaryGlands");
-    } else if (strcmp(str_index,kidabdo.c_str())==0) {
-        strcpy(str_name, "KidAbdo");
-    } else if (strcmp(str_index,adultcar.c_str())==0) {
-        strcpy(str_name, "AdultCardio");
-    } else if (strcmp(str_index,fetus.c_str())==0) {
-        strcpy(str_name, "FetusCardio");
-    } else if (strcmp(str_index,thyroid.c_str())==0) {
-        strcpy(str_name, "Thyroid");
-    } else if (strcmp(str_index,carotid.c_str())==0) {
-        strcpy(str_name, "Carotid");
-    } else if (strcmp(str_index, spine.c_str())==0) {
-        strcpy(str_name, "Spine");
-    } else if(strcmp(str_index, tcd.c_str())==0) {
-        strcpy(str_name, "TCD");
-    } else if(strcmp(str_index, meniscus.c_str())==0) {
-        strcpy(str_name, "Meniscus");
-    } else if(strcmp(str_index, jugular.c_str())==0) {
-        strcpy(str_name, "Jugular");
-    } else {
-        strcpy(str_name,str_index);
-    }
-#else
-    string user1 =_("User1");
-    string user2 =_("User2");
-    string user3 =_("User3");
-    string user4 =_("User4");
-    string user5 =_("User5");
-    string user6 =_("User6");
-    string user7 =_("User7");
-    string user8 =_("User8");
-    string user9 =_("User9");
-    string user10 =_("User10");
-    if (strcmp(str_index, user1.c_str())==0) {
-        strcpy(str_name, "User1");
-    } else if (strcmp(str_index, user2.c_str())==0) {
-        strcpy(str_name, "User2");
-    } else if (strcmp(str_index, user3.c_str())==0) {
-        strcpy(str_name, "User3");
-    } else if (strcmp(str_index, user4.c_str())==0) {
-        strcpy(str_name, "User4");
-    } else if (strcmp(str_index, user5.c_str())==0) {
-        strcpy(str_name, "User5");
-    } else if (strcmp(str_index, user6.c_str())==0) {
-        strcpy(str_name, "User6");
-    } else if (strcmp(str_index, user7.c_str())==0) {
-        strcpy(str_name, "User7");
-    } else if (strcmp(str_index, user8.c_str())==0) {
-        strcpy(str_name, "User8");
-    } else if (strcmp(str_index, user9.c_str())==0) {
-        strcpy(str_name, "User9");
-    } else if (strcmp(str_index, user10.c_str())==0) {
-        strcpy(str_name, "User10");
-    } else {
-        strcpy(str_name,str_index);
-    }
-#endif
-}
 void ExamItem::WriteDefinedExamItemPara(const char *department, string section, IniFile* ptrIni, string probelist, char *new_string,const char *str_index) {
-    char str_name[256];
-    TransItemNameEng(str_index, str_name);
-    //printf("--------------str_naem=%s\n",str_name);
+    string str_name = TransItemNameEng(str_index);
+
     ParaItem paradefinedItem;
     char path[256];
     ParaItem* paraItem;
@@ -1527,8 +1435,7 @@ void ExamItem::WriteDefinedExamItemPara(const char *department, string section, 
 }
 
 void ExamItem::WriteDefaultDefinedExamItemPara(const char *department, string section, IniFile* ptrIni, string probelist,char *new_string,const char *str_index) {
-    char str_name[256];
-    TransItemNameEng(str_index, str_name);
+    string str_name = TransItemNameEng(str_index);
 
     char path[256];
     ParaItem paraItem;
@@ -1548,22 +1455,16 @@ void ExamItem::WriteDefaultDefinedExamItemPara(const char *department, string se
 }
 
 void ExamItem::WriteNewExamItem(const char *department, string section, IniFile* ptrIni, string probelist, const char *new_string,const char *str_index) {
-    const gchar *username = ViewSystem::GetInstance()->GetUserName();
-    char name[256];
-    strcpy(name , username);
-    char userselect[256];;
-    ExamItem exam;
-    exam.TransUserSelectForEng(name, userselect);
-    const char* ptrProbelist = probelist.c_str();
-    const char* ptrSection = section.c_str();
+    string username = ViewSystem::GetInstance()->GetUserName();
 
-    ptrIni->WriteString(ptrSection, "UserSelect",userselect);
-    ptrIni->WriteString(ptrSection, "ProbeType",ptrProbelist);
-    ptrIni->WriteString(ptrSection, "ExamItem", new_string);
-#ifndef VET
-    ptrIni->WriteString(ptrSection, "Department", department);
-    ptrIni->WriteString(ptrSection, "GenFirstItem", str_index);
-#endif
+    ExamItem exam;
+    string userselect = exam.TransUserSelectForEng(username);
+
+    ptrIni->WriteString(section, "UserSelect",userselect);
+    ptrIni->WriteString(section, "ProbeType",probelist);
+    ptrIni->WriteString(section, "ExamItem", new_string);
+    ptrIni->WriteString(section, "Department", department);
+    ptrIni->WriteString(section, "GenFirstItem", str_index);
     ptrIni->SyncConfigFile();
 }
 

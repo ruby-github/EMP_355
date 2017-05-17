@@ -279,38 +279,35 @@ int ViewProbe::CreateAllExamType(const char *model, vector<ExamItem::EItem> item
 }
 
 void ViewProbe::GetUserItemNameOfProbe(const char* model) {
-    m_vecUserItemName.clear();
+  m_vecUserItemName.clear();
 
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char firstGenItem[256];
-    char src_group[256];
-    char userselect[256];
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini(path);
-    ExamItem exam;
-    string username;
-    username = exam.ReadDefaultUserSelect(&ini);
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
 
-    vector<string> useritemgroup;
-    ExamItem examitem;
-    useritemgroup = examitem.GetDefaultUserGroup();
-    int group_length(0);
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        examitem.GetDefaultUserItem(src_group, userselect, probelist, useritem, department, firstGenItem);
-        ExamPara exampara;
-        exampara.name = useritem;
-        exampara.index = ExamItem::USERNAME;
-        if(strcmp(username.c_str(), userselect) == 0) {
-            if (strcmp(model, probelist) == 0) {
-                m_vecUserItemName.push_back(exampara.name);
-            }
-        }
+  ExamItem exam;
+  string username = exam.ReadDefaultUserSelect(&ini);
+
+  ExamItem examitem;
+  vector<string> useritemgroup = examitem.GetDefaultUserGroup();
+
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+    string firstGenItem;
+
+    examitem.GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, firstGenItem);
+
+    ExamPara exampara;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if(username == userselect) {
+      if (probelist == model) {
+        m_vecUserItemName.push_back(exampara.name);
+      }
     }
+  }
 }
 
 int ViewProbe::CreateExamType(vector<ExamItem::EItem> item, char exam_type[][50]) {
@@ -662,13 +659,13 @@ void ViewProbe::TreeSelectionChanged(GtkTreeSelection *selection) {
         int num = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_user_select));
 
         UserSelect::GetInstance()->save_cur_username(name);
-        char username[256];
+
         char str_path[256] = {'\0'};
         sprintf(str_path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
         IniFile ini(str_path);
         ExamItem exam;
-        exam.TransUserSelectForEng(name, username);
-        exam.WriteDefaultUserSelect(&ini, username);
+        string username = exam.TransUserSelectForEng(name);
+        exam.WriteDefaultUserSelect(&ini, username.c_str());
         exam.WriteDefaultUserIndex(&ini, num);
         memset(user_configure, 0, USERCONFIG_LEN);
         if (num > 0) {
@@ -744,13 +741,13 @@ void ViewProbe::ProbeUserChanged(GtkWidget *widget) {
     }
     //int num = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_user_select));
     UserSelect::GetInstance()->save_cur_username(name);
-    char username[256];
+
     char str_path[256] = {'\0'};
     sprintf(str_path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini(str_path);
     ExamItem exam;
-    exam.TransUserSelectForEng(name, username);
-    exam.WriteDefaultUserSelect(&ini, username);
+    string username = exam.TransUserSelectForEng(name);
+    exam.WriteDefaultUserSelect(&ini, username.c_str());
 
     // display probe dialog and wait user's operation
     ProbeSocket::ProbePara* para = NULL;
@@ -809,13 +806,13 @@ void ViewProbe::TreeViewBtnClicked(GtkWidget *widget, GdkEventButton *event) {
         if (name != NULL) {
             int num = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_user_select));
             UserSelect::GetInstance()->save_cur_username(name);
-            char username[256];
+
             char str_path[256] = {'\0'};
             sprintf(str_path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
             IniFile ini(str_path);
             ExamItem exam;
-            exam.TransUserSelectForEng(name, username);
-            exam.WriteDefaultUserSelect(&ini, username);
+            string username = exam.TransUserSelectForEng(name);
+            exam.WriteDefaultUserSelect(&ini, username.c_str());
             exam.WriteDefaultUserIndex(&ini, num);
             memset(user_configure, 0, USERCONFIG_LEN);
             if (num > 0) {

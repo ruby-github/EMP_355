@@ -27,7 +27,7 @@ void MenuNote::Show(void) {
     UpdateLabel();
     gtk_widget_show_all(m_table);
 
-//根据不同的探头部位设置不同科别
+    //根据不同的探头部位设置不同科别
     int index = 0;
     ExamItem::EItem item = ProbeSelect::GetItemIndex();
     char path[256];
@@ -35,12 +35,12 @@ void MenuNote::Show(void) {
     IniFile ini(path);
     string current_item;
     string current_probe;
-    char current_exam[256];
+
     ExamItem exam;
     current_item = exam.ReadDefaultProbeDefaultItemName(&ini);
     current_probe = exam.ReadDefaultProbe(&ini);
 
-    exam.TransItemNameEng(current_item.c_str(), current_exam);
+    string current_exam = exam.TransItemNameEng(current_item);
 
     string username;
     username = exam.ReadDefaultUserSelect(&ini);
@@ -133,11 +133,11 @@ void MenuNote::Show(void) {
         IniFile ini(path);
         string current_item;
         string current_probe;
-        char current_exam[256];
+
         ExamItem exam;
         current_item = exam.ReadDefaultProbeDefaultItemName(&ini);
         current_probe = exam.ReadDefaultProbe(&ini);
-        exam.TransItemNameEng(current_item.c_str(), current_exam);
+        string current_exam = exam.TransItemNameEng(current_item);
 
         strcpy(department,(current_probe + "-" + current_exam).c_str());
     } else {
@@ -409,10 +409,10 @@ GtkWidget * MenuNote::create_current_item() {
     ExamItem exam;
     string current_item;
     string current_probe;
-    char current_exam[256];
+
     current_item = exam.ReadDefaultProbeDefaultItemName(&ini);
     current_probe = exam.ReadDefaultProbe(&ini);
-    exam.TransItemNameEng(current_item.c_str(), current_exam);
+    string current_exam = exam.TransItemNameEng(current_item);
     string probe_exam_string= current_probe + "-" + current_exam;
     char department[256];
     strcpy(department, probe_exam_string.c_str());
@@ -775,11 +775,11 @@ void MenuNote::BtnComboDeptChanged(GtkComboBox *widget) {
         IniFile ini(path);
         string current_item;
         string current_probe;
-        char current_exam[256];
+
         ExamItem exam;
         current_item = exam.ReadDefaultProbeDefaultItemName(&ini);
         current_probe = exam.ReadDefaultProbe(&ini);
-        exam.TransItemNameEng(current_item.c_str(), current_exam);
+        string current_exam = exam.TransItemNameEng(current_item);
 
         strcpy(department,(current_probe + "-" + current_exam).c_str());
     } else {

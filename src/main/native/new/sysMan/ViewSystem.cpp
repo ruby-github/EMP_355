@@ -6326,45 +6326,36 @@ void ViewSystem::EntryItemLengthInsert(GtkEditable *editable, gchar *new_text, g
         gtk_signal_emit_stop(GTK_OBJECT(editable), g_signal_lookup("insert-text", GTK_TYPE_EDITABLE));
     }
 }
+
 void ViewSystem::CreateDefineItem(int probeIndex, vector<ExamPara>& vecExamItem) {
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char firstgenitem[256];
-    char src_group[256];
-    char userselect[256];
-    const char* username = GetUserName();
-    ExamItem exam;
-    char usernamechar[256];
-    strcpy(usernamechar, username);
-    char userselectname[256];;
-    exam.TransUserSelectForEng(usernamechar, userselectname);
+  ExamItem exam;
+  string userselectname = exam.TransUserSelectForEng(GetUserName());
 
-    vector<string> useritemgroup;
-    ExamItem examitem;
-    useritemgroup = examitem.GetCurrentUserGroup();
+  ExamItem examitem;
+  vector<string> useritemgroup = examitem.GetCurrentUserGroup();
 
-    int group_length(0);
-    group_length = useritemgroup.size();
-    PRINTF("probeIndex=%d,group_length=%d\n",probeIndex, group_length);
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        examitem.GetUserItem(src_group, userselect, probelist, useritem, department, firstgenitem);
-        ExamPara exampara;
-#ifndef VET
-        exampara.dept_name=_(department);
-#endif
-        exampara.name=useritem;
-        exampara.index=ExamItem::USERNAME;
-        PRINTF("probelist=%s, PROBE_LIST=%s\n",probelist,PROBE_LIST[probeIndex].c_str());
-        if(strcmp(userselectname, userselect) == 0) {
-            if((probeIndex>=0)&&(probeIndex<=NUM_PROBE)) {
-                if (strcmp(probelist, PROBE_LIST[probeIndex].c_str())==0) {
-                    vecExamItem.push_back(exampara);
-                }
-            }
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+    string firstgenitem;
+
+    examitem.GetUserItem(useritemgroup[i], userselect, probelist, useritem, department, firstgenitem);
+
+    ExamPara exampara;
+    exampara.dept_name = department;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if(userselectname == userselect ) {
+      if (probeIndex >= 0 && probeIndex <= NUM_PROBE) {
+        if (probelist == PROBE_LIST[probeIndex]) {
+          vecExamItem.push_back(exampara);
         }
+      }
     }
+  }
 }
 
 void ViewSystem::CreateDefineItemFormUsbToHost(char *name) {
@@ -6438,76 +6429,67 @@ void ViewSystem::CreateDefineItemFormUsbToHost(char *name) {
 }
 
 void ViewSystem::CreateDefineItem_comment(int probeIndex, vector<string>& vecExamItem_comment) {
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char firstgenitem[256];
-    char src_group[256];
-    char userselect[256];
-    // const char* username = GetUserName();
-    char path_userselect[256];
-    sprintf(path_userselect, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini_userselect(path_userselect);
-    ExamItem examitem;
-    string userselectname;
-    userselectname = examitem.ReadDefaultUserSelect(&ini_userselect);
+  IniFile ini_userselect(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
 
-    vector<string> useritemgroup;
-    useritemgroup = examitem.GetDefaultUserGroup();
+  ExamItem examitem;
+  string userselectname = examitem.ReadDefaultUserSelect(&ini_userselect);
 
-    int group_length(0);
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        examitem.GetUserItem(src_group, userselect, probelist, useritem, department, firstgenitem);
-        ExamPara exampara;
-        exampara.dept_name=_(department);
-        exampara.name=useritem;
-        exampara.index=ExamItem::USERNAME;
-        PRINTF("probelist=%s, PROBE_LIST=%s\n",probelist,PROBE_LIST[probeIndex].c_str());
-        if(strcmp(userselectname.c_str(), userselect) == 0) {
-            if((probeIndex>=0)&&(probeIndex<=NUM_PROBE)) {
-                if (strcmp(probelist, PROBE_LIST[probeIndex].c_str())==0) {
-                    vecExamItem_comment.push_back(useritem);
-                }
-            }
+  vector<string> useritemgroup = examitem.GetDefaultUserGroup();
+
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+    string firstgenitem;
+
+    examitem.GetUserItem(useritemgroup[i], userselect, probelist, useritem, department, firstgenitem);
+
+    ExamPara exampara;
+    exampara.dept_name = department;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if (userselectname == userselect) {
+      if (probeIndex >= 0 && probeIndex <= NUM_PROBE) {
+        if (probelist == PROBE_LIST[probeIndex]) {
+          vecExamItem_comment.push_back(useritem);
         }
+      }
     }
+  }
 }
 
 bool ViewSystem::RenameNotice(int probe_type_index, char *new_text, char *dialognotice, int group_length) {
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char firstgenitem[256];
-    char src_group[256];
-    char userselect[256];
-    const char* username = GetUserName();
-    char usernamechar[256];
-    strcpy(usernamechar, username);
-    char userselectname[256];;
-    ExamItem examitem;
-    examitem.TransUserSelectForEng(usernamechar, userselectname);
+  ExamItem examitem;
+  string userselectname = examitem.TransUserSelectForEng(GetUserName());
 
-    vector<string> useritemgroup;
-    useritemgroup = examitem.GetCurrentUserGroup();
+  vector<string> useritemgroup = examitem.GetCurrentUserGroup();
 
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        examitem.GetUserItem(src_group, userselect, probelist,useritem,department, firstgenitem);
-        if(strcmp(userselectname, userselect) == 0) {
-            if((probe_type_index>=0)&&(probe_type_index<=NUM_PROBE)) {
-                if (strcmp(probelist, PROBE_LIST[probe_type_index].c_str())==0) {
-                    if (strcmp(useritem,new_text)==0) {
-                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, dialognotice, NULL); //重命名失败!该结点已存在
-                        return FALSE;
-                    }
-                }
-            }
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+    string firstgenitem;
+
+    examitem.GetUserItem(useritemgroup[i], userselect, probelist, useritem, department, firstgenitem);
+
+    if (userselectname == userselect) {
+      if (probe_type_index >= 0 && probe_type_index <= NUM_PROBE) {
+        if (probelist == PROBE_LIST[probe_type_index]) {
+          if (useritem == new_text) {
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+              MessageDialog::DLG_ERROR, dialognotice, NULL); // 重命名失败!该结点已存在
+
+            return false;
+          }
         }
+      }
+    }
     }
 
+    return true;
 }
 
 void ViewSystem::TransEnglish(char *strname, char str[256],char *str_indexname,char str_index[256])
@@ -7134,9 +7116,9 @@ GtkTreeModel* ViewSystem::create_item_comment_model1() {
 
     if(!exam_type_name)
         return NULL;
-    char exam_type[256];
+
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
 
     vector<ExamPara> vecItemComment1;
     vecItemComment1.clear();
@@ -7312,9 +7294,8 @@ int ViewSystem::DepartmentIndex() {
     if(!exam_type_name)
         return -1;
 
-    char exam_type[256];
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
 
     char path[256];
@@ -9104,9 +9085,9 @@ void ViewSystem::ButtonSelectOneCommentClicked(GtkButton *button) {
 
     if(!exam_type_name)
         return;
-    char exam_type[256];
+
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
     vector<ExamPara> vecItem_Comment;
     vecItem_Comment.clear();
@@ -9212,9 +9193,9 @@ void ViewSystem::ButtonSelectAllCommentClicked(GtkButton *button) {
 
     if(!exam_type_name)
         return;
-    char exam_type[256];
+
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
     char path11[256];
     sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -9317,9 +9298,9 @@ void ViewSystem::ButtonDownClicked(GtkButton *button) {
     int index1 = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
 
     gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_comment));
-    char exam_type[256];
+
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
     vector<ExamPara> vecDelete_Comment;
     vecDelete_Comment.clear();
@@ -9406,9 +9387,9 @@ void ViewSystem::ButtonUpClicked(GtkButton *button) {
     int index1 = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
 
     gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_comment));
-    char exam_type[256];
+
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
 
     vector<ExamPara> vecDelete_Comment;
@@ -9706,9 +9687,8 @@ void ViewSystem::ButtonDeleteClicked(GtkButton *button) {
     if(!exam_type_name)
         return;
 
-    char exam_type[256];
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
     char path11[256];
     sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -9971,15 +9951,10 @@ void ViewSystem::ButtonDeleteAllClicked(GtkButton *button) {
     if(!exam_type_name)
         return;
 
-    char exam_type[256];
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
-    /* char path[256];
-     sprintf(path, "%s%s", CFG_RES_PATH, COMMENT_FILE);
-     IniFile ini(path);
-     IniFile *ptrIni= &ini;
-    */
+
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini1(path);
@@ -10147,9 +10122,8 @@ void ViewSystem::CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_c
     if(!exam_type_name)
         return;
 
-    char exam_type[256];
     ExamItem exam;
-    exam.TransItemName(exam_type_name, exam_type);
+    string exam_type = exam.TransItemName(exam_type_name);
 
     string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
     vector<ExamPara> vecItem_Comment;

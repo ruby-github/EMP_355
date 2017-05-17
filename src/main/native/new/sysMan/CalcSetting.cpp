@@ -323,8 +323,7 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   ExamItem exam;
   string examType = exam.ReadDefaultProbeDefaultItemName(&ini);
 
-  char exam_type[256] = {0};
-  exam.TransItemNameEng(examType.c_str(), exam_type);
+  string exam_type = exam.TransItemNameEng(examType);
   int sequence = GetSequence(examType);
 
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
@@ -782,10 +781,10 @@ void CalcSetting::ComboBoxChangedExamType(GtkComboBox* combobox) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   int sequence = GetSequence(exam_type);
+
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
 }
 
@@ -805,9 +804,8 @@ void CalcSetting::ComboBoxChangedSequence(GtkComboBox* combobox) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
 
   int number = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sequence));
 
@@ -856,9 +854,8 @@ void CalcSetting::ButtonClickedSelectOne(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   vector<string> vecItem_Calc;
   vecItem_Calc.clear();
   CreateItemList_Calc1(exam_type, vecItem_Calc);
@@ -960,9 +957,8 @@ void CalcSetting::ButtonClickedSelectAll(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   char path11[256];
   sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini11(path11);
@@ -1083,9 +1079,8 @@ void CalcSetting::ButtonClickedBackOne(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   char path11[256];
   sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path11);
@@ -1149,9 +1144,8 @@ void CalcSetting::ButtonClickedBackAll(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   char path[256];
   sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path);
@@ -1235,9 +1229,8 @@ void CalcSetting::ButtonClickedUp(GtkButton* button) {
     exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name.c_str());
 
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
@@ -1324,9 +1317,8 @@ void CalcSetting::ButtonClickedDown(GtkButton* button) {
     exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
   CreateItemList_Calc2(exam_type, vecDelete_Calc);
@@ -1596,26 +1588,18 @@ void CalcSetting::UpdateAll() {
 }
 
 void CalcSetting::CreateDefineItemCalc(vector<string>& vecExamItem) {
-  char probelist[256];
-  char useritem[256];
-  char department[256];
-  char firstgenitem[256];
-  char src_group[256];
-  char userselect[256];
-  char path_userselect[256];
-  sprintf(path_userselect, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-  IniFile ini_userselect(path_userselect);
   ExamItem examitem;
-  vector<string> useritemgroup;
-  useritemgroup = examitem.GetDefaultUserGroup();
+  vector<string> useritemgroup = examitem.GetDefaultUserGroup();
 
-  int group_length(0);
-  group_length = useritemgroup.size();
-  for (int i= 0 ; i <  group_length; i++) {
-    if (useritemgroup[i].length() != 0) {
-      sprintf(src_group ,"%s", useritemgroup[i].c_str());
-      examitem.GetUserItem(src_group, userselect, probelist, useritem, department, firstgenitem);
-      string username=useritem;
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    if (!useritemgroup[i].empty()) {
+      string userselect;
+      string probelist;
+      string username;
+      string department;
+      string firstgenitem;
+
+      examitem.GetUserItem(useritemgroup[i], userselect, probelist, username, department, firstgenitem);
       vecExamItem.push_back(username);
     }
   }
@@ -1652,9 +1636,8 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel1() {
     return NULL;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   int sequence = GetSequence(exam_type);
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
 
@@ -1717,9 +1700,8 @@ GtkTreeModel* CalcSetting::CreateItemCalcModel2() {
     return NULL;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
 
   vector<string> vecItemCalc1;
   vecItemCalc1.clear();
@@ -2352,10 +2334,8 @@ void CustomCalc::ImportSuccess() {
     sprintf(userselectname, "%s%s%s%s", CFG_RES_PATH, CALC_PATH, username.c_str(), ".ini");
   }
 
-  char exam_name[256];
-  char exam_type[256];
-  strcpy(exam_name, CalcSetting::GetInstance()->GetExamName().c_str());
-  exam.TransItemName(exam_name, exam_type);
+  string exam_name = CalcSetting::GetInstance()->GetExamName();
+  string exam_type = exam.TransItemName(exam_name);
   IniFile ini_add3(userselectname);
   IniFile* ptrIni_add3 = &ini_add3;
   ptrIni_add3->RemoveGroup(exam_type);
@@ -2877,11 +2857,9 @@ void CustomCalc::LoadData() {
       sprintf(userselectname1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/",username.c_str(),".ini");
     }
 
-    char exam_type[256];
-    char exam_name[256];
-    strcpy(exam_name, CalcSetting::GetInstance()->GetExamName().c_str());
-    exam.TransItemName(exam_name, exam_type);
-    PRINTF("exam_type=%s\n", exam_type);
+    string exam_name = CalcSetting::GetInstance()->GetExamName();
+    string exam_type = exam.TransItemName(exam_name);
+
     IniFile ini_tmp(userselectname);
     IniFile* ptrIni_tmp = &ini_tmp;
 
@@ -2895,7 +2873,7 @@ void CustomCalc::LoadData() {
       sprintf(src_group ,"%s", itemgroup[i].c_str());
       PRINTF("src_group=%s\n", src_group);
 
-      if(strcmp(src_group,exam_type) != 0) {
+      if(strcmp(src_group,exam_type.c_str()) != 0) {
         PRINTF("src_group_delete=%s\n", src_group);
         ptrIni_tmp->RemoveGroup(src_group);
         ptrIni_tmp->SyncConfigFile();

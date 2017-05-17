@@ -111,8 +111,7 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget* parent) {
   ExamItem exam;
   string examType = exam.ReadDefaultProbeDefaultItemName(&ini);
 
-  char exam_type[256] = {0};
-  exam.TransItemNameEng(examType.c_str(), exam_type);
+  string exam_type = exam.TransItemNameEng(examType.c_str());
   int sequence = GetSequence(exam_type);
 
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
@@ -259,9 +258,8 @@ void MeasureSetting::ComboBoxChangedExamType(GtkComboBox* combobox) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name.c_str());
   int sequence = GetSequence(exam_type);
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
 }
@@ -277,9 +275,8 @@ void MeasureSetting::ComboBoxChangedMeasureSequence(GtkComboBox* combobox) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
 
   int number = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sequence));
 
@@ -327,9 +324,8 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   vector<string> vecItem_Calc;
   vecItem_Calc.clear();
   CreateItemListForMeasureed(exam_type, vecItem_Calc);
@@ -430,9 +426,8 @@ void MeasureSetting::ButtonClickedSelectAll(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   char path11[256];
   sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini11(path11);
@@ -532,9 +527,8 @@ void MeasureSetting::ButtonClickedBackOne(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   char path11[256];
   sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path11);
@@ -597,9 +591,8 @@ void MeasureSetting::ButtonClickedBackAll(GtkButton* button) {
     return;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   char path[256];
   sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path);
@@ -660,9 +653,8 @@ void MeasureSetting::ButtonClickedUp(GtkButton* button) {
     exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
 
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
@@ -749,9 +741,8 @@ void MeasureSetting::ButtonClickedDown(GtkButton* button) {
     exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   vector<int> vecDelete_Calc;
   vecDelete_Calc.clear();
   CreateItemListCalc2(exam_type, vecDelete_Calc);
@@ -856,27 +847,18 @@ void MeasureSetting::ButtonClickedDefault(GtkButton* button) {
 }
 
 void MeasureSetting::CreateDefineItemCalc(vector<string>& vec) {
-  char probelist[256];
-  char useritem[256];
-  char department[256];
-  char firstgenitem[256];
-  char src_group[256];
-  char userselect[256];
-  char path_userselect[256];
-  sprintf(path_userselect, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-  IniFile ini_userselect(path_userselect);
   ExamItem examitem;
-  vector<string> useritemgroup;
-  useritemgroup = examitem.GetDefaultUserGroup();
+  vector<string> useritemgroup = examitem.GetDefaultUserGroup();
 
-  int group_length(0);
-  group_length = useritemgroup.size();
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    if (!useritemgroup[i].empty()) {
+      string userselect;
+      string probelist;
+      string username;
+      string department;
+      string firstgenitem;
 
-  for (int i= 0 ; i <  group_length; i++) {
-    if (useritemgroup[i].length() != 0) {
-      sprintf(src_group ,"%s", useritemgroup[i].c_str());
-      examitem.GetUserItem(src_group, userselect, probelist, useritem, department, firstgenitem);
-      string username=useritem;
+      examitem.GetUserItem(useritemgroup[i], userselect, probelist, username, department, firstgenitem);
       vec.push_back(username);
     }
   }
@@ -893,9 +875,8 @@ GtkTreeModel* MeasureSetting::CreateItemCalcModel1() {
     return NULL;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
   int sequence = GetSequence(exam_type);
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sequence), sequence);
 
@@ -937,9 +918,8 @@ GtkTreeModel* MeasureSetting::CreateItemCalcModel2() {
     return NULL;
   }
 
-  char exam_type[256];
   ExamItem exam;
-  exam.TransItemName(exam_type_name.c_str(), exam_type);
+  string exam_type = exam.TransItemName(exam_type_name);
 
   vector<string> vecItemCalc1;
   vecItemCalc1.clear();
