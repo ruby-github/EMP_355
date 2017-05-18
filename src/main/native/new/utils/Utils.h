@@ -4,11 +4,7 @@
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
 
-#include <string>
-#include <vector>
-
-using std::string;
-using std::vector;
+#include "utils/Settings.h"
 
 class Utils {
 public:
