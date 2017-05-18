@@ -330,11 +330,7 @@ void UserSelect::write_username(GtkWidget* widget, string db_dbname, string reco
     FileMan f;
     char srcpath[50]= {0};
 
-    #ifdef VET
-      sprintf(srcpath, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "VetDefaultItemPara.ini");
-    #else
-      sprintf(srcpath, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "DefaultItemPara.ini");
-    #endif
+    sprintf(srcpath, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "DefaultItemPara.ini");
 
     // f.CopyFile("./res/config/ItemPara.ini", path);
     f.CopyFile(srcpath, path);

@@ -418,11 +418,7 @@ void ConfigToHost::LoadSelectedData() {
     gchar* destPath;
     gchar* destPath_other = NULL;
 
-    #ifdef VET
-      sprintf(usb_file_path, "%s/default/VetItemPara.ini",UDISK_DATA_PATH);
-    #else
-      sprintf(usb_file_path, "%s/default/ItemPara.ini",UDISK_DATA_PATH);
-    #endif
+    sprintf(usb_file_path, "%s/default/ItemPara.ini",UDISK_DATA_PATH);
 
     char name[50]= {0};
     if(strcmp(usb_file_path, (*ite).c_str()) == 0) { //default目录下文件路径
@@ -655,13 +651,8 @@ void ConfigToHost::LoadSelectedDataCalc() {
     char userselectname[256];
     char userselectname1[256];
 
-    #ifdef VET
-      sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
-      sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
-    #else
-      sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
-      sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
-    #endif
+    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
 
     FileMan f;
 
@@ -1100,13 +1091,8 @@ bool ConfigToHost::GetAllSelectPathCalc() {
   char path[256];
   char path1[256];
 
-  #ifdef VET
-    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/VetCalcSetting.ini");
-    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/VetCalcItemSetting.ini");
-  #else
-    sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/CalcSetting.ini");
-    sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/CalcItemSetting.ini");
-  #endif
+  sprintf(path, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/CalcSetting.ini");
+  sprintf(path1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_rootName.c_str(), "/CalcItemSetting.ini");
 
   m_vecPath.push_back(path);
   m_vecPath.push_back(path1);

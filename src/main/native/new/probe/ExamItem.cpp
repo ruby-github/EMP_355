@@ -479,19 +479,13 @@ void ExamItem::SetUserItemOfProbe(char* probeModel, enum EItem itemIndex, const 
 
     // read current item para value to m_paraItem
     char path[256];
-#ifdef VET
-    if (strcmp(user_configure, "VetItemPara.ini") == 0)
-        sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE);
-    else
-        sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
 
-#else
     //const gchar *name = ViewProbe::GetInstance()->GetUserName();
     if (strcmp(user_configure, "ItemPara.ini") == 0)
         sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE);
     else
         sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
-#endif
+
     IniFile ini(path);
     ReadConfigCommon(&m_paraItem, KEY_COMMON + "-" + item, &ini);
     ReadConfigOther(&m_paraItem, PROBE_LIST[m_probeIndex] + "-" + item, &ini);
@@ -506,19 +500,11 @@ void ExamItem::SetItemOfProbe(char* probeModel, enum EItem itemIndex) {
     // read current item para value to m_paraItem
     char path[256];
 
-#ifdef VET
-
-    if (strcmp(user_configure, "VetItemPara.ini") == 0)
-        sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE);
-    else
-        sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
-
-#else
     if (strcmp(user_configure, "ItemPara.ini") == 0)
         sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE);
     else
         sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
-#endif
+
     IniFile ini(path);
     ReadConfigCommon(&m_paraItem, KEY_COMMON + "-" + ITEM_LIB[m_itemIndex], &ini);
     ReadConfigOther(&m_paraItem, PROBE_LIST[m_probeIndex] + "-" + ITEM_LIB[m_itemIndex], &ini);
@@ -717,14 +703,10 @@ void ExamItem::WriteNewItemToCommentFile(int probeIndex, char *new_string, const
     IniFile ini(path);
     IniFile *ptrIni= &ini;
 
-    /*   char path[256];
-       sprintf(path, "%s%s", CFG_RES_PATH, COMMENT_FILE);
-       IniFile ini(path);
-       IniFile *ptrIni= &ini;
-      */ ptrIni->WriteInt((PROBE_LIST[probeIndex] + "-" + new_string).c_str(), "Number", 0);
-#ifndef VET
+    ptrIni->WriteInt((PROBE_LIST[probeIndex] + "-" + new_string).c_str(), "Number", 0);
+
     ptrIni->WriteString((PROBE_LIST[probeIndex] + "-" + new_string).c_str(), "Department", str);
-#endif
+
     ptrIni->SyncConfigFile();
 
 }
@@ -800,14 +782,6 @@ void ExamItem::DeleteItemParaFile(int probeIndex, const char *old_string, const 
 
     DeleteNewExamItem(str, KEY_COMMON + "-" + old_string, &ini);
     DeleteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + old_string, &ini);
-
-    /*char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, DEFAULT_EXAM_FILE);
-    IniFile ini1(path1);
-
-    DeleteNewExamItem(str, KEY_COMMON  + "-" + old_string, &ini1);
-    DeleteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + old_string, &ini1);
-    */
 }
 
 void ExamItem::WriteDefinedItemPara(int probeIndex, char *new_string,const char *str,const char *str_index) {
@@ -818,7 +792,6 @@ void ExamItem::WriteDefinedItemPara(int probeIndex, char *new_string,const char 
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0)&& (strcmp(name, "Sistema por defecto") !=0))
 
     {
-        //  sprintf(path1, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, name, ".ini");
         sprintf(path, "%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, user_configure);
     } else {
         sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE);
@@ -877,12 +850,6 @@ void ExamItem::WriteNewItemFile(int probeIndex, char *new_string,const char *str
 
 }
 
-/*
- * @brief read parameter of factory defalut examItem in config file, according to probeIndex and itemIndex
- * @para probeIndex [in] index of probe in PROBE_LIST
- * @para itemIndex [in] index of exam item in ITEM_LIB
- * @para paraItem[out] pointer saved all parameter read from ItemPara.ini file
- */
 void ExamItem::ReadDefaultExamItem(int probeIndex, int itemIndex, ParaItem* paraItem, char *itemName) {
     char path[256];
     sprintf(path, "%s/%s", CFG_RES_PATH, DEFAULT_EXAM_FILE);
@@ -896,9 +863,6 @@ void ExamItem::ReadDefaultExamItem(int probeIndex, int itemIndex, ParaItem* para
     }
 }
 
-/*
- * @brief generate all probe's default image optimizing para, only used when the first time "OptimizePara.ini" file is generate
- */
 void ExamItem::GenerateDefaultImgOptimize() {
     char path[256];
     sprintf(path, "%s/%s", CFG_RES_PATH, DEFAULT_OPTIMIZE_FILE);
@@ -912,18 +876,7 @@ void ExamItem::GenerateDefaultImgOptimize() {
     }
 }
 
-///> private func
-/*
- * @brief get the probe index that match probeModel, if no probe match it, return an index of similar probe
- *
- * @retval index of probe in PROBE_LIST[]
- */
 
-/*
- * @brief init value of m_paraItem
- *
- * @para paraItem variable to be set value
- */
 void ExamItem::InitItemPara(ParaItem* paraItem) {
     // common
     paraItem->common.MBP = 0;
@@ -985,125 +938,8 @@ void ExamItem::InitItemPara(ParaItem* paraItem) {
     paraItem->color.persist = 0;
 }
 
-/*
- * @brief init items in each probe(in PROBE_LIST), set the item index to m_vecItemIndex
- *
- */
+
 void ExamItem::InitItemOfProbe() {
-#ifdef VET
-    m_vecItemIndex[0].push_back(USER1);
-    m_vecItemIndex[0].push_back(USER2);
-    m_vecItemIndex[0].push_back(USER3);
-    m_vecItemIndex[0].push_back(USER4);
-    m_vecItemIndex[0].push_back(USER5);
-    m_vecItemIndex[0].push_back(USER6);
-    m_vecItemIndex[0].push_back(USER7);
-    m_vecItemIndex[0].push_back(USER8);
-    m_vecItemIndex[0].push_back(USER9);
-    m_vecItemIndex[0].push_back(USER10);
-    // probe 1 70L40J 8
-    m_vecItemIndex[1].push_back(USER1);
-    m_vecItemIndex[1].push_back(USER2);
-    m_vecItemIndex[1].push_back(USER3);
-    m_vecItemIndex[1].push_back(USER4);
-    m_vecItemIndex[1].push_back(USER5);
-    m_vecItemIndex[1].push_back(USER6);
-    m_vecItemIndex[1].push_back(USER7);
-    m_vecItemIndex[1].push_back(USER8);
-    m_vecItemIndex[1].push_back(USER9);
-    m_vecItemIndex[1].push_back(USER10);
-    // probe 2 70L60J 8
-    m_vecItemIndex[2].push_back(USER1);
-    m_vecItemIndex[2].push_back(USER2);
-    m_vecItemIndex[2].push_back(USER3);
-    m_vecItemIndex[2].push_back(USER4);
-    m_vecItemIndex[2].push_back(USER5);
-    m_vecItemIndex[2].push_back(USER6);
-    m_vecItemIndex[2].push_back(USER7);
-    m_vecItemIndex[2].push_back(USER8);
-    m_vecItemIndex[2].push_back(USER9);
-    m_vecItemIndex[2].push_back(USER10);
-
-    // probe 2 70L60J 8
-    m_vecItemIndex[3].push_back(USER1);
-    m_vecItemIndex[3].push_back(USER2);
-    m_vecItemIndex[3].push_back(USER3);
-    m_vecItemIndex[3].push_back(USER4);
-    m_vecItemIndex[3].push_back(USER5);
-    m_vecItemIndex[3].push_back(USER6);
-    m_vecItemIndex[3].push_back(USER7);
-    m_vecItemIndex[3].push_back(USER8);
-    m_vecItemIndex[3].push_back(USER9);
-    m_vecItemIndex[3].push_back(USER10);
-// probe 2 70L60J 8
-    m_vecItemIndex[4].push_back(USER1);
-    m_vecItemIndex[4].push_back(USER2);
-    m_vecItemIndex[4].push_back(USER3);
-    m_vecItemIndex[4].push_back(USER4);
-    m_vecItemIndex[4].push_back(USER5);
-    m_vecItemIndex[4].push_back(USER6);
-    m_vecItemIndex[4].push_back(USER7);
-    m_vecItemIndex[4].push_back(USER8);
-    m_vecItemIndex[4].push_back(USER9);
-    m_vecItemIndex[4].push_back(USER10);
-
-    // probe 2 70L60J 8
-    m_vecItemIndex[5].push_back(USER1);
-    m_vecItemIndex[5].push_back(USER2);
-    m_vecItemIndex[5].push_back(USER3);
-    m_vecItemIndex[5].push_back(USER4);
-    m_vecItemIndex[5].push_back(USER5);
-    m_vecItemIndex[5].push_back(USER6);
-    m_vecItemIndex[5].push_back(USER7);
-    m_vecItemIndex[5].push_back(USER8);
-    m_vecItemIndex[5].push_back(USER9);
-    m_vecItemIndex[5].push_back(USER10);
-
-    m_vecItemIndex[6].push_back(USER1);
-    m_vecItemIndex[6].push_back(USER2);
-    m_vecItemIndex[6].push_back(USER3);
-    m_vecItemIndex[6].push_back(USER4);
-    m_vecItemIndex[6].push_back(USER5);
-    m_vecItemIndex[6].push_back(USER6);
-    m_vecItemIndex[6].push_back(USER7);
-    m_vecItemIndex[6].push_back(USER8);
-    m_vecItemIndex[6].push_back(USER9);
-    m_vecItemIndex[6].push_back(USER10);
-
-    m_vecItemIndex[7].push_back(USER1);
-    m_vecItemIndex[7].push_back(USER2);
-    m_vecItemIndex[7].push_back(USER3);
-    m_vecItemIndex[7].push_back(USER4);
-    m_vecItemIndex[7].push_back(USER5);
-    m_vecItemIndex[7].push_back(USER6);
-    m_vecItemIndex[7].push_back(USER7);
-    m_vecItemIndex[7].push_back(USER8);
-    m_vecItemIndex[7].push_back(USER9);
-    m_vecItemIndex[7].push_back(USER10);
-
-    m_vecItemIndex[8].push_back(USER1);
-    m_vecItemIndex[8].push_back(USER2);
-    m_vecItemIndex[8].push_back(USER3);
-    m_vecItemIndex[8].push_back(USER4);
-    m_vecItemIndex[8].push_back(USER5);
-    m_vecItemIndex[8].push_back(USER6);
-    m_vecItemIndex[8].push_back(USER7);
-    m_vecItemIndex[8].push_back(USER8);
-    m_vecItemIndex[8].push_back(USER9);
-    m_vecItemIndex[8].push_back(USER10);
-
-    m_vecItemIndex[9].push_back(USER1);
-    m_vecItemIndex[9].push_back(USER2);
-    m_vecItemIndex[9].push_back(USER3);
-    m_vecItemIndex[9].push_back(USER4);
-    m_vecItemIndex[9].push_back(USER5);
-    m_vecItemIndex[9].push_back(USER6);
-    m_vecItemIndex[9].push_back(USER7);
-    m_vecItemIndex[9].push_back(USER8);
-    m_vecItemIndex[9].push_back(USER9);
-    m_vecItemIndex[9].push_back(USER10);
-
-#else
     //probe 0 35C505 13
     m_vecItemIndex[0].push_back(ABDO_ADULT);
     m_vecItemIndex[0].push_back(ABDO_LIVER);
@@ -1128,19 +964,12 @@ void ExamItem::InitItemOfProbe() {
     m_vecItemIndex[1].push_back(MENISCUS);
     m_vecItemIndex[1].push_back(JOINT_CAVITY);
     m_vecItemIndex[1].push_back(SPINE);
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     m_vecItemIndex[1].push_back(CAROTID);
     m_vecItemIndex[1].push_back(JUGULAR);
     m_vecItemIndex[1].push_back(PERI_ARTERY);
     m_vecItemIndex[1].push_back(PERI_VEIN);
-#endif
-#endif
 
-    // probe 2 65C10K 2
-#if defined(EMP_322)
-    m_vecItemIndex[2].push_back(GYN);
-#elif (defined EMP_355)
     //75L40J
     m_vecItemIndex[2].push_back(GLANDS);
     m_vecItemIndex[2].push_back(THYROID);
@@ -1167,21 +996,7 @@ void ExamItem::InitItemOfProbe() {
     m_vecItemIndex[3].push_back(JUGULAR);
     m_vecItemIndex[3].push_back(PERI_ARTERY);
     m_vecItemIndex[3].push_back(PERI_VEIN);
-#else
-    m_vecItemIndex[2].push_back(GYN);
-    m_vecItemIndex[2].push_back(EARLY_PREG);
-    m_vecItemIndex[2].push_back(LATER_PREG);
-    m_vecItemIndex[2].push_back(CAR_FETUS);
-    m_vecItemIndex[2].push_back(KIDNEY);
-    m_vecItemIndex[2].push_back(BLADDER);
-#endif
 
-#if defined(EMP_430)
-    //probe 3 65C15D
-    m_vecItemIndex[3].push_back(ABDO_KID);
-    m_vecItemIndex[3].push_back(CAR_ADULT);
-    m_vecItemIndex[3].push_back(CAR_KID);
-#elif (defined EMP_355)
     //90L40J
     m_vecItemIndex[4].push_back(GLANDS);
     m_vecItemIndex[4].push_back(THYROID);
@@ -1195,73 +1010,14 @@ void ExamItem::InitItemOfProbe() {
     m_vecItemIndex[4].push_back(JUGULAR);
     m_vecItemIndex[4].push_back(PERI_ARTERY);
     m_vecItemIndex[4].push_back(PERI_VEIN);
-#else
-    // probe 3 35C20H 3
-    m_vecItemIndex[3].push_back(ABDO_KID);
-    m_vecItemIndex[3].push_back(CAR_ADULT);
-    m_vecItemIndex[3].push_back(CAR_KID);
-#endif
 
-#if (defined(EMP_161))
-    //30P16A
-    if(NUM_PROBE > 4) {
-        m_vecItemIndex[4].push_back(CAR_ADULT);
-        m_vecItemIndex[4].push_back(CAR_KID);
-        m_vecItemIndex[4].push_back(CAR_FETUS);
-    }
-#elif (defined EMP_430)
-    {
-        m_vecItemIndex[4].push_back(ABDO_ADULT);
-    }
-#elif (defined EMP_355)
     m_vecItemIndex[5].push_back(GYN);
     m_vecItemIndex[5].push_back(EARLY_PREG);
     m_vecItemIndex[5].push_back(LATER_PREG);
     m_vecItemIndex[5].push_back(CAR_FETUS);
     m_vecItemIndex[5].push_back(KIDNEY);
     m_vecItemIndex[5].push_back(BLADDER);
-#else
-    // probe 4 65C15D
-    if(NUM_PROBE > 4) {
-        m_vecItemIndex[4].push_back(ABDO_KID);
-        m_vecItemIndex[4].push_back(CAR_ADULT);
-        m_vecItemIndex[4].push_back(CAR_KID);
-    }
-#endif
 
-#if (defined(EMP_313) || defined(EMP_322))
-    // probe 5 90L40J
-    if (NUM_PROBE > 5) {
-        m_vecItemIndex[5].push_back(THYROID);
-    }
-
-// probe 6 35D40J
-    if (NUM_PROBE > 6) {
-        m_vecItemIndex[6].push_back(ABDO_ADULT);
-    }
-
-    if (NUM_PROBE > 7) {
-        m_vecItemIndex[7].push_back(CAR_ADULT);
-        m_vecItemIndex[7].push_back(CAR_KID);
-        m_vecItemIndex[7].push_back(CAR_FETUS);
-    }
-
-#elif defined(EMP_360)
-    // probe 5 30P16A
-    if (NUM_PROBE > 5) {
-        m_vecItemIndex[5].push_back(CAR_ADULT);
-        m_vecItemIndex[5].push_back(CAR_KID);
-        m_vecItemIndex[5].push_back(CAR_FETUS);
-    }
-
-    //probe 6 35D40J
-    if (NUM_PROBE > 6) {
-        m_vecItemIndex[6].push_back(ABDO_ADULT);
-        m_vecItemIndex[6].push_back(EARLY_PREG);
-        m_vecItemIndex[6].push_back(LATER_PREG);
-    }
-
-#elif defined(EMP_355)
     ///probe6 35C20I
     if (NUM_PROBE > 5) {
         m_vecItemIndex[6].push_back(ABDO_KID);
@@ -1300,68 +1056,8 @@ void ExamItem::InitItemOfProbe() {
     if(NUM_PROBE > 9) {
         m_vecItemIndex[10].push_back(GYN);
     }
-
-#else //340
-    // probe 5 30P16A
-    if (NUM_PROBE > 5) {
-        m_vecItemIndex[5].push_back(CAR_ADULT);
-        m_vecItemIndex[5].push_back(CAR_KID);
-        m_vecItemIndex[5].push_back(CAR_FETUS);
-    }
-
-    //probe 6 90L25K
-    if (NUM_PROBE > 6) {
-        m_vecItemIndex[6].push_back(GLANDS);
-        m_vecItemIndex[6].push_back(THYROID);
-        m_vecItemIndex[6].push_back(EYE);
-        m_vecItemIndex[6].push_back(SMALL_PART);
-        m_vecItemIndex[6].push_back(CAROTID);
-        m_vecItemIndex[6].push_back(JUGULAR);
-        m_vecItemIndex[6].push_back(PERI_ARTERY);
-        m_vecItemIndex[6].push_back(PERI_VEIN);
-        m_vecItemIndex[6].push_back(HIP_JOINT);
-        m_vecItemIndex[6].push_back(MENISCUS);
-        m_vecItemIndex[6].push_back(JOINT_CAVITY);
-        m_vecItemIndex[6].push_back(SPINE);
-    }
-
-    //probe 7 10L25J
-    if (NUM_PROBE > 7) {
-        m_vecItemIndex[7].push_back(GLANDS);
-        m_vecItemIndex[7].push_back(THYROID);
-        m_vecItemIndex[7].push_back(EYE);
-        m_vecItemIndex[7].push_back(SMALL_PART);
-        m_vecItemIndex[7].push_back(CAROTID);
-        m_vecItemIndex[7].push_back(JUGULAR);
-        m_vecItemIndex[7].push_back(PERI_ARTERY);
-        m_vecItemIndex[7].push_back(PERI_VEIN);
-        m_vecItemIndex[7].push_back(HIP_JOINT);
-        m_vecItemIndex[7].push_back(MENISCUS);
-        m_vecItemIndex[7].push_back(JOINT_CAVITY);
-        m_vecItemIndex[7].push_back(SPINE);
-    }
-
-    //probe 8 35D40J
-    if (NUM_PROBE > 8) {
-        m_vecItemIndex[8].push_back(ABDO_ADULT);
-        m_vecItemIndex[8].push_back(EARLY_PREG);
-        m_vecItemIndex[8].push_back(LATER_PREG);
-    }
-
-    //probe 9 65C10H
-    if (NUM_PROBE > 9) {
-        m_vecItemIndex[9].push_back(GYN);
-    }
-#endif
-#endif
 }
 
-/*
- * @brief write common para in each item to config file
- *
- * @para paraItem it's common para are to be written
- * @para section item name
- */
 void ExamItem::WriteConfigCommon(ParaItem* paraItem, string section, IniFile* ptrIni) {
     const char* ptrSection = section.c_str();
     // common
@@ -1370,8 +1066,6 @@ void ExamItem::WriteConfigCommon(ParaItem* paraItem, string section, IniFile* pt
     int texType = 0, bodymarkType = 0;
     ptrIni->WriteInt(ptrSection, "Common-TextType", texType);
     ptrIni->WriteInt(ptrSection, "Common-BodymarkType", bodymarkType);
-    //ptrIni->WriteInt(ptrSection, "Common-TextType", paraItem->common.textType);
-    //ptrIni->WriteInt(ptrSection, "Common-BodymarkType", paraItem->common.bodymarkType);
     ptrIni->SyncConfigFile();
 }
 
@@ -1452,12 +1146,6 @@ void ExamItem::DeleteNewExamItem(const char *department, string section, IniFile
     ptrIni->SyncConfigFile();
 }
 
-/*
- * @brief write 2d/cfm/pw para in each item and each probe to config file
- *
- * @para paraItem it's paras except common para are to be written
- * @para section probe name + item name
- */
 void ExamItem::WriteConfigOther(ParaItem* paraItem, string section, IniFile* ptrIni) {
     const char* ptrSection = section.c_str();
     //2d
@@ -1491,8 +1179,7 @@ void ExamItem::WriteConfigOther(ParaItem* paraItem, string section, IniFile* ptr
     ptrIni->WriteInt(ptrSection, "D2-ImageEhn", paraItem->d2.imgEhn);
     ptrIni->WriteInt(ptrSection, "D2-GrayTransIndex", paraItem->d2.grayTransIndex);
     ptrIni->WriteInt(ptrSection, "D2-Scanline", paraItem->d2.scanline);
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     // spectrum
     ptrIni->WriteInt(ptrSection, "Spectrum-Freq", paraItem->spectrum.freq);
     ptrIni->WriteInt(ptrSection, "Spectrum-Gain", paraItem->spectrum.gain);
@@ -1524,8 +1211,7 @@ void ExamItem::WriteConfigOther(ParaItem* paraItem, string section, IniFile* ptr
     ptrIni->WriteInt(ptrSection, "Color-Steer", paraItem->color.steer);
     //ptrIni->WriteInt(ptrSection, "Color-ColorMap", paraItem->color.colormap);
     ptrIni->WriteInt(ptrSection, "Color-Artifact", paraItem->color.artifact);
-#endif
-#endif
+
     ptrIni->SyncConfigFile();
 }
 
@@ -1574,8 +1260,7 @@ void ExamItem::ReadConfigOther(ParaItem* paraItem, string section, IniFile* ptrI
     paraItem->d2.freqCompoundIndex = ptrIni->ReadInt(ptrSection, "D2-FreqCompoundIndex");
     paraItem->d2.thiFreqIndex = ptrIni->ReadInt(ptrSection, "D2-ThiFreqIndex");
     paraItem->d2.scanline = ptrIni->ReadInt(ptrSection, "D2-Scanline");
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     // spectrum
     paraItem->spectrum.freq = ptrIni->ReadInt(ptrSection, "Spectrum-Freq");
     paraItem->spectrum.gain = ptrIni->ReadInt(ptrSection, "Spectrum-Gain");
@@ -1607,8 +1292,6 @@ void ExamItem::ReadConfigOther(ParaItem* paraItem, string section, IniFile* ptrI
     paraItem->color.baseline = ptrIni->ReadInt(ptrSection, "Color-Baseline");
     paraItem->color.steer = ptrIni->ReadInt(ptrSection, "Color-Steer");
     paraItem->color.colormap = ptrIni->ReadInt(ptrSection, "Color-ColorMap");
-#endif
-#endif
 }
 
 void ExamItem::WriteSelectedProbeItem(char *probeModel, IniFile* ptrIni, int item) {
@@ -1625,10 +1308,6 @@ void ExamItem::WriteDefaultProbe(const char *probeModel, IniFile* ptrIni) {
     ptrIni->WriteString("ProbeModel", "ProbeModel", probeModel);
     ptrIni->SyncConfigFile();
 }
-
-/**
- * read the last probe before close machine, and switch to this probe when open machine
- */
 
 void ExamItem::WriteDefaultUserIndex(IniFile* ptrIni, int index) {
     ptrIni->WriteInt("UserIndex", "DefaultUserIndex", index);
@@ -1785,13 +1464,6 @@ vector<ExamItem::ProjectDefaultParaItem> ExamItem::ReadProjectPara(const char* m
     return projectPara;
 }
 
-/**
- * @brief write 2d/cfm/pw project para in each frequence and each probe to project default config file
- *
- * @para proParaItem it's project paras are to be written
- * @para model: name of probe
- * @para user: name of user defined or default user("Default")
- */
 void ExamItem::WriteProjectPara(ExamItem::ProjectDefaultParaItem *proParaItem, const char* model, const char* user, IniFile* ptrIni) {
     if(model == NULL || user == NULL) return;
 
@@ -1805,8 +1477,6 @@ void ExamItem::WriteProjectPara(ExamItem::ProjectDefaultParaItem *proParaItem, c
         char *tmp1 = group_name;
         char *tmp2 = key_name;
         ptrIni->WriteDoubleList(tmp1, tmp2, (double*)proParaItem->pro2d.BandPassW1, ExamItem::BAND_PASS_SIZE_D2);
-        //for(int i = 0; i < 5; i++)
-        //    printf("write func bandpassw1:%.1f\n", proParaItem->pro2d.BandPassW1[i]);
         sprintf(key_name, "%s-%d-%s", "D2", proParaItem->pro2d.freq, "BandPassW2");
         tmp2 = key_name;
         ptrIni->WriteDoubleList(tmp1, tmp2, (double*)proParaItem->pro2d.BandPassW2, ExamItem::BAND_PASS_SIZE_D2);
@@ -1829,12 +1499,6 @@ void ExamItem::WriteProjectPara(ExamItem::ProjectDefaultParaItem *proParaItem, c
     ptrIni->SyncConfigFile();
 }
 
-/**
- * @brief remove group from project config file or project default config file
- *
- * @para model: name of probe
- * @para name: name of user defined or default user("Default")
- */
 void ExamItem::RemoveUserFromFile(const char* model, const char* user, IniFile* ptrIni) {
     if(model == NULL || user == NULL) {
         perror("input is null\n");
@@ -1846,13 +1510,6 @@ void ExamItem::RemoveUserFromFile(const char* model, const char* user, IniFile* 
     ptrIni->SyncConfigFile();
 }
 
-/**
- *@brief read paramenter from debug config file
- *
- * @para debugParaItem: paramenter in debug project mode
- * @para model: name of probe
- * @para user: name of user defined or default user("Default")
- */
 void ExamItem::ReadProDebugParaItem(ProjectDebugParaItem* debugPara, const char* model, const char* user, IniFile* ptrIni) {
     char group_name[256] = {"\0"};
     char key_name[256]= {"\0"};
@@ -1897,13 +1554,6 @@ void ExamItem::ReadProDebugParaItem(ProjectDebugParaItem* debugPara, const char*
     }
 }
 
-/**
- * @brief write project debug paramenter to debug config file
- *
- * @para debugParaItem: paramenter in debug project mode
- * @para model: name of probe
- * @para user: name of user defined or default user("Default")
- */
 void ExamItem::WriteProDebugParaItem(ProjectDebugParaItem* debugPara, const char* model, const char* user, IniFile* ptrIni) {
     if(model == NULL || user == NULL) return;
 

@@ -13,47 +13,9 @@
 
 #include "ViewMain.h"
 
-#if defined(EMP_360)
-  string probeName[] = {
-    "3.5CV", "6.5VMC", "7.5LVS", "3.5MC", "6.5MC", "30P16A", "35D40J(SNR)", "35D40J(NDK)"
-  };
-#elif defined(EMP_161)
-  string probeName[] = {
-    "3.5CV", "6.5VMC", "7.5LVS", "3.5MC", "30P16A"
-  };
-#elif (defined(EMP_322) || defined(EMP_313))
-  string probeName[] = {
-    "35C50J", "75L40J", "65C10J", "35C20G", "65C20G", "90L40J", "35D40J(SNR)", "35D40J(NDK)", "30P16A"
-  };
-#elif defined(EMP_430)
-  string probeName[] = {
-    "35C60E", "65L40E", "65C10E", "65C15D", "35D50D"
-  };
-#elif defined(EMP_440)
-  string probeName[] = {
-    "35C60E", "65C10E", "65L40E",  "65C15D"
-  };
-#elif (defined(EMP_355))
-  #ifdef VET
-    string probeName[] = {
-      "35C50L", "35C20I", "70L40J", "75L40J","70L60J", "90L40J", "65C10L", "65C15E(APX)", "65C15E(JR)", "30P16B", "10L25K", "65C10I", "55L60G"
-    };
-  #else
-    string probeName[] = {
-      "35C50L", "35C20I", "70L40J", "75L40J", "70L60J", "90L40J", "65C10L", "65C15E(APX)", "65C15E(JR)", "30P16B", "10L25K", "65C10I"
-    };
-  #endif
-#else
-  #ifdef VET
-    string probeName[] = {
-      "35C50K", "65C10K", "75L40K", "35C20H", "65C15D", "30P16A", "90L25K", "10L25J", "35D40J(SNR)", "35D40J(NDK)", "55L60H"
-    };
-  #else
-    string probeName[] = {
-      "35C50K", "65C10K", "75L40K", "35C20H", "65C15D", "30P16A", "90L25K", "10L25J", "35D40J(SNR)", "35D40J(NDK)", "65C10H"
-    };
-  #endif
-#endif
+string probeName[] = {
+  "35C50L", "35C20I", "70L40J", "75L40J", "70L60J", "90L40J", "65C10L", "65C15E(APX)", "65C15E(JR)", "30P16B", "10L25K", "65C10I"
+};
 
 #define AUTHEN_NUM  11
 #define DEMO_NUM    5
@@ -132,22 +94,7 @@ void ViewSuperuser::CreateWindow() {
   gtk_table_attach_defaults(table_probe, GTK_WIDGET(button_probe), 2, 3, 0, 2);
   gtk_table_attach_defaults(table_probe, GTK_WIDGET(m_treeview_probe), 3, 4, 0, 2);
 
-  #if defined(EMP_360)
-    gtk_combo_box_text_append_text(combobox_machine, "G60");
-  #elif defined(EMP_161)
-    gtk_combo_box_text_append_text(combobox_machine, "EMP-3000");
-  #elif defined(EMP_322)
-    gtk_combo_box_text_append_text(combobox_machine, "EMP-2900Plus");
-  #elif defined(EMP_313)
-    gtk_combo_box_text_append_text(combobox_machine, "EMP-2800");
-  #elif defined(EMP_430) || defined(EMP_440)
-    gtk_combo_box_text_append_text(combobox_machine, "A60");
-  #elif defined(EMP_355)
-    gtk_combo_box_text_append_text(combobox_machine, "G30Plus");
-  #else
-    gtk_combo_box_text_append_text(combobox_machine, "G70");
-  #endif
-
+  gtk_combo_box_text_append_text(combobox_machine, "G30Plus");
   gtk_combo_box_set_active(GTK_COMBO_BOX(combobox_machine), 0);
   g_signal_connect(G_OBJECT(combobox_machine), "changed", G_CALLBACK(signal_combobox_changed_machine), this);
 
@@ -388,12 +335,6 @@ GtkTreeView* ViewSuperuser::CreateProbeTreeview() {
     NULL);
 
   GtkCellRenderer* render = gtk_cell_renderer_text_new();
-
-  #ifdef EMP_355
-    gtk_cell_renderer_set_fixed_size(render, -1, 33);
-  #else
-    gtk_cell_renderer_set_fixed_size(render, -1, 25);
-  #endif
 
   GtkTreeViewColumn* column = gtk_tree_view_column_new_with_attributes("Porbe", render, "text", 0, NULL);
   gtk_tree_view_append_column(treeview, column);

@@ -59,12 +59,6 @@ void ScreenSaver::SetPeriod(guint time) {
 }
 
 void ScreenSaver::EnterScreenSaver2() {
-  #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode()) { // 如果当前3D/4D进程在运行，则不进入屏保
-      return;
-    }
-  #endif
-
   if (ModeStatus::IsAutoReplayMode()) {
     Reset();
   } else if (ModeStatus::IsUnFreezeMode()) {
@@ -76,12 +70,6 @@ void ScreenSaver::EnterScreenSaver2() {
 }
 
 void ScreenSaver::EnterScreenSaver3() {
-  #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode()) { // 如果当前3D/4D进程在运行，则不进入屏保
-      return;
-    }
-  #endif
-
   if (ModeStatus::IsAutoReplayMode()) {
     Reset();
   } else if (ModeStatus::IsUnFreezeMode()) {
@@ -124,12 +112,6 @@ void ScreenSaver::Init() {
 }
 
 void ScreenSaver::EnterScreenSaver() {
-  #ifdef EMP3D
-    if (D4FuncMan::GetInstance()->Get4DMode()) { // 如果当前3D/4D进程在运行，则不进入屏保
-      return;
-    }
-  #endif
-
   if(ViewSuperuser::GetInstance()->GetDemoStatus()) {
     return;
   }

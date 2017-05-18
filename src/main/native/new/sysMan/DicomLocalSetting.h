@@ -1,5 +1,5 @@
-#ifndef _DICOM_LOCAL_SETTING_H_
-#define _DICOM_LOCAL_SETTING_H_
+#ifndef __DICOM_LOCAL_SETTING_H__
+#define __DICOM_LOCAL_SETTING_H__
 
 #include "utils/Utils.h"
 

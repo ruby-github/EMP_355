@@ -20,102 +20,28 @@
 #include "probe/ExamItem.h"
 #include "sysMan/UserSelect.h"
 
-#ifdef VET
-  static const int EXAM_NUM = 9;
-#else
-  #ifdef EMP_322
-    static const int EXAM_NUM = 18;
-  #else
-    static const int EXAM_NUM = 22;
-  #endif
-#endif
+static const int EXAM_NUM = 22;
 
-#ifdef EMP_322
-  const string SECTIONS[] = {
-    N_("Abdomen-General") ,
-    N_("Gynecology") ,
-    N_("Obstetrics-General") ,
-    N_("Obstetrics-FetalHeart") ,
-    N_("Urology") ,
-    N_("Orthopedic") ,
-    N_("SmallPart-Glands") ,
-    N_("SmallPart-Thyroid") ,
-    N_("SmallPart-Eye") ,
-    N_("SmallPart-Testicle") ,
-    N_("Cardiac") ,
-    N_("Fetal Cardio")
-  };
-
-  const string EXAM_TYPES_CALC[] = {
-    N_("Adult Abdomen"),
-    N_("Adult Liver"),
-    N_("Kid Abdomen"),
-    N_("Adult Cardio"),
-    N_("Kid Cardio"),
-    N_("Mammary Glands"),
-    N_("Thyroid"),
-    N_("Eye Ball"),
-    N_("Testicle"),
-    N_("Gynecology"),
-    N_("Early Pregnancy"),
-    N_("Middle-late Pregnancy"),
-    N_("Fetal Cardio"),
-    N_("Kidney Ureter"),
-    N_("Bladder Prostate"),
-    N_("Hip Joint"),
-    N_("Meniscus"),
-    N_("Joint Cavity"),
-    N_("Spine")
-  };
-#else
-  #ifdef VET
-    const string SECTIONS[] = {
-      N_("Abdomen-General") ,
-      N_("Abdomen-Arterial") ,
-      N_("Abdomen-Venous") ,
-      N_("Obstetrics-Dog") ,
-      N_("Obstetrics-Cat") ,
-      N_("Obstetrics-Sheep") ,
-      N_("Obstetrics-Swine") ,
-      N_("Obstetrics-Bovine") ,
-      N_("Obstetrics-Equine") ,
-      N_("Urology") ,
-      N_("Orthopedic") ,
-      N_("SmallPart-Glands") ,
-      N_("SmallPart-Thyroid") ,
-      N_("SmallPart-Eye") ,
-      N_("SmallPart-Testicle") ,
-      N_("Vascular-LE") ,
-      N_("Vascular-UE") ,
-      N_("Vascular-Carotid") ,
-      N_("Cardiac") ,
-      N_("Fetal Cardio") ,
-      N_("TCD"),
-      N_("Tendon")
-    };
-  #else
-    const string SECTIONS[] = {
-      N_("Abdomen-General") ,
-      N_("Abdomen-Arterial") ,
-      N_("Abdomen-Venous") ,
-      N_("Gynecology") ,
-      N_("Obstetrics-General") ,
-      N_("Obstetrics-FetalHeart") ,
-      N_("Urology") ,
-      N_("Orthopedic") ,
-      N_("SmallPart-Glands") ,
-      N_("SmallPart-Thyroid") ,
-      N_("SmallPart-Eye") ,
-      N_("SmallPart-Testicle") ,
-      N_("Vascular-LE") ,
-      N_("Vascular-UE") ,
-      N_("Vascular-Carotid") ,
-      N_("Cardiac") ,
-      N_("Fetal Cardio") ,
-      N_("TCD")
-    };
-  #endif
-#endif
+const string SECTIONS[] = {
+  N_("Abdomen-General") ,
+  N_("Abdomen-Arterial") ,
+  N_("Abdomen-Venous") ,
+  N_("Gynecology") ,
+  N_("Obstetrics-General") ,
+  N_("Obstetrics-FetalHeart") ,
+  N_("Urology") ,
+  N_("Orthopedic") ,
+  N_("SmallPart-Glands") ,
+  N_("SmallPart-Thyroid") ,
+  N_("SmallPart-Eye") ,
+  N_("SmallPart-Testicle") ,
+  N_("Vascular-LE") ,
+  N_("Vascular-UE") ,
+  N_("Vascular-Carotid") ,
+  N_("Cardiac") ,
+  N_("Fetal Cardio") ,
+  N_("TCD")
+};
 
 struct CustomEtype {
   string name;
@@ -151,21 +77,13 @@ const string METHOD_NAMES[] = {
 const CustomTypeAndMethod CUSTOM_TYPES[] = {
   {0, N_("Dist-Dot"), DIST_DOT},
   {0, N_("Dist-Line"), DIST_LINE},
-
-  #ifndef EMP_322
-    {1, N_("Length-Track"), LENGTH_TRACK},
-    {1, N_("Length-Dot"), LENGTH_DOT},
-  #endif
-
+  {1, N_("Length-Track"), LENGTH_TRACK},
+  {1, N_("Length-Dot"), LENGTH_DOT},
   {1, N_("Integral-Track"), INTEGRAL_TRACK},
   {2, N_("Peri-Track"), PERI_TRACK},
   {2, N_("Peri-Ellipse"), PERI_ELLIPSE},
   {3, N_("Area-Track"), AREA_TRACK},
-
-  #ifndef EMP_322
-    {3, N_("Area-Dot"), AREA_TRACK},
-  #endif
-
+  {3, N_("Area-Dot"), AREA_TRACK},
   {3, N_("Area-Rectangle"), AREA_REC},
   {3, N_("Area-Ellipse"), AREA_ELLIPSE},
   {4, N_("Vol-3Axis"), VOL_3AXIS},
@@ -185,25 +103,13 @@ const CustomTypeAndMethod CUSTOM_TYPES[] = {
   {9, N_("Profile"), PROFILE},
   {10, N_("Histogram"), HISTOGRAM},
   {11, N_("Time-M"), TIME_M},
-
-  #ifndef EMP_322
-    {11, N_("Time-D"), TIME_D},
-  #endif
-
+  {11, N_("Time-D"), TIME_D},
   {12, N_("Slope"), SLOPE},
   {13, N_("Vel-M"), VEL_M},
-
-  #ifdef EMP_322
-    {14, N_("HR-M"), HR_M}
-  #else
-    {13, N_("Vel-D"), VEL_D},
-    {14, N_("HR-M"), HR_M},
-  #endif
-
-  #ifndef EMP_322
-    {15, N_("Acceleration"), ACCEL},
-    {16, N_("PG Mean"), PGMEAN}
-  #endif
+  {13, N_("Vel-D"), VEL_D},
+  {14, N_("HR-M"), HR_M},
+  {15, N_("Acceleration"), ACCEL},
+  {16, N_("PG Mean"), PGMEAN}
 };
 
 // ---------------------------------------------------------
@@ -398,19 +304,11 @@ vector<string> CalcSetting::GetExamItemsCalc() {
 
   vector<string> vec;
 
-  #ifdef EMP_322
-    size_t size = sizeof(EXAM_TYPES_CALC) / sizeof(EXAM_TYPES_CALC[0]);
+  size_t size = sizeof(EXAM_TYPES) / sizeof(EXAM_TYPES[0]);
 
-    for (size_t i = 0; i < size; i++) {
-      vec.push_back(EXAM_TYPES_CALC[i]);
-    }
-  #else
-    size_t size = sizeof(EXAM_TYPES) / sizeof(EXAM_TYPES[0]);
-
-    for (size_t i = 0; i < size; i++) {
-      vec.push_back(EXAM_TYPES[i]);
-    }
-  #endif
+  for (size_t i = 0; i < size; i++) {
+    vec.push_back(EXAM_TYPES[i]);
+  }
 
   return vec;
 }
@@ -578,22 +476,6 @@ string CalcSetting::ItemMenuTransEnglish(int item_num) {
       }
     }
   } else {
-    #ifdef VET
-      if((item_num >= TD_MEA_START)&&(item_num < TD_MEA_END)) {
-        for(int i=0; i < (TD_MEA_END - TD_MEA_START); i++) {
-          if(item_num == TDInfo[i].item) {
-              item_name = TDInfo[i].title;
-          }
-        }
-      } else if((item_num >= ANOB_MEA_START)&&(item_num < ANOB_MEA_END)) {
-        for(int i=0; i < (ANOB_MEA_END - ANOB_MEA_START); i++) {
-          if(item_num == AnOBInfo[i].item) {
-              item_name = AnOBInfo[i].title;
-          }
-        }
-      } else {
-      }
-    #endif
   }
 
   return item_name;
@@ -1859,22 +1741,6 @@ int CalcSetting::ItemNameTransEtype(string select_name) {
     }
   }
 
-  #ifdef VET
-    for(int i=0; i < (TD_MEA_END - TD_MEA_START); i++) {
-      if(strcmp(select_name.c_str(), _(TDInfo[i].title))==0 ) {
-        select_num = TDInfo[i].item - BASIC_MEA_END;
-        return select_num;
-      }
-    }
-
-    for(int i=0; i < (ANOB_MEA_END - ANOB_MEA_START); i++) {
-      if(strcmp(select_name.c_str(), _(AnOBInfo[i].title))==0 ) {
-        select_num = AnOBInfo[i].item - BASIC_MEA_END;
-        return select_num;
-      }
-    }
-  #endif
-
   char path1[256];
   sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
   IniFile ini1(path1);
@@ -2381,13 +2247,8 @@ void CustomCalc::ImportWrite(string item_name, int& item_num) {
   char userselectname[256];
   char userselectname1[256];
 
-  #ifdef VET
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
-  #else
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
-  #endif
+  sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+  sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
 
   FileMan f;
   if(strcmp(username.c_str(), "System Default") == 0) {
@@ -2818,13 +2679,8 @@ void CustomCalc::LoadData() {
     char path4[256];
     char path5[256];
 
-    #ifdef VET
-      sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "VetCalcSetting.ini");
-      sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "VetCalcItemSetting.ini");
-    #else
-      sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "CalcSetting.ini");
-      sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "CalcItemSetting.ini");
-    #endif
+    sprintf(path4, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "CalcSetting.ini");
+    sprintf(path5, "%s%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/", m_export_name.c_str(),"/", "CalcItemSetting.ini");
 
     char path1[256];
     sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -2839,13 +2695,8 @@ void CustomCalc::LoadData() {
     char userselectname3[256];
 
     if(strcmp(username.c_str(), "System Default") == 0) {
-      #ifdef VET
-        sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "VetDSCalcSetting.ini");
-        sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","VetDSCalcItemSetting.ini");
-      #else
-        sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "DSCalcSetting.ini");
-        sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","DSCalcItemSetting.ini");
-      #endif
+      sprintf(userselectname, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/", "DSCalcSetting.ini");
+      sprintf(userselectname1, "%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/","DSCalcItemSetting.ini");
     } else {
       sprintf(userselectname, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcsetting/",username.c_str(),".ini");
       sprintf(userselectname1, "%s%s%s%s%s", G_DIR_SEPARATOR_S, UDISK_DATA_PATH, "/calcitemsetting/",username.c_str(),".ini");
@@ -2945,28 +2796,12 @@ void CustomCalc::LoadData() {
 void CustomCalc::KeyEvent(unsigned char keyValue) {
   // FakeXEvent::KeyEvent(keyValue);
 
-  #if defined(EMP_322)
-    if (keyValue == KEY_CTRL_SHIFT_SPACE) {
-      KeySwitchIM ksim;
-      ksim.ExcuteChange(FALSE);
+  if (keyValue == KEY_SHIFT_CTRL) {
+    KeySwitchIM ksim;
+    ksim.ExcuteChange(FALSE);
 
-      return;
-    }
-  #elif defined(EMP_313)
-    if (keyValue == KEY_ONE) {
-      KeySwitchIM ksim;
-      ksim.ExcuteChange(FALSE);
-
-      return;
-    }
-  #else
-    if (keyValue == KEY_SHIFT_CTRL) {
-      KeySwitchIM ksim;
-      ksim.ExcuteChange(FALSE);
-
-      return;
-    }
-  #endif
+    return;
+  }
 
   if (FakeMouseButton(keyValue)) {
     return;
@@ -3047,13 +2882,8 @@ void CustomCalc::ImportRenameCopy(string item_name) {
   char userselectname[256];
   char userselectname1[256];
 
-  #ifdef VET
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/VetCalcItemSetting.ini");
-  #else
-    sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
-    sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
-  #endif
+  sprintf(path2, "%s%s", CALC_TMP_DATA_PATH, "/CalcSetting.ini");
+  sprintf(path3, "%s%s", CALC_TMP_DATA_PATH, "/CalcItemSetting.ini");
 
   FileMan f;
   if(strcmp(username.c_str(), "System Default") == 0) {

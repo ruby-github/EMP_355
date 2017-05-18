@@ -96,12 +96,6 @@ void UserDefineKey::FactoryCreate(EKeyFunc type) {
     }
 
     break;
-  #if defined(EMP_322)
-    case PIP:
-      g_menu2D.BtnPIP(NULL);
-
-      break;
-  #else
     case STEER:
       if (ms.GetFreezeMode() == FreezeMode::UNFREEZE) {
         D2ChgSteer(ROTATE);
@@ -135,14 +129,9 @@ void UserDefineKey::FactoryCreate(EKeyFunc type) {
         }
 
         ViewSystem::GetInstance()->CreateWindow();
-
-        #ifndef EMP_355        //按自定义键进入systemsetting时，保持冻结
-          FreezeMode::GetInstance()->PressUnFreeze();
-        #endif
       }
 
       break;
-  #endif
   default:
     break;
   }

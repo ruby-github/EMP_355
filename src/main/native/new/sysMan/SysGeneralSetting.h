@@ -49,11 +49,6 @@ public:
   void TVOutDefaultFactory();
   void SyncFile();
 
-  #ifdef TRANSDUCER
-    int GetPressAjust();
-    void SetPressAdjust(double PressAjust);
-  #endif
-
 private:
   IniFile* m_inifile;
 };

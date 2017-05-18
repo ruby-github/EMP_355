@@ -12,11 +12,7 @@ public:
   void PressKeyP3();
 
 private:
-  #if defined(EMP_322)
-    enum EKeyFunc {NONE, TSI, SAVE_CINE, PRINT, PIP, BIOPSY};
-  #else
-    enum EKeyFunc {NONE, TSI, SAVE_CINE, PRINT, STEER, PIP, PW_SOUND, HPRF, IMAGE_PRESET, BIOPSY};
-  #endif
+  enum EKeyFunc {NONE, TSI, SAVE_CINE, PRINT, STEER, PIP, PW_SOUND, HPRF, IMAGE_PRESET, BIOPSY};
 
   void FactoryCreate(EKeyFunc type);
 };

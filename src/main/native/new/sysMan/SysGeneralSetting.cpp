@@ -200,13 +200,3 @@ void SysGeneralSetting::TVOutDefaultFactory() {
 void SysGeneralSetting::SyncFile() {
   m_inifile->SyncConfigFile();
 }
-
-#ifdef TRANSDUCER
-  int SysGeneralSetting::GetPressAjust() {
-    return m_inifile->ReadInt("GeneralSetting", "PressAjust");
-  }
-
-  void SysGeneralSetting::SetPressAdjust(double PressAjust) {
-    m_inifile->WriteInt("GeneralSetting", "PressAjust", PressAjust);
-  }
-#endif
