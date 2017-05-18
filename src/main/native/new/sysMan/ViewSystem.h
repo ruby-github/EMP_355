@@ -38,11 +38,7 @@ class ViewSystem : public FakeXEvent {
 public:
     ~ViewSystem();
 
-#if defined(EMP_322)
-    static const int MAX_KEY = 6;
-#else
     static const int MAX_KEY = 10;//8;//9;
-#endif
 
     static ViewSystem* GetInstance();
     void CreateWindow(void);
@@ -76,12 +72,9 @@ public:
 
     ////>option fuction
     void UpdateOptionStatus(bool status);
-#ifdef VET
-    void UpdateExamName(int probe_index);
-#endif
-#if 1 //add by jhuang
+
     bool CheckFlagFromReportTemplet(int id);
-#endif
+
     void UpdateUserItem(void);
 
 private:
@@ -285,7 +278,7 @@ private:
     GtkWidget *m_button_exit;
     //GtkWidget *m_button_save;
     GtkWidget *m_notebook;
-#if 1 //add by jhuang
+
     GtkTreeIter topIter;
     GtkCellRenderer *renderer;
     GtkWidget *m_combobox_childsection;
@@ -372,11 +365,9 @@ private:
     void TransEnglish(char *strname, char str[256],char *str_indexname,char str_index[256]);
 
     std::vector <string> GetUserGroup(void);
-#ifdef EMP_355
     static void  on_combobox_video_changed(GtkComboBox *widget,ViewSystem *data) {
         data->BtnComboVideoChanged();
     }
-#endif
     static void  on_entry_user_item_insert(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path, ViewSystem *data) {
         data->EntryItemInsert(cell, editable, path);
     }
@@ -455,8 +446,6 @@ private:
     static void on_entry_templet_insert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
         data->EntrytempletInsert(editable, new_text, new_text_length, position);
     }
-
-#endif  //add by jhuang end
 
     void GetImageNoteSelection(int &probeIndex, int &itemIndex, char *&itemName);
 
@@ -577,18 +566,9 @@ private:
     gchar *m_str_index;
     GtkTreeIter m_optionIter;
 
-#ifdef VET
-    GtkCellRenderer *m_cellrenderer_text;
-#endif
     GtkCellRenderer *m_cellrenderer_comment_text;
     GtkCellRenderer *m_cellrenderer_comment_text1;
-    //hlx
-#ifdef VET
-    GtkWidget *button_edit_dept;
-    GtkWidget *button_return_dept;
-    GtkWidget *button_get_current;
-    GtkWidget *button_default_image;
-#endif
+
     GtkWidget* create_note_general(void);
     void init_general_setting(SysGeneralSetting* sysGeneralSetting);
     void save_general_setting(void);
@@ -632,12 +612,12 @@ private:
 
     // void add_print_column(GtkTreeView *treeview);
     GtkWidget * create_key_function_treeview(const std::string function_list[], unsigned int size);
-    GtkTreeModel* create_exam_item_model(std::vector<int> index);
+    GtkTreeModel* create_exam_item_model(std::vector<ExamItem::EItem> index);
     GtkTreeModel* create_item_comment_model(int index);
     GtkTreeModel* create_item_comment_model1();
 
     int  DepartmentIndex();
-    void create_exam_comment_model(std::vector<int> index);
+    void create_exam_comment_model(std::vector<ExamItem::EItem> index);
     void  DepartmentName(char department[256], int index);
     void CreateItemList_Comment(char *department,vector<ExamPara>& vecItemComment, int number);
     void CreateItemList_Note(char *department,vector<ExamPara>& vecItemComment, int number);
@@ -683,10 +663,8 @@ private:
     void AddItemClicked(GtkButton *button);
     void AddCheckPart(char *checkpart);
 
-#ifdef VET
-#else
     void RadioP1Toggled(GtkToggleButton *togglebutton);
-#endif
+
     void RadioP2Toggled(GtkToggleButton *togglebutton);
     void TreeFuncChanged(GtkTreeSelection *selection);
     void ExamTypeChanged(GtkTreeSelection *selection);
@@ -717,12 +695,6 @@ private:
     void add_columns_comment(GtkTreeView *treeview);
     void add_columns_comment1(GtkTreeView *treeview);
 
-#ifdef VET
-    void add_columns(GtkTreeView *treeview);
-    void BtnImageEditClicked(GtkButton *button);
-    void BtnImageReturnClicked(GtkButton *button);
-    void BtnEditCellChanged(GtkCellRendererText *cell, gchar *path_string, gchar *new_text);
-#endif
     void SpinbuttonInsertAngle(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     gboolean SpinbuttonOutputAngle(GtkSpinButton *spin);
     void CommonTreeviewSelectionChanged(GtkTreeSelection *treeselection);
@@ -763,7 +735,7 @@ private:
     void BtnRegisterClicked(GtkButton *button);
 
     void ButtonDownClicked(GtkButton *button);
-// signal connect
+    // signal connect
     static void on_entry_hospital_insert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
         data->EntryHospitalInsert(editable, new_text, new_text_length, position);
     }
@@ -838,13 +810,10 @@ private:
         data->ChkBtnHRToggled(togglebutton);
     }
 
-    //static void HandleChkTotalToggled(GtkToggleButton *togglebutton, ViewSystem *data) { data->ChkBtnTotalToggled(togglebutton); }
-#ifdef VET
-#else
     static void HandleP1Toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
         data->RadioP1Toggled(togglebutton);
     }
-#endif
+
     static void HandleP2Toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
         data->RadioP2Toggled(togglebutton);
     }
@@ -927,17 +896,7 @@ private:
     static gboolean on_spinbutton_output_angle(GtkSpinButton *spin, ViewSystem *data) {
         return data->SpinbuttonOutputAngle(spin);
     }
-#ifdef VET
-    static void HandleImageBtnEditDept(GtkButton *button, ViewSystem *data) {
-        data->BtnImageEditClicked(button);
-    }
-    static void HandleImageBtnReturnDept(GtkButton *button, ViewSystem *data) {
-        data->BtnImageReturnClicked(button);
-    }
-    static void on_button_edit_cell_callback(GtkCellRendererText *cell, gchar *path_string, gchar *new_text, ViewSystem *data) {
-        data->BtnEditCellChanged(cell, path_string, new_text);
-    }
-#endif
+
     static void on_common_treeview_selection_changed(GtkTreeSelection *treeselection, ViewSystem *data) {
         data->CommonTreeviewSelectionChanged(treeselection);
     }
@@ -1008,11 +967,6 @@ private:
             data->ButtonSelectAllCommentClicked(button);
     }
 
-    /*  static void HandleButtonEditClicked(GtkButton *button, CalcSetting *data)
-      {
-          if (data)
-              data->ButtonEditClicked(button);
-      }*/
     static void HandleButtonDeleteClicked(GtkButton *button, ViewSystem *data) {
         if (data)
             data->ButtonDeleteClicked(button);

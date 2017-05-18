@@ -80,7 +80,7 @@ bool ProbeSelect::ProbeRead() {
     for (i = 0; i < ProbeMan::MAX_SOCKET; i ++) {
         if (m_para[i].exist) {
             PRINTF("================get Probe Model correct: %s\n", m_para[i].model);
-            m_e.GetItemListOfProbe(m_para[i].model, &m_itemList[i]);
+            m_itemList[i] = m_e.GetItemListOfProbe(m_para[i].model);
             select = i;
         } else {
             m_itemList[i].clear();
@@ -114,8 +114,7 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
         ExamItem exam;
         string userItemName = exam.ReadDefaultProbeDefaultItemName(&ini);
         //keeping calc and bodymark are right
-        string geninitfirstitem="Adult Abdomen";
-        exam.GetInitUserItemInfo(curPara.model, userItemName, geninitfirstitem);
+        string geninitfirstitem = exam.GetInitUserItemInfo(curPara.model, userItemName);
         int probeIndex = indexSocket;
         if(probeIndex < ProbeMan::MAX_SOCKET) {
             for(int m = 0; m < (int)m_itemList[probeIndex].size(); m++) {
@@ -129,9 +128,8 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     } else {
         //keeping calc and bodymark are right
         ExamItem exam;
-        string genfirstitem="Adult Abdomen";
-        exam.GetUserItemInfo(curPara.model, genfirstitem);
-        //string str_fisrt_item = exam.GetFirstGenItem();
+        string genfirstitem = exam.GetUserItemInfo(curPara.model);
+
         int probeIndex = ViewProbe::GetInstance()->GetProbeIndex();
         if(probeIndex < ProbeMan::MAX_SOCKET) {
             for(int m = 0; m < (int)m_itemList[probeIndex].size(); m++) {
@@ -221,7 +219,7 @@ bool ProbeSelect::OneProbeRead(int socket) {
     int i = socket;
     if (m_para[i].exist) {
         PRINTF("================get Probe Model: %s\n", m_para[i].model);
-        m_e.GetItemListOfProbe(m_para[i].model, &m_itemList[i]);
+        m_itemList[i] = m_e.GetItemListOfProbe(m_para[i].model);
         select = i;
     } else {
         m_itemList[i].clear();

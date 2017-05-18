@@ -68,29 +68,19 @@
 using std::vector;
 using std::string;
 
-#if defined(EMP_322)
-  const string KeyFunctionList[] = {
-    N_("NULL"),
-    N_("TSI"),
-    N_("Save Video"),
-    N_("Print Screen"),
-    N_("PIP"),
-    N_("Biopsy")
-  };
-#else
-  const string KeyFunctionList[] = {
-    N_("NULL"),
-    N_("TSI"),
-    N_("Save Video"),
-    N_("Print Screen"),
-    N_("Steer"),
-    N_("PIP"),
-    N_("Spectrum Sound"),
-    N_("HPRF"),
-    N_("Image Preset"),
-    N_("Biopsy")
-  };
-#endif
+const string KeyFunctionList[] = {
+  N_("NULL"),
+  N_("TSI"),
+  N_("Save Video"),
+  N_("Print Screen"),
+  N_("Steer"),
+  N_("PIP"),
+  N_("Spectrum Sound"),
+  N_("HPRF"),
+  N_("Image Preset"),
+  N_("Biopsy")
+};
+
 
 extern bool g_authorizationOn;
 #include "utils/Const.h"
@@ -123,22 +113,12 @@ int _system_(const char *cmd) {
     return status;
 }
 
-#ifdef VET
-static string KB_LIST[NUM_KB]= {
-    // "Abdomen","Urology", "Cardiac","Obstetrics","Gynecology","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
-    "Abdomen","Urology", "Cardiac","Obstetrics","Tendon","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
-};
-#else
-
 static string KB_LIST[NUM_KB]= {
     "Abdomen","Urology", "Cardiac","Obstetrics","Gynecology","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
 };
-#endif
-#ifdef VET
-char user_configure[USERCONFIG_LEN] = "VetItemPara.ini";
-#else
+
 char user_configure[USERCONFIG_LEN] = "ItemPara.ini";
-#endif
+
 static common_printer common_printer_data[] = {
     {"HP",    "LaserJet Series"},
     {"HP",    "DeskJet Series"},
@@ -150,20 +130,7 @@ static common_printer common_printer_data[] = {
     {"EPSON", "Stylus Photo Series"},
     {"EPSON", "New Stylus Photo Series"},
 };
-#ifdef VET
-static ExamPara ExamItemArray[] = {
-    {"", N_("User1"),  ExamItem::USER1},
-    {"", N_("User2"),  ExamItem::USER2},
-    {"", N_("User3"),  ExamItem::USER3},
-    {"", N_("User4"),  ExamItem::USER4},
-    {"", N_("User5"),  ExamItem::USER5},
-    {"", N_("User6"),  ExamItem::USER6},
-    {"", N_("User7"),  ExamItem::USER7},
-    {"", N_("User8"),  ExamItem::USER8},
-    {"", N_("User9"),  ExamItem::USER9},
-    {"", N_("User10"), ExamItem::USER10}
-};
-#else
+
 const static ExamPara ExamItemArray[] = {
     {N_("Abdomen"), N_("Adult Abdomen"), ExamItem::ABDO_ADULT},
     {N_("Abdomen"), N_("Adult Liver"), ExamItem::ABDO_LIVER},
@@ -203,7 +170,7 @@ const static ExamPara ExamItemArray[] = {
     {N_("User Defined"), N_("User defined 3"), ExamItem::USER3},
     {N_("User Defined"), N_("User defined 4"), ExamItem::USER4}
 };
-#endif
+
 ViewSystem::ViewSystem(void) {
     m_p1Selected = true;
     m_p1_func_index = 0;
@@ -241,45 +208,9 @@ GtkWidget* ViewSystem::GetWindow(void) {
     return m_window;
 }
 
-#if 1 //add by jhuang
 #include "calcPeople/MeasureDef.h"
 #include "calcPeople/ViewReport.h"
-#ifdef VET
-const char *sectionstr[][LANG_MAX] = {
-    //{ ENGLISH, CHINESE, RU, PL,ES, FR DE }
-    {"Abdomen", "\u8179\u90e8", "\u0436\u0438\u0432\u043e\u0442\u0410\u043a", "Jama brzuszna", "Abdomen","Abdomen", "Abdomen",      },  //"Abdomen"
-    {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce", "Cardiaque", "Cardiaco", "Kardial",                 },  //"Cardiac"
-    {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia", "Urologie", "Urologico","Urologie",   },  //"Urology"
-    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo",  "Obstétrique",  "Obstetrico",  "Geburtshilfe"   },  //"Obstetrics"
-    {"Tendon", "\u808c\u8171", "\u0441\u0443\u0445\u043e\u0436\u0438\u043b\u0438\u0435", "Tendon", "Tendon","Tendon",  "Sehne",                                                   },//"Tendon"
-    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes", "Small-Parts",             },  //"Small Part"
-    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu","Cardio f\u0153tal",  "Fetal Cardio","fötale Kardio"    },  //"Fetal Cardio"
-    {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire", "Vascular", "Vaskulär",                        },  //"Vascular"
-#if 1 // "Others" take place for "TCD" and "Orthopedic"
-    //{"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD", "TCD","TCD",  "TCD",                                                                   },  //"TCD"
-    {"Others", "其他", "Другие", "Inne", "Autres",  "Otro", "Andere",                                                                   },  //"Others"
 
-#else
-    {"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD", "TCD","TCD",  "TCD",                                                                   },  //"TCD"
-    {"Orthopedic", "\u77eb\u5f62\u5916\u79d1", "\u041e\u0440\u0442\u043e\u043f\u0435\u0434\u0438\u044f", "Ortopedia",  "Orthopédie",   "Ortopedico", "Orthopädisch",                }   //"Orthopedic"
-#endif
-};
-#else
-
-#ifdef EMP_322
-const char *sectionstr[][LANG_MAX] = {
-    //{ ENGLISH, CHINESE, RU, PL,SE, FR, DE }
-    {"Abdomen", "\u6210\u4eba\u8179\u90e8", "\u0410\u0431\u0434\u043e\u043c.", "Jama brzuszna","Abdomen", "Abdomen", "Abdomen",      },  //"Abdomen"
-    {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce","Cardiaque",  "Cardiaco", "Kardial",                 },  //"Cardiac"
-    {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia","Urologie", "Urologico", "Urologie",   },  //"Urology"
-    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obstétrique", "Obstetrico",  "Geburtshilfe",     },  //"Obstetrics"
-    {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia","Gynécologie", "Gynecologico",  "Gynäkologie",        },  //"Gynecology"
-    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes","Small-Parts",             },  //"Small Part"
-    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu","Cardio f\u0153tal", "Cardio Fetal", "fötale Kardio"    },  //"Fetal Cardio"
-    {"Others", "其他", "Другие", "Inne", "Autres",  "Otro","Andere",                                                                   },  //"Others"
-
-};
-#else
 const char *sectionstr[][LANG_MAX] = {
     //{ ENGLISH, CHINESE, RU, PL,ES, FR DE }
     {"Abdomen", "\u6210\u4eba\u8179\u90e8", "\u0410\u0431\u0434\u043e\u043c.", "Jama brzuszna", "Abdomen","Abdomen", "Abdomen",      },  //"Abdomen"
@@ -290,18 +221,9 @@ const char *sectionstr[][LANG_MAX] = {
     {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes",  "Small-Parts",             },  //"Small Part"
     {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu", "Cardio f\u0153tal","Cardio Fetal", "fötale Kardio"    },  //"Fetal Cardio"
     {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire","Vascular", "Vaskulär",                        },  //"Vascular"
-#if 1 // "Others" take place for "TCD" and "Orthopedic"
-    //{"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD", "TCD",  "TCD",                                                                   },  //"TCD"
-
     {"Others", "其他", "Другие", "Inne", "Autres","Otro",  "Andere",                                                                   },  //"Others"
-#else
-    {"TCD", "\u7ecf\u9885\u591a\u666e\u52d2", "TCD", "TCD","TCD", "TCD",  "TCD",                                                                   },  //"TCD"
-    {"Orthopedic", "\u77eb\u5f62\u5916\u79d1", "\u041e\u0440\u0442\u043e\u043f\u0435\u0434\u0438\u044f", "Ortopedia", "Orthopédie", "Ortopedico", "Orthopädisch",                }   //"Orthopedic"
-#endif
-
 };
-#endif
-#endif
+
 const char *defaultstr = "System Default";
 const char *defaultflag ="\u221a"; //62; //251; // \u221a;//
 const char *templet1str[LANG_MAX] = ////{ ENGLISH, CHINESE, RU, PL, FR,es, DE}
@@ -323,12 +245,8 @@ sqlite3 *CustomReport_db = NULL;
 #define CHECK_VALUE             (0x74)
 #define UNCHECK_VALUE           (0x66)
 #define MAX_SECTION             (sizeof(sectionstr)/sizeof(sectionstr[0]))
-
-#ifdef EMP_322
-#define OTHERS_M                (ORTHO_M)
-#else
 #define OTHERS_M                (TCD_M)
-#endif
+
 bool ViewSystem::StrCmpSectionString(int section, const char *string, int *language) {
     int maxsection = MAX_SECTION;
     PRINTF("maxSection==%d\n",maxsection);
@@ -824,45 +742,32 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
         if(StrCmpSectionString(UR_M, childsection, NULL)) {
             window =  CreatWindowUR();
         }
-#ifdef VET
-        if(StrCmpSectionString(ANOB_M, childsection, NULL)) {
-            window =  CreatWindowAnOB();
-        }
-#else
+
         if(StrCmpSectionString(OB_M, childsection, NULL)) {
             window =  CreatWindowOB();
         }
-#endif
-#ifdef VET
-#else
+
+
         if(StrCmpSectionString(GYN_M, childsection, NULL)) {
             window =  CreatWindowGYN();
         }
-#endif
+
         if(StrCmpSectionString(SP_M, childsection, NULL)) {
             window =  CreatWindowSP();
         }
-#if(defined(EMP_313) || defined(EMP_322))
-        if(StrCmpSectionString(FETAL_M, childsection, NULL)) {
-            window =  CreatWindowFE();
-        }
-#else//TCD// VES
+
         if(StrCmpSectionString(VS_M, childsection, NULL)) {
             window =  CreatWindowFE();
         }
         if(StrCmpSectionString(FETAL_M, childsection, NULL)) {
             window =  CreatWindowVES();
         }
-#endif
+
         if(StrCmpSectionString(OTHERS_M, childsection, NULL)) {
 
             window =  CreatWindowOTHERS();
         }
-#ifdef VET
-        if(StrCmpSectionString(TD_M, childsection, NULL)) {
-            window =  CreatWindowTD();
-        }
-#endif
+
         if(window) {
             show_window = window;
             gtk_widget_show_all (show_window);
@@ -876,8 +781,7 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
                 }
             }
         }
-#ifdef VET
-#else
+
         if(StrCmpSectionString(OB_M, childsection, NULL)) {
             //Fetal 2
             for(int id = MAX_CALC_COUNT; id < MAX_CALC_COUNT+OB_CALC_COUNT; id++) {
@@ -902,7 +806,7 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
                 }
             }
         }
-#endif
+
         //PSAD
         if(StrCmpSectionString(UR_M, childsection, NULL)) {
             for(int id = PSAD_START_ID; id < PSAD_START_ID + PSAD_COUNT; id++) {
@@ -1011,11 +915,6 @@ GtkWidget* ViewSystem::AddFrameByTitle(char *title, int section, int startid, in
         case UR_M:
             checkbutton = gtk_check_button_new_with_mnemonic (_(URInfo[id - UR_MEA_START].title));
             break;
-#ifdef VET
-        case ANOB_M:
-            checkbutton = gtk_check_button_new_with_mnemonic (_(AnOBInfo[id - ANOB_MEA_START].title));
-            break;
-#endif
         case OB_M:
             checkbutton = gtk_check_button_new_with_mnemonic (_(OBInfo[id - OB_MEA_START].title));
             break;
@@ -1037,11 +936,6 @@ GtkWidget* ViewSystem::AddFrameByTitle(char *title, int section, int startid, in
         case ORTHO_M:
             checkbutton = gtk_check_button_new_with_mnemonic (_(OrthoInfo[id - ORTHO_MEA_START].title));
             break;
-#ifdef VET
-        case TD_M:
-            checkbutton = gtk_check_button_new_with_mnemonic (_(TDInfo[id - TD_MEA_START].title));
-            break;
-#endif
         default:
             break;
         }
@@ -1218,7 +1112,7 @@ GtkWidget *ViewSystem::CreatWindowABD(void) {
     //add frames
     frame = AddFrameByTitle(_("<i><b>General</b></i>"), ABDO_M, ABD_MEA_START,  ABD_DIST_AO, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-#ifndef EMP_322
+
     y += high + 20;
 
     frame = AddFrameByTitle(_("<i><b>Arterial</b></i>"),  ABDO_M, ABD_DIST_AO, ABD_PROX_IVC, &high);
@@ -1227,7 +1121,6 @@ GtkWidget *ViewSystem::CreatWindowABD(void) {
 
     frame = AddFrameByTitle(_("<i><b>Venous</b></i>"), ABDO_M, ABD_PROX_IVC, ABD_MEA_END, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-#endif
 
     scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_set_size_request (scrolledwindow, SHOW_WINDOW_WIDTH, 430);
@@ -1291,7 +1184,7 @@ GtkWidget *ViewSystem::CreatWindowAE(void) {
 
     frame = AddFrameByTitle(_("<i><b>Pulmonic Valve(M)</b></i>"), ADULT_M, ADULT_LATE_DIAS_SLOPE, ADULT_AV_ACC_T, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-#ifndef EMP_322
+
     y += high + 20;
 
     frame = AddFrameByTitle(_("<i><b>Aortic Valve(D)</b></i>"), ADULT_M, ADULT_AV_ACC_T, ADULT_HR_MV, &high);
@@ -1308,7 +1201,7 @@ GtkWidget *ViewSystem::CreatWindowAE(void) {
 
     frame = AddFrameByTitle(_("<i><b>Pulmonic Valve(D)</b></i>"), ADULT_M, ADULT_HR_PV, ADULT_MEA_END, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-#endif
+
     scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_set_size_request (scrolledwindow, SHOW_WINDOW_WIDTH, 430);
     gtk_fixed_put (GTK_FIXED (m_FixedReportSet), scrolledwindow, (TREE_WINDOW_WIDTH + 2*GRAY_WIDTH), 20);
@@ -1367,66 +1260,6 @@ GtkWidget *ViewSystem::CreatWindowUR(void) {
 
     return m_WindowUR = scrolledwindow;
 }
-#ifdef VET
-GtkWidget *ViewSystem::CreatWindowAnOB(void) {
-    GtkWidget* scrolledwindow;
-    GtkWidget* frame;
-    GtkWidget *viewport;
-    GtkWidget* fixed;
-    int x = GRAY_WIDTH, y = 20, high = 0;
-
-    if(m_WindowANOB)
-        return m_WindowANOB;
-
-    viewport = gtk_viewport_new (NULL, NULL);
-    gtk_widget_show (viewport);
-
-    fixed = gtk_fixed_new ();
-    gtk_widget_show (fixed);
-    gtk_container_add (GTK_CONTAINER (viewport), fixed);
-
-    char title[256];
-
-    sprintf(title, "<i><b>%s</b></i>", _(" Dog "));
-    frame = AddFrameByTitle(title, ANOB_M, ANOB_MEA_START, ANOB_CAT_HD, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 20;
-
-    sprintf(title, "<i><b>%s</b></i>", _(" Cat "));
-    frame = AddFrameByTitle(title, ANOB_M, ANOB_CAT_HD, ANOB_SHEEP_CRL, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 20;
-
-    sprintf(title, "<i><b>%s</b></i>", _(" Sheep "));
-    frame = AddFrameByTitle(title, ANOB_M, ANOB_SHEEP_CRL, ANOB_SWINE_HL, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 20;
-
-    sprintf(title, "<i><b>%s</b></i>", _(" Swine "));
-    frame = AddFrameByTitle(title, ANOB_M,ANOB_SWINE_HL, ANOB_BOVINE_KCRL, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 20;
-
-    sprintf(title, "<i><b>%s</b></i>", _(" Bovine "));
-    frame = AddFrameByTitle( title, ANOB_M, ANOB_BOVINE_KCRL, ANOB_EQUINE_GSD, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 20;
-
-    sprintf(title, "<i><b>%s</b></i>", _(" Equine "));
-    frame = AddFrameByTitle(title, ANOB_M, ANOB_EQUINE_GSD, ANOB_MEA_END, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 20;
-
-    scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_set_size_request (scrolledwindow, SHOW_WINDOW_WIDTH, 430);
-    gtk_fixed_put (GTK_FIXED (m_FixedReportSet), scrolledwindow, (TREE_WINDOW_WIDTH + 2*GRAY_WIDTH), 20);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_SHADOW_OUT);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow), viewport);
-
-    return m_WindowANOB = scrolledwindow;
-}
-#endif
 
 GtkWidget *ViewSystem::CreatWindowOB(void) {
     GtkWidget* scrolledwindow;
@@ -1553,7 +1386,7 @@ GtkWidget *ViewSystem::CreatWindowGYN(void) {
     gtk_widget_show (fixed);
     gtk_container_add (GTK_CONTAINER (viewport), fixed);
 
-//add frames
+    //add frames
     frame = AddFrameByTitle(_("<i><b>General</b></i>"), GYN_M, GYN_MEA_START, GYN_L_FOLL1, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
@@ -1592,7 +1425,7 @@ GtkWidget *ViewSystem::CreatWindowSP(void) {
     gtk_widget_show (fixed);
     gtk_container_add (GTK_CONTAINER (viewport), fixed);
 
-//add frames
+    //add frames
     frame = AddFrameByTitle(_("<i><b>Breast</b></i>"), SP_M, SP_MEA_START, SP_L_TESTIS_VOL, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
@@ -1635,7 +1468,7 @@ GtkWidget *ViewSystem::CreatWindowFE(void) {
     gtk_widget_show (fixed);
     gtk_container_add (GTK_CONTAINER (viewport), fixed);
 
-//add frames
+    //add frames
     frame = AddFrameByTitle(_("<i><b>Dimen(2D)</b></i>"), FETAL_M, FETAL_MEA_START, FETAL_AOR_DIAM, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
@@ -1662,7 +1495,7 @@ GtkWidget *ViewSystem::CreatWindowFE(void) {
 
     frame = AddFrameByTitle(_("<i><b>PV &amp; TV(M)</b></i>"), FETAL_M, FETAL_LATE_DIAS_SLOPE_MM, FETAL_PLACENTA, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-#ifndef EMP_322
+
     y += high + 20;
 
     frame = AddFrameByTitle(_("<i><b>Utero &amp; Placenta(D)</b></i>"), FETAL_M, FETAL_PLACENTA, FETAL_FROAMEN_OVALE, &high);
@@ -1683,7 +1516,7 @@ GtkWidget *ViewSystem::CreatWindowFE(void) {
 
     frame = AddFrameByTitle(_("<i><b>Peripheral Vasc(D)</b></i>"), FETAL_M, FETAL_THORACIC_AO, FETAL_MEA_END, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-#endif
+
     scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_set_size_request (scrolledwindow, SHOW_WINDOW_WIDTH, 430);
     gtk_fixed_put (GTK_FIXED (m_FixedReportSet), scrolledwindow, (TREE_WINDOW_WIDTH + 2*GRAY_WIDTH), 20);
@@ -1711,19 +1544,16 @@ GtkWidget *ViewSystem::CreatWindowOTHERS(void) {
     gtk_widget_show (fixed);
     gtk_container_add (GTK_CONTAINER (viewport), fixed);
 
-//add frames
-#if(defined(EMP_313) || defined(EMP_322))
-#else//TCD// VES
     frame = AddFrameByTitle(_("TCD"), TCD_M, TCD_MEA_START, TCD_MEA_END, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
-#endif
-//add frames
+
+    //add frames
     frame = AddFrameByTitle(_("Orthopedic"), ORTHO_M, ORTHO_MEA_START, ORTHO_MEA_END, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
 
-//others
+    //others
     frame = AddFrameForOthers(_("Others"), &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
@@ -1737,80 +1567,7 @@ GtkWidget *ViewSystem::CreatWindowOTHERS(void) {
 
     return m_WindowOTHERS = scrolledwindow;
 }
-#ifdef VET
-GtkWidget *ViewSystem::CreatWindowTD(void) {
-    GtkWidget* scrolledwindow;
-    GtkWidget* frame;
-    GtkWidget *viewport;
-    GtkWidget* fixed;
-    int x = GRAY_WIDTH, y = 20, high = 0;
 
-    if(m_WindowTD)
-        return m_WindowTD;
-
-    viewport = gtk_viewport_new (NULL, NULL);
-    gtk_widget_show (viewport);
-
-    fixed = gtk_fixed_new ();
-    gtk_widget_show (fixed);
-    gtk_container_add (GTK_CONTAINER (viewport), fixed);
-
-//add frames
-    frame = AddFrameByTitle(_("<i><b>Tendon Le1</b></i>"), TD_M,  TD_MEA_START, TD_LES2_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le2</b></i>"), TD_M, TD_LES2_AREA  , TD_LES3_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le3</b></i>"), TD_M, TD_LES3_AREA, TD_LES4_AREA,  &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le4</b></i>"),TD_M, TD_LES4_AREA, TD_LES5_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le5</b></i>"), TD_M, TD_LES5_AREA, TD_LES6_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le6</b></i>"), TD_M, TD_LES6_AREA, TD_LES7_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le7</b></i>"), TD_M, TD_LES7_AREA, TD_LES8_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le8</b></i>"), TD_M, TD_LES8_AREA, TD_LES9_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le9</b></i>"), TD_M, TD_LES9_AREA, TD_LES10_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le10</b></i>"), TD_M, TD_LES10_AREA, TD_LES11_AREA, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    frame = AddFrameByTitle(_("<i><b>Tendon Le11</b></i>"), TD_M, TD_LES11_AREA, TD_MEA_END, &high);
-    gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
-    y += high + 5;
-
-    scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_set_size_request (scrolledwindow, SHOW_WINDOW_WIDTH, 430);
-    gtk_fixed_put (GTK_FIXED (m_FixedReportSet), scrolledwindow, (TREE_WINDOW_WIDTH + 2*GRAY_WIDTH), 20);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_SHADOW_OUT);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow), viewport);
-
-    return m_WindowTD = scrolledwindow;
-}
-
-#endif
 GtkWidget *ViewSystem::CreatWindowVES(void) {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
@@ -1828,7 +1585,7 @@ GtkWidget *ViewSystem::CreatWindowVES(void) {
     gtk_widget_show (fixed);
     gtk_container_add (GTK_CONTAINER (viewport), fixed);
 
-//add frames
+    //add frames
     frame = AddFrameByTitle(_("<i><b>Carotid</b></i>"), VS_M, VS_MEA_START, VS_L_CFA, &high);
     gtk_fixed_put (GTK_FIXED (fixed), frame, x, y);
     y += high + 20;
@@ -1899,40 +1656,31 @@ void ViewSystem::ChangeCommentExamBox(int probe_type, char *check_part) {
 }
 
 void ViewSystem::ChangeCommentExamBoxDelete(int probe_type) {
-    int comment_probe = GetCommentProbeType();
-    if(comment_probe == probe_type) {
-        ExamItem examItem;
-        vector<int> itemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[comment_probe].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
+  int comment_probe = GetCommentProbeType();
 
-        vecExamItem_comment.clear();
-        vector<int>::iterator iter_index;
+  if(comment_probe == probe_type) {
+    ExamItem examItem;
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[comment_probe]);
 
-#if 0
-        ExamItem::ParaItem paraItem;
-        for(int i=0; i<10; i++) {
-            examItem.ReadExamItemPara(comment_probe, i,  &paraItem,NULL);
-            ExamItemArray[i].name=paraItem.alias;
-            PRINTF("---name=%s\n", ExamItemArray[i].name.c_str());
-        }
-#endif
-        for (iter_index = itemIndex.begin(); iter_index != itemIndex.end(); iter_index++) {
-            vecExamItem_comment.push_back(ExamItemArray[*iter_index].name);
+    vecExamItem_comment.clear();
+    vector<int>::iterator iter_index;
 
-        }
-        CreateDefineItem_comment(comment_probe, vecExamItem_comment);
-
-        int exam_size(0);
-        exam_size = vecExamItem_comment.size();
-
-        for(int i = exam_size; i >= 0; i--) {
-            gtk_combo_box_remove_text(GTK_COMBO_BOX (m_combobox_exam_comment), i);
-        }
-
-        for (int i = 0; i <exam_size; i++) {
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_comment), _(vecExamItem_comment[i].c_str()));
-        }
+    for (int i = 0; i < itemIndex.size(); i++) {
+      vecExamItem_comment.push_back(ExamItemArray[itemIndex[i]].name);
     }
+
+    CreateDefineItem_comment(comment_probe, vecExamItem_comment);
+
+    int exam_size = vecExamItem_comment.size();
+
+    for(int i = exam_size; i >= 0; i--) {
+      gtk_combo_box_remove_text(GTK_COMBO_BOX (m_combobox_exam_comment), i);
+    }
+
+    for (int i = 0; i <exam_size; i++) {
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_comment), _(vecExamItem_comment[i].c_str()));
+    }
+  }
 }
 
 GtkTreeIter ViewSystem::InsertUnique(GtkTreeModel *model, GtkTreeIter *iter, const char *str) {
@@ -2486,19 +2234,16 @@ GtkWidget *ViewSystem::create_set_report(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Cardiac"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Urology"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Obstetrics"));
-#ifndef VET
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Gynecology"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Small Part"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Fetal Cardio"));
-#if (defined(EMP_313) || defined(EMP_322))
-#else//TCD// VES
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Vascular"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Others"));
-#ifdef VET
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Tendon"));
-#endif
+
     gtk_combo_box_set_active((GtkComboBox*)(m_combobox_childsection), 0);
 
     //create buttons: ok, cancel
@@ -2536,19 +2281,7 @@ bool ViewSystem::InitRecordFromShowArr(const char *childsection, int *start, int
         *end = UR_MEA_END;
         ret = true;
     }
-#ifdef VET
 
-    if(StrCmpSectionString(ANOB_M, childsection, NULL)) {
-        *start = ANOB_MEA_START;
-        *end = ANOB_MEA_END;
-        ret = true;
-    }
-    if(StrCmpSectionString(TD_M, childsection, NULL)) {
-        *start = TD_MEA_START;
-        *end = TD_MEA_END;
-        ret = true;
-    }
-#else
     if(StrCmpSectionString(OB_M, childsection, NULL)) {
         *start = OB_MEA_START;
         *end = OB_MEA_END;
@@ -2559,40 +2292,32 @@ bool ViewSystem::InitRecordFromShowArr(const char *childsection, int *start, int
         *end = GYN_MEA_END;
         ret = true;
     }
-#endif
+
     if(StrCmpSectionString(SP_M, childsection, NULL)) {
         *start = SP_MEA_START;
         *end = SP_MEA_END;
         ret = true;
     }
-#ifdef EMP_322
-#else
+
     if(StrCmpSectionString(VS_M, childsection, NULL)) {
         *start = VS_MEA_START;
         *end = VS_MEA_END;
         ret = true;
     }
-#endif
+
     if(StrCmpSectionString(FETAL_M, childsection, NULL)) {
         *start = FETAL_MEA_START;
         *end = FETAL_MEA_END;
         ret = true;
     }
-#ifdef EMP_322
-    if(StrCmpSectionString(OTHERS_M, childsection, NULL)) {
-        *start = ORTHO_MEA_START;
-        //*end = TCD_MEA_END;
-        *end = ORTHO_MEA_END;
-        ret = true;
-    }
-#else
+
     if(StrCmpSectionString(OTHERS_M, childsection, NULL)) {
         *start = TCD_MEA_START;
         //*end = TCD_MEA_END;
         *end = ORTHO_MEA_END;
         ret = true;
     }
-#endif
+
     return ret;
 }
 bool ViewSystem::ReadRecordFromDB(const char * sections, const char* templet, const char* childsection) {
@@ -2774,7 +2499,6 @@ bool ViewSystem::CheckFlagFromReportTemplet(int id) {
     else
         return false;
 }
-#endif //add by jhuang
 
 void ViewSystem::CreateWindow(void) {
     GtkWidget *fixed_main;
@@ -2791,10 +2515,9 @@ void ViewSystem::CreateWindow(void) {
     GtkWidget *fixed_kbcal;
     GtkWidget *fixed_calculate;
 
-#if not defined(EMP_313)
     GtkWidget *fixed_key_config;
     GtkWidget *label_key_config;
-#endif
+
     GtkWidget *fixed_info;
     GtkWidget *label_general;
     GtkWidget *label_options;
@@ -2925,8 +2648,8 @@ void ViewSystem::CreateWindow(void) {
     gtk_widget_show (label_measure);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_measure);
 
-// create kbcal
-//fixed_kbcal = create_note_kbcal();
+    // create kbcal
+    //fixed_kbcal = create_note_kbcal();
     fixed_kbcal = create_note_calc_measure();
     gtk_container_add (GTK_CONTAINER (m_notebook), fixed_kbcal);
 
@@ -2934,7 +2657,6 @@ void ViewSystem::CreateWindow(void) {
     gtk_widget_show (label_kbcal);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_kbcal);
 
-#ifndef VET
     // create calculate table
     fixed_calculate = create_note_calc();
     gtk_container_add (GTK_CONTAINER (m_notebook), fixed_calculate);
@@ -2943,7 +2665,7 @@ void ViewSystem::CreateWindow(void) {
     label_calculate = gtk_label_new (_("OB "));
     gtk_widget_show (label_calculate);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_calculate);
-#endif
+
     // create note comment setting
     fixed_comment = create_note_comment();
     gtk_container_add (GTK_CONTAINER (m_notebook), fixed_comment);
@@ -2974,11 +2696,8 @@ void ViewSystem::CreateWindow(void) {
     gtk_widget_show (label_setreport);
     m_flag_notebook_coustomreport = notebook_counter++;
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), m_flag_notebook_coustomreport), label_setreport);
-#ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
-#else
+
     if(CDCMRegister::GetMe()->IsAuthorize())
-#endif
     {
         // create note dicom
         fixed_dicom = create_note_dicom();
@@ -2988,29 +2707,13 @@ void ViewSystem::CreateWindow(void) {
         gtk_widget_show (label_dicom);
         gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_dicom);
     }
-#if defined(EMP_313)
-    // create note info
-    fixed_info = create_note_info();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_info);
-    init_info_setting();
 
-    label_system = gtk_label_new (_("System Info"));
-    gtk_widget_show (label_system);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_system);
-
-#else
     // create note key config
     fixed_key_config = create_note_key_config();
     gtk_container_add (GTK_CONTAINER (m_notebook), fixed_key_config);
     init_key_config();
-#if defined(EMP_322)
-    label_key_config = gtk_label_new (_("Value-Gain"));
 
-#elif (defined(EMP_460) || defined(EMP_355))
     label_key_config = gtk_label_new (_("P1-P3"));
-#else
-    label_key_config = gtk_label_new (_("P1-P2"));
-#endif
 
     gtk_widget_show (label_key_config);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_key_config);
@@ -3019,46 +2722,15 @@ void ViewSystem::CreateWindow(void) {
     fixed_info = create_note_info();
     gtk_container_add (GTK_CONTAINER (m_notebook), fixed_info);
     init_info_setting();
-#ifdef EMP_3410
-    label_system = gtk_label_new (_("Other"));
-#else
     label_system = gtk_label_new (_("System Info"));
-#endif
+
     gtk_widget_show (label_system);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_system);
-#endif
+
 
     g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(on_notebook_switch_page), this);
     gtk_notebook_set_current_page(GTK_NOTEBOOK(m_notebook), m_flag_notebook_image);
 
-#if 0
-    image_apply = gtk_image_new_from_stock ("gtk-apply", GTK_ICON_SIZE_BUTTON);
-    label_apply = gtk_label_new_with_mnemonic (_("Apply"));
-    button_apply = create_button_icon (label_apply, image_apply);
-    gtk_fixed_put (GTK_FIXED (fixed_main), button_apply, 440, 560);
-    gtk_widget_set_sensitive(button_apply, FALSE);
-
-    image_save = gtk_image_new_from_stock ("gtk-save", GTK_ICON_SIZE_BUTTON);
-    label_save = gtk_label_new_with_mnemonic (_("Save & Exit"));
-    button_save = create_button_icon(label_save, image_save);
-    gtk_fixed_put (GTK_FIXED (fixed_main), button_save, 570, 560);
-    gtk_widget_set_sensitive(button_save, FALSE);
-
-    image_exit = gtk_image_new_from_stock ("gtk-quit", GTK_ICON_SIZE_BUTTON);
-    label_exit = gtk_label_new_with_mnemonic (_("Exit"));
-    button_exit = create_button_icon(label_exit, image_exit);
-    gtk_fixed_put (GTK_FIXED (fixed_main), button_exit, 700, 560);
-
-    g_signal_connect ((gpointer) button_apply, "clicked",
-                      G_CALLBACK (on_button_apply_clicked),
-                      this);
-    g_signal_connect ((gpointer) button_save, "clicked",
-                      G_CALLBACK (on_button_save_clicked),
-                      this);
-    g_signal_connect ((gpointer) button_exit, "clicked",
-                      G_CALLBACK (on_button_exit_clicked),
-                      this);
-#endif
     gtk_widget_show(m_window);
 
     g_keyInterface.Push(this);
@@ -3110,11 +2782,11 @@ GtkWidget* ViewSystem::create_note_general(void) {
     GtkWidget *label_screen_saver;
     GtkWidget *label_date_format;
     GtkWidget *label_language;
-#ifdef EMP_355
+
     GtkWidget *combobox_video;
     GtkWidget *label_video;
     GtkWidget *label_vga;
-#endif
+
     GtkWidget *frame_datetime;
     GtkWidget *fixed_datetime;
     // GtkWidget *calendar;
@@ -3164,7 +2836,6 @@ GtkWidget* ViewSystem::create_note_general(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "English");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "中文");
 
-#ifdef EMP_355
     label_vga=gtk_label_new(_("<b>VGA Source:</b>"));
     gtk_widget_show(label_vga);
     gtk_fixed_put(GTK_FIXED(fixed_general),label_vga,30+20,390);
@@ -3179,17 +2850,12 @@ GtkWidget* ViewSystem::create_note_general(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("External"));
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_vga), 0);
     g_signal_connect((gpointer)m_combobox_vga, "changed", G_CALLBACK (on_vga_changed), this);
-#endif
 
-#ifdef VET
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Русский язык");
-#else
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Русский язык");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Polski");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Français");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Español");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Deutsch");
-#endif
 
     g_signal_connect((gpointer)m_combobox_language, "changed", G_CALLBACK (on_language_changed), this);
 
@@ -3229,40 +2895,6 @@ GtkWidget* ViewSystem::create_note_general(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("30 Min."));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("45 Min."));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("60 Min."));
-
-    // label_video = gtk_label_new (_("<b>Video Standard:</b>"));
-    // gtk_widget_show (label_video);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), label_video, 25, 400);
-    // gtk_widget_set_size_request (label_video, 125, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_video), TRUE);
-    // gtk_misc_set_alignment (GTK_MISC (label_video), 0.9, 0.5);
-
-    // m_combobox_video = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_video);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_video, 150, 400);
-    // gtk_widget_set_size_request (m_combobox_video, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video), _("PAL"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video), _("NTSC"));
-    // gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), 0);
-
-    // label_connector_type = gtk_label_new (_("<b>TV Connector:</b>"));
-    // gtk_widget_show (label_connector_type);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), label_connector_type, 275, 400);
-    // gtk_widget_set_size_request (label_connector_type, 125, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_connector_type), TRUE);
-
-    // m_combobox_connect_type = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_connect_type);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_connect_type, 390, 400);
-    // gtk_widget_set_size_request (m_combobox_connect_type, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_connect_type), _("S-Video"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_connect_type), _("Composite"));
-
-    // label_connector_hint = gtk_label_new (_(" (Restart to complete changes)"));
-    // gtk_widget_show (label_connector_hint);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), label_connector_hint, 500, 400);
-    // gtk_widget_set_size_request (label_connector_hint, 210, 30);
-    // gtk_misc_set_alignment (GTK_MISC (label_connector_hint), 0, 0.5);
 
     frame_datetime = gtk_frame_new (NULL);
     gtk_widget_show (frame_datetime);
@@ -3333,99 +2965,13 @@ GtkWidget* ViewSystem::create_note_general(void) {
     g_signal_connect ((gpointer) button_adjust_time, "clicked",
                       G_CALLBACK (on_button_adjust_time_clicked),
                       this);
-#if 0
-    frame_print = gtk_frame_new (NULL);
-    gtk_widget_show (frame_print);
-    gtk_fixed_put (GTK_FIXED (fixed_general), frame_print, 510, 70);
-    gtk_widget_set_size_request (frame_print, 340, 240);
-    gtk_frame_set_label_align (GTK_FRAME (frame_print), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_print), GTK_SHADOW_IN);
 
-    fixed_printer = gtk_fixed_new ();
-    gtk_widget_show (fixed_printer);
-    gtk_container_add (GTK_CONTAINER (frame_print), fixed_printer);
-
-    m_radiobutton_common = gtk_radio_button_new_with_mnemonic (NULL, _("Common"));
-    gtk_widget_show (m_radiobutton_common);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_radiobutton_common, 10, 10);
-    gtk_widget_set_size_request (m_radiobutton_common, 100, 30);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_common), radiobutton_printer_group);
-    radiobutton_printer_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_common));
-    g_signal_connect((gpointer)m_radiobutton_common, "toggled", G_CALLBACK (on_common_radio_button_toggled), this);
-
-    m_radiobutton_specific = gtk_radio_button_new_with_mnemonic (NULL, _("Specific"));
-    gtk_widget_show (m_radiobutton_specific);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_radiobutton_specific, 110, 10);
-    gtk_widget_set_size_request (m_radiobutton_specific, 100, 30);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_specific), radiobutton_printer_group);
-    radiobutton_printer_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_specific));
-    g_signal_connect((gpointer)m_radiobutton_specific, "toggled", G_CALLBACK (on_specific_radio_button_toggled), this);
-
-    m_scrolledwindow_common = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_set_size_request (m_scrolledwindow_common, 320, 170);
-    gtk_widget_show (m_scrolledwindow_common);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_scrolledwindow_common, 10, 40);
-
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (m_scrolledwindow_common), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (m_scrolledwindow_common), GTK_SHADOW_IN);
-
-    m_treeview_common_print = create_common_print_treeview();
-    gtk_widget_show (m_treeview_common_print);
-    m_selected_common_printer = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_common_print));
-    gtk_tree_selection_set_mode(m_selected_common_printer, GTK_SELECTION_SINGLE);
-    gtk_container_add (GTK_CONTAINER (m_scrolledwindow_common), m_treeview_common_print);
-
-    m_fixed_specific = gtk_fixed_new ();
-    gtk_widget_show (m_fixed_specific);
-    gtk_widget_set_size_request (m_fixed_specific, 320, 170);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_fixed_specific, 10, 40);
-
-    scrolledwindow_specific = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_specific);
-    gtk_fixed_put(GTK_FIXED(m_fixed_specific), scrolledwindow_specific, 5, 5);
-    gtk_widget_set_size_request(scrolledwindow_specific, 320, 145);
-
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_specific), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_specific), GTK_SHADOW_IN);
-
-    m_treeview_specific_print = create_specific_print_treeview();
-    gtk_widget_show (m_treeview_specific_print);
-    m_selected_specific_printer = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_specific_print));
-    gtk_tree_selection_set_mode(m_selected_specific_printer, GTK_SELECTION_SINGLE);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_specific), m_treeview_specific_print);
-
-    GtkWidget *button_add_printer = gtk_button_new_with_mnemonic (_("Add"));
-    gtk_widget_show (button_add_printer);
-    gtk_fixed_put (GTK_FIXED (m_fixed_specific), button_add_printer, 115, 150);
-    gtk_widget_set_size_request (button_add_printer, 100, 30);
-    g_signal_connect((gpointer)button_add_printer, "clicked", G_CALLBACK (on_button_add_printer_clicked), this);
-
-    GtkWidget *button_del_printer = gtk_button_new_with_mnemonic (_("Delete"));
-    gtk_widget_show (button_del_printer);
-    gtk_fixed_put (GTK_FIXED (m_fixed_specific), button_del_printer, 225, 150);
-    gtk_widget_set_size_request (button_del_printer, 100, 30);
-    g_signal_connect((gpointer)button_del_printer, "clicked", G_CALLBACK (on_button_del_printer_clicked), this);
-
-    label_print = gtk_label_new (_("<b>Printer</b>"));
-    gtk_widget_show (label_print);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_print), label_print);
-    gtk_label_set_use_markup (GTK_LABEL (label_print), TRUE);
-
-    g_signal_connect((gpointer)m_selected_common_printer, "changed", G_CALLBACK (on_common_treeview_selection_changed), this);
-    g_signal_connect((gpointer)m_selected_specific_printer, "changed", G_CALLBACK (on_specific_treeview_selection_changed), this);
-#endif
     button_default = gtk_button_new_with_mnemonic (_("Default Factory"));
     gtk_widget_show (button_default);
     gtk_fixed_put (GTK_FIXED (fixed_general), button_default, 50, 420+20);
     gtk_widget_set_size_request (button_default, 120+28, 56-16);
     g_signal_connect ((gpointer) button_default, "clicked", G_CALLBACK (on_button_general_default_clicked), this);
 
-    // g_signal_connect ((gpointer) m_combobox_language, "changed",
-    // 		      G_CALLBACK (on_combobox_language_changed),
-    // 		      this);
-    // g_signal_connect ((gpointer) combobox_screen_saver, "changed",
-    // 		      G_CALLBACK (on_combobox_screen_saver_changed),
-    // 		      NULL);
     return fixed_general;
 }
 
@@ -3485,13 +3031,9 @@ void ViewSystem::BtnAdjustTimeClicked(GtkButton *button) {
     sprintf(setdatetime, "hwclock --set --date=\"%d/%d/%d %d:%d:%d\"", month+1, day, year, hour, minute, second);
     //同步时间
     sprintf(hctosys, "hwclock --hctosys");
-#if 0
-    system(setdatetime);
-    system(hctosys);
-#else
+
     _system_(setdatetime);
     _system_(hctosys);
-#endif
 }
 
 void ViewSystem::CommonTreeviewSelectionChanged(GtkTreeSelection *treeselection) {
@@ -3748,23 +3290,7 @@ void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
         break;
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_screen_saver), index_screen_saver);
-#if 0
-    sysGeneralSetting = new SysGeneralSetting;
-    if (sysGeneralSetting->GetPrinterMethod() == 0) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_common), TRUE);
-        gtk_widget_show_all(m_scrolledwindow_common);
-        gtk_widget_hide_all(m_fixed_specific);
-        char printer_path[3];
-        int index_printer = sysGeneralSetting->GetPrinter();
-        sprintf(printer_path, "%d", index_printer);
-        GtkTreePath *path = gtk_tree_path_new_from_string(printer_path);
-        gtk_tree_selection_select_path(m_selected_common_printer, path);
-    } else if (sysGeneralSetting->GetPrinterMethod() == 1) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_specific), TRUE);
-        gtk_widget_hide_all(m_scrolledwindow_common);
-        gtk_widget_show_all(m_fixed_specific);
-    }
-#endif
+
     delete sysGeneralSetting;
 }
 extern bool review_pic;
@@ -3875,24 +3401,6 @@ void ViewSystem::save_general_setting(void) {
     }
     ScreenSaver::GetInstance()->SetPeriod(ScreenSaver * 60);
 
-#if 0
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_common))) {
-        int printIndex = common_printer_selection();
-        if (printIndex != -1) {
-            sysGeneralSetting.SetPrinterMethod(0);
-            sysGeneralSetting.SetPrinter(printIndex);
-        }
-    } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_specific))) {
-        string default_print = specific_printer_selection();
-        if (!default_print.empty()) {
-            Printer print;
-            sysGeneralSetting.SetPrinterMethod(1);
-            print.SetDefault(default_print.c_str());
-            PeripheralMan::GetInstance()->SwitchPrinterDriver();
-            update_specific_printer_model();
-        }
-    }
-#endif
     sysGeneralSetting.SyncFile();
     //update calc menu
     g_menuCalc.UpdateLabel();
@@ -3903,19 +3411,9 @@ void ViewSystem::save_general_setting(void) {
 GtkWidget* ViewSystem::create_note_options(void) {
     GtkWidget *fixed_options;
 
-    //GtkWidget *frame_biopsy_line;
-    //GtkWidget *hbox_biopsy;
-    //GtkWidget *m_radiobutton_biopsy_on;
-    //GSList *radiobutton_biopsy_group = NULL;
-    //GtkWidget *radiobutton_biopsy_off;
-    //GtkWidget *label_biopsy_line;
-
     GtkWidget *frame_TI;
     GtkWidget *hbox_TI;
-    //GtkWidget *m_radiobutton_TIC;
     GSList *radiobutton_TI_group = NULL;
-    //GtkWidget *m_radiobutton_TIB;
-    //GtkWidget *m_radiobutton_TIS;
 
     GtkWidget *label_TI;
     GtkWidget *frame_center_line;
@@ -3973,46 +3471,14 @@ GtkWidget* ViewSystem::create_note_options(void) {
     fixed_options = gtk_fixed_new ();
     gtk_widget_show (fixed_options);
 
-    // biopsy line
-    // frame_biopsy_line = gtk_frame_new (NULL);
-    // gtk_widget_show (frame_biopsy_line);
-    // gtk_fixed_put (GTK_FIXED (fixed_options), frame_biopsy_line, 30, 30);
-    // gtk_widget_set_size_request (frame_biopsy_line, 170, 60);
-    // gtk_frame_set_label_align (GTK_FRAME (frame_biopsy_line), 0.5, 0.5);
-    // gtk_frame_set_shadow_type (GTK_FRAME (frame_biopsy_line), GTK_SHADOW_IN);
-
-    // label_biopsy_line = gtk_label_new (_("<b>Biopsy Line</b>"));
-    // gtk_widget_show (label_biopsy_line);
-    // gtk_frame_set_label_widget (GTK_FRAME (frame_biopsy_line), label_biopsy_line);
-    // gtk_label_set_use_markup (GTK_LABEL (label_biopsy_line), TRUE);
-
-    // hbox_biopsy = gtk_hbox_new (TRUE, 0);
-    // gtk_widget_show (hbox_biopsy);
-    // gtk_container_add (GTK_CONTAINER (frame_biopsy_line), hbox_biopsy);
-
-    // m_radiobutton_biopsy_on = gtk_radio_button_new_with_mnemonic (NULL, _("ON"));
-    // gtk_widget_show (m_radiobutton_biopsy_on);
-    // gtk_box_pack_start (GTK_BOX (hbox_biopsy), m_radiobutton_biopsy_on, FALSE, FALSE, 0);
-    // gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_biopsy_on), radiobutton_biopsy_group);
-    // radiobutton_biopsy_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_biopsy_on));
-
-    // m_radiobutton_biopsy_off = gtk_radio_button_new_with_mnemonic (NULL, _("OFF"));
-    // gtk_widget_show (m_radiobutton_biopsy_off);
-    // gtk_box_pack_start (GTK_BOX (hbox_biopsy), m_radiobutton_biopsy_off, FALSE, FALSE, 0);
-    // gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_biopsy_off), radiobutton_biopsy_group);
-    // radiobutton_biopsy_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_biopsy_off));
-
     // TI
     frame_TI = gtk_frame_new (NULL);
     gtk_widget_show (frame_TI);
     //gtk_fixed_put (GTK_FIXED (fixed_options), frame_TI, 30, 30);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_TI, 50, 30);
-    gtk_widget_set_size_request (frame_TI, 320, 60);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_TI, 50, 30);
     gtk_widget_set_size_request (frame_TI, 170, 60);
-#endif
+
     gtk_frame_set_label_align (GTK_FRAME (frame_TI), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_TI), GTK_SHADOW_IN);
     gtk_widget_set_sensitive(frame_TI, FALSE);
@@ -4048,13 +3514,10 @@ GtkWidget* ViewSystem::create_note_options(void) {
     frame_center_line = gtk_frame_new (NULL);
     gtk_widget_show (frame_center_line);
     //gtk_fixed_put (GTK_FIXED (fixed_options), frame_center_line, 30, 120); //lihuamei 2012.09.28
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_center_line, 450, 30);
-    gtk_widget_set_size_request (frame_center_line, 320, 60);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_center_line, 500+50, 30);
     gtk_widget_set_size_request (frame_center_line, 170, 60);
-#endif
+
     gtk_frame_set_label_align (GTK_FRAME (frame_center_line), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_center_line), GTK_SHADOW_IN);
 
@@ -4083,13 +3546,10 @@ GtkWidget* ViewSystem::create_note_options(void) {
     frame_kb_sound = gtk_frame_new (NULL);
     gtk_widget_show (frame_kb_sound);
     // gtk_fixed_put (GTK_FIXED (fixed_options), frame_kb_sound, 240, 30);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_kb_sound, 450, 120);
-    gtk_widget_set_size_request (frame_kb_sound, 320, 60);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_kb_sound, 300, 30);
     gtk_widget_set_size_request (frame_kb_sound, 170, 60);
-#endif
+
     gtk_frame_set_label_align (GTK_FRAME (frame_kb_sound), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_kb_sound), GTK_SHADOW_IN);
 
@@ -4114,27 +3574,20 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_kb_sound_off), radiobutton_kb_sound_group);
     radiobutton_kb_sound_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_kb_sound_off));
 
-// mouse speed
+    // mouse speed
     GtkWidget *frame_mouse_speed = gtk_frame_new (_("<b>Mouse Speed</b>"));
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_mouse_speed, 50, 120);
-    gtk_widget_set_size_request (frame_mouse_speed, 320, 60);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_mouse_speed, 660, 120);
     gtk_widget_set_size_request (frame_mouse_speed, 160, 160);
-#endif
+
     gtk_frame_set_label_align (GTK_FRAME (frame_mouse_speed), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_mouse_speed), GTK_SHADOW_IN);
     gtk_label_set_use_markup (GTK_LABEL(GTK_FRAME (frame_mouse_speed)->label_widget), TRUE);
     GtkWidget *fixed_mouse_speed = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(frame_mouse_speed), fixed_mouse_speed);
-#ifdef EMP_322
-    GtkWidget *vbox_mouse_speed = gtk_hbox_new (TRUE, 45);
-    gtk_fixed_put (GTK_FIXED (fixed_mouse_speed), vbox_mouse_speed, 24, 10);
-#else
+
     GtkWidget *vbox_mouse_speed = gtk_vbox_new (TRUE, 20);
     gtk_fixed_put (GTK_FIXED (fixed_mouse_speed), vbox_mouse_speed, 30, 20);
-#endif
 
     m_radiobutton_mouse_speed_low = gtk_radio_button_new_with_mnemonic (NULL, _("Low"));
     gtk_box_pack_start (GTK_BOX (vbox_mouse_speed), m_radiobutton_mouse_speed_low, FALSE, FALSE, 0);
@@ -4148,54 +3601,12 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_box_pack_start (GTK_BOX (vbox_mouse_speed), m_radiobutton_mouse_speed_high, FALSE, FALSE, 0);
     gtk_widget_show_all(frame_mouse_speed);
 
-    // display format
-#if 0
-    GtkWidget *frame_mode = gtk_frame_new(NULL);
-    gtk_widget_show(frame_mode);
-    // gtk_fixed_put(GTK_FIXED(fixed_options), frame_mode, 30, 120);
-    gtk_fixed_put(GTK_FIXED(fixed_options), frame_mode, 50, 120);
-    gtk_widget_set_size_request(frame_mode, 100, 160);
-    gtk_frame_set_label_align (GTK_FRAME (frame_mode), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_mode), GTK_SHADOW_IN);
-    GtkWidget *label_mode = gtk_label_new_with_mnemonic(_("<b>MODE</b>"));
-    gtk_widget_show(label_mode);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_mode), label_mode);
-    gtk_label_set_use_markup (GTK_LABEL (label_mode), TRUE);
-
-    GtkWidget *fixed_mode = gtk_fixed_new();
-    gtk_widget_show(fixed_mode);
-    gtk_container_add(GTK_CONTAINER(frame_mode), fixed_mode);
-
-    m_radiobtn_bm = gtk_radio_button_new_with_mnemonic(NULL, _("B/M"));
-    gtk_widget_show (m_radiobtn_bm);
-    gtk_fixed_put (GTK_FIXED (fixed_mode), m_radiobtn_bm, 8, 10);
-    gtk_widget_set_size_request (m_radiobtn_bm, 80, 30);
-    GSList *radiobutton_mode_group = NULL;
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_bm), radiobutton_mode_group);
-    radiobutton_mode_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_bm));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobtn_bm), FALSE);
-    g_signal_connect((gpointer)m_radiobtn_bm, "toggled", G_CALLBACK (on_modebm_radio_button_toggled), this);
-
-    m_radiobtn_bpw = gtk_radio_button_new_with_mnemonic(NULL, _("B/PW"));
-    gtk_widget_show (m_radiobtn_bpw);
-    gtk_fixed_put (GTK_FIXED (fixed_mode), m_radiobtn_bpw, 8, 45);
-    gtk_widget_set_size_request (m_radiobtn_bpw, 80, 30);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_bpw), radiobutton_mode_group);
-    radiobutton_mode_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_bpw));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobtn_bpw), FALSE);
-    g_signal_connect((gpointer)m_radiobtn_bpw, "toggled", G_CALLBACK (on_modebpw_radio_button_toggled), this);
-#endif
-    //12.28
-
     frame_display_format = gtk_frame_new (NULL);
     gtk_widget_show (frame_display_format);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_display_format, 50, 210);
-    gtk_widget_set_size_request (frame_display_format, 720, 90);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_display_format, 50, 120);
     gtk_widget_set_size_request (frame_display_format, 420+150, 160);
-#endif
+
     gtk_frame_set_label_align (GTK_FRAME (frame_display_format), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_display_format), GTK_SHADOW_IN);
 
@@ -4207,11 +3618,7 @@ GtkWidget* ViewSystem::create_note_options(void) {
     fixed_display_format = gtk_fixed_new ();
     gtk_widget_show (fixed_display_format);
     gtk_container_add (GTK_CONTAINER (frame_display_format), fixed_display_format);
-#if 0
-    hbox_display_format = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_display_format);
-    gtk_container_add (GTK_CONTAINER (frame_display_format), hbox_display_format);
-#endif
+
     m_radiobtn_total = gtk_radio_button_new (NULL);
     gtk_widget_show (m_radiobtn_total);
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_total, FALSE, FALSE, 0);
@@ -4228,22 +3635,13 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_widget_show (image_format_1);
     gtk_box_pack_start (GTK_BOX (vbox_format_1), image_format_1, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_1), 5, 10);
-#if 0
-    GtkWidget *label_format_1 = gtk_label_new (_("TOTAL"));
-    gtk_widget_modify_fg(label_format_1, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_1, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_1);
-    gtk_box_pack_start (GTK_BOX (vbox_format_1), label_format_1, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_1), TRUE);
-#endif
+
     m_radiobtn_ud_11 = gtk_radio_button_new (NULL);
     gtk_widget_show (m_radiobtn_ud_11);
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_11, FALSE, FALSE, 0);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_11, 200, 8);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_11, 170, 8);
-#endif
+
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11), radiobtn_display_format_group_bm);
     radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11));
     // g_signal_connect((gpointer)m_radiobtn_ud_11, "toggled", G_CALLBACK (on_display_ud11_radio_button_toggled), this);
@@ -4257,23 +3655,12 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_box_pack_start (GTK_BOX (vbox_format_2), image_format_2, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_2), 5, 10);
 
-#if 0
-    GtkWidget *label_format_2 = gtk_label_new (_("UD_11"));
-    gtk_widget_modify_fg(label_format_2, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_2, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_2);
-    gtk_box_pack_start (GTK_BOX (vbox_format_2), label_format_2, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_2), TRUE);
-#endif
-
     m_radiobtn_ud_21 = gtk_radio_button_new(NULL);
     gtk_widget_show (m_radiobtn_ud_21);
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_21, FALSE, FALSE, 0);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_21, 330, 8);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_21, 270, 8);
-#endif
+
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21), radiobtn_display_format_group_bm);
     radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21));
     // g_signal_connect((gpointer)m_radiobtn_ud_21, "toggled", G_CALLBACK (on_display_ud21_radio_button_toggled), this);
@@ -4287,23 +3674,12 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_box_pack_start (GTK_BOX (vbox_format_3), image_format_3, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_3), 5, 10);
 
-#if 0
-    GtkWidget *label_format_3 = gtk_label_new (_("UD_21"));
-    gtk_widget_modify_fg(label_format_3, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_3, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_3);
-    gtk_box_pack_start (GTK_BOX (vbox_format_3), label_format_3, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_3), TRUE);
-#endif
-
     m_radiobtn_ud_12 = gtk_radio_button_new (NULL);
     gtk_widget_show (m_radiobtn_ud_12);
     //gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_12, FALSE, FALSE, 0);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_12, 460, 8);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_12, 370, 8);
-#endif
+
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12), radiobtn_display_format_group_bm);
     radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12));
     // g_signal_connect((gpointer)m_radiobtn_ud_12, "toggled", G_CALLBACK (on_display_ud12_radio_button_toggled), this);
@@ -4316,22 +3692,13 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_widget_show (image_format_4);
     gtk_box_pack_start (GTK_BOX (vbox_format_4), image_format_4, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_4), 5, 10);
-#if 0
-    GtkWidget *label_format_4 = gtk_label_new (_("UD_12"));
-    gtk_widget_modify_fg(label_format_4, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_4, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_4);
-    gtk_box_pack_start (GTK_BOX (vbox_format_4), label_format_4, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_4), TRUE);
-#endif
+
     m_radiobtn_lr_11 = gtk_radio_button_new (NULL);
     gtk_widget_show (m_radiobtn_lr_11);
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_lr_11, FALSE, FALSE, 0);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_lr_11, 590, 8);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_lr_11, 470, 8);
-#endif
+
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11), radiobtn_display_format_group_bm);
     radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11));
     // g_signal_connect((gpointer)m_radiobtn_lr_11, "toggled", G_CALLBACK (on_display_lr11_radio_button_toggled), this);
@@ -4353,199 +3720,124 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_misc_set_alignment (GTK_MISC (label_mode_bm), 0, 0.5);
     //pw
     m_radiobtn_total_pw = gtk_radio_button_new (NULL);
-#ifdef EMP_322
-    gtk_widget_hide (m_radiobtn_total_pw);
-#else
+
     gtk_widget_show (m_radiobtn_total_pw);
-#endif
+
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_total, FALSE, FALSE, 0);
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_total_pw, 70, 70);
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_total_pw), radiobtn_display_format_group_bpw);
     radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_total_pw));
 
     GtkWidget *vbox_format_1_pw = gtk_vbox_new (FALSE, 0);
-#ifdef EMP_322
-    gtk_widget_hide (vbox_format_1_pw);
-#else
+
     gtk_widget_show (vbox_format_1_pw);
-#endif
+
     gtk_container_add (GTK_CONTAINER (m_radiobtn_total_pw), vbox_format_1_pw);
 
     GtkWidget *image_format_1_pw = create_pixmap ("./res/btn_format/1.jpg");
-#ifdef EMP_322
-    gtk_widget_hide (image_format_1_pw);
 
-#else
     gtk_widget_show (image_format_1_pw);
-#endif
+
     gtk_box_pack_start (GTK_BOX (vbox_format_1_pw), image_format_1_pw, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_1_pw), 5, 10);
-#if 0
-    GtkWidget *label_format_1 = gtk_label_new (_("TOTAL"));
-    gtk_widget_modify_fg(label_format_1, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_1, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_1);
-    gtk_box_pack_start (GTK_BOX (vbox_format_1), label_format_1, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_1), TRUE);
-#endif
 
     m_radiobtn_ud_11_pw = gtk_radio_button_new (NULL);
-#ifdef EMP_322
-    gtk_widget_hide (m_radiobtn_ud_11_pw);
-#else
+
     gtk_widget_show (m_radiobtn_ud_11_pw);
-#endif
+
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_11, FALSE, FALSE, 0);
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_11_pw, 170, 70);
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11_pw), radiobtn_display_format_group_bpw);
     radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11_pw));
 
     GtkWidget *vbox_format_2_pw = gtk_vbox_new (FALSE, 0);
-#ifdef EMP_322
-    gtk_widget_hide (vbox_format_2_pw);
-#else
+
     gtk_widget_show (vbox_format_2_pw);
-#endif
+
     gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_11_pw), vbox_format_2_pw);
 
     GtkWidget *image_format_2_pw = create_pixmap ("./res/btn_format/2.jpg");
-#ifdef EMP_322
-    gtk_widget_hide (image_format_2_pw);
-#else
+
     gtk_widget_show (image_format_2_pw);
-#endif
+
     gtk_box_pack_start (GTK_BOX (vbox_format_2_pw), image_format_2_pw, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_2_pw), 5, 10);
 
-#if 0
-    GtkWidget *label_format_2 = gtk_label_new (_("UD_11"));
-    gtk_widget_modify_fg(label_format_2, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_2, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_2);
-    gtk_box_pack_start (GTK_BOX (vbox_format_2), label_format_2, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_2), TRUE);
-#endif
-
     m_radiobtn_ud_21_pw = gtk_radio_button_new(NULL);
-#ifdef EMP_322
-    gtk_widget_hide (m_radiobtn_ud_21_pw);
-#else
+
     gtk_widget_show (m_radiobtn_ud_21_pw);
-#endif
+
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_21, FALSE, FALSE, 0);
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_21_pw, 270, 70);
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21_pw), radiobtn_display_format_group_bpw);
     radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21_pw));
 
     GtkWidget *vbox_format_3_pw = gtk_vbox_new (FALSE, 0);
-#ifdef EMP_322
-    gtk_widget_hide (vbox_format_3_pw);
-#else
+
     gtk_widget_show (vbox_format_3_pw);
-#endif
+
     gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_21_pw), vbox_format_3_pw);
 
     GtkWidget *image_format_3_pw = create_pixmap ("./res/btn_format/3.jpg");
-#ifdef EMP_322
-    gtk_widget_hide (image_format_3_pw);
-#else
+
     gtk_widget_show (image_format_3_pw);
-#endif
+
     gtk_box_pack_start (GTK_BOX (vbox_format_3_pw), image_format_3_pw, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_3_pw), 5, 10);
 
-#if 0
-    GtkWidget *label_format_3 = gtk_label_new (_("UD_21"));
-    gtk_widget_modify_fg(label_format_3, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_3, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_3);
-    gtk_box_pack_start (GTK_BOX (vbox_format_3), label_format_3, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_3), TRUE);
-#endif
 
     m_radiobtn_ud_12_pw = gtk_radio_button_new (NULL);
-#ifdef EMP_322
-    gtk_widget_hide (m_radiobtn_ud_12_pw);
-#else
+
     gtk_widget_show (m_radiobtn_ud_12_pw);
-#endif
+
     //gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_12, FALSE, FALSE, 0);
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_12_pw, 370, 70);
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12_pw), radiobtn_display_format_group_bpw);
     radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12_pw));
 
     GtkWidget *vbox_format_4_pw = gtk_vbox_new (FALSE, 0);
-#ifdef EMP_322
-    gtk_widget_hide (vbox_format_4_pw);
-#else
+
     gtk_widget_show (vbox_format_4_pw);
-#endif
+
     gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_12_pw), vbox_format_4_pw);
 
     GtkWidget *image_format_4_pw = create_pixmap ("./res/btn_format/4.jpg");
-#ifdef EMP_322
-    gtk_widget_hide (image_format_4_pw);
-#else
+
     gtk_widget_show (image_format_4_pw);
-#endif
+
 
     gtk_box_pack_start (GTK_BOX (vbox_format_4_pw), image_format_4_pw, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_4_pw), 5, 10);
-#if 0
-    GtkWidget *label_format_4 = gtk_label_new (_("UD_12"));
-    gtk_widget_modify_fg(label_format_4, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_4, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_4);
-    gtk_box_pack_start (GTK_BOX (vbox_format_4), label_format_4, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_4), TRUE);
-#endif
+
     m_radiobtn_lr_11_pw = gtk_radio_button_new (NULL);
-#ifdef EMP_322
-    gtk_widget_hide (m_radiobtn_lr_11_pw);
-#else
+
     gtk_widget_show (m_radiobtn_lr_11_pw);
-#endif
+
     // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_lr_11, FALSE, FALSE, 0);
     gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_lr_11_pw, 470, 70);
     gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11_pw), radiobtn_display_format_group_bpw);
     radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11_pw));
 
     GtkWidget *vbox_format_5_pw = gtk_vbox_new (FALSE, 0);
-#ifdef EMP_322
-    gtk_widget_hide (vbox_format_5_pw);
-#else
+
     gtk_widget_show (vbox_format_5_pw);
-#endif
+
     gtk_container_add (GTK_CONTAINER (m_radiobtn_lr_11_pw), vbox_format_5_pw);
 
     GtkWidget *image_format_5_pw = create_pixmap ("./res/btn_format/5.jpg");
-#ifdef EMP_322
-    gtk_widget_hide (image_format_5_pw);
-#else
+
     gtk_widget_show (image_format_5_pw);
-#endif
+
     gtk_box_pack_start (GTK_BOX (vbox_format_5_pw), image_format_5_pw, TRUE, TRUE, 0);
     gtk_misc_set_padding (GTK_MISC (image_format_5_pw), 5, 10);
 
     label_mode_bpw = gtk_label_new (_("<b>PW/CW: </b>"));
-#ifdef EMP_322
-    gtk_widget_hide (label_mode_bpw);
-#else
     gtk_widget_show (label_mode_bpw);
-#endif
+
     gtk_fixed_put (GTK_FIXED (fixed_display_format), label_mode_bpw, 10, 85);
     gtk_widget_set_size_request (label_mode_bpw, 60, 30);
     gtk_label_set_use_markup (GTK_LABEL (label_mode_bpw), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label_mode_bpw), 0, 0.5);
-
-#if 0
-    GtkWidget *label_format_5 = gtk_label_new (_("LR_11"));
-    gtk_widget_modify_fg(label_format_5, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_5, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_5);
-    gtk_box_pack_start (GTK_BOX (vbox_format_5), label_format_5, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_5), TRUE);
-#endif
 
     // factory default
     button_default_options = gtk_button_new_with_mnemonic (_("Default Factory"));
@@ -4560,11 +3852,8 @@ GtkWidget* ViewSystem::create_note_options(void) {
     frame_image_options = gtk_frame_new (NULL);
     gtk_widget_show (frame_image_options);
     // gtk_fixed_put (GTK_FIXED (fixed_options), frame_image_options, 30, 310);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_image_options, 50, 330);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_image_options, 50, 310);
-#endif
 
     //gtk_widget_set_size_request (frame_image_options, 320, 100);
     gtk_widget_set_size_request (frame_image_options, 320, 100);
@@ -4595,16 +3884,6 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_format), _("JPEG"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_format), _("EMP"));
 
-#if 0
-    m_combobox_img_medium = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_img_medium);
-    gtk_table_attach (GTK_TABLE (table_img_options), m_combobox_img_medium, 1, 2, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_medium), _("Hard disk"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_medium), _("U disk"));
-#endif
-
     m_combobox_img_file = gtk_combo_box_new_text ();
     gtk_widget_show (m_combobox_img_file);
     gtk_table_attach (GTK_TABLE (table_img_options), m_combobox_img_file, 1, 2, 1, 2,
@@ -4622,16 +3901,6 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_label_set_use_markup (GTK_LABEL (label_img_file), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label_img_file), 0, 0.5);
 
-#if 0
-    label_img_medium = gtk_label_new (_("<b>Storage medium:</b>"));
-    gtk_widget_show (label_img_medium);
-    gtk_table_attach (GTK_TABLE (table_img_options), label_img_medium, 0, 1, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_img_medium), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_img_medium), 0, 0.5);
-#endif
-
     label_img_format = gtk_label_new (_("<b>Storage format: </b>"));
     gtk_widget_show (label_img_format);
     gtk_table_attach (GTK_TABLE (table_img_options), label_img_format, 0, 1, 0, 1,
@@ -4644,13 +3913,10 @@ GtkWidget* ViewSystem::create_note_options(void) {
     frame_video_options = gtk_frame_new (NULL);
     gtk_widget_show (frame_video_options);
     // gtk_fixed_put (GTK_FIXED (fixed_options), frame_video_options, 390, 310);
-#ifdef EMP_322
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_video_options, 450, 330);
-    gtk_widget_set_size_request (frame_video_options, 320, 100);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_options), frame_video_options, 450, 310);
     gtk_widget_set_size_request (frame_video_options, 320-10, 100);
-#endif
+
     //gtk_widget_set_size_request (frame_video_options, 320, 100);
     gtk_frame_set_label_align (GTK_FRAME (frame_video_options), 0.5, 0.5);
     gtk_frame_set_shadow_type (GTK_FRAME (frame_video_options), GTK_SHADOW_IN);
@@ -4678,17 +3944,6 @@ GtkWidget* ViewSystem::create_note_options(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_format), _("CINE"));
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_format), 1);
 
-#if 0
-    m_combobox_video_medium = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_video_medium);
-    gtk_table_attach (GTK_TABLE (table_video_options), m_combobox_video_medium, 1, 2, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_medium), _("Hard disk"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_medium), _("U disk"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_medium), 1);
-#endif
-
     label_video_file = gtk_label_new (_("<b>File name:</b>"));
     gtk_widget_show (label_video_file);
     gtk_table_attach (GTK_TABLE (table_video_options), label_video_file, 0, 1, 1, 2,
@@ -4696,16 +3951,6 @@ GtkWidget* ViewSystem::create_note_options(void) {
                       (GtkAttachOptions) (GTK_FILL), 0, 0);
     gtk_label_set_use_markup (GTK_LABEL (label_video_file), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label_video_file), 0, 0.5);
-
-#if 0
-    label_video_medium = gtk_label_new (_("<b>Storage medium:</b>"));
-    gtk_widget_show (label_video_medium);
-    gtk_table_attach (GTK_TABLE (table_video_options), label_video_medium, 0, 1, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_video_medium), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_video_medium), 0, 0.5);
-#endif
 
     label_video_format = gtk_label_new (_("<b>Storage format: </b>"));
     gtk_widget_show (label_video_format);
@@ -4731,12 +3976,6 @@ void ViewSystem::init_option_setting(SysOptions* sysOptions) {
     if (sysOptions == NULL)
         sysOptions = new SysOptions;
 
-    // int index_biopsy_display = sysOptions->GetBiopsyLine();
-    // if (index_biopsy_display == 0)
-    // 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_biopsy_on), TRUE);
-    // else
-    // 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_biopsy_off), TRUE);
-
     int index_center_display = sysOptions->GetCenterLine();
     if (index_center_display == 0)
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_center_on), TRUE);
@@ -4759,7 +3998,7 @@ void ViewSystem::init_option_setting(SysOptions* sysOptions) {
 
     int index_display_format = 0;
     index_display_format = sysOptions->GetDisplayFormatM();
-//  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobtn_bm), TRUE);
+    //  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobtn_bm), TRUE);
     m_bmIndex = index_display_format;
     m_bpwIndex = sysOptions->GetDisplayFormatPW();
 
@@ -4811,13 +4050,6 @@ void ViewSystem::init_option_setting(SysOptions* sysOptions) {
 
 void ViewSystem::save_option_setting(void) {
     SysOptions sysOptions;
-
-    // unsigned char biopsyIndex;
-    // if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_biopsy_on)))
-    // 	biopsyIndex = 0;
-    // else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_biopsy_off)))
-    // 	biopsyIndex = 1;
-    // sysOptions.SetBiopsyLine(biopsyIndex);
 
     unsigned char centerLineIndex = 0;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_on)))
@@ -4929,12 +4161,11 @@ GtkWidget* ViewSystem::create_note_image(void) {
     GtkWidget *img_delete;
     GtkWidget *m_image_button_add;
     GtkWidget *m_image_button_delete;
-#ifndef VET
+
     GtkWidget *button_edit_dept;
     GtkWidget *button_return_dept;
     GtkWidget *button_get_current;
     GtkWidget *button_default_image;
-#endif
 
     GtkWidget *button_import_from_USB;
     GtkWidget *button_export_to_USB;
@@ -5013,8 +4244,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     GtkWidget *label_space_compound;
     GtkWidget *label_freq_compound;
     GtkWidget *label_thi_freq;
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     GtkWidget *frame_pw_mode;
     GtkWidget *fixed_pw_mode;
     GtkWidget *table_pw_mode;
@@ -5067,8 +4297,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     // GtkWidget *combobox_sensitivity;
     GtkWidget *hseparator4;
     GtkWidget *label_cfm_mode;
-#endif
-#endif
+
     GtkWidget *bin_entry_dia;
 
     SysGeneralSetting sysGS;
@@ -5148,74 +4377,47 @@ GtkWidget* ViewSystem::create_note_image(void) {
         string  newProbeName = ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_type), newProbeName.c_str());
     }
-#ifdef VET
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), 0);
-#else
+
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), -1);
 
-#endif
     g_signal_connect(m_combobox_probe_type, "changed", G_CALLBACK(HandleProbeTypeChanged), this);
 
     // exam type
     scrolledwindow_exam_type = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (scrolledwindow_exam_type);
-#ifdef VET
-    gtk_fixed_put (GTK_FIXED (fixed_image), scrolledwindow_exam_type, 10+20, 70+30-40);
-#else
+
     gtk_fixed_put (GTK_FIXED (fixed_image), scrolledwindow_exam_type, 10+20, 70+10-40);
-#endif
-#ifdef VET
-    gtk_widget_set_size_request (scrolledwindow_exam_type, 220, 345-50-60+40+40);
-#else
+
+
     gtk_widget_set_size_request (scrolledwindow_exam_type, 220+50, 275+48+40+40+77-30);
-#endif
+
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_exam_type), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-#ifdef VET
-    ExamItem examItem;
-    vector<int> itemIndex;
-    examItem.GetItemListOfProbe((char*)PROBE_LIST[0].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
-    GtkTreeModel *model = create_exam_item_model(itemIndex);
-#else
-    vector<int> test;
+
+    vector<ExamItem::EItem> test;
     GtkTreeModel *model = create_exam_item_model(test);
 
-#endif
+
     m_treeview_exam_type = gtk_tree_view_new_with_model(model);
 
-//#ifdef VET
-    //  add_columns(GTK_TREE_VIEW(m_treeview_exam_type));
-//#else
     add_exam_item_column(GTK_TREE_VIEW(m_treeview_exam_type));
-//#endif
+
     gtk_container_add (GTK_CONTAINER (scrolledwindow_exam_type), m_treeview_exam_type);
 
     GtkTreeSelection *select;
     select = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
 
-#ifndef VET
+
     g_object_set(renderer, "editable", TRUE, NULL);
     g_signal_connect(renderer, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
     g_signal_connect(renderer, "edited", G_CALLBACK(HandleCellRendererRename), this);
-#endif
+
     g_signal_connect(select, "changed", G_CALLBACK(HandleExamTypeChanged), this);
     gtk_widget_add_events(GTK_WIDGET(m_treeview_exam_type), (gtk_widget_get_events(GTK_WIDGET(m_treeview_exam_type)) | GDK_BUTTON_RELEASE_MASK));
     g_signal_connect_after(m_treeview_exam_type, "button_release_event", G_CALLBACK(HandleExamDepartmentBtnClicked), this);
     //g_signal_connect(m_treeview_exam_type, "test-expand-row", G_CALLBACK(HandleExamTypeExpandBefore), this);
     gtk_widget_show (m_treeview_exam_type);
 
-    //GtkTreePath *path_tmp = gtk_tree_path_new_from_string("0:0");
-    // gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
-    // gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
-#if 0
-    GtkTreeIter iter_new;
-    gtk_tree_store_append(GTK_TREE_STORE(model), &iter_new, &iter);
-    gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, new_string, -1);
-    GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
-    gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_TreeviewReportSet), new_path);
-#endif
-    //GtkTreePath *path = gtk_tree_path_new_from_string();
-#ifndef VET
     m_image_button_add = gtk_image_new_from_stock ("gtk-add", GTK_ICON_SIZE_BUTTON);
     m_button_add = create_button_icon_only(m_image_button_add, 0, 0, NULL);
     gtk_widget_hide (m_button_add);
@@ -5229,39 +4431,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_fixed_put (GTK_FIXED (fixed_image), m_button_delete_item, 295-10, 50+30-2-40);
     gtk_widget_set_size_request (m_button_delete_item, 30-5, 30-5);
     g_signal_connect(m_button_delete_item, "clicked", G_CALLBACK(HandleDeleteItemClicked), this);
-#endif
 
-#if 0
-    button_edit_dept = gtk_button_new_with_mnemonic (_("Edit"));
-    gtk_widget_show (button_edit_dept);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_edit_dept, 80, 345+20);//415);
-    gtk_widget_set_size_request (button_edit_dept, 148, 40-10);
-    g_signal_connect(button_edit_dept, "clicked", G_CALLBACK(HandleImageBtnEditDept), this);
-
-    button_return_dept = gtk_button_new_with_mnemonic (_("Return"));
-    gtk_widget_hide (button_return_dept);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), button_import_from_USB, 50, 355);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_return_dept, 80, 385+20);//415);
-    gtk_widget_set_size_request (button_return_dept, 148, 40-10);
-    g_signal_connect(button_return_dept, "clicked", G_CALLBACK(HandleImageBtnReturnDept), this);
-
-    // get current
-    button_get_current = gtk_button_new_with_mnemonic (_("Get Current"));
-    gtk_widget_show (button_get_current);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), button_get_current, 42, 425);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_get_current, 80, 385+20);//465);
-    gtk_widget_set_size_request (button_get_current, 136+12, 30);//+10);
-    g_signal_connect(button_get_current, "clicked", G_CALLBACK(HandleImageBtnGetCurrent), this);
-
-    // factory default
-    button_default_image = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_default_image);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), button_default_image, 42, 460);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_default_image, 80, 425+20);//465);
-    gtk_widget_set_size_request (button_default_image, 136+12, 30);//+10);
-    g_signal_connect(button_default_image, "clicked", G_CALLBACK(HandleImageBtnDefault), this);
-
-#else
     const int dir = 20;
     //new checkpart
     m_frame_new_check_part = gtk_frame_new (NULL);
@@ -5334,21 +4504,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     //gtk_fixed_put (GTK_FIXED (fixed_image), button_default_image, 340+20+10, 415);
     gtk_widget_set_size_request (button_default_image, 136+12, 30+10-10);
     g_signal_connect(button_default_image, "clicked", G_CALLBACK(HandleImageBtnDefault), this);
-#if 0
-    // export to USB
-    button_export_to_USB = gtk_button_new_with_mnemonic (_("Export To USB"));
-    gtk_widget_show (button_export_to_USB);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_export_to_USB, 340+20+10+136+12+dir, 415-85);
-    gtk_widget_set_size_request (button_export_to_USB, 136+12, 30+10+10);
-    g_signal_connect(button_export_to_USB, "clicked", G_CALLBACK(HandleImageBtnExportToUSB), this);
 
-    // import from USB
-    button_import_from_USB = gtk_button_new_with_mnemonic (_("Import From USB"));
-    gtk_widget_show (button_import_from_USB);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_import_from_USB, 340+20+10+136+12+dir+136+12+dir, 415-85);
-    gtk_widget_set_size_request (button_import_from_USB, 136+12, 30+10+10);
-    g_signal_connect(button_import_from_USB, "clicked", G_CALLBACK(HandleImageBtnImportFromUSB), this);
-#else
     // export to USB
     button_export_to_USB = gtk_button_new_with_mnemonic (_("Export To USB"));
     gtk_widget_show (button_export_to_USB);
@@ -5362,8 +4518,6 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_fixed_put (GTK_FIXED (fixed_image), button_import_from_USB, 340+20+10+232+dir, 415-80+20+20);
     gtk_widget_set_size_request (button_import_from_USB, 232, 30+10+10);
     g_signal_connect(button_import_from_USB, "clicked", G_CALLBACK(HandleImageBtnImportFromUSB), this);
-#endif
-#endif
 
     // scroll window
     scrolledwindow_img_set = gtk_scrolled_window_new (NULL, NULL);
@@ -5437,28 +4591,6 @@ GtkWidget* ViewSystem::create_note_image(void) {
         sprintf(buf, "%d", Img2D::POWER_DATA[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ao_power), buf);
     }
-
-    // label_note = gtk_label_new (_("Note :"));
-    // gtk_widget_show (label_note);
-    // gtk_fixed_put (GTK_FIXED (fixed_comment), label_note, 5, 50);
-    // gtk_widget_set_size_request (label_note, 100, 30);
-
-    // combobox_note = gtk_combo_box_new_text ();
-    // gtk_widget_show (combobox_note);
-    // gtk_fixed_put (GTK_FIXED (fixed_comment), combobox_note, 105, 50);
-    // gtk_widget_set_size_request (combobox_note, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_note), _("test"));
-
-    // label_bdmk = gtk_label_new (_("Body Mark:"));
-    // gtk_widget_show (label_bdmk);
-    // gtk_fixed_put (GTK_FIXED (fixed_comment), label_bdmk, 250, 50);
-    // gtk_widget_set_size_request (label_bdmk, 100, 30);
-
-    // combobox_bdmk = gtk_combo_box_new_text ();
-    // gtk_widget_show (combobox_bdmk);
-    // gtk_fixed_put (GTK_FIXED (fixed_comment), combobox_bdmk, 350, 50);
-    // gtk_widget_set_size_request (combobox_bdmk, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (combobox_bdmk), _("test"));
 
     // 2d and m mode
     frame_2d_m_mode = gtk_frame_new (NULL);
@@ -5732,23 +4864,6 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_polarity), _("OFF"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_polarity), _("ON"));
 
-#if 0
-    // rotate
-    label_rotation = gtk_label_new (_("Rotation:"));
-    gtk_widget_show (label_rotation);
-    gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_rotation, 270, 310);
-    gtk_widget_set_size_request (label_rotation, 100, 30);
-
-    m_combobox_rotation = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_rotation);
-    gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_rotation, 370, 310);
-    gtk_widget_set_size_request (m_combobox_rotation, 100, 30);
-    for (i = 0; i < ImgProc2D::MAX_ROTATE; i ++) {
-        sprintf(buf , "%d°", ImgProc2D::Rotate[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_rotation), buf);
-    }
-#endif
-
     // frame aver
     label_frame = gtk_label_new (_("Frame aver. :"));
     gtk_widget_show (label_frame);
@@ -5944,8 +5059,6 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_thi_freq, 1, 2, 15, 16);
 
     // pw mode
-#if not defined(EMP_322)
-#ifndef  EMP_313
     frame_pw_mode = gtk_frame_new (NULL);
     gtk_widget_show (frame_pw_mode);
     gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_pw_mode, 5, 715); //660
@@ -5995,13 +5108,6 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_spinbutton_pw_gain, 3, 4, 0, 1);
     gtk_widget_set_size_request (m_spinbutton_pw_gain, 100, 27);
     g_signal_connect(G_OBJECT(m_spinbutton_pw_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
-
-#if 0
-    for (i = 0; i < ProbeSocket::FREQ_DOPPLER_SUM[probeIndex]; i ++) {
-        sprintf(buf , "%.1f", (float)ProbeSocket::FREQ_DOPPLER[probeIndex][i] / 20);
-        gtk_combo_box_append_text (GTK_COMBO_BOX(m_combobox_pw_freq), buf);
-    }
-#endif
 
     // pw scale
     label_pw_scale_prf = gtk_label_new (_("Scale PRF:"));
@@ -6274,24 +5380,11 @@ GtkWidget* ViewSystem::create_note_image(void) {
         sprintf(buf , "%d", i);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_smooth), buf);
     }
-#endif
-#endif
-    // pdi gain
-    // label_pdi_gain = gtk_label_new (_("PDI Gain:"));
-    // gtk_widget_show (label_pdi_gain);
-    // gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_pdi_gain, 5, 230);
-    // gtk_widget_set_size_request (label_pdi_gain, 100, 30);
-
-    // spinbutton_pdi_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
-    // m_spinbutton_pdi_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_pdi_gain_adj), 1, 0);
-    // gtk_widget_show (m_spinbutton_pdi_gain);
-    // gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_spinbutton_pdi_gain, 105, 232);
-    // gtk_widget_set_size_request (m_spinbutton_pdi_gain, 100, 27);
 
     return fixed_image;
 }
 
-#ifndef VET
+
 void ViewSystem::RenameItemClicked(GtkButton *button) {
 
     g_object_set(renderer, "editable", TRUE, NULL);
@@ -6299,7 +5392,7 @@ void ViewSystem::RenameItemClicked(GtkButton *button) {
     // g_signal_connect(renderer, "editable", G_CALLBACK(on_entry_user_item_insert), this);
     g_signal_connect(renderer, "edited", G_CALLBACK(HandleCellRendererRename), this);
 }
-#endif
+
 void ViewSystem::EntryItemInsert(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path) {
     if(GTK_IS_ENTRY(editable)) {
         g_signal_connect(G_OBJECT(editable), "insert_text", G_CALLBACK(on_entry_insert_custom_item), this);
@@ -6348,18 +5441,10 @@ void ViewSystem::CreateDefineItem(int probeIndex, vector<ExamPara>& vecExamItem)
 void ViewSystem::CreateDefineItemFormUsbToHost(char *name) {
     char path_defined[256];
     if(strcmp(name, "System Default") ==0)
-        /*
-        #ifdef EMP_355
-                sprintf(path_defined, "%s%s%s", "/mnt/udisk/emp-data/userconfig/", name, ".ini");
-                //sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, "SystemDefault", ".ini");
-            else
-                sprintf(path_defined, "%s%s%s", "/mnt/udisk/emp-data/userconfig/", name, ".ini");
-        #else
-        */
         sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, "SystemDefault", ".ini");
     else
         sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name, ".ini");
-//#endif
+
     FILE *fp;
     if((fp = fopen(path_defined, "r")) !=NULL) {
         remove(path_defined);
@@ -6399,17 +5484,17 @@ void ViewSystem::CreateDefineItemFormUsbToHost(char *name) {
         if(strcmp(userselect , "") !=0) {
             strcpy(probelist,(char*)ptrIni->ReadString(src_group, "ProbeType").c_str());
             strcpy(useritem,(char*)ptrIni->ReadString(src_group, "ExamItem").c_str());
-#ifndef VET
+
             strcpy(department,(char*)ptrIni->ReadString(src_group, "Department").c_str());
             strcpy(firstgenitem,(char*)ptrIni->ReadString(src_group, "GenFirstItem").c_str());
-#endif
+
             ptrIni1->WriteString(src_group, "UserSelect",name);
             ptrIni1->WriteString(src_group, "ProbeType",probelist);
             ptrIni1->WriteString(src_group, "ExamItem", useritem);
-#ifndef VET
+
             ptrIni1->WriteString(src_group, "Department", department);
             ptrIni1->WriteString(src_group, "GenFirstItem", firstgenitem);
-#endif
+
             ptrIni1->SyncConfigFile();
         }
     }
@@ -6584,11 +5669,9 @@ void ViewSystem::CellRendererRename(GtkCellRendererText *renderer, gchar *path_s
     }
 
     //except the user defined1 to user defined4
-#ifdef VET
-    int size = sizeof(ExamItemArray)/sizeof(ExamPara);
-#else
+
     int size = sizeof(ExamItemArray)/sizeof(ExamPara) - 4;
-#endif
+
     for(int i = 0; i < size/*24*/; i++) {
         if (new_text==ExamItemArray[i].name) {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Fail to rename! The item name has existed!"), NULL); //重命名失败!该结点已存在
@@ -6654,15 +5737,12 @@ void ViewSystem::AddCheckPart(char *checkpart) {
     GtkTreeModel *model;
     GtkTreeIter iter;
 
-#ifdef VET
-    gtk_tree_selection_get_selected(selected_node, &model, &iter);
-#else
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
                                           _("Please select a department before inserting!"), NULL); //请先选择待插入结点的父结点
         return;
     }
-#endif
+
     int probe_type_index = GetProbeType();
     char *dialognotice=_("Fail to rename! The item name has existed!");
     int group_length(0);
@@ -6670,7 +5750,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
 
     renameflag=RenameNotice(probe_type_index, checkpart, dialognotice, group_length);
     if(renameflag) {
-#ifndef VET
+
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
         gint tree_depth = gtk_tree_path_get_depth(path);
         gtk_tree_path_free (path);
@@ -6689,12 +5769,12 @@ void ViewSystem::AddCheckPart(char *checkpart) {
         gtk_tree_model_get(model, &iter, 0, &strname, -1);
         gtk_tree_model_iter_children(model, &childern, &iter);
         gtk_tree_model_get(model, &childern, 0, &str_indexname, -1);
-#endif
+
         char str[256];
         char str_index[256];
-#ifndef VET
+
         TransEnglish(strname, str, str_indexname, str_index);
-#endif
+
         ExamItem examItem;
         int itemIndex;
         int probeIndex;
@@ -6721,38 +5801,21 @@ void ViewSystem::AddCheckPart(char *checkpart) {
             int probe_type_index = GetProbeType();
             ChangeCommentExamBox(probe_type_index, checkpart);
         }
-#ifdef VET
-        vector<int> vecItemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[probeIndex].c_str(), ((vector<ExamItem::EItem>*) &vecItemIndex));
-        GtkTreeModel *new_model1 = create_exam_item_model(vecItemIndex);
-        gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), new_model1);
-        //高亮插入的词条，并更新滚动条
-        GtkTreeSelection *new_selection;
-        GtkTreeIter iter_new;
-        new_selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
-        iter_new= InsertUniqueComment(new_model1, checkpart);
-        gtk_tree_selection_select_iter(new_selection, &iter_new);
 
-        GtkTreePath *path_scroll = gtk_tree_model_get_path(new_model1, &iter_new);
-        gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_exam_type), path_scroll, NULL, TRUE, 1.0, 1.0);
-        gtk_tree_path_free (path_scroll);
-
-#else
         GtkTreeIter iter_new;
         gtk_tree_store_append(GTK_TREE_STORE(model), &iter_new, &iter);
         gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, checkpart, -1);
         GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
 
         //刷新treeview
-        vector<int> vecItemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[probeIndex].c_str(), ((vector<ExamItem::EItem>*) &vecItemIndex));
+        vector<ExamItem::EItem> vecItemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probeIndex]);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(vecItemIndex));
         //gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_treeview_exam_type), new_path);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), new_path, NULL, TRUE);
 
         gtk_tree_path_free (new_path);
-#endif
+
         //保存当前参数值到新建检查科别
         if ((probeIndex >= 0)) {
             get_current_and_save_image_para();
@@ -6823,12 +5886,10 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
     GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
 
     //刷新treeview
-    int probeIndex;
-    probeIndex = GetProbeType();
+    int probeIndex = GetProbeType();
 
     ExamItem examItem;
-    vector<int> itemIndex;
-    examItem.GetItemListOfProbe((char*)PROBE_LIST[probeIndex].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probeIndex]);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(itemIndex));
     gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_treeview_exam_type), new_path);
     //设置结点为编辑状态
@@ -6858,38 +5919,35 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
     gint tree_depth = gtk_tree_path_get_depth(path);
     gtk_tree_path_free(path);
 
-#ifndef VET
+
     if (tree_depth == 1) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
                                           _("Fail to delete! Can not delete the department!"), NULL); //删除失败!不能删除根结点!
         return;
     }
     if (tree_depth == 2)
-#endif
+
     {
         char *str0name, *str1name;
         string str0;
         string str1;
         GtkTreeIter parent;
         gtk_tree_model_get(model, &iter, 0, &str0name, -1);
-#ifndef VET
+
         gtk_tree_model_iter_parent(model, &parent, &iter);
         gtk_tree_model_get(model, &parent, 0, &str1name, -1);
-#endif
+
         str0=str0name;
-#ifndef VET
+
         str1=str1name;
-#endif
+
         ExamItem examItem;
         int itemIndex;
         int probeIndex;
         probeIndex = GetProbeType();
         if ((probeIndex >= 0)) {
-#ifdef VET
-            int size = sizeof(ExamItemArray)/sizeof(ExamPara);
-#else
             int size = sizeof(ExamItemArray)/sizeof(ExamPara) - 4;
-#endif
+
             for(int i = 0; i < size/*24*/; i++) {
                 if (strcmp(str0.c_str(),_(ExamItemArray[i].name.c_str()))==0) {
                     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
@@ -6934,18 +5992,17 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
                     MeasureSetting::GetInstance()->ChangeExamBoxDelete();
                     ChangeCommentExamBoxDelete(probeIndex);
                 }
-#ifndef VET
+
                 GtkTreeIter parent_iter;
                 GtkTreeIter child_iter;
                 gtk_tree_model_iter_parent(model, &parent_iter, &iter);
                 GtkTreePath *parent_path = gtk_tree_model_get_path(model, &parent_iter);
-#endif
+
                 ExamItem examItem;
-                vector<int> itemIndex;
-                examItem.GetItemListOfProbe((char*)PROBE_LIST[probeIndex].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
+                vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probeIndex]);
                 gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(itemIndex));
 
-#ifndef VET
+
                 //展开被删除结点的父结点
                 gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
                 gboolean has_node = gtk_tree_model_iter_children(model, &child_iter, &parent_iter);
@@ -6956,7 +6013,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
                 }
 
                 gtk_tree_path_free (parent_path);
-#endif
+
             }
         }
     }
@@ -7013,11 +6070,9 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
         if (select > 0) {
             sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");
         } else {
-#ifdef VET
-            sprintf(user_configure, "%s", "VetItemPara.ini");
-#else
+
             sprintf(user_configure, "%s", "ItemPara.ini");
-#endif
+
         }
         set_image_item_sensitive(false);
         save_itemIndex(-1);
@@ -7027,9 +6082,8 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
         if (index == -1)
             return;
         ExamItem examItem;
-        vector<int> itemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
-        GtkTreeModel *model = create_exam_item_model(itemIndex);
+        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+        GtkTreeModel* model = create_exam_item_model(itemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
 
@@ -7046,11 +6100,8 @@ void ViewSystem::UpdateUserItem(void) {
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
         sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");
     } else {
-#ifdef VET
-        sprintf(user_configure, "%s", "VetItemPara.ini");
-#else
-        sprintf(user_configure, "%s", "ItemPara.ini");
-#endif
+
+    sprintf(user_configure, "%s", "ItemPara.ini");
     }
     set_image_item_sensitive(false);
     save_itemIndex(-1);
@@ -7060,9 +6111,8 @@ void ViewSystem::UpdateUserItem(void) {
     if (index == -1)
         return;
     ExamItem examItem;
-    vector<int> itemIndex;
-    examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
-    GtkTreeModel *model = create_exam_item_model(itemIndex);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+    GtkTreeModel* model = create_exam_item_model(itemIndex);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
     gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
 
@@ -7072,13 +6122,9 @@ void ViewSystem::ExamCommentChanged(GtkComboBox *widget) {
     GtkTreeModel *model1 = create_item_comment_model1();
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_comment1), model1);
 
-#ifdef VET
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), 0);
-
-#else
     int department_index = DepartmentIndex();
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), department_index);
-#endif
+
     g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
 
     g_object_set(m_cellrenderer_comment_text, "editable", TRUE, NULL);
@@ -7139,8 +6185,6 @@ GtkTreeModel* ViewSystem::create_item_comment_model1() {
                                INDEX_COLUMN, iterItem->index,
                                -1);
         }
-next:
-        continue;
     }
 
     return GTK_TREE_MODEL(store);
@@ -7201,77 +6245,6 @@ next:
 
     return GTK_TREE_MODEL(store);
 }
-/*
-void ViewSystem::Add_Columns_Comment(GtkTreeView *treeView)
-{
-    //column for menu name
-    GtkCellRenderer *renderer_text;
-    GtkCellRenderer *renderer_toggle;
-    GtkTreeViewColumn *column_text;
-    GtkTreeViewColumn *column_toggle;
-
-    renderer_text = gtk_cell_renderer_text_new(); // GtkCellRendererText
-    column_text = gtk_tree_view_column_new_with_attributes("ITEM_NAME", // column name
-            renderer_text,    // the cell renderer type
-            "text", NAME_COLUMN, // renderer attribute
-            NULL);
-    g_object_set(G_OBJECT(column_text),
-            "sizing", GTK_TREE_VIEW_COLUMN_FIXED,
-            "fixed_width", 180,
-            NULL);
-
-    renderer_toggle = gtk_cell_renderer_toggle_new();
-    column_toggle = gtk_tree_view_column_new_with_attributes("TOGGLE",
-            renderer_toggle,
-            "visible", RENDERER_TYPE_COLUMN,
-            "active", VALUE_COLUMN,
-            NULL);
-    g_object_set(G_OBJECT(column_toggle),
-            "sizing", GTK_TREE_VIEW_COLUMN_FIXED,
-            "fixed_width", 50,
-            NULL);
-
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeView), column_text);
-}
-
-GtkWidget* ViewSystem::CreateCommentTreeView()
-{
-
-    // creating the view
-    GtkWidget *treeview = gtk_tree_view_new_with_model(NULL);
-    Add_Columns_Comment(GTK_TREE_VIEW(treeview));
-
-    // creating a model
-    GtkTreeModel *model;
-    model = CreateModel(treeview, pItem);
-
-    // set view property //
-    gtk_tree_view_set_enable_search(GTK_TREE_VIEW(treeview), FALSE);
-    gtk_tree_view_set_enable_tree_lines(GTK_TREE_VIEW(treeview), TRUE);
-    // gtk_tree_view_set_hover_selection(GTK_TREE_VIEW(treeview), TRUE);
-    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(treeview), FALSE);
-    //gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(treeview), TRUE);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(treeview), TRUE);
-
-    // selection handling \//
-    GtkTreeSelection *select;
-    select = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
-    gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
-#if O
-    g_signal_connect(select, "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
-    g_signal_connect(treeview, "row-expanded", G_CALLBACK(HandleTreeViewExpanded), this);
-    g_signal_connect(treeview, "row-collapsed", G_CALLBACK(HandleTreeViewCollapse), this);
-#endif
-    //g_signal_connect(treeview, "row-active", G_CALLBACK(HandleTreeRowActivated), this);
-
-    // gtk_tree_view_collapse_all(GTK_TREE_VIEW(treeview));
-    gtk_tree_view_expand_all(GTK_TREE_VIEW(treeview));
-
-    //    g_object_unref(model);
-    return treeview;
-}
-
-*/
 
 int ViewSystem::DepartmentIndex() {
 
@@ -7296,12 +6269,8 @@ int ViewSystem::DepartmentIndex() {
     } else {
         sprintf(path1, "%s%s%s%s", CFG_RES_PATH, COMMENT_PATH, username.c_str(), ".ini");
     }
-    /* IniFile ini(path);
-     IniFile *ptrIni= &ini;
 
-      char path1[256];
-      sprintf(path1, "%s%s", CFG_RES_PATH, COMMENT_FILE);
-     */ IniFile ini(path1);
+    IniFile ini(path1);
     IniFile *ptrIni= &ini;
 
     string department_string = ptrIni->ReadString(probe_exam.c_str(), "Department");
@@ -7318,30 +6287,7 @@ int ViewSystem::DepartmentIndex() {
     else if(strcmp(department, "Obstetrics") == 0) {
         return 3;
     }
-#ifdef EMP_322
-    else if(strcmp(department, "Gynecology") == 0) {
-        return 4;
-    } else if(strcmp(department, "Small Part") == 0) {
-        return 5;
-    }
 
-    else if(strcmp(department, "Orthopedic") == 0) {
-        return 6;
-    }
-
-#else
-#ifdef VET
-    else if(strcmp(department, "Small Part") == 0) {
-        return 4;
-    }
-
-    else if(strcmp(department, "Vascular") == 0) {
-        return 5;
-    } else if(strcmp(department, "Orthopedic") == 0) {
-        return 6;
-    }
-
-#else
     else if(strcmp(department, "Gynecology") == 0) {
         return 4;
     } else if(strcmp(department, "Small Part") == 0) {
@@ -7353,8 +6299,6 @@ int ViewSystem::DepartmentIndex() {
     } else if(strcmp(department, "Orthopedic") == 0) {
         return 7;
     }
-#endif
-#endif
     else
         return 0;
 
@@ -7370,29 +6314,7 @@ void ViewSystem::DepartmentName(char department[256], int index) {
     } else if(index == 3) {
         strcpy(department, "Obstetrics");
     }
-#ifdef EMP_322
-    else if(index == 4) {
-        strcpy(department, "Gynecology");
-    } else if(index == 5) {
-        strcpy(department, "Small Part");
-    } else {
-        strcpy(department, "Orthopedic");
-    }
 
-#else
-#ifdef VET
-
-    else if(index == 4) {
-        strcpy(department, "Small Part");
-    } else if(index == 5) {
-        strcpy(department, "Vascular");
-    } else if(index == 6) {
-        strcpy(department, "Orthopedic");
-    } else {
-        strcpy(department, "Tendon");
-    }
-
-#else
     else if(index == 4) {
         strcpy(department, "Gynecology");
     } else if(index == 5) {
@@ -7402,9 +6324,6 @@ void ViewSystem::DepartmentName(char department[256], int index) {
     } else {
         strcpy(department, "Orthopedic");
     }
-#endif
-#endif
-
 }
 
 void ViewSystem::CreateItemList_Delete_Comment1(char *select_name, string probe_exam,vector<ExamPara>& vecItemComment1) {
@@ -7569,8 +6488,7 @@ void ViewSystem::ProbeCommentChanged(GtkComboBox *widget) {
         return;
     }
     ExamItem examItem;
-    vector<int> itemIndex;
-    examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
 
     create_exam_comment_model(itemIndex);
 }
@@ -7586,8 +6504,7 @@ void ViewSystem::ProbeTypeChanged(GtkComboBox *widget) {
         return;
     }
     ExamItem examItem;
-    vector<int> itemIndex;
-    examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
 
     GtkTreeModel *model = create_exam_item_model(itemIndex);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
@@ -7615,16 +6532,14 @@ void ViewSystem::ProbeTypeChanged(GtkComboBox *widget) {
             sprintf(buf , "%.1fMHz", (float)ProbeSocket::FREQ2D[probeIndex][i].emit / 20);
             gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_2d_freq), buf);
         }
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
         // update doppler freq
         ClearComboBox(GTK_COMBO_BOX(m_combobox_pw_freq));
         for (i = 0; i < ProbeSocket::FREQ_DOPPLER_SUM[probeIndex]; i ++) {
             sprintf(buf , "%.1f", (float)ProbeSocket::FREQ_DOPPLER[probeIndex][i] / 20);
             gtk_combo_box_append_text (GTK_COMBO_BOX(m_combobox_pw_freq), buf);
         }
-#endif
-#endif
+
         ClearComboBox(GTK_COMBO_BOX(m_combobox_thi_freq));
         for (i = 0; i < ProbeSocket::FREQ_THI_SUM[probeIndex]; i ++) {
             if(ProbeSocket::FREQ_THI[i] != 0) {
@@ -7716,8 +6631,7 @@ void ViewSystem::SetImagePara(const ExamItem::ParaItem &item) {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(m_spinbutton_m_gain), (double)item.d2.gainM);
     image_para_combo_box_set((m_combobox_space_compound), item.d2.spaceCompoundIndex);
     image_para_combo_box_set((m_combobox_freq_compound), item.d2.freqCompoundIndex);
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(m_spinbutton_pw_gain), (double)item.spectrum.gain);
     image_para_combo_box_set((m_combobox_pw_scale_prf), item.spectrum.PRF);
     image_para_combo_box_set((m_combobox_time_resolution), item.spectrum.timeSmooth);
@@ -7736,8 +6650,6 @@ void ViewSystem::SetImagePara(const ExamItem::ParaItem &item) {
     image_para_combo_box_set((m_combobox_persistence), item.color.persist);
     image_para_combo_box_set((m_combobox_cfm_smooth), item.color.smooth);
     image_para_combo_box_set((m_combobox_color_rejection), item.color.reject);
-#endif
-#endif
 }
 
 void ViewSystem::save_image_para(ExamItem::ParaItem &item) {
@@ -7795,8 +6707,7 @@ void ViewSystem::GetImagePara(ExamItem::ParaItem &item) {
     item.d2.gainM = atoi(gain.c_str());
     item.d2.spaceCompoundIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_space_compound));
     item.d2.freqCompoundIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_freq_compound));
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     // item.spectrum.gain = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(m_spinbutton_pw_gain));
     gain = gtk_entry_get_text(GTK_ENTRY(m_spinbutton_pw_gain));
     item.spectrum.gain = atoi(gain.c_str());
@@ -7820,8 +6731,6 @@ void ViewSystem::GetImagePara(ExamItem::ParaItem &item) {
     item.color.smooth = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_cfm_smooth));
     item.color.reject = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_color_rejection));
     item.color.sensitive = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sensitivity));
-#endif
-#endif
 }
 
 void ViewSystem::image_para_restrict(int probeIndex) {
@@ -7831,74 +6740,34 @@ void ViewSystem::image_para_restrict(int probeIndex) {
         break;
     case 1:                     // 75L40K
         gtk_widget_set_sensitive(m_combobox_scan_range, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
+        //            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
         break;
     case 2:                     // 65C10K
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
+        //            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
         break;
     case 3:
-#ifdef EMP_430
-        gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-#else
         // 35C20H
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-#endif
         break;
     case 4:
-#if defined(EMP_161)
-        //30P16A
-        gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-        gtk_widget_set_sensitive(m_combobox_space_compound, FALSE);
-#elif defined(EMP_430)
-        //35D50D
-        gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-#elif defined(EMP_440)
-        //30P16A
-        gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-        gtk_widget_set_sensitive(m_combobox_space_compound, FALSE);
-#else
         //65C15D
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-#endif
+        //            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
         break;
     case 5:
-#ifdef EMP_322
-        //90L40J
-        gtk_widget_set_sensitive(m_combobox_scan_range, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-#else
         // 30P16A
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
+        //            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
         gtk_widget_set_sensitive(m_combobox_space_compound, FALSE);
-#endif
         break;
     case 6:
-#ifdef EMP_340
-        //90L25K
-        gtk_widget_set_sensitive(m_combobox_scan_range, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-#else
         //35D40J
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-#endif
         break;
     case 7:
-#ifdef EMP_322
-        //30P16A
-        gtk_widget_set_sensitive(m_combobox_steer, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-        gtk_widget_set_sensitive(m_combobox_space_compound, FALSE);
-#else
         //10L25K
         gtk_widget_set_sensitive(m_combobox_scan_range, FALSE);
-//            gtk_widget_set_sensitive(m_combobox_thi, FALSE);
-#endif
         break;
     case 8:
         //35D40J
@@ -8012,9 +6881,6 @@ void ViewSystem::ExamTypeChanged(GtkTreeSelection *selection) {
             image_para_restrict(probeIndex);
         }
     }
-    //  else {
-//      set_image_item_sensitive(false);
-//}
 }
 
 bool ViewSystem::ExamTypeTestRowExpandBefore(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path) {
@@ -8066,8 +6932,7 @@ void ViewSystem::init_image_para(void) {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(m_spinbutton_m_gain), (double)0);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_space_compound), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_freq_compound), -1);
-#if not defined(EMP_322)
-#if not defined(EMP_313)
+
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(m_spinbutton_pw_gain), (double)0);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_pw_scale_prf), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_time_resolution), -1);
@@ -8086,8 +6951,6 @@ void ViewSystem::init_image_para(void) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_persistence), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_cfm_smooth), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_color_rejection), -1);
-#endif
-#endif
 }
 
 void ViewSystem::set_image_item_sensitive(bool status) {
@@ -8126,8 +6989,6 @@ void ViewSystem::set_image_item_sensitive(bool status) {
     gtk_widget_set_sensitive(m_combobox_space_compound, status);
     gtk_widget_set_sensitive(m_combobox_freq_compound, status);
 
-#if not defined(EMP_322)
-#if not defined(EMP_313)
     gtk_widget_set_sensitive(m_spinbutton_pw_gain, status);
     gtk_widget_set_sensitive(m_combobox_pw_scale_prf, status);
     gtk_widget_set_sensitive(m_combobox_time_resolution, status);
@@ -8145,8 +7006,6 @@ void ViewSystem::set_image_item_sensitive(bool status) {
     gtk_widget_set_sensitive(m_combobox_persistence, status);
     gtk_widget_set_sensitive(m_combobox_cfm_smooth, status);
     gtk_widget_set_sensitive(m_combobox_color_rejection, status);
-#endif
-#endif
 }
 
 void ViewSystem::save_image_setting(void) {
@@ -8322,39 +7181,10 @@ void ViewSystem::create_note_tvout(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video), _("NTSC"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video), _("PAL"));
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), 0);
-#ifdef EMP_355
+
     g_signal_connect ((gpointer) m_combobox_video, "changed",
                       G_CALLBACK (on_combobox_video_changed),
                       this);
-#endif
-
-#if 0
-    label_connector_type = gtk_label_new (_("<b>TV Connector:</b>"));
-    gtk_widget_show (label_connector_type);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), label_connector_type, 175 - ADJUST_PIXEL_X + 120 + 5, 30 - 5);
-
-    gtk_widget_set_size_request (label_connector_type, 125, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_connector_type), TRUE);
-
-    m_combobox_connect_type = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_connect_type);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), m_combobox_connect_type, 175 - ADJUST_PIXEL_X + 120 + 5 + 125, 30 - 5);
-
-    gtk_widget_set_size_request (m_combobox_connect_type, 120, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_connect_type), _("S-Video"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_connect_type), _("Composite"));
-
-    label_connector_hint = gtk_label_new (_(" (Restart to complete changes)"));
-
-#ifdef EMP3D
-    gtk_widget_hide (label_connector_hint);
-#else
-    gtk_widget_show (label_connector_hint);
-#endif
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), label_connector_hint, 175 - ADJUST_PIXEL_X + 120 + 5 + 125 + 120 + 5, 30 - 5);
-    gtk_widget_set_size_request (label_connector_hint, 210 + 240, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_connector_hint), 0, 0.5);
-#endif
 
     frame_tvout = gtk_frame_new (NULL);
     gtk_widget_show (frame_tvout);
@@ -8456,10 +7286,6 @@ void ViewSystem::init_tvout_setting(SysGeneralSetting *sysGeneralSetting) {
 
     int index_video_mode = sysGeneralSetting->GetVideoMode();
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), index_video_mode);
-#if 0
-    int index_connector_type = sysGeneralSetting->GetConnectorType();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_connect_type), index_connector_type);
-#endif
 
     int tvout_format = sysGeneralSetting->GetVideoFormat();
     switch (tvout_format) {
@@ -8478,11 +7304,6 @@ void ViewSystem::init_tvout_setting(SysGeneralSetting *sysGeneralSetting) {
 
 void ViewSystem::save_tvout_setting(void) {
     SysGeneralSetting sysGeneralSetting;
-
-#if 0
-    int ConnectorType = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_connect_type));
-    sysGeneralSetting.SetConnectorType(ConnectorType);
-#endif
 
     int VideoModeIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video));
     int tvout_format = 0;
@@ -8680,48 +7501,6 @@ void ViewSystem::LanguageChanged(GtkComboBox *box) {
         gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), 2);  //set date format to d:m:y)
 }
 
-#if 0
-void ViewSystem::init_dicom_setting(void) {
-#if 0
-    SysDicomSetting *sysDicomSetting = new SysDicomSetting;
-
-    string local_ip, local_netmask, local_gateway, local_AE;
-    string remote_ip, remote_port, remote_AE;
-
-    local_ip = sysDicomSetting->GetLocalIP();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_network_ip), local_ip.c_str());
-    local_netmask = sysDicomSetting->GetLocalNetMask();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_network_mask), local_netmask.c_str());
-    local_gateway = sysDicomSetting->GetLocalGateWay();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_network_gateway), local_gateway.c_str());
-    local_AE = sysDicomSetting->GetLocalAE();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_equipment_ae), local_AE.c_str());
-    remote_ip = sysDicomSetting->GetRemoteIP();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_host_dicom), remote_ip.c_str());
-    remote_port = sysDicomSetting->GetRemotePort();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_host_port), remote_port.c_str());
-    remote_AE = sysDicomSetting->GetRemoteAE();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_host_ae), remote_AE.c_str());
-
-    delete sysDicomSetting;
-#endif
-}
-
-void ViewSystem::save_dicom_setting(void) {
-#if 0
-    SysDicomSetting sysDicomSetting;
-    sysDicomSetting.SetLocalIP(gtk_entry_get_text(GTK_ENTRY(m_entry_network_ip)));
-    sysDicomSetting.SetLocalNetMask(gtk_entry_get_text(GTK_ENTRY(m_entry_network_mask)));
-    sysDicomSetting.SetLocalGateWay(gtk_entry_get_text(GTK_ENTRY(m_entry_network_gateway)));
-    sysDicomSetting.SetLocalAE(gtk_entry_get_text(GTK_ENTRY(m_entry_equipment_ae)));
-    sysDicomSetting.SetRemoteIP(gtk_entry_get_text(GTK_ENTRY(m_entry_host_dicom)));
-    sysDicomSetting.SetRemotePort(gtk_entry_get_text(GTK_ENTRY(m_entry_host_port)));
-    sysDicomSetting.SetRemoteAE(gtk_entry_get_text(GTK_ENTRY(m_entry_host_ae)));
-    sysDicomSetting.SyncFile();
-#endif
-}
-#endif
-
 GtkWidget* ViewSystem::create_note_comment(void) {
     //GtkWidget *fixed_comment;
     GtkWidget *frame_comment_font;
@@ -8788,8 +7567,7 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     gtk_widget_set_size_request (m_combobox_exam_comment, 120, 30);
 
     ExamItem examItem;
-    vector<int> itemIndex;
-    examItem.GetItemListOfProbe((char*)PROBE_LIST[probe_comment_index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probe_comment_index]);
     create_exam_comment_model(itemIndex);
     //gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_exam_comment), 0);//-1);
     g_signal_connect(m_combobox_exam_comment, "changed", G_CALLBACK(HandleExamCommentChanged), this);
@@ -8812,23 +7590,17 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Cardiac"));
 
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Obstetrics"));
-#ifndef VET
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Gynecology"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Small Part"));
-#ifndef EMP_322
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Vascular"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Orthopedic"));
 
-#ifdef VET
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Tendon"));
-
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), 0);//0);
-
-#else
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), department_index);//0);
-#endif
+
     g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
 
     section_frame = gtk_frame_new (NULL);
@@ -10337,41 +9109,6 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_frame_set_label_widget (GTK_FRAME (frame_measure_line), label_measure_line);
     gtk_label_set_use_markup (GTK_LABEL (label_measure_line), TRUE);
 
-    // frame_ml_density = gtk_frame_new (NULL);
-    // gtk_widget_show (frame_ml_density);
-    // gtk_fixed_put (GTK_FIXED (fixed_measure), frame_ml_density, 260, 30);
-    // gtk_widget_set_size_request (frame_ml_density, 200, 60);
-    // gtk_frame_set_label_align (GTK_FRAME (frame_ml_density), 0.5, 0.5);
-    // gtk_frame_set_shadow_type (GTK_FRAME (frame_ml_density), GTK_SHADOW_IN);
-    // gtk_widget_set_sensitive (frame_ml_density, FALSE);
-
-    // hbox_ml_density = gtk_hbox_new (TRUE, 0);
-    // gtk_widget_show (hbox_ml_density);
-    // gtk_container_add (GTK_CONTAINER (frame_ml_density), hbox_ml_density);
-
-    // m_radiobutton_ml_high = gtk_radio_button_new_with_mnemonic (NULL, _("High"));
-    // gtk_widget_show (m_radiobutton_ml_high);
-    // gtk_box_pack_start (GTK_BOX (hbox_ml_density), m_radiobutton_ml_high, FALSE, FALSE, 0);
-    // gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_ml_high), radiobutton_ml_density_group);
-    // radiobutton_ml_density_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_ml_high));
-
-    // m_radiobutton_ml_mid = gtk_radio_button_new_with_mnemonic (NULL, _("Mid"));
-    // gtk_widget_show (m_radiobutton_ml_mid);
-    // gtk_box_pack_start (GTK_BOX (hbox_ml_density), m_radiobutton_ml_mid, FALSE, FALSE, 0);
-    // gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_ml_mid), radiobutton_ml_density_group);
-    // radiobutton_ml_density_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_ml_mid));
-
-    // m_radiobutton_ml_low = gtk_radio_button_new_with_mnemonic (NULL, _("Low"));
-    // gtk_widget_show (m_radiobutton_ml_low);
-    // gtk_box_pack_start (GTK_BOX (hbox_ml_density), m_radiobutton_ml_low, FALSE, FALSE, 0);
-    // gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_ml_low), radiobutton_ml_density_group);
-    // radiobutton_ml_density_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_ml_low));
-
-    // label_ml_density = gtk_label_new (_("<b>Measure Line Density</b>"));
-    // gtk_widget_show (label_ml_density);
-    // gtk_frame_set_label_widget (GTK_FRAME (frame_ml_density), label_ml_density);
-    // gtk_label_set_use_markup (GTK_LABEL (label_ml_density), TRUE);
-
     frame_cursor = gtk_frame_new (NULL);
     gtk_widget_show (frame_cursor);
     // gtk_fixed_put (GTK_FIXED (fixed_measure), frame_cursor, 490, 30);
@@ -10486,18 +9223,9 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_frame_set_label_widget (GTK_FRAME (frame_measure_result), label_measure_result);
     gtk_label_set_use_markup (GTK_LABEL (label_measure_result), TRUE);
 
-#if 0
-    hseparator_1 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator_1);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), hseparator_1, 15, 190);//10
-    gtk_widget_set_size_request (hseparator_1, DEFALT_SCREEN_WIDTH - 30, 16); //775
-#endif
     frame_trace_method = gtk_frame_new (NULL);
-#if (defined(EMP_322) || defined(EMP_313))
-    gtk_widget_hide (frame_trace_method);
-#else
     gtk_widget_show (frame_trace_method);
-#endif
+
     //  gtk_fixed_put (GTK_FIXED (fixed_measure), frame_trace_method, 260, 210);
     gtk_fixed_put (GTK_FIXED (fixed_measure), frame_trace_method, 310, 240+70);
     gtk_widget_set_size_request (frame_trace_method, 255, 60);
@@ -10561,11 +9289,8 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_label_set_use_markup (GTK_LABEL (label_report_result), TRUE);
 
     frame_autocalc_para = gtk_frame_new (NULL);
-#if (defined(EMP_313) || defined(EMP_322))
-    gtk_widget_hide (frame_autocalc_para);
-#else
     gtk_widget_show (frame_autocalc_para);
-#endif
+
     //  gtk_fixed_put (GTK_FIXED (fixed_measure), frame_autocalc_para, 30, 290);
     gtk_fixed_put (GTK_FIXED (fixed_measure), frame_autocalc_para, 310, 10);
     gtk_widget_set_size_request (frame_autocalc_para, 610-80+20, 150);
@@ -10739,20 +9464,6 @@ GtkWidget* ViewSystem::create_note_measure(void) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vel), "mm/s");
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vel), "m/s");
 
-    /* label_unit_slope = gtk_label_new(_("Slope"));
-     gtk_label_set_use_markup (GTK_LABEL (label_unit_slope), TRUE);
-     gtk_misc_set_alignment (GTK_MISC (label_unit_slope), 0, 0.5);
-     gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_slope, 50, 260);
-     gtk_widget_set_size_request (label_unit_slope, 100, 30);
-     gtk_widget_show (label_unit_slope);
-     m_combobox_unit_slope = gtk_combo_box_new_text ();
-     gtk_widget_show (m_combobox_unit_slope);
-     gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_slope, 160, 260);
-     gtk_widget_set_size_request (m_combobox_unit_slope, 100, 30);
-     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_slope), "cm/s");
-     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_slope), "mm/s");
-     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_slope), "m/s");
-    */
     label_unit_accel = gtk_label_new(_("Accel"));
     gtk_label_set_use_markup (GTK_LABEL (label_unit_accel), TRUE);
     gtk_misc_set_alignment (GTK_MISC (label_unit_accel), 0, 0.5);
@@ -10801,15 +9512,7 @@ void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_ml_off), TRUE);
         break;
     }
-    // int density = sysMeasure->GetMeasureLineDensity();
-    // switch (density) {
-    // case 0:
-    //     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_ml_high), TRUE); break;
-    // case 1:
-    //     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_ml_mid), TRUE); break;
-    // case 2:
-    //     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_ml_low), TRUE); break;
-    // }
+
     int cursorSize = sysMeasure->GetMeasureCursorSize();
     switch (cursorSize) {
     case 0:
@@ -10827,14 +9530,6 @@ void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_current_line), lineColor);
     lineColor = sysMeasure->GetMeasureColorConfirm();
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_confirmed_line), lineColor);
-
-    // int traceMethod = sysMeasure->GetTraceInMeasure();
-    // switch (traceMethod) {
-    // case 0:
-    // 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_auto), TRUE); break;
-    // case 1:
-    // 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_manual), TRUE); break;
-    // }
 
     int meaResult = sysMeasure->GetMeasureResult();
     switch (meaResult) {
@@ -10868,8 +9563,6 @@ void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
         break;
     }
 
-    // gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ps), sysMeasure->GetAutoCalcPS());
-    // gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ed), sysMeasure->GetAutoCalcED());
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ps), TRUE);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ed), TRUE);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ri), sysMeasure->GetAutoCalcRI());
@@ -10896,9 +9589,6 @@ void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
     int unitVel = sysMeasure->GetUnitVel();
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_vel), unitVel);
 
-//	int unitSlope = sysMeasure->GetUnitSlope();
-//	gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_slope), unitSlope);
-
     int unitAccel = sysMeasure->GetUnitAccel();
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_accel), unitAccel);
 
@@ -10922,15 +9612,6 @@ void ViewSystem::save_measure_setting(void) {
         measureLine = 1;
     sysMeasure.SetMeasureLineDisplay(measureLine);
 
-    // unsigned char density = 0;
-    // if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_ml_high)))
-    //     density = 0;
-    // else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_ml_mid)))
-    //     density = 1;
-    // else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_ml_low)))
-    //     density = 2;
-    // sysMeasure.SetMeasureLineDensity(density);
-
     unsigned char cursorSize = 0;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_big)))
         cursorSize = 0;
@@ -10951,13 +9632,6 @@ void ViewSystem::save_measure_setting(void) {
     else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_big)))
         meaResult = 1;
     sysMeasure.SetMeasureResult(meaResult);
-    //  ImageArea::GetInstance()->UpdateMeaResultArea(meaResult);
-
-    // if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_auto)))
-    // 	trace = 0;
-    // else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_manual)))
-    // 	trace = 1;
-    // sysMeasure.SetTraceInMeasure(trace);
 
     unsigned char trace = 0;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_point)))
@@ -10975,8 +9649,6 @@ void ViewSystem::save_measure_setting(void) {
         reportResult = 1;
     sysMeasure.SetReportResult(reportResult);
 
-    // sysMeasure.SetAutoCalcPS(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ps)));
-    // sysMeasure.SetAutoCalcED(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ed)));
     sysMeasure.SetAutoCalcPS(true);
     sysMeasure.SetAutoCalcED(true);
     sysMeasure.SetAutoCalcRI(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ri)));
@@ -11002,9 +9674,6 @@ void ViewSystem::save_measure_setting(void) {
 
     int unitVel = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_vel));
     sysMeasure.SetUnitVel(unitVel);
-
-    // int unitSlope = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_slope));
-    //sysMeasure.SetUnitSlope(unitSlope);
 
     int unitAccel = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_accel));
     sysMeasure.SetUnitAccel(unitAccel);
@@ -11049,8 +9718,6 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
     GtkWidget *fixed_key_config;
 
     GtkWidget *fixed_key;
-    // GtkWidget *m_entry_function_p1;
-    // GtkWidget *m_entry_function_p2;
 
     GSList *radiobutton_key_p1_group = NULL;
     GSList *radiobutton_key_p2_group = NULL;
@@ -11090,11 +9757,9 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
         gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p1[i]), radiobutton_key_p1_group);
         radiobutton_key_p1_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_key_p1[i]));
     }
-#ifdef EMP_322
-    label_key_p1 = gtk_label_new (_("<b>Value</b>"));
-#else
+
     label_key_p1 = gtk_label_new (_("<b>P1</b>"));
-#endif
+
     gtk_widget_show (label_key_p1);
     gtk_frame_set_label_widget (GTK_FRAME (frame_key_p1), label_key_p1);
     gtk_label_set_use_markup (GTK_LABEL (label_key_p1), TRUE);
@@ -11116,16 +9781,13 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
         gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p2[i]), radiobutton_key_p2_group);
         radiobutton_key_p2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_key_p2[i]));
     }
-#ifdef EMP_322
-    label_key_p2 = gtk_label_new (_("<b>Gain</b>"));
-#else
+
     label_key_p2 = gtk_label_new (_("<b>P2</b>"));
-#endif
+
     gtk_widget_show (label_key_p2);
     gtk_frame_set_label_widget (GTK_FRAME (frame_key_p2), label_key_p2);
     gtk_label_set_use_markup (GTK_LABEL (label_key_p2), TRUE);
-//p3
-#if (defined(EMP_460) || defined(EMP_355))
+
     frame_key_p3 = gtk_frame_new (NULL);
     gtk_widget_show (frame_key_p3);
     gtk_fixed_put (GTK_FIXED (fixed_key_config), frame_key_p3, 50, 310);
@@ -11147,7 +9809,7 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
     gtk_widget_show (label_key_p3);
     gtk_frame_set_label_widget (GTK_FRAME (frame_key_p3), label_key_p3);
     gtk_label_set_use_markup (GTK_LABEL (label_key_p3), TRUE);
-#endif
+
     return fixed_key_config;
 
 }
@@ -11159,24 +9821,14 @@ void ViewSystem::init_key_config(void) {
 
     m_p2_func_index = sysDefine.GetFuncP2();
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p2[m_p2_func_index]), TRUE);
-#if (defined(EMP_460) || defined(EMP_355))
+
     m_p3_func_index = sysDefine.GetFuncP3();
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[m_p3_func_index]), TRUE);
-#endif
-#if 0
-    SysUserDefinedKey sysDefine;
-    m_p1_func_index = sysDefine.GetFuncP1();
-    m_p2_func_index = sysDefine.GetFuncP2();
-
-    gtk_entry_set_text(GTK_ENTRY(m_entry_function_p1), _(KeyFunctionList[m_p1_func_index].c_str()));
-    gtk_entry_set_text(GTK_ENTRY(m_entry_function_p2), _(KeyFunctionList[m_p2_func_index].c_str()));
-    m_p1Selected = true;
-#endif
 }
 
 void ViewSystem::save_key_config(void) {
     SysUserDefinedKey sysDefine;
-#if (defined(EMP_460) || defined(EMP_355))
+
     for(int i = 0; i < MAX_KEY; i++) {
         if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[i])))
             m_p1_func_index = i;
@@ -11185,48 +9837,17 @@ void ViewSystem::save_key_config(void) {
         if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[i])))
             m_p3_func_index = i;
     }
-#else
-    for(int i = 0; i < MAX_KEY; i++) {
-        if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[i])))
-            m_p1_func_index = i;
-        if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p2[i])))
-            m_p2_func_index = i;
-    }
-#endif
+
     sysDefine.SetFuncP1(m_p1_func_index);
     sysDefine.SetFuncP2(m_p2_func_index);
     sysDefine.SetFuncP3(m_p3_func_index);
     sysDefine.SyncFile();
 }
-#if 0
-SysUserDefinedKey sysDefine;
-//printf("*********system config**********%d  %d\n",m_p1_func_index,m_p2_func_index);
-sysDefine.SetFuncP1(m_p1_func_index);
-sysDefine.SetFuncP2(m_p2_func_index);
-sysDefine.SyncFile();
-#endif
 
 GtkWidget *ViewSystem::create_note_calc(void) {
     GtkWidget *fixed_calc;
-    // GtkWidget *frame_adult_echo;
-    // GtkWidget *fixed_adult_echo;
-    // GtkWidget *label_adult_2d_edv;
-    // GtkWidget *label_adult_2d_fs;
-    // GtkWidget *label_adult_2d_lv_mass;
-    // GtkWidget *label_adult_m_edv;
-    // GtkWidget *label_adult_m_fs;
-    // GtkWidget *label_adult_m_lv_mass;
-    // GtkWidget *label_mva;
-    GtkWidget *label_bsa;
-    // GtkWidget *label_adult_echo;
 
-    // GtkWidget *frame_fetus_echo;
-    // GtkWidget *fixed_fetus_echo;
-    // GtkWidget *label_fetus_2d_edv;
-    // GtkWidget *label_fetus_2d_fs;
-    // GtkWidget *label_fetus_m_edv;
-    // GtkWidget *label_fetus_m_fs;
-    // GtkWidget *label_fetus_echo;
+    GtkWidget *label_bsa;
 
     GtkWidget *frame_ob_method;
     GtkWidget *fixed_ob_method;
@@ -11252,200 +9873,6 @@ GtkWidget *ViewSystem::create_note_calc(void) {
 
     fixed_calc = gtk_fixed_new ();
     gtk_widget_show (fixed_calc);
-
-    // -*- set adult echo -*-
-    // frame_adult_echo = gtk_frame_new (NULL);
-    // gtk_widget_show (frame_adult_echo);
-    // gtk_fixed_put (GTK_FIXED (fixed_calc), frame_adult_echo, 20, 5);
-    // gtk_widget_set_size_request (frame_adult_echo, 650, 130);
-    // gtk_frame_set_label_align (GTK_FRAME (frame_adult_echo), 0.5, 0.5);
-    // gtk_frame_set_shadow_type (GTK_FRAME (frame_adult_echo), GTK_SHADOW_IN);
-
-    // fixed_adult_echo = gtk_fixed_new ();
-    // gtk_widget_show (fixed_adult_echo);
-    // gtk_container_add (GTK_CONTAINER (frame_adult_echo), fixed_adult_echo);
-
-    // label_adult_2d_edv = gtk_label_new (_("<b>2D</b> [EDV ESV] :"));
-    // gtk_widget_show (label_adult_2d_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_adult_2d_edv, 5, 5);
-    // gtk_widget_set_size_request (label_adult_2d_edv, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_2d_edv), TRUE);
-
-    // m_combobox_adult_2d_edv = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_adult_2d_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_adult_2d_edv, 105, 5);
-    // gtk_widget_set_size_request (m_combobox_adult_2d_edv, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_edv), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_edv), _("Teich"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_edv), _("A/L"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_edv), _("A2C"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_edv), _("A4C"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_edv), _("BP"));
-
-    // label_adult_2d_fs = gtk_label_new (_("<b>2D</b> [FS] :"));
-    // gtk_widget_show (label_adult_2d_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_adult_2d_fs, 5, 40);
-    // gtk_widget_set_size_request (label_adult_2d_fs, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_2d_fs), TRUE);
-
-    // m_combobox_adult_2d_fs = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_adult_2d_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_adult_2d_fs, 105, 40);
-    // gtk_widget_set_size_request (m_combobox_adult_2d_fs, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_fs), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_fs), _("Teich"));
-
-    // label_adult_2d_lv_mass = gtk_label_new (_("<b>2D</b> [LV Mass] :"));
-    // gtk_widget_show (label_adult_2d_lv_mass);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_adult_2d_lv_mass, 5, 75);
-    // gtk_widget_set_size_request (label_adult_2d_lv_mass, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_2d_lv_mass), TRUE);
-
-    // m_combobox_adult_2d_lv_mass = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_adult_2d_lv_mass);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_adult_2d_lv_mass, 105, 75);
-    // gtk_widget_set_size_request (m_combobox_adult_2d_lv_mass, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_lv_mass), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_2d_lv_mass), _("A/L"));
-
-    // label_adult_m_edv = gtk_label_new (_("<b>M</b> [EDV ESV] :"));
-    // gtk_widget_show (label_adult_m_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_adult_m_edv, 220, 5);
-    // gtk_widget_set_size_request (label_adult_m_edv, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_m_edv), TRUE);
-
-    // m_combobox_adult_m_edv = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_adult_m_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_adult_m_edv, 320, 5);
-    // gtk_widget_set_size_request (m_combobox_adult_m_edv, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_m_edv), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_m_edv), _("Teich"));
-
-    // label_adult_m_fs = gtk_label_new (_("<b>M</b> [FS] :"));
-    // gtk_widget_show (label_adult_m_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_adult_m_fs, 220, 40);
-    // gtk_widget_set_size_request (label_adult_m_fs, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_m_fs), TRUE);
-
-    // m_combobox_adult_m_fs = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_adult_m_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_adult_m_fs, 320, 40);
-    // gtk_widget_set_size_request (m_combobox_adult_m_fs, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_m_fs), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_m_fs), _("Teich"));
-
-    // label_adult_m_lv_mass = gtk_label_new (_("<b>M</b> [LV Mass] :"));
-    // gtk_widget_show (label_adult_m_lv_mass);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_adult_m_lv_mass, 220, 75);
-    // gtk_widget_set_size_request (label_adult_m_lv_mass, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_m_lv_mass), TRUE);
-
-    // m_combobox_adult_m_lv_mass = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_adult_m_lv_mass);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_adult_m_lv_mass, 320, 75);
-    // gtk_widget_set_size_request (m_combobox_adult_m_lv_mass, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_m_lv_mass), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_adult_m_lv_mass), _("A/L"));
-
-    // label_mva = gtk_label_new (_("[ MVA ] :"));
-    // gtk_widget_show (label_mva);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_mva, 435, 5);
-    // gtk_widget_set_size_request (label_mva, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_mva), TRUE);
-
-    // m_combobox_mva = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_mva);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_mva, 535, 5);
-    // gtk_widget_set_size_request (m_combobox_mva, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_mva), _("P1 / 2t"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_mva), _("PISA"));
-
-    // label_bsa = gtk_label_new (_("[ BSA ] :"));
-    // gtk_widget_show (label_bsa);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), label_bsa, 435, 40);
-    // gtk_widget_set_size_request (label_bsa, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_bsa), TRUE);
-
-    // m_combobox_bsa = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_bsa);
-    // gtk_fixed_put (GTK_FIXED (fixed_adult_echo), m_combobox_bsa, 535, 40);
-    // gtk_widget_set_size_request (m_combobox_bsa, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bsa), _("Oriental"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bsa), _("Occidental"));
-
-    // label_adult_echo = gtk_label_new (_("<b>Adult echo</b>"));
-    // gtk_widget_show (label_adult_echo);
-    // gtk_frame_set_label_widget (GTK_FRAME (frame_adult_echo), label_adult_echo);
-    // gtk_label_set_use_markup (GTK_LABEL (label_adult_echo), TRUE);
-
-    // -*- set fetus echo -*-
-    // frame_fetus_echo = gtk_frame_new (NULL);
-    // gtk_widget_show (frame_fetus_echo);
-    // gtk_fixed_put (GTK_FIXED (fixed_calc), frame_fetus_echo, 20, 150);
-    // gtk_widget_set_size_request (frame_fetus_echo, 440, 100);
-    // gtk_frame_set_label_align (GTK_FRAME (frame_fetus_echo), 0.5, 0.5);
-    // gtk_frame_set_shadow_type (GTK_FRAME (frame_fetus_echo), GTK_SHADOW_IN);
-
-    // fixed_fetus_echo = gtk_fixed_new ();
-    // gtk_widget_show (fixed_fetus_echo);
-    // gtk_container_add (GTK_CONTAINER (frame_fetus_echo), fixed_fetus_echo);
-
-    // label_fetus_2d_edv = gtk_label_new (_("<b>2D</b> [EDV ESV] :"));
-    // gtk_widget_show (label_fetus_2d_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), label_fetus_2d_edv, 5, 5);
-    // gtk_widget_set_size_request (label_fetus_2d_edv, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_fetus_2d_edv), TRUE);
-
-    // m_combobox_fetus_2d_edv = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_fetus_2d_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), m_combobox_fetus_2d_edv, 105, 5);
-    // gtk_widget_set_size_request (m_combobox_fetus_2d_edv, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_2d_edv), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_2d_edv), _("Teich"));
-
-    // label_fetus_2d_fs = gtk_label_new (_("<b>2D</b> [FS] :"));
-    // gtk_widget_show (label_fetus_2d_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), label_fetus_2d_fs, 5, 40);
-    // gtk_widget_set_size_request (label_fetus_2d_fs, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_fetus_2d_fs), TRUE);
-
-    // m_combobox_fetus_2d_fs = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_fetus_2d_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), m_combobox_fetus_2d_fs, 105, 40);
-    // gtk_widget_set_size_request (m_combobox_fetus_2d_fs, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_2d_fs), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_2d_fs), _("Teich"));
-
-    // label_fetus_m_edv = gtk_label_new (_("<b>M</b> [EDV ESV] :"));
-    // gtk_widget_show (label_fetus_m_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), label_fetus_m_edv, 220, 5);
-    // gtk_widget_set_size_request (label_fetus_m_edv, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_fetus_m_edv), TRUE);
-
-    // m_combobox_fetus_m_edv = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_fetus_m_edv);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), m_combobox_fetus_m_edv, 320, 5);
-    // gtk_widget_set_size_request (m_combobox_fetus_m_edv, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_m_edv), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_m_edv), _("Teich"));
-
-    // label_fetus_m_fs = gtk_label_new (_("<b>M</b> [FS] :"));
-    // gtk_widget_show (label_fetus_m_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), label_fetus_m_fs, 220, 40);
-    // gtk_widget_set_size_request (label_fetus_m_fs, 100, 30);
-    // gtk_label_set_use_markup (GTK_LABEL (label_fetus_m_fs), TRUE);
-
-    // m_combobox_fetus_m_fs = gtk_combo_box_new_text ();
-    // gtk_widget_show (m_combobox_fetus_m_fs);
-    // gtk_fixed_put (GTK_FIXED (fixed_fetus_echo), m_combobox_fetus_m_fs, 320, 40);
-    // gtk_widget_set_size_request (m_combobox_fetus_m_fs, 100, 30);
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_m_fs), _("Cubed"));
-    // gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_fetus_m_fs), _("Teich"));
-
-    // label_fetus_echo = gtk_label_new (_("<b>Fetus echo</b>"));
-    // gtk_widget_show (label_fetus_echo);
-    // gtk_frame_set_label_widget (GTK_FRAME (frame_fetus_echo), label_fetus_echo);
-    // gtk_label_set_use_markup (GTK_LABEL (label_fetus_echo), TRUE);
 
     frame_ob_method = gtk_frame_new (NULL);
     gtk_widget_show (frame_ob_method);
@@ -11794,197 +10221,7 @@ void ViewSystem::save_calc_setting(void) {
 
 GtkWidget* ViewSystem::create_note_info(void) {
     GtkWidget *fixed_info;
-#ifdef EMP_3410
-    GtkWidget *frame_version;
-    GtkWidget *scrolledwindow_version;
-    GtkWidget *label_version;
-    GtkWidget *button_upgrade;
-    const int X0 = 20;
-    fixed_info = gtk_fixed_new ();
-    gtk_widget_show (fixed_info);
 
-    frame_version = gtk_frame_new (NULL);
-    gtk_widget_show (frame_version);
-    gtk_fixed_put (GTK_FIXED (fixed_info), frame_version, X0, 10);
-    gtk_widget_set_size_request (frame_version, 360+150, 160);
-    gtk_frame_set_label_align (GTK_FRAME (frame_version), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_version), GTK_SHADOW_IN);
-
-    GtkWidget *fixed_system_info = gtk_fixed_new ();
-    gtk_widget_show (fixed_system_info);
-    gtk_container_add (GTK_CONTAINER (frame_version), fixed_system_info);
-
-    GtkWidget *frame_container = gtk_frame_new(NULL);
-    gtk_widget_show(frame_container);
-    gtk_fixed_put (GTK_FIXED (fixed_system_info), frame_container, 10, 10);
-    gtk_widget_set_size_request (frame_container, 360, 120);
-    gtk_frame_set_label_align (GTK_FRAME (frame_container), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_container), GTK_SHADOW_IN);
-
-    scrolledwindow_version = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_version);
-    gtk_container_add (GTK_CONTAINER (frame_container), scrolledwindow_version);
-    gtk_container_set_border_width (GTK_CONTAINER (scrolledwindow_version), 5);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_version), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_version), GTK_SHADOW_IN);
-
-    GtkWidget *label_frame_container = gtk_label_new (_("<b>Software and FPGA Version</b>"));
-    gtk_widget_show (label_frame_container);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_container), label_frame_container);
-    gtk_label_set_use_markup (GTK_LABEL (label_frame_container), TRUE);
-
-    m_textview_version = gtk_text_view_new ();
-    gtk_widget_show (m_textview_version);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_version), m_textview_version);
-    gtk_text_view_set_editable (GTK_TEXT_VIEW (m_textview_version), FALSE);
-    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (m_textview_version), GTK_WRAP_WORD);
-    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (m_textview_version), FALSE);
-
-    label_version = gtk_label_new (_("System Info"));
-    gtk_widget_show (label_version);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_version), label_version);
-    gtk_label_set_use_markup (GTK_LABEL (label_version), TRUE);
-
-    button_upgrade = gtk_button_new_with_mnemonic (_("Upgrade"));
-    gtk_widget_show (button_upgrade);
-    gtk_fixed_put (GTK_FIXED (fixed_system_info), button_upgrade, 360+150-10-100, 60);
-    gtk_widget_set_size_request (button_upgrade, 100, 35);
-
-    g_signal_connect ((gpointer) button_upgrade, "clicked",
-                      G_CALLBACK (on_button_upgrade_clicked),
-                      this);
-
-    ///options list
-    GtkWidget *frame_option = gtk_frame_new(NULL);
-    gtk_widget_show (frame_option);
-    gtk_fixed_put (GTK_FIXED (fixed_info), frame_option, X0, 10+160+20);
-    gtk_widget_set_size_request (frame_option, 360+150, 300);
-    gtk_frame_set_label_align (GTK_FRAME (frame_option), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_option), GTK_SHADOW_IN);
-
-    GtkWidget *scrolledwindow_option = gtk_scrolled_window_new (NULL, NULL);
-    gtk_container_add (GTK_CONTAINER (frame_option), scrolledwindow_option);
-    gtk_container_set_border_width (GTK_CONTAINER (scrolledwindow_option), 5);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_option), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_option), GTK_SHADOW_IN);
-
-    GtkTreeModel *modelOption = GTK_TREE_MODEL(gtk_list_store_new(2,
-                                G_TYPE_STRING,
-                                G_TYPE_STRING));
-    m_treeOption = gtk_tree_view_new_with_model(modelOption);
-    gtk_widget_set_usize(m_treeOption, 360, 200);
-    gtk_tree_view_set_enable_search (GTK_TREE_VIEW(m_treeOption), FALSE);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(m_treeOption), TRUE);
-    gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeOption)), GTK_SELECTION_SINGLE);
-
-    char buf[10];
-    char *title_list[]= {"Option", "State"};
-    for(int i = 0; i < 2; i++) {
-        GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
-        g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i));
-        GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer, "text", i, NULL);
-        GtkWidget *label = create_label(_(title_list[i]), 0, 0, g_white, NULL);
-        g_object_set(G_OBJECT(column), "widget", label, "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 170, NULL);
-        gtk_widget_show(label);
-        gtk_tree_view_append_column(GTK_TREE_VIEW(m_treeOption), column);
-    }
-
-    gtk_list_store_clear(GTK_LIST_STORE(modelOption));
-    GtkTreeIter iter;
-    char status[50];
-    for(int row=1; row<CManRegister::MAX_OPTIONAL_NUM+1; row++) {
-        gtk_list_store_append(GTK_LIST_STORE(modelOption), &iter);///<增加一行
-        if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[row-1]))
-            strcpy(status, "Installed");
-        else
-            strcpy(status, "Disabled");
-        gtk_list_store_set(GTK_LIST_STORE(modelOption), &iter,
-                           0, _(CManRegister::Optional[row-1].c_str()),
-                           1, _(status),
-                           -1);
-    }
-    g_signal_connect(G_OBJECT(m_treeOption), "cursor-changed", G_CALLBACK(HandleOptionCursorChanged), this);
-    g_signal_connect(G_OBJECT(m_treeOption), "event-after", G_CALLBACK(HandleOptionOptEvent), this);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_option), m_treeOption);
-    gtk_widget_show_all(scrolledwindow_option);
-
-    ///>register info
-    m_frameRegisterInfo = gtk_frame_new(NULL);
-    gtk_widget_show (m_frameRegisterInfo);
-    gtk_fixed_put (GTK_FIXED (fixed_info), m_frameRegisterInfo, X0+360+150+20, 10);
-    gtk_widget_set_size_request (m_frameRegisterInfo, 330, 480);
-    gtk_frame_set_label_align (GTK_FRAME (m_frameRegisterInfo), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (m_frameRegisterInfo), GTK_SHADOW_IN);
-
-    GtkWidget *fixed_register_info = gtk_fixed_new ();
-    gtk_widget_show (fixed_register_info);
-    gtk_container_add (GTK_CONTAINER (m_frameRegisterInfo), fixed_register_info);
-
-    GtkWidget *label_frame_register = gtk_label_new (_("Register"));
-    gtk_widget_show (label_frame_register);
-    gtk_frame_set_label_widget (GTK_FRAME (m_frameRegisterInfo), label_frame_register);
-    gtk_label_set_use_markup (GTK_LABEL (label_frame_register), TRUE);
-
-    GtkWidget *labelNote = gtk_label_new(_("Note: According to the license file,the manufacturer will generate a unique register key for every machine,you can register optional function by inputting thist register key.If register is successful,you can use the optional function.\n\nPlease insert Udisk,and click button 'Export License File'. You will find this file named 'license' in Udisk. Please send this file to manufacturer."));
-    gtk_widget_show(labelNote);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), labelNote, 10, 5);
-    gtk_misc_set_alignment (GTK_MISC(labelNote), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (labelNote), TRUE);
-    gtk_widget_set_size_request (labelNote, 330-10-10, 200);
-    gtk_label_set_line_wrap(GTK_LABEL(labelNote), true);
-    gtk_label_set_line_wrap_mode(GTK_LABEL(labelNote), PANGO_WRAP_WORD_CHAR);
-
-    const int YT = 20;
-    m_labelExport = gtk_label_new ("");
-    gtk_widget_show (m_labelExport);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), m_labelExport, 10, 200-10);
-    gtk_label_set_use_markup (GTK_LABEL (m_labelExport), TRUE);
-    gtk_widget_set_size_request (m_labelExport, 330-15, 33);
-    gtk_label_set_justify(GTK_LABEL(m_labelExport), GTK_JUSTIFY_LEFT);
-
-    GtkWidget *btnExport = gtk_button_new_with_mnemonic(_("Export License File"));
-    gtk_widget_show(btnExport);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), btnExport, 330-200-10, 5+200+10+YT);
-    gtk_widget_set_size_request (btnExport, 200, 35);
-    g_signal_connect (G_OBJECT(btnExport), "clicked", G_CALLBACK(HandleBtnExportClicked), this);
-    GtkWidget *hseparator1 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator1);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), hseparator1, 8, 5+200+10+35+5+YT);
-    gtk_widget_set_size_request (hseparator1, 330-16, 16);
-
-    GtkWidget *labelKey = gtk_label_new (_("Register Key:"));
-    gtk_widget_show (labelKey);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), labelKey, 10, 5+200+10+34+5+16+20+YT-10);
-    gtk_label_set_use_markup (GTK_LABEL (labelKey), TRUE);
-
-    m_entryRegisterKey = gtk_entry_new ();
-    gtk_widget_show (m_entryRegisterKey);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), m_entryRegisterKey, 10+10, 5+200+10+34+5+16+20+25+YT-10);
-    gtk_widget_set_size_request (m_entryRegisterKey, 330-20-10, 30);
-    gtk_entry_set_invisible_char (GTK_ENTRY (m_entryRegisterKey), 9679);
-
-    m_labelRegister = gtk_label_new ("");
-    gtk_widget_show (m_labelRegister);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), m_labelRegister, 10, 5+200+10+34+5+16+20+35+30+15+YT-20);
-    gtk_label_set_use_markup (GTK_LABEL (m_labelRegister), TRUE);
-    gtk_widget_set_size_request (m_labelRegister, 200, 33);
-
-    GtkWidget *btnRegister = gtk_button_new_with_mnemonic(_("Register"));
-    gtk_widget_show(btnRegister);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), btnRegister, 330-10-100, 5+200+10+34+5+16+20+35+30+15+YT-20);
-    gtk_widget_set_size_request (btnRegister, 100, 35);
-    g_signal_connect (G_OBJECT(btnRegister), "clicked", G_CALLBACK(HandleBtnRegisterClicked), this);
-
-    GtkWidget *labelWarning = gtk_label_new(_("If the registeration is successful, it will take effect after the machine is rebooted."));
-    gtk_widget_show(labelWarning);
-    gtk_fixed_put (GTK_FIXED (fixed_register_info), labelWarning, 10, 5+200+10+34+5+16+20+35+30+15+YT+35+5-25);
-    gtk_label_set_use_markup (GTK_LABEL (labelWarning), TRUE);
-    gtk_widget_set_size_request (labelWarning, 330-10-10, 50);
-    gtk_label_set_line_wrap(GTK_LABEL(labelWarning), true);
-    gtk_label_set_line_wrap_mode(GTK_LABEL(labelWarning), PANGO_WRAP_WORD_CHAR);
-
-    gtk_widget_hide(m_frameRegisterInfo);
-#else
     GtkWidget *frame_info_model;
     GtkWidget *scrolledwindow_info_model;
     GtkWidget *label_info_model;
@@ -12054,7 +10291,7 @@ GtkWidget* ViewSystem::create_note_info(void) {
     g_signal_connect ((gpointer) button_upgrade, "clicked",
                       G_CALLBACK (on_button_upgrade_clicked),
                       this);
-#endif
+
     return fixed_info;
 }
 
@@ -12209,24 +10446,14 @@ GtkWidget * ViewSystem::create_key_function_treeview(const string function_list[
     return treeview;
 }
 
-void  ViewSystem::create_exam_comment_model(vector<int> index) {
+void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     vecExamItem_comment.clear();
-    vector<int>::iterator iter_index;
-
     int probeIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
-#if 0
-    ExamItem::ParaItem paraItem;
-    ExamItem examItem;
-    for(int i=0; i<10; i++) {
-        examItem.ReadExamItemPara(probeIndex,i, &paraItem,NULL);
-        ExamItemArray[i].name=paraItem.alias;
 
+    for (int i = 0; i < indexVec.size(); i++) {
+        vecExamItem_comment.push_back(ExamItemArray[indexVec[i]].name);
     }
-#endif
-    for (iter_index = index.begin(); iter_index != index.end(); iter_index++) {
-        vecExamItem_comment.push_back(ExamItemArray[*iter_index].name);
 
-    }
     CreateDefineItem_comment(probeIndex, vecExamItem_comment);
 
     int exam_size(0);
@@ -12277,13 +10504,13 @@ void  ViewSystem::create_exam_comment_model(vector<int> index) {
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Cardiac"));
 
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Obstetrics"));
-#ifndef VET
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Gynecology"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Small Part"));
-#ifndef EMP_322
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Vascular"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Orthopedic"));
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), department_index);
     g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
@@ -12312,7 +10539,7 @@ void  ViewSystem::create_exam_comment_model(vector<int> index) {
 
     gtk_widget_show (m_treeview_item_comment);
 
-//select note item
+    //select note item
     scrolledwindow_item_comment1 = gtk_scrolled_window_new (NULL, NULL);
     gtk_widget_show (scrolledwindow_item_comment1);
     gtk_fixed_put (GTK_FIXED (fixed_comment), scrolledwindow_item_comment1, 470, 10+20+50-5+40-5);//-3-2);
@@ -12339,144 +10566,100 @@ void  ViewSystem::create_exam_comment_model(vector<int> index) {
 
 }
 
-GtkTreeModel* ViewSystem::create_exam_item_model(vector<int> index) {
-    vector<ExamPara> vecExamItem;
-    vecExamItem.clear();
-    vector<int>::iterator iter_index;
-    int probe_index = 0;
-    string probe_type = TopArea::GetInstance()->GetProbeType();
-    for (int i = 0; i < NUM_PROBE; ++i) {
-        if (probe_type == PROBE_LIST[i])
-            probe_index = i;
+GtkTreeModel* ViewSystem::create_exam_item_model(vector<ExamItem::EItem> indexVec) {
+  string probe_type = TopArea::GetInstance()->GetProbeType();
+  int probe_index = 0;
+
+  for (int i = 0; i < NUM_PROBE; ++i) {
+    if (probe_type == PROBE_LIST[i]) {
+      probe_index = i;
     }
+  }
 
-    int probeIndex = GetProbeType();
-    string str_check_part("");
-    TopArea::GetInstance()->GetCheckPart(str_check_part);
-#if 0
-    ExamItem::ParaItem paraItem;
-    ExamItem examItem;
-    for(int i=0; i<10; i++) {
-        examItem.ReadExamItemPara(probeIndex,i, &paraItem,NULL);
-        ExamItemArray[i].name=paraItem.alias;
-        PRINTF("---name=%s\n", ExamItemArray[i].name.c_str());
-    }
-#endif
-    for (iter_index = index.begin(); iter_index != index.end(); iter_index++) {
-        vecExamItem.push_back(ExamItemArray[*iter_index]);
-    }
+  string str_check_part("");
+  TopArea::GetInstance()->GetCheckPart(str_check_part);
 
-    CreateDefineItem(probeIndex, vecExamItem);
+  vector<ExamPara> vecExamItem;
+  for (int i = 0; i < indexVec.size(); i++) {
+    vecExamItem.push_back(ExamItemArray[indexVec[i]]);
+  }
 
-    if (vecExamItem.empty())
-        return NULL;
+  int probeIndex = GetProbeType();
+  CreateDefineItem(probeIndex, vecExamItem);
 
-    GtkTreeIter iter;
-    GtkTreeIter child_iter;
-    GtkTreeStore *store = gtk_tree_store_new(N_COLUMNS,
-                          G_TYPE_STRING,
-                          G_TYPE_INT);
+  if (vecExamItem.empty()) {
+    return NULL;
+  }
 
-    vector<ExamPara>::iterator iterItem;
-    for (iterItem = vecExamItem.begin(); iterItem != vecExamItem.end(); iterItem++) {
+  GtkTreeIter iter;
+  GtkTreeIter child_iter;
+  GtkTreeStore* store = gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_INT);
 
-#ifdef VET
-        gtk_tree_store_append(store, &iter, NULL);
+  vector<ExamPara>::iterator iterItem;
 
-        gtk_tree_store_set(store, &iter,
-                           NAME_COLUMN, _(iterItem->name.c_str()),
-                           INDEX_COLUMN, iterItem->index,
-                           -1);
+  for (iterItem = vecExamItem.begin(); iterItem != vecExamItem.end(); iterItem++) {
+    if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
+        bool has_node = true;
+        char *strtmp;
+        while (has_node) {
+          gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, NAME_COLUMN, &strtmp, -1);
 
-        if((strcmp(str_check_part.c_str(), _(iterItem->name.c_str())) == 0) && (probe_index == probeIndex)) {
-            GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
-            m_str_index = gtk_tree_path_to_string (path);
-            PRINTF("path:%s\n", m_str_index);
-            gtk_tree_path_free(path);
-        } else if(probe_index != probeIndex) {
-            m_str_index = NULL;
-        }
-
-        goto next;
-
-#else
-        if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
-            bool has_node = true;
-            char *strtmp;
-            while (has_node) {
-
-                gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, NAME_COLUMN, &strtmp, -1);
-
-                if (strcmp(_(iterItem->dept_name.c_str()), strtmp) == 0) {
-                    gtk_tree_store_append(store, &child_iter, &iter);
-                    gtk_tree_store_set(store, &child_iter,
-                                       NAME_COLUMN, _(iterItem->name.c_str()),
-                                       INDEX_COLUMN, iterItem->index,
-                                       -1);
-                    if((strcmp(str_check_part.c_str(), _(iterItem->name.c_str())) == 0) && (probe_index == probeIndex)) {
-                        GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &child_iter);
-                        m_str_index = gtk_tree_path_to_string (path);
-                        PRINTF("path:%s\n", m_str_index);
-                        gtk_tree_path_free(path);
-                    } else if(probe_index != probeIndex) {
-                        m_str_index = NULL;
-                    }
-
-                    goto next;
-                } else {
-                    has_node = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter);
-                }
-            }
-        }
-        if ((iterItem->name).empty()) {
-            gtk_tree_store_append(store, &iter, NULL);
-            gtk_tree_store_set(store, &iter,
-                               NAME_COLUMN, _(iterItem->dept_name.c_str()),
-                               INDEX_COLUMN, iterItem->index,
-                               -1);
-        } else {
-            gtk_tree_store_append(store, &iter, NULL);
-            gtk_tree_store_set(store, &iter,
-                               NAME_COLUMN, _(iterItem->dept_name.c_str()),
-                               INDEX_COLUMN, -1,
-                               -1);
+          if (iterItem->dept_name == strtmp) {
             gtk_tree_store_append(store, &child_iter, &iter);
             gtk_tree_store_set(store, &child_iter,
-                               NAME_COLUMN, _(iterItem->name.c_str()),
-                               INDEX_COLUMN, iterItem->index,
-                               -1);
+              NAME_COLUMN, _(iterItem->name.c_str()),
+              INDEX_COLUMN, iterItem->index,
+              -1);
 
-            if((strcmp(str_check_part.c_str(), _(iterItem->name.c_str())) == 0) && (probe_index == probeIndex)) {
-                // printf("chekc:%s\n", str_check_part.c_str());
-                GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &child_iter);
-                m_str_index = gtk_tree_path_to_string (path);
-                PRINTF("path:%s\n", m_str_index);
-                gtk_tree_path_free(path);
+            if(str_check_part == iterItem->name && probe_index == probeIndex) {
+              GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &child_iter);
+              m_str_index = gtk_tree_path_to_string (path);
+
+              gtk_tree_path_free(path);
             } else if(probe_index != probeIndex) {
-                m_str_index = NULL;
+              m_str_index = NULL;
             }
 
+            goto next;
+          } else {
+            has_node = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter);
+          }
         }
-#endif
-next:
-        continue;
     }
-    return GTK_TREE_MODEL(store);
 
+    if ((iterItem->name).empty()) {
+      gtk_tree_store_append(store, &iter, NULL);
+      gtk_tree_store_set(store, &iter,
+        NAME_COLUMN, _(iterItem->dept_name.c_str()),
+        INDEX_COLUMN, iterItem->index,
+        -1);
+    } else {
+      gtk_tree_store_append(store, &iter, NULL);
+      gtk_tree_store_set(store, &iter,
+        NAME_COLUMN, _(iterItem->dept_name.c_str()),
+        INDEX_COLUMN, -1,
+        -1);
+      gtk_tree_store_append(store, &child_iter, &iter);
+      gtk_tree_store_set(store, &child_iter,
+        NAME_COLUMN, _(iterItem->name.c_str()),
+        INDEX_COLUMN, iterItem->index,
+        -1);
+
+      if(str_check_part == iterItem->name && probe_index == probeIndex) {
+        GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &child_iter);
+        m_str_index = gtk_tree_path_to_string (path);
+        gtk_tree_path_free(path);
+      } else if(probe_index != probeIndex) {
+        m_str_index = NULL;
+      }
+    }
+
+  next:
+    continue;
+  }
+
+  return GTK_TREE_MODEL(store);
 }
-
-#ifdef VET
-void ViewSystem::add_columns(GtkTreeView *treeview) {
-    gint col_offset;
-    GtkTreeViewColumn *column;
-
-    m_cellrenderer_text = gtk_cell_renderer_text_new();
-    col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (treeview),
-                 -1,_("User"),m_cellrenderer_text, "text", 0,NULL);
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
-    gtk_tree_view_column_set_clickable (GTK_TREE_VIEW_COLUMN (column), TRUE);
-}
-#endif
 
 void ViewSystem::add_columns_comment(GtkTreeView *treeview) {
     gint col_offset;
@@ -12504,11 +10687,8 @@ void ViewSystem::add_exam_item_column(GtkTreeView *treeview) {
     GtkTreeViewColumn *column;
 
     renderer = gtk_cell_renderer_text_new();
-#ifdef VET
-    column = gtk_tree_view_column_new_with_attributes(_("User"), renderer, "text", NAME_COLUMN, NULL);
-#else
     column = gtk_tree_view_column_new_with_attributes(_("Department"), renderer, "text", NAME_COLUMN, NULL);
-#endif
+
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 }
 
@@ -12531,10 +10711,10 @@ void ViewSystem::KeyEvent(unsigned char keyValue) {
     case KEY_P1:
         g_timeout_add(100, ExitWindow, this);
         FakeEscKey();
-#ifdef EMP_355
+
         FreezeMode::GetInstance()->PressUnFreeze();
         MultiFuncUndo();//2016.11.05--solve problem that biopsy verify don't exit.
-#endif
+
         break;
     default:
         break;
@@ -12565,9 +10745,7 @@ void ViewSystem::BtnApplyClicked(GtkButton *button) {
     save_measure_setting();
     //save_image_setting();
     save_key_config();
-#ifndef VET
     save_calc_setting();
-#endif
 }
 
 bool system_save = false;
@@ -12581,21 +10759,6 @@ void ViewSystem::BtnSaveClicked(GtkButton *button) {
         LocalizationDB(); // 110~120ms
     }
 
-    /*BtnSave2Clicked(NULL);//add by jhuang
-    save_general_setting();
-    save_option_setting();
-    save_comment_setting();
-    if(m_current_note_page == m_flag_notebook_tvout)
-        save_tvout_setting();//改成了"Peripheral" 避免打印机总是死机问题
-    //save_dicom_setting();
-    save_measure_setting();
-    save_key_config();
-    #ifndef VET
-    save_calc_setting();
-    #endif
-    DestroyWindow();
-    system_save = true;*/
-
     BtnSave2Clicked(NULL);//add by jhuang
     save_general_setting();
     save_option_setting();
@@ -12605,18 +10768,15 @@ void ViewSystem::BtnSaveClicked(GtkButton *button) {
     //save_dicom_setting();
     save_measure_setting();
     save_key_config();
-#ifndef VET
     save_calc_setting();
-#endif
+
     g_timeout_add(500, ExitWindowSystem, this);
     //DestroyWindow();
     system_save = true;
     //-----------------------------//
-#ifdef EMP_355
+
     FreezeMode::GetInstance()->PressUnFreeze();
     MultiFuncUndo();//2016.11.05--solve problem that biopsy verify don't exit.
-#endif
-
 }
 
 void ViewSystem::UpdateHospitalandpart(int date_format, const char *hospital_name) {
@@ -12634,28 +10794,10 @@ void ViewSystem::UpdateHospitalandpart(int date_format, const char *hospital_nam
         TopArea::GetInstance()->UpdateCheckPart(_(userItemName.c_str()));
     } else {
         ExamItem::EItem index = ProbeSelect::GetItemIndex();
-#ifdef VET
-        TopArea::GetInstance()->UpdateCheckPart(_(ExamItemArray[index].name.c_str()));
-#else
+
         TopArea::GetInstance()->UpdateCheckPart(_(EXAM_TYPES[index].c_str()));
-#endif
     }
 }
-
-#ifdef VET
-void ViewSystem::UpdateExamName(int probe_index) {
-    ExamItem::ParaItem paraItem;
-    ExamItem examItem;
-    /* for(int i=0;i<10;i++)
-     {
-         examItem.ReadExamItemPara(probe_index,i, &paraItem,NULL);
-         ExamItemArray[i].name=paraItem.alias;
-     }*/
-    ExamItem::EItem index = ProbeSelect::GetItemIndex();
-    TopArea::GetInstance()->UpdateCheckPart(_(ExamItemArray[index].name.c_str()));
-
-}
-#endif
 
 void ViewSystem::BtnGeneralDefaultClicked(GtkButton *button) {
     SysGeneralSetting sysGeneralSetting;
@@ -12690,13 +10832,6 @@ void ViewSystem::BtnGeneralDefaultClicked(GtkButton *button) {
         break;
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_screen_saver), index_screen_saver);
-#if 0
-    char printer_path[3];
-    int index_printer = sysGeneralSetting.GetPrinter();
-    sprintf(printer_path, "%d", index_printer);
-    GtkTreePath *path = gtk_tree_path_new_from_string(printer_path);
-    gtk_tree_selection_select_path(m_selected_common_printer, path);
-#endif
 }
 
 void ViewSystem::BtnOptionsDefaultClicked(GtkButton *button) {
@@ -12723,166 +10858,6 @@ void ViewSystem::BtnCommentDefaultClicked(GtkButton *button) {
     init_comment_setting(sysNote);
 }
 
-// void ViewSystem::ComboNetMethodChanged(GtkComboBox *widget)
-// {
-//     int active = gtk_combo_box_get_active (widget);
-//     if (active) {
-// 	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_ip), TRUE);
-// 	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_mask), TRUE);
-// 	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_gateway), TRUE);
-// //	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_dns), TRUE);
-//     } else {
-// 	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_ip), FALSE);
-// 	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_mask), FALSE);
-// 	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_gateway), FALSE);
-// //	gtk_widget_set_sensitive(GTK_WIDGET(m_entry_network_dns), FALSE);
-//     }
-// }
-
-#if 0
-gboolean DicomTest(gpointer data) {
-    ViewSystem *tmp;
-    tmp = (ViewSystem *)data;
-    tmp->DoDicomTest();
-    return FALSE;
-}
-
-void ViewSystem::DoDicomTest() {
-    char info[256];
-    const char *local_ip, *local_mask, *local_gateway, *local_ae, *host_ip, *host_port, *host_ae;
-
-    local_ip = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_network_ip));
-    local_mask = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_network_mask));
-    local_gateway = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_network_gateway));
-    local_ae = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_equipment_ae));
-    host_ip = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_host_dicom));
-    host_port = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_host_port));
-    host_ae = (const char *)gtk_entry_get_text(GTK_ENTRY(m_entry_host_ae));
-
-    if ((!host_ip[0])||(!host_ae[0])||(!host_port)||(!local_ae[0])) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please set the relevant information of network,host and equipment!"), NULL);
-        return ;
-    }
-    CNetworkMan localIP;
-    if(localIP.SetLocalIP(local_ip, local_gateway, local_mask)) {
-        CDCMMan::GetMe()->SetRemoteAE(host_ae);
-        CDCMMan::GetMe()->SetRemoteIP(host_ip);
-        CDCMMan::GetMe()->SetRemotePort(atoi(host_port));
-        CDCMMan::GetMe()->SetLocalAE(local_ae);
-        //		CDCMMan::GetMe()->SetLocalPort(atoi(local_port));
-
-        if(CDCMMan::GetMe()->TestLink()) {
-            PRINTF("Dicom test link OK!!\n");
-            sprintf(info, _("Connection test successfully!"));
-        } else {
-            PRINTF("Dicom test link FAIL!!\n");
-            sprintf(info, _("Connection test fails!"));
-        }
-    } else {
-        PRINTF("Fail to set the local network!\n");
-        sprintf(info, _("Fail to set the local network!"));
-    }
-
-    MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                      MessageDialog::DLG_INFO,
-                                      info,
-                                      NULL);
-}
-
-void ViewSystem::BtnDicomTest(GtkButton *button) {
-    MessageHintDialog::GetInstance()->Create(GTK_WINDOW(ViewSystem::GetInstance()->GetWindow()),
-                                          _("Configuring Network and Testing..."));
-
-    g_timeout_add(500, DicomTest, this);
-}
-
-void ViewSystem::BtnDicomReset(GtkButton *button) {
-    gtk_entry_set_text(GTK_ENTRY(m_entry_network_ip), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_network_mask), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_network_gateway), "");
-    //    gtk_entry_set_text(GTK_ENTRY(m_entry_network_dns), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_host_dicom), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_host_port), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_host_ae), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entry_equipment_ae), "");
-}
-#endif
-
-#if 0
-void ViewSystem::EntryIPInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
-    if ((*new_text > '9' || *new_text < '0') && (*new_text != '.'))
-        g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
-    return;
-}
-#endif
-
-// void ViewSystem::EntryIPChanged(GtkEditable *editable)
-// {
-//     int position = gtk_editable_get_position(editable);
-//     PRINTF("%d\n", position);
-// }
-
-#ifdef VET
-void ViewSystem:: BtnEditCellChanged(GtkCellRendererText *cell, gchar *path_string, gchar *new_text) {
-    ExamItem::ParaItem paraItem;
-    ExamItem examItem;
-    int probeIndex = -1;
-    int itemIndex = -1;
-    char *itemName =NULL;
-    GtkTreeIter iter;
-    GtkTreeModel *model;
-    GtkTreePath *path;
-
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_exam_type));
-    path = gtk_tree_path_new_from_string(path_string);
-    gtk_tree_model_get_iter(GTK_TREE_MODEL(model), &iter, path);
-//get old_text
-    char old_text[256];
-    gtk_tree_model_get(model,&iter,0,&old_text,-1);
-
-    GetImageNoteSelection(probeIndex, itemIndex, itemName);
-    if (probeIndex == -1 || itemIndex == -1) return;
-    if (strlen(new_text) == 0) {
-        char default_text[20]= {0};
-        snprintf(default_text, 20, "User defined %d", itemIndex+1);
-        char *tmp_text = g_strdup(default_text);
-        gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 0, tmp_text, -1);
-        g_free(tmp_text);
-        //gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 0, g_strdup(default_text), -1);
-    } else {
-        //printf("%s\n", paraItem.alias);
-        char *tmp_text = g_strdup(new_text);
-        gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 0, tmp_text, -1);
-        g_free(tmp_text);
-        //gtk_tree_store_set(GTK_TREE_STORE(model), &iter, 0, g_strdup(new_text), -1);
-    }
-
-    gtk_tree_path_free(path);
-}
-
-void ViewSystem::BtnImageEditClicked(GtkButton *button) {
-    gtk_widget_hide(button_default_image);
-    gtk_widget_hide(button_get_current);
-    gtk_widget_hide(button_edit_dept);
-    gtk_widget_show(button_return_dept);
-
-    g_object_set(m_cellrenderer_text, "editable", TRUE, NULL);
-//  g_signal_connect(m_cellrenderer_text, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
-
-    g_signal_connect(m_cellrenderer_text, "edited", G_CALLBACK(on_button_edit_cell_callback), this);
-}
-
-void ViewSystem::BtnImageReturnClicked(GtkButton *button) {
-    gtk_widget_show(button_default_image);
-    gtk_widget_show(button_get_current);
-    gtk_widget_show(button_edit_dept);
-    gtk_widget_hide(button_return_dept);
-
-    g_object_set(m_cellrenderer_text, "editable", FALSE, NULL);
-}
-
-#endif
-
 void ViewSystem::EntryDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
     if (!g_ascii_isdigit(*new_text))
         g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
@@ -12894,41 +10869,6 @@ void ViewSystem::EntryFracDigitInsert(GtkEditable *editable, gchar *new_text, gi
         g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
     return;
 }
-#if 0
-bool IsUTF8(const void* pBuffer, long size) {
-    bool IsUTF8 = true;
-    unsigned char* start = (unsigned char*)pBuffer;
-    unsigned char* end = (unsigned char*)pBuffer + size;
-    while(start < end) {
-        if (*start < 0x80) {
-            start++;
-        } else if (*start < (0xC0)) {
-            IsUTF8 = false;
-            break;
-        } else if (*start < (0xE0)) {
-            if (start >= end - 1)
-                break;
-            if ((start[1] & (0xC0)) != 0x80) {
-                IsUTF8 = false;
-                break;
-            }
-            start += 2;
-        } else if (*start < (0xF0)) {
-            if (start >= end - 2)
-                break;
-            if ((start[1] & (0xC0)) != 0x80 || (start[2] & (0xC0)) != 0x80) {
-                IsUTF8 = false;
-                break;
-            }
-            start += 3;
-        } else {
-            IsUTF8 = false;
-            break;
-        }
-    }
-    return IsUTF8;
-}
-#endif
 
 void ViewSystem::EntryHospitalInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
     gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));
@@ -12998,21 +10938,6 @@ void ViewSystem::image_default_setting() {
         ClearComboBox(GTK_COMBO_BOX(m_comboboxentry_user_select));
         UserSelect::GetInstance()->read_default_username(m_comboboxentry_user_select);
         UserSelect::GetInstance()->set_active_user(m_comboboxentry_user_select, 0);
-#ifdef VET
-        set_image_item_sensitive(false);
-        save_itemIndex(-1);
-
-        // rebuild the exam type treeview, in order to disppear the select box in gtk
-        int index = GetProbeType();
-        if (index == -1)
-            return;
-        ExamItem examItem;
-        vector<int> itemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
-        GtkTreeModel *model = create_exam_item_model(itemIndex);
-        gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
-        gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
-#endif
     }
 
     CalcSetting::GetInstance()->ChangeExamBoxDelete();
@@ -13021,12 +10946,6 @@ void ViewSystem::image_default_setting() {
     int probeIndex;
     probeIndex = GetProbeType();
     ChangeCommentExamBoxDelete(probeIndex);
-
-    // comment change
-    //   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_comment), 0);
-
-    //calc change
-    //  CalcSetting::GetInstance()->ChangeExamBoxToDefault();
 }
 
 void ViewSystem::BtnImageGetCurrentClicked(GtkButton *button) {
@@ -13048,17 +10967,6 @@ void ViewSystem::BtnImageGetCurrentClicked(GtkButton *button) {
 
 // 获取当前值，并保存当前检查部位参数预设
 void ViewSystem::BtnImageSaveClicked(GtkButton *button) {
-#ifdef VET
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
-
-    GtkTreeModel *model_vet;
-    GtkTreeIter iter_vet;
-    if (gtk_tree_selection_get_selected(selected_node, &model_vet, &iter_vet) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
-                                          _("Please select one item to be save!"), NULL); //请先选择保存的结点!
-        return;
-    }
-#endif
     gtk_label_set_text(GTK_LABEL(m_label_check_part), (_("Clicking OK will override the previous data, whether\n to continue the operation.")));
     gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_check_part), PANGO_WRAP_WORD);
     gtk_widget_show(m_frame_new_check_part);
@@ -13192,12 +11100,9 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
         // set System Default is the active user after delete a user
         UserSelect::GetInstance()->set_active_user(m_comboboxentry_user_select, 0);
         memset(user_configure, 0, USERCONFIG_LEN);
-#ifdef VET
-        sprintf(user_configure, "%s", "VetItemPara.ini");
 
-#else
         sprintf(user_configure, "%s", "ItemPara.ini");
-#endif
+
         // set parameter zoom disable
         set_image_item_sensitive(false);
         save_itemIndex(-1);
@@ -13207,9 +11112,8 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
         if (index == -1)
             return;
         ExamItem examItem;
-        vector<int> itemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
-        GtkTreeModel *model = create_exam_item_model(itemIndex);
+        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+        GtkTreeModel* model = create_exam_item_model(itemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
     } else {
@@ -13244,7 +11148,7 @@ void ViewSystem::ComboPwPrf(GtkComboBox *box) {
     int i;
     int indexWf;
     int index = gtk_combo_box_get_active(box);
-#if not defined(EMP_322)
+
     if ((index != -1) && (index < ImgPw::MAX_PRF)) {
         indexWf = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_pw_wallfilter));
 
@@ -13260,7 +11164,6 @@ void ViewSystem::ComboPwPrf(GtkComboBox *box) {
             indexWf = 0;
         gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_pw_wallfilter), indexWf);
     }
-#endif
 }
 
 void ViewSystem::ComboCfmPrf(GtkComboBox *box) {
@@ -13270,23 +11173,7 @@ void ViewSystem::ComboCfmPrf(GtkComboBox *box) {
 
     if ((index != -1) && (index < ImgCfm::MAX_PRF_INDEX)) {
         int indexPkt = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sensitivity));
-#if 0
-        if ((indexPkt != -1) && (indexPkt < ImgCfm::MAX_PRF_INDEX)) {
-            // wall filter
-            ClearComboBox(GTK_COMBO_BOX(m_combobox_cfm_wallfilter));
-            for (i = 0; i < ImgCfm::MAX_WALLFILTER_INDEX; i ++) {
-                sprintf(buf , "%dHz", ImgCfm::GetWFDisplay(index, indexPkt, ImgCfm::WALL_FILTER_SELECT_IDNEX[indexPkt][i]));
-                gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_wallfilter), buf);
-            }
 
-            int indexWF = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_cfm_wallfilter));
-            if (indexWF >= ImgCfm::MAX_WALLFILTER_INDEX)
-                indexWF = 0;
-            gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_cfm_wallfilter), indexWF);
-        }
-#endif
-
-#if 1
         // sensitive
         ClearComboBox(GTK_COMBO_BOX(m_combobox_sensitivity));
         for (i = 0; i < ImgCfm::MAX_PKTSIZE_INDEX; i ++) {
@@ -13297,13 +11184,10 @@ void ViewSystem::ComboCfmPrf(GtkComboBox *box) {
         if (indexPkt >= ImgCfm::MAX_PKTSIZE_INDEX)
             indexPkt = 0;
         gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_sensitivity), indexPkt);
-#endif
     }
 }
 
 void ViewSystem::ComboSensitivity(GtkComboBox *box) {
-#if not defined(EMP_322)
-#if not defined(EMP_313)
     char buf[50];
     int i;
     int indexPkt = gtk_combo_box_get_active(box);
@@ -13324,8 +11208,6 @@ void ViewSystem::ComboSensitivity(GtkComboBox *box) {
             indexWF = 0;
         gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_cfm_wallfilter), indexWF);
     }
-#endif
-#endif
 }
 
 void ViewSystem::ClearComboBox(GtkComboBox *box) {
@@ -13357,24 +11239,13 @@ void ViewSystem::ChkBtnHRToggled(GtkToggleButton *togglebutton) {
         gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_autocalc_time), TRUE);
 }
 
-#if 0
-void ViewSystem::ChkBtnTotalToggled(GtkToggleButton *togglebutton) {
-    gboolean press = gtk_toggle_button_get_active(togglebutton);
-    if (press) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobtn_total), TRUE);
-        //m_display_format = 0;
-    }
-}
-#endif
-#ifdef VET
-#else
 void ViewSystem::RadioP1Toggled(GtkToggleButton *togglebutton) {
     gboolean press = gtk_toggle_button_get_active(togglebutton);
     if (press) {
         m_p1Selected = true;
     }
 }
-#endif
+
 void ViewSystem::RadioP2Toggled(GtkToggleButton *togglebutton) {
     gboolean press = gtk_toggle_button_get_active(togglebutton);
     if (press) {
@@ -13564,21 +11435,6 @@ GtkWidget* ViewCustomOB::create_customOB_window(void) {
     gtk_list_store_clear(GTK_LIST_STORE(m_modelCustomOB));
 
     for(unsigned int i=0; i<m_arrayGW->len; i++) {
-#if 0
-        PRINTF("Append Col: ");
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw1);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw2);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw3);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw4);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw5);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw6);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw7);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw8);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw9);
-        PRINTF("%s  ", g_array_index(m_arrayGW, CustomData, i).gw10);
-        PRINTF("\n");
-#endif
         gtk_list_store_append(GTK_LIST_STORE(m_modelCustomOB), &iter);
         gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter,
                            COL_GW, g_array_index(m_arrayGW, CustomData, i).gw,
@@ -13953,12 +11809,11 @@ void ViewCustomOB::insert_list(GtkTreeModel *model, int table[]) {
         gtk_tree_model_get_iter(model, &iter, path);
         for (col=1; col<11; col++) {
             PRINTF("%d  ", table[10*row + col - 1]);
-#if 1
+
             sprintf(buf[col-1], "%.1f", (float)table[10*row+(col-1)]/10);
             if (strcmp(buf[col-1], "0.0") == 0)
                 strcpy(buf[col-1], "");
             gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, buf[col-1], -1);
-#endif
         }
     }
     PRINTF("\n");
@@ -14035,9 +11890,8 @@ void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
         if (index == -1)
             return;
         ExamItem examItem;
-        vector<int> itemIndex;
-        examItem.GetItemListOfProbe((char*)PROBE_LIST[index].c_str(), ((vector<ExamItem::EItem>*) &itemIndex));
-        GtkTreeModel *model = create_exam_item_model(itemIndex);
+        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+        GtkTreeModel* model = create_exam_item_model(itemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
     }

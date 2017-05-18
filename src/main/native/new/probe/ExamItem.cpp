@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "Def.h"
+#include "probe/ViewProbe.h"
 #include "sysMan/ViewSystem.h"
 
 using namespace std;
@@ -324,14 +325,113 @@ string ExamItem::TransUserSelectForEng(const string name) {
   }
 }
 
+vector<ExamItem::EItem> ExamItem::GetItemListOfProbe(const string probeModel) {
+  int probeIndex = GetProbeIndex(probeModel);
+
+  return m_vecItemIndex[probeIndex];
+}
+
+vector<string> ExamItem::GetUserItemListOfProbe(const string probeModel) {
+  m_vecUserItemName.clear();
+  GetUserItemInfo(probeModel);
+
+  return m_vecUserItemName;
+}
+
+string ExamItem::GetUserItemInfo(const string probeModel) {
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
+  string username = ReadDefaultUserSelect(&ini);
+
+  vector<string> useritemgroup = GetDefaultUserGroup();
+  string str_user_item_name = ViewProbe::GetInstance()->GetItemNameUserDef();
+
+  for (int i= 0; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+    string genFirstItem;
+
+    GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, genFirstItem);
+
+    ExamPara exampara;
+
+    exampara.dept_name = department;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if(username == userselect) {
+      if (probeModel == probelist) {
+        m_vecUserItemName.push_back(exampara.name);
+
+        if(str_user_item_name == useritem) {
+          m_genFirstItem = genFirstItem;
+
+          return genFirstItem;
+        }
+      }
+    }
+  }
+
+  return "Adult Abdomen";
+}
+
+string ExamItem::GetInitUserItemInfo(const string probeModel, const string inituseritem) {
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
+  string username = ReadDefaultUserSelect(&ini);
+
+  vector<string> useritemgroup = GetDefaultUserGroup();
+
+  for (int i= 0 ; i < useritemgroup.size(); i++) {
+    string userselect;
+    string probelist;
+    string useritem;
+    string department;
+    string genFirstItem;
+
+    GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, genFirstItem);
+
+    ExamPara exampara;
+    exampara.dept_name=department;
+    exampara.name = useritem;
+    exampara.index = ExamItem::USERNAME;
+
+    if (username == userselect) {
+      if (probeModel == probelist) {
+        m_vecUserItemName.push_back(exampara.name);
+
+        if(inituseritem == useritem) {
+          m_genFirstItem = genFirstItem;
+
+          return genFirstItem;
+        }
+      }
+    }
+  }
+
+  return "Adult Abdomen";
+}
+
 // ---------------------------------------------------------
+
+int ExamItem::GetProbeIndex(const string probeModel) {
+  for (int i = 0; i < NUM_PROBE; i++) {
+    if (probeModel == PROBE_LIST[i]) {
+      return i;
+    }
+  }
+
+  return 0;
+}
+
+
 
 #include "imageProc/ModeStatus.h"
 #include <stdio.h>
 #include <string.h>
 
 
-#include "probe/ViewProbe.h"
+
 
 #include <locale.h>
 #include <libintl.h>
@@ -348,114 +448,8 @@ string ExamItem::TransUserSelectForEng(const string name) {
 ///> public func
 
 
-/*
- * @brief get item list of designated probe
- *
- * @para probeModel[in] designamted probe model, in
- * @para itemList[out] list of item index in ITEM_LIB returned, out
- */
-void ExamItem::GetItemListOfProbe(char* probeModel, vector<enum EItem> *ptrItemList) {
 
-    int probeIndex = GetProbeIndex(probeModel);
-    *ptrItemList = m_vecItemIndex[probeIndex];
-    // vector<ExamPara> vecExamItem;
-    PRINTF("SIZE of item list = %d\n", ptrItemList->size());
-}
-/*
- * @brief get user item list of designated probe
- *
- * @para probeModel[in] designamted probe model, in
- * @para itemList[out] list of user item index in ITEM_LIB returned, out
- */
-void ExamItem::GetUserItemListOfProbe(char* probeModel, vector<string> &ItemList) {
-    m_vecUserItemName.clear();
-    // GetUserItemInfo(probeModel);
-    string genfirstitem="Adult Abdomen";
-    GetUserItemInfo(probeModel, genfirstitem);
-    ItemList = m_vecUserItemName;
-}
 
-void ExamItem::GetUserItemInfo(char* probeModel, string &genfirstitem) {
-  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
-
-  ExamItem exam;
-  string username = exam.ReadDefaultUserSelect(&ini);
-
-  ExamItem examitem;
-  vector<string> useritemgroup = GetDefaultUserGroup();
-
-  int num = 0;
-  string str_user_item_name =  ViewProbe::GetInstance()->GetItemNameUserDef();
-
-  for (int i= 0 ; i < useritemgroup.size(); i++) {
-    string userselect;
-    string probelist;
-    string useritem;
-    string department;
-
-    examitem.GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, genfirstitem);
-
-    ExamPara exampara;
-
-    exampara.dept_name=department;
-    exampara.name = useritem;
-    exampara.index = ExamItem::USERNAME;
-
-    if(username == userselect) {
-      if (probeModel == probelist) {
-        m_vecUserItemName.push_back(exampara.name);
-
-        if(str_user_item_name == useritem) {
-          m_genFirstItem = genfirstitem;
-          genfirstitem = m_genFirstItem;
-
-          break;
-        }
-      }
-    }
-  }
-}
-
-void ExamItem::GetInitUserItemInfo(char* probeModel, string inituseritem, string &geninitfirstitem) {
-  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
-
-  ExamItem exam;
-  string username = exam.ReadDefaultUserSelect(&ini);
-
-  vector<string> vecExamItem;
-
-  ExamItem examitem;
-  vector<string> useritemgroup = examitem.GetDefaultUserGroup();
-
-  string str_user_item_name = inituseritem;
-
-  for (int i= 0 ; i < useritemgroup.size(); i++) {
-    string userselect;
-    string probelist;
-    string useritem;
-    string department;
-
-    examitem.GetDefaultUserItem(useritemgroup[i], userselect, probelist, useritem, department, geninitfirstitem);
-
-    ExamPara exampara;
-    exampara.dept_name=department;
-    exampara.name = useritem;
-    exampara.index = ExamItem::USERNAME;
-
-    if (username == userselect) {
-      if (probeModel == probelist) {
-        m_vecUserItemName.push_back(exampara.name);
-
-        if(str_user_item_name == useritem) {
-          m_genFirstItem = geninitfirstitem;
-          geninitfirstitem = m_genFirstItem;
-
-          break;
-        }
-      }
-    }
-  }
-}
 
 /*
  * @brief set probe "probeModel"'s default item
@@ -924,25 +918,7 @@ void ExamItem::GenerateDefaultImgOptimize() {
  *
  * @retval index of probe in PROBE_LIST[]
  */
-int ExamItem::GetProbeIndex(char* probeModel) {
 
-    int i;
-    for (i = 0; i < NUM_PROBE; i ++) {
-        PRINTF("list model = %s\n", PROBE_LIST[i].c_str());
-        if (strcmp(probeModel, PROBE_LIST[i].c_str()) == 0) {
-            PRINTF("item %d is match\n", i);
-            break;
-        }
-    }
-
-    PRINTF("get probe of index = %d\n", i);
-    int index = i;
-    if (index >= NUM_PROBE) { //not found
-        index = 0;
-    }
-
-    return index;
-}
 /*
  * @brief init value of m_paraItem
  *

@@ -171,19 +171,20 @@ public:
   vector<string> GetDefaultUserGroup();
   vector<string> GetUserGroup();
 
-  void GetUserItem(const string group, string& userselect, string& probelist_value, string& useritem_value, string& department_value, string& genFirstItem);
-  void GetDefaultUserItem(const string group, string& userselect, string& probelist_value, string& useritem_value, string& department_value, string& genFirstItem);
+  void GetUserItem(const string group, string& userselect,
+    string& probelist_value, string& useritem_value, string& department_value, string& genFirstItem);
+  void GetDefaultUserItem(const string group, string& userselect,
+    string& probelist_value, string& useritem_value, string& department_value, string& genFirstItem);
   void DeleteUserItem(const string group);
 
   string TransItemName(const string str);
   string TransItemNameEng(const string str);
   string TransUserSelectForEng(const string name);
 
-  void GetItemListOfProbe(char* probeModel, vector<enum EItem> *ptrItemList);
-  void GetUserItemListOfProbe(char* probeModel, vector<string> &ItemList);
-
-  void GetUserItemInfo(char* probeModel, string &genfirstitem);
-  void GetInitUserItemInfo(char* probeModel, string inituseritem, string &genfirstitem);
+  vector<EItem> GetItemListOfProbe(const string probeModel);
+  vector<string> GetUserItemListOfProbe(const string probeModel);
+  string GetUserItemInfo(const string probeModel);
+  string GetInitUserItemInfo(const string probeModel, const string inituseritem);
 
   ExamItem::EItem GetDefaultItem(char* probeModel);
   void GetCurrentItemPara(ParaItem &ptrPara);
@@ -194,6 +195,8 @@ public:
 
 public:
 
+private:
+  int GetProbeIndex(const string probeModel);
 
 public:
     // config para
@@ -287,7 +290,7 @@ private:
     //store general first item
     string m_genFirstItem;
 
-    int GetProbeIndex(char* probeModel);
+
 
     ///> wirte config file
     void InitItemPara(ParaItem* paraItem);
