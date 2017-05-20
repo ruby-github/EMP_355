@@ -22,7 +22,6 @@ MenuBiopsy::MenuBiopsy(void) {
 }
 
 void MenuBiopsy::Hide(void) {
-    //-----------------------------------------------//
     gtk_widget_hide_all(m_vboxBiopsy);
     m_ptrBiopsy->Clear();//2016.11.01
     SetDrawStatus(false);//2016.11.01
@@ -43,12 +42,11 @@ void MenuBiopsy::Show(void) {
         gtk_widget_show_all(m_vboxBiopsy);
 
         m_ptrBiopsy->Create();
-        //--------------------------------------------------------//
+
         SetSystemCursor(90,130);//	SetSystemCursor(90,100);
         doBtnEvent(1, 1);//fake btn press
         doBtnEvent(1, 0);//fake btn unpres
-        SetMenuBiopsyCursorYRange(128,213);//SetMenuBiopsyCursorYRange(128,188);//2016.08.26
-        //----------------------------------------------------------------//
+        SetMenuBiopsyCursorYRange(128,213);
     }
 }
 
@@ -70,14 +68,9 @@ GtkWidget* MenuBiopsy::Create(void) {
     gtk_widget_set_usize(m_menuItemAngle, WIDTH_BIOPSY_MENU, HEIGHT_BIOPSY_MENUITEM);
 
     gtk_menu_bar_append(GTK_MENU_BAR(menuBar0),m_menuItemAngle);
-//	g_signal_connect(G_OBJECT(m_menuItemAngle),"activate",G_CALLBACK(),this);
-//	g_signal_connect(G_OBJECT(m_menuItemAngle),"select",G_CALLBACK(HandleMenuItemAngleSelect),this);
     g_signal_connect(G_OBJECT(m_menuItemAngle),"activate",G_CALLBACK(HandleMenuItemAngleActivate),this);
-//	g_signal_connect(G_OBJECT(m_menuItemAngle),"deselect",G_CALLBACK(HandleMenuItemAngleDeSelect),this);
-//	g_signal_connect(G_OBJECT(m_menuItemAngle),"button-release-event",G_CALLBACK(HandleMenuItemAngleButtonRelease),this);
-//	g_signal_connect(G_OBJECT(m_menuItemAngle),"button-press-event",G_CALLBACK(HandleMenuItemAngleButtonPress),this);
     gtk_widget_show(m_menuItemAngle);
-//------------2016.11.02------------------------------------------------------------//
+
     m_menuItemLineType=gtk_menu_item_new_with_label("");
 
     gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(m_menuItemLineType)), GTK_STATE_NORMAL, g_white);
@@ -85,11 +78,10 @@ GtkWidget* MenuBiopsy::Create(void) {
     gtk_widget_set_usize(m_menuItemLineType, WIDTH_BIOPSY_MENU, HEIGHT_BIOPSY_MENUITEM);
 
     gtk_menu_bar_append(GTK_MENU_BAR(menuBar0),m_menuItemLineType);
-//	g_signal_connect(G_OBJECT(m_menuItemLineType),"activate",G_CALLBACK(HandleMenuItemLineTypeActivate),this);
     g_signal_connect(G_OBJECT(m_menuItemLineType),"button-release-event",G_CALLBACK(HandleMenuItemLineTypeButtonRelease),this);
 
     gtk_widget_show(m_menuItemLineType);
-//----------------------------------------------------------------------//
+
     m_menuItemSetup=gtk_menu_item_new_with_label("");
     gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(m_menuItemSetup)), GTK_STATE_NORMAL, g_white);
     gtk_widget_set_usize(m_menuItemSetup, WIDTH_BIOPSY_MENU, HEIGHT_BIOPSY_MENUITEM);
@@ -107,25 +99,21 @@ GtkWidget* MenuBiopsy::Create(void) {
     return m_vboxBiopsy;
 }
 void MenuBiopsy::UpdateLabel(void) {
-    /*	string bracketType=BiopsyMan::GetInstance()->GetDefaultBioBracketTypeOfCurProbe();
-        gtk_label_set_text(GTK_LABEL(m_labelBioBracketType), _(bracketType.c_str()));*/
-
-    //gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle), _("Angle None"));
     if(m_isDoubleLine) {
         gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemLineType), _("Line Type     Double"));
     } else {
         gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemLineType), _("Line Type     Single"));
     }
     gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemSetup), _("Setting"));
-//	gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemExit), _("Exit"));
 
 }
-//---------------------------------------------------------//
+
 void MenuBiopsy::ClearBiopsyLine(void) {
     if(m_isDraw) {
-        BiopsyLine::GetInstance()->Clear();//
+        BiopsyLine::GetInstance()->Clear();
     }
 }
+
 void MenuBiopsy::UpdateBiopsyLine(void) {
     if(m_isDraw) {
         BiopsyLine::GetInstance()->Clear();
@@ -133,28 +121,25 @@ void MenuBiopsy::UpdateBiopsyLine(void) {
         if(bisInitOk) {
             BiopsyLine::GetInstance()->Redraw();
         } else {
-            CloseBiopsyLine();//
+            CloseBiopsyLine();
         }
     }
 }
-void MenuBiopsy::CloseBiopsyLine(void) { //--2016.09.18----
+void MenuBiopsy::CloseBiopsyLine(void) {
     m_isDraw=false;
     SetDrawStatus(false);
 }
-//------------------------------------------------------------//
+
 void  MenuBiopsy::SubMenuItemAngleActivate(GtkMenuItem *menuitem) {
-    //---2016.09.06--------------------------------------------//
     int size0=m_vecMenuItem.size();
     for(int i=0; i<size0; i++) {
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(m_vecMenuItem[i]),false);
     }
 
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem),true);
-    //-----------------------------------------------------//
 
     string text=gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem));
 
-//	gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle),gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem)));
     gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle),text.c_str());
     string noAngle="Angle None";
     if(text.compare(noAngle)!=0) {
@@ -165,12 +150,11 @@ void  MenuBiopsy::SubMenuItemAngleActivate(GtkMenuItem *menuitem) {
         m_isDraw=false;
         m_ptrBiopsy->Clear();
     }
-//------2016.08.30---------------------------------------//
     SetSystemCursor(90,170);//SetSystemCursor(90,170);
     doBtnEvent(1, 1);//fake btn press
     doBtnEvent(1, 0);//fake btn unpress
-//----------------------------------------------------------//
 }
+
 void  MenuBiopsy::MenuItemLineTypeActivate(GtkMenuItem *menuitem) {
     if(m_isDoubleLine) {
         m_ptrBiopsy->ClearDoubleLine();
@@ -194,11 +178,7 @@ void  MenuBiopsy::MenuItemSetupActivate(GtkMenuItem *menuitem) {
         MenuArea::GetInstance()->ShowBioBracketMenu();
     }
 }
-/*void  MenuBiopsy::MenuItemExitActivate(GtkMenuItem *menuitem)
-{
-	   MenuShowUndo();
-	   MultiFuncUndo();//2016.09.13
-}*/
+
 void MenuBiopsy::SetBiopsyBracketTypeLabel(string bioBracketType) {
     gtk_label_set_text(GTK_LABEL(m_labelBioBracketType), _(bioBracketType.c_str()));
 }
@@ -211,58 +191,43 @@ void MenuBiopsy::UpdateSubMenuAngle(void) {
         gtk_widget_destroy(m_subMenuAngle);
     }
 
-    m_vecMenuItem.clear();//2016.09.06
+    m_vecMenuItem.clear();
 
     m_subMenuAngle=gtk_menu_new();
     gtk_widget_set_usize(m_subMenuAngle, WIDTH_BIOPSY_MENU, -1);
-    gtk_widget_modify_bg(m_subMenuAngle,GTK_STATE_NORMAL, g_deep);//2016.10.10
-    //----------------------------------------------------------------------------------//
+    gtk_widget_modify_bg(m_subMenuAngle,GTK_STATE_NORMAL, g_deep);
+
     if(m_vecWidgetIndex.size()>0) {
         int size0=m_vecWidgetIndex.size();
         for(int i=0; i<size0; i++) {
             delete m_vecWidgetIndex[i];
         }
     }
-    m_vecWidgetIndex.clear();//2016.10.13
+    m_vecWidgetIndex.clear();
     m_vecAngleType.clear();
 
     vector<string> vecAngleType=BiopsyMan::GetInstance()->GetBioAngleTypesOfcurBioBracket();
 
-    m_vecAngleType=vecAngleType;//2016.10.12
+    m_vecAngleType=vecAngleType;
 
     int size1=vecAngleType.size();
     if(size1==1) {
         string angleOnOff;
-        /*if(m_isDraw)
-        {
-        	angleOnOff=vecAngleType[0]+"     On";
-        }
-        else
-        {
-        	angleOnOff=vecAngleType[0]+"     Off";
-        }*/
         angleOnOff=vecAngleType[0];
-
         SetAngleMenuItem(angleOnOff);
     } else {
         if(size1>1) {
 
             for(int j=0; j<size1; j++) {
-                GtkWidget* menuItem=gtk_check_menu_item_new_with_label(_(vecAngleType[j].c_str()));//2016.09.05
+                GtkWidget* menuItem=gtk_check_menu_item_new_with_label(_(vecAngleType[j].c_str()));
                 gtk_widget_modify_base(menuItem,GTK_STATE_NORMAL, g_deepGray);
                 gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(menuItem)), GTK_STATE_NORMAL, g_white);
-                //	GtkWidget* menuItem=gtk_menu_item_new_with_label(vecAngleType[j].c_str());//2016.09.05
-                gtk_widget_set_usize(menuItem, WIDTH_BIOPSY_MENU, HEIGHT_BIOPSY_MENUITEM);//2016.08.25
-
-                //	g_signal_connect(G_OBJECT(menuItem),"activate",G_CALLBACK(HandleSubMenuItemAngleActivate),this);
-                //	g_signal_connect(G_OBJECT(menuItem),"button-release-event",G_CALLBACK(HandleSubMenuItemAngleButtonRelease),this);
-
+                gtk_widget_set_usize(menuItem, WIDTH_BIOPSY_MENU, HEIGHT_BIOPSY_MENUITEM);
                 StructWidgetIndex* pWidgetIndex0=new StructWidgetIndex;
                 pWidgetIndex0->pData=this;
-                pWidgetIndex0->index=j;//pWidgetIndex0->index=j+1;
+                pWidgetIndex0->index=j;
                 m_vecWidgetIndex.push_back(pWidgetIndex0);
 
-                /*	g_signal_connect(G_OBJECT(menuItem),"button-release-event",G_CALLBACK(HandleSubMenuItemAngleButtonRelease),m_vecWidgetIndex[j+1]);*/
                 g_signal_connect(G_OBJECT(menuItem),"button-release-event",G_CALLBACK(HandleSubMenuItemAngleButtonRelease),m_vecWidgetIndex[j]);
 
                 gtk_menu_shell_append(GTK_MENU_SHELL(m_subMenuAngle),menuItem);
@@ -271,9 +236,8 @@ void MenuBiopsy::UpdateSubMenuAngle(void) {
 
             gtk_menu_item_set_submenu(GTK_MENU_ITEM(m_menuItemAngle),m_subMenuAngle);
 
-            //-------------------------------------------------------------------------//
             if(m_isDraw) {
-                string curAngleType=BiopsyMan::GetInstance()->GetCurBioAngleType();//2016.09.14
+                string curAngleType=BiopsyMan::GetInstance()->GetCurBioAngleType();
                 for(int i=0; i<size1; i++) {
                     if(vecAngleType[i].compare(curAngleType)==0) {
                         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(m_vecMenuItem[i]),true);
@@ -281,15 +245,8 @@ void MenuBiopsy::UpdateSubMenuAngle(void) {
                     }
                 }
 
-                SetAngleMenuItem(curAngleType);//2016.09.22
+                SetAngleMenuItem(curAngleType);
             }
-            /*	else
-            	{
-            		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(m_vecMenuItem[0]),true);
-
-            		SetAngleMenuItem(gtk_menu_item_get_label(GTK_MENU_ITEM(m_vecMenuItem[0])));//2016.09.22
-            	}*/
-            //-----------------------------------------------------------------------------//
         }
     }
 }
@@ -309,22 +266,14 @@ void MenuBiopsy::SetDrawStatus(bool status) {
     m_isDraw=status;
 }
 void MenuBiopsy::MenuItemAngleSelect(GtkMenuItem *menuitem) {
-    //	SetMenuBiopsyCursorYRange(128,208);
-    //SetMenuBiopsyCursorYRange(128,208);
     SetMenuBiopsyCursorYRange(128,213);
 }
 void MenuBiopsy::MenuItemAngleDeSelect(GtkMenuItem *menuitem) {
-    /*SetSystemCursor(90,130);//SetSystemCursor(90,170);
-    doBtnEvent(1, 1);//fake btn press
-    doBtnEvent(1, 0);*///fake btn unpress
-
-//	SetMenuBiopsyCursorYRange(128,188);
     SetMenuBiopsyCursorYRange(128,213);
 
 }
 void MenuBiopsy::MenuItemAngleActivate(GtkMenuItem *menuitem) {
-//	SetMenuBiopsyCursorYRange(128,208);//2016.08.26
-    SetMenuBiopsyCursorYRange(128,228);//2016.08.26
+    SetMenuBiopsyCursorYRange(128,228);
 
 }
 void MenuBiopsy::MenuItemAngleButtonRelease(GtkMenuItem *menuitem) {
@@ -343,20 +292,19 @@ void MenuBiopsy::MenuItemAngleButtonRelease(GtkMenuItem *menuitem) {
 
             angleOnOff=vecAngleType[0]+"     On";
 
-            BiopsyMan::GetInstance()->SetCurBioAngleType(vecAngleType[0]);//2016.08.09
+            BiopsyMan::GetInstance()->SetCurBioAngleType(vecAngleType[0]);
 
             m_ptrBiopsy->AngleSwitch();
         }
 
         SetAngleMenuItem(angleOnOff);
     }
-//----------------------------------------------------//
 
 }
 
 void MenuBiopsy::SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem,int index) {
 
-    int size0=m_vecMenuItem.size();//2016.10.12
+    int size0=m_vecMenuItem.size();
 
     for(int i=0; i<size0; i++) {
         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(m_vecMenuItem[i]),false);
@@ -368,36 +316,6 @@ void MenuBiopsy::SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem,int index) 
 
     gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle),text.c_str());
 
-    /*if(index!=0)
-    {
-    	m_isDraw=true;
-    	BiopsyMan::GetInstance()->SetCurBioAngleType(m_vecAngleType[index-1]);
-    	m_ptrBiopsy->AngleSwitch();
-    }
-    else
-    {
-    	m_isDraw=false;
-    	m_ptrBiopsy->Clear();
-    }*/
     BiopsyMan::GetInstance()->SetCurBioAngleType(m_vecAngleType[index]);
     m_ptrBiopsy->AngleSwitch();
-
-    /*string noAngle="Angle None";
-    if(text.compare(noAngle)!=0)
-    {
-    	m_isDraw=true;
-    	BiopsyMan::GetInstance()->SetCurBioAngleType(text);//2016.08.09
-    	m_ptrBiopsy->AngleSwitch();
-    }
-    else
-    {
-    	m_isDraw=false;
-    	m_ptrBiopsy->Clear();
-    }*/
-//------2016.08.30---------------------------------------//
-    /*	SetSystemCursor(90,180);//SetSystemCursor(90,170);
-    	doBtnEvent(1, 1);//fake btn press
-    	doBtnEvent(1, 0);*///fake btn unpress
-//----------------------------------------------------------//
-
 }

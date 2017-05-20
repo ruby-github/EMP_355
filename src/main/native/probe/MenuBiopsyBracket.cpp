@@ -12,7 +12,6 @@ MenuBiopsyBracket g_menuBiopsyBracket;
 
 MenuBiopsyBracket::MenuBiopsyBracket() {
     m_vecMenuItem.clear();
-//	m_vecMenuItem.clear();
 }
 GtkWidget * MenuBiopsyBracket::Create(void) {
     GtkWidget* menuItemExit;
@@ -26,7 +25,6 @@ GtkWidget * MenuBiopsyBracket::Create(void) {
 
     gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(menuItemExit)), GTK_STATE_NORMAL, g_white);
 
-//	gtk_widget_set_usize(menuItemExit, WIDTH_BIOPSYBRACKET_MENU, -1);
     gtk_widget_set_usize(menuItemExit, WIDTH_BIOPSYBRACKET_MENU, HEIGHT_BIOPSYBRACKET_MENUITEM);
 
     gtk_menu_item_set_label(GTK_MENU_ITEM(menuItemExit), _("Exit"));
@@ -38,7 +36,7 @@ GtkWidget * MenuBiopsyBracket::Create(void) {
 
     gtk_box_pack_start(GTK_BOX(m_vboxBioBracketType),m_menuBar,false,false,0);
     gtk_menu_bar_set_pack_direction(GTK_MENU_BAR(m_menuBar),GTK_PACK_DIRECTION_TTB);
-    // UpdateLabel();
+
     return m_vboxBioBracketType;
 }
 void MenuBiopsyBracket::UpdateLabel(void) {
@@ -48,11 +46,11 @@ void MenuBiopsyBracket::Show(void) {
 
     UpdateMenuBiopsyBracket();//2016.08.07
     gtk_widget_show_all(m_vboxBioBracketType);
-    //--------------------------------------------------------//
+
     SetSystemCursor(90,110);//	SetSystemCursor(90,100);
     doBtnEvent(1, 1);//fake btn press
     doBtnEvent(1, 0);//fake btn unpress
-    SetMenuBiopsyCursorYRange(110,160);//SetMenuBiopsyCursorYRange(110,150);//2016.08.26
+    SetMenuBiopsyCursorYRange(110,160);
 
     ModeStatus ms;
     if (ms.IsD2Mode() && (ms.GetFormat2D() == Format2D::B) && ms.IsUnFreezeMode()) {
@@ -61,7 +59,6 @@ void MenuBiopsyBracket::Show(void) {
         HintArea::GetInstance()->UpdateHint(_("[Biopsy]: Only valid in B mode and UnFreeze status."), 1);
     }
 
-    //-------------------------------------------------------------//
     BiopsyLine::GetInstance()->Draw();//2016.11.01
 }
 void MenuBiopsyBracket::Hide(void) {
@@ -98,6 +95,5 @@ void MenuBiopsyBracket::UpdateMenuBiopsyBracket(void) {
         g_signal_connect(G_OBJECT(menuItemType),"activate",G_CALLBACK(HandleMenuItemTypeActivate),this);
 
         m_vecMenuItem.push_back(menuItemType);
-
     }
 }

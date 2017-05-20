@@ -39,7 +39,6 @@ ViewProbe::~ViewProbe() {
 }
 
 ViewProbe::ViewProbe() {
-    //HintArea::GetInstance()->UpdateHint(_("[Probe Select]: Reading Probe Para..."));
     m_userItemName = NULL;
     m_treeViewIndex = -1;
     m_examItemIndex = -1;
@@ -66,11 +65,7 @@ gboolean HandleReadProbe(gpointer data) {
 void ViewProbe::ReadProbe(void) {
     if (!m_pKps.ProbeRead()) { // no probe is found
         HintArea::GetInstance()->UpdateHint(_("[Probe Select]: No Probe was found."), 2);
-#ifdef EMP_430
-        if(ModeStatus::IsAllSpectrumImgMode()) {
-            ImgPw::GetInstance()->ChangeDopplerSoundStatus(true);
-        }
-#endif
+
         return ;
     }
     HintArea::GetInstance()->ClearHint();
@@ -113,18 +108,14 @@ bool ViewProbe::Create(void) {
     while(gtk_events_pending()) {
         gtk_main_iteration();
         ///> 解决pw冻结，屏幕上有pw trace计算时，不能读探头。
-#ifdef EMP_430
-        break;
-#endif
     }
     gdk_threads_leave();
 
-    //	g_timeout_add(100, HandleReadProbe, this);
     ReadProbe();
 
     return TRUE;
 }
-//test for A60
+
 bool ViewProbe::Create(int socket) {
     // get probe and item info
     HintArea::GetInstance()->UpdateHint(_("[Probe Select]: Reading Probe Para..."));
@@ -147,24 +138,20 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
 
     m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-#ifdef EMP_355
+
     gtk_widget_set_size_request (m_window, 550, 610);
-#else
-    gtk_widget_set_size_request (m_window, 730, 610);
-#endif
     gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
     gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
     gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
     gtk_window_set_transient_for (GTK_WINDOW (m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
     gtk_window_set_title (GTK_WINDOW (m_window), _("Probe Select"));
-    //    gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
     g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
 
     GtkWidget *fixed_window = gtk_fixed_new ();
     gtk_container_add (GTK_CONTAINER (m_window), fixed_window);
 
     int x = 20, y = 20;
-    //vector<string>exam_type;
+
     char exam_type[MAXNUMBER+20][50];
 
     for (int i = 0; i < maxSocket; i++, x+=180) {
@@ -178,7 +165,6 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
             } else
                 m_preSocketIndex = -1;
             CreateAllExamType(para[i].model, itemList[i], exam_type);
-            //CreateExamType(itemList[i], exam_type);
             vbox_probe = CreateProbe(para[i].model, para[i].type, exam_type, i);
         } else {
             m_examItemIndex = -1;
@@ -187,57 +173,32 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
         gtk_fixed_put (GTK_FIXED (fixed_window), vbox_probe, x, y);
     }
 
-    // image_button_ok = gtk_image_new_from_stock("gtk-ok", GTK_ICON_SIZE_BUTTON);
-    // label_button_ok = gtk_label_new_with_mnemonic(_("OK"));
-    // button_ok = create_button_icon (label_button_ok, image_button_ok);
-    // gtk_fixed_put (GTK_FIXED (fixed_window), button_ok, 460, 530);
-
-    // image_button_preset = gtk_image_new_from_stock("gtk-preferences", GTK_ICON_SIZE_BUTTON);
-    // label_button_preset = gtk_label_new_with_mnemonic(_("Exam Preset"));
-    // button_preset = create_button_icon (label_button_preset, image_button_preset);
-    // gtk_fixed_put (GTK_FIXED (fixed_window), button_preset, 460, 530);
-
     image_button_cancel = gtk_image_new_from_stock("gtk-quit", GTK_ICON_SIZE_BUTTON);
     label_button_cancel = gtk_label_new_with_mnemonic(_("Exit"));
     button_cancel = create_button_icon (label_button_cancel, image_button_cancel);
-#ifdef EMP_355
+
     gtk_fixed_put (GTK_FIXED (fixed_window), button_cancel, 380, 530);
-#else
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_cancel, 590, 530);
-#endif
 
     g_signal_connect ((gpointer) button_cancel, "clicked",
                       G_CALLBACK (on_button_cancel_clicked),
                       this);
-
-    // g_signal_connect ((gpointer) button_ok, "clicked",
-    //     	      G_CALLBACK (on_button_ok_clicked),
-    //     	      this);
 
     //user select
     GtkWidget *label_user_select;
     label_user_select = gtk_label_new (_("<b>Current User: </b>"));
     gtk_label_set_use_markup (GTK_LABEL (label_user_select), TRUE);
     gtk_widget_show (label_user_select);
-#ifdef EMP_355
+
     gtk_fixed_put (GTK_FIXED (fixed_window), label_user_select, 20, 530+15);
-#else
-    gtk_fixed_put (GTK_FIXED (fixed_window), label_user_select, 200, 530+15);
-#endif
     gtk_widget_set_size_request (label_user_select, 150, 30);
 
     m_combobox_user_select = gtk_combo_box_new_text();
     gtk_widget_show (m_combobox_user_select);
-#ifdef EMP_355
+
     gtk_fixed_put (GTK_FIXED (fixed_window), m_combobox_user_select, 180, 530+15);
-#else
-    gtk_fixed_put (GTK_FIXED (fixed_window), m_combobox_user_select, 360, 530+15);
-#endif
     gtk_widget_set_size_request (m_combobox_user_select, 100+60, 30);
-    // g_signal_connect(GTK_COMBO_BOX(m_combobox_user_select), "changed", G_CALLBACK(HandleProbeUserChanged), this);
 
     UserSelect::GetInstance()->read_default_username(m_combobox_user_select);
-    //UserSelect::GetInstance()->read_username(m_combobox_user_select);
     UserSelect::GetInstance()->read_username_db(USERNAME_DB, m_combobox_user_select);
     int num = UserSelect::GetInstance()->get_active_user();
     UserSelect::GetInstance()->set_active_user(m_combobox_user_select, num);
@@ -354,14 +315,10 @@ GtkWidget* ViewProbe::CreateProbe(const char *probe_name, const char probeType,
         break;
     case 'T':
     case 't': {
-#ifdef EMP_440
-        sprintf(image_path, "%s/%s", CFG_RES_PATH, "res/probe/65C10K.png");
-#else
         if((strcmp(probe_name, "65C10H") == 0)||(strcmp(probe_name, "65C10E") == 0))
             sprintf(image_path, "%s/%s", CFG_RES_PATH, "res/probe/65C10H.png");
         else
             sprintf(image_path, "%s/%s", CFG_RES_PATH, "res/probe/65C10K.png");
-#endif
     }
     break;
     case 'N':
@@ -478,7 +435,6 @@ GtkWidget* ViewProbe::CreateTreeView(char exam_type[][50], int probe_index) {
             }
         }
         g_signal_connect(treeview0, "focus-out-event", G_CALLBACK(HandleTreeViewFocusOut), this);
-        //g_signal_connect(select, "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
         g_signal_connect(treeview0, "button-press-event", G_CALLBACK(HandleTreeViewButtonClick), this);
 
         g_object_unref(model);
@@ -510,7 +466,6 @@ GtkWidget* ViewProbe::CreateTreeView(char exam_type[][50], int probe_index) {
         }
 
         g_signal_connect(treeview1, "focus-out-event", G_CALLBACK(HandleTreeViewFocusOut), this);
-        //g_signal_connect(select, "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
         g_signal_connect(treeview1, "button-press-event", G_CALLBACK(HandleTreeViewButtonClick), this);
 
         g_object_unref(model);
@@ -541,7 +496,6 @@ GtkWidget* ViewProbe::CreateTreeView(char exam_type[][50], int probe_index) {
         }
 
         g_signal_connect(treeview2, "focus-out-event", G_CALLBACK(HandleTreeViewFocusOut), this);
-        //g_signal_connect(select, "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
         g_signal_connect(treeview2, "button-press-event", G_CALLBACK(HandleTreeViewButtonClick), this);
 
         g_object_unref(model);
@@ -572,7 +526,6 @@ GtkWidget* ViewProbe::CreateTreeView(char exam_type[][50], int probe_index) {
         }
 
         g_signal_connect(treeview3, "focus-out-event", G_CALLBACK(HandleTreeViewFocusOut), this);
-        //g_signal_connect(select, "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
         g_signal_connect(treeview3, "button-press-event", G_CALLBACK(HandleTreeViewButtonClick), this);
 
         g_object_unref(model);
@@ -596,14 +549,9 @@ void ViewProbe::KeyEvent(unsigned char keyValue) {
 
 void ViewProbe::Destroy(void) {
     gtk_combo_box_popdown(GTK_COMBO_BOX(m_combobox_user_select));
-#ifndef EMP_430
+
     m_pKps.ActiveHV(TRUE);
-#endif
-#ifdef EMP_430
-    if(ModeStatus::IsAllSpectrumImgMode()) {
-        ImgPw::GetInstance()->ChangeDopplerSoundStatus(true);
-    }
-#endif
+
     if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
@@ -629,23 +577,11 @@ gboolean DestroyWindow(gpointer data) {
 }
 
 void ViewProbe::BtnCancelClicked(GtkButton *button) {
-#if (defined(EMP_322) || defined(EMP_313) || (EMP_430) ||(EMP_355))
     m_probe_index = ProbeMan::GetInstance()->GetCurProbeSocket();
     ProbeMan::GetInstance()->SetProbeSocket(m_probe_index);
-#endif
+
     Destroy();
 }
-
-// void ViewProbe::BtnOKClicked(GtkButton *button)
-// {
-// g_keyInterface.Pop();
-// gtk_widget_destroy(m_window);
-// PRINTF("PROBE index = %d\n", m_probeIndex);
-// PRINTF("item index = %d\n", m_itemIndex);
-// m_pKps.ProbeInit(m_probeIndex, (ExamItem::EItem)m_itemIndex);
-// if (g_keyInterface.Size() == 1)
-//     SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-// }
 
 void ViewProbe::TreeSelectionChanged(GtkTreeSelection *selection) {
     //triged this single
@@ -671,12 +607,7 @@ void ViewProbe::TreeSelectionChanged(GtkTreeSelection *selection) {
         if (num > 0) {
             sprintf(user_configure, "%s%s%s", "userconfig/", name, ".ini");
         } else {
-#ifdef VET
-            sprintf(user_configure, "%s", "VetItemPara.ini");
-
-#else
             sprintf(user_configure, "%s", "ItemPara.ini");
-#endif
         }
     }
 
@@ -739,7 +670,7 @@ void ViewProbe::ProbeUserChanged(GtkWidget *widget) {
     if (select >= 0) {
         name = gtk_combo_box_get_active_text (GTK_COMBO_BOX(widget));
     }
-    //int num = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_user_select));
+
     UserSelect::GetInstance()->save_cur_username(name);
 
     char str_path[256] = {'\0'};
@@ -754,7 +685,7 @@ void ViewProbe::ProbeUserChanged(GtkWidget *widget) {
     int maxSocket;
 
     m_pKps.GetPara(para, m_itemList, maxSocket);
-    //	ASSERT(para != NULL);
+
     if(para == NULL)
         return;
     else {
@@ -818,11 +749,7 @@ void ViewProbe::TreeViewBtnClicked(GtkWidget *widget, GdkEventButton *event) {
             if (num > 0) {
                 sprintf(user_configure, "%s%s%s", "userconfig/", name, ".ini");
             } else {
-#ifdef VET
-                sprintf(user_configure, "%s", "VetItemPara.ini");
-#else
                 sprintf(user_configure, "%s", "ItemPara.ini");
-#endif
             }
         }
 
@@ -878,7 +805,7 @@ void ViewProbe::TreeViewBtnClicked(GtkWidget *widget, GdkEventButton *event) {
                 exam.WriteDefaultProbeItem(&ini, m_itemIndex);
 
                 //update biopsy bracket type to solve the problem of unfresh biopsy bracket.
-                BiopsyMan::GetInstance()->SetCurBioBracketAndAngleTypeOfProbeChanged();//2016.11.06--hy
+                BiopsyMan::GetInstance()->SetCurBioBracketAndAngleTypeOfProbeChanged();
             }
         }
     }

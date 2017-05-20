@@ -1,14 +1,3 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: ProbeSelect.cpp
- * @brief: provide basic function of probe select and  probe init
- *
- * version: V1.0
- * date: 2009-8-22
- * @author: zhanglei
- */
-
 #include "probe/ProbeSelect.h"
 #include "imageProc/ModeStatus.h"
 #include "imageControl/Knob2D.h"
@@ -34,14 +23,9 @@
 #include "probe/ViewProbe.h"
 #include "calcPeople/MenuCalcNew.h"
 #include "measure/MenuMeasure.h"
-/*
- * @brief select probe and exam item
- */
-#ifdef VET
-ExamItem::EItem ProbeSelect::m_itemIndex = ExamItem::EItem(0);
-#else
+
 ExamItem::EItem ProbeSelect::m_itemIndex = ExamItem::ABDO_ADULT;
-#endif
+
 int ProbeSelect::m_socketIndex = 0;
 
 #include "utils/Const.h"
@@ -57,13 +41,10 @@ bool ProbeSelect::Execute() {
     if (!ProbeRead()) { // no probe is found
         return FALSE;
     }
-#ifdef VET
 
-    ProbeInit(1, ExamItem::EItem(0));
-#else
     // display probe dialog and wait user's operation
     ProbeInit(1, ExamItem::GYN);
-#endif
+
     return TRUE;
 }
 bool ProbeSelect::ProbeRead() {
@@ -166,7 +147,7 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     // init M
     ptrImg2D->InitProbeM(&curPara, &paraItem);
     ImgProcM::GetInstance()->Init(&(paraItem.d2));
-#if not defined(EMP_322) && not defined(EMP_313)
+
     // init pw
     ImgPw* ptrImgPw = ImgPw::GetInstance();
     ptrImgPw->SetCalcPw( GlobalClassMan::GetInstance()->GetCalcPw(curPara.model) );
@@ -178,15 +159,14 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     ptrImgCfm->SetCalcCfm( GlobalClassMan::GetInstance()->GetCalcCfm(curPara.model) );
     ptrImgCfm->InitProbe(&curPara, &paraItem);
     ImgProcCfm::GetInstance()->Init(&(paraItem.color));
-#endif
+
     // recreate biopsy line
     BiopsyLine::GetInstance()->Create();
 
     // enter 2D scan mode
-#if (defined(EMP_322) || defined (EMP_313))
     ScanMode::GetInstance()->DarkAllModeLight();
     g_keyInterface.CtrlLight(TRUE,LIGHT_D2);
-#endif
+
     ScanMode::GetInstance()->Enter2D();
 
     // power on HV
@@ -204,7 +184,6 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     ptrFreeze->UnFreeze();
 }
 
-//test for A60
 bool ProbeSelect::OneProbeRead(int socket) {
     int select = ProbeMan::MAX_SOCKET;
 
@@ -245,10 +224,7 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem) {
 
     // get real probe and item parameter
     m_ptrProbe->SetProbeSocket(indexSocket);
-#ifdef EMP_430
-    ActiveHV(TRUE);
-    usleep(50000);
-#endif
+
     ProbeSocket::ProbePara curPara;
     m_ptrProbe->GetCurProbe(curPara);
 
@@ -271,26 +247,11 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem) {
     ptrImg2D->SetCalc2D( GlobalClassMan::GetInstance()->GetCalc2D(curPara.model) );
     ptrImg2D->InitProbe2D(&curPara, &paraItem);
     ImgProc2D::GetInstance()->Init(&(paraItem.d2));
-#if 0
-    vector<ExamItem::ProjectDefaultParaItem> projectParaItem;
-    if(!projectParaItem.empty()) {
-        projectParaItem.clear();
-    }
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, PROJECT_DEFAULT_FILE);
-    FILE *fd;
-    if((fd = fopen(path, "r")) == NULL) {
-        perror("file is not exist!\n");
-    } else {
-        IniFile ini(path);
-        projectParaItem = m_e.ReadProjectPara(curPara.model, "Default", &ini);
-    }
-#endif
+
     // init M
     ptrImg2D->InitProbeM(&curPara, &paraItem);
     ImgProcM::GetInstance()->Init(&(paraItem.d2));
-#ifndef EMP_322
-#ifndef EMP_313
+
     // init pw
     ImgPw* ptrImgPw = ImgPw::GetInstance();
     ptrImgPw->SetCalcPw( GlobalClassMan::GetInstance()->GetCalcPw(curPara.model) );
@@ -302,16 +263,11 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem) {
     ptrImgCfm->SetCalcCfm( GlobalClassMan::GetInstance()->GetCalcCfm(curPara.model) );
     ptrImgCfm->InitProbe(&curPara, &paraItem);
     ImgProcCfm::GetInstance()->Init(&(paraItem.color));
-#endif
-#endif
+
     // recreate biopsy line
     BiopsyLine::GetInstance()->Create();
 
     // enter 2D scan mode
-#if (defined(EMP_322) || defined (EMP_313))
-    ScanMode::GetInstance()->DarkAllModeLight();
-    g_keyInterface.CtrlLight(TRUE,LIGHT_D2);
-#endif
     ScanMode::GetInstance()->Enter2D();
 
     //test
@@ -376,6 +332,5 @@ void ProbeSelect::GetPara(ProbeSocket::ProbePara* &para, vector<ExamItem::EItem>
 }
 
 void ProbeSelect::ActiveHV(bool on) {
-    // control HV
     m_ptrProbe->ActiveHV(on);
 }
