@@ -8,6 +8,10 @@
 #include "probe/MenuBiopsy.h"
 #include "display/HintArea.h"
 
+#define WIDTH_BIOPSYVERIFY_MENU 175
+#define HEIGHT_BIOPSYVERIFY_MENU  635
+#define HEIGHT_BIOPSYVERIFY_MENUITEM 25
+
 MenuBiopsyVerify g_menuBiopsyVerify;
 
 MenuBiopsyVerify::MenuBiopsyVerify() {

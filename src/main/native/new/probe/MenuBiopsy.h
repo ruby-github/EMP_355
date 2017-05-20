@@ -1,16 +1,9 @@
-// -*- c++ -*-
-#ifndef _MENU_BIOPSY_H_
-#define _MENU_BIOPSY_H_
+#ifndef __MENU_BIOPSY_H__
+#define __MENU_BIOPSY_H__
 
-#include "Def.h"
-#include "display/CusSpin.h"
-#include "probe/BiopsyLine.h"
+#include "utils/Utils.h"
 #include "display/ImageAreaDraw.h"
-
-#define WIDTH_BIOPSY_MENU  175 //220
-#define HEIGHT_BIOPSY_MENU 635
-
-#define HEIGHT_BIOPSY_MENUITEM 25 //
+#include "probe/BiopsyLine.h"
 
 class MenuBiopsy {
 public:
@@ -20,31 +13,31 @@ public:
     };
     MenuBiopsy();
     ~MenuBiopsy() {}
-    void Hide(void);
-    void Show(void);
-    GtkWidget * Create(void);
+    void Hide();
+    void Show();
+    GtkWidget * Create();
 
-    void UpdateLabel(void);
-    //---------------------------------------------------//
+    void UpdateLabel();
+
     void SetBiopsyBracketTypeLabel(string bioBracketType);
     void SetAngleMenuItem(string strText);
-    //------------------------------------------------------//
-    void UpdateSubMenuAngle(void);
-    void UpdateBioBracketTypeLabel(void);
-    void UpdateAngleMenuItem(void);
+
+    void UpdateSubMenuAngle();
+    void UpdateBioBracketTypeLabel();
+    void UpdateAngleMenuItem();
     void SetDrawStatus(bool status);
-    //------------Reserved-2016.07.25-------------------//
-    void ClearBiopsyLine(void);
-    void UpdateBiopsyLine(void);
-    static bool GetDrawStatus(void) {
+
+    void ClearBiopsyLine();
+    void UpdateBiopsyLine();
+    static bool GetDrawStatus() {
         return m_isDraw;
     }
-    static bool GetDoubleLineStatus(void) {
+    static bool GetDoubleLineStatus() {
         return m_isDoubleLine;
     }
-    //--------------------------------------------------//
-    void CloseBiopsyLine(void);//2016.09.18
-    //--------------------------------------------------//
+
+    void CloseBiopsyLine();
+
 public:
     static  bool m_isDraw;
     static bool m_isDoubleLine;
@@ -54,34 +47,30 @@ private:
 
     GtkWidget *m_vboxBiopsy;
     GtkWidget *m_labelBioBracketType;
-    // GtkWidget *m_menuBiopsy;
-//	GtkWidget *m_menuBarBiopsy;
 
     GtkWidget *m_menuItemAngle;
     GtkWidget *m_menuItemLineType;
     GtkWidget *m_menuItemSetup;
     GtkWidget *m_menuItemExit;
-    //------------------------------//
+
     GtkWidget*m_subMenuAngle;
     vector<GtkWidget*> m_vecMenuItem;
-    //--------------------------------------//
+
     vector<string> m_vecAngleType;
-    vector<StructWidgetIndex*> m_vecWidgetIndex;//2016.10.13
-    ////----------------------------------//
+    vector<StructWidgetIndex*> m_vecWidgetIndex;
+
     //signal handle
     void SubMenuItemAngleActivate(GtkMenuItem *menuitem);
     void MenuItemLineTypeActivate(GtkMenuItem *menuitem);
     void MenuItemSetupActivate(GtkMenuItem *menuitem);
-    // void MenuItemExitActivate(GtkMenuItem *menuitem);
     void MenuItemAngleSelect(GtkMenuItem *menuitem);
     void MenuItemAngleDeSelect(GtkMenuItem *menuitem);
 
     void MenuItemAngleActivate(GtkMenuItem *menuitem);
     void MenuItemAngleButtonRelease(GtkMenuItem *menuitem);
-    //void SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem);//2016.09.06
-    void SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem,int index);//2016.09.06
+    void SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem,int index);
 
-//signal connect
+    //signal connect
     static void HandleSubMenuItemAngleActivate(GtkMenuItem *menuitem, MenuBiopsy *data) {
         data->SubMenuItemAngleActivate(menuitem);
     }

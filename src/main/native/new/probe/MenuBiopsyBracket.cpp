@@ -8,6 +8,11 @@
 #include "display/HintArea.h"
 #include "utils/FakeXUtils.h"
 
+#define WIDTH_BIOPSYBRACKET_MENU  175
+#define HEIGHT_BIOPSYBRACKET_MENU  635
+
+#define HEIGHT_BIOPSYBRACKET_MENUITEM 25
+
 MenuBiopsyBracket g_menuBiopsyBracket;
 
 MenuBiopsyBracket::MenuBiopsyBracket() {

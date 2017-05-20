@@ -200,7 +200,7 @@ void ViewSuperuser::ComboBoxChangedProbe(GtkComboBox* combobox) {
   int i;
   char index[5];
   char name[20];
-  for (i = 0; i < ProbeMan::MAX_SOCKET; i ++) {
+  for (i = 0; i < MAX_SOCKET; i ++) {
     sprintf(index, "%d", i);
     sprintf(name, "%d: 无探头", i+1);
     UpdateProbeStatus(index, name);
@@ -260,13 +260,13 @@ void ViewSuperuser::WriteProbe() {
   ProbeMan::GetInstance()->WriteProbe(m_probeType);
 
   sleep(1);
-  ProbeSocket::ProbePara para[ProbeMan::MAX_SOCKET];
+  ProbeSocket::ProbePara para[MAX_SOCKET];
   ProbeMan::GetInstance()->GetAllProbe(para);
 
   char index[5];
   char name[20];
 
-  for (int i = 0; i < ProbeMan::MAX_SOCKET; i ++) {
+  for (int i = 0; i < MAX_SOCKET; i ++) {
     sprintf(index, "%d", i);
     if (para[i].exist) {
       sprintf(name, "%d: %s", i+1, para[i].model);
@@ -353,7 +353,7 @@ GtkTreeModel* ViewSuperuser::CreateProbeModel() {
   GtkTreeIter iter;
 
   GtkListStore* store = gtk_list_store_new(1, G_TYPE_STRING);
-  for (unsigned int i = 0; i < ProbeMan::MAX_SOCKET; i++) {
+  for (unsigned int i = 0; i < MAX_SOCKET; i++) {
     gtk_list_store_append (store, &iter);
     gtk_list_store_set(store, &iter, 0, "No Probe", -1);
   }

@@ -8,11 +8,16 @@
 #include "display/HintArea.h"
 #include "utils/FakeXUtils.h"
 
+#define WIDTH_BIOPSY_MENU  175
+#define HEIGHT_BIOPSY_MENU 635
+
+#define HEIGHT_BIOPSY_MENUITEM 25
+
 MenuBiopsy g_menuBiopsy;
 bool MenuBiopsy::m_isDraw=false;
 bool MenuBiopsy::m_isDoubleLine=false;
 
-MenuBiopsy::MenuBiopsy(void) {
+MenuBiopsy::MenuBiopsy() {
     m_ptrImgDraw = ImageAreaDraw::GetInstance();
     m_ptrBiopsy = BiopsyLine::GetInstance();
     m_vecMenuItem.clear();
@@ -21,13 +26,13 @@ MenuBiopsy::MenuBiopsy(void) {
     m_vecWidgetIndex.clear();//2016.10.13
 }
 
-void MenuBiopsy::Hide(void) {
+void MenuBiopsy::Hide() {
     gtk_widget_hide_all(m_vboxBiopsy);
     m_ptrBiopsy->Clear();//2016.11.01
     SetDrawStatus(false);//2016.11.01
 }
 
-void MenuBiopsy::Show(void) {
+void MenuBiopsy::Show() {
     int bioBracketTypeNum=BiopsyMan::GetInstance()->GetBioBracketTypeNumOfCurProbe();
     if(bioBracketTypeNum<=0) {
         HintArea::GetInstance()->UpdateHint(_("No biopsy bracket found!"), 2);
@@ -50,7 +55,7 @@ void MenuBiopsy::Show(void) {
     }
 }
 
-GtkWidget* MenuBiopsy::Create(void) {
+GtkWidget* MenuBiopsy::Create() {
     GtkWidget* menuBar0;
 
     m_vboxBiopsy=gtk_vbox_new(false,0);
@@ -98,7 +103,7 @@ GtkWidget* MenuBiopsy::Create(void) {
 
     return m_vboxBiopsy;
 }
-void MenuBiopsy::UpdateLabel(void) {
+void MenuBiopsy::UpdateLabel() {
     if(m_isDoubleLine) {
         gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemLineType), _("Line Type     Double"));
     } else {
@@ -108,13 +113,13 @@ void MenuBiopsy::UpdateLabel(void) {
 
 }
 
-void MenuBiopsy::ClearBiopsyLine(void) {
+void MenuBiopsy::ClearBiopsyLine() {
     if(m_isDraw) {
         BiopsyLine::GetInstance()->Clear();
     }
 }
 
-void MenuBiopsy::UpdateBiopsyLine(void) {
+void MenuBiopsy::UpdateBiopsyLine() {
     if(m_isDraw) {
         BiopsyLine::GetInstance()->Clear();
         bool bisInitOk=BiopsyLine::GetInstance()->InitPara();
@@ -125,7 +130,7 @@ void MenuBiopsy::UpdateBiopsyLine(void) {
         }
     }
 }
-void MenuBiopsy::CloseBiopsyLine(void) {
+void MenuBiopsy::CloseBiopsyLine() {
     m_isDraw=false;
     SetDrawStatus(false);
 }
@@ -186,7 +191,7 @@ void MenuBiopsy::SetAngleMenuItem(string strText) {
     gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle), _(strText.c_str()));
 }
 
-void MenuBiopsy::UpdateSubMenuAngle(void) {
+void MenuBiopsy::UpdateSubMenuAngle() {
     if(m_subMenuAngle!=NULL) {
         gtk_widget_destroy(m_subMenuAngle);
     }
@@ -251,11 +256,11 @@ void MenuBiopsy::UpdateSubMenuAngle(void) {
     }
 }
 
-void MenuBiopsy::UpdateBioBracketTypeLabel(void) {
+void MenuBiopsy::UpdateBioBracketTypeLabel() {
     string bracketType=BiopsyMan::GetInstance()->GetCurBioBracketType();
     SetBiopsyBracketTypeLabel(bracketType);
 }
-void MenuBiopsy::UpdateAngleMenuItem(void) {
+void MenuBiopsy::UpdateAngleMenuItem() {
 
     string angleType=BiopsyMan::GetInstance()->GetCurBioAngleType();
     SetAngleMenuItem(angleType);

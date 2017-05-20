@@ -1,13 +1,7 @@
-#ifndef _MENU_BIOPSYVERIFY_H_
-#define _MENU_BIOPSYVERIFY_H_
+#ifndef __MENU_BIOPSY_VERIFY_H__
+#define __MENU_BIOPSY_VERIFY_H__
 
-#define WIDTH_BIOPSYVERIFY_MENU 175// 220
-#define HEIGHT_BIOPSYVERIFY_MENU  635
-#define HEIGHT_BIOPSYVERIFY_MENUITEM 25 //
-
-#include <vector>
-#include <string>
-using namespace std;
+#include "utils/Utils.h"
 
 class MenuBiopsyVerify {
 public:
@@ -35,22 +29,21 @@ private:
     GtkWidget *m_menuItemSave;
     GtkWidget *m_menuItemLoadFactory;
     GtkWidget *m_menuItemExit;
-    //----------------------------------//
+
     GtkWidget*m_subMenuAngle;
     vector<GtkWidget*> m_vecMenuItem;
-    //-----------------------------------------------//
+
     vector<string> m_vecAngleType;
     vector<StructWidgetIndex*> m_vecWidgetIndex;
-    //----------------------------------------------//
-//signal handle
+
+    //signal handle
     void MenuItemAngleActivate(GtkMenuItem *menuitem);
     void MenuItemExitActivate(GtkMenuItem *menuitem);
     void MenuItemSaveActivate(GtkMenuItem *menuitem);
     void MenuItemLoadFactoryActivate(GtkMenuItem *menuitem);
-    //void SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem);
     void SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem,int index);
 
-//signal connect
+    //signal connect
     static void HandleMenuItemAngleActivate(GtkMenuItem *menuitem, MenuBiopsyVerify *data) {
         data->MenuItemAngleActivate(menuitem);
     }
@@ -75,14 +68,8 @@ private:
     static gboolean HandleMenuItemAngleButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
         return TRUE;
     }
-    /*	static gboolean HandleSubMenuItemAngleButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data)
-    	{
-    		((MenuBiopsyVerify*)user_data)->SubMenuItemAngleButtonRelease(GTK_MENU_ITEM(widget));
-    		return TRUE;
 
-    	}*/
     static gboolean HandleSubMenuItemAngleButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-        /*	((MenuBiopsyVerify*)user_data)->SubMenuItemAngleButtonRelease(GTK_MENU_ITEM(widget));*/
         (((StructWidgetIndex*)user_data)->pData)->SubMenuItemAngleButtonRelease(GTK_MENU_ITEM(widget), ((StructWidgetIndex*)user_data)->index);
         return TRUE;
 
