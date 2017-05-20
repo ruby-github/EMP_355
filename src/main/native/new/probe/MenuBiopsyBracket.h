@@ -5,32 +5,41 @@
 
 class MenuBiopsyBracket {
 public:
-    MenuBiopsyBracket();
-    ~MenuBiopsyBracket() {}
-    GtkWidget * Create(void);
-    void UpdateLabel(void);
-    void Show(void);
-    void Hide(void);
-    void UpdateMenuBiopsyBracket(void);
+  MenuBiopsyBracket();
+  ~MenuBiopsyBracket();
+
+public:
+  GtkWidget* Create();
+
+  void Show();
+  void Hide();
+  void UpdateMenuBiopsyBracket();
+
 private:
+  // signal
 
-    GtkWidget *m_vboxBioBracketType;
-    GtkWidget *m_menuBar;
-
-    vector<GtkWidget*> m_vecMenuItem;
-
-    //signal handle
-    void MenuItemTypeActivate(GtkMenuItem *menuitem);
-    void MenuItemExitActivate(GtkMenuItem *menuitem);
-    //signal connect
-    static void HandleMenuItemTypeActivate(GtkMenuItem *menuitem, MenuBiopsyBracket *data) {
-        data->MenuItemTypeActivate(menuitem);
+  static void signal_menuitem_activate_type(GtkMenuItem* menuitem, MenuBiopsyBracket* data) {
+    if (data != NULL) {
+      data->MenuItemActivateType(menuitem);
     }
-    static void HandleMenuItemExitActivate(GtkMenuItem *menuitem, MenuBiopsyBracket *data) {
-        data-> MenuItemExitActivate(menuitem);
+  }
+  static void signal_menuitem_activate_exit(GtkMenuItem* menuitem, MenuBiopsyBracket* data) {
+    if (data != NULL) {
+      data->MenuItemActivateExit(menuitem);
     }
+  }
 
+  // signal
+  void MenuItemActivateType(GtkMenuItem* menuitem);
+  void MenuItemActivateExit(GtkMenuItem* menuitem);
+
+private:
+  GtkWidget* m_vboxBioBracketType;
+  GtkWidget* m_menuBar;
+
+  vector<GtkWidget*> m_vecMenuItem;
 };
 
 extern MenuBiopsyBracket g_menuBiopsyBracket;
+
 #endif

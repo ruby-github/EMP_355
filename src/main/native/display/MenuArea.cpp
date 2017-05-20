@@ -312,7 +312,6 @@ void MenuArea::UpdateLabel(void) {
     g_menuBiopsy.UpdateLabel();
     g_menuEFOV.UpdateLabel();
     g_menuBiopsy.UpdateLabel();//2016.11.02
-    g_menuBiopsyVerify.UpdateLabel();//2016.11.02
     UpdateSubMenu();
 }
 
