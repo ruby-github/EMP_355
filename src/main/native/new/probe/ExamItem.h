@@ -185,124 +185,99 @@ public:
   vector<string> GetUserItemListOfProbe(const string probeModel);
   string GetUserItemInfo(const string probeModel);
   string GetInitUserItemInfo(const string probeModel, const string inituseritem);
+  string GetFirstGenItem();
 
-  ExamItem::EItem GetDefaultItem(char* probeModel);
-  void GetCurrentItemPara(ParaItem &ptrPara);
-  void GetImgOptimize(char* probeModel, ParaItem &para);
+  ExamItem::EItem GetDefaultItem(const string probeModel);
+  ExamItem::ParaItem GetCurrentItemPara();
+  ExamItem::ParaItem GetImgOptimize(const string probeModel);
 
-  void SetUserItemOfProbe(char* probeModel, enum EItem itemIndex, const char* item);
-  void SetItemOfProbe(char* probeModel, enum EItem itemIndex);
+  void GenerateDefaultExamItem();
+  void GenerateDefaultImgOptimize();
 
-public:
+  void SetUserItemOfProbe(const string probeModel, enum EItem itemIndex, const string item);
+  void SetItemOfProbe(const string probeModel, enum EItem itemIndex);
+
+  void RemoveUserFromFile(const string model, const string user, IniFile* ptrIni);
+  void ReadDefaultExamItem(int probeIndex, int itemIndex, ParaItem* paraItem, const string itemName);
+  void DeleteItemParaFile(int probeIndex, const string old_string, const string str);
+
+  int ReadDefaultProbeDefaultItem(IniFile* ptrIni);
+  void WriteDefaultProbeItem(IniFile* ptrIni, int item);
+  void WriteSelectedProbeItem(const string probeModel, IniFile* ptrIni, int item);
+
+  void ReadExamItemPara(int probeIndex, int itemIndex, ParaItem* paraItem, const string itemName);
+  void WriteExamItemPara(int probeIndex, int itemIndex, ParaItem* paraItem, const string itemName);
+
+  void WriteDefinedItemPara(int probeIndex, const string new_string, const string str, const string str_index);
+  void WriteDefaultDefinedItemPara(int probeIndex, const string new_string, const string str, const string str_index);
+  void WriteDefinedExamItemPara(const string department, string section, IniFile* ptrIni, string probelist, const string new_string, const string str_index);
+  void WriteDefaultDefinedExamItemPara(const string department, string section, IniFile* ptrIni, string probelist, const string new_string, const string str_index);
+
+  void WriteNewItemFile(int probeIndex, const string new_string, const string str, const string str_index);
+  void DeleteNewItemFile(int probeIndex, const string old_string, const string str);
+
+  void WriteNewItemToCommentFile(int probeIndex, const string new_string, const string str);
+  void WriteNewItemToCalcFile(int probeIndex, const string new_string, const string str);
+  void WriteNewItemToMeasureFile(int probeIndex, const string new_string, const string str);
+  void DeleteNewItemForCommentFile(int probeIndex, const string old_string, const string str);
+  void DeleteNewItemForCalcFile(int probeIndex, const string old_string, const string str);
+  void DeleteNewItemForMeasureFile(int probeIndex, const string old_string, const string str);
+
+  void WriteUserItemFlag(IniFile* ptrIni, bool flag);
+  bool ReadUserItemFlag(IniFile* ptrIni);
+
+  void WriteDefaultUserSelect(IniFile* ptrIni, const string username);
+  string ReadDefaultUserSelect(IniFile* ptrIni);
+
+  void WriteDefaultProbe(const string probeModel, IniFile* ptrIni);
+  string ReadDefaultProbe(IniFile* ptrIni);
+
+  void WriteDefaultUserIndex(IniFile* ptrIni, int index);
+  int ReadDefaultUserIndex(IniFile* ptrIni);
+
+  void WriteDefaultProbeItemName(IniFile* ptrIni, const string itemName);
+  string ReadDefaultProbeDefaultItemName(IniFile* ptrIni);
+
+  void WriteProjectPara(ProjectDefaultParaItem* paraItem, const string model, const string user, IniFile* ptrIni);
+  vector<ExamItem::ProjectDefaultParaItem> ReadProjectPara(const string model, const string user, IniFile* ptrIni);
+
+  void WriteProDebugParaItem(ProjectDebugParaItem* debugPara, const string model, const string user, IniFile* ptrIni);
+  void ReadProDebugParaItem(ProjectDebugParaItem* debugPara, const string model, const string user, IniFile* ptrIni);
 
 private:
+  void InitItemPara(ParaItem* paraItem);
+  void InitItemOfProbe();
+
+  void WriteConfigCommon(ParaItem* paraItem, const string section, IniFile* ptrIni);
+  void WriteConfigOther(ParaItem* paraItem, const string section, IniFile* ptrIni);
+  void ReadConfigCommon(ParaItem* paraItem, const string section, IniFile* ptrIni);
+  void ReadConfigOther(ParaItem* paraItem, const string section, IniFile* ptrIni);
+  void ReadCurrentConfig(ParaItem* paraItem, const string section, IniFile* ptrIni);
+
   int GetProbeIndex(const string probeModel);
+  int ReadSelectedProbeItem(const string probeModel, IniFile* ptrIni);
 
-public:
-    // config para
-    void ReadExamItemPara(int probeIndex, int itemIndex, ParaItem* paraItem,char *itemName);
-    void WriteExamItemPara(int probeIndex, int itemIndex, ParaItem* paraItem,char *itemName);
-    void ReadDefaultExamItem(int probeIndex, int itemIndex, ParaItem* paraItem,char *itemName);
-    void WriteNewItemFile(int probeIndex, char *new_string, const char *str,const char *str_index);
-    void DeleteNewItemFile(int probeIndex, const char *old_string,const char *str);
-    void DeleteItemParaFile(int probeIndex, const char *old_string,const char *str);
-    void WriteDefaultDefinedExamItemPara(const char *department, string section, IniFile* ptrIni, string probelist, char *new_string,const char *str_index);
-    void WriteDefinedExamItemPara(const char *department, string section, IniFile* ptrIni, string probelist, char *new_string,const char *str_index);
-    void WriteDefinedItemPara(int probeIndex, char *new_string, const char *str, const char *str_index);
-    void WriteDefaultDefinedItemPara(int probeIndex, char *new_string,const char *str, const char *str_index);
-    void WriteNewItemToCommentFile(int probeIndex, char *new_string, const char *str);
-    void WriteNewItemToCalcFile(int probeIndex, char *new_string, const char *str);
-    void WriteNewItemToMeasureFile(int probeIndex, char *new_string, const char *str);
-
-    void DeleteNewItemForCommentFile(int probeIndex, const char *old_string, const char *str);
-    void DeleteNewItemForCalcFile(int probeIndex, const char *old_string, const char *str);
-    void DeleteNewItemForMeasureFile(int probeIndex, const char *old_string, const char *str);
-
-    void WriteDefaultUserSelect(IniFile* ptrIni, const char *username);
-    std::string ReadDefaultUserSelect(IniFile* ptrIni);
-    void WriteDefaultProbe(const char *probeModel, IniFile* ptrIni);
-    string ReadDefaultProbe(IniFile* ptrIni);
-    void WriteDefaultUserIndex(IniFile* ptrIni, int index);
-
-    int ReadDefaultUserIndex(IniFile* ptrIni);
-    ///> only used for generate config file first
-    void GenerateDefaultExamItem();
-    void GenerateDefaultImgOptimize();
-
-    //write selected item to file
-    void WriteSelectedProbeItem(char *probeModel, IniFile* ptrIni, int item);
-
-    ///>write the last probe selected item to file
-    void WriteDefaultProbeItem(IniFile* ptrIni, int item);
-
-    ///>read the last probe selectd item from file
-    int ReadDefaultProbeDefaultItem(IniFile* ptrIni);
-
-    ///>write the last probe selected item name to file
-    void WriteDefaultProbeItemName(IniFile* ptrIni, const char* itemName);
-
-    ///>read the last probe selectd item name from file
-    std::string ReadDefaultProbeDefaultItemName(IniFile* ptrIni);
-
-    ///>write user item flag
-    void WriteUserItemFlag(IniFile* ptrIni, bool flag);
-
-    ///>read user item flag
-    bool ReadUserItemFlag(IniFile* ptrIni);
-
-    vector<ExamItem::ProjectDefaultParaItem> ReadProjectPara(const char* model, const char* user, IniFile* ptrIni);
-    void WriteProjectPara(ProjectDefaultParaItem *paraItem, const char* model, const char* user, IniFile* ptrIni);
-    void RemoveUserFromFile(const char* model, const char* user, IniFile* ptrIni);
-    void ReadProDebugParaItem(ProjectDebugParaItem* debugPara, const char* model, const char* user, IniFile* ptrIni);
-    void WriteProDebugParaItem(ProjectDebugParaItem* debugPara, const char* model, const char* user, IniFile* ptrIni);
-
-    ///>get first general item in this department
-    std::string GetFirstGenItem() {
-        return m_genFirstItem;
-    }
-
-
-
+  void WriteNewExamItem(const string str, const string section, IniFile* ptrIni,string probelist, const string new_string, const string str_index);
+  void DeleteNewExamItem(const string str, const string section, IniFile* ptrIni);
 
 private:
+  struct ParaDefinedItem {
+    ParaCommon common;
+    Para2D d2;
+    ParaSpectrum spectrum;
+    ParaColor color;
+  };
 
-    // static const int MAX_ITEM = 16; ///< max number of item
-    //static const string ITEM_LIB[NUM_ITEM];
-    static const string KEY_COMMON;
-    struct ParaDefinedItem {
-        ParaCommon common;
-        Para2D d2;
-        ParaSpectrum spectrum;
-        ParaColor color;
-    };
+  // store general first item
+  string m_genFirstItem;
 
-    int m_probeIndex; ///< current probe
-    EItem m_itemIndex; ///< current item
-    ParaItem m_paraItem; ///< current para of item-probe
-    ParaItem m_paraOptimize; ///< current image optimize para
+  int m_probeIndex;         // current probe
+  EItem m_itemIndex;        // current item
+  ParaItem m_paraItem;      // current para of item-probe
+  ParaItem m_paraOptimize;  // current image optimize para
 
-    vector<enum EItem> m_vecItemIndex[NUM_PROBE]; ///< save item list index of all support probe, example: m_itemIndex[0] save the item list of PROBE_LIST[0] = 35C50K
-
-    //store user defined item
-    vector<string> m_vecUserItemName;
-    vector<string> m_vecGenFirstItem;
-
-    //store general first item
-    string m_genFirstItem;
-
-
-
-    ///> wirte config file
-    void InitItemPara(ParaItem* paraItem);
-    void InitItemOfProbe();
-    void WriteConfigCommon(ParaItem* paraItem, string section, IniFile* ptrIni);
-    void WriteConfigOther(ParaItem* paraItem, string section, IniFile* ptrIni);
-    int ReadSelectedProbeItem(char *probeModel, IniFile* ptrIni);
-    void ReadConfigCommon(ParaItem* paraItem, string section, IniFile* ptrIni);
-    void ReadConfigOther(ParaItem* paraItem, string section, IniFile* ptrIni);
-    void ReadCurrentConfig(ParaItem* paraItem, string section, IniFile* ptrIni);
-    void WriteNewExamItem(const char *str, string section, IniFile* ptrIni,string probelist,const char *new_string, const char *str_index);
-    void DeleteNewExamItem(const char *str, string section, IniFile* ptrIni);
+  vector<EItem> m_vecItemIndex[NUM_PROBE];  // save item list index of all support probe, example: m_itemIndex[0] save the item list of PROBE_LIST[0] = 35C50K
+  vector<string> m_vecUserItemName; // store user defined item
 };
 
 #endif
