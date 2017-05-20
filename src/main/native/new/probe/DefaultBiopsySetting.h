@@ -1,21 +1,19 @@
-#ifndef _DEFAULTBIOPSYSETTING_H_
-#define _DEFAULTBIOPSYSETTING_H_
+#ifndef __DEFAULT_BIOPSY_SETTING_H__
+#define __DEFAULT_BIOPSY_SETTING_H__
 
 #include "utils/IniFile.h"
 
 class DefaultBiopsySetting {
 public:
-    DefaultBiopsySetting();
-    ~DefaultBiopsySetting();
+  DefaultBiopsySetting();
+  ~DefaultBiopsySetting();
 
-    //int GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
-    double GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
-
-    //int GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
-    double  GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
+public:
+  double GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
+  double GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
 
 private:
-    IniFile *m_ptrIni;
+  IniFile* m_ptrIni;
 };
 
 #endif

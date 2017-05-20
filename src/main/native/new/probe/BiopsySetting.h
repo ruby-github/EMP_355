@@ -1,37 +1,31 @@
-#ifndef _BIOPSYSETTING_H_
-#define _BIOPSYSETTING_H_
+#ifndef __BIOPSY_SETTING_H__
+#define __BIOPSY_SETTING_H__
 
 #include "utils/IniFile.h"
 
-using namespace std;
-
 class BiopsySetting {
 public:
-    BiopsySetting();
-    ~BiopsySetting();
+  BiopsySetting();
+  ~BiopsySetting();
 
-    string GetDefaultBioBracketType(const string probeModel);
+public:
+  string GetDefaultAngleType(const string bioBracketType);
+  string GetDefaultBioBracketType(const string probeModel);
+  int GetBioBracketNum(const string probeModel);
+  int GetBioBracketAngleNum(const string bioBracketType);
+  double GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
+  double GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
 
-    int GetBioBracketNum(const string probeModel);
-    vector<string> GetBioBracketTypeOfProbe(const string probeModel);
+  vector<string> GetBioBracketAngleType(const string bioBracketType);
+  vector<string> GetBioBracketTypeOfProbe(const string probeModel);
 
-    string GetDefaultAngleType(const string bioBracketType);
+  void SetBiopsyXOfAngleType(const string bioBracketTypeAngle, double value);
+  void SetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle, double value);
 
-    int GetBioBracketAngleNum(const string bioBracketType);
-    vector<string> GetBioBracketAngleType(const string bioBracketType);
-    //int GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
-    double GetBiopsyXOfAngleType(const string bioBracketTypeAngle);
+  void SyncFile();
 
-    /*void SetBiopsyXOfAngleType(const string bioBracketTypeAngle,int value);*/
-    void SetBiopsyXOfAngleType(const string bioBracketTypeAngle,double value);
-    //int GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
-    double GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle);
-    /*void SetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle,int value);*/
-    void SetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle,double value);
-
-    void SyncFile(void);
 private:
-    IniFile *m_ptrIni;
+  IniFile* m_ptrIni;
 };
 
 #endif

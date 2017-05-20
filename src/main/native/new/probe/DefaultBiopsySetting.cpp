@@ -1,32 +1,22 @@
 #include "probe/DefaultBiopsySetting.h"
+
 #include "Def.h"
 
 DefaultBiopsySetting::DefaultBiopsySetting() {
-    char path[256];
-    sprintf(path, "%s/%s", CFG_RES_PATH, DEFAULT_SETTING_FILE);
-    m_ptrIni = new IniFile(path);
-
-}
-DefaultBiopsySetting:: ~DefaultBiopsySetting() {
-    if (m_ptrIni != NULL) {
-        delete m_ptrIni;
-        m_ptrIni = NULL;
-    }
+  m_ptrIni = new IniFile(string(CFG_RES_PATH) + string(DEFAULT_SETTING_FILE));
 }
 
-/*int DefaultBiopsySetting::GetBiopsyXOfAngleType(const string bioBracketTypeAngle)
-{
-	return m_ptrIni->ReadInt(bioBracketTypeAngle.c_str(),"BiopsyX");
-}*/
+DefaultBiopsySetting::~DefaultBiopsySetting() {
+  if (m_ptrIni != NULL) {
+    delete m_ptrIni;
+    m_ptrIni = NULL;
+  }
+}
+
 double DefaultBiopsySetting::GetBiopsyXOfAngleType(const string bioBracketTypeAngle) {
-    return m_ptrIni->ReadDouble(bioBracketTypeAngle.c_str(),"BiopsyX");
+  return m_ptrIni->ReadDouble(bioBracketTypeAngle, "BiopsyX");
 }
-
-/*int DefaultBiopsySetting::GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle)
-{
-	return (m_ptrIni->ReadInt(bioBracketTypeAngle.c_str(),"BiopsyAngle"));
-}*/
 
 double  DefaultBiopsySetting::GetBiopsyAngleValueOfAngleType(const string bioBracketTypeAngle) {
-    return (m_ptrIni->ReadDouble(bioBracketTypeAngle.c_str(),"BiopsyAngle"));
+  return m_ptrIni->ReadDouble(bioBracketTypeAngle, "BiopsyAngle");
 }
