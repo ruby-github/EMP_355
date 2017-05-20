@@ -163,8 +163,7 @@ bool KeyAutoOptimize::Do() {
     ptrMan->GetCurProbe(pPara);
 
     ExamItem e;
-    ExamItem::ParaItem ePara;
-    e.GetImgOptimize(pPara.model, ePara);
+    ExamItem::ParaItem ePara = e.GetImgOptimize(pPara.model);
     ImgOptimize(pPara, ePara);
 
     return TRUE;

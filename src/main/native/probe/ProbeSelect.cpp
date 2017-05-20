@@ -151,10 +151,9 @@ void ProbeSelect::UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem
     else
         m_ptrUpdate->ProbeType(curPara.model);
 
-    ExamItem::ParaItem paraItem;
     m_ptrUpdate->UserDefineExamItem(item);
     m_e.SetUserItemOfProbe(curPara.model, (ExamItem::EItem)m_itemIndex, item);
-    m_e.GetCurrentItemPara(paraItem);
+    ExamItem::ParaItem paraItem = m_e.GetCurrentItemPara();
 
     g_menuCalc.ChangeExamItem(item);
     g_menuMeasure.ChangeExamItem(item);
@@ -260,12 +259,10 @@ void ProbeSelect::ProbeInit(int indexSocket, ExamItem::EItem indexItem) {
     else
         m_ptrUpdate->ProbeType(curPara.model);
     //  m_ptrUpdate->ExamItem(indexItem);
-    ExamItem::ParaItem paraItem;
     m_ptrUpdate->ExamItem(indexItem);
 
-//	ExamItem::ParaItem paraItem;
     m_e.SetItemOfProbe(curPara.model, (ExamItem::EItem)indexItem);
-    m_e.GetCurrentItemPara(paraItem);
+    ExamItem::ParaItem paraItem = m_e.GetCurrentItemPara();
 
     g_menuCalc.ChangeExamItem(m_e.ITEM_LIB[indexItem]);
     g_menuMeasure.ChangeExamItem(m_e.ITEM_LIB[indexItem]);
