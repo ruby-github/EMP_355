@@ -309,9 +309,7 @@ void MenuArea::UpdateLabel(void) {
     g_menuReview.UpdateLabel();
     g_menuCalc.UpdateLabel();
     g_menuNote.UpdateLabel();
-    g_menuBiopsy.UpdateLabel();
     g_menuEFOV.UpdateLabel();
-    g_menuBiopsy.UpdateLabel();//2016.11.02
     UpdateSubMenu();
 }
 
@@ -655,10 +653,10 @@ void MenuArea::HideAllOtherMenu(void) {
     if (m_menuType != EFOV)
         g_menuEFOV.Hide();
     //-----------------------------//
-    if(m_menuType != BIOPSYBRACKET)
-        g_menuBiopsyBracket.Hide();
-    if(m_menuType != BIOPSYVERIFY)
-        g_menuBiopsyVerify.Hide();
+    //if(m_menuType != BIOPSYBRACKET)
+    //    g_menuBiopsyBracket.Hide();
+    //if(m_menuType != BIOPSYVERIFY)
+        //g_menuBiopsyVerify.Hide();
     //-------------------------------------//
 
     DarkFucusLight();

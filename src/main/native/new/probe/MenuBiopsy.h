@@ -7,105 +7,96 @@
 
 class MenuBiopsy {
 public:
-    struct StructWidgetIndex {
-        MenuBiopsy* pData;
-        int index;
-    };
-    MenuBiopsy();
-    ~MenuBiopsy() {}
-    void Hide();
-    void Show();
-    GtkWidget * Create();
-
-    void UpdateLabel();
-
-    void SetBiopsyBracketTypeLabel(string bioBracketType);
-    void SetAngleMenuItem(string strText);
-
-    void UpdateSubMenuAngle();
-    void UpdateBioBracketTypeLabel();
-    void UpdateAngleMenuItem();
-    void SetDrawStatus(bool status);
-
-    void ClearBiopsyLine();
-    void UpdateBiopsyLine();
-    static bool GetDrawStatus() {
-        return m_isDraw;
-    }
-    static bool GetDoubleLineStatus() {
-        return m_isDoubleLine;
-    }
-
-    void CloseBiopsyLine();
+  static bool GetDrawStatus();
+  static bool GetDoubleLineStatus();
 
 public:
-    static  bool m_isDraw;
-    static bool m_isDoubleLine;
+  MenuBiopsy();
+  ~MenuBiopsy();
+
+public:
+  GtkWidget* Create();
+
+  void Show();
+  void Hide();
+
+  void SetBiopsyBracketTypeLabel(string bioBracketType);
+  void SetAngleMenuItem(string strText);
+
+  void UpdateSubMenuAngle();
+  void UpdateBioBracketTypeLabel();
+  void UpdateAngleMenuItem();
+  void SetDrawStatus(bool status);
+
+  void ClearBiopsyLine();
+  void UpdateBiopsyLine();
+  void CloseBiopsyLine();
+
 private:
-    BiopsyLine * m_ptrBiopsy;
-    ImageAreaDraw *m_ptrImgDraw;
+  struct StructWidgetIndex {
+    MenuBiopsy* pData;
+    int index;
+  };
 
-    GtkWidget *m_vboxBiopsy;
-    GtkWidget *m_labelBioBracketType;
+private:
+  // signal
 
-    GtkWidget *m_menuItemAngle;
-    GtkWidget *m_menuItemLineType;
-    GtkWidget *m_menuItemSetup;
-    GtkWidget *m_menuItemExit;
+  static void signal_menuitem_activate_angle(GtkMenuItem* menuitem, MenuBiopsy* data) {
+    if (data != NULL) {
+      data->MenuItemActivateAngle(menuitem);
+    }
+  }
 
-    GtkWidget*m_subMenuAngle;
-    vector<GtkWidget*> m_vecMenuItem;
+  static void signal_menuitem_activate_setup(GtkMenuItem* menuitem, MenuBiopsy* data) {
+    if (data != NULL) {
+      data->MenuItemActivateSetup(menuitem);
+    }
+  }
 
-    vector<string> m_vecAngleType;
-    vector<StructWidgetIndex*> m_vecWidgetIndex;
+  static gboolean signal_menuitem_release_linetype(GtkWidget* widget, GdkEvent* event, gpointer data) {
+    MenuBiopsy* menu = (MenuBiopsy*)data;
 
-    //signal handle
-    void SubMenuItemAngleActivate(GtkMenuItem *menuitem);
-    void MenuItemLineTypeActivate(GtkMenuItem *menuitem);
-    void MenuItemSetupActivate(GtkMenuItem *menuitem);
-    void MenuItemAngleSelect(GtkMenuItem *menuitem);
-    void MenuItemAngleDeSelect(GtkMenuItem *menuitem);
-
-    void MenuItemAngleActivate(GtkMenuItem *menuitem);
-    void MenuItemAngleButtonRelease(GtkMenuItem *menuitem);
-    void SubMenuItemAngleButtonRelease(GtkMenuItem *menuitem,int index);
-
-    //signal connect
-    static void HandleSubMenuItemAngleActivate(GtkMenuItem *menuitem, MenuBiopsy *data) {
-        data->SubMenuItemAngleActivate(menuitem);
-    }
-    static void HandleMenuItemLineTypeActivate(GtkMenuItem *menuitem, MenuBiopsy *data) {
-        data->MenuItemLineTypeActivate(menuitem);
-    }
-    static void HandleMenuItemSetupActivate(GtkMenuItem *menuitem, MenuBiopsy *data) {
-        data->MenuItemSetupActivate(menuitem);
-    }
-    static gboolean HandleMenuItemLineTypeButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-        ((MenuBiopsy*)user_data)->MenuItemLineTypeActivate(GTK_MENU_ITEM(widget));
-        return TRUE;
-    }
-    static void HandleMenuItemAngleSelect(GtkMenuItem *menuitem, MenuBiopsy *data) {
-        data->MenuItemAngleSelect(menuitem);
-    }
-    static void HandleMenuItemAngleDeSelect(GtkMenuItem *menuitem, MenuBiopsy *data) {
-        data->MenuItemAngleDeSelect(menuitem);
-    }
-    static void HandleMenuItemAngleActivate(GtkMenuItem *menuitem, MenuBiopsy *data) {
-        data->MenuItemAngleActivate(menuitem);
-    }
-    static gboolean HandleMenuItemAngleButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-        ((MenuBiopsy*)user_data)->MenuItemAngleButtonRelease(GTK_MENU_ITEM(widget));
-        return TRUE;
-    }
-    static gboolean HandleMenuItemAngleButtonPress(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-        return TRUE;
+    if (menu != NULL) {
+      menu->MenuItemActivateLineType(GTK_MENU_ITEM(widget));
     }
 
-    static gboolean HandleSubMenuItemAngleButtonRelease(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
-        (((StructWidgetIndex*)user_data)->pData)->SubMenuItemAngleButtonRelease(GTK_MENU_ITEM(widget), ((StructWidgetIndex*)user_data)->index);
-        return TRUE;
+    return TRUE;
+  }
+
+  static gboolean signal_submenuitem_release_angle(GtkWidget* widget, GdkEvent* event, gpointer data) {
+    StructWidgetIndex* menu = (StructWidgetIndex*)data;
+
+    if (menu != NULL) {
+      menu->pData->SubMenuItemButtonReleaseAngle(GTK_MENU_ITEM(widget), menu->index);
     }
 
+    return TRUE;
+  }
+
+  // signal
+
+  void MenuItemActivateAngle(GtkMenuItem* menuitem);
+  void MenuItemActivateSetup(GtkMenuItem* menuitem);
+  void MenuItemActivateLineType(GtkMenuItem* menuitem);
+  void SubMenuItemButtonReleaseAngle(GtkMenuItem* menuitem, int index);
+
+private:
+  static bool m_isDraw;
+  static bool m_isDoubleLine;
+
+private:
+  GtkBox* m_box;
+  GtkLabel* m_label;
+  GtkMenuItem* m_menuItemAngle;
+  GtkMenuItem* m_menuItemLineType;
+  GtkMenuItem* m_subMenuAngle;
+
+  BiopsyLine* m_ptrBiopsy;
+  ImageAreaDraw* m_ptrImgDraw;
+
+  vector<GtkWidget*> m_vecMenuItem;
+  vector<string> m_vecAngleType;
+  vector<StructWidgetIndex*> m_vecWidgetIndex;
 };
 
 extern MenuBiopsy g_menuBiopsy;

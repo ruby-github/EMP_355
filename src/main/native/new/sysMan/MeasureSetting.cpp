@@ -248,11 +248,7 @@ void MeasureSetting::ComboBoxChangedExamType(GtkComboBox* combobox) {
   ChangeModel2();
 
   // update measur sequence
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if (exam_type_name.empty()) {
     return;
@@ -265,11 +261,7 @@ void MeasureSetting::ComboBoxChangedExamType(GtkComboBox* combobox) {
 }
 
 void MeasureSetting::ComboBoxChangedMeasureSequence(GtkComboBox* combobox) {
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if(exam_type_name.empty()) {
     return;
@@ -314,11 +306,7 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
   char* select_name;
   gtk_tree_model_get(model, &iter, 0, &select_name, -1);
 
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if(exam_type_name.empty()) {
     return;
@@ -408,11 +396,7 @@ void MeasureSetting::ButtonClickedSelectOne(GtkButton* button) {
 }
 
 void MeasureSetting::ButtonClickedSelectAll(GtkButton* button) {
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if(exam_type_name.empty()) {
     return;
@@ -516,11 +500,7 @@ void MeasureSetting::ButtonClickedBackOne(GtkButton* button) {
   char* select_name;
   gtk_tree_model_get(model, &iter, 0, &select_name, -1);
 
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if (exam_type_name.empty()) {
     return;
@@ -580,11 +560,7 @@ void MeasureSetting::ButtonClickedBackOne(GtkButton* button) {
 }
 
 void MeasureSetting::ButtonClickedBackAll(GtkButton* button) {
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if (exam_type_name.empty()) {
     return;
@@ -646,11 +622,7 @@ void MeasureSetting::ButtonClickedUp(GtkButton* button) {
     return;
   }
 
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   ExamItem exam;
   string exam_type = exam.TransItemName(exam_type_name);
@@ -734,11 +706,7 @@ void MeasureSetting::ButtonClickedDown(GtkButton* button) {
   char* path_string = gtk_tree_path_to_string(path);
   int path_num = atoi(path_string);
 
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   ExamItem exam;
   string exam_type = exam.TransItemName(exam_type_name);
@@ -864,11 +832,7 @@ void MeasureSetting::CreateDefineItemCalc(vector<string>& vec) {
 }
 
 GtkTreeModel* MeasureSetting::CreateItemCalcModel1() {
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if (exam_type_name.empty()) {
     return NULL;
@@ -907,11 +871,7 @@ GtkTreeModel* MeasureSetting::CreateItemCalcModel2() {
   int item_size(0);
   item_size = vecItemCalc.size();
 
-  string exam_type_name;
-
-  if (m_combobox_exam_type != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_exam_type)) >= 0) {
-    exam_type_name = gtk_combo_box_text_get_active_text(m_combobox_exam_type);
-  }
+  string exam_type_name = Utils::combobox_active_text(m_combobox_exam_type);
 
   if (exam_type_name.empty()) {
     return NULL;

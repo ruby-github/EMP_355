@@ -285,6 +285,30 @@ GtkVSeparator* Utils::create_vseparator() {
   return separator;
 }
 
+GtkBox* Utils::create_hbox() {
+  GtkBox* box = GTK_BOX(gtk_hbox_new(FALSE, 0));
+
+  return box;
+}
+
+GtkBox* Utils::create_vbox() {
+  GtkBox* box = GTK_BOX(gtk_vbox_new(FALSE, 0));
+
+  return box;
+}
+
+GtkMenuBar* Utils::create_menu_bar() {
+  GtkMenuBar* menubar = GTK_MENU_BAR(gtk_menu_bar_new());
+
+  return menubar;
+}
+
+GtkMenuItem* Utils::create_menu_item(const string label) {
+  GtkMenuItem* menuitem = GTK_MENU_ITEM(gtk_menu_item_new_with_label(label.c_str()));
+
+  return menuitem;
+}
+
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
   PangoFontDescription* font = NULL;
 
@@ -369,9 +393,17 @@ void Utils::adjust_font_size(GtkWidget* widget, const string family, const strin
   }
 }
 
-void Utils::combobox_clear(GtkComboBox* combobox) {
-  GtkListStore* store = GTK_LIST_STORE(gtk_combo_box_get_model(combobox));
+void Utils::combobox_clear(GtkComboBoxText* combobox_text) {
+  GtkListStore* store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(combobox_text)));
   gtk_list_store_clear(store);
+}
+
+string Utils::combobox_active_text(GtkComboBoxText* combobox_text) {
+  if (combobox_text != NULL && gtk_combo_box_get_active(GTK_COMBO_BOX(combobox_text)) >= 0) {
+    return gtk_combo_box_text_get_active_text(combobox_text);
+  } else {
+    return "";
+  }
 }
 
 GdkColor* Utils::get_color(const string color_name) {
@@ -387,15 +419,10 @@ GdkColor* Utils::get_color(const string color_name) {
 // ---------------------------------------------------------
 
 #include "sysMan/DicomServiceSetting.h"
-#include <iostream>
-
-using namespace std;
+#include "probe/MenuBiopsyVerify.h"
 
 void Utils::test(GtkWidget* widget) {
-  GtkDialog* dialog = Utils::create_dialog(NULL, _("test"), 800, 600);
-  GtkWidget* w = DicomServiceSetting::GetInstance()->CreateDicomWindow(widget);
-  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
-  gtk_widget_show_all(GTK_WIDGET(dialog));
+
 
   //DicomServiceSetting::GetInstance()->InitServiceSetting();
 

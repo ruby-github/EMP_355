@@ -195,7 +195,7 @@ bool DicomServiceSetting::EntryKeyFilter(GtkWidget* entry, GdkEventKey* event) {
 // Storage
 
 void DicomServiceSetting::ComboBoxChangedDeviceStorage(GtkComboBox* combobox) {
-  string device = gtk_combo_box_text_get_active_text(m_combobox_storage_device);
+  string device = Utils::combobox_active_text(m_combobox_storage_device);
 
   if (!device.empty()) {
     string serviceName = gtk_entry_get_text(m_entry_storage_service);
@@ -209,12 +209,7 @@ void DicomServiceSetting::ComboBoxChangedDeviceStorage(GtkComboBox* combobox) {
 }
 
 void DicomServiceSetting::ButtonClickedAddStorage(GtkButton* button) {
-  string device;
-
-  if (gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_storage_device)) >= 0) {
-    device = gtk_combo_box_text_get_active_text(m_combobox_storage_device);
-  }
-
+  string device = Utils::combobox_active_text(m_combobox_storage_device);
   string ae = gtk_entry_get_text(m_entry_storage_ae);
   string port = gtk_entry_get_text(m_entry_storage_port);
 
@@ -368,7 +363,7 @@ void DicomServiceSetting::ComboBoxChangedFramesStorage(GtkComboBox* combobox) {
 // Worklist
 
 void DicomServiceSetting::ComboBoxChangedDeviceWorklist(GtkComboBox* combobox) {
-  string device = gtk_combo_box_text_get_active_text(m_combobox_worklist_device);
+  string device = Utils::combobox_active_text(m_combobox_worklist_device);
 
   if (!device.empty()) {
     string serviceName = gtk_entry_get_text(m_entry_worklist_service);
@@ -382,11 +377,7 @@ void DicomServiceSetting::ComboBoxChangedDeviceWorklist(GtkComboBox* combobox) {
 }
 
 void DicomServiceSetting::ButtonClickedAddWorklist(GtkButton* button) {
-  string device;
-
-  if (gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_worklist_device)) >= 0) {
-    device = gtk_combo_box_text_get_active_text(m_combobox_worklist_device);
-  }
+  string device = Utils::combobox_active_text(m_combobox_worklist_device);
 
   string ae = gtk_entry_get_text(m_entry_worklist_ae);
   string port = gtk_entry_get_text(m_entry_worklist_port);
@@ -536,11 +527,7 @@ void DicomServiceSetting::CheckButtonToggledAutoWorklist(GtkToggleButton* toggle
 // Mpps
 
 void DicomServiceSetting::ComboBoxChangedDeviceMpps(GtkComboBox* combobox) {
-  string device;
-
-  if (gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_mpps_device)) >= 0) {
-    device = gtk_combo_box_text_get_active_text(m_combobox_mpps_device);
-  }
+  string device = Utils::combobox_active_text(m_combobox_mpps_device);
 
   if (!device.empty()) {
     string serviceName = gtk_entry_get_text(m_entry_mpps_service);
@@ -554,7 +541,7 @@ void DicomServiceSetting::ComboBoxChangedDeviceMpps(GtkComboBox* combobox) {
 }
 
 void DicomServiceSetting::ButtonClickedAddMpps(GtkButton* button) {
-  string device = gtk_combo_box_text_get_active_text(m_combobox_mpps_device);
+  string device = Utils::combobox_active_text(m_combobox_mpps_device);
   string ae = gtk_entry_get_text(m_entry_mpps_ae);
   string port = gtk_entry_get_text(m_entry_mpps_port);
 
@@ -703,11 +690,7 @@ void DicomServiceSetting::CheckButtonToggledSendMpps(GtkToggleButton* togglebutt
 // StorageCommitment
 
 void DicomServiceSetting::ComboBoxChangedDeviceStorageCommitment(GtkComboBox* combobox) {
-  string device;
-
-  if (gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_storage_commitment_device)) >= 0) {
-    device = gtk_combo_box_text_get_active_text(m_combobox_storage_commitment_device);
-  }
+  string device = Utils::combobox_active_text(m_combobox_storage_commitment_device);
 
   if (!device.empty()) {
     string serviceName = gtk_entry_get_text(m_entry_storage_commitment_service);
@@ -721,7 +704,7 @@ void DicomServiceSetting::ComboBoxChangedDeviceStorageCommitment(GtkComboBox* co
 }
 
 void DicomServiceSetting::ButtonClickedAddStorageCommitment(GtkButton* button) {
-  string device = gtk_combo_box_text_get_active_text(m_combobox_storage_commitment_device);
+  string device = Utils::combobox_active_text(m_combobox_storage_commitment_device);
   string ae = gtk_entry_get_text(m_entry_storage_commitment_ae);
   string port = gtk_entry_get_text(m_entry_storage_commitment_port);
 
@@ -873,7 +856,7 @@ void DicomServiceSetting::ComboBoxChangedDeviceQueryRetrieve(GtkComboBox* combob
   string device;
 
   if (gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_query_retrieve_device)) >= 0) {
-    device = gtk_combo_box_text_get_active_text(m_combobox_query_retrieve_device);
+    device = Utils::combobox_active_text(m_combobox_query_retrieve_device);
   }
 
   if (!device.empty()) {
@@ -888,7 +871,7 @@ void DicomServiceSetting::ComboBoxChangedDeviceQueryRetrieve(GtkComboBox* combob
 }
 
 void DicomServiceSetting::ButtonClickedAddQueryRetrieve(GtkButton* button) {
-  string device = gtk_combo_box_text_get_active_text(m_combobox_query_retrieve_device);
+  string device = Utils::combobox_active_text(m_combobox_query_retrieve_device);
   string ae = gtk_entry_get_text(m_entry_query_retrieve_ae);
   string port = gtk_entry_get_text(m_entry_query_retrieve_port);
 

@@ -34,8 +34,8 @@ private:
   void MenuItemActivateExit(GtkMenuItem* menuitem);
 
 private:
-  GtkWidget* m_vboxBioBracketType;
-  GtkWidget* m_menuBar;
+  GtkBox* m_box;
+  GtkMenuBar* m_menubar;
 
   vector<GtkWidget*> m_vecMenuItem;
 };

@@ -2559,9 +2559,9 @@ void ViewMain::Create(void) {
     UserSelect::GetInstance()->save_active_user_id(0);
 
     m_mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_decorated(GTK_WINDOW(m_mainWindow), FALSE);
+    //gtk_window_set_decorated(GTK_WINDOW(m_mainWindow), FALSE);
     gtk_window_set_position(GTK_WINDOW(m_mainWindow), GTK_WIN_POS_CENTER);
-    gtk_window_set_resizable(GTK_WINDOW(m_mainWindow), FALSE);
+    //gtk_window_set_resizable(GTK_WINDOW(m_mainWindow), FALSE);
     gtk_widget_set_size_request(m_mainWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
     gtk_container_set_border_width(GTK_CONTAINER(m_mainWindow), 0);
     gtk_widget_modify_bg(m_mainWindow, GTK_STATE_NORMAL, g_deep);

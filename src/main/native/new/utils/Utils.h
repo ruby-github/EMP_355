@@ -37,11 +37,18 @@ public:
   static GtkHSeparator* create_hseparator();
   static GtkVSeparator* create_vseparator();
 
+  static GtkBox* create_hbox();
+  static GtkBox* create_vbox();
+
+  static GtkMenuBar* create_menu_bar();
+  static GtkMenuItem* create_menu_item(const string label);
+
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,
     const int size, const int max_width, const int max_height);
 
-  static void combobox_clear(GtkComboBox* combobox);
+  static void combobox_clear(GtkComboBoxText* combobox_text);
+  static string combobox_active_text(GtkComboBoxText* combobox_text);
 
   static GdkColor* get_color(const string color_name);
 

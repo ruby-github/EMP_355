@@ -25,62 +25,64 @@ private:
 
 private:
   // signal
-  static void HandleMenuItemAngleActivate(GtkMenuItem *menuitem, MenuBiopsyVerify *data) {
-    data->MenuItemActivateAngle(menuitem);
+
+  static void signal_menuitem_activate_exit(GtkMenuItem* menuitem, MenuBiopsyVerify* data) {
+    if (data != NULL) {
+      data->MenuItemActivateExit(menuitem);
+    }
   }
 
-  static void HandleMenuItemExitActivate(GtkMenuItem *menuitem, MenuBiopsyVerify *data) {
-    data-> MenuItemActivateExit(menuitem);
-  }
+  static gboolean signal_menuitem_release_save(GtkWidget* widget, GdkEvent* event, gpointer data) {
+    MenuBiopsyVerify* menu = (MenuBiopsyVerify*)data;
 
-  static void HandleMenuItemSaveActivate(GtkMenuItem *menuitem, MenuBiopsyVerify *data) {
-    data->MenuItemActivateSave(menuitem);
-  }
+    if (data != NULL) {
+      menu->MenuItemActivateSave(GTK_MENU_ITEM(widget));
+    }
 
-  static void HandleMenuItemLoadFactoryActivate(GtkMenuItem *menuitem, MenuBiopsyVerify *data) {
-    data-> MenuItemActivateLoadFactory(menuitem);
-  }
-
-  static gboolean HandleMenuItemSaveButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-    ((MenuBiopsyVerify*)user_data)->MenuItemActivateSave(GTK_MENU_ITEM(widget));
     return TRUE;
   }
 
-  static gboolean HandleMenuItemLoadFactoryButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-    ((MenuBiopsyVerify*)user_data)->MenuItemActivateLoadFactory(GTK_MENU_ITEM(widget));
+  static gboolean signal_menuitem_release_loadfactory(GtkWidget* widget, GdkEvent* event, gpointer data) {
+    MenuBiopsyVerify* menu = (MenuBiopsyVerify*)data;
+
+    if (data != NULL) {
+      menu->MenuItemActivateLoadFactory(GTK_MENU_ITEM(widget));
+    }
+
     return TRUE;
   }
 
-  static gboolean HandleMenuItemAngleButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
+  static gboolean signal_menuitem_release_angle(GtkWidget* widget, GdkEvent* event, gpointer data) {
     return TRUE;
   }
 
-  static gboolean HandleSubMenuItemAngleButtonRelease(GtkWidget *widget,GdkEvent *event,gpointer user_data) {
-    (((StructWidgetIndex*)user_data)->pData)->SubMenuItemAngleButtonRelease(GTK_MENU_ITEM(widget), ((StructWidgetIndex*)user_data)->index);
+  static gboolean signal_submenuitem_release_angle(GtkWidget* widget, GdkEvent* event, gpointer data) {
+    StructWidgetIndex* index = (StructWidgetIndex*)data;
+
+    if (index != NULL) {
+      index->pData->SubMenuItemButtonReleaseAngle(GTK_MENU_ITEM(widget), index->index);
+    }
+
     return TRUE;
   }
 
   // signal
+
   void MenuItemActivateAngle(GtkMenuItem* menuitem);
   void MenuItemActivateExit(GtkMenuItem* menuitem);
   void MenuItemActivateSave(GtkMenuItem* menuitem);
   void MenuItemActivateLoadFactory(GtkMenuItem* menuitem);
-  void SubMenuItemAngleButtonRelease(GtkMenuItem* menuitem, int index);
+  void SubMenuItemButtonReleaseAngle(GtkMenuItem* menuitem, int index);
 
 private:
-    GtkWidget *m_vboxBioVerify;
-    GtkWidget *m_labelBioBracketType;
+  GtkBox* m_box;
+  GtkLabel* m_label;
+  GtkMenuItem* m_menuitem_angle;
+  GtkWidget* m_subMenuAngle;
 
-    GtkWidget *m_menuItemAngle;
-    GtkWidget *m_menuItemSave;
-    GtkWidget *m_menuItemLoadFactory;
-    GtkWidget *m_menuItemExit;
-
-    GtkWidget*m_subMenuAngle;
-    vector<GtkWidget*> m_vecMenuItem;
-
-    vector<string> m_vecAngleType;
-    vector<StructWidgetIndex*> m_vecWidgetIndex;
+  vector<GtkWidget*> m_vecMenuItem;
+  vector<string> m_vecAngleType;
+  vector<StructWidgetIndex*> m_vecWidgetIndex;
 };
 
 extern MenuBiopsyVerify g_menuBiopsyVerify;

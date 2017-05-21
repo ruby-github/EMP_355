@@ -15,6 +15,9 @@ MenuBiopsyVerify g_menuBiopsyVerify;
 // ---------------------------------------------------------
 
 MenuBiopsyVerify::MenuBiopsyVerify() {
+  m_box = NULL;
+  m_label = NULL;
+  m_menuitem_angle = NULL;
   m_subMenuAngle = NULL;
 }
 
@@ -22,59 +25,33 @@ MenuBiopsyVerify::~MenuBiopsyVerify() {
 }
 
 GtkWidget* MenuBiopsyVerify::Create() {
-  GtkWidget* menuBar0;
+  m_box = Utils::create_vbox();
 
-  m_vboxBioVerify=gtk_vbox_new(false,0);
+  m_label = Utils::create_label();
+  GtkMenuBar* menubar = Utils::create_menu_bar();
 
-  m_labelBioBracketType= create_label("", 0, 0, g_lightGray, NULL);
-  gtk_box_pack_start(GTK_BOX(m_vboxBioVerify),m_labelBioBracketType,false,false,0);
+  gtk_box_pack_start(m_box, GTK_WIDGET(m_label), FALSE, FALSE, 0);
+  gtk_box_pack_start(m_box, GTK_WIDGET(menubar), FALSE, FALSE, 0);
 
-  menuBar0=gtk_menu_bar_new();
-  gtk_widget_modify_bg(menuBar0,GTK_STATE_NORMAL, g_deep);//2016.10.10
+  GtkMenuItem* menuitem_exit = Utils::create_menu_item(_("Exit"));
+  gtk_menu_bar_append(menubar, GTK_WIDGET(menuitem_exit));
+  g_signal_connect(G_OBJECT(menuitem_exit), "activate", G_CALLBACK(signal_menuitem_activate_exit), this);
 
-  m_menuItemExit=gtk_menu_item_new_with_label("");
-  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(m_menuItemExit)), GTK_STATE_NORMAL, g_white);
+  m_menuitem_angle = Utils::create_menu_item("");
+  gtk_menu_bar_append(menubar, GTK_WIDGET(m_menuitem_angle));
+  g_signal_connect(G_OBJECT(m_menuitem_angle), "button-release-event", G_CALLBACK(signal_menuitem_release_angle), this);
 
-  gtk_widget_set_usize(m_menuItemExit, WIDTH_BIOPSYVERIFY_MENU, HEIGHT_BIOPSYVERIFY_MENUITEM);
+  GtkMenuItem* menuitem_save = Utils::create_menu_item(_("Save"));
+  gtk_menu_bar_append(menubar, GTK_WIDGET(menuitem_save));
+  g_signal_connect(G_OBJECT(menuitem_save), "button-release-event", G_CALLBACK(signal_menuitem_release_save), this);
 
-  gtk_menu_bar_append(GTK_MENU_BAR(menuBar0),m_menuItemExit);
-  g_signal_connect(G_OBJECT(m_menuItemExit),"activate",G_CALLBACK(HandleMenuItemExitActivate),this);
-  gtk_widget_show(m_menuItemExit);
+  GtkMenuItem* menuitem_loadfactory = Utils::create_menu_item(_("Default Factory"));
+  gtk_menu_bar_append(menubar, GTK_WIDGET(menuitem_loadfactory));
+  g_signal_connect(G_OBJECT(menuitem_loadfactory), "button-release-event", G_CALLBACK(signal_menuitem_release_loadfactory), this);
 
-  m_menuItemAngle=gtk_menu_item_new_with_label("");
-  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(m_menuItemAngle)), GTK_STATE_NORMAL, g_white);
+  gtk_menu_bar_set_pack_direction(menubar, GTK_PACK_DIRECTION_TTB);
 
-  gtk_widget_set_usize(m_menuItemAngle, WIDTH_BIOPSYVERIFY_MENU, HEIGHT_BIOPSYVERIFY_MENUITEM);
-
-  gtk_menu_bar_append(GTK_MENU_BAR(menuBar0),m_menuItemAngle);
-  g_signal_connect(G_OBJECT(m_menuItemAngle),"button-release-event",G_CALLBACK(HandleMenuItemAngleButtonRelease),this);
-  gtk_widget_show(m_menuItemAngle);
-
-  m_menuItemSave=gtk_menu_item_new_with_label("");
-  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(m_menuItemSave)), GTK_STATE_NORMAL, g_white);
-  gtk_widget_set_usize(m_menuItemSave, WIDTH_BIOPSYVERIFY_MENU, HEIGHT_BIOPSYVERIFY_MENUITEM);
-
-  gtk_menu_bar_append(GTK_MENU_BAR(menuBar0),m_menuItemSave);
-  g_signal_connect(G_OBJECT(m_menuItemSave),"button-release-event",G_CALLBACK(HandleMenuItemSaveButtonRelease),this);
-
-  gtk_widget_show(m_menuItemSave);
-
-  m_menuItemLoadFactory=gtk_menu_item_new_with_label("");
-  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(m_menuItemLoadFactory)), GTK_STATE_NORMAL, g_white);
-
-  gtk_widget_set_usize(m_menuItemLoadFactory, WIDTH_BIOPSYVERIFY_MENU, HEIGHT_BIOPSYVERIFY_MENUITEM);
-  gtk_menu_bar_append(GTK_MENU_BAR(menuBar0),m_menuItemLoadFactory);
-  g_signal_connect(G_OBJECT(m_menuItemLoadFactory),"button-release-event",G_CALLBACK(HandleMenuItemLoadFactoryButtonRelease),this);
-  gtk_widget_show(m_menuItemLoadFactory);
-
-  gtk_box_pack_start(GTK_BOX(m_vboxBioVerify),menuBar0,false,false,0);
-  gtk_menu_bar_set_pack_direction(GTK_MENU_BAR(menuBar0),GTK_PACK_DIRECTION_TTB);
-
-  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemSave), _("Save"));
-  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemLoadFactory), _("Default Factory"));
-  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemExit), _("Exit"));
-
-  return m_vboxBioVerify;
+  return GTK_WIDGET(m_box);
 }
 
 void MenuBiopsyVerify::Show() {
@@ -84,7 +61,7 @@ void MenuBiopsyVerify::Show() {
 
   UpdateSubMenuAngle();
 
-  gtk_widget_show_all(m_vboxBioVerify);
+  gtk_widget_show_all(GTK_WIDGET(m_box));
 
   g_menuBiopsy.SetDrawStatus(true);
 
@@ -98,7 +75,7 @@ void MenuBiopsyVerify::Show() {
 }
 
 void MenuBiopsyVerify::Hide() {
-  gtk_widget_hide_all(m_vboxBioVerify);
+  gtk_widget_hide_all(GTK_WIDGET(m_box));
   BiopsyLine::GetInstance()->Clear();
   g_menuBiopsy.SetDrawStatus(false);
 }
@@ -108,7 +85,7 @@ void MenuBiopsyVerify::Hide() {
 void MenuBiopsyVerify::MenuItemActivateAngle(GtkMenuItem* menuitem) {
   string angleType=gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem));
 
-  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle),gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem)));
+  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuitem_angle),gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem)));
 
   BiopsyMan::GetInstance()->SetCurBioAngleType(angleType);
   g_menuBiopsy.UpdateAngleMenuItem();
@@ -128,15 +105,17 @@ void  MenuBiopsyVerify::MenuItemActivateLoadFactory(GtkMenuItem* menuitem) {
 }
 
 void MenuBiopsyVerify::UpdateSubMenuAngle() {
-  if(m_subMenuAngle!=NULL) {
-    gtk_widget_destroy(m_subMenuAngle);
+  if(m_menuitem_angle != NULL) {
+    gtk_widget_destroy(GTK_WIDGET(m_menuitem_angle));
   }
 
   m_vecMenuItem.clear();
 
-  m_subMenuAngle=gtk_menu_new();
-  gtk_widget_modify_bg(m_subMenuAngle,GTK_STATE_NORMAL, g_deep);
-  gtk_widget_set_usize(m_subMenuAngle, WIDTH_BIOPSYVERIFY_MENU, -1);
+  m_menuitem_angle = Utils::create_menu_item("");
+
+  for (int i = 0; i < m_vecWidgetIndex.size(); i++) {
+    delete m_vecWidgetIndex[i];
+  }
 
   m_vecWidgetIndex.clear();
   m_vecAngleType.clear();
@@ -146,7 +125,7 @@ void MenuBiopsyVerify::UpdateSubMenuAngle() {
   int size=vecAngleType.size();
 
   if (size == 1) {
-    gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle), _(vecAngleType[0].c_str()));
+    gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuitem_angle), _(vecAngleType[0].c_str()));
   } else {
     if (size > 1) {
       for(int i = 0; i < size; i++) {
@@ -162,12 +141,12 @@ void MenuBiopsyVerify::UpdateSubMenuAngle() {
         pWidgetIndex0->index=i;
         m_vecWidgetIndex.push_back(pWidgetIndex0);
 
-        g_signal_connect(G_OBJECT(menuItem),"button-release-event",G_CALLBACK(HandleSubMenuItemAngleButtonRelease),m_vecWidgetIndex[i]);
-        gtk_menu_shell_append(GTK_MENU_SHELL(m_subMenuAngle),menuItem);
+        g_signal_connect(G_OBJECT(menuItem),"button-release-event",G_CALLBACK(signal_submenuitem_release_angle), m_vecWidgetIndex[i]);
+        gtk_menu_shell_append(GTK_MENU_SHELL(m_subMenuAngle), menuItem);
         m_vecMenuItem.push_back(menuItem);
       }
 
-      gtk_menu_item_set_submenu(GTK_MENU_ITEM(m_menuItemAngle),m_subMenuAngle);
+      gtk_menu_item_set_submenu(GTK_MENU_ITEM(m_menuitem_angle), m_subMenuAngle);
 
       string curAngleType=BiopsyMan::GetInstance()->GetCurBioAngleType();
       for(int i = 0; i < size; i++) {
@@ -182,7 +161,7 @@ void MenuBiopsyVerify::UpdateSubMenuAngle() {
 
 void MenuBiopsyVerify::UpdateBioBracketType() {
   string bracketType=BiopsyMan::GetInstance()->GetCurBioBracketType();
-  gtk_label_set_text(GTK_LABEL(m_labelBioBracketType), _(bracketType.c_str()));
+  gtk_label_set_text(GTK_LABEL(m_label), _(bracketType.c_str()));
 }
 
 void MenuBiopsyVerify::UpdateAngleMenuItem() {
@@ -193,12 +172,12 @@ void MenuBiopsyVerify::UpdateAngleMenuItem() {
     angleType=BiopsyMan::GetInstance()->GetCurBioAngleType();
   }
 
-  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle), _(angleType.c_str()));
+  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuitem_angle), _(angleType.c_str()));
 
   BiopsyMan::GetInstance()->SetCurBioAngleType(angleType);
 }
 
-void MenuBiopsyVerify::SubMenuItemAngleButtonRelease(GtkMenuItem* menuitem, int index) {
+void MenuBiopsyVerify::SubMenuItemButtonReleaseAngle(GtkMenuItem* menuitem, int index) {
   for(int i=0; i<m_vecMenuItem.size(); i++) {
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(m_vecMenuItem[i]),false);
   }
@@ -206,7 +185,7 @@ void MenuBiopsyVerify::SubMenuItemAngleButtonRelease(GtkMenuItem* menuitem, int 
   gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem),true);
 
   string angleType=gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem));
-  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuItemAngle),gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem)));
+  gtk_menu_item_set_label(GTK_MENU_ITEM(m_menuitem_angle),gtk_menu_item_get_label(GTK_MENU_ITEM(menuitem)));
 
   BiopsyMan::GetInstance()->SetCurBioAngleType(m_vecAngleType[index]);
   BiopsyLine::GetInstance()->AngleSwitch();
