@@ -1,171 +1,178 @@
-#ifndef KEY_FUNC_H
-#define KEY_FUNC_H
+#ifndef __KEY_FUNC_H__
+#define __KEY_FUNC_H__
 
 #include "AbsCommand.h"
 #include "probe/ExamItem.h"
 #include "probe/ProbeSocket.h"
-#include "display/MenuArea.h"
 
 class KeySwitchIM: public AbsCommand {
 public:
-    bool Execute();
-    bool ExcuteChange(bool isswitch);
-    static bool m_imOn;	//TRUE: input method on; FALSE: input method off
+  bool Execute();
+  bool ExcuteChange(bool isswitch);
+
+public:
+  // true: input method on; false: input method off
+  static bool m_imOn;
 };
 
 class KeyPowerOff: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyTSI: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 
 private:
-    bool Do();
-    bool Undo();
-    static int keyNum ;
+  bool Do();
+  bool Undo();
+
+public:
+  static int keyNum;
 };
 
 class KeyAutoOptimize: public AbsCommand {
 public:
-    bool Execute();
-    static void AutoOff(void);
+  static void AutoOff();
+
+public:
+  bool Execute();
 
 private:
-    bool Do();
-    bool Undo();
-    void ImgOptimize(ProbeSocket::ProbePara p, ExamItem::ParaItem i);
-    void BackupPara();
+  bool Do();
+  bool Undo();
+  void ImgOptimize(ProbeSocket::ProbePara p, ExamItem::ParaItem i);
+  void BackupPara();
 
-    static ExamItem::ParaItem m_itemPara;
-    static bool m_autoOn; // TRUE: enter optimize; FALSE: exit optimize
+private:
+  // true: enter optimize; false: exit optimize
+  static bool m_autoOn;
+  static ExamItem::ParaItem m_itemPara;
 };
 
 class KeyMeasure: public AbsCommand {
 public:
-    bool Execute();
-};
-class KeyCalc: public AbsCommand {
-public:
-    bool Execute();
+  bool Execute();
 };
 
-class KeySystem : public AbsCommand {
+class KeyCalc: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
+};
+
+class KeySystem: public AbsCommand {
+public:
+  bool Execute();
 };
 
 class KeyCursor: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyText: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyArrow: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyBodyMark: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeySaveSnap: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyReview: public AbsCommand {
 public:
-    bool Execute();
-    static void HideMenuReview();
-    static void SetDefaultIDAndPath();
-    static void SetDemoIDAndPath();
-    static void ExitMenuReivew();
+  static void HideMenuReview();
+  static void SetDefaultIDAndPath();
+  static void SetDemoIDAndPath();
+  static void ExitMenuReivew();
 
-//	private:
-    static bool m_menuRead;
+public:
+  bool Execute();
+
+public:
+  static bool m_menuRead;
 };
 
 class KeyPIP: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyLocalZoom: public AbsCommand {
 public:
-    bool Execute();
-    bool ExitLocalZoom();
+  bool Execute();
+  bool ExitLocalZoom();
 };
 
-class KeyFocus: public AbsCommand
-
-{
+class KeyFocus: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyDepth: public AbsCommand {
 public:
-    bool ExecuteAdd(); //ADD
-    bool ExecuteSub(); //SUB
-    bool Execute();
+  bool ExecuteAdd();
+  bool ExecuteSub();
+  bool Execute();
 
 private:
-    void DepthExe(EKnobOper oper);
+  void DepthExe(EKnobOper oper);
 };
 
 class KeyFreq: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyChroma: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyClearScreen: public AbsCommand {
 public:
-    bool Execute();
-    bool UnFreezeExecute(bool update=false);
-    bool ModeExecute(bool update=false);
+  bool Execute();
+  bool UnFreezeExecute(bool update=false);
+  bool ModeExecute(bool update=false);
 
 private:
-    void DeleteDataForClearScreen();
+  void DeleteDataForClearScreen();
 };
 
 class KeyEndExam: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyCenterLine: public AbsCommand {
 public:
-    bool Execute();
-    void Clear();
+  bool Execute();
+  void Clear();
 };
 
 class KeyMenu: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
 class KeyBiopsy: public AbsCommand {
 public:
-    bool Execute();
+  bool Execute();
 };
 
-extern int g_count11;
-
-//global function
 void ChangeTis();
 void DarkFucusLight();
+
 #endif

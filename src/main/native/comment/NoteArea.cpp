@@ -13,6 +13,7 @@
 #include "sysMan/SysNoteSetting.h"
 #include "display/ImageArea.h"
 #include "display/KnobNone.h"
+#include "display/MenuArea.h"
 
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
