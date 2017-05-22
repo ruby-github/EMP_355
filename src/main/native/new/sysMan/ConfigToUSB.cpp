@@ -3,6 +3,7 @@
 #include "utils/FakeXUtils.h"
 #include "utils/MessageDialog.h"
 
+#include "Def.h"
 #include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
 #include "patient/FileMan.h"
