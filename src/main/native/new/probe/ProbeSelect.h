@@ -1,41 +1,44 @@
-#ifndef PROBE_SELECT_H
-#define PROBE_SELECT_H
+#ifndef __PROBE_SELECT_H__
+#define __PROBE_SELECT_H__
 
-#include <vector>
 #include "probe/ExamItem.h"
 #include "probe/ProbeSocket.h"
 #include "probe/ProbeMan.h"
+
+#include <vector>
 
 using std::vector;
 
 class ProbeSelect {
 public:
-    static ExamItem::EItem GetItemIndex(void) {
-        return m_itemIndex;
-    }
+  static ExamItem::EItem GetItemIndex();
 
-    ProbeSelect() {
-        m_ptrProbe = ProbeMan::GetInstance();
-    }
+public:
+  ProbeSelect();
+  ~ProbeSelect();
 
-    bool Execute(); //only for test
-    bool ProbeRead();
-    void UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem, const char *item);
-    bool OneProbeRead(int socket);
-    void ProbeInit(int indexSocket, ExamItem::EItem indexItem);
-    void GetDefaultValue(int &socket, ExamItem::EItem &item, bool &flag);
-    void GetDefaultItemNameandFlag(string &itemName, bool &flag);
-    void GetPara(ProbeSocket::ProbePara* &para, vector<ExamItem::EItem>* &item,int &maxSocket);
-    void ActiveHV(bool on);
+public:
+  bool Execute();
+  bool ProbeRead();
+  void UserItemOfProbeInit(int indexSocket, ExamItem::EItem indexItem, const string item);
+  bool OneProbeRead(int socket);
+  void ProbeInit(int indexSocket, ExamItem::EItem indexItem);
+  void GetDefaultValue(int& socket, ExamItem::EItem& item, bool& flag);
+  void GetDefaultItemNameandFlag(string& itemName, bool& flag);
+  void GetPara(ProbeSocket::ProbePara*& para, vector<ExamItem::EItem>*& item, int& maxSocket);
+  void ActiveHV(bool on);
 
 private:
-    static ExamItem::EItem m_itemIndex;
-    static int m_socketIndex;
+  static int m_socketIndex;
+  static ExamItem::EItem m_itemIndex;
 
-    ProbeMan* m_ptrProbe;
-    ExamItem m_e;
-    ProbeSocket::ProbePara m_para[MAX_SOCKET];
-    vector<ExamItem::EItem> m_itemList[MAX_SOCKET];
-    vector<ExamItem::EItem> probeItemName[MAX_SOCKET];
+private:
+  ProbeMan* m_ptrProbe;
+  ExamItem m_e;
+
+  ProbeSocket::ProbePara m_para[MAX_SOCKET];
+  vector<ExamItem::EItem> m_itemList[MAX_SOCKET];
+  vector<ExamItem::EItem> probeItemName[MAX_SOCKET];
 };
+
 #endif
