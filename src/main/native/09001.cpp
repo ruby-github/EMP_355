@@ -23,124 +23,115 @@ using namespace std;
 
 pthread_t pidDsc;
 
-extern int g_shm_id0, g_shm_id1;
-extern int g_sem_id0, g_sem_id1;
-extern unsigned char *g_pshm_data0, *g_pshm_data1;
+extern int g_shm_id0;
+extern int g_shm_id1;
+extern int g_sem_id0;
+extern int g_sem_id1;
+extern unsigned char* g_pshm_data0;
+extern unsigned char* g_pshm_data1;
 
 extern CUIS4DReceiveInterface g_uis4d_ri;
 
-#ifdef EMP_355
 bool g_printProcessFps = false;
-#endif
 
 void* ThreadDsc(void* argv) {
-    cout << "Hello! I am thread dsc\n";
+  cout << "Hello! I am thread dsc\n";
 
-    FpgaReceive fr;
-    fr.UsbServiceRoutine(argv);
+  FpgaReceive fr;
+  fr.UsbServiceRoutine(argv);
 
-    return NULL;
+  return NULL;
 }
 
-/*
- * When recevied SIGSEGV signal, auto run gdb
- */
 void dump(int signo) {
-    char buf[1024];
-    char cmd[1024];
-    FILE *fh;
+  char buf[1024];
+  char cmd[1024];
+  FILE *fh;
 
-    snprintf(buf, sizeof(buf), "/proc/%d/cmdline", getpid());
-    if(!(fh = fopen(buf, "r")))
-        exit(0);
-    if(!fgets(buf, sizeof(buf), fh))
-        exit(0);
-    fclose(fh);
-    if(buf[strlen(buf) - 1] == '\n')
-        buf[strlen(buf) - 1] = '\0';
-    snprintf(cmd, sizeof(cmd), "gdb %s %d", buf, getpid());
-    _system_(cmd);
-
+  snprintf(buf, sizeof(buf), "/proc/%d/cmdline", getpid());
+  if(!(fh = fopen(buf, "r"))) {
     exit(0);
+  }
+
+  if(!fgets(buf, sizeof(buf), fh)) {
+    exit(0);
+  }
+
+  fclose(fh);
+
+  if(buf[strlen(buf) - 1] == '\n') {
+    buf[strlen(buf) - 1] = '\0';
+  }
+
+  snprintf(cmd, sizeof(cmd), "gdb %s %d", buf, getpid());
+  _system_(cmd);
+
+  exit(0);
 }
+
 #include "periDevice/Printmain.h"
+
 void IngPipe(int signo) {
-    int id = getpid();
-    signal(SIGPIPE, SIG_IGN);
+  int id = getpid();
+  signal(SIGPIPE, SIG_IGN);
 }
 
-int main(int argc, char*argv[]) {
-#ifdef EMP_355
-    if (argc > 1) {
-        if (strcmp(argv[1], "PrintProcessFps") == 0) {
-            g_printProcessFps = true;
-            printf("==================printf:%s\n", argv[1]);
-        }
+int main(int argc, char* argv[]) {
+  if (argc > 1) {
+    if (strcmp(argv[1], "PrintProcessFps") == 0) {
+      g_printProcessFps = true;
+      printf("==================printf:%s\n", argv[1]);
     }
-#endif
-    //signal(SIGSEGV, &dump);
-    signal(SIGSEGV, SIG_IGN);
-    // in order to due the GetPrinter cause broken pipe, process be killed
-    //signal(SIGPIPE, SIG_IGN);
-    signal(SIGPIPE, &IngPipe);
+  }
 
-    Init init;
-    init.WriteLogHead();
+  signal(SIGSEGV, SIG_IGN);
+  signal(SIGPIPE, &IngPipe);
 
-    ///> system init
-    SysLog* sysLog = SysLog::Instance();
-    (*sysLog) << "main: Sytem init!" << endl;
-    init.SystemInit(argc, argv);
+  Init init;
+  init.WriteLogHead();
 
-    if(!g_thread_supported())
-        g_thread_init(NULL);
-    gdk_threads_init();
-    gtk_init(&argc, &argv);
+  SysLog* sysLog = SysLog::Instance();
+  (*sysLog) << "main: Sytem init!" << endl;
+  init.SystemInit(argc, argv);
 
-    SetTheme(RC_PATH);
+  if(!g_thread_supported()) {
+    g_thread_init(NULL);
+  }
 
-    ChangeKeymap();
+  gdk_threads_init();
+  gtk_init(&argc, &argv);
 
-    ASSERT(init_colors());
-#ifdef EMP_3410
-    CManRegister::GetInstance()->Create(OPTIONAL_DIR);
-#endif
+  SetTheme(RC_PATH);
 
-    ///> init gui, and create main view
-    (*sysLog) << "main: Run gui, create main view!" << endl;
-    init.CreatMainWindow();
+  ChangeKeymap();
+  init_colors();
 
-    init.ParaInit();
+  (*sysLog) << "main: Run gui, create main view!" << endl;
+  init.CreatMainWindow();
 
-    ///> probe init
-    (*sysLog) << "main: Probe init!" << endl;
-    init.ProbeCheck();
+  init.ParaInit();
 
-    ///> start up DSC thread
-#if 1
-    (*sysLog) << "main: Start up DSC thread!" << endl;
-//	pthread_t pidDsc;
-    if( pthread_create(&pidDsc, NULL, ThreadDsc, NULL) != 0) {
-        ///> phread create error
-        cerr << "main: Fail to create DSC thread!" << endl;
-    }
-#endif
+  (*sysLog) << "main: Probe init!" << endl;
+  init.ProbeCheck();
 
-    ///>IPC Control
-    g_uis4d_ri.IPC4DInit();
-    g_shm_id0 = g_uis4d_ri.GetSHMID(0);
-    g_pshm_data0 = g_uis4d_ri.GetSHMData(0);
-    g_sem_id0 = g_uis4d_ri.GetSEMID(0);
-    /****************** LWF ************************/
+  (*sysLog) << "main: Start up DSC thread!" << endl;
 
-    gdk_threads_enter();
-    gtk_main();
-    gdk_threads_leave();
+  if(pthread_create(&pidDsc, NULL, ThreadDsc, NULL) != 0) {
+    cerr << "main: Fail to create DSC thread!" << endl;
+  }
 
-    ///> exit main, and do something clear
-    (*sysLog) << "main: Exit main, and do something clear!" << endl;
+  g_uis4d_ri.IPC4DInit();
+  g_shm_id0 = g_uis4d_ri.GetSHMID(0);
+  g_pshm_data0 = g_uis4d_ri.GetSHMData(0);
+  g_sem_id0 = g_uis4d_ri.GetSEMID(0);
 
-    g_uis4d_ri.IPC4DDestroy();
+  gdk_threads_enter();
+  gtk_main();
+  gdk_threads_leave();
 
-    init.ExitSystem();
+  (*sysLog) << "main: Exit main, and do something clear!" << endl;
+
+  g_uis4d_ri.IPC4DDestroy();
+
+  init.ExitSystem();
 }
