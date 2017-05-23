@@ -1,78 +1,87 @@
-/**
-* @brief MultiFuncArrow.h: interface for the MultiFuncArrow class.
-*
-* MultiFuncArrow handle all events of arrow operation, include
-* add delete cancel move and so on. MultiFuncArrow derive from
-* class CAbsUpdateArrow KnobEvent and AbsMultiFunc.
-*
-* emperor
-* @version: 1.0
-* @author: hehao
-* @date: 2009-9-6
-*/
-
-#ifndef __MULTIFUNCARROW_H__
-#define __MULTIFUNCARROW_H__
+#ifndef __MULTI_FUNC_ARROW_H__
+#define __MULTI_FUNC_ARROW_H__
 
 #include "utils/CalcTime.h"
 
-
-
 #include "Def.h"
-#include "AbsUpdateArrow.h"
-#include "keyboard/KnobEvent.h"
 #include "AbsMultiFunc.h"
+#include "AbsUpdateArrow.h"
 #include "comment/Arrow.h"
 #include "display/KnobMenu.h"
+#include "keyboard/KnobEvent.h"
 
 class MultiFuncArrow: public CAbsUpdateArrow, public CKnobEvent, public AbsMultiFunc {
 public:
-    MultiFuncArrow();
-    virtual ~MultiFuncArrow();
+  static EKnobReturn PressSetShape();
+  static EKnobReturn SetShape(EKnobOper opr);
+  static EKnobReturn PressSetSize();
+  static EKnobReturn SetSize(EKnobOper opr);
+  static EKnobReturn PressSetColor();
+  static EKnobReturn SetColor(EKnobOper opr);
 
-    virtual void Do();
-    virtual void Undo();
-    virtual void Value(EKnobOper opr);
-    virtual void Mouse(int offsetX, int offsetY);
-    virtual void Esc();
+public:
+  MultiFuncArrow();
+  virtual ~MultiFuncArrow();
 
-    virtual void DrawArrow(POINT pos, unsigned int direction, double scale,
-                           unsigned int color, unsigned int shape);
+public:
+  virtual void Do();
+  virtual void Undo();
+  virtual void Value(EKnobOper opr);
+  virtual void Mouse(int offsetX, int offsetY);
+  virtual void Esc();
 
-    virtual void KeyEvent(unsigned char keyValue);
-    virtual void KnobEvent(unsigned char keyValue, unsigned char offset);
-    virtual void MouseEvent(char offsetX, char offsetY);
-    virtual void KnobArrowCreate();
+  virtual void KeyEvent(unsigned char keyValue);
+  virtual void KnobEvent(unsigned char keyValue, unsigned char offset);
+  virtual void MouseEvent(char offsetX, char offsetY);
+  virtual void KnobArrowCreate();
 
-    static EKnobReturn PressSetShape(void);
-    static EKnobReturn SetShape(EKnobOper opr);
-    static EKnobReturn PressSetSize(void);
-    static EKnobReturn SetSize(EKnobOper opr);
-    static EKnobReturn PressSetColor(void);
-    static EKnobReturn SetColor(EKnobOper opr);
-    POINT GetPoint(int offsetX, int offsetY);
+  virtual void DrawArrow(POINT pos, unsigned int direction,
+    double scale, unsigned int color, unsigned int shape);
+
+  POINT GetPoint(int offsetX, int offsetY);
 
 protected:
-    enum PRESSMODE { CLICK, DBLCLK };
-    enum ARROWOPR { ADD, MODIFY };
+  enum PRESSMODE {
+    CLICK, DBLCLK
+  };
+
+  enum ARROWOPR {
+    ADD, MODIFY
+  };
 
 private:
-    static MultiFuncArrow *m_pThis;
-    CArrow *m_arrow;
-    POINT m_pos;
-    PRESSMODE m_pressMode;
-    ARROWOPR m_arrowOpr;
-    int m_timer;
-    KnobMenu::KnobItem *m_knobItemBku;
-    KnobMenu::EKnobType m_knobTypeBku;
+  // signal
+  static gboolean signal_callback_clicked(gpointer data) {
+    if (m_pThis == NULL) {
+      return FALSE;
+    }
 
-    gboolean Clicked();
+    m_pThis->Clicked();
 
-    static EKnobReturn GetKnobRetShape(CArrow::SHAPE shape);
-    static EKnobReturn GetKnobRetSize(CArrow::SIZE size);
-    static EKnobReturn GetKnobRetColor(CArrow::COLOR color);
+    return FALSE;
+  }
 
-    static gboolean HandleClicked(gpointer data);
+private:
+  static EKnobReturn GetKnobRetShape(CArrow::SHAPE shape);
+  static EKnobReturn GetKnobRetSize(CArrow::SIZE size);
+  static EKnobReturn GetKnobRetColor(CArrow::COLOR color);
+
+private:
+  void Clicked();
+
+private:
+  static MultiFuncArrow* m_pThis;
+
+private:
+  CArrow* m_arrow;
+
+  KnobMenu::KnobItem* m_knobItemBku;
+  KnobMenu::EKnobType m_knobTypeBku;
+
+  PRESSMODE m_pressMode;
+  ARROWOPR m_arrowOpr;
+  POINT m_pos;
+  int m_timer;
 };
 
-#endif //MULTIFUNCARROW_H
+#endif
