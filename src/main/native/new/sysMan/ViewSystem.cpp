@@ -4336,10 +4336,10 @@ GtkWidget* ViewSystem::create_note_image(void) {
     gtk_widget_set_size_request (button_delete_user, 30, 30);
     g_signal_connect(button_delete_user, "clicked", G_CALLBACK(HandleImageBtnDeleteUser), this);
 
-    UserSelect::GetInstance()->read_default_username(m_comboboxentry_user_select);
-    UserSelect::GetInstance()->read_username_db(USERNAME_DB, m_comboboxentry_user_select);
+    UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxentry_user_select));
+    UserSelect::GetInstance()->read_username_db(USERNAME_DB, GTK_COMBO_BOX(m_comboboxentry_user_select));
     int num = UserSelect::GetInstance()->get_active_user();
-    UserSelect::GetInstance()->set_active_user(m_comboboxentry_user_select, num);
+    UserSelect::GetInstance()->set_active_user(GTK_COMBO_BOX(m_comboboxentry_user_select), num);
 
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -6657,7 +6657,7 @@ void ViewSystem::save_image_para(ExamItem::ParaItem &item) {
     if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
             (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
-        UserSelect::GetInstance()->write_username(m_comboboxentry_user_select, USERNAME_DB, name);
+        UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
     }
 
     ExamItem examItem;
@@ -7015,7 +7015,7 @@ void ViewSystem::save_image_setting(void) {
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
 
     {
-        UserSelect::GetInstance()->write_username(m_comboboxentry_user_select, USERNAME_DB, name);
+        UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
 
     }
 
@@ -10576,8 +10576,7 @@ GtkTreeModel* ViewSystem::create_exam_item_model(vector<ExamItem::EItem> indexVe
     }
   }
 
-  string str_check_part("");
-  TopArea::GetInstance()->GetCheckPart(str_check_part);
+  string str_check_part = TopArea::GetInstance()->GetCheckPart();
 
   vector<ExamPara> vecExamItem;
   for (int i = 0; i < indexVec.size(); i++) {
@@ -10936,8 +10935,8 @@ void ViewSystem::image_default_setting() {
         UserSelect::GetInstance()->create_userconfig_dir();
         UserSelect::GetInstance()->creat_username_db(USERNAME_DB);
         ClearComboBox(GTK_COMBO_BOX(m_comboboxentry_user_select));
-        UserSelect::GetInstance()->read_default_username(m_comboboxentry_user_select);
-        UserSelect::GetInstance()->set_active_user(m_comboboxentry_user_select, 0);
+        UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxentry_user_select));
+        UserSelect::GetInstance()->set_active_user(GTK_COMBO_BOX(m_comboboxentry_user_select), 0);
     }
 
     CalcSetting::GetInstance()->ChangeExamBoxDelete();
@@ -11094,11 +11093,11 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
 
         // append text to combo_box
         ClearComboBox(GTK_COMBO_BOX(m_comboboxentry_user_select));
-        UserSelect::GetInstance()->read_default_username(m_comboboxentry_user_select);
-        UserSelect::GetInstance()->read_username_db(USERNAME_DB, m_comboboxentry_user_select);
+        UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxentry_user_select));
+        UserSelect::GetInstance()->read_username_db(USERNAME_DB, GTK_COMBO_BOX(m_comboboxentry_user_select));
 
         // set System Default is the active user after delete a user
-        UserSelect::GetInstance()->set_active_user(m_comboboxentry_user_select, 0);
+        UserSelect::GetInstance()->set_active_user(GTK_COMBO_BOX(m_comboboxentry_user_select), 0);
         memset(user_configure, 0, USERCONFIG_LEN);
 
         sprintf(user_configure, "%s", "ItemPara.ini");
@@ -11841,7 +11840,7 @@ void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
 
     {
-        UserSelect::GetInstance()->write_username(m_comboboxentry_user_select, USERNAME_DB, name);
+        UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
 
         memset(user_configure, 0, USERCONFIG_LEN);
         sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");

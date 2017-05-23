@@ -171,8 +171,7 @@ GtkWidget* CalcSetting::CreateCalcWindow(GtkWidget* parent) {
   }
 
   for (size_t i = 0; i < vec_exam_type.size(); i++) {
-    string cur_exam_type;
-    TopArea::GetInstance()->GetCheckPart(cur_exam_type);
+    string cur_exam_type = TopArea::GetInstance()->GetCheckPart();
 
     if (cur_exam_type == vec_exam_type[i]) {
       gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_exam_type), i);

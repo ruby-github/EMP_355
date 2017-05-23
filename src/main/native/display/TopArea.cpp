@@ -229,8 +229,8 @@ void TopArea::GetTIS(string& TIS) {
     TIS = TempTis;
 }
 
-void TopArea::GetCheckPart(string& ExamType) {
-    ExamType = m_checkPart;
+string TopArea::GetCheckPart() {
+  return m_checkPart;
 }
 
 void TopArea::GetDepth(int& Depth) {

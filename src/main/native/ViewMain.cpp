@@ -1485,7 +1485,7 @@ void ViewMain::Create() {
     CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 1);
   }
 
-  //Utils::test(m_mainWindow);
+  Utils::test(m_mainWindow);
 }
 
 void ViewMain::MySleep(int msecond) {

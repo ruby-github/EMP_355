@@ -839,7 +839,7 @@ void ViewWorkList::GetSelectedPatInfo() {
     info.e.examTime.minute = examMin;
     info.e.examTime.second = examSec;
 
-    TopArea::GetInstance()->GetCheckPart(info.e.examType);
+    info.e.examType = TopArea::GetInstance()->GetCheckPart();
 
     Database db;
     db.GetExamIDNext(info.e.examNum);

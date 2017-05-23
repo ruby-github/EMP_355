@@ -37,8 +37,8 @@ public:
   static GtkHSeparator* create_hseparator();
   static GtkVSeparator* create_vseparator();
 
-  static GtkBox* create_hbox();
-  static GtkBox* create_vbox();
+  static GtkBox* create_hbox(gboolean homogeneous = FALSE, gint spacing = 0);
+  static GtkBox* create_vbox(gboolean homogeneous = FALSE, gint spacing = 0);
 
   static GtkMenuBar* create_menu_bar();
   static GtkMenuItem* create_menu_item(const string label);

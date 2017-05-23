@@ -2628,7 +2628,7 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
     info.e.examTime.minute = examMin;
     info.e.examTime.second = examSec;
 
-    TopArea::GetInstance()->GetCheckPart(info.e.examType);
+    info.e.examType = TopArea::GetInstance()->GetCheckPart();
 
     // general
 #ifndef VET

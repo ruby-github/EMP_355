@@ -285,14 +285,14 @@ GtkVSeparator* Utils::create_vseparator() {
   return separator;
 }
 
-GtkBox* Utils::create_hbox() {
-  GtkBox* box = GTK_BOX(gtk_hbox_new(FALSE, 0));
+GtkBox* Utils::create_hbox(gboolean homogeneous, gint spacing) {
+  GtkBox* box = GTK_BOX(gtk_hbox_new(homogeneous, spacing));
 
   return box;
 }
 
-GtkBox* Utils::create_vbox() {
-  GtkBox* box = GTK_BOX(gtk_vbox_new(FALSE, 0));
+GtkBox* Utils::create_vbox(gboolean homogeneous, gint spacing) {
+  GtkBox* box = GTK_BOX(gtk_vbox_new(homogeneous, spacing));
 
   return box;
 }
@@ -418,13 +418,8 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "sysMan/DicomServiceSetting.h"
-#include "probe/MenuBiopsyVerify.h"
+#include "probe/ViewProbe.h"
 
 void Utils::test(GtkWidget* widget) {
-
-
-  //DicomServiceSetting::GetInstance()->InitServiceSetting();
-
-  //DicomServiceSetting::GetInstance()->CreateDicomWindow(widget);
+  ViewProbe::GetInstance()->CreateWindow(NULL, NULL, 4);
 }

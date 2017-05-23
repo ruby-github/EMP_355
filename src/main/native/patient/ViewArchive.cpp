@@ -2671,9 +2671,9 @@ void ViewArchive::StartUsbExport(GtkWidget *parent) {
 }
 
 string ViewArchive::GetExamType() {
-    string part = "";
+    string part = TopArea::GetInstance()->GetCheckPart();
     string partTemp = "";
-    TopArea::GetInstance()->GetCheckPart(part);
+
     if (strcmp(part.c_str(), _("Abdomen")) == 0 || strcmp(part.c_str(), _("Adult Abdomen")) == 0 || strcmp(part.c_str(), _("Adult Liver")) == 0 || strcmp(part.c_str(), _("Kid Abdomen")) == 0 || strcmp(part.c_str(), _("Kidney Ureter")) == 0
             || strcmp(part.c_str(), _("Bladder Prostate")) == 0 || strcmp(part.c_str(), _("Abdo-adult")) == 0 || strcmp(part.c_str(), _("Abdo-liver")) == 0 || strcmp(part.c_str(), _("Abdo-kid")) == 0)
         partTemp = "ABDOMEN";

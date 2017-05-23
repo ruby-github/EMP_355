@@ -780,8 +780,7 @@ void ViewPrintPreview::Item_To_Get() {
 
     sprintf(age, "%d", report_info.p.age);
 
-    string part;
-    TopArea::GetInstance()->GetCheckPart(part);
+    string part = TopArea::GetInstance()->GetCheckPart();
     strcpy(section, part.c_str());
     char dayTmp[4], monthTmp[4], yearTmp[6];
     itoa(report_info.e.examDate.day, dayTmp, 10);
@@ -1447,8 +1446,7 @@ void ViewPrintPreview::CreatePages(char *path) {
     else
         strcpy(ageUnitstr, _("D"));
 
-    string part;
-    TopArea::GetInstance()->GetCheckPart(part);
+    string part = TopArea::GetInstance()->GetCheckPart();
     strcpy(sectionstr, part.c_str());
     char dayTmp[20], monthTmp[20], yearTmp[20];
     itoa(report_info.e.examDate.day, dayTmp, 10);
@@ -1868,8 +1866,7 @@ void ViewPrintPreview::CreatePagesForRetrieve(char *path,string indication,strin
     }
     sprintf(agestr, "%d%s", report_info.p.age,unit.c_str());
 
-    string part;
-    TopArea::GetInstance()->GetCheckPart(part);
+    string part = TopArea::GetInstance()->GetCheckPart();
     strcpy(sectionstr, part.c_str());
     char dayTmp[20], monthTmp[20], yearTmp[20];
     //printf("year=%d month=%d day=%d\n", report_info.e.examDate.year, report_info.e.examDate.month, report_info.e.examDate.day);

@@ -81,8 +81,7 @@ void ImgProcCfm::InitOptimize(ExamItem::ParaColor* color) {
 #if 0
     ProbeSocket::ProbePara para;
     ProbeMan::GetInstance()->GetCurProbe(para);
-    string s;
-    TopArea::GetInstance()->GetCheckPart(s);
+    string s = TopArea::GetInstance()->GetCheckPart();
     if(strcmp(para.model, "35C50K") == 0) {
         if(strcmp(s.c_str(), _("Kidney Ureter")) == 0) {
             m_artifact = 0;

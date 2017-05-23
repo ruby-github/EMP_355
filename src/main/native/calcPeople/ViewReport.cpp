@@ -1314,8 +1314,7 @@ void ViewReport::SetPatientInfo(void) {
 //		gtk_entry_set_text (GTK_ENTRY(m_entryItem), info.e.examType.c_str());
 //	else
 //	{
-    string s;
-    TopArea::GetInstance()->GetCheckPart(s);
+    string s = TopArea::GetInstance()->GetCheckPart();
     gtk_entry_set_text (GTK_ENTRY(m_entryItem), _(s.c_str()));
     //	}
     gtk_entry_set_text (GTK_ENTRY(m_entryUDr), info.e.examDoctor.c_str());

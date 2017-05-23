@@ -1,106 +1,132 @@
-// -*- c++ -*-
-#ifndef VIEWPROBE_H
-#define VIEWPROBE_H
+#ifndef __VIEW_PROBE_H__
+#define __VIEW_PROBE_H__
 
-#include <gtk/gtk.h>
-#include "probe/ProbeSelect.h"
 #include "utils/FakeXEvent.h"
+#include "utils/Utils.h"
+#include "probe/ProbeSelect.h"
 
-class ViewProbe : public FakeXEvent {
+class ViewProbe: public FakeXEvent {
 public:
-    ~ViewProbe();
-    static ViewProbe* GetInstance();
-    bool Create(void);
-    bool Create(int socket);
-    void Destroy(void);
-    void ReadProbe(void);
-    void ReadOneProbe(int socket);
-    const gchar* GetUserName(void);
-    string GetItemNameUserDef() {
-        return m_itemNameUserDef;
-    }
-    int GetProbeIndex() {
-        return m_probeIndex;
-    }
-    int GetCurExamItemIndex() {
-        return m_examItemIndex;
-    }
+  static ViewProbe* GetInstance();
+
+public:
+  ~ViewProbe();
+
+  bool Create();
+  bool Create(int socket);
+  void Destroy();
+
+  void ReadProbe();
+  void ReadOneProbe(int socket);
+
+  string GetUserName();
+  string GetItemNameUserDef();
+
+  int GetProbeIndex();
+  int GetCurExamItemIndex();
+
+public:
+  void CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EItem>* itemList, int maxSocket);
 
 private:
-    enum {
-        PROBE_INDEX,
-        EXAM_COLUMN,
-        N_COLUMNS
-    };
+  // signal
 
-    static ViewProbe* m_ptrInstance;
-
-    ProbeSelect m_pKps;
-    int m_probeIndex;
-    int m_itemIndex;
-    int m_probe_index;
-    GtkWidget *m_window;
-    vector<ExamItem::EItem>* m_itemList;
-    vector<string>* probeItemName;
-    vector<string> m_vecUserItemName;
-    char *m_userItemName;
-    string m_itemNameUserDef;
-    GtkWidget *m_combobox_user_select;
-    ViewProbe();
-    void KeyEvent(unsigned char keyValue);
-    GtkWidget *treeview0;
-    GtkWidget *treeview1;
-    GtkWidget *treeview2;
-    GtkWidget *treeview3;
-    int m_preSocketIndex;
-    int m_examItemIndex;
-    int m_treeViewIndex;
-    gchar *m_tree_view_path;
-    char m_treeViewPath[32];
-
-    void CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EItem>* itemList, int maxSocket);
-    GtkWidget* CreateProbe(const char *probe_name, const char probeType,
-                           char exam_type[][50], int probe_index);
-    int CreateAllExamType(const char *model, vector<ExamItem::EItem> item, char exam_type[][50]);
-    void GetUserItemNameOfProbe(const char* model);
-    //void GetUserItemNameOfProbe(const char* model, vector<string> &useritemname);
-    int CreateExamType(vector<ExamItem::EItem> item, char exam_type[][50]);
-    GtkTreeModel* CreateModel(char exam_type[][50], int probe_index);
-    void AddColumn(GtkTreeView *treeView);
-    GtkWidget* CreateTreeView(char exam_type[][50], int probe_index);
-    void GetCurExamItemIndex(char exam_type[][50], int probe_index);
-
-    // signal handle
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
-    void BtnCancelClicked(GtkButton *button);
-    // void BtnOKClicked(GtkButton *button);
-    void TreeSelectionChanged(GtkTreeSelection *treeselection);
-    void TreeViewFocusOut(GtkWidget *widget, GdkEventFocus *event);
-    void ProbeUserChanged(GtkWidget *widget);
-    void TreeViewBtnClicked(GtkWidget *widget, GdkEventButton *event);
-
-    // signal connect
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewProbe *data) {
-        return data->WindowDeleteEvent(widget, event);
+  static void signal_button_clicked_exit(GtkButton* button, ViewProbe* data) {
+    if (data != NULL) {
+      data->BtnClickedExit(button);
     }
-    // static void on_button_ok_clicked(GtkButton *button, ViewProbe *data) { data->BtnOKClicked(button); }
-    static void on_button_cancel_clicked(GtkButton *button, ViewProbe *data) {
-        data->BtnCancelClicked(button);
-    }
-    static gboolean HandleTreeViewFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewProbe *data) {
-        data->TreeViewFocusOut(widget, event);
-        return FALSE;
-    }
-    static void HandleTreeSelectionChanged(GtkTreeSelection *treeselection, ViewProbe *data) {
-        data->TreeSelectionChanged(treeselection);
-    }
-    static void HandleProbeUserChanged(GtkWidget *widget, ViewProbe *data) {
-        data->ProbeUserChanged(widget);
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ViewProbe* data) {
+    if (data != NULL) {
+      data->Destroy();
     }
 
-    static gboolean HandleTreeViewButtonClick(GtkWidget *widget, GdkEventButton *event, ViewProbe *data) {
-        data->TreeViewBtnClicked(widget, event);
-        return TRUE;
+    return FALSE;
+  }
+
+  static void signal_combobox_changed_probe_user(GtkComboBox* combobox, ViewProbe* data) {
+    if (data != NULL) {
+      data->ComboboxChangedProbeUser(combobox);
     }
+  }
+
+  static gboolean signal_treeview_focusout(GtkTreeView* treeview, GdkEventFocus* event, ViewProbe* data) {
+    if (data != NULL) {
+      data->TreeViewFocusOut(treeview, event);
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_treeview_button_clicked(GtkTreeView* treeview, GdkEventButton* event, ViewProbe* data) {
+    if (data != NULL) {
+      data->TreeViewButtonClicked(treeview, event);
+    }
+
+    return TRUE;
+  }
+
+  static gboolean signal_callback_destroy_window(gpointer data) {
+    ViewProbe* tmp = (ViewProbe*)data;
+
+    if (tmp != NULL) {
+      tmp->Destroy();
+    }
+
+    return FALSE;
+  }
+
+  // signal
+
+  void BtnClickedExit(GtkButton* button);
+  void ComboboxChangedProbeUser(GtkComboBox* combobox);
+  void TreeViewFocusOut(GtkTreeView* treeview, GdkEventFocus* event);
+  void TreeViewButtonClicked(GtkTreeView* treeview, GdkEventButton* event);
+
+private:
+  ViewProbe();
+
+  void KeyEvent(unsigned char keyValue);
+
+  GtkWidget* CreateProbe(const string probe_name, const char probeType,
+    const vector<string> exam_type, int probe_index);
+
+  vector<string> CreateAllExamType(const string model, vector<ExamItem::EItem> item);
+  void GetUserItemNameOfProbe(const string model);
+
+  GtkTreeView* CreateTreeView(const vector<string> exam_type, int probe_index);
+  GtkTreeModel* CreateModel(const vector<string> exam_type, int probe_index);
+  void AddColumn(GtkTreeView* treeView);
+  void GetCurExamItemIndex(const vector<string> exam_type, int probe_index);
+
+private:
+  static ViewProbe* m_instance;
+
+private:
+  GtkDialog* m_dialog;
+  GtkComboBoxText* m_comboboxtext_user;
+
+  GtkTreeView* m_treeview0;
+  GtkTreeView* m_treeview1;
+  GtkTreeView* m_treeview2;
+  GtkTreeView* m_treeview3;
+
+  ProbeSelect m_pKps;
+
+  string m_treeViewPath;
+  string m_userItemName;
+  string m_itemNameUserDef;
+
+  int m_preSocketIndex;
+  int m_examItemIndex;
+  int m_treeViewIndex;
+  int m_probeIndex;
+  int m_itemIndex;
+  int m_probe_index;
+
+  vector<ExamItem::EItem>* m_itemList;
+  vector<string> m_vecUserItemName;
 };
+
 #endif

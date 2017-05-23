@@ -21,7 +21,7 @@ public:
   void create_exportUSB_dir(string name);
 
   bool creat_username_db(string db_dbname);
-  bool read_username_db(string db_dbname, GtkWidget* widget);
+  bool read_username_db(string db_dbname, GtkComboBox* combobox);
   bool insert_username_db(string db_dbname, string record);
   bool delete_username_db(string db_dbname, string record);
   bool username_unique_db(string db_dbname, string record);
@@ -29,9 +29,9 @@ public:
   int get_active_user();
   int compare_with_current_user(string username);
 
-  void read_default_username(GtkWidget* widget);
-  void set_active_user(GtkWidget* widget, gint num);
-  void write_username(GtkWidget* widget, string db_dbname, string record);
+  void read_default_username(GtkComboBox* combobox);
+  void set_active_user(GtkComboBox* combobox, gint num);
+  void write_username(GtkComboBox* combobox, string db_dbname, string record);
   void save_active_user_id(int num);
   void save_cur_username(string username);
 

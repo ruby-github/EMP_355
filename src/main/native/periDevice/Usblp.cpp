@@ -657,11 +657,8 @@ int print_report( int size_x, int size_y, gint8 language) {
     sprintf(age, "%d%s", report_info.p.age,unit.c_str());
     //printf("age is************************** %s\n", age);
 
-//	strcpy(section, ViewReport::GetInstance()->GetCheckPart());
-    string part;
-    TopArea::GetInstance()->GetCheckPart(part);
+    string part = TopArea::GetInstance()->GetCheckPart();
     strcpy(section, part.c_str());
-//	PRINTF("exam type is %s\n", section);
 
     char dayTmp[4], monthTmp[4], yearTmp[6];
     itoa(report_info.e.examDate.day, dayTmp, 4);

@@ -180,7 +180,7 @@ bool UserSelect::creat_username_db(string db_dbname) {
   return true;
 }
 
-bool UserSelect::read_username_db(string db_dbname, GtkWidget* widget) {
+bool UserSelect::read_username_db(string db_dbname, GtkComboBox* combobox) {
   char buf[1024];
   sqlite3* db = 0;
   int t = 0;
@@ -206,7 +206,7 @@ bool UserSelect::read_username_db(string db_dbname, GtkWidget* widget) {
       continue;
     }
 
-    gtk_combo_box_append_text(GTK_COMBO_BOX(widget), name.c_str());
+    gtk_combo_box_append_text(combobox, name.c_str());
     count++;
 
     if (name == cur_username) {
@@ -313,17 +313,17 @@ int UserSelect::compare_with_current_user(string username) {
   return cur_username == username;
 }
 
-void UserSelect::read_default_username(GtkWidget* widget) {
-  gtk_combo_box_append_text(GTK_COMBO_BOX (widget), _("System Default"));
+void UserSelect::read_default_username(GtkComboBox* combobox) {
+  gtk_combo_box_append_text(combobox, _("System Default"));
 }
 
-void UserSelect::set_active_user(GtkWidget* widget, gint num) {
-  gtk_combo_box_set_active(GTK_COMBO_BOX(widget), num);
+void UserSelect::set_active_user(GtkComboBox* combobox, gint num) {
+  gtk_combo_box_set_active(combobox, num);
 }
 
-void UserSelect::write_username(GtkWidget* widget, string db_dbname, string record) {
+void UserSelect::write_username(GtkComboBox* combobox, string db_dbname, string record) {
   if (username_unique_db(db_dbname, record)) {
-    gtk_combo_box_append_text(GTK_COMBO_BOX (widget), record.c_str());
+    gtk_combo_box_append_text(combobox, record.c_str());
     insert_username_db(db_dbname, record);
     char path[256];
     sprintf(path, "%s%s%s", USERCONFIG_PATH, record.c_str(), ".ini");

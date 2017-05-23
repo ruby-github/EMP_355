@@ -262,7 +262,7 @@ void D4FuncMan::GetTIS() {
 }
 
 void D4FuncMan::GetCheckPart() {
-    TopArea::GetInstance()->GetCheckPart(m_checkpart);
+    m_checkpart = TopArea::GetInstance()->GetCheckPart();
     m_Para4d.check_part = m_checkpart;
     return;
 }

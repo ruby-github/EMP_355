@@ -46,7 +46,7 @@ public:
     void AddTimeOut();
     void DelTimeOut();
     void GetTIS(std::string& TIS);
-    void GetCheckPart(std::string& ExamType);
+    string GetCheckPart();
     void GetDepth(int& Depth);
     string GetHospitalName();
     void SetDateFormat(int DateFormat) {
