@@ -264,11 +264,20 @@ GtkTreeView* Utils::create_tree_view(GtkTreeModel* mode) {
 }
 
 GtkFrame* Utils::create_frame(const string label) {
-  GtkFrame* frame = GTK_FRAME(gtk_frame_new(label.c_str()));
+  GtkFrame* frame = NULL;
 
-  gtk_label_set_use_markup(GTK_LABEL(gtk_frame_get_label_widget(frame)), TRUE);
-  gtk_frame_set_label_align(frame, 0.5, 0.5);
-  gtk_frame_set_shadow_type(frame, GTK_SHADOW_IN);
+  if (label.empty()) {
+    frame = GTK_FRAME(gtk_frame_new(NULL));
+
+    gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
+  } else {
+    frame = GTK_FRAME(gtk_frame_new(label.c_str()));
+
+    gtk_label_set_use_markup(GTK_LABEL(gtk_frame_get_label_widget(frame)), TRUE);
+    gtk_frame_set_label_align(frame, 0.5, 0.5);
+
+    gtk_frame_set_shadow_type(frame, GTK_SHADOW_IN);
+  }
 
   return frame;
 }
@@ -421,5 +430,5 @@ GdkColor* Utils::get_color(const string color_name) {
 #include "probe/ViewProbe.h"
 
 void Utils::test(GtkWidget* widget) {
-  ViewProbe::GetInstance()->CreateWindow(NULL, NULL, 4);
+  ViewProbe::GetInstance()->CreateWindow(NULL, NULL, 3);
 }

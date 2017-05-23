@@ -369,6 +369,7 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
   g_signal_connect(button_exit, "clicked", G_CALLBACK(signal_button_clicked_exit), this);
 
   GtkTable* table = Utils::create_table(8, 1);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 0);
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
 
   if (maxSocket > 0) {
@@ -397,7 +398,7 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
         m_examItemIndex = -1;
 
         vector<string> exam_type;
-        probe = CreateProbe("", 'C', exam_type, i);
+        probe = CreateProbe("", 0, exam_type, i);
       }
 
       gtk_table_attach_defaults(table_probe, probe, i, i + 1, 0, 1);
@@ -406,15 +407,15 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
     gtk_table_attach_defaults(table, GTK_WIDGET(table_probe), 0, 1, 0, 7);
   }
 
-  GtkTable* table_user = Utils::create_table(1, 3);
+  GtkTable* table_user = Utils::create_table(1, 9);
   gtk_container_set_border_width(GTK_CONTAINER(table_user), 10);
   gtk_table_attach_defaults(table, GTK_WIDGET(table_user), 0, 1, 7, 8);
 
   GtkLabel* label = Utils::create_label(_("Current User:"));
   m_comboboxtext_user = Utils::create_combobox_text();
 
-  gtk_table_attach_defaults(table_user, GTK_WIDGET(label), 0, 1, 0, 1);
-  gtk_table_attach(table_user, GTK_WIDGET(m_comboboxtext_user), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_user, GTK_WIDGET(label), 0, 2, 0, 1);
+  gtk_table_attach(table_user, GTK_WIDGET(m_comboboxtext_user), 2, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
 
   UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxtext_user));
   UserSelect::GetInstance()->read_username_db(USERNAME_DB, GTK_COMBO_BOX(m_comboboxtext_user));
@@ -450,12 +451,11 @@ GtkWidget* ViewProbe::CreateProbe(const string probe_name, const char probeType,
   GtkFrame* frame_image = Utils::create_frame();
   GtkFrame* frame_exam = Utils::create_frame();
 
-  gtk_box_pack_start(vbox, GTK_WIDGET(label_name), FALSE, TRUE, 0);
-  gtk_box_pack_start(vbox, GTK_WIDGET(frame_image), FALSE, TRUE, 0);
+  gtk_box_pack_start(vbox, GTK_WIDGET(label_name), FALSE, FALSE, 10);
+  gtk_box_pack_start(vbox, GTK_WIDGET(frame_image), FALSE, FALSE, 0);
   gtk_box_pack_start(vbox, GTK_WIDGET(frame_exam), TRUE, TRUE, 0);
 
-  gtk_frame_set_shadow_type(frame_image, GTK_SHADOW_OUT);
-  gtk_frame_set_shadow_type(frame_exam, GTK_SHADOW_OUT);
+  gtk_misc_set_alignment(GTK_MISC(label_name), 0.5, 0);
 
   string probe_path;
 
@@ -587,7 +587,7 @@ GtkTreeView* ViewProbe::CreateTreeView(const vector<string> exam_type, int probe
   GtkTreeModel* model = CreateModel(exam_type, probe_index);
   GetCurExamItemIndex(exam_type, probe_index);
 
-  if (probe_index > 0 && probe_index <= 3) {
+  if (probe_index >= 0 && probe_index <= 3) {
     GtkTreeView* treeview = Utils::create_tree_view(model);
     AddColumn(treeview);
 
