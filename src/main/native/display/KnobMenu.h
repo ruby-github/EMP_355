@@ -32,7 +32,7 @@ public:
     GtkWidget * Create(void);
     void SetItem(KnobItem *item, unsigned int total_item, EKnobType type);
     KnobItem* GetItem(void);
-    void SetValue(int index, const char* value, EKnobReturn status);
+    void SetValue(int index, const string value, EKnobReturn status);
     void Update(void); ///< update Knob menu
     void PageUp(void);
     void PageDown(void);

@@ -570,8 +570,8 @@ void KnobMenu::Update(void) {
  * @para value[in] string of new value
  * @para status[in] status of current item knob
  */
-void KnobMenu::SetValue(int index, const char* value, EKnobReturn status) {
-    sprintf(m_KnobItem[index].value, "%s", value);
+void KnobMenu::SetValue(int index, const string value, EKnobReturn status) {
+    sprintf(m_KnobItem[index].value, "%s", value.c_str());
     m_KnobItem[index].status = status;
     Update();
 }

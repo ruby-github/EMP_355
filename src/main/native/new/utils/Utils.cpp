@@ -318,6 +318,16 @@ GtkMenuItem* Utils::create_menu_item(const string label) {
   return menuitem;
 }
 
+GooCanvas* Utils::create_canvas(const int width, const int height) {
+  GooCanvas* canvas = GOO_CANVAS(goo_canvas_new());
+
+  if (width > 0 && height > 0) {
+    gtk_widget_set_size_request(GTK_WIDGET(canvas), width, height);
+  }
+
+  return canvas;
+}
+
 void Utils::set_font(GtkWidget* widget, const string family, const string sytle, const int size) {
   PangoFontDescription* font = NULL;
 

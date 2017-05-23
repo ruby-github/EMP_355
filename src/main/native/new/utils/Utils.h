@@ -2,6 +2,7 @@
 #define __UTILS_H__
 
 #include <glib/gi18n.h>
+#include <goocanvas.h>
 #include <gtk/gtk.h>
 
 #include "utils/Settings.h"
@@ -42,6 +43,8 @@ public:
 
   static GtkMenuBar* create_menu_bar();
   static GtkMenuItem* create_menu_item(const string label);
+
+  static GooCanvas* create_canvas(const int width = 0, const int height = 0);
 
   static void set_font(GtkWidget* widget, const string family = "", const string sytle = "", const int size = 0);
   static void adjust_font_size(GtkWidget* widget, const string family, const string sytle,
