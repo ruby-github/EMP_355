@@ -437,8 +437,16 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "probe/ViewProbe.h"
+#include "comment/MenuNote.h"
 
 void Utils::test(GtkWidget* widget) {
-  ViewProbe::GetInstance()->CreateWindow(NULL, NULL, 3);
+  MenuNote m;
+  GtkWidget* w = m.Create();
+
+  GtkDialog* dialog = create_dialog(NULL, "test", 600, 450);
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
+  gtk_widget_show_all(GTK_WIDGET(dialog));
+
+
+  //ViewProbe::GetInstance()->CreateWindow(NULL, NULL, 3);
 }
