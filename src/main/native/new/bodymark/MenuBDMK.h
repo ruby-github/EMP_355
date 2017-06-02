@@ -1,79 +1,83 @@
-// -*- c++ -*-
-#ifndef MENU_BDMK_H
-#define MENU_BDMK_H
+#ifndef __MENU_BDMK_H__
+#define __MENU_BDMK_H__
 
-#include <string>
-#include <vector>
-
-using std::string;
-using std::vector;
+#include "utils/Utils.h"
 
 class MenuBDMK {
 public:
-    MenuBDMK();
-    ~MenuBDMK() {}
-    void Hide(void);
-    void Show(void);
-    void UpdateLabel(void);
+  MenuBDMK();
+  ~MenuBDMK();
 
-    GtkWidget* Create(void);
+public:
+  GtkWidget* Create();
+
+  void Hide();
+  void Show();
 
 private:
-    static const int MAX_IMAGE = 10;//15;
-    static const int MAX_ROWS = 5;
+  // signal
 
-    GtkWidget *m_fixed;
-    GtkWidget *m_combobox;
-    GtkWidget *m_labelPage;
-    GtkWidget *m_labelHide;
-    GtkWidget *m_btnLeft;
-    GtkWidget *m_btnRight;
-    GtkWidget *m_btn[MAX_IMAGE];
-    gint m_study;
-    gint m_numTotal;
-    gint m_pageCur;
-    GDir *m_dir;
-    vector<string> m_vecName;
+  static void signal_combobox_changed(GtkComboBox* combobox, MenuBDMK* data) {
+    if (data != NULL) {
+      data->ComboBoxChanged(combobox);
+    }
+  }
 
-    GdkPixbuf * m_pixbufSel;
+  static void signal_button_clicked_bdmk(GtkButton* button, MenuBDMK* data) {
+    if (data != NULL) {
+      data->ButtonClickedBDMK(button);
+    }
+  }
 
-    void SetPageValue(guint page, guint total_page);
-    void ChangeBDMKStudy(guchar study);
-    void UpdateImage(const char *path, int page);
-    void HideAllButton();
-    gint GetFileNum(const char *file);
-    static bool Sort(const string s1, const string s2);
-    gint SortFileName(gconstpointer p1, gconstpointer p2);
-    char* GetBdmkPath(const char *item);
+  static void signal_button_clicked_left(GtkButton* button, MenuBDMK* data) {
+    if (data != NULL) {
+      data->ButtonClickedLeft(button);
+    }
+  }
 
-    static gint HandleSortFileName(gconstpointer p1, gconstpointer p2, MenuBDMK *data) {
-        return (data->SortFileName(p1, p2));
+  static void signal_button_clicked_right(GtkButton* button, MenuBDMK* data) {
+    if (data != NULL) {
+      data->ButtonClickedRight(button);
     }
+  }
 
-    gchar* GetFilePath(int study);
-    //signal handle
-    void StudyChanged(GtkComboBox *combobox);
-    void BDMKClicked(GtkButton *button);
-    void HideClicked(GtkButton *button);
-    void LeftClicked(GtkButton *button);
-    void RightClicked(GtkButton *button);
+  // signal
 
-    //signal connect
-    static void HandleStudyChanged(GtkComboBox *combobox, MenuBDMK *data) {
-        data->StudyChanged(combobox);
-    }
-    static void HandleBDMKClicked(GtkButton *button, MenuBDMK *data) {
-        data->BDMKClicked(button);
-    }
-    static void HandleHideClicked(GtkButton *button, MenuBDMK *data) {
-        data->HideClicked(button);
-    }
-    static void HandleLeftClicked(GtkButton *button, MenuBDMK *data) {
-        data->LeftClicked(button);
-    }
-    static void HandleRightClicked(GtkButton *button, MenuBDMK *data) {
-        data->RightClicked(button);
-    }
+  void ComboBoxChanged(GtkComboBox* combobox);
+  void ButtonClickedBDMK(GtkButton* button);
+  void ButtonClickedLeft(GtkButton* button);
+  void ButtonClickedRight(GtkButton*button);
+
+private:
+  static bool Sort(const string s1, const string s2);
+
+private:
+  string GetBdmkPath(const string item);
+
+  void ChangeBDMKStudy(guchar study);
+  void SetPageValue(guint page, guint total_page);
+  void HideAllButton();
+  void UpdateImage(const string path, int page);
+
+private:
+  static const int MAX_IMAGE = 10;
+  static const int MAX_ROWS = 5;
+
+private:
+  GtkTable* m_table;
+  GtkComboBoxText* m_combobox_text;
+  GtkButton* m_button_images[MAX_IMAGE];
+  GtkButton* m_button_left;
+  GtkButton* m_button_right;
+  GtkLabel* m_label_page;
+
+  gint m_numTotal;
+  gint m_pageCur;
+  gint m_study;
+  GDir* m_dir;
+  GdkPixbuf* m_pixbufSel;
+
+  vector<string> m_vecName;
 };
 
 extern MenuBDMK g_menuBDMK;

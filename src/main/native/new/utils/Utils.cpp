@@ -437,10 +437,10 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "comment/MenuNote.h"
+#include "bodymark/MenuBDMK.h"
 
 void Utils::test(GtkWidget* widget) {
-  MenuNote m;
+  MenuBDMK m;
   GtkWidget* w = m.Create();
 
   GtkDialog* dialog = create_dialog(NULL, "test", 600, 450);

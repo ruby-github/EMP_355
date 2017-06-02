@@ -305,7 +305,7 @@ void MenuArea::UpdateLabel(void) {
     g_menuCW.UpdateLabel();
     g_menuCFM.UpdateLabel();
     g_menuMeasure.UpdateLabel();
-    g_menuBDMK.UpdateLabel();
+    //g_menuBDMK.UpdateLabel();
     g_menuReview.UpdateLabel();
     g_menuCalc.UpdateLabel();
     g_menuNote.UpdateLabel();

@@ -2,6 +2,7 @@
 
 #include "bodymark/MultiFuncBodyMark.h"
 #include "comment/MultiFuncArrow.h"
+#include "display/MenuArea.h"
 #include "keyboard/MultiFuncMode.h"
 #include "keyboard/MultiFuncValue.h"
 #include "ViewMain.h"

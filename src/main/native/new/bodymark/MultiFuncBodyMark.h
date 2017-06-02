@@ -1,67 +1,75 @@
-#ifndef MULTI_FUNC_BODYMARK_H
-#define MULTI_FUNC_BODYMARK_H
+#ifndef __MULTI_FUNC_BODYMARK_H__
+#define __MULTI_FUNC_BODYMARK_H__
 
-#include <gtk/gtk.h>
-#include "keyboard/KnobEvent.h"
 #include "utils/FakeXEvent.h"
+#include "utils/Utils.h"
+
 #include "AbsMultiFunc.h"
 #include "bodymark/BodyMark.h"
 
 class MultiFuncBodyMark: public FakeXEvent, public AbsMultiFunc {
 public:
-    MultiFuncBodyMark();
-    ~MultiFuncBodyMark();
+  static void SetNewBodyMark(GdkPixbuf* pixbuf);
 
-    static void SetNewBodyMark(GdkPixbuf* pixbuf);
-    static EKnobReturn SetBodyMarkSize(EKnobOper opr);
-    static EKnobReturn PressSetBodyMarkSize(void);
-    static EKnobReturn SetProbeMarkColor(EKnobOper opr);
-    static EKnobReturn PressSetProbeMarkColor(void);
-    static EKnobReturn PressSetHideBodyMark(EKnobOper opr);
-    static EKnobReturn PressSetHideBodyMark(void);
-    // event
-    void KeyEvent(unsigned char keyValue);
-    void KnobEvent(unsigned char keyValue, unsigned char offset);
-    void MouseEvent(char offsetX, char offsetY);
-    void KnobBodyMarkCreate();
+  static EKnobReturn SetBodyMarkSize(EKnobOper opr);
+  static EKnobReturn SetProbeMarkColor(EKnobOper opr);
+  static EKnobReturn PressSetBodyMarkSize();
+  static EKnobReturn PressSetProbeMarkColor();
+  static EKnobReturn PressSetHideBodyMark();
+  static EKnobReturn PressSetHideBodyMark(EKnobOper opr);
+
+public:
+  MultiFuncBodyMark();
+  ~MultiFuncBodyMark();
+
+public:
+  void KeyEvent(unsigned char keyValue);
+  void KnobEvent(unsigned char keyValue, unsigned char offset);
+  void MouseEvent(char offsetX, char offsetY);
+  void KnobBodyMarkCreate();
 
 private:
-    //enum {BDMK_W = 60, BDMK_H = 75};
-    enum BODYMARK_OPR {IDEL, ADD, MOVE_PROBE, MOVE_BODY};
+  static EKnobReturn GetKnobRetBodyMarkSize(BodyMark::SIZE size);
+  static EKnobReturn GetKnobRetProbeMarkColor(BodyMark::COLOR color);
 
-    static MultiFuncBodyMark* m_ptrThis;
-    POINT m_bodyPos[4]; // pos of left-up corner of bodymark
-    POINT m_probePos[4]; // pos of center of probe mark
-    POINT m_probePosOffset; // offset of probe mark to body mark(left-up corner)
-    GdkRectangle m_bodyPosRange; // range of bodymark's pos
-    BodyMark* m_ptrBodyMark;
-    BODYMARK_OPR m_bodyOpr;
-    int m_timer;
-    //bool m_firstDraw[4];
-    int m_active; // which bodymark is active,  equal to current B; must <= 4
+private:
+  void BeginMoveProbeMark();
+  void EndMoveProbeMark();
 
-    // opr
-    POINT GetPointProbe(int offsetX, int offsetY);
-    POINT GetPointBody(int offsetX, int offsetY);
-    void Value(EKnobOper opr);
-    void EndMoveProbeMark();
-    void EndMoveBodyMark();
-    void UndoMoveBodyMark();
-    void Esc();
-    void Hide(); // hide bodymark
-    bool Clicked();
-    bool DClicked();
+  void EndMoveBodyMark();
+  void UndoMoveBodyMark();
 
-    void AddNewBodyMark(GdkPixbuf* pixbuf);
-    void BeginMoveProbeMark();
-    void GetBodyMarkSize(int &w, int &h);
-    void ReviseProbePos(double scale);
+  void AddNewBodyMark(GdkPixbuf* pixbuf);
+  void GetBodyMarkSize(int& w, int& h);
+  void ReviseProbePos(double scale);
 
-    static EKnobReturn GetKnobRetBodyMarkSize(BodyMark::SIZE size);
-    static EKnobReturn GetKnobRetProbeMarkColor(BodyMark::COLOR color);
+  void Esc();
+  void Hide();
+  bool Clicked();
+  bool DClicked();
 
-    static gboolean HandleClicked(gpointer data) {
-        return m_ptrThis->Clicked();
-    }
+  POINT GetPointProbe(int offsetX, int offsetY);
+  POINT GetPointBody(int offsetX, int offsetY);
+
+  void Value(EKnobOper opr);
+
+private:
+  static MultiFuncBodyMark* m_this;
+
+private:
+  enum BODYMARK_OPR {
+    IDEL, ADD, MOVE_PROBE, MOVE_BODY
+  };
+
+  POINT m_bodyPos[4];           // pos of left-up corner of bodymark
+  POINT m_probePos[4];          // pos of center of probe mark
+  POINT m_probePosOffset;       // offset of probe mark to body mark(left-up corner)
+  GdkRectangle m_bodyPosRange;  // range of bodymark's pos
+  BodyMark* m_ptrBodyMark;
+  BODYMARK_OPR m_bodyOpr;
+
+  int m_timer;
+  int m_active;
 };
+
 #endif
