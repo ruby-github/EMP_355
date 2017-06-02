@@ -14,7 +14,7 @@
 #include "imageProc/ScanMode.h"
 #include "calcPeople/MeasureDef.h"
 
-extern SingleItemInfo userDef_new[100];
+extern SingleItemInfo g_userdef_new[MAX_USER_CALC_NUM];
 
 class MenuCalcNew {
 public:

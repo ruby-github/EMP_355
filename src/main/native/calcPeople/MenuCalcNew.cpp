@@ -19,7 +19,7 @@ static void ExpandChildMenu(int type) {
     g_menuCalc.ExpandMenu();
 }
 
-SingleItemInfo userDef_new[MAX_USER_CALC_NUM];
+SingleItemInfo g_userdef_new[MAX_USER_CALC_NUM];
 
 GUIMenuNew g_calcAllDefaultItem[] = {
     {NULL, ABD_GALLBLAD_VOL, MEA_2D, TEXT_ONLY, true, {ExpandChildMenu}},
@@ -1162,9 +1162,9 @@ void MenuCalcNew::UpdateAllCalcItems() {
         if (strlen(menu.name) != 0) {
             menu.mode = GetMeasureModeFromMeasureType(measureType);
             menu.pf.ptrNone = MeasureFunc;
-            userDef_new[i - customBegin].meaType = measureType;
-            strncpy(userDef_new[i - customBegin].title, menu.name, 40);
-            userDef_new[i - customBegin].unitItem = GetUnitItemFromMeasureType(measureType);
+            g_userdef_new[i - customBegin].meaType = measureType;
+            strncpy(g_userdef_new[i - customBegin].title, menu.name, 40);
+            g_userdef_new[i - customBegin].unitItem = GetUnitItemFromMeasureType(measureType);
         } else {
             menu.mode = MEA_UNKNOWN;
             menu.pf.ptrNone = NULL;
@@ -1282,11 +1282,11 @@ void MenuCalcNew::ClearUserDefineCalcItem() {
 
 void MenuCalcNew::ClearUserDefineSingleItemInfo() {
     for (int i = 0; i < MAX_USER_CALC_NUM; i++) {
-        userDef_new[i].item = USER_START + i;
-        userDef_new[i].meaType = MEA_TYPE_END;
-        userDef_new[i].title[0] = 0;
-        userDef_new[i].unitItem = UNIT_END;
-        userDef_new[i].ptrCalcInfo = NULL;
+        g_userdef_new[i].item = USER_START + i;
+        g_userdef_new[i].meaType = MEA_TYPE_END;
+        g_userdef_new[i].title[0] = 0;
+        g_userdef_new[i].unitItem = UNIT_END;
+        g_userdef_new[i].ptrCalcInfo = NULL;
     }
 }
 

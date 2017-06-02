@@ -1376,7 +1376,7 @@ const char* MeasureMan::GetMeasureTitle(int item) {
     else if((item>=EFW_MEA_START) && (item<EFW_MEA_END)) {
         return EFWInfo[item-EFW_MEA_START].title;
     } else if (item >=USER_START) {
-        return userDef_new[item-USER_START].title;
+        return g_userdef_new[item-USER_START].title;
     }
     return NULL;
 }
@@ -1441,7 +1441,7 @@ void MeasureMan::GetMeasureString(int item, const SingleItemInfo **ptrSingleItem
     else if ((item>=0) && (item< ABD_MEA_START)) {
         itemStart = 0;
         //	itemMultiStart = (int)ORTHO_MULTI_START;
-        ptrSingleItemStart = userDef_new;
+        ptrSingleItemStart = g_userdef_new;
         //	ptrMultiItemStart = OrthoMultiInfo;
     }
 #endif
@@ -1466,7 +1466,7 @@ void MeasureMan::GetMeasureString(int item, const SingleItemInfo **ptrSingleItem
     else if ((item>= USER_START) && (item< USER_END )) {
         itemStart =(int)USER_START;
         //	itemMultiStart = (int)ORTHO_MULTI_START;
-        ptrSingleItemStart = userDef_new;
+        ptrSingleItemStart = g_userdef_new;
         //	ptrMultiItemStart = OrthoMultiInfo;
     } else {
         itemStart = 0;

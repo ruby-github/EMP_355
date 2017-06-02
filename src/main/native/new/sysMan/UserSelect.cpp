@@ -5,6 +5,7 @@
 #include "Def.h"
 #include "patient/FileMan.h"
 #include "probe/ExamItem.h"
+#include "sysMan/ViewSystem.h"
 
 string listname[] = {};
 
@@ -335,8 +336,10 @@ void UserSelect::write_username(GtkComboBox* combobox, string db_dbname, string 
     // f.CopyFile("./res/config/ItemPara.ini", path);
     f.CopyFile(srcpath, path);
 
-    memset(user_configure, 0, USERCONFIG_LEN);
-    sprintf(user_configure, "%s%s%s", "userconfig/", record.c_str(), ".ini");
+    stringstream ss;
+    ss << "userconfig/" << record << ".ini";
+
+    g_user_configure = ss.str();
   }
 }
 

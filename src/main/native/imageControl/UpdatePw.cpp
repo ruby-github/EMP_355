@@ -261,13 +261,13 @@ void UpdatePw::SoundVolume(int index, EKnobReturn status) {
 }
 
 void UpdatePw::Simult(bool on, EKnobReturn status) {
-    const char * Toggle[2] = {
+    const string Toggle[] = {
         N_("OFF"),
         N_("ON")
     };
 
-    SyncKnobPw(PW_SIMULT, (char*)Toggle[on], status);
-    SyncKnobCfm(CFM_SIMULT, (char*)Toggle[on], status);
+    SyncKnobPw(PW_SIMULT, Toggle[on].c_str(), status);
+    SyncKnobCfm(CFM_SIMULT, Toggle[on].c_str(), status);
 }
 void UpdatePw::DynamicRange(int index, EKnobReturn status) {
     sprintf(m_str, "%d", index);

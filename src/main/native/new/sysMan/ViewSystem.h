@@ -4,33 +4,29 @@
 #include "utils/FakeXEvent.h"
 #include "utils/Utils.h"
 
+#include <sqlite3.h>
 #include "probe/ExamItem.h"
 
-#define NUM_KB 10
-#include <sqlite3.h>
-//typedef void (*pSetExamPara)(void);
-using namespace std;
 #define MAXNUMBER 100
 
+extern string g_user_configure;
+
 class SysCalculateSetting;
-class SysNoteSetting;
 class SysGeneralSetting;
 class SysMeasurementSetting;
+class SysNoteSetting;
 class SysOptions;
 
-typedef struct {
-    std::string brand;
-    std::string model;
-} common_printer;
-
-struct ExamPara {
-    string dept_name;
-    string name;
-    ExamItem::EItem index;
+struct CommonPrinter {
+  string brand;
+  string model;
 };
 
-extern char user_configure[USERCONFIG_LEN];
-extern FILE *fp_user;
+struct ExamPara {
+  string dept_name;
+  string name;
+  ExamItem::EItem index;
+};
 
 int _system_(const char *cmd);
 
@@ -41,30 +37,30 @@ public:
     static const int MAX_KEY = 10;//8;//9;
 
     static ViewSystem* GetInstance();
-    void CreateWindow(void);
-    void DestroyWindow(void);
-    GtkWidget* GetWindow(void);
+    void CreateWindow();
+    void DestroyWindow();
+    GtkWidget* GetWindow();
     void DoDicomTest();
-    int GetProbeType(void);
-    int GetCommentProbeType(void);
-    int GetKbType(void);
+    int GetProbeType();
+    int GetCommentProbeType();
+    int GetKbType();
     void UpdateHospitalandpart(int date_format, const char* hospital_name);
-    const gchar* GetUserName(void);
+    const gchar* GetUserName();
     void ShowList(const char *name);
     void set_active_user(gint num);
-    int get_active_user(void);
+    int get_active_user();
     void save_itemIndex(int itemIndex);
-    int  get_itemIndex(void);
+    int  get_itemIndex();
     void save_itemName(char *itemName);
     GtkWidget* GetVGACombobox();
 
     void get_itemName(char *itemName);
-    //char *get_itemName(void);
+    //char *get_itemName();
 
     void SetImagePara(const ExamItem::ParaItem &item);
     void GetImagePara(ExamItem::ParaItem &item);
     void save_image_para(ExamItem::ParaItem &item);
-    void update_specific_printer_model(void);
+    void update_specific_printer_model();
     //void GetItemListOfKb(char* KbModel, vector<enum PItem> *ptrItemList);
     void tree_auto_scroll(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path, gpointer user_data);
     void CreateDefineItemFormUsbToHost(char *name);
@@ -75,7 +71,7 @@ public:
 
     bool CheckFlagFromReportTemplet(int id);
 
-    void UpdateUserItem(void);
+    void UpdateUserItem();
 
 private:
     ViewSystem();
@@ -84,7 +80,6 @@ private:
     bool m_vgaInterl;
     GtkWidget *m_combobox_vga;
     //PItem m_itemIndex;
-    // vector<enum PItem> m_vecItemIndex[NUM_KB];
 
     enum {
         PRT_BRAND,
@@ -203,7 +198,7 @@ private:
 
     //vector<string> vecItemComment;
     vector<string> vecExamItem_comment;
-// measure
+    // measure
     GtkWidget *m_radiobutton_ml_on;
     GtkWidget *m_radiobutton_ml_off;
     GtkWidget *m_radiobutton_ml_high;
@@ -319,11 +314,11 @@ private:
     bool StrCmpCustomString(const char *string, int *language);
     bool StrCmpTemplet1String(const char *string, int *language);
 
-    void InitReportVar(void);
-    bool OpenDB(void);
-    bool CloseDB(void);
-    bool InitDB(void);
-    bool LocalizationDB(void);
+    void InitReportVar();
+    bool OpenDB();
+    bool CloseDB();
+    bool InitDB();
+    bool LocalizationDB();
 
     void AddTempletBySection( sqlite3 *db);
     void BtnRecoveryClicked(GtkButton *button);
@@ -334,19 +329,19 @@ private:
     GtkWidget *AddFrameByTitle2(char *title, int section, int startid, int endid, int *h);
     GtkWidget *AddFrameForOthers(const char *title, int *h);
 
-    GtkWidget *CreatWindowABD(void);
-    GtkWidget *CreatWindowAE(void);
-    GtkWidget *CreatWindowUR(void);
-    GtkWidget *CreatWindowOB(void);
-    GtkWidget *CreatWindowGYN(void);
-    GtkWidget *CreatWindowSP(void);
-    GtkWidget *CreatWindowFE(void);
-    GtkWidget *CreatWindowOTHERS(void);
-    GtkWidget *CreatWindowVES(void);
-    GtkWidget *CreatWindowTD(void);
-    GtkWidget *CreatWindowAnOB(void);
+    GtkWidget *CreatWindowABD();
+    GtkWidget *CreatWindowAE();
+    GtkWidget *CreatWindowUR();
+    GtkWidget *CreatWindowOB();
+    GtkWidget *CreatWindowGYN();
+    GtkWidget *CreatWindowSP();
+    GtkWidget *CreatWindowFE();
+    GtkWidget *CreatWindowOTHERS();
+    GtkWidget *CreatWindowVES();
+    GtkWidget *CreatWindowTD();
+    GtkWidget *CreatWindowAnOB();
 
-    GtkTreeModel *CreateTreeModel(void);
+    GtkTreeModel *CreateTreeModel();
     void TreeSelectionChanged(GtkTreeSelection *selection);
     void BtnAddClicked(GtkButton *button);
     void BtnSave2Clicked(GtkButton *button);
@@ -364,7 +359,7 @@ private:
     bool RenameNotice(int probe_type_index, char *new_text, char *dialognotice, int group_length);
     void TransEnglish(char *strname, char str[256],char *str_indexname,char str_index[256]);
 
-    std::vector <string> GetUserGroup(void);
+    std::vector <string> GetUserGroup();
     static void  on_combobox_video_changed(GtkComboBox *widget,ViewSystem *data) {
         data->BtnComboVideoChanged();
     }
@@ -427,7 +422,7 @@ private:
         data->BtnCancelClicked(button);
     }
 
-    GtkWidget *create_set_report(void);
+    GtkWidget *create_set_report();
 
     bool UniqueItem(const char *sections, const char *templet = "%", const char *childsection = "%");
     GtkTreeIter InsertUnique(GtkTreeModel *model, GtkTreeIter *iter, const char *str);
@@ -435,7 +430,7 @@ private:
 
     bool InitRecordFromShowArr(const char *childsection, int *start, int *end);
     bool ReadRecordFromDB(const char * sections, const char* templet, const char * childsection);
-    void apply_report_setting(void);
+    void apply_report_setting();
 
     void EntrytempletInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     //void EntryNewCheckPartInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
@@ -569,46 +564,46 @@ private:
     GtkCellRenderer *m_cellrenderer_comment_text;
     GtkCellRenderer *m_cellrenderer_comment_text1;
 
-    GtkWidget* create_note_general(void);
+    GtkWidget* create_note_general();
     void init_general_setting(SysGeneralSetting* sysGeneralSetting);
-    void save_general_setting(void);
-    GtkWidget* create_note_options(void);
+    void save_general_setting();
+    GtkWidget* create_note_options();
     void init_option_setting(SysOptions* sysOptions);
-    void save_option_setting(void);
-    GtkWidget* create_note_image(void);
-    void init_image_setting(void);
-    void save_image_setting(void);
-    void save_new_item(void);
+    void save_option_setting();
+    GtkWidget* create_note_image();
+    void init_image_setting();
+    void save_image_setting();
+    void save_new_item();
     void init_printer(SysGeneralSetting *sysGeneralSetting);
     void CreatePrinter();
-    void create_note_tvout(void);
+    void create_note_tvout();
     void init_tvout_setting(SysGeneralSetting *sysGeneralSetting);
-    void save_tvout_setting(void);
-    GtkWidget* create_note_dicom(void);
-    void init_dicom_setting(void);
-    void save_dicom_setting(void);
-    GtkWidget* create_note_comment(void);
+    void save_tvout_setting();
+    GtkWidget* create_note_dicom();
+    void init_dicom_setting();
+    void save_dicom_setting();
+    GtkWidget* create_note_comment();
     void init_comment_setting(SysNoteSetting* sysNote);
-    void save_comment_setting(void);
-    GtkWidget* create_note_measure(void);
+    void save_comment_setting();
+    GtkWidget* create_note_measure();
     void init_measure_setting(SysMeasurementSetting* sysMeasure);
-    void save_measure_setting(void);
-    GtkWidget* create_note_calc(void);
-    GtkWidget* create_note_calc_measure(void);
+    void save_measure_setting();
+    GtkWidget* create_note_calc();
+    GtkWidget* create_note_calc_measure();
     void init_calc_setting(SysCalculateSetting* sysCalc);
-    void save_calc_setting(void);
-    GtkWidget* create_note_key_config(void);
-    void init_key_config(void);
-    void save_key_config(void);
-    GtkWidget* create_note_info(void);
-    void init_info_setting(void);
-    GtkTreeModel* create_common_print_model(void);
-    GtkTreeModel* create_specific_print_model(void);
-    GtkWidget* create_common_print_treeview(void);
-    GtkWidget* create_specific_print_treeview(void);
+    void save_calc_setting();
+    GtkWidget* create_note_key_config();
+    void init_key_config();
+    void save_key_config();
+    GtkWidget* create_note_info();
+    void init_info_setting();
+    GtkTreeModel* create_common_print_model();
+    GtkTreeModel* create_specific_print_model();
+    GtkWidget* create_common_print_treeview();
+    GtkWidget* create_specific_print_treeview();
 
-    int common_printer_selection(void);
-    std::string specific_printer_selection(void);
+    int common_printer_selection();
+    std::string specific_printer_selection();
 
     // void add_print_column(GtkTreeView *treeview);
     GtkWidget * create_key_function_treeview(const std::string function_list[], unsigned int size);
@@ -625,7 +620,7 @@ private:
     void CreateItemList_Delete_Comment1(char *select_name, string probe_exam,vector<ExamPara>& vecItemComment1);
     void CreateItemList_Delete_Comment(char *select_name, char *department, vector<ExamPara>& vecDeleteComment);
     void add_exam_item_column(GtkTreeView *treeview);
-    void init_image_para(void);
+    void init_image_para();
     void set_image_item_sensitive(bool status);
     void image_para_combo_box_set(GtkWidget *combobox, int value);
     void image_para_restrict(int probeIndex);
@@ -1021,7 +1016,7 @@ public:
 
     static ViewCustomOB* GetInstance();
     void CreateWindow(GtkWidget *parent);
-    void DestroyWindow(void);
+    void DestroyWindow();
 private:
     ViewCustomOB();
 
@@ -1062,9 +1057,9 @@ private:
     GArray *m_arrayGW;
     GtkTreeModel *m_modelCustomOB;
 
-    GtkWidget* create_customOB_window(void);
-    void init_customOB(void);
-    void save_customOB(void);
+    GtkWidget* create_customOB_window();
+    void init_customOB();
+    void save_customOB();
     void insert_list(GtkTreeModel *model, int table[]);
     void update_list(int type);
 

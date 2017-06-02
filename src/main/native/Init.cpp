@@ -224,9 +224,13 @@ void Init::ProbeCheck() {
     (strcmp(userName, "Par défaut du sys.") != 0) &&
     (strcmp(userName, "Systemvorgabe") != 0) &&
     (strcmp(userName, "Sistema por defecto") !=0)) {
-    sprintf(user_configure, "%s%s%s", "userconfig/",userName, ".ini");
+
+    stringstream ss;
+    ss << "userconfig/" << userName << ".ini";
+
+    g_user_configure = ss.str();
   } else {
-    sprintf(user_configure, "%s", "ItemPara.ini");
+    g_user_configure = "ItemPara.ini";
   }
 
   string itemName;

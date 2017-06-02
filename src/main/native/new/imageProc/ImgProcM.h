@@ -35,7 +35,6 @@ public:
 private:
     ImgProcM();
 
-    ///> extern member
     static ImgProcM* m_ptrInstance;
 
     DSCCONTROLATTRIBUTES* m_ptrDscPara;

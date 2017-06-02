@@ -288,7 +288,7 @@ void ViewProbe::TreeViewButtonClicked(GtkTreeView* treeview, GdkEventButton* eve
         ss << "ItemPara.ini";
       }
 
-      sprintf(user_configure, "%s", ss.str().c_str());
+      g_user_configure = ss.str();
     }
 
     int x = 0;

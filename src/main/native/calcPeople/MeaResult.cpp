@@ -1842,12 +1842,12 @@ int MeaResult::FindSingleMeaInfo(int section, int item) {
         while ((i>=0) || (j < (USER_END - USER_START))) {
             if ((i==0) && (j== (USER_END -USER_START -1)))
                 break;
-            if (item != userDef_new[i].item) {
+            if (item != g_userdef_new[i].item) {
                 if (i>0) i--;
             } else
                 return i;
 
-            if (item != userDef_new[j].item) {
+            if (item != g_userdef_new[j].item) {
                 if (j < (USER_END - USER_START -1)) j++;
             } else
                 return j;

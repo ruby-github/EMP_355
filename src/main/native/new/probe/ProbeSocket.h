@@ -10,9 +10,9 @@ using std::vector;
 
 static const int NUM_PROBE = 11;
 
-extern string PROBE_LIST[NUM_PROBE]; // probe's name list
+extern string g_probe_list[NUM_PROBE];
 
-enum PROBE_TYPE {CONVEX_35R50, LINEAR_75W40, TV_65R10, TINYCONVEX_35R20, TINYCONVEX_65R15, PHASE_30P16A, LINEAR_90W25, LINEAR_10W25, VOLUME_35R40}; ///< order must identical to PROBE_LIST
+enum PROBE_TYPE {CONVEX_35R50, LINEAR_75W40, TV_65R10, TINYCONVEX_35R20, TINYCONVEX_65R15, PHASE_30P16A, LINEAR_90W25, LINEAR_10W25, VOLUME_35R40}; ///< order must identical to g_probe_list
 
 class ProbeSocket {
 public:

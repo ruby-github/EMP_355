@@ -101,7 +101,6 @@ public:
 private:
     ImgProc2D();
 
-    ///> extern member
     static ImgProc2D* m_ptrInstance;
 
     DSCCONTROLATTRIBUTES* m_ptrDscPara;

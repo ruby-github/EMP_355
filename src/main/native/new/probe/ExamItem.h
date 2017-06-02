@@ -276,7 +276,7 @@ private:
   ParaItem m_paraItem;      // current para of item-probe
   ParaItem m_paraOptimize;  // current image optimize para
 
-  vector<EItem> m_vecItemIndex[NUM_PROBE];  // save item list index of all support probe, example: m_itemIndex[0] save the item list of PROBE_LIST[0] = 35C50K
+  vector<EItem> m_vecItemIndex[NUM_PROBE];  // save item list index of all support probe, example: m_itemIndex[0] save the item list of g_probe_list[0] = 35C50K
   vector<string> m_vecUserItemName; // store user defined item
 };
 

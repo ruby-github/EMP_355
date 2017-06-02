@@ -97,8 +97,8 @@ int MeaFactoryMainSingle::SectionItem(int item, int *itemStart, const SingleItem
         return ORTHO_M;
     } else if((item >= USER_START) && (item < USER_END)) {
         int a(0);
-        //*ptrSingleItemInfo =(const SingleItemInfo *)userDef_new;
-        *ptrSingleItemInfo = userDef_new;
+        //*ptrSingleItemInfo =(const SingleItemInfo *)g_userdef_new;
+        *ptrSingleItemInfo = g_userdef_new;
         *itemStart = USER_START;
         return USER_M;
     }

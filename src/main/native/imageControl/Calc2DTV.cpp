@@ -202,7 +202,7 @@ void Calc2DTV::CalcFilterBandPass(int order) {
     int freqIndex = Img2D::GetInstance()->GetFreqIndex();
     string probe_type = TopArea::GetInstance()->GetProbeType();
     for (int i = 0; i < NUM_PROBE; ++i) {
-        if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0)
+        if (strcmp(probe_type.c_str(), g_probe_list[i].c_str()) == 0)
             probeIndex = i;
     }
 
@@ -260,7 +260,7 @@ void Calc2DTV::CalcDynamicFilter(int order) {
     int freqIndex = Img2D::GetInstance()->GetFreqIndex();
     string probe_type = TopArea::GetInstance()->GetProbeType();
     for (int i = 0; i < NUM_PROBE; ++i) {
-        if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0)
+        if (strcmp(probe_type.c_str(), g_probe_list[i].c_str()) == 0)
             probeIndex = i;
     }
     int probeR = m_calcPara->probeR;
@@ -653,7 +653,7 @@ void Calc2DTV::CalcDynamicDemod(int order) {
     int probeIndex = 0;
     string probe_type = TopArea::GetInstance()->GetProbeType();
     for (i = 0; i < NUM_PROBE; ++i) {
-        if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0)
+        if (strcmp(probe_type.c_str(), g_probe_list[i].c_str()) == 0)
             probeIndex = i;
     }
 

@@ -164,7 +164,6 @@ protected:
     static const int PHASELINE = 256;
     static const int APERTURE_PHASE = 24; //16;
 
-    ///> extern
     static FpgaCtrl2D m_fpga;
     FpgaPw m_fpgaPW;
     static struct CalcPara* m_calcPara;

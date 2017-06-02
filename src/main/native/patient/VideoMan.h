@@ -88,7 +88,7 @@ private:
     void WriteConfigPara(VideoItem *ptrItem, string section, IniFile* ptrIni);
     void ReadConfigPara(VideoItem *ptrItem, string section, IniFile* ptrIni);
 
-    ///> extern member
+
     static VideoMan* m_ptrInstance;
     static struct VideoItem* m_ptrVideoItem;
 

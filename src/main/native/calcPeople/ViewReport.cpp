@@ -3650,7 +3650,7 @@ void ViewReport::InitTableData() {
     for(i=0; i<USER_END-USER_START; i++)
         for(j=0; j<CALC_MAX; j++)
             m_TableUser[i][j] = -1;
-    InitMapTable(m_TableUser, USER_START, USER_END,userDef_new);
+    InitMapTable(m_TableUser, USER_START, USER_END,g_userdef_new);
 
 }
 

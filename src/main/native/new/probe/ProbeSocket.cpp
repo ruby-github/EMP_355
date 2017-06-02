@@ -8,7 +8,7 @@ enum EPROBELIST355 {
   P65C10IP
 };
 
-string PROBE_LIST[NUM_PROBE] = {
+string g_probe_list[NUM_PROBE] = {
   "35C50L", "70L40J", "75L40J", "70L60J", "90L40J",
   "65C10L", "35C20I", "65C15E", "30P16B", "10L25K",
   "65C10I"
@@ -348,8 +348,8 @@ int ProbeSocket::GetProbeIndex(char* model, unsigned char probeType) {
   PRINTF("----------------model = %s\n", model);
   int index = 0;
   for (index = 0; index < NUM_PROBE; index ++) {
-      PRINTF("list model = %s\n", PROBE_LIST[index].c_str());
-      if (strcmp(model, PROBE_LIST[index].c_str()) == 0) {
+      PRINTF("list model = %s\n", g_probe_list[index].c_str());
+      if (strcmp(model, g_probe_list[index].c_str()) == 0) {
           break;
       }
   }
@@ -414,7 +414,7 @@ string ProbeSocket::GetProbeFactoryFlag(char* flag, char* model) {
   if(strFlag.empty()) {
     int i;
     for (i = 0; i < NUM_PROBE; i ++) {
-      if (strcmp(model, PROBE_LIST[i].c_str()) == 0) {
+      if (strcmp(model, g_probe_list[i].c_str()) == 0) {
         break;
       }
     }

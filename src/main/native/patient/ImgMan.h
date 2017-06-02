@@ -75,7 +75,6 @@ private:
     void WriteConfigPara(ImgItem *ptrItem, IniFile* ptrIni, string section=SECTION);
     void ReadConfigPara(ImgItem *ptrItem, IniFile* ptrIni, string section=SECTION);
 
-    ///> extern member
     static ImgMan* m_ptrInstance;
     static struct ImgItem* m_ptrImgItem;
 

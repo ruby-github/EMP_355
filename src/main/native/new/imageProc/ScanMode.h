@@ -119,7 +119,6 @@ private:
 
     static ScanMode* m_ptrInstance;
     AbsUpdatePw* m_ptrUpdate;
-    // extern
     FpgaCtrl2D m_fpgaCtrl2D;
 
     AbsUpdate2D* m_ptrUpdate2D;

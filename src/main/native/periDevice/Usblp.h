@@ -58,7 +58,6 @@ int size_x:图像宽度_像素为单位
 int size_y:图像高度_像素为单位
 unsigned char* printer_name: 打印机名称
 *************************************************************/
-//extern int print_report(struct print_re_item item, int size_x, int size_y, gint8 language);
 extern int print_report(int size_x, int size_y, gint8 language);
 extern void itoa(int data, char *string, unsigned char length);
 

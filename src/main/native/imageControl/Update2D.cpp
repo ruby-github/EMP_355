@@ -19,7 +19,7 @@
 
 #include "utils/Const.h"
 
-const char * Toggle[2] = {
+const string Toggle[] = {
     N_("OFF"),
     N_("ON")
 };
@@ -131,7 +131,7 @@ void Update2D::LineDensity(const char* density, EKnobReturn status) {
 }
 
 void  Update2D::Harmonic(bool on, EKnobReturn status) {
-    SyncKnobD2(D2_THI, Toggle[on], status);
+    SyncKnobD2(D2_THI, Toggle[on].c_str(), status);
     m_ptrImgPara->Update2DTHI(on);
 }
 
@@ -787,7 +787,7 @@ void Update2D::UpDown(bool on) {
 void Update2D::Polarity(bool on, EKnobReturn status) {
 //	g_menu2D.UpdatePolarity(on);
 //	g_menuM.UpdatePolarity(on);
-    SyncKnobD2(D2_POLARITY, Toggle[on], status);
+    SyncKnobD2(D2_POLARITY, Toggle[on].c_str(), status);
 }
 
 void Update2D::NoiseReject(bool on) {
@@ -845,7 +845,7 @@ void Update2D::ImgEhn(int data, EKnobReturn status) {
 
 void Update2D::CompoundSpace(int angle, EKnobReturn status) {
     if (angle == 0)
-        sprintf(m_str, "%s", Toggle[0]);
+        sprintf(m_str, "%s", Toggle[0].c_str());
     else
         //sprintf(m_str, "%d°", angle);
         sprintf(m_str, "%d", angle);
@@ -853,16 +853,16 @@ void Update2D::CompoundSpace(int angle, EKnobReturn status) {
     SyncKnobD2(D2_SPACE_COMPOUND, m_str, status);
 }
 void Update2D::CompoundFreq(bool on, EKnobReturn status) {
-    SyncKnobD2(D2_FREQ_COMPOUND, Toggle[on], status);
+    SyncKnobD2(D2_FREQ_COMPOUND, Toggle[on].c_str(), status);
 }
 
 void Update2D::TpView(int index, EKnobReturn status) {
     //SyncKnobD2(D2_TP_VIEW, TpName[index], status);
-    SyncKnobD2(D2_TP_VIEW, Toggle[index], status);
+    SyncKnobD2(D2_TP_VIEW, Toggle[index].c_str(), status);
 }
 
 void Update2D::EFVI(bool on, EKnobReturn status) {
-    SyncKnobD2(D2_EFVI, Toggle[on], status);
+    SyncKnobD2(D2_EFVI, Toggle[on].c_str(), status);
 }
 
 // M

@@ -1,3 +1,16 @@
+#include "sysMan/ViewSystem.h"
+
+
+// ---------------------------------------------------------
+//
+//  ViewSystem
+//
+// ---------------------------------------------------------
+
+// ---------------------------------------------------------
+
+// ---------------------------------------------------------
+
 #include "periDevice/DCMMan.h"
 #include <string.h>
 #include <time.h>
@@ -11,7 +24,7 @@
 #include "sysMan/UpgradeMan.h"
 #include "display/gui_func.h"
 #include "display/gui_global.h"
-#include "sysMan/ViewSystem.h"
+
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/KeyDef.h"
 #include "periDevice/PeripheralMan.h"
@@ -65,9 +78,6 @@
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
 
-using std::vector;
-using std::string;
-
 const string KeyFunctionList[] = {
   N_("NULL"),
   N_("TSI"),
@@ -80,7 +90,6 @@ const string KeyFunctionList[] = {
   N_("Image Preset"),
   N_("Biopsy")
 };
-
 
 extern bool g_authorizationOn;
 #include "utils/Const.h"
@@ -113,13 +122,13 @@ int _system_(const char *cmd) {
     return status;
 }
 
-static string KB_LIST[NUM_KB]= {
-    "Abdomen","Urology", "Cardiac","Obstetrics","Gynecology","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
+const string KB_LIST[]= {
+  "Abdomen","Urology", "Cardiac","Obstetrics","Gynecology","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
 };
 
-char user_configure[USERCONFIG_LEN] = "ItemPara.ini";
+string g_user_configure = "ItemPara.ini";
 
-static common_printer common_printer_data[] = {
+const CommonPrinter COMMON_PRINTER_DATA[] = {
     {"HP",    "LaserJet Series"},
     {"HP",    "DeskJet Series"},
     {"HP",    "New DeskJet Series"},
@@ -131,7 +140,7 @@ static common_printer common_printer_data[] = {
     {"EPSON", "New Stylus Photo Series"},
 };
 
-const static ExamPara ExamItemArray[] = {
+const ExamPara ExamItemArray[] = {
     {N_("Abdomen"), N_("Adult Abdomen"), ExamItem::ABDO_ADULT},
     {N_("Abdomen"), N_("Adult Liver"), ExamItem::ABDO_LIVER},
     {N_("Abdomen"), N_("Kid Abdomen"), ExamItem::ABDO_KID},
@@ -171,7 +180,7 @@ const static ExamPara ExamItemArray[] = {
     {N_("User Defined"), N_("User defined 4"), ExamItem::USER4}
 };
 
-ViewSystem::ViewSystem(void) {
+ViewSystem::ViewSystem() {
     m_p1Selected = true;
     m_p1_func_index = 0;
     m_p2_func_index = 0;
@@ -204,7 +213,7 @@ ViewSystem* ViewSystem::GetInstance() {
     return m_ptrInstance;
 }
 
-GtkWidget* ViewSystem::GetWindow(void) {
+GtkWidget* ViewSystem::GetWindow() {
     return m_window;
 }
 
@@ -285,12 +294,12 @@ bool ViewSystem::StrCmpTemplet1String(const char *string, int *language) {
     return false;
 }
 
-bool ViewSystem::OpenDB(void) {
+bool ViewSystem::OpenDB() {
     if(sqlite3_open(CustomReport_PATH, &CustomReport_db) != SQLITE_OK)return false;
     return true;
 }
 
-bool ViewSystem::CloseDB(void) {
+bool ViewSystem::CloseDB() {
     if (sqlite3_close(CustomReport_db) != SQLITE_OK) {
         PRINTF("Database Close Error:%s\n", sqlite3_errmsg(CustomReport_db));
         return false;
@@ -299,7 +308,7 @@ bool ViewSystem::CloseDB(void) {
     return true;
 }
 
-bool ViewSystem::InitDB(void) {
+bool ViewSystem::InitDB() {
     if(access(CustomReport_PATH, F_OK)) {
         sqlite3 *db = 0;
         if (sqlite3_open(CustomReport_PATH, &db) != SQLITE_OK) {
@@ -355,7 +364,7 @@ bool ViewSystem::InitDB(void) {
     return true;
 }
 
-bool ViewSystem::LocalizationDB(void) {
+bool ViewSystem::LocalizationDB() {
     char *errmsg = NULL;
     sqlite3_stmt *stmt_f1=NULL;
     const char *sections = NULL, *templet = NULL, *childsection = NULL;
@@ -533,7 +542,7 @@ bool ViewSystem::LocalizationDB(void) {
     return true;
 }
 
-GtkTreeModel *ViewSystem:: CreateTreeModel(void) {
+GtkTreeModel *ViewSystem:: CreateTreeModel() {
     InitDB();
     LocalizationDB();
     OpenDB();
@@ -1092,7 +1101,7 @@ GtkWidget* ViewSystem::AddFrameForOthers(const char *title, int *h) {
     return frame;
 }
 
-GtkWidget *ViewSystem::CreatWindowABD(void) {
+GtkWidget *ViewSystem::CreatWindowABD() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1132,7 +1141,7 @@ GtkWidget *ViewSystem::CreatWindowABD(void) {
     return m_WindowABD = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowAE(void) {
+GtkWidget *ViewSystem::CreatWindowAE() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1212,7 +1221,7 @@ GtkWidget *ViewSystem::CreatWindowAE(void) {
     return m_WindowAE = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowUR(void) {
+GtkWidget *ViewSystem::CreatWindowUR() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1261,7 +1270,7 @@ GtkWidget *ViewSystem::CreatWindowUR(void) {
     return m_WindowUR = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowOB(void) {
+GtkWidget *ViewSystem::CreatWindowOB() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1369,7 +1378,7 @@ GtkWidget *ViewSystem::CreatWindowOB(void) {
     return m_WindowOB = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowGYN(void) {
+GtkWidget *ViewSystem::CreatWindowGYN() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1408,7 +1417,7 @@ GtkWidget *ViewSystem::CreatWindowGYN(void) {
     return m_WindowGYN = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowSP(void) {
+GtkWidget *ViewSystem::CreatWindowSP() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1451,7 +1460,7 @@ GtkWidget *ViewSystem::CreatWindowSP(void) {
     return m_WindowSP = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowFE(void) {
+GtkWidget *ViewSystem::CreatWindowFE() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1527,7 +1536,7 @@ GtkWidget *ViewSystem::CreatWindowFE(void) {
     return m_WindowFE = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowOTHERS(void) {
+GtkWidget *ViewSystem::CreatWindowOTHERS() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1568,7 +1577,7 @@ GtkWidget *ViewSystem::CreatWindowOTHERS(void) {
     return m_WindowOTHERS = scrolledwindow;
 }
 
-GtkWidget *ViewSystem::CreatWindowVES(void) {
+GtkWidget *ViewSystem::CreatWindowVES() {
     GtkWidget* scrolledwindow;
     GtkWidget* frame;
     GtkWidget *viewport;
@@ -1660,7 +1669,7 @@ void ViewSystem::ChangeCommentExamBoxDelete(int probe_type) {
 
   if(comment_probe == probe_type) {
     ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[comment_probe]);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[comment_probe]);
 
     vecExamItem_comment.clear();
     vector<int>::iterator iter_index;
@@ -2115,7 +2124,7 @@ void ViewSystem::BtnDeleteClicked(GtkButton *button) {
     gtk_widget_hide(button_cancel);
 }
 
-void ViewSystem::InitReportVar(void) {
+void ViewSystem::InitReportVar() {
     show_window = NULL;
 
     m_WindowABD = NULL;
@@ -2139,7 +2148,7 @@ void ViewSystem::InitReportVar(void) {
     init_language = sys.GetLanguage();
 }
 
-GtkWidget *ViewSystem::create_set_report(void) {
+GtkWidget *ViewSystem::create_set_report() {
     InitReportVar();
     GtkWidget* fixed = gtk_fixed_new ();
     gtk_widget_show (fixed);
@@ -2384,7 +2393,7 @@ bool ViewSystem::ReadRecordFromDB(const char * sections, const char* templet, co
     return true;
 }
 
-void ViewSystem::apply_report_setting(void) {
+void ViewSystem::apply_report_setting() {
     GtkTreeIter iter;
     GtkTreeModel *model;
     char *templet;
@@ -2500,7 +2509,7 @@ bool ViewSystem::CheckFlagFromReportTemplet(int id) {
         return false;
 }
 
-void ViewSystem::CreateWindow(void) {
+void ViewSystem::CreateWindow() {
     GtkWidget *fixed_main;
     //    GtkWidget *button_title;
     //    GtkWidget *label_title;
@@ -2759,7 +2768,7 @@ static gboolean ExitWindowSystem(gpointer data) {
     return FALSE;
 }
 
-void ViewSystem::DestroyWindow(void) {
+void ViewSystem::DestroyWindow() {
     if(GTK_IS_WIDGET(m_window)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
@@ -2773,7 +2782,7 @@ void ViewSystem::DestroyWindow(void) {
         g_timeout_add(500, PowerOff, this);
 }
 
-GtkWidget* ViewSystem::create_note_general(void) {
+GtkWidget* ViewSystem::create_note_general() {
     GtkWidget *fixed_general;
     //    GtkWidget *entry_hospital;
     GtkWidget *label_hospital;
@@ -3219,7 +3228,7 @@ void ViewSystem::BtnDelPrinterClicked(GtkButton *button) {
     update_specific_printer_model();
 }
 
-int ViewSystem::common_printer_selection(void) {
+int ViewSystem::common_printer_selection() {
     GtkTreeModel *model;
     GtkTreeIter iter;
 
@@ -3231,7 +3240,7 @@ int ViewSystem::common_printer_selection(void) {
     return atoi(index_str);
 }
 
-string ViewSystem::specific_printer_selection(void) {
+string ViewSystem::specific_printer_selection() {
     GtkTreeModel *model;
     GtkTreeIter iter;
     string ret_val;
@@ -3245,7 +3254,7 @@ string ViewSystem::specific_printer_selection(void) {
         ret_val = value;
     return ret_val;
 }
-void ViewSystem::update_specific_printer_model(void) {
+void ViewSystem::update_specific_printer_model() {
     GtkTreeModel* model = create_specific_print_model();
     if (model != NULL)
         gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeview_specific_print), model);
@@ -3294,7 +3303,7 @@ void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
     delete sysGeneralSetting;
 }
 extern bool review_pic;
-void ViewSystem::save_general_setting(void) {
+void ViewSystem::save_general_setting() {
     SysGeneralSetting sysGeneralSetting;
 
     const char * hospital_name = gtk_entry_get_text(GTK_ENTRY(m_entry_hospital));
@@ -3408,7 +3417,7 @@ void ViewSystem::save_general_setting(void) {
     ViewNewPat::GetInstance()->UpdateNameLength();
 }
 
-GtkWidget* ViewSystem::create_note_options(void) {
+GtkWidget* ViewSystem::create_note_options() {
     GtkWidget *fixed_options;
 
     GtkWidget *frame_TI;
@@ -4048,7 +4057,7 @@ void ViewSystem::init_option_setting(SysOptions* sysOptions) {
     delete sysOptions;
 }
 
-void ViewSystem::save_option_setting(void) {
+void ViewSystem::save_option_setting() {
     SysOptions sysOptions;
 
     unsigned char centerLineIndex = 0;
@@ -4149,7 +4158,7 @@ void ViewSystem::save_option_setting(void) {
     VideoMan::GetInstance()->SetVideoNameMode(videoFileIndex);
 }
 
-GtkWidget* ViewSystem::create_note_image(void) {
+GtkWidget* ViewSystem::create_note_image() {
     GtkWidget *fixed_image;
     GtkWidget *label_probe_type;
     // GtkWidget *combobox_probe_type;
@@ -4352,7 +4361,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     string default_probe;
     default_probe=exam.ReadDefaultProbe(&ini);
     for (i = 0; i < NUM_PROBE; i++) {
-        if(strcmp(default_probe.c_str(), PROBE_LIST[i].c_str())==0) {
+        if(strcmp(default_probe.c_str(), g_probe_list[i].c_str())==0) {
             save_itemIndex(i);
             break;
         }
@@ -4374,7 +4383,7 @@ GtkWidget* ViewSystem::create_note_image(void) {
     //gtk_fixed_put (GTK_FIXED (fixed_image), m_combobox_probe_type, 110+20, 40+10);
     gtk_widget_set_size_request (m_combobox_probe_type, 120+25+25, 30);
     for (i = 0; i < NUM_PROBE; i++) {
-        string  newProbeName = ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i]);
+        string  newProbeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_type), newProbeName.c_str());
     }
 
@@ -5430,7 +5439,7 @@ void ViewSystem::CreateDefineItem(int probeIndex, vector<ExamPara>& vecExamItem)
 
     if(userselectname == userselect ) {
       if (probeIndex >= 0 && probeIndex <= NUM_PROBE) {
-        if (probelist == PROBE_LIST[probeIndex]) {
+        if (probelist == g_probe_list[probeIndex]) {
           vecExamItem.push_back(exampara);
         }
       }
@@ -5524,7 +5533,7 @@ void ViewSystem::CreateDefineItem_comment(int probeIndex, vector<string>& vecExa
 
     if (userselectname == userselect) {
       if (probeIndex >= 0 && probeIndex <= NUM_PROBE) {
-        if (probelist == PROBE_LIST[probeIndex]) {
+        if (probelist == g_probe_list[probeIndex]) {
           vecExamItem_comment.push_back(useritem);
         }
       }
@@ -5549,7 +5558,7 @@ bool ViewSystem::RenameNotice(int probe_type_index, char *new_text, char *dialog
 
     if (userselectname == userselect) {
       if (probe_type_index >= 0 && probe_type_index <= NUM_PROBE) {
-        if (probelist == PROBE_LIST[probe_type_index]) {
+        if (probelist == g_probe_list[probe_type_index]) {
           if (useritem == new_text) {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
               MessageDialog::DLG_ERROR, dialognotice, NULL); // 重命名失败!该结点已存在
@@ -5808,7 +5817,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
         GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
 
         //刷新treeview
-        vector<ExamItem::EItem> vecItemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probeIndex]);
+        vector<ExamItem::EItem> vecItemIndex = examItem.GetItemListOfProbe(g_probe_list[probeIndex]);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(vecItemIndex));
         //gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_treeview_exam_type), new_path);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
@@ -5889,7 +5898,7 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
     int probeIndex = GetProbeType();
 
     ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probeIndex]);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[probeIndex]);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(itemIndex));
     gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_treeview_exam_type), new_path);
     //设置结点为编辑状态
@@ -5968,7 +5977,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
             string userprobe = ptrIni->ReadString("ProbeModel", "ProbeModel");
             const char* username = GetUserName();
 
-            if((strcmp(useritemname.c_str(),str0.c_str())==0)&&(userflag==true)&&(strcmp(userprobe.c_str(),PROBE_LIST[probeIndex].c_str())==0)&&(strcmp(username,  _(userselect.c_str()))==0)) {
+            if((strcmp(useritemname.c_str(),str0.c_str())==0)&&(userflag==true)&&(strcmp(userprobe.c_str(),g_probe_list[probeIndex].c_str())==0)&&(strcmp(username,  _(userselect.c_str()))==0)) {
                 MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
                                                   _("Fail to delete! The item is under using!"), NULL); //删除失败!
                 return;
@@ -5999,7 +6008,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
                 GtkTreePath *parent_path = gtk_tree_model_get_path(model, &parent_iter);
 
                 ExamItem examItem;
-                vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probeIndex]);
+                vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[probeIndex]);
                 gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), create_exam_item_model(itemIndex));
 
 
@@ -6066,13 +6075,14 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
     select = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
     if (select >= 0) {
         gchar * name = gtk_combo_box_get_active_text (GTK_COMBO_BOX(widget));
-        memset(user_configure, 0, USERCONFIG_LEN);
+
         if (select > 0) {
-            sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");
+          stringstream ss;
+          ss << "userconfig/" << name << ".ini";
+
+          g_user_configure = ss.str();
         } else {
-
-            sprintf(user_configure, "%s", "ItemPara.ini");
-
+          g_user_configure = "ItemPara.ini";
         }
         set_image_item_sensitive(false);
         save_itemIndex(-1);
@@ -6082,7 +6092,7 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
         if (index == -1)
             return;
         ExamItem examItem;
-        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
         GtkTreeModel* model = create_exam_item_model(itemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
@@ -6090,18 +6100,19 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
     }
 }
 
-void ViewSystem::UpdateUserItem(void) {
+void ViewSystem::UpdateUserItem() {
 // gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), 0);
     const char* name = GetUserName();
     printf("name = %s\n", name);
-    memset(user_configure, 0, USERCONFIG_LEN);
     if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
             (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
-        sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");
-    } else {
+        stringstream ss;
+        ss << "userconfig/" << name << ".ini";
 
-    sprintf(user_configure, "%s", "ItemPara.ini");
+        g_user_configure = ss.str();
+    } else {
+      g_user_configure = "ItemPara.ini";
     }
     set_image_item_sensitive(false);
     save_itemIndex(-1);
@@ -6111,7 +6122,7 @@ void ViewSystem::UpdateUserItem(void) {
     if (index == -1)
         return;
     ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
     GtkTreeModel* model = create_exam_item_model(itemIndex);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
     gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
@@ -6155,7 +6166,7 @@ GtkTreeModel* ViewSystem::create_item_comment_model1() {
 
     vector<ExamPara> vecItemComment1;
     vecItemComment1.clear();
-    CreateItemList_Comment1(PROBE_LIST[index1] + "-" +exam_type, vecItemComment1);
+    CreateItemList_Comment1(g_probe_list[index1] + "-" +exam_type, vecItemComment1);
     int item_size(0);
     item_size = vecItemComment1.size();
 
@@ -6256,7 +6267,7 @@ int ViewSystem::DepartmentIndex() {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
 
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -6488,7 +6499,7 @@ void ViewSystem::ProbeCommentChanged(GtkComboBox *widget) {
         return;
     }
     ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
 
     create_exam_comment_model(itemIndex);
 }
@@ -6504,7 +6515,7 @@ void ViewSystem::ProbeTypeChanged(GtkComboBox *widget) {
         return;
     }
     ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
 
     GtkTreeModel *model = create_exam_item_model(itemIndex);
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
@@ -6574,16 +6585,16 @@ void ViewSystem::set_active_user(gint num) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_user_select), num);
 }
 
-int ViewSystem::get_active_user(void) {
+int ViewSystem::get_active_user() {
     return gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxentry_user_select));
 }
 
-const gchar* ViewSystem::GetUserName(void) {
+const gchar* ViewSystem::GetUserName() {
     return gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_user_select))));
 
 }
 
-int ViewSystem::GetProbeType(void) {
+int ViewSystem::GetProbeType() {
     return gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_type));
 }
 
@@ -6790,7 +6801,7 @@ void ViewSystem::save_itemName(char *itemName) {
 
 }
 
-int ViewSystem::get_itemIndex(void) {
+int ViewSystem::get_itemIndex() {
     return m_itemIndex;
 }
 
@@ -6888,10 +6899,10 @@ bool ViewSystem::ExamTypeTestRowExpandBefore(GtkTreeView *tree_view, GtkTreeIter
     return FALSE; //必须要有返回值,才能触发事件
 }
 
-void ViewSystem::init_image_setting(void) {
+void ViewSystem::init_image_setting() {
     string probe_type = TopArea::GetInstance()->GetProbeType();
     for (int i = 0; i < NUM_PROBE; ++i) {
-        if (strcmp(probe_type.c_str(), PROBE_LIST[i].c_str()) == 0) {
+        if (strcmp(probe_type.c_str(), g_probe_list[i].c_str()) == 0) {
             string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(probe_type);
             gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), i);
         }
@@ -6900,7 +6911,7 @@ void ViewSystem::init_image_setting(void) {
     set_image_item_sensitive(false);
 }
 
-void ViewSystem::init_image_para(void) {
+void ViewSystem::init_image_para() {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_mbp), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ao_power), -1);
 
@@ -7008,7 +7019,7 @@ void ViewSystem::set_image_item_sensitive(bool status) {
     gtk_widget_set_sensitive(m_combobox_color_rejection, status);
 }
 
-void ViewSystem::save_image_setting(void) {
+void ViewSystem::save_image_setting() {
     const char* name = GetUserName();
     if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
             (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
@@ -7141,7 +7152,7 @@ void ViewSystem::init_printer(SysGeneralSetting *sysGeneralSetting) {
     delete sysGeneralSetting;
 }
 
-void ViewSystem::create_note_tvout(void) {
+void ViewSystem::create_note_tvout() {
     GtkWidget *label_video;
     GtkWidget *label_connector_type;
     GtkWidget *label_connector_hint;
@@ -7302,7 +7313,7 @@ void ViewSystem::init_tvout_setting(SysGeneralSetting *sysGeneralSetting) {
     delete sysGeneralSetting;
 }
 
-void ViewSystem::save_tvout_setting(void) {
+void ViewSystem::save_tvout_setting() {
     SysGeneralSetting sysGeneralSetting;
 
     int VideoModeIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video));
@@ -7370,7 +7381,7 @@ void ViewSystem::BtnTVOutDefaultClicked(GtkButton *button) {
     init_tvout_setting(sysGeneralSetting);
 }
 
-GtkWidget* ViewSystem::create_note_calc_measure(void) {
+GtkWidget* ViewSystem::create_note_calc_measure() {
     GtkWidget *fixed_calc_measure;
     GtkWidget *fixed_calc;
     GtkWidget *label_calc;
@@ -7407,7 +7418,7 @@ GtkWidget* ViewSystem::create_note_calc_measure(void) {
     return fixed_calc_measure;
 }
 
-GtkWidget* ViewSystem::create_note_dicom(void) {
+GtkWidget* ViewSystem::create_note_dicom() {
     GtkWidget *fixed_dicom;
     GtkWidget *fixed_local;
     GtkWidget *label_local;
@@ -7501,7 +7512,7 @@ void ViewSystem::LanguageChanged(GtkComboBox *box) {
         gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), 2);  //set date format to d:m:y)
 }
 
-GtkWidget* ViewSystem::create_note_comment(void) {
+GtkWidget* ViewSystem::create_note_comment() {
     //GtkWidget *fixed_comment;
     GtkWidget *frame_comment_font;
     GtkWidget *hbox_comment_font;
@@ -7536,7 +7547,7 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     string default_probe;
     default_probe=exam.ReadDefaultProbe(&ini);
     for (int j = 0; j < NUM_PROBE; j++) {
-        if(strcmp(default_probe.c_str(), PROBE_LIST[j].c_str())==0) {
+        if(strcmp(default_probe.c_str(), g_probe_list[j].c_str())==0) {
             probe_comment_index = j;
             break;
         } else
@@ -7548,7 +7559,7 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_probe_comment, 110+20+20+20-30, 10+10+5);
     gtk_widget_set_size_request (m_combobox_probe_comment, 120, 30);
     for (int i = 0; i < NUM_PROBE; i++) {
-        string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(PROBE_LIST[i]);
+        string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_comment), newProbeName.c_str());
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_comment), probe_comment_index);//-1);
@@ -7567,7 +7578,7 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     gtk_widget_set_size_request (m_combobox_exam_comment, 120, 30);
 
     ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[probe_comment_index]);
+    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[probe_comment_index]);
     create_exam_comment_model(itemIndex);
     //gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_exam_comment), 0);//-1);
     g_signal_connect(m_combobox_exam_comment, "changed", G_CALLBACK(HandleExamCommentChanged), this);
@@ -7817,7 +7828,7 @@ GtkWidget* ViewSystem::create_note_comment(void) {
     return fixed_comment;
 }
 
-int ViewSystem::GetCommentProbeType(void) {
+int ViewSystem::GetCommentProbeType() {
     return  gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
 }
 
@@ -7847,7 +7858,7 @@ void ViewSystem::ButtonSelectOneCommentClicked(GtkButton *button) {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
     vector<ExamPara> vecItem_Comment;
     vecItem_Comment.clear();
     CreateItemList_Comment1(probe_exam, vecItem_Comment);
@@ -7955,7 +7966,7 @@ void ViewSystem::ButtonSelectAllCommentClicked(GtkButton *button) {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
     char path11[256];
     sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini11(path11);
@@ -8060,7 +8071,7 @@ void ViewSystem::ButtonDownClicked(GtkButton *button) {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
     vector<ExamPara> vecDelete_Comment;
     vecDelete_Comment.clear();
     CreateItemList_Comment1(probe_exam, vecDelete_Comment);
@@ -8149,7 +8160,7 @@ void ViewSystem::ButtonUpClicked(GtkButton *button) {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
 
     vector<ExamPara> vecDelete_Comment;
     vecDelete_Comment.clear();
@@ -8448,7 +8459,7 @@ void ViewSystem::ButtonDeleteClicked(GtkButton *button) {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
     char path11[256];
     sprintf(path11, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
     IniFile ini1(path11);
@@ -8712,7 +8723,7 @@ void ViewSystem::ButtonDeleteAllClicked(GtkButton *button) {
 
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
 
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -8884,7 +8895,7 @@ void ViewSystem::CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_c
     ExamItem exam;
     string exam_type = exam.TransItemName(exam_type_name);
 
-    string probe_exam = PROBE_LIST[index1] + "-" +exam_type;
+    string probe_exam = g_probe_list[index1] + "-" +exam_type;
     vector<ExamPara> vecItem_Comment;
     vecItem_Comment.clear();
     CreateItemList_Comment1(probe_exam, vecItem_Comment);
@@ -9001,7 +9012,7 @@ void ViewSystem::init_comment_setting(SysNoteSetting* sysNoteSetting) {
     delete sysNoteSetting;
 }
 
-void ViewSystem::save_comment_setting(void) {
+void ViewSystem::save_comment_setting() {
     SysNoteSetting sysNoteSetting;
     unsigned char fontSizeIndex = 0;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_big)))
@@ -9029,7 +9040,7 @@ void ViewSystem::save_comment_setting(void) {
     sysNoteSetting.SyncFile();
 }
 
-GtkWidget* ViewSystem::create_note_measure(void) {
+GtkWidget* ViewSystem::create_note_measure() {
     GtkWidget *fixed_measure;
     GtkWidget *frame_measure_line;
     GtkWidget *hbox_measure_line;
@@ -9603,7 +9614,7 @@ void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
     delete sysMeasure;
 }
 
-void ViewSystem::save_measure_setting(void) {
+void ViewSystem::save_measure_setting() {
     SysMeasurementSetting sysMeasure;
     unsigned char measureLine = 0;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_ml_on)))
@@ -9710,11 +9721,11 @@ void ViewSystem::GetImageNoteSelection(int &probeIndex, int &itemIndex, char* &i
                        -1);
 }
 
-void ViewCustomOB::save_customOB(void) {
+void ViewCustomOB::save_customOB() {
     MeaCalcFun::SaveCustomTable();
 }
 
-GtkWidget* ViewSystem::create_note_key_config(void) {
+GtkWidget* ViewSystem::create_note_key_config() {
     GtkWidget *fixed_key_config;
 
     GtkWidget *fixed_key;
@@ -9814,7 +9825,7 @@ GtkWidget* ViewSystem::create_note_key_config(void) {
 
 }
 
-void ViewSystem::init_key_config(void) {
+void ViewSystem::init_key_config() {
     SysUserDefinedKey sysDefine;
     m_p1_func_index = sysDefine.GetFuncP1();
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[m_p1_func_index]), TRUE);
@@ -9826,7 +9837,7 @@ void ViewSystem::init_key_config(void) {
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[m_p3_func_index]), TRUE);
 }
 
-void ViewSystem::save_key_config(void) {
+void ViewSystem::save_key_config() {
     SysUserDefinedKey sysDefine;
 
     for(int i = 0; i < MAX_KEY; i++) {
@@ -9844,7 +9855,7 @@ void ViewSystem::save_key_config(void) {
     sysDefine.SyncFile();
 }
 
-GtkWidget *ViewSystem::create_note_calc(void) {
+GtkWidget *ViewSystem::create_note_calc() {
     GtkWidget *fixed_calc;
 
     GtkWidget *label_bsa;
@@ -10168,7 +10179,7 @@ void ViewSystem::init_calc_setting(SysCalculateSetting* sysCalc) {
     delete sysCalc;
 }
 
-void ViewSystem::save_calc_setting(void) {
+void ViewSystem::save_calc_setting() {
     SysCalculateSetting sysCalc;
 
     int bsa = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_bsa));
@@ -10219,7 +10230,7 @@ void ViewSystem::save_calc_setting(void) {
     g_menuCalc.UpdateEfwItem(efw);
 }
 
-GtkWidget* ViewSystem::create_note_info(void) {
+GtkWidget* ViewSystem::create_note_info() {
     GtkWidget *fixed_info;
 
     GtkWidget *frame_info_model;
@@ -10295,7 +10306,7 @@ GtkWidget* ViewSystem::create_note_info(void) {
     return fixed_info;
 }
 
-void ViewSystem::init_info_setting(void) {
+void ViewSystem::init_info_setting() {
     string machine = UpgradeMan::GetInstance()->GetMachineType();
     string soft = UpgradeMan::GetInstance()->GetSoftVersion();
     string fpga = UpgradeMan::GetInstance()->GetFpgaVersion();
@@ -10317,7 +10328,7 @@ void ViewSystem::init_info_setting(void) {
     g_free(buf);
 }
 
-GtkWidget* ViewSystem::create_common_print_treeview(void) {
+GtkWidget* ViewSystem::create_common_print_treeview() {
     GtkWidget *treeview;
     GtkTreeModel *model;
 
@@ -10343,22 +10354,22 @@ GtkWidget* ViewSystem::create_common_print_treeview(void) {
     return treeview;
 }
 
-GtkTreeModel* ViewSystem::create_common_print_model(void) {
+GtkTreeModel* ViewSystem::create_common_print_model() {
     GtkListStore  *store;
     GtkTreeIter    iter;
 
     store = gtk_list_store_new(CNUM_COLS, G_TYPE_STRING, G_TYPE_STRING);
-    for (unsigned int i = 0; i < G_N_ELEMENTS(common_printer_data); i++) {
+    for (unsigned int i = 0; i < G_N_ELEMENTS(COMMON_PRINTER_DATA); i++) {
         gtk_list_store_append (store, &iter);
         gtk_list_store_set(store, &iter,
-                           PRT_BRAND, common_printer_data[i].brand.c_str(),
-                           PRT_MODEL, common_printer_data[i].model.c_str(),
+                           PRT_BRAND, COMMON_PRINTER_DATA[i].brand.c_str(),
+                           PRT_MODEL, COMMON_PRINTER_DATA[i].model.c_str(),
                            -1);
     }
     return GTK_TREE_MODEL (store);
 }
 
-GtkWidget* ViewSystem::create_specific_print_treeview(void) {
+GtkWidget* ViewSystem::create_specific_print_treeview() {
     GtkWidget *treeview;
     GtkTreeModel *model;
 
@@ -10392,7 +10403,7 @@ GtkWidget* ViewSystem::create_specific_print_treeview(void) {
     return treeview;
 }
 
-GtkTreeModel* ViewSystem::create_specific_print_model(void) {
+GtkTreeModel* ViewSystem::create_specific_print_model() {
     GtkListStore  *store;
     GtkTreeIter    iter;
 
@@ -10571,7 +10582,7 @@ GtkTreeModel* ViewSystem::create_exam_item_model(vector<ExamItem::EItem> indexVe
   int probe_index = 0;
 
   for (int i = 0; i < NUM_PROBE; ++i) {
-    if (probe_type == PROBE_LIST[i]) {
+    if (probe_type == g_probe_list[i]) {
       probe_index = i;
     }
   }
@@ -11098,9 +11109,7 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
 
         // set System Default is the active user after delete a user
         UserSelect::GetInstance()->set_active_user(GTK_COMBO_BOX(m_comboboxentry_user_select), 0);
-        memset(user_configure, 0, USERCONFIG_LEN);
-
-        sprintf(user_configure, "%s", "ItemPara.ini");
+        g_user_configure = "ItemPara.ini";
 
         // set parameter zoom disable
         set_image_item_sensitive(false);
@@ -11111,7 +11120,7 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
         if (index == -1)
             return;
         ExamItem examItem;
-        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
         GtkTreeModel* model = create_exam_item_model(itemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
@@ -11334,7 +11343,7 @@ void ViewCustomOB::CreateWindow(GtkWidget *parent) {
     return ;
 }
 
-GtkWidget* ViewCustomOB::create_customOB_window(void) {
+GtkWidget* ViewCustomOB::create_customOB_window() {
     int k1, k2;
     char buf[10];
     GtkWidget *fixed;
@@ -11479,7 +11488,7 @@ gboolean ViewCustomOB::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     return FALSE;
 }
 
-void ViewCustomOB::DestroyWindow(void) {
+void ViewCustomOB::DestroyWindow() {
     if(GTK_IS_WIDGET(m_obWindow)) {
         g_keyInterface.Pop();
         gtk_widget_destroy(m_obWindow);
@@ -11571,7 +11580,7 @@ void ViewCustomOB::BtnOBCustomExitClicked(GtkButton *button) {
         SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
 }
 
-void ViewCustomOB::init_customOB(void) {
+void ViewCustomOB::init_customOB() {
     update_list(gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_customOB)));
 }
 
@@ -11842,8 +11851,11 @@ void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
     {
         UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
 
-        memset(user_configure, 0, USERCONFIG_LEN);
-        sprintf(user_configure, "%s%s%s", "userconfig/",name, ".ini");
+        stringstream ss;
+        ss << "userconfig/" << name << ".ini";
+
+        g_user_configure = ss.str();
+
         char path[256];
         sprintf(path, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name, ".ini");
 
@@ -11889,7 +11901,7 @@ void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
         if (index == -1)
             return;
         ExamItem examItem;
-        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(PROBE_LIST[index]);
+        vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
         GtkTreeModel* model = create_exam_item_model(itemIndex);
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));

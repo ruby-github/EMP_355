@@ -249,7 +249,7 @@ void FreezeMode::UpdateHospitalandpart(int date_format, const char *hospital_nam
         ExamItem exam;
         string probemodel=exam.ReadDefaultProbe(&ini);
         for (int j = 0; j < NUM_PROBE; j++) {
-            if(strcmp(probemodel.c_str(), PROBE_LIST[j].c_str())==0) {
+            if(strcmp(probemodel.c_str(), g_probe_list[j].c_str())==0) {
                 probeIndex=j;
                 break;
             }

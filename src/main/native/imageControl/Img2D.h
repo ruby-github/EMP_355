@@ -278,10 +278,7 @@ private:
     static const int MAX_M_SPEED = 8;
     static const int MAX_HARMONIC_FREQ = 50;
 
-    ///> extended imaging
     static const int MAX_TP_VIEW = 2;
-
-    ///> extern member
     static Img2D* m_ptrInstance;
 
     Calc2D* m_ptrCalc;

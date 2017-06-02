@@ -389,7 +389,7 @@ void Img2D::InitProbe2DOptimizePara(ProbeSocket::ProbePara* ptrPara, ExamItem::P
     ProbeSocket::ProbePara para;
     ProbeMan::GetInstance()->GetCurProbe(para);
     for (i = 0; i < NUM_PROBE; i++) {
-        if(strcmp(para.model, PROBE_LIST[i].c_str()) == 0)
+        if(strcmp(para.model, g_probe_list[i].c_str()) == 0)
             m_curProbeIndex = i;
     }
 

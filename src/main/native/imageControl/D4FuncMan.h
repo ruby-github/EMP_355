@@ -51,6 +51,5 @@ private:
     void GetTimeFormat();
     void GetDepth();
 
-    ///> extern member
     static D4FuncMan* m_ptrInstance;
 };

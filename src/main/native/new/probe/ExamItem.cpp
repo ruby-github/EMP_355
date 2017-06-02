@@ -434,8 +434,8 @@ ExamItem::ParaItem ExamItem::GetImgOptimize(const string probeModel) {
   IniFile ini(string(CFG_RES_PATH) + string(OPTIMIZE_FILE));
 
   int probeIndex = GetProbeIndex(probeModel);
-  ReadConfigCommon(&m_paraOptimize, PROBE_LIST[probeIndex], &ini);
-  ReadConfigOther(&m_paraOptimize, PROBE_LIST[probeIndex], &ini);
+  ReadConfigCommon(&m_paraOptimize, g_probe_list[probeIndex], &ini);
+  ReadConfigOther(&m_paraOptimize, g_probe_list[probeIndex], &ini);
 
   return m_paraOptimize;
 }
@@ -458,7 +458,7 @@ void ExamItem::GenerateDefaultExamItem() {
   for (int i = 0; i < NUM_PROBE; i ++) {
     for (int j = 0; j < m_vecItemIndex[i].size(); j ++) {
       int itemIndex = m_vecItemIndex[i][j];
-      WriteConfigOther(&m_paraItem, PROBE_LIST[i] + "-" + ITEM_LIB[itemIndex], &ini);
+      WriteConfigOther(&m_paraItem, g_probe_list[i] + "-" + ITEM_LIB[itemIndex], &ini);
     }
   }
 }
@@ -468,8 +468,8 @@ void ExamItem::GenerateDefaultImgOptimize() {
   InitItemPara(&m_paraOptimize);
 
   for (int i = 0; i < NUM_PROBE; i ++) {
-    WriteConfigCommon(&m_paraOptimize, PROBE_LIST[i], &ini);
-    WriteConfigOther(&m_paraOptimize, PROBE_LIST[i], &ini);
+    WriteConfigCommon(&m_paraOptimize, g_probe_list[i], &ini);
+    WriteConfigOther(&m_paraOptimize, g_probe_list[i], &ini);
   }
 }
 
@@ -479,15 +479,15 @@ void ExamItem::SetUserItemOfProbe(const string probeModel, EItem itemIndex, cons
 
   stringstream ss;
 
-  if (strcmp(user_configure, "ItemPara.ini") == 0) {
+  if (g_user_configure == "ItemPara.ini") {
     ss << CFG_RES_PATH << EXAM_FILE;
   } else {
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   }
 
   IniFile ini(ss.str());
   ReadConfigCommon(&m_paraItem, KEY_COMMON + "-" + item, &ini);
-  ReadConfigOther(&m_paraItem, PROBE_LIST[m_probeIndex] + "-" + item, &ini);
+  ReadConfigOther(&m_paraItem, g_probe_list[m_probeIndex] + "-" + item, &ini);
 }
 
 void ExamItem::SetItemOfProbe(const string probeModel, EItem itemIndex) {
@@ -496,15 +496,15 @@ void ExamItem::SetItemOfProbe(const string probeModel, EItem itemIndex) {
 
   stringstream ss;
 
-  if (strcmp(user_configure, "ItemPara.ini") == 0) {
+  if (g_user_configure == "ItemPara.ini") {
     ss << CFG_RES_PATH << EXAM_FILE;
   } else {
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   }
 
   IniFile ini(ss.str());
   ReadConfigCommon(&m_paraItem, KEY_COMMON + "-" + ITEM_LIB[m_itemIndex], &ini);
-  ReadConfigOther(&m_paraItem, PROBE_LIST[m_probeIndex] + "-" + ITEM_LIB[m_itemIndex], &ini);
+  ReadConfigOther(&m_paraItem, g_probe_list[m_probeIndex] + "-" + ITEM_LIB[m_itemIndex], &ini);
 }
 
 void ExamItem::RemoveUserFromFile(const string model, const string user, IniFile* ptrIni) {
@@ -523,10 +523,10 @@ void ExamItem::ReadDefaultExamItem(int probeIndex, int itemIndex, ParaItem* para
 
   if(itemIndex == ExamItem::USERNAME) {
     ReadConfigCommon(paraItem, KEY_COMMON + "-" + itemName, &ini);
-    ReadConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + itemName, &ini);
+    ReadConfigOther(paraItem, g_probe_list[probeIndex] + "-" + itemName, &ini);
   } else {
     ReadConfigCommon(paraItem, KEY_COMMON + "-" + ITEM_LIB[itemIndex], &ini);
-    ReadConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini);
+    ReadConfigOther(paraItem, g_probe_list[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini);
   }
 }
 
@@ -539,7 +539,7 @@ void ExamItem::DeleteItemParaFile(int probeIndex, const string old_string, const
   if (name == "System Default" && name == "Умолчан системы" &&
     name == "系统默认" && name == "Domyślne Systemu" && name == "Par défaut du sys." &&
     name == "Systemvorgabe" &&  name == "Sistema por defecto") {
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   } else {
     ss << CFG_RES_PATH << EXAM_FILE;
 
@@ -555,13 +555,13 @@ void ExamItem::DeleteItemParaFile(int probeIndex, const string old_string, const
 
     IniFile ini_other(path_other);
     DeleteNewExamItem(str, KEY_COMMON + "-" + old_string, &ini_other);
-    DeleteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + old_string, &ini_other);
+    DeleteNewExamItem(str, g_probe_list[probeIndex] + "-" + old_string, &ini_other);
   }
 
   IniFile ini(ss.str());
 
   DeleteNewExamItem(str, KEY_COMMON + "-" + old_string, &ini);
-  DeleteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + old_string, &ini);
+  DeleteNewExamItem(str, g_probe_list[probeIndex] + "-" + old_string, &ini);
 }
 
 int ExamItem::ReadDefaultProbeDefaultItem(IniFile* ptrIni) {
@@ -585,7 +585,7 @@ void ExamItem::ReadExamItemPara(int probeIndex, int itemIndex, ParaItem* paraIte
   if (name == "System Default" && name == "Умолчан системы" &&
     name == "系统默认" && name == "Domyślne Systemu" && name == "Par défaut du sys." &&
     name == "Systemvorgabe" &&  name == "Sistema por defecto") {
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   } else {
     ss << CFG_RES_PATH << EXAM_FILE;
   }
@@ -595,10 +595,10 @@ void ExamItem::ReadExamItemPara(int probeIndex, int itemIndex, ParaItem* paraIte
   if (probeIndex >= 0) {
     if(itemIndex == ExamItem::USERNAME) {
       ReadConfigCommon(paraItem, KEY_COMMON + "-" + itemName, &ini);
-      ReadConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + itemName, &ini);
+      ReadConfigOther(paraItem, g_probe_list[probeIndex] + "-" + itemName, &ini);
     } else {
       ReadConfigCommon(paraItem, KEY_COMMON + "-" + ITEM_LIB[itemIndex], &ini);
-      ReadConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini);
+      ReadConfigOther(paraItem, g_probe_list[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini);
     }
   }
 }
@@ -629,20 +629,20 @@ void ExamItem::WriteExamItemPara(int probeIndex, int itemIndex, ParaItem* paraIt
     IniFile ini_other(path_other);
     if(itemIndex == ExamItem::USERNAME) {
       WriteConfigCommon(paraItem, KEY_COMMON + "-" + itemName, &ini_other);
-      WriteConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + itemName, &ini_other);
+      WriteConfigOther(paraItem, g_probe_list[probeIndex] + "-" + itemName, &ini_other);
     } else {
       WriteConfigCommon(paraItem, KEY_COMMON + "-" + ITEM_LIB[itemIndex], &ini_other);
-      WriteConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini_other);
+      WriteConfigOther(paraItem, g_probe_list[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini_other);
     }
   }
 
   IniFile ini(ss.str());
   if(itemIndex == ExamItem::USERNAME) {
     WriteConfigCommon(paraItem, KEY_COMMON + "-" + itemName, &ini);
-    WriteConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + itemName, &ini);
+    WriteConfigOther(paraItem, g_probe_list[probeIndex] + "-" + itemName, &ini);
   } else {
     WriteConfigCommon(paraItem, KEY_COMMON + "-" + ITEM_LIB[itemIndex], &ini);
-    WriteConfigOther(paraItem, PROBE_LIST[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini);
+    WriteConfigOther(paraItem, g_probe_list[probeIndex] + "-" + ITEM_LIB[itemIndex], &ini);
   }
 }
 
@@ -653,19 +653,19 @@ void ExamItem::WriteDefinedItemPara(int probeIndex, const string new_string, con
   if (name == "System Default" && name == "Умолчан системы" &&
     name == "系统默认" && name == "Domyślne Systemu" && name == "Par défaut du sys." &&
     name == "Systemvorgabe" &&  name == "Sistema por defecto") {
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   } else {
     ss << CFG_RES_PATH << EXAM_FILE;
   }
 
   IniFile ini(ss.str());
-  WriteDefinedExamItemPara(str, PROBE_LIST[probeIndex] + "-" + new_string, &ini, PROBE_LIST[probeIndex], new_string, str_index);
+  WriteDefinedExamItemPara(str, g_probe_list[probeIndex] + "-" + new_string, &ini, g_probe_list[probeIndex], new_string, str_index);
 }
 
 void ExamItem::WriteDefaultDefinedItemPara(int probeIndex, const string new_string, const string str, const string str_index) {
   IniFile ini(string(CFG_RES_PATH) + string(DEFAULT_EXAM_FILE));
 
-  WriteDefaultDefinedExamItemPara(str, PROBE_LIST[probeIndex] + "-" + new_string, &ini, PROBE_LIST[probeIndex], new_string, str_index);
+  WriteDefaultDefinedExamItemPara(str, g_probe_list[probeIndex] + "-" + new_string, &ini, g_probe_list[probeIndex], new_string, str_index);
 }
 
 void ExamItem::WriteDefinedExamItemPara(const string department, string section, IniFile* ptrIni, string probelist, const string new_string, const string str_index) {
@@ -684,7 +684,7 @@ void ExamItem::WriteDefinedExamItemPara(const string department, string section,
   if (name == "System Default" && name == "Умолчан системы" &&
     name == "系统默认" && name == "Domyślne Systemu" && name == "Par défaut du sys." &&
     name == "Systemvorgabe" &&  name == "Sistema por defecto") {
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   } else {
     ss << CFG_RES_PATH << EXAM_FILE;
   }
@@ -730,7 +730,7 @@ void ExamItem::WriteNewItemFile(int probeIndex, const string new_string, const s
   close(fd);
 
   IniFile ini(ss.str());
-  WriteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + new_string, &ini, PROBE_LIST[probeIndex], new_string, str_index);
+  WriteNewExamItem(str, g_probe_list[probeIndex] + "-" + new_string, &ini, g_probe_list[probeIndex], new_string, str_index);
 
   string name = ViewSystem::GetInstance()->GetUserName();
   if (name == "System Default" && name == "Умолчан системы" &&
@@ -738,18 +738,18 @@ void ExamItem::WriteNewItemFile(int probeIndex, const string new_string, const s
     name == "Systemvorgabe" &&  name == "Sistema por defecto") {
 
     ss.str("");
-    ss << CFG_RES_PATH << EXAM_FILE_DIR << user_configure;
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << g_user_configure;
   } else {
     ss.str("");
     ss << CFG_RES_PATH << EXAM_FILE;
 
     IniFile ini_other(string(CFG_RES_PATH) + string(EXAM_FILE_OTHER));
-    WriteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + new_string, &ini_other, PROBE_LIST[probeIndex], new_string, str_index);
+    WriteNewExamItem(str, g_probe_list[probeIndex] + "-" + new_string, &ini_other, g_probe_list[probeIndex], new_string, str_index);
   }
 
   IniFile ini_new(ss.str());
 
-  WriteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + new_string, &ini_new, PROBE_LIST[probeIndex], new_string, str_index);
+  WriteNewExamItem(str, g_probe_list[probeIndex] + "-" + new_string, &ini_new, g_probe_list[probeIndex], new_string, str_index);
 }
 
 void ExamItem::DeleteNewItemFile(int probeIndex, const string old_string, const string str) {
@@ -762,7 +762,7 @@ void ExamItem::DeleteNewItemFile(int probeIndex, const string old_string, const 
   ss << CFG_RES_PATH << EXAM_ITEM_FILE << username << ".ini";
 
   IniFile ini(ss.str());
-  DeleteNewExamItem(str, PROBE_LIST[probeIndex] + "-" + old_string, &ini);
+  DeleteNewExamItem(str, g_probe_list[probeIndex] + "-" + old_string, &ini);
 }
 
 void ExamItem::WriteNewItemToCommentFile(int probeIndex, const string new_string, const string str) {
@@ -778,8 +778,8 @@ void ExamItem::WriteNewItemToCommentFile(int probeIndex, const string new_string
 
   IniFile ini(ss.str());
 
-  ini.WriteInt(PROBE_LIST[probeIndex] + "-" + new_string, "Number", 0);
-  ini.WriteString(PROBE_LIST[probeIndex] + "-" + new_string, "Department", str);
+  ini.WriteInt(g_probe_list[probeIndex] + "-" + new_string, "Number", 0);
+  ini.WriteString(g_probe_list[probeIndex] + "-" + new_string, "Department", str);
   ini.SyncConfigFile();
 }
 
@@ -830,7 +830,7 @@ void ExamItem::DeleteNewItemForCommentFile(int probeIndex, const string old_stri
 
   IniFile ini(ss.str());
 
-  ini.RemoveGroup(PROBE_LIST[probeIndex] + "-" + old_string);
+  ini.RemoveGroup(g_probe_list[probeIndex] + "-" + old_string);
   ini.SyncConfigFile();
 }
 
@@ -955,11 +955,11 @@ vector<ExamItem::ProjectDefaultParaItem> ExamItem::ReadProjectPara(const string 
   ExamItem::ProjectDefaultParaItem para;
 
   for(int i = 0; i < NUM_PROBE; i++) {
-    if (model == PROBE_LIST[i]) {
+    if (model == g_probe_list[i]) {
       index = i;
       int freq_2d_sum = ProbeSocket::FREQ2D_SUM[index];
       int freq_doppler_sum = ProbeSocket::FREQ_DOPPLER_SUM[index];
-      string group_name = PROBE_LIST[index] + "-" + "Default";
+      string group_name = g_probe_list[index] + "-" + "Default";
 
       for (int j = 0; j < ProbeSocket::FREQ2D_SUM[index]; j++) {
         ss << "D2-" << ProbeSocket::FREQ2D[index][j].emit << "-";
@@ -1461,7 +1461,7 @@ void ExamItem::ReadConfigOther(ParaItem* paraItem, const string section, IniFile
 
 int ExamItem::GetProbeIndex(const string probeModel) {
   for (int i = 0; i < NUM_PROBE; i++) {
-    if (probeModel == PROBE_LIST[i]) {
+    if (probeModel == g_probe_list[i]) {
       return i;
     }
   }
