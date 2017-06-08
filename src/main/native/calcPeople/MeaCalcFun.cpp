@@ -15,23 +15,23 @@
 
 #define GW_TABLE_HEAD_LEN	3//产科表表头长度
 
-int cer_custom[272]; //x10
-int hl_custom[272]; //x10
-int bpd_custom[272]; //x10
-int fl_custom[272]; //x10
-int crl_custom[272]; //x10
-int gs_custom[272]; //x10
-int ac_custom[272]; //x10
-int hc_custom[272]; //x10
-int tad_custom[272]; //x10
-int apad_custom[272]; //x10
-int thd_custom[272]; //x10
-int ofd_custom[272]; //x10
-int ood_custom[272]; //x10
-int tibia_custom[272]; //x10
-int ttd_custom[272]; //x10
-int ulna_custom[272]; //x10
-int fta_custom[272]; //x100
+int g_cer_custom[272];    // x10
+int g_hl_custom[272];     // x10
+int g_bpd_custom[272];    // x10
+int g_fl_custom[272];     // x10
+int g_crl_custom[272];    // x10
+int g_gs_custom[272];     // x10
+int g_ac_custom[272];     // x10
+int g_hc_custom[272];     // x10
+int g_tad_custom[272];    // x10
+int g_apad_custom[272];   // x10
+int g_thd_custom[272];    // x10
+int g_ofd_custom[272];    // x10
+int g_ood_custom[272];    // x10
+int g_tibia_custom[272];  // x10
+int g_ttd_custom[272];    // x10
+int g_ulna_custom[272];   // x10
+int g_fta_custom[272];    // x100
 
 namespace {
 const int HumanDOP = 280;//人的孕期长度280天
@@ -569,23 +569,23 @@ const int CatBD[][2] = {
 };
 #endif
 const int *GWMethodLine[] = {
-    cer_goldstein, cer_custom,
-    hl_jeanty, hl_custom,
-    bpd_hadlock, bpd_merz, bpd_lasser, bpd_rempen, bpd_tokyo, bpd_custom,
-    fl_hadlock, fl_merz, fl_jeanty, fl_tokyo, fl_custom,
-    crl_hadlock, crl_robinson, crl_hansmenn, crl_lasser, crl_tokyo, crl_custom,
-    gs_hellman, gs_rempen, gs_tokyo, gs_custom,
-    ac_hadlock, ac_merz, ac_lasser, ac_tokyo, ac_custom,
-    hc_hadlock, hc_merz, hc_lasser, hc_custom,
-    tad_merz, tad_custom,
-    apad_merz, apad_custom,
-    thd_hansmenn, thd_custom,
-    ofd_korean, ofd_custom,
-    ood_jeanty, ood_custom,
-    tibia_jeanty, tibia_custom,
-    ttd_hansmenn, ttd_custom,
-    ulna_jeanty, ulna_custom,
-    fta_osaka, fta_custom
+    cer_goldstein,                                                      g_cer_custom,
+    hl_jeanty,                                                          g_hl_custom,
+    bpd_hadlock,    bpd_merz,     bpd_lasser,   bpd_rempen, bpd_tokyo,  g_bpd_custom,
+    fl_hadlock,     fl_merz,      fl_jeanty,    fl_tokyo,               g_fl_custom,
+    crl_hadlock,    crl_robinson, crl_hansmenn, crl_lasser, crl_tokyo,  g_crl_custom,
+    gs_hellman,     gs_rempen,    gs_tokyo,                             g_gs_custom,
+    ac_hadlock,     ac_merz,      ac_lasser,    ac_tokyo,               g_ac_custom,
+    hc_hadlock,     hc_merz,      hc_lasser,                            g_hc_custom,
+    tad_merz,                                                           g_tad_custom,
+    apad_merz,                                                          g_apad_custom,
+    thd_hansmenn,                                                       g_thd_custom,
+    ofd_korean,                                                         g_ofd_custom,
+    ood_jeanty,                                                         g_ood_custom,
+    tibia_jeanty,                                                       g_tibia_custom,
+    ttd_hansmenn,                                                       g_ttd_custom,
+    ulna_jeanty,                                                        g_ulna_custom,
+    fta_osaka,                                                          g_fta_custom
 };
 
 #ifdef VET
@@ -2966,67 +2966,67 @@ void MeaCalcFun::InitCustomTable() {
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        cer_custom[i] = atoi(buf);
+        g_cer_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        hl_custom[i] = atoi(buf);
+        g_hl_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        bpd_custom[i] = atoi(buf);
+        g_bpd_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        fl_custom[i] = atoi(buf);
+        g_fl_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        crl_custom[i] = atoi(buf);
+        g_crl_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        gs_custom[i] = atoi(buf);
+        g_gs_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        ac_custom[i] = atoi(buf);
+        g_ac_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        hc_custom[i] = atoi(buf);
+        g_hc_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        tad_custom[i] = atoi(buf);
+        g_tad_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        apad_custom[i] = atoi(buf);
+        g_apad_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        thd_custom[i] = atoi(buf);
+        g_thd_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        ofd_custom[i] = atoi(buf);
+        g_ofd_custom[i] = atoi(buf);
     }
 
     for (i=0; i<272; i++) {
         fgets(buf, 10, fp);
-        fta_custom[i] = atoi(buf);
+        g_fta_custom[i] = atoi(buf);
     }
 
     fclose(fp);
@@ -3061,19 +3061,19 @@ void MeaCalcFun::SetTableMaxMin(int table[]) {
 
 bool MeaCalcFun::SaveCustomTable() {
 //	printf("%s\n", __FUNCTION__);
-    SetTableMaxMin(cer_custom);
-    SetTableMaxMin(hl_custom);
-    SetTableMaxMin(bpd_custom);
-    SetTableMaxMin(fl_custom);
-    SetTableMaxMin(crl_custom);
-    SetTableMaxMin(gs_custom);
-    SetTableMaxMin(ac_custom);
-    SetTableMaxMin(hc_custom);
-    SetTableMaxMin(tad_custom);
-    SetTableMaxMin(apad_custom);
-    SetTableMaxMin(thd_custom);
-    SetTableMaxMin(ofd_custom);
-    SetTableMaxMin(fta_custom);
+    SetTableMaxMin(g_cer_custom);
+    SetTableMaxMin(g_hl_custom);
+    SetTableMaxMin(g_bpd_custom);
+    SetTableMaxMin(g_fl_custom);
+    SetTableMaxMin(g_crl_custom);
+    SetTableMaxMin(g_gs_custom);
+    SetTableMaxMin(g_ac_custom);
+    SetTableMaxMin(g_hc_custom);
+    SetTableMaxMin(g_tad_custom);
+    SetTableMaxMin(g_apad_custom);
+    SetTableMaxMin(g_thd_custom);
+    SetTableMaxMin(g_ofd_custom);
+    SetTableMaxMin(g_fta_custom);
 
     FILE *fp;
     int i;
@@ -3089,55 +3089,55 @@ bool MeaCalcFun::SaveCustomTable() {
         return false;
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", cer_custom[i]);
+        sprintf(buf, "%d\n", g_cer_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", hl_custom[i]);
+        sprintf(buf, "%d\n", g_hl_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", bpd_custom[i]);
+        sprintf(buf, "%d\n", g_bpd_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", fl_custom[i]);
+        sprintf(buf, "%d\n", g_fl_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", crl_custom[i]);
+        sprintf(buf, "%d\n", g_crl_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", gs_custom[i]);
+        sprintf(buf, "%d\n", g_gs_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", ac_custom[i]);
+        sprintf(buf, "%d\n", g_ac_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", hc_custom[i]);
+        sprintf(buf, "%d\n", g_hc_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", tad_custom[i]);
+        sprintf(buf, "%d\n", g_tad_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", apad_custom[i]);
+        sprintf(buf, "%d\n", g_apad_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", thd_custom[i]);
+        sprintf(buf, "%d\n", g_thd_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", ofd_custom[i]);
+        sprintf(buf, "%d\n", g_ofd_custom[i]);
         fputs(buf, fp);
     }
     for (i=0; i<272; i++) {
-        sprintf(buf, "%d\n", fta_custom[i]);
+        sprintf(buf, "%d\n", g_fta_custom[i]);
         fputs(buf, fp);
     }
 

@@ -437,15 +437,14 @@ GdkColor* Utils::get_color(const string color_name) {
 
 // ---------------------------------------------------------
 
-#include "bodymark/MenuBDMK.h"
+#include "sysMan/ViewSystem.h"
 
 void Utils::test(GtkWidget* widget) {
-  MenuBDMK m;
-  GtkWidget* w = m.Create();
+  ViewCustomOB::GetInstance()->CreateWindow(NULL);
 
-  GtkDialog* dialog = create_dialog(NULL, "test", 600, 450);
-  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
-  gtk_widget_show_all(GTK_WIDGET(dialog));
+  //GtkDialog* dialog = create_dialog(NULL, "test", 600, 450);
+  //gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
+ // gtk_widget_show_all(GTK_WIDGET(ViewCustomOB::GetInstance()));
 
 
   //ViewProbe::GetInstance()->CreateWindow(NULL, NULL, 3);

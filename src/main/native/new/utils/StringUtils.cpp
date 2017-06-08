@@ -1,5 +1,9 @@
 #include "utils/StringUtils.h"
 
+#include <sstream>
+
+using namespace std;
+
 string lstrip(const string str) {
   size_t pos = 0;
 
@@ -34,4 +38,12 @@ string rstrip(const string str) {
 
 string strip(const string str) {
   return lstrip(rstrip(str));
+}
+
+bool IsNum(const string str) {
+  istringstream iss(str);
+  float i;
+  iss >> i;
+
+  return iss.rdstate() == std::ios_base::eofbit;
 }

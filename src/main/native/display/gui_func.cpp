@@ -678,12 +678,7 @@ int GetComboBoxIndex(GtkComboBox *combobox, string name) {
     }
 }
 
-bool IsNum(string str) {
-    std::istringstream iss(str);
-    float i;
-    iss>> i;
-    return iss.rdstate() == std::ios_base::eofbit;
-}
+
 
 PangoFontDescription* AdaptStringFont(const char *font_family, const char *font_style, int font_size, PangoLayout *layout, const char *str, const int max_width) {
     char font_des[128];

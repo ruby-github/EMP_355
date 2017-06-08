@@ -442,7 +442,7 @@ void ConfigToHost::LoadSelectedData() {
         UserSelect::GetInstance()->insert_username_db(USERNAME_DB, name);
         ViewSystem::GetInstance()->ShowList(name);
         int last =  UserSelect::GetInstance()->get_active_user();
-        ViewSystem::GetInstance()->set_active_user(last);
+        ViewSystem::GetInstance()->SetActiveUser(last);
       }
     }
 

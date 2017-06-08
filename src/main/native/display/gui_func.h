@@ -60,7 +60,7 @@ PangoLayout * create_pango_text(GtkWidget *widget,
 int CountLines(std::string& text);
 void trim(std::string& str);
 int GetComboBoxIndex(GtkComboBox *combobox, string name);
-bool IsNum(std::string str);
+
 PangoFontDescription* AdaptStringFont(const char *font_family, const char *font_style, int font_size, PangoLayout *layout, const char *str, const int max_width);
 
 template <typename T> T max_3(const T &a, const T &b, const T &c) {

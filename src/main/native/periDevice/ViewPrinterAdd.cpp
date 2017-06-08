@@ -202,7 +202,7 @@ void ViewPrinterAdd::BtnAddClicked(GtkButton *button) {
     PRINTF("print name : %s\nuri : %s\nppd file : %s\n", prt_name, m_uriName.c_str(), m_ppdFileName.c_str());
     prt.AddPrinter(prt_name, m_uriName.c_str(), m_ppdFileName.c_str());
     PeripheralMan::GetInstance()->SwitchPrinterDriver();
-    ViewSystem::GetInstance()->update_specific_printer_model();
+    ViewSystem::GetInstance()->UpdateSpecificPrinterModel();
     DestroyWindow();
 }
 

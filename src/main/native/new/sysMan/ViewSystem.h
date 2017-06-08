@@ -28,26 +28,168 @@ struct ExamPara {
   ExamItem::EItem index;
 };
 
-int _system_(const char *cmd);
+int _system_(const string cmd);
 
-class ViewSystem : public FakeXEvent {
+class ViewCustomOB: public FakeXEvent {
 public:
-    ~ViewSystem();
+  static ViewCustomOB* GetInstance();
 
+public:
+  ~ViewCustomOB();
+
+  void CreateWindow(GtkWidget* parent);
+  void DestroyWindow();
+
+private:
+  // signal
+
+  static void signal_button_clicked_save(GtkButton* button, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->ButtonClickedSave(button);
+    }
+  }
+
+  static void signal_button_clicked_clear(GtkButton* button, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->ButtonClickedClear(button);
+    }
+  }
+
+  static void signal_button_clicked_exit(GtkButton* button, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->ButtonClickedExit(button);
+    }
+  }
+
+  static void signal_combobox_changed(GtkComboBox *combobox, ViewCustomOB *data) {
+    data->ComboBoxChanged(combobox);
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->DestroyWindow();
+    }
+
+    return FALSE;
+  }
+
+  static void signal_cell_edited(GtkCellRenderer* cell, gchar* path_string, gchar* new_text, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->CellEdited(cell, path_string, new_text);
+    }
+  }
+
+  static void signal_cell_editing_started(GtkCellRenderer* cell, GtkCellEditable* editable, const gchar* path, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->CellEditingStarted(cell, editable, path);
+    }
+  }
+
+  static void signal_entry_insert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewCustomOB* data) {
+    if (data != NULL) {
+      data->EntryInsert(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static gboolean signal_callback_exitwindow(gpointer data) {
+    ViewCustomOB* ob = (ViewCustomOB*)data;
+
+    if (ob != NULL) {
+      ob->DestroyWindow();
+    }
+
+    return FALSE;
+  }
+
+  // signal
+
+  void ButtonClickedSave(GtkButton* button);
+  void ButtonClickedClear(GtkButton* button);
+  void ButtonClickedExit(GtkButton* button);
+  void ComboBoxChanged(GtkComboBox* combobox);
+
+  void CellEdited(GtkCellRenderer* cell, gchar* path_string, gchar* new_text);
+  void CellEditingStarted(GtkCellRenderer* cell, GtkCellEditable* editable, const gchar* path);
+  void EntryInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+
+private:
+  ViewCustomOB();
+
+  void KeyEvent(unsigned char keyValue);
+
+  GtkWidget* CreateCustomOB();
+  void InitCustomOB();
+
+  void UpdateList(int type);
+  void InsertList(GtkTreeModel* model, int table[]);
+
+  void AddToTable(gint type, int temp1, float temp2);
+
+private:
+  static ViewCustomOB* m_instance;
+
+private:
+  struct CustomData {
+    char* gw;
+    char* gw1;
+    char* gw2;
+    char* gw3;
+    char* gw4;
+    char* gw5;
+    char* gw6;
+    char* gw7;
+    char* gw8;
+    char* gw9;
+    char* gw10;
+  };
+
+  GtkDialog* m_dialog;
+  GtkComboBoxText* m_combobox_text;
+
+  GtkTreeModel* m_modelCustomOB;
+  GtkTreeView* m_treeCustomOB;
+
+  GArray* m_arrayGW;
+  CustomData m_data;
+};
+
+
+
+
+
+class ViewSystem: public FakeXEvent {
+public:
+  static ViewSystem* GetInstance();
+
+public:
+  ~ViewSystem();
+
+public:
+  void CreateWindow();
+  void DestroyWindow();
+
+  GtkWidget* GetWindow();
+  string GetUserName();
+
+  bool CheckFlagFromReportTemplet(int id);
+
+  void CreateDefineItemFormUsbToHost(string name);
+  void ChangeNoteBookPage(int page);
+  void SetActiveUser(gint num);
+  void ShowList(const string name);
+
+  void UpdateUserItem();
+  void UpdateSpecificPrinterModel();
+
+public:
     static const int MAX_KEY = 10;//8;//9;
 
-    static ViewSystem* GetInstance();
-    void CreateWindow();
-    void DestroyWindow();
-    GtkWidget* GetWindow();
     void DoDicomTest();
     int GetProbeType();
     int GetCommentProbeType();
     int GetKbType();
     void UpdateHospitalandpart(int date_format, const char* hospital_name);
-    const gchar* GetUserName();
-    void ShowList(const char *name);
-    void set_active_user(gint num);
+
     int get_active_user();
     void save_itemIndex(int itemIndex);
     int  get_itemIndex();
@@ -60,19 +202,11 @@ public:
     void SetImagePara(const ExamItem::ParaItem &item);
     void GetImagePara(ExamItem::ParaItem &item);
     void save_image_para(ExamItem::ParaItem &item);
-    void update_specific_printer_model();
     //void GetItemListOfKb(char* KbModel, vector<enum PItem> *ptrItemList);
     void tree_auto_scroll(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path, gpointer user_data);
-    void CreateDefineItemFormUsbToHost(char *name);
-    void ChangeNoteBookPage(int page);
 
     ////>option fuction
     void UpdateOptionStatus(bool status);
-
-    bool CheckFlagFromReportTemplet(int id);
-
-    void UpdateUserItem();
-
 private:
     ViewSystem();
     void KeyEvent(unsigned char keyValue);
@@ -1008,100 +1142,6 @@ private:
         return data->BtnRegisterClicked(widget);
     }
 
-};
-
-class ViewCustomOB: public FakeXEvent {
-public:
-    ~ViewCustomOB();
-
-    static ViewCustomOB* GetInstance();
-    void CreateWindow(GtkWidget *parent);
-    void DestroyWindow();
-private:
-    ViewCustomOB();
-
-    static ViewCustomOB* m_ptrInstance;
-
-    GtkWidget *m_obWindow;
-    // custom OB
-    typedef struct {
-        char *gw;
-        char *gw1;
-        char *gw2;
-        char *gw3;
-        char *gw4;
-        char *gw5;
-        char *gw6;
-        char *gw7;
-        char *gw8;
-        char *gw9;
-        char *gw10;
-    } CustomData;
-    enum {
-        COL_GW,
-        COL_GW1,
-        COL_GW2,
-        COL_GW3,
-        COL_GW4,
-        COL_GW5,
-        COL_GW6,
-        COL_GW7,
-        COL_GW8,
-        COL_GW9,
-        COL_GW10,
-        NUM_COLUMNS
-    };
-    CustomData m_data;
-    GtkWidget *m_combobox_customOB;
-    GtkWidget *m_treeCustomOB;
-    GArray *m_arrayGW;
-    GtkTreeModel *m_modelCustomOB;
-
-    GtkWidget* create_customOB_window();
-    void init_customOB();
-    void save_customOB();
-    void insert_list(GtkTreeModel *model, int table[]);
-    void update_list(int type);
-
-    void KeyEvent(unsigned char keyValue);
-
-    void CustomSelectChanged(GtkComboBox *combobox);
-    void CustomCellEditingStarted(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path);
-    void CustomCellEdited(GtkCellRenderer *cell, gchar *path_string, gchar *new_text);
-    void EntryFracDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-
-    static void changed_custom_ob(GtkComboBox *combobox, ViewCustomOB *data) {
-        data->CustomSelectChanged(combobox);
-    }
-    static void cell_editing_started_custom_ob(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path, ViewCustomOB *data) {
-        data->CustomCellEditingStarted(cell, editable, path);
-    }
-    static void cell_edited_custom_ob(GtkCellRenderer *cell, gchar *path_string, gchar *new_text, ViewCustomOB *data) {
-        data->CustomCellEdited(cell, path_string, new_text);
-    }
-    static void on_entry_insert_custom_ob(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewCustomOB *data) {
-        data->EntryFracDigitInsert(editable, new_text, new_text_length, position);
-    }
-
-    //signal handle
-    void BtnOBCustomClearClicked(GtkButton *button);
-    void BtnOBCustomSaveClicked(GtkButton *button);
-    void BtnOBCustomExitClicked(GtkButton *button);
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
-
-    //signal
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewCustomOB*data) {
-        return data->WindowDeleteEvent(widget, event);
-    }
-    static void on_button_ob_custom_clear_clicked(GtkButton *button, ViewCustomOB *data) {
-        data->BtnOBCustomClearClicked(button);
-    }
-    static void on_button_ob_custom_save_clicked(GtkButton *button, ViewCustomOB *data) {
-        data->BtnOBCustomSaveClicked(button);
-    }
-    static void on_button_ob_custom_exit_clicked(GtkButton *button, ViewCustomOB *data) {
-        data->BtnOBCustomExitClicked(button);
-    }
 };
 
 #endif

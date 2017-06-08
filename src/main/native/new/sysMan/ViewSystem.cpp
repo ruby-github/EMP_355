@@ -1,5 +1,613 @@
 #include "sysMan/ViewSystem.h"
 
+#include <errno.h>
+#include <sys/wait.h>
+
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
+#include "utils/StringUtils.h"
+
+#include "calcPeople/MeaCalcFun.h"
+#include "keyboard/KeyDef.h"
+#include "keyboard/KeyValueOpr.h"
+
+extern int g_cer_custom[];
+extern int g_hl_custom[];
+extern int g_bpd_custom[];
+extern int g_fl_custom[];
+extern int g_crl_custom[];
+extern int g_gs_custom[];
+extern int g_ac_custom[];
+extern int g_hc_custom[];
+extern int g_tad_custom[];
+extern int g_apad_custom[];
+extern int g_thd_custom[];
+extern int g_ofd_custom[];
+extern int g_fta_custom[];
+
+enum {
+  COL_GW,
+  COL_GW1,
+  COL_GW2,
+  COL_GW3,
+  COL_GW4,
+  COL_GW5,
+  COL_GW6,
+  COL_GW7,
+  COL_GW8,
+  COL_GW9,
+  COL_GW10,
+  NUM_COLUMNS
+};
+
+int _system_(const string cmd) {
+  if (cmd.empty()) {
+    return -1;
+  }
+
+  pid_t pid = vfork();
+
+  int status = 0;
+
+  if (pid < 0) {
+    perror("vfork error");
+
+    status = -1;
+  } else if (pid == 0) {
+    if (execl("/bin/sh", "sh", "-c", cmd.c_str(), 0) == -1) {
+      perror((string("execl error-") + strerror(errno)).c_str());
+
+      _exit(127);
+    }
+  } else {
+    while (waitpid(pid, &status, 0) < 0) {
+      if (errno != EINTR) {
+        status = -1;
+        break;
+      }
+    }
+  }
+
+  return status;
+}
+
+// ---------------------------------------------------------
+//
+//  ViewCustomOB
+//
+// ---------------------------------------------------------
+
+ViewCustomOB* ViewCustomOB::m_instance = NULL;
+
+// ---------------------------------------------------------
+
+ViewCustomOB* ViewCustomOB::GetInstance() {
+  if (m_instance == NULL) {
+    m_instance = new ViewCustomOB();
+  }
+
+  return m_instance;
+}
+
+ViewCustomOB::ViewCustomOB() {
+  m_dialog = NULL;
+  m_combobox_text = NULL;
+
+  m_modelCustomOB = NULL;
+  m_treeCustomOB = NULL;
+
+  m_arrayGW = NULL;
+}
+
+ViewCustomOB::~ViewCustomOB() {
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
+}
+
+void ViewCustomOB::CreateWindow(GtkWidget* parent) {
+  m_dialog = Utils::create_dialog(GTK_WINDOW(parent), _("OB Custom"), 800, 600);
+
+  GtkButton* button_save = Utils::add_dialog_button(m_dialog, _("Save"), GTK_RESPONSE_OK, GTK_STOCK_SAVE);
+  GtkButton* button_clear = Utils::add_dialog_button(m_dialog, _("Clear"), GTK_RESPONSE_CANCEL, GTK_STOCK_CLEAR);
+  GtkButton* button_exit = Utils::add_dialog_button(m_dialog, _("Exit"), GTK_RESPONSE_CLOSE, GTK_STOCK_QUIT);
+
+  g_signal_connect(button_save, "clicked", G_CALLBACK(signal_button_clicked_save), this);
+  g_signal_connect(button_clear, "clicked", G_CALLBACK(signal_button_clicked_clear), this);
+  g_signal_connect(button_exit, "clicked", G_CALLBACK(signal_button_clicked_exit), this);
+
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), CreateCustomOB());
+
+  MeaCalcFun::InitCustomTable();
+  InitCustomOB();
+
+  gtk_widget_show_all(GTK_WIDGET(m_dialog));
+  g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
+}
+
+void ViewCustomOB::DestroyWindow() {
+  if(GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
+
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+    }
+
+    m_dialog = NULL;
+    m_combobox_text = NULL;
+
+    m_modelCustomOB = NULL;
+    m_treeCustomOB = NULL;
+
+    m_arrayGW = NULL;
+  }
+}
+
+// ---------------------------------------------------------
+
+void ViewCustomOB::ButtonClickedSave(GtkButton* button) {
+  MeaCalcFun::SaveCustomTable();
+}
+
+void ViewCustomOB::ButtonClickedClear(GtkButton* button) {
+  gint type = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text));
+  int* ptr = NULL;
+
+  switch (type) {
+  case 0:   // CER
+    ptr = g_cer_custom;
+    break;
+  case 1:   // HL
+    ptr = g_hl_custom;
+    break;
+  case 2:   // BPD
+    ptr = g_bpd_custom;
+    break;
+  case 3:   // FL
+    ptr = g_fl_custom;
+    break;
+  case 4:   // CRL
+    ptr = g_crl_custom;
+    break;
+  case 5:   // GS
+    ptr = g_gs_custom;
+    break;
+  case 6:   // AC
+    ptr = g_ac_custom;
+    break;
+  case 7:   // HC
+    ptr = g_hc_custom;
+    break;
+  case 8:   // TAD
+    ptr = g_tad_custom;
+    break;
+  case 9:   // APAD
+    ptr = g_apad_custom;
+    break;
+  case 10:  // THD
+    ptr = g_thd_custom;
+    break;
+  case 11:  // OFD
+    ptr = g_ofd_custom;
+    break;
+  case 12:  // FTA
+    ptr = g_fta_custom;
+    break;
+  }
+
+  for (int i = 0; i < 272; i++) {
+    *ptr = 0;
+    ptr++;
+  }
+
+  UpdateList(type);
+}
+
+void ViewCustomOB::ButtonClickedExit(GtkButton* button) {
+  g_keyInterface.Pop();
+  gtk_widget_destroy(GTK_WIDGET(m_dialog));
+
+  if (g_keyInterface.Size() == 1) {
+    SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+  }
+}
+
+void ViewCustomOB::ComboBoxChanged(GtkComboBox* combobox) {
+  gint type = gtk_combo_box_get_active(combobox);
+  UpdateList(type);
+}
+
+void ViewCustomOB::CellEdited(GtkCellRenderer* cell, gchar* path_string, gchar* new_text) {
+  GtkTreePath *path = gtk_tree_path_new_from_string(path_string);
+
+  GtkTreeIter iter;
+  gint type = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text));
+
+  gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
+  gtk_tree_model_get_iter(m_modelCustomOB, &iter, path);
+
+  if(!IsNum(new_text) && strcmp(new_text, "")) {
+    PRINTF("It's not a num!\n");
+    return;
+  }
+
+  float new_value = atof(new_text);
+  if (new_value < 0.0 || new_value > 500.0) {
+    PRINTF("Out of range!\n");
+    return;
+  }
+
+  gint i = gtk_tree_path_get_indices(path)[0];
+
+  switch(column) {
+  case COL_GW1:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw1);
+      g_array_index(m_arrayGW, CustomData, i).gw1 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw1, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW2:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw2);
+      g_array_index(m_arrayGW, CustomData, i).gw2 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw2, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW3:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw3);
+      g_array_index(m_arrayGW, CustomData, i).gw3 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw3, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW4:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw4);
+      g_array_index(m_arrayGW, CustomData, i).gw4 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw4, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW5:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw5);
+      g_array_index(m_arrayGW, CustomData, i).gw5 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw5, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW6:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw6);
+      g_array_index(m_arrayGW, CustomData, i).gw6 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw6, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW7:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw7);
+      g_array_index(m_arrayGW, CustomData, i).gw7 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw7, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW8:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw8);
+      g_array_index(m_arrayGW, CustomData, i).gw8 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw8, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW9:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw9);
+      g_array_index(m_arrayGW, CustomData, i).gw9 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw9, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  case COL_GW10:
+    {
+      g_free(g_array_index(m_arrayGW, CustomData, i).gw10);
+      g_array_index(m_arrayGW, CustomData, i).gw10 = g_strdup(new_text);
+
+      gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
+        g_array_index(m_arrayGW, CustomData, i).gw10, -1);
+      AddToTable(type, (i*10 + column)-1, new_value);
+    }
+    break;
+  }
+}
+
+void ViewCustomOB::CellEditingStarted(GtkCellRenderer* cell, GtkCellEditable* editable, const gchar* path) {
+  if(GTK_IS_ENTRY(editable)) {
+    g_signal_connect(G_OBJECT(editable), "insert_text", G_CALLBACK(signal_entry_insert), this);
+  }
+}
+
+void ViewCustomOB::EntryInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position) {
+  if (!g_ascii_isdigit(*new_text) && g_ascii_strcasecmp(new_text, ".") != 0) {
+    g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
+  }
+}
+
+void ViewCustomOB::KeyEvent(unsigned char keyValue) {
+  FakeXEvent::KeyEvent(keyValue);
+
+  if (keyValue == KEY_ESC) {
+    g_timeout_add(100, signal_callback_exitwindow, this);
+
+    FakeEscKey();
+  }
+}
+
+GtkWidget* ViewCustomOB::CreateCustomOB() {
+  GtkTable* table = Utils::create_table(10, 5);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+
+  // GW, Value, ComboBoxText
+
+  GtkLabel* label_gw = Utils::create_label(_("GW:31~300days"));
+  GtkLabel* label_value = Utils::create_label(_("Value:0.0~500.0mm (Click to enter a value)"));
+  m_combobox_text = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_gw), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_value), 1, 3, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_text), 4, 5, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  string StringOBType[] = {
+    {"CER"},  {"HL"},   {"BPD"},  {"FL"},   {"CRL"},
+    {"GS"},   {"AC"},   {"HC"},   {"TAD"},  {"APAD"},
+    {"THD"},  {"OFD"},  {"FTA"}
+  };
+
+  int size = sizeof(StringOBType) / sizeof(StringOBType[0]);
+
+  for (int i = 0; i < size; i++) {
+    gtk_combo_box_text_append_text(m_combobox_text, StringOBType[i].c_str());
+  }
+
+  g_signal_connect(GTK_OBJECT(m_combobox_text), "changed", G_CALLBACK(signal_combobox_changed), this);
+
+  // scrolled_window
+
+  GtkScrolledWindow* scrolled_window = Utils::create_scrolled_window();
+  gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window), 0, 5, 1, 10);
+
+  m_modelCustomOB = GTK_TREE_MODEL(gtk_list_store_new(NUM_COLUMNS,
+    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+    G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+    G_TYPE_STRING)
+  );
+
+  m_treeCustomOB = Utils::create_tree_view(m_modelCustomOB);
+
+  gtk_tree_view_set_enable_search (m_treeCustomOB, FALSE);
+  gtk_tree_view_set_rules_hint(m_treeCustomOB, TRUE);
+  gtk_tree_selection_set_mode(gtk_tree_view_get_selection(m_treeCustomOB), GTK_SELECTION_SINGLE);
+
+  for (int i = 0; i < NUM_COLUMNS; i++) {
+    stringstream ss;
+
+    if (i != COL_GW) {
+      ss << i;
+    }
+
+    GtkCellRenderer* renderer = gtk_cell_renderer_text_new();
+    g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i));
+    GtkTreeViewColumn* column = gtk_tree_view_column_new_with_attributes(ss.str().c_str(), renderer, "text", i, NULL);
+
+    if (i == COL_GW) {
+      g_object_set(G_OBJECT(column), "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 80, NULL);
+    } else {
+      g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+      g_signal_connect(renderer, "edited", G_CALLBACK(signal_cell_edited), this);
+      g_signal_connect(renderer, "editing_started", G_CALLBACK(signal_cell_editing_started), this);
+
+      g_object_set(G_OBJECT(column), "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 60, NULL);
+    }
+
+    gtk_tree_view_append_column(m_treeCustomOB, column);
+  }
+
+  m_arrayGW = g_array_new(TRUE, TRUE, sizeof(CustomData));
+
+  for (int i = 1; i < 28; i++) {
+    int k = (i+2)*10+1;
+
+    stringstream ss;
+    ss << k << "~" << k + 9;
+
+    m_data.gw = g_strdup(ss.str().c_str());
+    m_data.gw1 = NULL;
+    m_data.gw2 = NULL;
+    m_data.gw3 = NULL;
+    m_data.gw4 = NULL;
+    m_data.gw5 = NULL;
+    m_data.gw6 = NULL;
+    m_data.gw7 = NULL;
+    m_data.gw8 = NULL;
+    m_data.gw9 = NULL;
+    m_data.gw10 = NULL;
+    g_array_append_vals(m_arrayGW, &m_data, 1);
+  }
+
+  gtk_list_store_clear(GTK_LIST_STORE(m_modelCustomOB));
+
+  GtkTreeIter iter;
+
+  for (int i = 0; i < m_arrayGW->len; i++) {
+    gtk_list_store_append(GTK_LIST_STORE(m_modelCustomOB), &iter);
+    gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter,
+      COL_GW, g_array_index(m_arrayGW, CustomData, i).gw,
+      COL_GW1, g_array_index(m_arrayGW, CustomData, i).gw1,
+      COL_GW2, g_array_index(m_arrayGW, CustomData, i).gw2,
+      COL_GW3, g_array_index(m_arrayGW, CustomData, i).gw3,
+      COL_GW4, g_array_index(m_arrayGW, CustomData, i).gw4,
+      COL_GW5, g_array_index(m_arrayGW, CustomData, i).gw5,
+      COL_GW6, g_array_index(m_arrayGW, CustomData, i).gw6,
+      COL_GW7, g_array_index(m_arrayGW, CustomData, i).gw7,
+      COL_GW8, g_array_index(m_arrayGW, CustomData, i).gw8,
+      COL_GW9, g_array_index(m_arrayGW, CustomData, i).gw9,
+      COL_GW10, g_array_index(m_arrayGW, CustomData, i).gw10,
+      -1);
+  }
+
+  gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_treeCustomOB));
+
+  return GTK_WIDGET(table);
+}
+
+void ViewCustomOB::InitCustomOB() {
+  UpdateList(gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text)));
+}
+
+void ViewCustomOB::UpdateList(int type) {
+  PRINTF("type = %d\n", type);
+
+  switch (type) {
+  case 0:   // CER
+    InsertList(m_modelCustomOB, g_cer_custom);
+    break;
+  case 1:   // HL
+    InsertList(m_modelCustomOB, g_hl_custom);
+    break;
+  case 2:   // BPD
+    InsertList(m_modelCustomOB, g_bpd_custom);
+    break;
+  case 3:   // FL
+    InsertList(m_modelCustomOB, g_fl_custom);
+    break;
+  case 4:   // CRL
+    InsertList(m_modelCustomOB, g_crl_custom);
+    break;
+  case 5:   // GS
+    InsertList(m_modelCustomOB, g_gs_custom);
+    break;
+  case 6:   // AC
+    InsertList(m_modelCustomOB, g_ac_custom);
+    break;
+  case 7:   // HC
+    InsertList(m_modelCustomOB, g_hc_custom);
+    break;
+  case 8:   // TAD
+    InsertList(m_modelCustomOB, g_tad_custom);
+    break;
+  case 9:   // APAD
+    InsertList(m_modelCustomOB, g_apad_custom);
+    break;
+  case 10:  // THD
+    InsertList(m_modelCustomOB, g_thd_custom);
+    break;
+  case 11:  // OFD
+    InsertList(m_modelCustomOB, g_ofd_custom);
+    break;
+  case 12:  // FTA
+    InsertList(m_modelCustomOB, g_fta_custom);
+    break;
+  }
+}
+
+void ViewCustomOB::InsertList(GtkTreeModel* model, int table[]) {
+  for(int row = 0; row < 27; row++) {
+    stringstream ss;
+    ss << row;
+
+    GtkTreePath* path = gtk_tree_path_new_from_string(ss.str().c_str());
+
+    GtkTreeIter iter;
+    gtk_tree_model_get_iter(model, &iter, path);
+
+    for (int col = 1; col < 11; col++) {
+      PRINTF("%d  ", table[10*row + col - 1]);
+
+      char buf[5] = {0};
+
+      sprintf(buf, "%.1f", (float)table[10*row+(col-1)]/10);
+      if (strcmp(buf, "0.0") == 0) {
+        strcpy(buf, "");
+      }
+
+      gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, buf, -1);
+    }
+  }
+  PRINTF("\n");
+}
+
+void ViewCustomOB::AddToTable(gint type, int temp1, float temp2) {
+  float val = temp2 * 10.0;
+  switch(type) {
+  case 0:   // CER
+    g_cer_custom[temp1] = val;
+    break;
+  case 1:   // HL
+    g_hl_custom[temp1] = val;
+    break;
+  case 2:   // BPD
+    g_bpd_custom[temp1] = val;
+    break;
+  case 3:   // FL
+    g_fl_custom[temp1] = val;
+    break;
+  case 4:   // CRL
+    g_crl_custom[temp1] = val;
+    break;
+  case 5:   // GS
+    g_gs_custom[temp1] = val;
+    break;
+  case 6:   // AC
+    g_ac_custom[temp1] = val;
+    break;
+  case 7:   // HC
+    g_hc_custom[temp1] = val;
+    break;
+  case 8:   // TAD
+    g_tad_custom[temp1] = val;
+    break;
+  case 9:   // APAD
+    g_apad_custom[temp1] = val;
+    break;
+  case 10:  // THD
+    g_thd_custom[temp1] = val;
+    break;
+  case 11:  // OFD
+    g_ofd_custom[temp1] = val;
+    break;
+  case 12:  // FTA
+    g_fta_custom[temp1] = val;
+    break;
+  }
+}
 
 // ---------------------------------------------------------
 //
@@ -25,8 +633,7 @@
 #include "display/gui_func.h"
 #include "display/gui_global.h"
 
-#include "keyboard/KeyValueOpr.h"
-#include "keyboard/KeyDef.h"
+
 #include "periDevice/PeripheralMan.h"
 #include "ViewMain.h"
 #include "utils/MessageDialog.h"
@@ -44,7 +651,7 @@
 #include "sysMan/SysUserDefinedKey.h"
 #include "patient/ImgMan.h"
 #include "patient/VideoMan.h"
-#include "calcPeople/MeaCalcFun.h"
+
 #include "imageControl/ImgPw.h"
 #include "imageControl/ImgCfm.h"
 #include "imageProc/ImgProc2D.h"
@@ -72,11 +679,11 @@
 #include "calcPeople/MenuCalcNew.h"
 #include "measure/MenuMeasure.h"
 #include "Init.h"
-#include <errno.h>
+
 #include "patient/ViewNewPat.h"
 
-#include "utils/FakeXUtils.h"
-#include "utils/MainWindowConfig.h"
+
+
 
 const string KeyFunctionList[] = {
   N_("NULL"),
@@ -94,33 +701,9 @@ const string KeyFunctionList[] = {
 extern bool g_authorizationOn;
 #include "utils/Const.h"
 
-int _system_(const char *cmd) {
-    char str_cmd[20];
-    int status;
-    pid_t pid;
-    if(cmd == NULL)
-        return (-1);
 
-    pid = vfork();
-    if(pid < 0) {
-        status = -1;
-        perror("vfork error");
-    } else if(pid == 0) {
-        if(execl("/bin/sh", "sh", "-c", cmd, (char*)0) == -1) {
-            PRINTF("execl error-%s", strerror(errno));
-            _exit(127);
-        }
-    } else {
-        while(waitpid(pid, &status, 0) < 0) {
-            if(errno != EINTR) {
-                status = -1;
-                break;
-            }
-        }
-    }
 
-    return status;
-}
+
 
 const string KB_LIST[]= {
   "Abdomen","Urology", "Cardiac","Obstetrics","Gynecology","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
@@ -3225,7 +3808,7 @@ void ViewSystem::BtnDelPrinterClicked(GtkButton *button) {
         prnt.DeletePrinter(prnt_name.c_str());
         PeripheralMan::GetInstance()->SwitchPrinterDriver();
     }
-    update_specific_printer_model();
+    UpdateSpecificPrinterModel();
 }
 
 int ViewSystem::common_printer_selection() {
@@ -3254,7 +3837,7 @@ string ViewSystem::specific_printer_selection() {
         ret_val = value;
     return ret_val;
 }
-void ViewSystem::update_specific_printer_model() {
+void ViewSystem::UpdateSpecificPrinterModel() {
     GtkTreeModel* model = create_specific_print_model();
     if (model != NULL)
         gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeview_specific_print), model);
@@ -5447,12 +6030,12 @@ void ViewSystem::CreateDefineItem(int probeIndex, vector<ExamPara>& vecExamItem)
   }
 }
 
-void ViewSystem::CreateDefineItemFormUsbToHost(char *name) {
+void ViewSystem::CreateDefineItemFormUsbToHost(string name) {
     char path_defined[256];
-    if(strcmp(name, "System Default") ==0)
+    if(name == "System Default")
         sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, "SystemDefault", ".ini");
     else
-        sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name, ".ini");
+        sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name.c_str(), ".ini");
 
     FILE *fp;
     if((fp = fopen(path_defined, "r")) !=NULL) {
@@ -5476,10 +6059,10 @@ void ViewSystem::CreateDefineItemFormUsbToHost(char *name) {
     ExamItem examitem;
     char path[256];
 
-    if(strcmp(name, "System Default") ==0)
+    if(name == "System Default")
         sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE_OTHER);
     else
-        sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "userconfig/", name,".ini");
+        sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "userconfig/", name.c_str(),".ini");
 
     IniFile ini(path);
     IniFile *ptrIni= &ini;
@@ -5804,7 +6387,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
         ExamItem exam;
         string username;
         username = exam.ReadDefaultUserSelect(&ini1);
-        if(strcmp(_(username.c_str()), GetUserName()) == 0) {
+        if(username == GetUserName()) {
             CalcSetting::GetInstance()->ChangeExamBox(checkpart);
             MeasureSetting::GetInstance()->ChangeExamBox(checkpart);
             int probe_type_index = GetProbeType();
@@ -5958,7 +6541,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
             int size = sizeof(ExamItemArray)/sizeof(ExamPara) - 4;
 
             for(int i = 0; i < size/*24*/; i++) {
-                if (strcmp(str0.c_str(),_(ExamItemArray[i].name.c_str()))==0) {
+                if (str0 == ExamItemArray[i].name) {
                     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
                                                       _("Fail to delete! Can not delete the defaulted exam item!"), NULL);
                     return;
@@ -5975,9 +6558,9 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
             useritemname = ptrIni->ReadString("UserItemName", "ItemName");
             string userselect = ptrIni->ReadString("UserSelect", "DefaultUser");
             string userprobe = ptrIni->ReadString("ProbeModel", "ProbeModel");
-            const char* username = GetUserName();
+            string username = GetUserName();
 
-            if((strcmp(useritemname.c_str(),str0.c_str())==0)&&(userflag==true)&&(strcmp(userprobe.c_str(),g_probe_list[probeIndex].c_str())==0)&&(strcmp(username,  _(userselect.c_str()))==0)) {
+            if (useritemname == str0 && userflag==true && userprobe == g_probe_list[probeIndex] && username == userselect) {
                 MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
                                                   _("Fail to delete! The item is under using!"), NULL); //删除失败!
                 return;
@@ -5995,7 +6578,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
                 ExamItem exam;
                 string username;
                 username = exam.ReadDefaultUserSelect(&ini1);
-                if(strcmp(_(username.c_str()), GetUserName()) == 0) {
+                if(username == GetUserName()) {
 
                     CalcSetting::GetInstance()->ChangeExamBoxDelete();
                     MeasureSetting::GetInstance()->ChangeExamBoxDelete();
@@ -6101,12 +6684,11 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
 }
 
 void ViewSystem::UpdateUserItem() {
-// gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), 0);
-    const char* name = GetUserName();
-    printf("name = %s\n", name);
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
-            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
-            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
+    string name = GetUserName();
+    printf("name = %s\n", name.c_str());
+    if (name == "System Default" && name == "Умолчан системы" &&
+            name == "系统默认" && name == "Domyślne Systemu"  &&
+            name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto") {
         stringstream ss;
         ss << "userconfig/" << name << ".ini";
 
@@ -6577,11 +7159,11 @@ void ViewSystem::ProbeTypeChanged(GtkComboBox *widget) {
     }
 }
 
-void ViewSystem::ShowList(const char *name) {
-    gtk_combo_box_append_text (GTK_COMBO_BOX(m_comboboxentry_user_select), name);
+void ViewSystem::ShowList(const string name) {
+    gtk_combo_box_append_text (GTK_COMBO_BOX(m_comboboxentry_user_select), name.c_str());
 }
 
-void ViewSystem::set_active_user(gint num) {
+void ViewSystem::SetActiveUser(gint num) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_user_select), num);
 }
 
@@ -6589,7 +7171,7 @@ int ViewSystem::get_active_user() {
     return gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxentry_user_select));
 }
 
-const gchar* ViewSystem::GetUserName() {
+string ViewSystem::GetUserName() {
     return gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_user_select))));
 
 }
@@ -6664,10 +7246,10 @@ void ViewSystem::SetImagePara(const ExamItem::ParaItem &item) {
 }
 
 void ViewSystem::save_image_para(ExamItem::ParaItem &item) {
-    const char* name = GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
-            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
-            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
+    string name = GetUserName();
+    if (name == "System Default" && name == "Умолчан системы" &&
+            name == "系统默认" && name == "Domyślne Systemu" &&
+            name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto") {
         UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
     }
 
@@ -7020,10 +7602,10 @@ void ViewSystem::set_image_item_sensitive(bool status) {
 }
 
 void ViewSystem::save_image_setting() {
-    const char* name = GetUserName();
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
-            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
-            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))
+    string name = GetUserName();
+    if (name == "System Default" && name == "Умолчан системы" &&
+            name == "系统默认" && name == "Domyślne Systemu"  &&
+            name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto")
 
     {
         UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
@@ -7361,7 +7943,7 @@ void ViewSystem::save_tvout_setting() {
             sysGeneralSetting.SetPrinterMethod(1);
             print.SetDefault(default_print.c_str());
             PeripheralMan::GetInstance()->SwitchPrinterDriver();
-            update_specific_printer_model();
+            UpdateSpecificPrinterModel();
         }
     }
 
@@ -9721,9 +10303,7 @@ void ViewSystem::GetImageNoteSelection(int &probeIndex, int &itemIndex, char* &i
                        -1);
 }
 
-void ViewCustomOB::save_customOB() {
-    MeaCalcFun::SaveCustomTable();
-}
+
 
 GtkWidget* ViewSystem::create_note_key_config() {
     GtkWidget *fixed_key_config;
@@ -11067,12 +11647,12 @@ void ViewSystem::BtnImageImportFromUSBClicked(GtkButton *button) {
 
 // delete username and file named by username
 void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
-    const char* name = GetUserName();
+    string name = GetUserName();
     char path[256];
 
-    if ((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
-            (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
-            (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0)) {
+    if (name == "System Default" && name == "Умолчан системы" &&
+            name == "系统默认" && name == "Domyślne Systemu"  &&
+            name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto") {
         // avoid to delete a config which is in use
         char *username = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_comboboxentry_user_select));
 
@@ -11090,16 +11670,16 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
         UserSelect::GetInstance()->delete_username_db(USERNAME_DB, name);
 
         // delete file named by username
-        sprintf(path, "%s%s%s", USERCONFIG_PATH, name, ".ini");
+        sprintf(path, "%s%s%s", USERCONFIG_PATH, name.c_str(), ".ini");
         remove(path);
 
         char path_define[256];
-        sprintf(path_define, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name,".ini");
+        sprintf(path_define, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name.c_str(),".ini");
         remove(path_define);
 
         //delete defined comment file
         char path_comment_user[256];
-        sprintf(path_comment_user, "%s%s%s%s", CFG_RES_PATH, COMMENT_PATH, name, ".ini");
+        sprintf(path_comment_user, "%s%s%s%s", CFG_RES_PATH, COMMENT_PATH, name.c_str(), ".ini");
         remove(path_comment_user);
 
         // append text to combo_box
@@ -11288,550 +11868,27 @@ void ViewSystem::TreeFuncChanged(GtkTreeSelection *selection) {
 
 /********************** CustomOB ********************/
 
-extern int cer_custom[];
-extern int hl_custom[];
-extern int bpd_custom[];
-extern int fl_custom[];
-extern int crl_custom[];
-extern int gs_custom[];
-extern int ac_custom[];
-extern int hc_custom[];
-extern int tad_custom[];
-extern int apad_custom[];
-extern int thd_custom[];
-extern int ofd_custom[];
-extern int fta_custom[];
 
-ViewCustomOB::ViewCustomOB() {
-}
 
-ViewCustomOB* ViewCustomOB::m_ptrInstance = NULL;
 
-ViewCustomOB::~ViewCustomOB() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
-}
 
-ViewCustomOB* ViewCustomOB::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new ViewCustomOB;
 
-    return m_ptrInstance;
-}
 
-void ViewCustomOB::CreateWindow(GtkWidget *parent) {
-    m_obWindow = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (m_obWindow, 840, 640);
-    gtk_window_set_position (GTK_WINDOW (m_obWindow), GTK_WIN_POS_CENTER);
-    gtk_window_set_modal (GTK_WINDOW (m_obWindow), TRUE);
-    gtk_window_set_resizable (GTK_WINDOW (m_obWindow), FALSE);
-    gtk_window_set_title (GTK_WINDOW (m_obWindow), _("OB Custom"));
-    gtk_window_set_transient_for(GTK_WINDOW(m_obWindow), GTK_WINDOW(parent));
-    g_signal_connect (G_OBJECT(m_obWindow), "delete-event", G_CALLBACK(on_window_delete_event), this);
 
-    GtkWidget *fixed = create_customOB_window();
-    gtk_container_add (GTK_CONTAINER (m_obWindow), fixed);
 
-    MeaCalcFun::InitCustomTable();
-    init_customOB();
 
-    gtk_widget_show_all(m_obWindow);
 
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
 
-    return ;
-}
 
-GtkWidget* ViewCustomOB::create_customOB_window() {
-    int k1, k2;
-    char buf[10];
-    GtkWidget *fixed;
-    GtkWidget *label_gw;
-    GtkWidget *label_value;
-    GtkWidget *button_clear;
-    GtkWidget *button_save;
-    GtkWidget *button_exit;
-    GtkTreeIter iter;
-    GtkListStore *store;
 
-    fixed = gtk_fixed_new ();
-    gtk_widget_show(fixed);
 
-    label_gw = create_label(_("GW:31~300days"), 0, 30, g_white, NULL);
-    gtk_fixed_put (GTK_FIXED (fixed), label_gw, 20, 10);
-    gtk_widget_show(label_gw);
 
-    label_value = create_label(_("Value:0.0~500.0mm (Click to enter a value)"), 0, 30, g_white, NULL);
-    gtk_fixed_put (GTK_FIXED (fixed), label_value, 180, 10);
-    gtk_widget_show(label_value);
 
-    guchar StringOBType[13][10] = { {"CER"}, {"HL"}, {"BPD"}, {"FL"}, {"CRL"},
-        {"GS"}, {"AC"}, {"HC"}, {"TAD"}, {"APAD"},
-        {"THD"}, {"OFD"}, {"FTA"}
-    };
-    store = gtk_list_store_new(1, G_TYPE_STRING);
-    for (int i=0; i<13; i++) {
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, StringOBType[i], -1);
-    }
-    m_combobox_customOB = create_combobox(150, 30, "text", GTK_TREE_MODEL(store));
-    gtk_fixed_put (GTK_FIXED (fixed), m_combobox_customOB, 670, 10);
-    gtk_widget_show(m_combobox_customOB);
-    g_signal_connect(GTK_OBJECT(m_combobox_customOB), "changed", G_CALLBACK(changed_custom_ob), this);
 
-    GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_widget_set_usize(sw, 800, 500);
-    gtk_fixed_put(GTK_FIXED(fixed), sw, 20, 50);
 
-    m_modelCustomOB = GTK_TREE_MODEL(gtk_list_store_new(NUM_COLUMNS,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING,
-                                     G_TYPE_STRING));
-    m_treeCustomOB = gtk_tree_view_new_with_model(m_modelCustomOB);
-    gtk_widget_set_usize(m_treeCustomOB, 720, 665);
-    gtk_tree_view_set_enable_search (GTK_TREE_VIEW(m_treeCustomOB), FALSE);
-    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(m_treeCustomOB), TRUE);
-    gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeCustomOB)), GTK_SELECTION_SINGLE);
 
-    for(int i=0; i<NUM_COLUMNS; i++) {
-        GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
-        g_object_set_data(G_OBJECT(renderer), "column", GINT_TO_POINTER(i));
-        GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer, "text", i, NULL);
-        GtkWidget *label = create_label(" ", 0, 0, g_white, NULL);
-        if(i==COL_GW) {
-            g_object_set(G_OBJECT(column), "widget", label, "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 80, NULL);
-        } else {
-            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
-            g_signal_connect(renderer, "edited", G_CALLBACK(cell_edited_custom_ob), this);
-            g_signal_connect(renderer, "editing_started", G_CALLBACK(cell_editing_started_custom_ob), this);
-            sprintf(buf, "%d", i);
-            gtk_label_set_text(GTK_LABEL(label), buf);
-            g_object_set(G_OBJECT(column), "widget", label, "sizing", GTK_TREE_VIEW_COLUMN_FIXED, "fixed-width", 60, NULL);
-        }
-        gtk_widget_show(label);
-        gtk_tree_view_append_column(GTK_TREE_VIEW(m_treeCustomOB), column);
-    }
 
-    m_arrayGW = g_array_new(TRUE, TRUE, sizeof(CustomData));
-    for(int i=1; i<28; i++) {
-        k1 = (i+2)*10+1;
-        k2 = k1 + 9;
-        sprintf(buf, "%d~%d", k1, k2);
-        m_data.gw = g_strdup(buf);
-        m_data.gw1 = NULL;
-        m_data.gw2 = NULL;
-        m_data.gw3 = NULL;
-        m_data.gw4 = NULL;
-        m_data.gw5 = NULL;
-        m_data.gw6 = NULL;
-        m_data.gw7 = NULL;
-        m_data.gw8 = NULL;
-        m_data.gw9 = NULL;
-        m_data.gw10 = NULL;
-        g_array_append_vals(m_arrayGW, &m_data, 1);
-    }
-    gtk_list_store_clear(GTK_LIST_STORE(m_modelCustomOB));
 
-    for(unsigned int i=0; i<m_arrayGW->len; i++) {
-        gtk_list_store_append(GTK_LIST_STORE(m_modelCustomOB), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter,
-                           COL_GW, g_array_index(m_arrayGW, CustomData, i).gw,
-                           COL_GW1, g_array_index(m_arrayGW, CustomData, i).gw1,
-                           COL_GW2, g_array_index(m_arrayGW, CustomData, i).gw2,
-                           COL_GW3, g_array_index(m_arrayGW, CustomData, i).gw3,
-                           COL_GW4, g_array_index(m_arrayGW, CustomData, i).gw4,
-                           COL_GW5, g_array_index(m_arrayGW, CustomData, i).gw5,
-                           COL_GW6, g_array_index(m_arrayGW, CustomData, i).gw6,
-                           COL_GW7, g_array_index(m_arrayGW, CustomData, i).gw7,
-                           COL_GW8, g_array_index(m_arrayGW, CustomData, i).gw8,
-                           COL_GW9, g_array_index(m_arrayGW, CustomData, i).gw9,
-                           COL_GW10, g_array_index(m_arrayGW, CustomData, i).gw10,
-                           -1);
-    }
-
-    GtkWidget *image_clear = gtk_image_new_from_stock ("gtk-clear", GTK_ICON_SIZE_BUTTON);
-    GtkWidget *label_clear = gtk_label_new_with_mnemonic (_("Clear"));
-    button_clear = create_button_icon(label_clear, image_clear);
-    gtk_fixed_put (GTK_FIXED (fixed), button_clear, 440, 560);
-    g_signal_connect ((gpointer) button_clear, "clicked", G_CALLBACK (on_button_ob_custom_clear_clicked), this);
-
-    GtkWidget *image_save = gtk_image_new_from_stock ("gtk-save", GTK_ICON_SIZE_BUTTON);
-    GtkWidget *label_save = gtk_label_new_with_mnemonic (_("Save"));
-    button_save = create_button_icon(label_save, image_save);
-    gtk_fixed_put (GTK_FIXED (fixed), button_save, 570, 560);
-    g_signal_connect ((gpointer) button_save, "clicked", G_CALLBACK (on_button_ob_custom_save_clicked), this);
-
-    GtkWidget *image_exit = gtk_image_new_from_stock ("gtk-quit", GTK_ICON_SIZE_BUTTON);
-    GtkWidget *label_exit = gtk_label_new_with_mnemonic (_("Exit"));
-    button_exit = create_button_icon(label_exit, image_exit);
-    gtk_fixed_put (GTK_FIXED (fixed), button_exit, 700, 560);
-    g_signal_connect ((gpointer) button_exit, "clicked", G_CALLBACK (on_button_ob_custom_exit_clicked), this);
-
-    gtk_container_add(GTK_CONTAINER(sw), m_treeCustomOB);
-    gtk_widget_show_all(sw);
-
-    return fixed;
-}
-
-gboolean ViewCustomOB::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
-    DestroyWindow();
-    return FALSE;
-}
-
-void ViewCustomOB::DestroyWindow() {
-    if(GTK_IS_WIDGET(m_obWindow)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(m_obWindow);
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-        m_obWindow = NULL;
-    }
-}
-
-static gboolean ExitWindowOB(gpointer data) {
-    ViewCustomOB *tmp;
-    tmp = (ViewCustomOB*)data;
-    tmp->DestroyWindow();
-    return FALSE;
-}
-
-void ViewCustomOB::KeyEvent(unsigned char keyValue) {
-    FakeXEvent::KeyEvent(keyValue);
-    switch(keyValue) {
-    case KEY_ESC:
-        g_timeout_add(100, ExitWindowOB, this);
-        FakeEscKey();
-        break;
-    default:
-        break;
-    }
-}
-
-void ViewCustomOB::BtnOBCustomClearClicked(GtkButton *button) {
-    gint type = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_customOB));
-    gint *ptr = NULL;
-
-    switch (type) {
-    case 0://CER
-        ptr = cer_custom;
-        break;
-    case 1://HL
-        ptr = hl_custom;
-        break;
-    case 2://BPD
-        ptr = bpd_custom;
-        break;
-    case 3://FL
-        ptr = fl_custom;
-        break;
-    case 4://CRL
-        ptr = crl_custom;
-        break;
-    case 5://GS
-        ptr = gs_custom;
-        break;
-    case 6://AC
-        ptr = ac_custom;
-        break;
-    case 7://HC
-        ptr = hc_custom;
-        break;
-    case 8://TAD
-        ptr = tad_custom;
-        break;
-    case 9://APAD
-        ptr = apad_custom;
-        break;
-    case 10://THD
-        ptr = thd_custom;
-        break;
-    case 11://OFD
-        ptr = ofd_custom;
-        break;
-    case 12://FTA
-        ptr = fta_custom;
-        break;
-    }
-    for(int i=0; i<272; i++) {
-        *ptr = 0;
-        ptr++;
-    }
-    update_list(type);
-}
-
-void ViewCustomOB::BtnOBCustomSaveClicked(GtkButton *button) {
-    save_customOB();
-}
-
-void ViewCustomOB::BtnOBCustomExitClicked(GtkButton *button) {
-    g_keyInterface.Pop();
-    gtk_widget_destroy(m_obWindow);
-    if (g_keyInterface.Size() == 1)
-        SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-}
-
-void ViewCustomOB::init_customOB() {
-    update_list(gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_customOB)));
-}
-
-void ViewCustomOB::CustomSelectChanged(GtkComboBox *combobox) {
-    gint type = gtk_combo_box_get_active(GTK_COMBO_BOX(combobox));
-    update_list(type);
-}
-
-void ViewCustomOB::CustomCellEditingStarted(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path) {
-    if(GTK_IS_ENTRY(editable)) {
-        g_signal_connect(G_OBJECT(editable), "insert_text", G_CALLBACK(on_entry_insert_custom_ob), this);
-    }
-}
-
-void add_to_table(gint type, int temp1, float temp2) {
-    float val = temp2 * 10.0;
-    switch(type) {
-    case 0://CER
-        cer_custom[temp1] = val;
-        break;
-    case 1://HL
-        hl_custom[temp1] = val;
-        break;
-    case 2://BPD
-        bpd_custom[temp1] = val;
-        break;
-    case 3://FL
-        fl_custom[temp1] = val;
-        break;
-    case 4://CRL
-        crl_custom[temp1] = val;
-        break;
-    case 5://GS
-        gs_custom[temp1] = val;
-        break;
-    case 6://AC
-        ac_custom[temp1] = val;
-        break;
-    case 7://HC
-        hc_custom[temp1] = val;
-        break;
-    case 8://TAD
-        tad_custom[temp1] = val;
-        break;
-    case 9://APAD
-        apad_custom[temp1] = val;
-        break;
-    case 10://THD
-        thd_custom[temp1] = val;
-        break;
-    case 11://OFD
-        ofd_custom[temp1] = val;
-        break;
-    case 12://FTA
-        fta_custom[temp1] = val;
-        break;
-
-    }
-}
-
-void ViewCustomOB::CustomCellEdited(GtkCellRenderer *cell, gchar *path_string, gchar *new_text) {
-    GtkTreePath *path = gtk_tree_path_new_from_string(path_string);
-
-    GtkTreeIter iter;
-    gint type = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_customOB));
-
-    gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
-    gtk_tree_model_get_iter(m_modelCustomOB, &iter, path);
-
-    if(!IsNum(new_text) && strcmp(new_text, "")) {
-        PRINTF("It's not a num!\n");
-        return;
-    }
-
-    float new_value = atof(new_text);
-    if (new_value < 0.0 || new_value > 500.0) {
-        PRINTF("Out of range!\n");
-        return;
-    }
-    gint i = gtk_tree_path_get_indices(path)[0];
-
-    switch(column) {
-    case COL_GW1: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw1);
-        g_array_index(m_arrayGW, CustomData, i).gw1 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw1, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW2: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw2);
-        g_array_index(m_arrayGW, CustomData, i).gw2 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw2, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW3: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw3);
-        g_array_index(m_arrayGW, CustomData, i).gw3 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw3, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW4: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw4);
-        g_array_index(m_arrayGW, CustomData, i).gw4 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw4, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW5: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw5);
-        g_array_index(m_arrayGW, CustomData, i).gw5 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw5, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW6: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw6);
-        g_array_index(m_arrayGW, CustomData, i).gw6 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw6, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW7: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw7);
-        g_array_index(m_arrayGW, CustomData, i).gw7 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw7, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW8: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw8);
-        g_array_index(m_arrayGW, CustomData, i).gw8 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw8, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW9: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw9);
-        g_array_index(m_arrayGW, CustomData, i).gw9 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw9, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    case COL_GW10: {
-        g_free(g_array_index(m_arrayGW, CustomData, i).gw10);
-        g_array_index(m_arrayGW, CustomData, i).gw10 = g_strdup(new_text);
-
-        gtk_list_store_set(GTK_LIST_STORE(m_modelCustomOB), &iter, column,
-                           g_array_index(m_arrayGW, CustomData, i).gw10, -1);
-        add_to_table(type, (i*10 + column)-1, new_value);
-    }
-    break;
-    }
-}
-
-void ViewCustomOB::update_list(int type) {
-    PRINTF("type = %d\n", type);
-    switch (type) {
-    case 0://CER
-        insert_list(m_modelCustomOB, cer_custom);
-        break;
-    case 1://HL
-        insert_list(m_modelCustomOB, hl_custom);
-        break;
-    case 2://BPD
-        insert_list(m_modelCustomOB, bpd_custom);
-        break;
-    case 3://FL
-        insert_list(m_modelCustomOB, fl_custom);
-        break;
-    case 4://CRL
-        insert_list(m_modelCustomOB, crl_custom);
-        break;
-    case 5://GS
-        insert_list(m_modelCustomOB, gs_custom);
-        break;
-    case 6://AC
-        insert_list(m_modelCustomOB, ac_custom);
-        break;
-    case 7://HC
-        insert_list(m_modelCustomOB, hc_custom);
-        break;
-    case 8://TAD
-        insert_list(m_modelCustomOB, tad_custom);
-        break;
-    case 9://APAD
-        insert_list(m_modelCustomOB, apad_custom);
-        break;
-    case 10://THD
-        insert_list(m_modelCustomOB, thd_custom);
-        break;
-    case 11://OFD
-        insert_list(m_modelCustomOB, ofd_custom);
-        break;
-    case 12://FTA
-        insert_list(m_modelCustomOB, fta_custom);
-        break;
-
-    }
-}
-
-void ViewCustomOB::insert_list(GtkTreeModel *model, int table[]) {
-    gint col;
-    gint row;
-    gchar tmp[5];
-    gchar buf[10][5];
-
-    GtkTreePath *path;
-    GtkTreeIter iter;
-
-    for(row=0; row<27; row++) {
-        sprintf(tmp, "%d", row);
-        path = gtk_tree_path_new_from_string(tmp);
-        gtk_tree_model_get_iter(model, &iter, path);
-        for (col=1; col<11; col++) {
-            PRINTF("%d  ", table[10*row + col - 1]);
-
-            sprintf(buf[col-1], "%.1f", (float)table[10*row+(col-1)]/10);
-            if (strcmp(buf[col-1], "0.0") == 0)
-                strcpy(buf[col-1], "");
-            gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, buf[col-1], -1);
-        }
-    }
-    PRINTF("\n");
-}
-
-void ViewCustomOB::EntryFracDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
-    if (!g_ascii_isdigit(*new_text) && g_ascii_strcasecmp(new_text, ".") != 0)
-        g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
-    return;
-}
 
 void ViewSystem::EntryNameInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
     gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));

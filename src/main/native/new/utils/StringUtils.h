@@ -9,4 +9,6 @@ string lstrip(const string str);
 string rstrip(const string str);
 string strip(const string str);
 
+bool IsNum(const string str);
+
 #endif
