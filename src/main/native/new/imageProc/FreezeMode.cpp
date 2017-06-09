@@ -190,7 +190,7 @@ void FreezeMode::Freeze() {
     ViewIcon::GetInstance()->Replay(TRUE);
     Update2D::SetCineRemoveImg(3);
 }
-extern bool system_save;
+extern bool g_system_save;
 extern bool review_pic;
 void FreezeMode::UnFreeze() {
     ///> darken freeze lamp
@@ -210,12 +210,12 @@ void FreezeMode::UnFreeze() {
     io.Unfreeze();
 
     if(review_pic) {
-        if(system_save) {
+        if(g_system_save) {
             SysGeneralSetting sys;
             int date_format = sys.GetDateFormat();
             string m_hospitalname = sys.GetHospital();
             UpdateHospitalandpart(date_format, m_hospitalname.c_str());
-            system_save = false;
+            g_system_save = false;
         }
         review_pic = false;
     }

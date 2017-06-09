@@ -153,10 +153,6 @@ private:
   CustomData m_data;
 };
 
-
-
-
-
 class ViewSystem: public FakeXEvent {
 public:
   static ViewSystem* GetInstance();
@@ -180,6 +176,83 @@ public:
 
   void UpdateUserItem();
   void UpdateSpecificPrinterModel();
+
+private:
+  // signal
+
+  static void signal_button_clicked_apply(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonClickedApply(button);
+    }
+  }
+
+  static void signal_button_clicked_save(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonClickedSave(button);
+    }
+  }
+
+  static void signal_button_clicked_exit(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonClickedExit(button);
+    }
+  }
+
+  static void signal_notebook_switch_page(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, ViewSystem *data) {
+    if (data != NULL) {
+      data->NotebookChanged(notebook, page, page_num);
+    }
+  }
+
+  static gboolean signal_window_delete_event(GtkWidget* widget, GdkEvent* event, ViewSystem* data) {
+    if (data != NULL) {
+      data->DestroyWindow();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_poweroff(gpointer data) {
+    execlp("poweroff", "poweroff", NULL);
+    perror("PowerOff Failed");
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_exit_window_system(gpointer data) {
+    ViewSystem* system = (ViewSystem*)data;
+
+    if (system != NULL) {
+      system->DestroyWindow();
+    }
+
+    return FALSE;
+  }
+
+  // signal
+
+  void ButtonClickedApply(GtkButton* button);
+  void ButtonClickedSave(GtkButton* button);
+  void ButtonClickedExit(GtkButton* button);
+  void NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num);
+
+private:
+  ViewSystem();
+
+  void KeyEvent(unsigned char keyValue);
+
+private:
+  static ViewSystem* m_instance;
+
+private:
+  GtkDialog* m_dialog;
+  GtkButton* m_button_apply;
+  GtkButton* m_button_save;
+  GtkButton* m_button_exit;
+  GtkNotebook* m_notebook;
+
+  GtkBox* m_box_peripheral;
+
 
 public:
     static const int MAX_KEY = 10;//8;//9;
@@ -208,34 +281,16 @@ public:
     ////>option fuction
     void UpdateOptionStatus(bool status);
 private:
-    ViewSystem();
-    void KeyEvent(unsigned char keyValue);
+
+
     int m_kbIndex;
     bool m_vgaInterl;
     GtkWidget *m_combobox_vga;
     //PItem m_itemIndex;
 
-    enum {
-        PRT_BRAND,
-        PRT_MODEL,
-        CNUM_COLS
-    };
 
-    enum {
-        PRT_DEFAULT,
-        PRT_NAME,
-        PRT_STATUS,
-        PRT_MESSAGE,
-        SNUM_COLS
-    };
 
-    enum {
-        NAME_COLUMN,
-        INDEX_COLUMN,
-        N_COLUMNS
-    };
 
-    static ViewSystem* m_ptrInstance;
     bool m_imageItemSensitive;
     int m_itemIndex;
     char *m_itemName;
@@ -246,7 +301,7 @@ private:
     GtkWidget *m_frame_new_check_part;
     GtkWidget *m_label_check_part;
     int m_save_or_new_flag;
-    GtkWidget *m_window;
+
 
     int m_current_note_page;
     // general
@@ -377,18 +432,7 @@ private:
 
     //calculate
     GtkWidget *m_obWindow;
-    // GtkWidget *m_combobox_adult_2d_edv;
-    // GtkWidget *m_combobox_adult_2d_fs;
-    // GtkWidget *m_combobox_adult_2d_lv_mass;
-    // GtkWidget *m_combobox_adult_m_edv;
-    // GtkWidget *m_combobox_adult_m_fs;
-    // GtkWidget *m_combobox_adult_m_lv_mass;
-    // GtkWidget *m_combobox_mva;
     GtkWidget *m_combobox_bsa;
-    // GtkWidget *m_combobox_fetus_2d_edv;
-    // GtkWidget *m_combobox_fetus_2d_fs;
-    // GtkWidget *m_combobox_fetus_m_edv;
-    // GtkWidget *m_combobox_fetus_m_fs;
     GtkWidget *m_combobox_ob_crl;
     GtkWidget *m_combobox_ob_fl;
     GtkWidget *m_combobox_ob_ac;
@@ -402,11 +446,7 @@ private:
     GtkWidget *m_combobox_ob_thd;
     GtkWidget *m_combobox_ob_ofd;
     GtkWidget *m_combobox_ob_efw;
-    GtkWidget *m_button_apply;
-    GtkWidget *m_button_save;
-    GtkWidget *m_button_exit;
-    //GtkWidget *m_button_save;
-    GtkWidget *m_notebook;
+
 
     GtkTreeIter topIter;
     GtkCellRenderer *renderer;
@@ -444,9 +484,9 @@ private:
     GtkWidget *m_labelRegister;
     bool m_powerOffFlag;
 
-    bool StrCmpSectionString(int section, const char *string, int *language);
-    bool StrCmpCustomString(const char *string, int *language);
-    bool StrCmpTemplet1String(const char *string, int *language);
+    bool StrCmpSectionString(int section, const string string, int* language);
+    bool StrCmpCustomString(const string str, int* language);
+    bool StrCmpTemplet1String(const string str, int* language);
 
     void InitReportVar();
     bool OpenDB();
@@ -558,17 +598,15 @@ private:
 
     GtkWidget *create_set_report();
 
-    bool UniqueItem(const char *sections, const char *templet = "%", const char *childsection = "%");
-    GtkTreeIter InsertUnique(GtkTreeModel *model, GtkTreeIter *iter, const char *str);
-    GtkTreeIter InsertUniqueComment(GtkTreeModel *model, const char *str);
+    bool UniqueItem(const string sections, const string templet = "%", const string childsection = "%");
+    GtkTreeIter InsertUnique(GtkTreeModel* model, GtkTreeIter* iter, const string str);
+    GtkTreeIter InsertUniqueComment(GtkTreeModel* model, const string str);
 
-    bool InitRecordFromShowArr(const char *childsection, int *start, int *end);
-    bool ReadRecordFromDB(const char * sections, const char* templet, const char * childsection);
+    bool InitRecordFromShowArr(const string childsection, int* start, int* end);
+    bool ReadRecordFromDB(const string sections, const string templet, const string childsection);
     void apply_report_setting();
 
     void EntrytempletInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    //void EntryNewCheckPartInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    //void NewCheckPartFocusOut(GtkWidget *widget, GdkEventFocus *event);
     void BtnNewCheckPartOkClicked(GtkButton *button);
     void BtnNewCheckPartCancelClicked(GtkButton *button);
 
@@ -579,20 +617,10 @@ private:
     void GetImageNoteSelection(int &probeIndex, int &itemIndex, char *&itemName);
 
     //signal handle
-    gboolean WindowDeleteEvent(GtkWidget *widget, GdkEvent *event);
+
 
     //signal
-    static gboolean on_window_delete_event(GtkWidget *widget, GdkEvent *event, ViewSystem *data) {
-        return data->WindowDeleteEvent(widget, event);
-    }
 
-    //2014.07.29 lihuamei
-    /*
-       static void on_entry_new_check_part(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data)
-       { data->EntryNewCheckPartInsert(editable, new_text, new_text_length, position); }
-       static gboolean HandleNewCheckPartFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewSystem *data)
-       { data->NewCheckPartFocusOut(widget, event); return FALSE;}
-     */
     static void HandleNewCheckPartBtnOk(GtkButton *button, ViewSystem *data) {
         data->BtnNewCheckPartOkClicked(button);
     }
@@ -765,9 +793,7 @@ private:
     void SpecificRadioToggled(GtkToggleButton *togglebutton);
     void BtnAddPrinterClicked(GtkButton *button);
     void BtnDelPrinterClicked(GtkButton *button);
-    void BtnApplyClicked(GtkButton *button);
-    void BtnSaveClicked(GtkButton *button);
-    void BtnExitClicked(GtkButton *button);
+
     void BtnGeneralDefaultClicked(GtkButton *button);
     void BtnOptionsDefaultClicked(GtkButton *button);
     void BtnMeasureDefaultClicked(GtkButton *button);
@@ -836,7 +862,7 @@ private:
     void OnRadiobtnDisplay_ud12(GtkToggleButton *togglebutton);
     void OnRadiobtnDisplay_lr11(GtkToggleButton *togglebutton);
 
-    void notebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
+
     void DicomnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
     void CalcnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
 
@@ -883,15 +909,7 @@ private:
     static void on_button_del_printer_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnDelPrinterClicked(button);
     }
-    static void on_button_apply_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnApplyClicked(button);
-    }
-    static void on_button_save_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnSaveClicked(button);
-    }
-    static void on_button_exit_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnExitClicked(button);
-    }
+
     static void on_button_general_default_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnGeneralDefaultClicked(button);
     }
@@ -1068,9 +1086,7 @@ private:
         return FALSE;
     }
 
-    static void on_notebook_switch_page(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, ViewSystem *data) {
-        data->notebookChanged(notebook, page, page_num);
-    }
+
 
     static void on_dicom_notebook_switch_page(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, ViewSystem *data) {
         data->DicomnotebookChanged(notebook, page, page_num);

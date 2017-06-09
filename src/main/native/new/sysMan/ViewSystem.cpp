@@ -5,11 +5,40 @@
 
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
+#include "utils/MessageDialog.h"
 #include "utils/StringUtils.h"
 
 #include "calcPeople/MeaCalcFun.h"
+#include "calcPeople/ViewReport.h"
+#include "imageProc/FreezeMode.h"
 #include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "periDevice/DCMRegister.h"
+#include "sysMan/SysCalculateSetting.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/SysMeasurementSetting.h"
+#include "sysMan/SysNoteSetting.h"
+#include "sysMan/SysOptions.h"
+
+#include "ViewMain.h"
+
+
+
+#include "display/gui_func.h"
+
+
+
+#define DEFALT_SCREEN_WIDTH   950
+#define GRAY_WIDTH            20
+#define TREE_WINDOW_WIDTH     260
+#define CHECK_VALUE           0x74
+#define UNCHECK_VALUE         0x66
+#define OTHERS_M              TCD_M
+#define SHOW_WINDOW_WIDTH     ((DEFALT_SCREEN_WIDTH - 40) - TREE_WINDOW_WIDTH - 3 * GRAY_WIDTH)
+
+#define CustomReport_PATH     "./res/CustomReport.db"
+#define CustomReport_PATH_BAK "./res/bak_CustomReport.db"
 
 extern int g_cer_custom[];
 extern int g_hl_custom[];
@@ -38,6 +67,26 @@ enum {
   COL_GW9,
   COL_GW10,
   NUM_COLUMNS
+};
+
+enum {
+  PRT_BRAND,
+  PRT_MODEL,
+  CNUM_COLS
+};
+
+enum {
+  PRT_DEFAULT,
+  PRT_NAME,
+  PRT_STATUS,
+  PRT_MESSAGE,
+  SNUM_COLS
+};
+
+enum {
+  NAME_COLUMN,
+  INDEX_COLUMN,
+  N_COLUMNS
 };
 
 int _system_(const string cmd) {
@@ -615,75 +664,50 @@ void ViewCustomOB::AddToTable(gint type, int temp1, float temp2) {
 //
 // ---------------------------------------------------------
 
-// ---------------------------------------------------------
+ViewSystem* ViewSystem::m_instance = NULL;
 
-// ---------------------------------------------------------
+extern bool g_authorizationOn;
 
-#include "periDevice/DCMMan.h"
-#include <string.h>
-#include <time.h>
-#include <stdlib.h>
-#include <gtk/gtk.h>
-#include <vector>
-#include "imageControl/Update2D.h"
-#include "probe/ExamItem.h"
-#include "Def.h"
-#include "display/MenuArea.h"
-#include "sysMan/UpgradeMan.h"
-#include "display/gui_func.h"
-#include "display/gui_global.h"
+string g_user_configure = "ItemPara.ini";
+bool g_system_save = false;
 
+sqlite3* CustomReport_db = NULL;
+char ShowArr[MAX_CALCARR_COUNT+1] = {0x66};
 
-#include "periDevice/PeripheralMan.h"
-#include "ViewMain.h"
-#include "utils/MessageDialog.h"
-#include "periDevice/NetworkMan.h"
-#include "display/KnobMenu.h"
-#include "display/TopArea.h"
-#include "sysMan/ScreenSaver.h"
-#include "patient/PatientInfo.h"
-#include "sysMan/SysGeneralSetting.h"
-#include "sysMan/SysOptions.h"
-#include "sysMan/SysNoteSetting.h"
-#include "sysMan/SysDicomSetting.h"
-#include "sysMan/SysMeasurementSetting.h"
-#include "sysMan/SysCalculateSetting.h"
-#include "sysMan/SysUserDefinedKey.h"
-#include "patient/ImgMan.h"
-#include "patient/VideoMan.h"
+const string DEFAULT_FLAG = "\u221a";
+const string DEFAULT_STR = "System Default";
 
-#include "imageControl/ImgPw.h"
-#include "imageControl/ImgCfm.h"
-#include "imageProc/ImgProc2D.h"
-#include "imageProc/ImgProcPw.h"
-#include "imageProc/ImgProcCfm.h"
-#include "sysMan/UserDefineKey.h"
-#include "periDevice/ViewPrinterAdd.h"
-#include "probe/ProbeSelect.h"
+const string TEMPLET1_STR[] = {
+  "Template 1",
+  "\u6a21\u677f1",
+  "\u0428\u0430\u0431\u043b\u043e\u043d 1",
+  "szablon 1",
+  "Modššle 1",
+  "Templete 1",
+  "Template 1"
+};
 
-#include "periDevice/Printer.h"
-#include "measure/MeasureMan.h"
-#include "sysMan/CalcSetting.h"
-#include "sysMan/MeasureSetting.h"
-#include "patient/FileMan.h"
-#include "sysMan/UserSelect.h"
-#include "patient/ViewUdiskDataSelect.h"
-#include "sysMan/ConfigToUSB.h"
-#include "sysMan/ConfigToHost.h"
+const string CUSTOM_STR[] = {
+  "Custom Template",
+  "\u81ea\u5B9a\u4e49\u6a21\u677f",
+  "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u0438\u0435 \u0448\u0430\u0431\u043b\u043e\u043d\u044b",
+  "Custom Template",
+  "Modššle auto-dšŠfini",
+  "Custom Templete",
+  "Custom Template"
+};
 
-#include "sysMan/DicomLocalSetting.h"
-#include "sysMan/DicomServerSetting.h"
-#include "sysMan/DicomServiceSetting.h"
-#include "periDevice/DCMRegister.h"
-#include <EmpAuthorization.h>
-#include "calcPeople/MenuCalcNew.h"
-#include "measure/MenuMeasure.h"
-#include "Init.h"
-
-#include "patient/ViewNewPat.h"
-
-
-
+const string SECTION_STR[][LANG_MAX] = {
+  {"Abdomen", "\u6210\u4eba\u8179\u90e8", "\u0410\u0431\u0434\u043e\u043c.", "Jama brzuszna", "Abdomen","Abdomen", "Abdomen"},
+  {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce","Cardiaque", "Cardiaco",  "Kardial"},
+  {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia", "Urologie", "Urologico", "Urologie"},
+  {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obstétrique","Obstetrico",  "Geburtshilfe"},
+  {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia", "Gynécologie", "Gynecologico",  "Gynäkologie"},
+  {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes",  "Small-Parts"},
+  {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu", "Cardio f\u0153tal","Cardio Fetal", "fötale Kardio"},
+  {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire","Vascular", "Vaskulär"},
+  {"Others", "其他", "Другие", "Inne", "Autres","Otro",  "Andere"}
+};
 
 const string KeyFunctionList[] = {
   N_("NULL"),
@@ -698,153 +722,526 @@ const string KeyFunctionList[] = {
   N_("Biopsy")
 };
 
-extern bool g_authorizationOn;
-#include "utils/Const.h"
-
-
-
-
-
-const string KB_LIST[]= {
-  "Abdomen","Urology", "Cardiac","Obstetrics","Gynecology","Small Part","Vascular","Fetal Cardio","TCD","Orthopedic"
-};
-
-string g_user_configure = "ItemPara.ini";
-
 const CommonPrinter COMMON_PRINTER_DATA[] = {
-    {"HP",    "LaserJet Series"},
-    {"HP",    "DeskJet Series"},
-    {"HP",    "New DeskJet Series"},
-    {"EPSON", "9-Pin Series"},
-    {"EPSON", "24-Pin Series"},
-    {"EPSON", "Stylus Color Series"},
-    {"EPSON", "New Stylus Color Series"},
-    {"EPSON", "Stylus Photo Series"},
-    {"EPSON", "New Stylus Photo Series"},
+  {"HP",    "LaserJet Series"},
+  {"HP",    "DeskJet Series"},
+  {"HP",    "New DeskJet Series"},
+  {"EPSON", "9-Pin Series"},
+  {"EPSON", "24-Pin Series"},
+  {"EPSON", "Stylus Color Series"},
+  {"EPSON", "New Stylus Color Series"},
+  {"EPSON", "Stylus Photo Series"},
+  {"EPSON", "New Stylus Photo Series"},
 };
 
 const ExamPara ExamItemArray[] = {
-    {N_("Abdomen"), N_("Adult Abdomen"), ExamItem::ABDO_ADULT},
-    {N_("Abdomen"), N_("Adult Liver"), ExamItem::ABDO_LIVER},
-    {N_("Abdomen"), N_("Kid Abdomen"), ExamItem::ABDO_KID},
+  {N_("Abdomen"), N_("Adult Abdomen"), ExamItem::ABDO_ADULT},
+  {N_("Abdomen"), N_("Adult Liver"), ExamItem::ABDO_LIVER},
+  {N_("Abdomen"), N_("Kid Abdomen"), ExamItem::ABDO_KID},
 
-    {N_("Cardiac"), N_("Adult Cardio"), ExamItem::CAR_ADULT},
-    {N_("Cardiac"), N_("Kid Cardio"), ExamItem::CAR_KID},
+  {N_("Cardiac"), N_("Adult Cardio"), ExamItem::CAR_ADULT},
+  {N_("Cardiac"), N_("Kid Cardio"), ExamItem::CAR_KID},
 
-    {N_("Small Part"), N_("Mammary Glands"), ExamItem::GLANDS},
-    {N_("Small Part"), N_("Thyroid"), ExamItem::THYROID},
-    {N_("Small Part"), N_("Eye Ball"), ExamItem::EYE},
-    //{N_("Small Part"), N_("Small Part"), ExamItem::SMALL_PART},
-    {N_("Small Part"), N_("Testicle"), ExamItem::SMALL_PART},
+  {N_("Small Part"), N_("Mammary Glands"), ExamItem::GLANDS},
+  {N_("Small Part"), N_("Thyroid"), ExamItem::THYROID},
+  {N_("Small Part"), N_("Eye Ball"), ExamItem::EYE},
+  {N_("Small Part"), N_("Testicle"), ExamItem::SMALL_PART},
 
-    {N_("Gynecology"), N_("Gynecology"), ExamItem::GYN},
+  {N_("Gynecology"), N_("Gynecology"), ExamItem::GYN},
 
-    {N_("Obstetrics"), N_("Early Pregnancy"), ExamItem::EARLY_PREG},
-    {N_("Obstetrics"), N_("Middle-late Pregnancy"), ExamItem::LATER_PREG},
-    {N_("Obstetrics"), N_("Fetal Cardio"), ExamItem::CAR_FETUS},
+  {N_("Obstetrics"), N_("Early Pregnancy"), ExamItem::EARLY_PREG},
+  {N_("Obstetrics"), N_("Middle-late Pregnancy"), ExamItem::LATER_PREG},
+  {N_("Obstetrics"), N_("Fetal Cardio"), ExamItem::CAR_FETUS},
 
-    {N_("Urology"), N_("Kidney Ureter"), ExamItem::KIDNEY},
-    {N_("Urology"), N_("Bladder Prostate"), ExamItem::BLADDER},
+  {N_("Urology"), N_("Kidney Ureter"), ExamItem::KIDNEY},
+  {N_("Urology"), N_("Bladder Prostate"), ExamItem::BLADDER},
 
-    {N_("Vascular"), N_("Carotid"), ExamItem::CAROTID},
-    {N_("Vascular"), N_("Jugular"), ExamItem::JUGULAR},
-    {N_("Vascular"), N_("Periphery Artery"), ExamItem::PERI_ARTERY},
-    {N_("Vascular"), N_("Periphery Vein"), ExamItem::PERI_VEIN},
+  {N_("Vascular"), N_("Carotid"), ExamItem::CAROTID},
+  {N_("Vascular"), N_("Jugular"), ExamItem::JUGULAR},
+  {N_("Vascular"), N_("Periphery Artery"), ExamItem::PERI_ARTERY},
+  {N_("Vascular"), N_("Periphery Vein"), ExamItem::PERI_VEIN},
 
-    {N_("Orthopedic"), N_("Hip Joint"), ExamItem::HIP_JOINT},
-    {N_("Orthopedic"), N_("Meniscus"), ExamItem::MENISCUS},
-    {N_("Orthopedic"), N_("Joint Cavity"), ExamItem::JOINT_CAVITY},
-    {N_("Orthopedic"), N_("Spine"), ExamItem::SPINE},
-    {N_("TCD"), "", ExamItem::TCD},
+  {N_("Orthopedic"), N_("Hip Joint"), ExamItem::HIP_JOINT},
+  {N_("Orthopedic"), N_("Meniscus"), ExamItem::MENISCUS},
+  {N_("Orthopedic"), N_("Joint Cavity"), ExamItem::JOINT_CAVITY},
+  {N_("Orthopedic"), N_("Spine"), ExamItem::SPINE},
+  {N_("TCD"), "", ExamItem::TCD},
 
-    {N_("User Defined"), N_("User defined 1"), ExamItem::USER1},
-    {N_("User Defined"), N_("User defined 2"), ExamItem::USER2},
-    {N_("User Defined"), N_("User defined 3"), ExamItem::USER3},
-    {N_("User Defined"), N_("User defined 4"), ExamItem::USER4}
+  {N_("User Defined"), N_("User defined 1"), ExamItem::USER1},
+  {N_("User Defined"), N_("User defined 2"), ExamItem::USER2},
+  {N_("User Defined"), N_("User defined 3"), ExamItem::USER3},
+  {N_("User Defined"), N_("User defined 4"), ExamItem::USER4}
 };
 
-ViewSystem::ViewSystem() {
-    m_p1Selected = true;
-    m_p1_func_index = 0;
-    m_p2_func_index = 0;
-    m_imageItemSensitive = false;
-    m_itemIndex = -1;
-    m_bmIndex = 0;
-    m_bpwIndex = 0;
-    m_page_num = 0;
-    m_calc_page_num = 0;
-    m_itemName = NULL;
-    m_save_or_new_flag = 0;
-    m_str_index = NULL;
-    m_current_note_page = 0;
-    m_frameRegisterInfo = NULL;
-    m_powerOffFlag = false;
-    m_vgaInterl=true;
-}
+GtkWidget* CheckButtonArr[MAX_CALCARR_COUNT] = {NULL};
 
-ViewSystem* ViewSystem::m_ptrInstance = NULL;
-
-ViewSystem::~ViewSystem() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
-}
+// ---------------------------------------------------------
 
 ViewSystem* ViewSystem::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new ViewSystem;
+  if (m_instance == NULL) {
+    m_instance = new ViewSystem();
+  }
 
-    return m_ptrInstance;
+  return m_instance;
+}
+
+ViewSystem::ViewSystem() {
+  m_p1Selected = true;
+  m_p1_func_index = 0;
+  m_p2_func_index = 0;
+  m_imageItemSensitive = false;
+  m_itemIndex = -1;
+  m_bmIndex = 0;
+  m_bpwIndex = 0;
+  m_page_num = 0;
+  m_calc_page_num = 0;
+  m_itemName = NULL;
+  m_save_or_new_flag = 0;
+  m_str_index = NULL;
+  m_current_note_page = 0;
+  m_frameRegisterInfo = NULL;
+  m_powerOffFlag = false;
+  m_vgaInterl=true;
+}
+
+ViewSystem::~ViewSystem() {
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
+}
+
+void ViewSystem::CreateWindow() {
+  MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
+
+  m_dialog = Utils::create_dialog(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), _("System Setup"), 880, 660);
+
+  m_button_apply = Utils::add_dialog_button(m_dialog, _("Apply"), GTK_RESPONSE_APPLY, GTK_STOCK_APPLY);
+  m_button_save = Utils::add_dialog_button(m_dialog, _("Save"), GTK_RESPONSE_OK, GTK_STOCK_SAVE);
+  m_button_exit = Utils::add_dialog_button(m_dialog, _("Exit"), GTK_RESPONSE_CLOSE, GTK_STOCK_QUIT);
+
+  g_signal_connect(m_button_apply, "clicked", G_CALLBACK(signal_button_clicked_apply), this);
+  g_signal_connect(m_button_save, "clicked", G_CALLBACK(signal_button_clicked_save), this);
+  g_signal_connect(m_button_exit, "clicked", G_CALLBACK(signal_button_clicked_exit), this);
+
+  GtkNotebook* m_notebook = Utils::create_notebook();
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(m_notebook));
+
+  // General
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_general()), GTK_WIDGET(Utils::create_label(_("General"))));
+  init_general_setting(NULL);
+
+  // Options
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_options()), GTK_WIDGET(Utils::create_label(_("Options"))));
+  init_option_setting(NULL);
+
+  // Image Preset
+  m_flag_notebook_image = gtk_notebook_get_n_pages(m_notebook);
+
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_image()), GTK_WIDGET(Utils::create_label(_("Image Preset"))));
+  init_image_setting();
+
+  // Measure
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_measure()), GTK_WIDGET(Utils::create_label(_("Measure"))));
+  init_measure_setting(NULL);
+
+  // Calc And Caliper
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc_measure()), GTK_WIDGET(Utils::create_label(_("Calc And Caliper"))));
+
+  // Calculate
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc()), GTK_WIDGET(Utils::create_label(_("OB"))));
+  init_calc_setting(NULL);
+
+  // Comment
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_comment()), GTK_WIDGET(Utils::create_label(_("Comment"))));
+  init_comment_setting(NULL);
+
+  // Peripheral
+  m_box_peripheral = Utils::create_hbox(); // create_note_tvout();
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(m_box_peripheral), GTK_WIDGET(Utils::create_label(_("Peripheral"))));
+
+  // Custom Report
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_set_report()), GTK_WIDGET(Utils::create_label(_("Custom Report"))));
+
+  // DICOM
+  //if (CDCMRegister::GetMe()->IsAuthorize()) {
+  //  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_dicom()), GTK_WIDGET(Utils::create_label(_("DICOM"))));
+  //}
+
+  // P1-P3
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_key_config()), GTK_WIDGET(Utils::create_label(_("P1-P3"))));
+  init_key_config();
+
+  // System Info
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_info()), GTK_WIDGET(Utils::create_label(_("System Info"))));
+  init_info_setting();
+
+  //g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
+  gtk_notebook_set_current_page(m_notebook, m_flag_notebook_image);
+
+  gtk_widget_show_all(GTK_WIDGET(m_dialog));
+  g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
+}
+
+void ViewSystem::DestroyWindow() {
+  if (GTK_IS_WIDGET(m_dialog)) {
+    g_keyInterface.Pop();
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
+
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+    }
+
+    m_dialog = NULL;
+  }
+
+  // 注册了新功能，关机重启
+  if(m_powerOffFlag) {
+    g_timeout_add(500, signal_callback_poweroff, this);
+  }
 }
 
 GtkWidget* ViewSystem::GetWindow() {
-    return m_window;
+  return GTK_WIDGET(m_dialog);
 }
 
+string ViewSystem::GetUserName() {
+  return gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_user_select))));
+}
+
+bool ViewSystem::CheckFlagFromReportTemplet(int id) {
+  const char *templet;
+
+  SysGeneralSetting sys;
+  init_language = sys.GetLanguage();
+
+  InitDB();
+  //LocalizationDB(); // 110~120ms
+  OpenDB();
+
+  ostringstream stream;
+  stream << "SELECT record FROM CustomReport WHERE sections = '" << DEFAULT_STR << "' AND templet = '" << DEFAULT_STR << "' AND childsection = '" << DEFAULT_STR << "'";
+  sqlite3_stmt *stmt = NULL;
+  string sql = stream.str();
+  string record;
+
+  if(sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
+      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+      if ((id == OTHERS_COMMENT_SHOW_ID) || (id == OTHERS_INDICTION_SHOW_ID)) {
+          return true;
+      }
+      return false;
+  }
+
+  while (sqlite3_step(stmt) != SQLITE_DONE) {
+      if(strcmp(sqlite3_column_name(stmt, 0), "record") == 0)
+          record.assign((const char *)sqlite3_column_text(stmt, 0));
+  }
+  sqlite3_finalize(stmt);
+
+  if(record.length() > 0) {
+      templet = record.c_str();
+  } else {
+      templet = TEMPLET1_STR[init_language].c_str();
+  }
+  CloseDB();
+
+  memset(ShowArr, UNCHECK_VALUE, sizeof(ShowArr));
+  int maxsection = sizeof(SECTION_STR)/sizeof(SECTION_STR[0]);
+
+  for(int t = 0; t < maxsection; t++) {
+      bool ret = false;
+      ret = ReadRecordFromDB(CUSTOM_STR[init_language], templet, SECTION_STR[t][init_language]);
+
+      if(false == ret && OTHERS_M == t && ((id == OTHERS_COMMENT_SHOW_ID)||(id == OTHERS_INDICTION_SHOW_ID))) {
+          return true;
+      }
+  }
+
+  if(CHECK_VALUE == ShowArr[id])
+      return true;
+  else
+      return false;
+}
+
+void ViewSystem::CreateDefineItemFormUsbToHost(string name) {
+  char path_defined[256];
+  if(name == "System Default")
+      sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, "SystemDefault", ".ini");
+  else
+      sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name.c_str(), ".ini");
+
+  FILE *fp;
+  if((fp = fopen(path_defined, "r")) !=NULL) {
+      remove(path_defined);
+      fclose(fp);
+  }
+  int fd = open(path_defined, O_RDWR |O_CREAT |O_TRUNC, 0666);
+  close(fd);
+  IniFile ini_defined(path_defined);
+  IniFile *ptrIni1= &ini_defined;
+
+  char probelist[256];
+  char useritem[256];
+  char department[256];
+  char firstgenitem[256];
+  char src_group[256];
+  char userselect[256];
+  ExamItem exam;
+
+  vector<string> useritemgroup;
+  ExamItem examitem;
+  char path[256];
+
+  if(name == "System Default")
+      sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE_OTHER);
+  else
+      sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "userconfig/", name.c_str(),".ini");
+
+  IniFile ini(path);
+  IniFile *ptrIni= &ini;
+  useritemgroup = ptrIni->GetGroupName();
+
+  int group_length(0);
+  group_length = useritemgroup.size();
+  for (int i= 0 ; i <  group_length; i++) {
+      sprintf(src_group ,"%s", useritemgroup[i].c_str());
+      strcpy(userselect,(char*)ptrIni->ReadString(src_group, "UserSelect").c_str());
+      if(strcmp(userselect , "") !=0) {
+          strcpy(probelist,(char*)ptrIni->ReadString(src_group, "ProbeType").c_str());
+          strcpy(useritem,(char*)ptrIni->ReadString(src_group, "ExamItem").c_str());
+
+          strcpy(department,(char*)ptrIni->ReadString(src_group, "Department").c_str());
+          strcpy(firstgenitem,(char*)ptrIni->ReadString(src_group, "GenFirstItem").c_str());
+
+          ptrIni1->WriteString(src_group, "UserSelect",name);
+          ptrIni1->WriteString(src_group, "ProbeType",probelist);
+          ptrIni1->WriteString(src_group, "ExamItem", useritem);
+
+          ptrIni1->WriteString(src_group, "Department", department);
+          ptrIni1->WriteString(src_group, "GenFirstItem", firstgenitem);
+
+          ptrIni1->SyncConfigFile();
+      }
+  }
+}
+
+void ViewSystem::ChangeNoteBookPage(int page) {
+  m_current_note_page = page;
+  gtk_notebook_set_current_page(GTK_NOTEBOOK(m_notebook), m_current_note_page);
+}
+
+void ViewSystem::SetActiveUser(gint num) {
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_user_select), num);
+}
+
+void ViewSystem::ShowList(const string name) {
+  gtk_combo_box_append_text (GTK_COMBO_BOX(m_comboboxentry_user_select), name.c_str());
+}
+
+void ViewSystem::UpdateUserItem() {
+  string name = GetUserName();
+  printf("name = %s\n", name.c_str());
+  if (name == "System Default" && name == "Умолчан системы" &&
+          name == "系统默认" && name == "Domyślne Systemu"  &&
+          name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto") {
+      stringstream ss;
+      ss << "userconfig/" << name << ".ini";
+
+      g_user_configure = ss.str();
+  } else {
+    g_user_configure = "ItemPara.ini";
+  }
+  set_image_item_sensitive(false);
+  save_itemIndex(-1);
+
+  // rebuild the exam type treeview, in order to disppear the select box in gtk
+  int index = GetProbeType();
+  if (index == -1)
+      return;
+  ExamItem examItem;
+  vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
+  GtkTreeModel* model = create_exam_item_model(itemIndex);
+  gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
+  gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
+}
+
+void ViewSystem::UpdateSpecificPrinterModel() {
+  GtkTreeModel* model = create_specific_print_model();
+
+  if (model != NULL) {
+    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_specific_print), model);
+  }
+
+  g_object_unref(model);
+}
+
+// ---------------------------------------------------------
+
+void ViewSystem::ButtonClickedApply(GtkButton* button) {
+  SysGeneralSetting sys;
+
+  int langage = sys.GetLanguage();
+  int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
+
+  if (langage != index_lang) {
+    InitDB();
+    LocalizationDB();
+  }
+
+  apply_report_setting();
+  save_general_setting();
+  save_option_setting();
+  save_comment_setting();
+
+  if (m_current_note_page == m_flag_notebook_tvout) {
+    save_tvout_setting();
+  }
+
+  save_measure_setting();
+  save_key_config();
+  save_calc_setting();
+}
+
+void ViewSystem::ButtonClickedSave(GtkButton* button) {
+  SysGeneralSetting sys;
+
+  int langage = sys.GetLanguage();
+  int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
+
+  if(langage != index_lang) {
+    InitDB();
+    LocalizationDB();
+  }
+
+  BtnSave2Clicked(NULL);
+  save_general_setting();
+  save_option_setting();
+  save_comment_setting();
+
+  if (m_current_note_page == m_flag_notebook_tvout) {
+    save_tvout_setting();
+  }
+
+  save_measure_setting();
+  save_key_config();
+  save_calc_setting();
+
+  g_timeout_add(500, signal_callback_exit_window_system, this);
+  g_system_save = true;
+
+  FreezeMode::GetInstance()->PressUnFreeze();
+  MultiFuncUndo();
+}
+
+void ViewSystem::ButtonClickedExit(GtkButton* button) {
+  DestroyWindow();
+}
+
+void ViewSystem::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num) {
+  m_current_note_page = page_num;
+
+  if (page_num == m_flag_notebook_coustomreport) {
+    GtkTreeIter iter;
+    GtkTreeModel* model = NULL;
+
+    GtkTreeSelection* selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+
+    if (gtk_tree_selection_get_selected(selected_node, &model, &iter) == TRUE) {
+      GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+      gint tree_depth = gtk_tree_path_get_depth(path);
+      gtk_tree_path_free (path);
+
+      if(2 == tree_depth) {
+        gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), TRUE);
+      } else {
+        gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
+      }
+
+      gtk_widget_set_sensitive(GTK_WIDGET(m_button_save), TRUE);
+      gtk_widget_set_sensitive(GTK_WIDGET(m_button_exit), TRUE);
+    }
+  } else if(page_num == m_flag_notebook_image) {
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_save), FALSE);
+  } else if(page_num == m_flag_notebook_tvout) {
+    create_note_tvout();
+    init_tvout_setting(NULL);
+    CreatePrinter();
+    init_printer(NULL);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_save), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_exit), TRUE);
+  } else {
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_save), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_exit), TRUE);
+  }
+}
+
+#include "periDevice/DCMMan.h"
+#include <string.h>
+#include <time.h>
+#include <stdlib.h>
+#include <gtk/gtk.h>
+#include <vector>
+#include "imageControl/Update2D.h"
+#include "probe/ExamItem.h"
+#include "Def.h"
+#include "display/MenuArea.h"
+#include "sysMan/UpgradeMan.h"
+
+#include "display/gui_global.h"
+#include "periDevice/PeripheralMan.h"
+#include "periDevice/NetworkMan.h"
+#include "display/KnobMenu.h"
+#include "display/TopArea.h"
+#include "sysMan/ScreenSaver.h"
+#include "patient/PatientInfo.h"
+#include "sysMan/SysDicomSetting.h"
+#include "sysMan/SysUserDefinedKey.h"
+#include "patient/ImgMan.h"
+#include "patient/VideoMan.h"
+#include "imageControl/ImgPw.h"
+#include "imageControl/ImgCfm.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ImgProcPw.h"
+#include "imageProc/ImgProcCfm.h"
+#include "sysMan/UserDefineKey.h"
+#include "periDevice/ViewPrinterAdd.h"
+#include "probe/ProbeSelect.h"
+#include "periDevice/Printer.h"
+#include "measure/MeasureMan.h"
+#include "sysMan/CalcSetting.h"
+#include "sysMan/MeasureSetting.h"
+#include "patient/FileMan.h"
+#include "sysMan/UserSelect.h"
+#include "patient/ViewUdiskDataSelect.h"
+#include "sysMan/ConfigToUSB.h"
+#include "sysMan/ConfigToHost.h"
+#include "sysMan/DicomLocalSetting.h"
+#include "sysMan/DicomServerSetting.h"
+#include "sysMan/DicomServiceSetting.h"
+#include <EmpAuthorization.h>
+#include "calcPeople/MenuCalcNew.h"
+#include "measure/MenuMeasure.h"
+#include "Init.h"
+#include "patient/ViewNewPat.h"
+
+#include "utils/Const.h"
 #include "calcPeople/MeasureDef.h"
 #include "calcPeople/ViewReport.h"
 
-const char *sectionstr[][LANG_MAX] = {
-    //{ ENGLISH, CHINESE, RU, PL,ES, FR DE }
-    {"Abdomen", "\u6210\u4eba\u8179\u90e8", "\u0410\u0431\u0434\u043e\u043c.", "Jama brzuszna", "Abdomen","Abdomen", "Abdomen",      },  //"Abdomen"
-    {"Cardiac", "\u5fc3\u810f\u79d1", "\u041a\u0430\u0440\u0434\u0438\u0430\u043b\u044c\u043d\u044b\u0439", "Serce","Cardiaque", "Cardiaco",  "Kardial",                 },  //"Cardiac"
-    {"Urology", "\u6ccc\u5c3f\u79d1", "\u0423\u0440\u043e\u043b\u043e\u0433\u0438\u044f", "Urologia", "Urologie", "Urologico", "Urologie",   },  //"Urology"
-    {"Obstetrics", "\u4ea7\u79d1", "\u0410\u043a\u0443\u0448\u0435\u0440\u0441\u0442\u0432\u043e", "Po\u0142o\u017cnictwo", "Obstétrique","Obstetrico",  "Geburtshilfe",     },  //"Obstetrics"
-    {"Gynecology", "\u5987\u79d1", "\u0413\u0438\u043d\u0435\u043a\u043e\u043b\u043e\u0433\u0438\u044f", "Ginekologia", "Gynécologie", "Gynecologico",  "Gynäkologie",        },  //"Gynecology"
-    {"Small Part", "\u5c0f\u5668\u5b98", "\u0414\u0435\u0442\u043e\u043b\u044c\u043d\u043e", "Ma\u0142e narz\u0105dy", "Petite partie", "Pequeñas partes",  "Small-Parts",             },  //"Small Part"
-    {"Fetal Cardio", "\u80ce\u513f\u5fc3\u810f", "\u041a\u0430\u0440\u0434\u0438\u043e. \u043f\u043b\u043e\u0434\u0430", "Kardio. P\u0142odu", "Cardio f\u0153tal","Cardio Fetal", "fötale Kardio"    },  //"Fetal Cardio"
-    {"Vascular", "\u8840\u7ba1", "\u0421\u043e\u0441\u0443\u0434\u044b", "Naczynia","Vasculaire","Vascular", "Vaskulär",                        },  //"Vascular"
-    {"Others", "其他", "Другие", "Inne", "Autres","Otro",  "Andere",                                                                   },  //"Others"
-};
-
-const char *defaultstr = "System Default";
-const char *defaultflag ="\u221a"; //62; //251; // \u221a;//
-const char *templet1str[LANG_MAX] = ////{ ENGLISH, CHINESE, RU, PL, FR,es, DE}
-{"Template 1",  "\u6a21\u677f1", "\u0428\u0430\u0431\u043b\u043e\u043d 1", "szablon 1", "Modššle 1",  "Templete 1",  "Template 1",     };//"templet"
-const char *Customstr[LANG_MAX] = ////{ ENGLISH, CHINESE, RU, PL, ,FR,es, DE}
-{"Custom Template", "\u81ea\u5B9a\u4e49\u6a21\u677f", "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u0438\u0435 \u0448\u0430\u0431\u043b\u043e\u043d\u044b","Custom Template","Modššle auto-dšŠfini", "Custom Templete","Custom Template",      };//"Custom Template"
-
-char ShowArr[MAX_CALCARR_COUNT+1] = {0x66};
-GtkWidget* CheckButtonArr[MAX_CALCARR_COUNT] = {NULL};
-sqlite3 *CustomReport_db = NULL;
-
-#define CustomReport_PATH       "./res/CustomReport.db"
-#define CustomReport_PATH_BAK   "./res/bak_CustomReport.db"
-#define DEFALT_SCREEN_WIDTH     (950) //(SCREEN_WIDTH)
-#define GRAY_WIDTH              (20)
-#define TREE_WINDOW_WIDTH       (260)
-#define SHOW_WINDOW_WIDTH       ((DEFALT_SCREEN_WIDTH -40) - TREE_WINDOW_WIDTH - 3*GRAY_WIDTH)
-#define DEF_FLAG_LEN            (strlen(defaultflag))
-#define CHECK_VALUE             (0x74)
-#define UNCHECK_VALUE           (0x66)
-#define MAX_SECTION             (sizeof(sectionstr)/sizeof(sectionstr[0]))
-#define OTHERS_M                (TCD_M)
-
-bool ViewSystem::StrCmpSectionString(int section, const char *string, int *language) {
-    int maxsection = MAX_SECTION;
+bool ViewSystem::StrCmpSectionString(int section, const string str, int* language) {
+    int maxsection = sizeof(SECTION_STR)/sizeof(SECTION_STR[0]);
     PRINTF("maxSection==%d\n",maxsection);
     if(section < maxsection && section >= 0) {
         for(int lan = 0; lan < LANG_MAX; lan++) {
-            if(strcmp(sectionstr[section][lan], string) == 0) {
+            if(SECTION_STR[section][lan] == str) {
 
                 if(language != NULL)
                     *language = lan;
@@ -855,9 +1252,9 @@ bool ViewSystem::StrCmpSectionString(int section, const char *string, int *langu
     return false;
 }
 
-bool ViewSystem::StrCmpCustomString(const char *string, int *language) {
+bool ViewSystem::StrCmpCustomString(const string str, int* language) {
     for(int lan = 0; lan < LANG_MAX; lan++) {
-        if(strcmp(Customstr[lan], string) == 0) {
+        if(CUSTOM_STR[lan] == str) {
             if(language != NULL)
                 *language = lan;
             return true;
@@ -866,9 +1263,9 @@ bool ViewSystem::StrCmpCustomString(const char *string, int *language) {
     return false;
 }
 
-bool ViewSystem::StrCmpTemplet1String(const char *string, int *language) {
+bool ViewSystem::StrCmpTemplet1String(const string str, int* language) {
     for(int lan = 0; lan < LANG_MAX; lan++) {
-        if(strcmp(templet1str[lan], string) == 0) {
+        if(TEMPLET1_STR[lan] == str) {
             if(language != NULL)
                 *language = lan;
             return true;
@@ -903,19 +1300,19 @@ bool ViewSystem::InitDB() {
         //create table
         strcpy(buffer, "BEGIN TRANSACTION;\nCREATE TABLE CustomReport(sections, templet, childsection, record);\nCREATE TABLE test_cp(sections, templet, childsection, record);\n");
         memset(buf, 0, sizeof(buf));
-        sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", defaultstr, defaultstr, defaultstr, templet1str[init_language]);
+        sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", DEFAULT_STR.c_str(), DEFAULT_STR.c_str(), DEFAULT_STR.c_str(), TEMPLET1_STR[init_language].c_str());
         strcat(buffer, buf);
 
-        int maxsection = MAX_SECTION;
+        int maxsection = sizeof(SECTION_STR)/sizeof(SECTION_STR[0]);
         for(int k = 0; k < maxsection; k++) {
             int start, end, count;
             char record[1024];
             memset(record, CHECK_VALUE, sizeof(record));
             memset(buf, 0, sizeof(buf));
 
-            InitRecordFromShowArr(sectionstr[k][init_language], &start, &end);
+            InitRecordFromShowArr(SECTION_STR[k][init_language], &start, &end);
             count = end - start;
-            if(StrCmpSectionString(OB_M, sectionstr[k][init_language], NULL)) {
+            if(StrCmpSectionString(OB_M, SECTION_STR[k][init_language], NULL)) {
                 //Fetal 2
                 count += OB_CALC_COUNT;
                 //EFW
@@ -923,16 +1320,16 @@ bool ViewSystem::InitDB() {
                 //average
                 count += AverRes_COUNT;
             }
-            if(StrCmpSectionString(UR_M, sectionstr[k][init_language], NULL)) {
+            if(StrCmpSectionString(UR_M, SECTION_STR[k][init_language], NULL)) {
                 //PSAD
                 count += PSAD_COUNT;
             }
-            if(StrCmpSectionString(OTHERS_M, sectionstr[k][init_language], NULL)) {
+            if(StrCmpSectionString(OTHERS_M, SECTION_STR[k][init_language], NULL)) {
                 //Ohters
                 count += OTHERS_COUNT;
             }
             record[count] = '\0';
-            sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", (char *)Customstr[init_language], (char *)templet1str[init_language], (char *)sectionstr[k][init_language], record);
+            sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", CUSTOM_STR[init_language].c_str(), TEMPLET1_STR[init_language].c_str(), SECTION_STR[k][init_language].c_str(), record);
             strcat(buffer, buf);
         }
 
@@ -961,7 +1358,7 @@ bool ViewSystem::LocalizationDB() {
     OpenDB();
 
     if (sqlite3_prepare(CustomReport_db, sql_f1.c_str(), sql_f1.size(), &stmt_f1, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
           MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
         PRINTF("LocalizationDB 1:%s\n", sqlite3_errmsg(CustomReport_db));
         CloseDB();
@@ -975,14 +1372,14 @@ bool ViewSystem::LocalizationDB() {
 
         if(StrCmpCustomString(f1, &language)) {
             if(language > LANG_MAX) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
                   MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
                 sqlite3_finalize(stmt_f1);
                 CloseDB();
                 return false;
             }
 
-            sections = Customstr[init_language];
+            sections = CUSTOM_STR[init_language].c_str();
         } else {
             sections = f1;
         }
@@ -1005,7 +1402,7 @@ bool ViewSystem::LocalizationDB() {
 
             if(StrCmpTemplet1String(f2, &language)) {
                 if(language > LANG_MAX) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
                       MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
                     sqlite3_finalize(stmt_f2);
                     sqlite3_finalize(stmt_f1);
@@ -1013,7 +1410,7 @@ bool ViewSystem::LocalizationDB() {
                     return false;
                 }
 
-                templet = templet1str[init_language];
+                templet = TEMPLET1_STR[init_language].c_str();
             } else {
                 templet = f2;
             }
@@ -1040,11 +1437,12 @@ bool ViewSystem::LocalizationDB() {
                 const char *f3 = (const char *)sqlite3_column_text(stmt_f3, 0);
                 if (strcmp(f3, "") == 0)continue;
 
-                int section, maxsection = MAX_SECTION;
+                int section = 0;
+                int maxsection = sizeof(SECTION_STR)/sizeof(SECTION_STR[0]);
                 for(section = 0; section < maxsection; section++) {
                     if(StrCmpSectionString(section, f3, &language)) {
                         if(language > LANG_MAX) {
-                            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
                               MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
                             sqlite3_finalize(stmt_f3);
                             sqlite3_finalize(stmt_f2);
@@ -1053,12 +1451,12 @@ bool ViewSystem::LocalizationDB() {
                             return false;
                         }
 
-                        childsection = sectionstr[section][init_language];
+                        childsection = SECTION_STR[section][init_language].c_str();
                         break;
                     }
                 }
 
-                if(!strcmp(f3, defaultstr)) childsection = defaultstr;
+                if(f3 == DEFAULT_STR) childsection = DEFAULT_STR.c_str();
 
                 string record;
                 ostringstream stream;
@@ -1067,7 +1465,7 @@ bool ViewSystem::LocalizationDB() {
                 string sql = stream.str();
 
                 if (sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
                       MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
                     PRINTF("SELECT ERROR:%s!\n", sqlite3_errmsg(CustomReport_db));
                     CloseDB();
@@ -1085,7 +1483,7 @@ bool ViewSystem::LocalizationDB() {
                 memset(buf, 0, sizeof(buf));
 
                 if(StrCmpTemplet1String(record.c_str(), NULL)) {
-                    sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", sections, templet, childsection, templet1str[init_language]);
+                    sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", sections, templet, childsection, TEMPLET1_STR[init_language].c_str());
                 } else {
                     sprintf(buf, "INSERT INTO \"CustomReport\" VALUES('%s','%s','%s','%s');\n", sections, templet, childsection, record.c_str());
                 }
@@ -1102,14 +1500,14 @@ bool ViewSystem::LocalizationDB() {
 
     sqlite3 *CustomReport_db_bak;
     if (sqlite3_open(CustomReport_PATH_BAK, &CustomReport_db_bak) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
         PRINTF("LocalizationDB 7:%s\n", sqlite3_errmsg(CustomReport_db_bak));
         return false;
     }
 
     strcat(buffer, "COMMIT;\n");
     if (sqlite3_exec(CustomReport_db_bak, buffer, 0, 0, &errmsg) != SQLITE_OK) { // costed 100ms, slower than sqlite3.6
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
         PRINTF("Init CustomReport_db_bak Error: %s\n", sqlite3_errmsg(CustomReport_db_bak));
         sqlite3_free(errmsg);
         return false;
@@ -1117,7 +1515,7 @@ bool ViewSystem::LocalizationDB() {
 
     sqlite3_close(CustomReport_db_bak);
     if(rename(CustomReport_PATH_BAK, CustomReport_PATH) != 0) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
           MessageDialog::DLG_ERROR, _("Database error!"), NULL);
         PRINTF("rename(%s, %s) error\n", CustomReport_PATH_BAK, CustomReport_PATH);
         return false;
@@ -1133,12 +1531,12 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
     int count = 0;
     string recordname;
     ostringstream stream;
-    stream << "SELECT record FROM CustomReport WHERE sections = '" << defaultstr << "' AND templet = '" << defaultstr << "' AND childsection = '" << defaultstr << "'";
+    stream << "SELECT record FROM CustomReport WHERE sections = '" << DEFAULT_STR << "' AND templet = '" << DEFAULT_STR << "' AND childsection = '" << DEFAULT_STR << "'";
     sqlite3_stmt *stmt = NULL;
     string sql = stream.str();
 
     if(sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
           MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
         PRINTF("SELECT ERROR:%s!\n", sqlite3_errmsg(CustomReport_db));
         return false;
@@ -1151,12 +1549,12 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
 
     if(recordname.length() > 0) {
         ostringstream stream2;
-        stream2 << "SELECT DISTINCT childsection FROM CustomReport WHERE sections = '" << Customstr[init_language] <<"' AND templet = '" << recordname.c_str() << "'";
+        stream2 << "SELECT DISTINCT childsection FROM CustomReport WHERE sections = '" << CUSTOM_STR[init_language] <<"' AND templet = '" << recordname.c_str() << "'";
         sqlite3_stmt *stmt2 = NULL;
         string sql2 = stream2.str();
 
         if(sqlite3_prepare(CustomReport_db, sql2.c_str(), sql2.size(), &stmt2, 0) != SQLITE_OK) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
               MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
             return false;
         }
@@ -1170,12 +1568,12 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
 
     char templatestr[256];
     if(0 == count) {
-        sprintf(templatestr, "%s", templet1str[init_language]);
+        sprintf(templatestr, "%s", TEMPLET1_STR[init_language].c_str());
         ostringstream stream3;
-        stream3 << "UPDATE CustomReport SET record = '" << templatestr << "' WHERE sections = '" << defaultstr << "' AND templet = '" << defaultstr << "' AND childsection = '" << defaultstr << "'";
+        stream3 << "UPDATE CustomReport SET record = '" << templatestr << "' WHERE sections = '" << DEFAULT_STR << "' AND templet = '" << DEFAULT_STR << "' AND childsection = '" << DEFAULT_STR << "'";
         string sql3 = stream3.str();
         if (sqlite3_exec(CustomReport_db, sql3.c_str(), 0, 0, NULL) != SQLITE_OK) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
             return false;
         }
     } else {
@@ -1189,7 +1587,7 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
     sqlite3_stmt *stmt_f1=NULL;
     string sql_f1 = "SELECT DISTINCT sections FROM CustomReport";
     if (sqlite3_prepare(CustomReport_db, sql_f1.c_str(), sql_f1.size(), &stmt_f1, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
         PRINTF("CreateTreeModel 1:%s\n", sqlite3_errmsg(CustomReport_db));
         return NULL;
     }
@@ -1197,7 +1595,7 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
     while(sqlite3_step(stmt_f1) != SQLITE_DONE) {
         const char *f1 = (const char *)sqlite3_column_text(stmt_f1, 0);
         if (strcmp(f1, "") == 0) continue;
-        if(!strcmp(f1, defaultstr))continue;//delet default system
+        if(f1 == DEFAULT_STR)continue;//delet default system
         gtk_tree_store_append(store, &topIter, NULL);
         gtk_tree_store_set(store, &topIter, 0, f1, -1);
 
@@ -1220,7 +1618,7 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
 
             if(!strcmp(f2, templatestr)) {
                 char buffer[256];
-                sprintf(buffer, "%s", defaultflag);
+                sprintf(buffer, "%s", DEFAULT_FLAG.c_str());
                 strcat(buffer, " ");
                 strcat(buffer, f2);
                 gtk_tree_store_set(store, &first_iter, 0, buffer, -1);
@@ -1258,7 +1656,7 @@ GtkTreeModel *ViewSystem:: CreateTreeModel() {
     CloseDB();
 
     if(0 == count) {
-        //MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Blank template cannot apply,switch to template 1!"), NULL);
+        //MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Blank template cannot apply,switch to template 1!"), NULL);
     }
     return GTK_TREE_MODEL(store);
 }
@@ -1287,11 +1685,11 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
         gtk_widget_hide(button_ok);
         gtk_widget_hide(button_cancel);
         if(show_window)gtk_widget_hide_all (show_window);
-        gtk_widget_set_sensitive(m_button_apply, FALSE);
+        gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
     } else if(tree_depth == 2) {
         gtk_tree_model_get(model, &iter, 0, &temp, -1);
 
-        if(NULL != strstr(temp, defaultflag) || StrCmpTemplet1String(temp, NULL)) {
+        if(NULL != strstr(temp, DEFAULT_FLAG.c_str()) || StrCmpTemplet1String(temp, NULL)) {
             gtk_widget_hide(button_delete);
         } else {
             gtk_widget_show(button_delete);
@@ -1306,7 +1704,7 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
         gtk_widget_hide(button_ok);
         gtk_widget_hide(button_cancel);
         if(show_window)gtk_widget_hide_all (show_window);
-        gtk_widget_set_sensitive(m_button_apply, TRUE);
+        gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), TRUE);
     } else if (tree_depth == 3) {
         GtkTreeIter iter_parent0;
         GtkTreeIter iter_parent1;
@@ -1316,8 +1714,8 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
         gtk_tree_model_iter_parent(model, &iter_parent1, &iter_parent0);
         gtk_tree_model_get(model, &iter_parent1, 0, &sections, -1);
 
-        if(NULL != strstr(temp, defaultflag)) {
-            templet = &temp[DEF_FLAG_LEN + 1];
+        if(NULL != strstr(temp, DEFAULT_FLAG.c_str())) {
+            templet = &temp[DEFAULT_FLAG.size() + 1];
         } else {
             templet = temp;
         }
@@ -1431,7 +1829,7 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
         gtk_widget_hide(m_entry_templet);
         gtk_widget_hide(button_ok);
         gtk_widget_hide(button_cancel);
-        gtk_widget_set_sensitive(m_button_apply, FALSE);
+        gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
     }
 }
 
@@ -2199,7 +2597,7 @@ GtkWidget *ViewSystem::CreatWindowVES() {
     return m_WindowVES = scrolledwindow;
 }
 
-bool ViewSystem::UniqueItem(const char *sections, const char *templet, const char *childsection) {
+bool ViewSystem::UniqueItem(const string sections, const string templet, const string childsection) {
     sqlite3_stmt *stmt = NULL;
     ostringstream stream;
     int result = 0;
@@ -2226,13 +2624,13 @@ bool ViewSystem::UniqueItem(const char *sections, const char *templet, const cha
         return true;
 }
 
-GtkTreeIter ViewSystem::InsertUniqueComment(GtkTreeModel *model, const char *str) {
+GtkTreeIter ViewSystem::InsertUniqueComment(GtkTreeModel *model, const string str) {
     GtkTreeIter tmp_iter;
     char *strtmp = NULL;
     gboolean has_node = gtk_tree_model_get_iter_first(model, &tmp_iter);
     while (has_node == TRUE) {
         gtk_tree_model_get(model, &tmp_iter, 0, &strtmp, -1);
-        if (strcmp(strtmp, str) == 0)
+        if (strtmp == str)
             return tmp_iter;
         else
             has_node = gtk_tree_model_iter_next(model, &tmp_iter);
@@ -2275,13 +2673,13 @@ void ViewSystem::ChangeCommentExamBoxDelete(int probe_type) {
   }
 }
 
-GtkTreeIter ViewSystem::InsertUnique(GtkTreeModel *model, GtkTreeIter *iter, const char *str) {
+GtkTreeIter ViewSystem::InsertUnique(GtkTreeModel* model, GtkTreeIter* iter, const string str) {
     GtkTreeIter tmp_iter;
     char *strtmp = NULL;
     gboolean has_node = gtk_tree_model_iter_children(model, &tmp_iter, iter);
     while (has_node == TRUE) {
         gtk_tree_model_get(model, &tmp_iter, 0, &strtmp, -1);
-        if (strcmp(strtmp, str) == 0)
+        if (strtmp == str)
             return tmp_iter;
         else
             has_node = gtk_tree_model_iter_next(model, &tmp_iter);
@@ -2355,7 +2753,7 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
                 GtkTreeIter iter_tmp = InsertUnique(model, &iter, new_string);
                 gtk_tree_selection_select_iter(selected_node, &iter_tmp);
             }
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _("Template name has existed or the input format is incorrect.Please input again!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _("Template name has existed or the input format is incorrect.Please input again!"), NULL);
             return;
         }
         if (gtk_tree_model_iter_has_child(model, &iter) == FALSE)
@@ -2368,19 +2766,19 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
         gtk_tree_model_iter_parent(model, &parent, &iter);
         gtk_tree_model_get(model, &parent, 0, &sections, -1);
 
-        if(NULL != strstr(temp, defaultflag)) {
-            templet = &temp[DEF_FLAG_LEN + 1];
+        if(NULL != strstr(temp, DEFAULT_FLAG.c_str())) {
+            templet = &temp[DEFAULT_FLAG.size() + 1];
         } else {
             templet = temp;
         }
 
         unsigned int child = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_childsection));
-        new_string = (char*)sectionstr[child][init_language];
+        new_string = (char*)SECTION_STR[child][init_language].c_str();
         for(int language = 0; language < LANG_MAX; language++) {
-            if(!UniqueItem(sections, templet, sectionstr[child][language])) {
+            if(!UniqueItem(sections, templet, SECTION_STR[child][language])) {
                 GtkTreeIter iter_tmp = InsertUnique(model, &iter, new_string);
                 gtk_tree_selection_select_iter(selected_node, &iter_tmp);
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _("Selected exam type has existed!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _("Selected exam type has existed!"), NULL);
                 return;
             }
         }
@@ -2388,14 +2786,14 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
         if (gtk_tree_model_iter_has_child(model, &iter) == FALSE)
             stream << "UPDATE CustomReport SET childsection = '" << new_string  << "' WHERE sections = '" << sections  << "' AND templet = '" << templet << "'";
         else
-            stream << "INSERT INTO CustomReport VALUES('"  << sections << "', '"  << templet << "', '"  << sectionstr[child][init_language] << "', '')";
+            stream << "INSERT INTO CustomReport VALUES('"  << sections << "', '"  << templet << "', '"  << SECTION_STR[child][init_language] << "', '')";
     }
 
     char *errmsg = NULL;
     string sql = stream.str();
     OpenDB();
     if (sqlite3_exec(CustomReport_db, sql.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
         PRINTF("INSERT or UPDATE error:%s!\n", errmsg);
         return;
     }
@@ -2530,8 +2928,8 @@ void ViewSystem::BtnSave2Clicked(GtkButton *button) {
         gtk_tree_model_iter_parent(model, &iter_parent1, &iter_parent0);
         gtk_tree_model_get(model, &iter_parent1, 0, &sections, -1);
 
-        if(NULL != strstr(temp, defaultflag)) {
-            templet = &temp[DEF_FLAG_LEN + 1];
+        if(NULL != strstr(temp, DEFAULT_FLAG.c_str())) {
+            templet = &temp[DEFAULT_FLAG.size() + 1];
         } else {
             templet = temp;
         }
@@ -2564,7 +2962,7 @@ void ViewSystem::BtnSave2Clicked(GtkButton *button) {
         OpenDB();
 
         if (sqlite3_exec(CustomReport_db, sql.c_str(), 0, 0, &errmsg) != SQLITE_OK) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
             PRINTF("save error:%s!\n", errmsg);
         }
         CloseDB();
@@ -2596,9 +2994,9 @@ void ViewSystem::BtnRecoveryClicked(GtkButton *button) {
     gtk_tree_path_free(path);
 
     if(ret) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),  MessageDialog::DLG_INFO,  _("Recovery succeeded!"), NULL); //Recovery succeed! Restart request!
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),  MessageDialog::DLG_INFO,  _("Recovery succeeded!"), NULL); //Recovery succeed! Restart request!
     } else {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Recovery failed!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Recovery failed!"), NULL);
     }
 }
 
@@ -2622,8 +3020,8 @@ void ViewSystem::BtnDeleteClicked(GtkButton *button) {
         gtk_tree_model_iter_parent(model, &parent, &iter);
         gtk_tree_model_get(model, &parent, 0, &sections, -1);
 
-        if(NULL != strstr(temp, defaultflag)) {
-            templet = &temp[DEF_FLAG_LEN + 1];
+        if(NULL != strstr(temp, DEFAULT_FLAG.c_str())) {
+            templet = &temp[DEFAULT_FLAG.size() + 1];
         } else {
             templet = temp;
         }
@@ -2643,8 +3041,8 @@ void ViewSystem::BtnDeleteClicked(GtkButton *button) {
         gtk_tree_model_iter_parent(model, &parent2, &parent1);
         gtk_tree_model_get(model, &parent2, 0, &sections, -1);
 
-        if(NULL != strstr(temp, defaultflag)) {
-            templet = &temp[DEF_FLAG_LEN + 1];
+        if(NULL != strstr(temp, DEFAULT_FLAG.c_str())) {
+            templet = &temp[DEFAULT_FLAG.size() + 1];
         } else {
             templet = temp;
         }
@@ -2663,7 +3061,7 @@ void ViewSystem::BtnDeleteClicked(GtkButton *button) {
 
     OpenDB();
     if (sqlite3_exec(CustomReport_db, sql.c_str(), NULL, NULL, &errmsg) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,  _("Database error!"), NULL);
         PRINTF("DELETE ERROR:%s!\n", errmsg);
         return;
     }
@@ -2854,9 +3252,9 @@ GtkWidget *ViewSystem::create_set_report() {
     return fixed;
 }
 
-bool ViewSystem::InitRecordFromShowArr(const char *childsection, int *start, int *end) {
+bool ViewSystem::InitRecordFromShowArr(const string childsection, int* start, int* end) {
     bool ret = false;
-    if(!childsection ||!start ||!end) return ret;
+    if(childsection.empty() ||!start ||!end) return ret;
 
     if(StrCmpSectionString(ABDO_M, childsection, NULL)) {
         *start = ABD_MEA_START;
@@ -2912,8 +3310,8 @@ bool ViewSystem::InitRecordFromShowArr(const char *childsection, int *start, int
 
     return ret;
 }
-bool ViewSystem::ReadRecordFromDB(const char * sections, const char* templet, const char* childsection) {
-    if(!sections || !templet ||!childsection)return false;
+bool ViewSystem::ReadRecordFromDB(const string sections, const string templet, const string childsection) {
+    if(sections.empty() || templet.empty() ||childsection.empty())return false;
 
     ostringstream stream;
     stream << "SELECT record FROM CustomReport WHERE sections = '" << sections << "' AND templet = '" << templet << "' AND childsection = '" << childsection << "'";
@@ -2923,7 +3321,7 @@ bool ViewSystem::ReadRecordFromDB(const char * sections, const char* templet, co
     OpenDB();
 
     if (sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
         PRINTF("SELECT ERROR:%s!\n", sqlite3_errmsg(CustomReport_db));
         return false;
     }
@@ -2990,18 +3388,18 @@ void ViewSystem::apply_report_setting() {
     gtk_tree_model_get(model, &iter, 0, &templet, -1);
 
     if((tree_depth <= 1) || (tree_depth >= 3))return;
-    if(NULL != strstr(templet, defaultflag))return;
+    if(NULL != strstr(templet, DEFAULT_FLAG.c_str()))return;
 
     int count = 0;
     if(strlen(templet) > 0) {
         OpenDB();
         ostringstream stream2;
-        stream2 << "SELECT DISTINCT childsection FROM CustomReport WHERE sections = '" << Customstr[init_language] <<"' AND templet = '" << templet << "'";
+        stream2 << "SELECT DISTINCT childsection FROM CustomReport WHERE sections = '" << CUSTOM_STR[init_language] <<"' AND templet = '" << templet << "'";
         sqlite3_stmt *stmt2 = NULL;
         string sql2 = stream2.str();
 
         if(sqlite3_prepare(CustomReport_db, sql2.c_str(), sql2.size(), &stmt2, 0) != SQLITE_OK) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
             return;
         }
         while (sqlite3_step(stmt2) != SQLITE_DONE) {
@@ -3013,10 +3411,10 @@ void ViewSystem::apply_report_setting() {
 
         if(count > 0) {
             ostringstream stream3;
-            stream3 << "UPDATE CustomReport SET record = '" << templet << "' WHERE sections = '" << defaultstr << "' AND templet = '" << defaultstr << "' AND childsection = '" << defaultstr << "'";
+            stream3 << "UPDATE CustomReport SET record = '" << templet << "' WHERE sections = '" << DEFAULT_STR << "' AND templet = '" << DEFAULT_STR << "' AND childsection = '" << DEFAULT_STR << "'";
             string sql3 = stream3.str();
             if (sqlite3_exec(CustomReport_db, sql3.c_str(), 0, 0, NULL) != SQLITE_OK) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
             }
 
             GtkTreeIter parent_iter;
@@ -3031,339 +3429,22 @@ void ViewSystem::apply_report_setting() {
             gtk_tree_path_free (parent_path);
             if(show_window)gtk_widget_hide_all(show_window);
         } else {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Blank template can't apply!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,   _("Blank template can't apply!"), NULL);
         }
         CloseDB();
     }
 }
 
-bool ViewSystem::CheckFlagFromReportTemplet(int id) {
-    const char *templet;
 
-    SysGeneralSetting sys;
-    init_language = sys.GetLanguage();
 
-    InitDB();
-    //LocalizationDB(); // 110~120ms
-    OpenDB();
 
-    ostringstream stream;
-    stream << "SELECT record FROM CustomReport WHERE sections = '" << defaultstr << "' AND templet = '" << defaultstr << "' AND childsection = '" << defaultstr << "'";
-    sqlite3_stmt *stmt = NULL;
-    string sql = stream.str();
-    string record;
 
-    if(sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
-        if ((id == OTHERS_COMMENT_SHOW_ID) || (id == OTHERS_INDICTION_SHOW_ID)) {
-            return true;
-        }
-        return false;
-    }
 
-    while (sqlite3_step(stmt) != SQLITE_DONE) {
-        if(strcmp(sqlite3_column_name(stmt, 0), "record") == 0)
-            record.assign((const char *)sqlite3_column_text(stmt, 0));
-    }
-    sqlite3_finalize(stmt);
 
-    if(record.length() > 0) {
-        templet = record.c_str();
-    } else {
-        templet = templet1str[init_language];
-    }
-    CloseDB();
 
-    memset(ShowArr, UNCHECK_VALUE, sizeof(ShowArr));
-    int maxsection = MAX_SECTION;
 
-    for(int t = 0; t < maxsection; t++) {
-        bool ret = false;
-        ret = ReadRecordFromDB(Customstr[init_language], templet, sectionstr[t][init_language]);
 
-        if(false == ret && OTHERS_M == t && ((id == OTHERS_COMMENT_SHOW_ID)||(id == OTHERS_INDICTION_SHOW_ID))) {
-            return true;
-        }
-    }
 
-    if(CHECK_VALUE == ShowArr[id])
-        return true;
-    else
-        return false;
-}
-
-void ViewSystem::CreateWindow() {
-    GtkWidget *fixed_main;
-    //    GtkWidget *button_title;
-    //    GtkWidget *label_title;
-    //GtkWidget *notebook;
-    GtkWidget *fixed_general;
-    GtkWidget *fixed_options;
-    GtkWidget *fixed_image;
-    GtkWidget *fixed_dicom;
-    //GtkWidget *fixed_tvout;
-    GtkWidget *fixed_comment;
-    GtkWidget *fixed_measure;
-    GtkWidget *fixed_kbcal;
-    GtkWidget *fixed_calculate;
-
-    GtkWidget *fixed_key_config;
-    GtkWidget *label_key_config;
-
-    GtkWidget *fixed_info;
-    GtkWidget *label_general;
-    GtkWidget *label_options;
-
-    GtkWidget *label_image_preset;
-    GtkWidget *label_measure;
-    GtkWidget *label_calculate;
-    GtkWidget *label_comment;
-    GtkWidget *label_tvout;
-    GtkWidget *label_dicom;
-    GtkWidget *label_system;
-
-    GtkWidget *button_apply;
-    GtkWidget *image_apply;
-    GtkWidget *label_apply;
-
-    GtkWidget *button_save;
-    GtkWidget *image_save;
-    GtkWidget *label_save;
-
-    GtkWidget *button_exit;
-    GtkWidget *image_exit;
-    GtkWidget *label_exit;
-
-    GtkWidget *label_kbcal;
-
-    MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
-    int w = DEFALT_SCREEN_WIDTH;
-
-    m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    // gtk_widget_set_size_request (m_window,840, 640);
-    gtk_widget_set_size_request (m_window, DEFALT_SCREEN_WIDTH, 640);
-    gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
-    gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
-    gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-    gtk_window_set_title (GTK_WINDOW (m_window), _("System Setup"));
-    gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
-    g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
-
-    fixed_main = gtk_fixed_new ();
-    gtk_widget_show (fixed_main);
-    gtk_container_add (GTK_CONTAINER (m_window), fixed_main);
-
-    // button_title = gtk_button_new ();
-    // gtk_widget_show (button_title);
-    // gtk_fixed_put (GTK_FIXED (fixed_main), button_title, 0, 0);
-    // gtk_widget_set_size_request (button_title, 800, 30);
-    // GTK_WIDGET_UNSET_FLAGS (button_title, GTK_CAN_FOCUS);
-    // gtk_button_set_focus_on_click (GTK_BUTTON (button_title), FALSE);
-
-    // label_title = gtk_label_new (_("System Setup"));
-    // gtk_widget_show (label_title);
-    // gtk_container_add (GTK_CONTAINER (button_title), label_title);
-    // gtk_label_set_justify (GTK_LABEL (label_title), GTK_JUSTIFY_CENTER);
-
-    image_apply = gtk_image_new_from_stock ("gtk-apply", GTK_ICON_SIZE_BUTTON);
-    label_apply = gtk_label_new_with_mnemonic (_("Apply"));
-    m_button_apply = button_apply = create_button_icon (label_apply, image_apply);
-    gtk_widget_modify_bg(m_button_apply, GTK_STATE_INSENSITIVE, g_deepGray);
-    gtk_fixed_put (GTK_FIXED (fixed_main), button_apply, 500, 560);
-
-    image_save = gtk_image_new_from_stock ("gtk-save", GTK_ICON_SIZE_BUTTON);
-    label_save = gtk_label_new_with_mnemonic (_("Save & Exit"));
-    m_button_save = button_save = create_button_icon(label_save, image_save);
-    gtk_widget_modify_bg(m_button_save, GTK_STATE_INSENSITIVE, g_deepGray);
-    gtk_fixed_put (GTK_FIXED (fixed_main), button_save, 630, 560);
-
-    image_exit = gtk_image_new_from_stock ("gtk-quit", GTK_ICON_SIZE_BUTTON);
-    label_exit = gtk_label_new_with_mnemonic (_("Exit"));
-    m_button_exit = button_exit = create_button_icon(label_exit, image_exit);
-    gtk_widget_modify_bg(m_button_exit, GTK_STATE_INSENSITIVE, g_deepGray);
-    //gtk_fixed_put (GTK_FIXED (fixed_main), button_exit, 700, 560);
-    gtk_fixed_put (GTK_FIXED (fixed_main), button_exit, 760, 560);
-
-    m_notebook = gtk_notebook_new ();
-    gtk_widget_show (m_notebook);
-    gtk_fixed_put (GTK_FIXED (fixed_main), m_notebook, 20, 10);
-    //gtk_widget_set_size_request (m_notebook, 800, 540);
-    gtk_widget_set_size_request (m_notebook, w - 40, 540);
-
-    g_signal_connect ((gpointer) button_apply, "clicked",
-                      G_CALLBACK (on_button_apply_clicked),
-                      this);
-    g_signal_connect ((gpointer) button_save, "clicked",
-                      G_CALLBACK (on_button_save_clicked),
-                      this);
-
-    g_signal_connect ((gpointer) button_exit, "clicked",
-                      G_CALLBACK (on_button_exit_clicked),
-                      this);
-
-    int notebook_counter = 0; //add by jhuang
-
-    // create note general
-    fixed_general = create_note_general();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_general);
-    init_general_setting(NULL);
-
-    label_general = gtk_label_new (_("General"));
-    gtk_widget_show (label_general);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_general);
-
-    // create note options
-    fixed_options = create_note_options();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_options);
-    init_option_setting(NULL);
-
-    label_options = gtk_label_new (_("Options"));
-    gtk_widget_show (label_options);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_options);
-
-    // create note image preset
-    fixed_image = create_note_image();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_image);
-    init_image_setting();
-
-    label_image_preset = gtk_label_new (_("Image Preset"));
-    gtk_widget_show (label_image_preset);
-    m_flag_notebook_image = notebook_counter++;
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), m_flag_notebook_image), label_image_preset);
-
-    // create measure preset
-    fixed_measure = create_note_measure();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_measure);
-    init_measure_setting(NULL);
-
-    label_measure = gtk_label_new (_("Measure"));
-    gtk_widget_show (label_measure);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_measure);
-
-    // create kbcal
-    //fixed_kbcal = create_note_kbcal();
-    fixed_kbcal = create_note_calc_measure();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_kbcal);
-
-    label_kbcal = gtk_label_new (_("Calc And Caliper"));
-    gtk_widget_show (label_kbcal);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_kbcal);
-
-    // create calculate table
-    fixed_calculate = create_note_calc();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_calculate);
-    init_calc_setting(NULL);
-
-    label_calculate = gtk_label_new (_("OB "));
-    gtk_widget_show (label_calculate);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_calculate);
-
-    // create note comment setting
-    fixed_comment = create_note_comment();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_comment);
-    init_comment_setting(NULL);
-
-    label_comment = gtk_label_new (_("Comment"));
-    gtk_widget_show (label_comment);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_comment);
-
-    /// create tvout
-    //fixed_tvout = create_note_tvout();
-    m_fixed_tvout = gtk_fixed_new();
-    gtk_widget_show(m_fixed_tvout);
-    gtk_container_add (GTK_CONTAINER (m_notebook), m_fixed_tvout);
-    //init_tvout_setting(NULL);
-
-    label_tvout = gtk_label_new (_("Peripheral"));
-    //label_tvout = gtk_label_new (_("TV Out"));
-    gtk_widget_show (label_tvout);
-    m_flag_notebook_tvout = notebook_counter++;
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), m_flag_notebook_tvout), label_tvout);
-
-    /// create reoprt set
-    GtkWidget *label_setreport;
-    m_FixedReportSet = create_set_report();
-    gtk_container_add (GTK_CONTAINER (m_notebook), m_FixedReportSet);
-    label_setreport = gtk_label_new (_("Custom Report"));
-    gtk_widget_show (label_setreport);
-    m_flag_notebook_coustomreport = notebook_counter++;
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), m_flag_notebook_coustomreport), label_setreport);
-
-    if(CDCMRegister::GetMe()->IsAuthorize())
-    {
-        // create note dicom
-        fixed_dicom = create_note_dicom();
-        gtk_container_add (GTK_CONTAINER (m_notebook), fixed_dicom);
-        // init_dicom_setting();
-        label_dicom = gtk_label_new (_("DICOM"));
-        gtk_widget_show (label_dicom);
-        gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_dicom);
-    }
-
-    // create note key config
-    fixed_key_config = create_note_key_config();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_key_config);
-    init_key_config();
-
-    label_key_config = gtk_label_new (_("P1-P3"));
-
-    gtk_widget_show (label_key_config);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_key_config);
-
-    // create note info
-    fixed_info = create_note_info();
-    gtk_container_add (GTK_CONTAINER (m_notebook), fixed_info);
-    init_info_setting();
-    label_system = gtk_label_new (_("System Info"));
-
-    gtk_widget_show (label_system);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_notebook), notebook_counter++), label_system);
-
-
-    g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(on_notebook_switch_page), this);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_notebook), m_flag_notebook_image);
-
-    gtk_widget_show(m_window);
-
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
-    return ;
-}
-
-gboolean ViewSystem::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
-    DestroyWindow();
-    // UserSelect::GetInstance()->close_username();
-    return FALSE;
-}
-
-static gboolean PowerOff(gpointer data) {
-    execlp("poweroff", "poweroff", NULL);	//system() is deprecated; when memory is lack, it will be not run!
-    perror("PowerOff Failed");
-
-    return FALSE;
-}
-
-static gboolean ExitWindowSystem(gpointer data) {
-    ViewSystem *tmp;
-    tmp = (ViewSystem*)data;
-    tmp->DestroyWindow();
-
-    return FALSE;
-}
-
-void ViewSystem::DestroyWindow() {
-    if(GTK_IS_WIDGET(m_window)) {
-        g_keyInterface.Pop();
-        gtk_widget_destroy(m_window);
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-        m_window = NULL;
-    }
-
-    ///>注册了新功能，关机重启
-    if(m_powerOffFlag)
-        g_timeout_add(500, PowerOff, this);
-}
 
 GtkWidget* ViewSystem::create_note_general() {
     GtkWidget *fixed_general;
@@ -3755,50 +3836,12 @@ void ViewSystem::SpecificTreeviewSelectionChanged(GtkTreeSelection *treeselectio
     }
 }
 
-void ViewSystem::ChangeNoteBookPage(int page) {
-    m_current_note_page = page;
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(m_notebook), m_current_note_page);
-}
 
-void ViewSystem::notebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num) {
-    m_current_note_page = page_num;
-    if(page_num == m_flag_notebook_coustomreport) {
-        GtkTreeIter iter;
-        GtkTreeModel *model;
 
-        GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
-        if (gtk_tree_selection_get_selected(selected_node, &model, &iter) == TRUE) {
-            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-            gint tree_depth = gtk_tree_path_get_depth(path);
-            gtk_tree_path_free (path);
 
-            if(2 == tree_depth)
-                gtk_widget_set_sensitive(m_button_apply, TRUE);
-            else
-                gtk_widget_set_sensitive(m_button_apply, FALSE);
-            gtk_widget_set_sensitive(m_button_save, TRUE);
-            gtk_widget_set_sensitive(m_button_exit, TRUE);
-        }
-    } else if(page_num == m_flag_notebook_image) {
-        gtk_widget_set_sensitive(m_button_apply, FALSE);
-        gtk_widget_set_sensitive(m_button_save, FALSE);
-    } else if(page_num == m_flag_notebook_tvout) {
-        create_note_tvout();
-        init_tvout_setting(NULL);
-        CreatePrinter();
-        init_printer(NULL);
-        gtk_widget_set_sensitive(m_button_apply, TRUE);
-        gtk_widget_set_sensitive(m_button_save, TRUE);
-        gtk_widget_set_sensitive(m_button_exit, TRUE);
-    } else {
-        gtk_widget_set_sensitive(m_button_apply, TRUE);
-        gtk_widget_set_sensitive(m_button_save, TRUE);
-        gtk_widget_set_sensitive(m_button_exit, TRUE);
-    }
-}
 
 void ViewSystem::BtnAddPrinterClicked(GtkButton *button) {
-    ViewPrinterAdd::GetInstance()->CreateWindow(GTK_WINDOW(m_window));
+    ViewPrinterAdd::GetInstance()->CreateWindow(GTK_WINDOW(m_dialog));
 }
 
 void ViewSystem::BtnDelPrinterClicked(GtkButton *button) {
@@ -3837,12 +3880,7 @@ string ViewSystem::specific_printer_selection() {
         ret_val = value;
     return ret_val;
 }
-void ViewSystem::UpdateSpecificPrinterModel() {
-    GtkTreeModel* model = create_specific_print_model();
-    if (model != NULL)
-        gtk_tree_view_set_model (GTK_TREE_VIEW(m_treeview_specific_print), model);
-    g_object_unref (model); /* destroy model automatically with view */
-}
+
 //  int date_format;
 void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
     if (sysGeneralSetting == NULL)
@@ -6030,67 +6068,7 @@ void ViewSystem::CreateDefineItem(int probeIndex, vector<ExamPara>& vecExamItem)
   }
 }
 
-void ViewSystem::CreateDefineItemFormUsbToHost(string name) {
-    char path_defined[256];
-    if(name == "System Default")
-        sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, "SystemDefault", ".ini");
-    else
-        sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name.c_str(), ".ini");
 
-    FILE *fp;
-    if((fp = fopen(path_defined, "r")) !=NULL) {
-        remove(path_defined);
-        fclose(fp);
-    }
-    int fd = open(path_defined, O_RDWR |O_CREAT |O_TRUNC, 0666);
-    close(fd);
-    IniFile ini_defined(path_defined);
-    IniFile *ptrIni1= &ini_defined;
-
-    char probelist[256];
-    char useritem[256];
-    char department[256];
-    char firstgenitem[256];
-    char src_group[256];
-    char userselect[256];
-    ExamItem exam;
-
-    vector<string> useritemgroup;
-    ExamItem examitem;
-    char path[256];
-
-    if(name == "System Default")
-        sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE_OTHER);
-    else
-        sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "userconfig/", name.c_str(),".ini");
-
-    IniFile ini(path);
-    IniFile *ptrIni= &ini;
-    useritemgroup = ptrIni->GetGroupName();
-
-    int group_length(0);
-    group_length = useritemgroup.size();
-    for (int i= 0 ; i <  group_length; i++) {
-        sprintf(src_group ,"%s", useritemgroup[i].c_str());
-        strcpy(userselect,(char*)ptrIni->ReadString(src_group, "UserSelect").c_str());
-        if(strcmp(userselect , "") !=0) {
-            strcpy(probelist,(char*)ptrIni->ReadString(src_group, "ProbeType").c_str());
-            strcpy(useritem,(char*)ptrIni->ReadString(src_group, "ExamItem").c_str());
-
-            strcpy(department,(char*)ptrIni->ReadString(src_group, "Department").c_str());
-            strcpy(firstgenitem,(char*)ptrIni->ReadString(src_group, "GenFirstItem").c_str());
-
-            ptrIni1->WriteString(src_group, "UserSelect",name);
-            ptrIni1->WriteString(src_group, "ProbeType",probelist);
-            ptrIni1->WriteString(src_group, "ExamItem", useritem);
-
-            ptrIni1->WriteString(src_group, "Department", department);
-            ptrIni1->WriteString(src_group, "GenFirstItem", firstgenitem);
-
-            ptrIni1->SyncConfigFile();
-        }
-    }
-}
 
 void ViewSystem::CreateDefineItem_comment(int probeIndex, vector<string>& vecExamItem_comment) {
   IniFile ini_userselect(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
@@ -6143,7 +6121,7 @@ bool ViewSystem::RenameNotice(int probe_type_index, char *new_text, char *dialog
       if (probe_type_index >= 0 && probe_type_index <= NUM_PROBE) {
         if (probelist == g_probe_list[probe_type_index]) {
           if (useritem == new_text) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
               MessageDialog::DLG_ERROR, dialognotice, NULL); // 重命名失败!该结点已存在
 
             return false;
@@ -6255,7 +6233,7 @@ void ViewSystem::CellRendererRename(GtkCellRendererText *renderer, gchar *path_s
         return;
     }
     if (strcmp(new_text, "") == 0) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
 
         return;
     }
@@ -6266,11 +6244,11 @@ void ViewSystem::CellRendererRename(GtkCellRendererText *renderer, gchar *path_s
 
     for(int i = 0; i < size/*24*/; i++) {
         if (new_text==ExamItemArray[i].name) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Fail to rename! The item name has existed!"), NULL); //重命名失败!该结点已存在
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Fail to rename! The item name has existed!"), NULL); //重命名失败!该结点已存在
             return;
         }
         if (old_text==ExamItemArray[i].name) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Operation is invaild."), NULL); //
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Operation is invaild."), NULL); //
             return;
         }
     }
@@ -6330,7 +6308,7 @@ void ViewSystem::AddCheckPart(char *checkpart) {
     GtkTreeIter iter;
 
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a department before inserting!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -6423,7 +6401,7 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a department before inserting!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -6437,7 +6415,7 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
         char *dialognotice= _("Fail to insert! 'New Item' has existed in the probe type. please rename it before inserting!");
         RenameNotice(probe_type_index, new_string, dialognotice, group_length);
         if(group_length>MAXNUMBER) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                               _("The defined items have reached the maximum!"), NULL);
             return;
         }
@@ -6467,7 +6445,7 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
 
         }
     } else if(tree_depth==2) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Fail to insert! Please select a department before inserting!"), NULL);
         return;
     }
@@ -6502,7 +6480,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select one item to be delete!"), NULL); //请先选择待删除的结点!
         return;
     }
@@ -6513,7 +6491,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
 
 
     if (tree_depth == 1) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Fail to delete! Can not delete the department!"), NULL); //删除失败!不能删除根结点!
         return;
     }
@@ -6542,7 +6520,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
 
             for(int i = 0; i < size/*24*/; i++) {
                 if (str0 == ExamItemArray[i].name) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                                       _("Fail to delete! Can not delete the defaulted exam item!"), NULL);
                     return;
                 }
@@ -6561,7 +6539,7 @@ void ViewSystem::DeleteItemClicked(GtkButton *button) {
             string username = GetUserName();
 
             if (useritemname == str0 && userflag==true && userprobe == g_probe_list[probeIndex] && username == userselect) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                                   _("Fail to delete! The item is under using!"), NULL); //删除失败!
                 return;
             } else {
@@ -6683,33 +6661,7 @@ void ViewSystem::UserChanged(GtkComboBox *widget) {
     }
 }
 
-void ViewSystem::UpdateUserItem() {
-    string name = GetUserName();
-    printf("name = %s\n", name.c_str());
-    if (name == "System Default" && name == "Умолчан системы" &&
-            name == "系统默认" && name == "Domyślne Systemu"  &&
-            name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto") {
-        stringstream ss;
-        ss << "userconfig/" << name << ".ini";
 
-        g_user_configure = ss.str();
-    } else {
-      g_user_configure = "ItemPara.ini";
-    }
-    set_image_item_sensitive(false);
-    save_itemIndex(-1);
-
-    // rebuild the exam type treeview, in order to disppear the select box in gtk
-    int index = GetProbeType();
-    if (index == -1)
-        return;
-    ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
-    GtkTreeModel* model = create_exam_item_model(itemIndex);
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
-    gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
-
-}
 
 void ViewSystem::ExamCommentChanged(GtkComboBox *widget) {
     GtkTreeModel *model1 = create_item_comment_model1();
@@ -7159,22 +7111,15 @@ void ViewSystem::ProbeTypeChanged(GtkComboBox *widget) {
     }
 }
 
-void ViewSystem::ShowList(const string name) {
-    gtk_combo_box_append_text (GTK_COMBO_BOX(m_comboboxentry_user_select), name.c_str());
-}
 
-void ViewSystem::SetActiveUser(gint num) {
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_user_select), num);
-}
+
+
 
 int ViewSystem::get_active_user() {
     return gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxentry_user_select));
 }
 
-string ViewSystem::GetUserName() {
-    return gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_user_select))));
 
-}
 
 int ViewSystem::GetProbeType() {
     return gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_type));
@@ -7981,14 +7926,14 @@ GtkWidget* ViewSystem::create_note_calc_measure() {
 
     int calc_notebook_page = 0;
 
-    fixed_calc = CalcSetting::GetInstance()->CreateCalcWindow(m_window);
+    fixed_calc = CalcSetting::GetInstance()->CreateCalcWindow(GTK_WIDGET(m_dialog));
     gtk_container_add (GTK_CONTAINER (m_calc_notebook), fixed_calc);
 
     label_calc = gtk_label_new (_("Calculate"));
     gtk_widget_show (label_calc);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_calc_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_calc_notebook), calc_notebook_page++), label_calc);
 
-    fixed_measure = MeasureSetting::GetInstance()->CreateMeasureWindow(m_window);
+    fixed_measure = MeasureSetting::GetInstance()->CreateMeasureWindow(GTK_WIDGET(m_dialog));
     gtk_container_add (GTK_CONTAINER (m_calc_notebook), fixed_measure);
 
     label_measure = gtk_label_new (_("Measure"));
@@ -8025,7 +7970,7 @@ GtkWidget* ViewSystem::create_note_dicom() {
 
     // create note local
     // fixed_local = Create_note_local();
-    fixed_local = DicomLocalSetting::GetInstance()->CreateDicomWindow(m_window);
+    fixed_local = DicomLocalSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
     gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_local);
     DicomLocalSetting::GetInstance()->InitLocalSetting();
 
@@ -8034,7 +7979,7 @@ GtkWidget* ViewSystem::create_note_dicom() {
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_local);
 
     // create note server
-    fixed_server = DicomServerSetting::GetInstance()->CreateDicomWindow(m_window);
+    fixed_server = DicomServerSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
     gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_server);
     // DicomServerSetting::GetInstance()-> InitServerSetting();
 
@@ -8043,7 +7988,7 @@ GtkWidget* ViewSystem::create_note_dicom() {
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_server);
 
     //create note service
-    fixed_service = DicomServiceSetting::GetInstance()->CreateDicomWindow(m_window);
+    fixed_service = DicomServiceSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
     gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_service);
     // DicomServiceSetting::GetInstance()->InitServiceSetting();
 
@@ -8423,7 +8368,7 @@ void ViewSystem::ButtonSelectOneCommentClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_comment));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a item before add!"), NULL);
         return;
     }
@@ -8467,7 +8412,7 @@ void ViewSystem::ButtonSelectOneCommentClicked(GtkButton *button) {
                     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path_scroll, NULL, FALSE, 1.0, 1.0);
                     gtk_tree_path_free (path_scroll);
 
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
                     return;
                 }
             } else {
@@ -8487,7 +8432,7 @@ void ViewSystem::ButtonSelectOneCommentClicked(GtkButton *button) {
                     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path_scroll, NULL, FALSE, 1.0, 1.0);
                     gtk_tree_path_free (path_scroll);
 
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _(" Item has existed. Please select item again!"), NULL);
                     return;
 
                 }
@@ -8639,7 +8584,7 @@ void ViewSystem::ButtonDownClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_comment1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a item before down!"), NULL);
         return;
     }
@@ -8724,7 +8669,7 @@ void ViewSystem::ButtonUpClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_comment1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a item before up!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -9023,7 +8968,7 @@ void ViewSystem::ButtonDeleteClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_comment1));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a item before delete!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -9097,7 +9042,7 @@ void ViewSystem::ButtonDeleteSelectClicked(GtkButton *button) {
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_item_comment));
 
     if (gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR,
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,
                                           _("Please select a item before delete!"), NULL); //请先选择待插入结点的父结点
         return;
     }
@@ -9127,12 +9072,12 @@ void ViewSystem::ButtonDeleteSelectClicked(GtkButton *button) {
             if(sysGS.GetLanguage() ==ZH) {
 
                 if( strcmp(select_name, _(vecItemNote[i].name.c_str())) == 0) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _(" Only Userdefined items can be deleted!"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _(" Only Userdefined items can be deleted!"), NULL);
                     return;
                 }
             } else {
                 if( strcmp(select_name, vecItemNote[i].name.c_str()) == 0) {
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _(" Only Userdefined items can be deleted!"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _(" Only Userdefined items can be deleted!"), NULL);
                     return;
                 }
             }
@@ -9205,7 +9150,7 @@ void ViewSystem::ButtonAddClicked(GtkButton *button) {
 
                     GtkTreeIter iter_tmp = InsertUniqueComment(model, new_string);
                     gtk_tree_selection_select_iter(selection, &iter_tmp);
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _(" 'New Item' has existed. Please rename item !"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _(" 'New Item' has existed. Please rename item !"), NULL);
                     return;
                 }
             } else {
@@ -9213,7 +9158,7 @@ void ViewSystem::ButtonAddClicked(GtkButton *button) {
 
                     GtkTreeIter iter_tmp = InsertUniqueComment(model, new_string);
                     gtk_tree_selection_select_iter(selection, &iter_tmp);
-                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _(" 'New Item' has existed. Please rename item !"), NULL);
+                    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _(" 'New Item' has existed. Please rename item !"), NULL);
                     return;
                 }
 
@@ -9352,7 +9297,7 @@ void ViewSystem::CellRendererRenameSelectComment(GtkCellRendererText *m_cellrend
         return;
     }
     if (strcmp(new_text, "") == 0) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
 
         return;
     }
@@ -9380,7 +9325,7 @@ void ViewSystem::CellRendererRenameSelectComment(GtkCellRendererText *m_cellrend
     if(!vecItemNote.empty()) {
         for(int i=0; i<note_item_length; i++) {
             if(( strcmp(old_text, vecItemNote[i].name.c_str()) == 0)||(strcmp(old_text, _(vecItemNote[i].name.c_str())) == 0)) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _("Only Userdefined items can be renamed!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _("Only Userdefined items can be renamed!"), NULL);
                 return;
             }
 
@@ -9404,7 +9349,7 @@ void ViewSystem::CellRendererRenameSelectComment(GtkCellRendererText *m_cellrend
     if(!vecItemComment.empty()) {
         for(int i=0; i<item_length; i++) {
             if( strcmp(new_text, vecItemComment[i].name.c_str()) == 0) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _("Fail to rename! The item name has existed!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _("Fail to rename! The item name has existed!"), NULL);
                 return;
             }
 
@@ -9462,7 +9407,7 @@ void ViewSystem::CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_c
         return;
     }
     if (strcmp(new_text, "") == 0) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("The new item name can not be empty!"), NULL); //结点名称不能为空
 
         return;
     }
@@ -9490,7 +9435,7 @@ void ViewSystem::CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_c
     if(!vecItem_Comment.empty()) {
         for(int i=0; i<item_length; i++) {
             if( strcmp(new_text, vecItem_Comment[i].name.c_str()) == 0) {
-                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO,  _("Fail to rename! The item name has existed!"), NULL);
+                MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO,  _("Fail to rename! The item name has existed!"), NULL);
                 return;
             }
 
@@ -10339,7 +10284,7 @@ GtkWidget* ViewSystem::create_note_key_config() {
     gtk_widget_show (fixed_key_p1);
     gtk_container_add (GTK_CONTAINER (frame_key_p1), fixed_key_p1);
     for(int i=0; i<MAX_KEY; i++) {
-        if(strcmp(KeyFunctionList[i].c_str(), "Print Screen") == 0)
+        if(KeyFunctionList[i] == "Print Screen")
             m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _("Print"));
         else
             m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
@@ -10707,7 +10652,7 @@ GtkWidget *ViewSystem::create_note_calc() {
 }
 
 void ViewSystem::BtnOBCustomClicked(GtkButton *button) {
-    ViewCustomOB::GetInstance()->CreateWindow(m_window);
+    ViewCustomOB::GetInstance()->CreateWindow(GTK_WIDGET(m_dialog));
 }
 
 void ViewSystem::init_calc_setting(SysCalculateSetting* sysCalc) {
@@ -11311,63 +11256,7 @@ void ViewSystem::KeyEvent(unsigned char keyValue) {
     }
 }
 
-void ViewSystem::BtnExitClicked(GtkButton *button) {
-    DestroyWindow();
-}
 
-void ViewSystem::BtnApplyClicked(GtkButton *button) {
-    //if language changed, relocalize the CustomReport.db
-    SysGeneralSetting sys;
-    int langage = sys.GetLanguage();
-    int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
-    if(langage != index_lang) {
-        InitDB();
-        LocalizationDB(); // 110~120ms
-    }
-
-    apply_report_setting();//add by jhuang
-    save_general_setting();
-    save_option_setting();
-    save_comment_setting();
-    if(m_current_note_page == m_flag_notebook_tvout)
-        save_tvout_setting();//改成了"Peripheral"
-    //save_dicom_setting();
-    save_measure_setting();
-    //save_image_setting();
-    save_key_config();
-    save_calc_setting();
-}
-
-bool system_save = false;
-void ViewSystem::BtnSaveClicked(GtkButton *button) {
-    //if language changed, relocalize the CustomReport.db
-    SysGeneralSetting sys;
-    int langage = sys.GetLanguage();
-    int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
-    if(langage != index_lang) {
-        InitDB();
-        LocalizationDB(); // 110~120ms
-    }
-
-    BtnSave2Clicked(NULL);//add by jhuang
-    save_general_setting();
-    save_option_setting();
-    save_comment_setting();
-    if(m_current_note_page == m_flag_notebook_tvout)
-        save_tvout_setting();//改成了"Peripheral" 避免打印机总是死机问题
-    //save_dicom_setting();
-    save_measure_setting();
-    save_key_config();
-    save_calc_setting();
-
-    g_timeout_add(500, ExitWindowSystem, this);
-    //DestroyWindow();
-    system_save = true;
-    //-----------------------------//
-
-    FreezeMode::GetInstance()->PressUnFreeze();
-    MultiFuncUndo();//2016.11.05--solve problem that biopsy verify don't exit.
-}
 
 void ViewSystem::UpdateHospitalandpart(int date_format, const char *hospital_name) {
     TopArea::GetInstance()->SetDateFormat(date_format);
@@ -11492,7 +11381,7 @@ void ViewSystem::image_default_setting() {
     if (((strcmp(name, "System Default") != 0) && (strcmp(name, "Умолчан системы") != 0) &&
             (strcmp(name, "系统默认") != 0) && (strcmp(name, "Domyślne Systemu") != 0)  &&
             (strcmp(name, "Par défaut du sys.") != 0) && (strcmp(name, "Systemvorgabe") != 0) && (strcmp(name, "Sistema por defecto") !=0))||(flag)) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("Fail to default factory! Define user or New item is under using!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("Fail to default factory! Define user or New item is under using!"), NULL);
 
     } else {
         //delete define item
@@ -11663,7 +11552,7 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
         string cur_username;
         cur_username = exam.ReadDefaultUserSelect(&ini);
         if(strcmp(username,_(cur_username.c_str()))==0) {
-            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("User configuration being in use!"), NULL);
+            MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("User configuration being in use!"), NULL);
             return ;
         }
 
@@ -11705,7 +11594,7 @@ void ViewSystem::BtnDeleteUserClicked(GtkButton *button) {
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
     } else {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("System Default is protected!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("System Default is protected!"), NULL);
     }
 
 }
