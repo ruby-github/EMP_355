@@ -272,6 +272,14 @@ private:
     }
   }
 
+  // Options
+
+  static void signal_button_clicked_options_default(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnOptionsDefaultClicked(button);
+    }
+  }
+
   // signal
 
   void ButtonClickedApply(GtkButton* button);
@@ -287,6 +295,9 @@ private:
   void LanguageChanged(GtkComboBox* combobox);
   void VgaChanged(GtkComboBox* combobox);
   void BtnGeneralDefaultClicked(GtkButton* button);
+
+  // Options
+  void BtnOptionsDefaultClicked(GtkButton* button);
 
 private:
   ViewSystem();
@@ -384,6 +395,8 @@ private:
   GtkComboBoxText* m_combobox_img_file;
   GtkComboBoxText* m_combobox_video_format;
   GtkComboBoxText* m_combobox_video_file;
+
+  // Measure
 
 public:
     static const int MAX_KEY = 10;//8;//9;
@@ -886,7 +899,7 @@ private:
     void BtnDelPrinterClicked(GtkButton *button);
 
 
-    void BtnOptionsDefaultClicked(GtkButton *button);
+
     void BtnMeasureDefaultClicked(GtkButton *button);
     void BtnCalculateDefaultClicked(GtkButton *button);
     void BtnCommentDefaultClicked(GtkButton *button);
@@ -997,9 +1010,7 @@ private:
     }
 
 
-    static void on_button_options_default_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnOptionsDefaultClicked(button);
-    }
+
     static void on_button_measure_default_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnMeasureDefaultClicked(button);
     }

@@ -1663,7 +1663,7 @@ GtkWidget* ViewSystem::create_note_options() {
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
   gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
 
-  g_signal_connect(button_default, "clicked", G_CALLBACK(on_button_options_default_clicked), this);
+  g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_options_default), this);
 
   return GTK_WIDGET(table);
 }
