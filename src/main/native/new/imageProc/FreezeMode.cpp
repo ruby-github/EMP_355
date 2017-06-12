@@ -191,7 +191,7 @@ void FreezeMode::Freeze() {
     Update2D::SetCineRemoveImg(3);
 }
 extern bool g_system_save;
-extern bool review_pic;
+extern bool g_review_pic;
 void FreezeMode::UnFreeze() {
     ///> darken freeze lamp
     m_freezeMode = UNFREEZE;
@@ -209,7 +209,7 @@ void FreezeMode::UnFreeze() {
     IoCtrl io;
     io.Unfreeze();
 
-    if(review_pic) {
+    if(g_review_pic) {
         if(g_system_save) {
             SysGeneralSetting sys;
             int date_format = sys.GetDateFormat();
@@ -217,7 +217,7 @@ void FreezeMode::UnFreeze() {
             UpdateHospitalandpart(date_format, m_hospitalname.c_str());
             g_system_save = false;
         }
-        review_pic = false;
+        g_review_pic = false;
     }
     ImgPw::GetInstance()->OnCwImgCtrl(TRUE); //控制CW图像的实时与冻结。
 

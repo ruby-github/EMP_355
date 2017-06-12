@@ -168,6 +168,14 @@ GtkCheckButton* Utils::create_check_button(const string label) {
   return button;
 }
 
+GtkSpinButton* Utils::create_spin_button(GtkAdjustment* adjustment, gdouble climb_rate, guint digits) {
+  GtkSpinButton* spin_button = GTK_SPIN_BUTTON(gtk_spin_button_new(adjustment, climb_rate, digits));
+
+  gtk_widget_set_size_request(GTK_WIDGET(spin_button), -1, 30);
+
+  return spin_button;
+}
+
 GtkImage* Utils::create_image(const string filename, const int width, const int height) {
   GtkImage* image = NULL;
 

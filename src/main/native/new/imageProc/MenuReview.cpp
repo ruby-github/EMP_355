@@ -471,9 +471,9 @@ void MenuReview::ExitSlideDemo(void) {
     }
 }
 
-bool review_pic =false;
+bool g_review_pic =false;
 void MenuReview::PreviewClicked(GtkButton *button) {
-    review_pic = true;
+    g_review_pic = true;
 
     m_cur_btn = GTK_WIDGET(button);
 //	PRINTF("%s\n", __FUNCTION__);
@@ -954,7 +954,7 @@ void MenuReview::PageDownClicked(GtkButton *button) {
 }
 
 void MenuReview::PreviewNextOrPrevious(GtkButton *button) {
-    review_pic = true;
+    g_review_pic = true;
 
     m_cur_btn = GTK_WIDGET(button);
 //	PRINTF("%s\n", __FUNCTION__);

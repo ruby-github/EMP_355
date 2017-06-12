@@ -22,6 +22,8 @@ public:
 
   static GtkCheckButton* create_check_button(const string label = "");
 
+  static GtkSpinButton* create_spin_button(GtkAdjustment* adjustment, gdouble climb_rate, guint digits);
+
   static GtkImage* create_image(const string filename = "", const int width = 0, const int height = 0);
 
   static GtkEntry* create_entry(gunichar ch = 0);

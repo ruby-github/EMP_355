@@ -229,6 +229,49 @@ private:
     return FALSE;
   }
 
+  // General
+  static void signal_entry_insert_hospital(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewSystem* data) {
+    if (data != NULL) {
+      data->EntryHospitalInsert(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static void signal_spinbutton_insert_hour(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewSystem* data) {
+    if (data != NULL) {
+      data->SpinbuttonInsertHour(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static void signal_spinbutton_insert_time(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewSystem* data) {
+    if (data != NULL) {
+      data->SpinbuttonInsertTime(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static void signal_button_clicked_adjust_time(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnAdjustTimeClicked(button);
+    }
+  }
+
+  static void signal_combobox_changed_language(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->LanguageChanged(combobox);
+    }
+  }
+
+  static void signal_combobox_changed_vga(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->VgaChanged(combobox);
+    }
+  }
+
+  static void signal_button_clicked_general_default(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnGeneralDefaultClicked(button);
+    }
+  }
+
   // signal
 
   void ButtonClickedApply(GtkButton* button);
@@ -236,10 +279,62 @@ private:
   void ButtonClickedExit(GtkButton* button);
   void NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num);
 
+  // General
+  void EntryHospitalInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void SpinbuttonInsertTime(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void SpinbuttonInsertHour(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void BtnAdjustTimeClicked(GtkButton* button);
+  void LanguageChanged(GtkComboBox* combobox);
+  void VgaChanged(GtkComboBox* combobox);
+  void BtnGeneralDefaultClicked(GtkButton* button);
+
 private:
   ViewSystem();
 
   void KeyEvent(unsigned char keyValue);
+
+  GtkWidget* create_note_general();
+  void init_general_setting(SysGeneralSetting* sysGeneralSetting);
+  void save_general_setting();
+
+  GtkWidget* create_note_options();
+  void init_option_setting(SysOptions* sysOptions);
+  void save_option_setting();
+
+  GtkWidget* create_note_image();
+  void init_image_setting();
+  void save_image_setting();
+
+  GtkWidget* create_note_measure();
+  void init_measure_setting(SysMeasurementSetting* sysMeasure);
+  void save_measure_setting();
+
+  GtkWidget* create_note_calc_measure();
+
+  GtkWidget* create_note_calc();
+  void init_calc_setting(SysCalculateSetting* sysCalc);
+  void save_calc_setting();
+
+  GtkWidget* create_note_comment();
+  void init_comment_setting(SysNoteSetting* sysNote);
+  void save_comment_setting();
+
+  void create_note_tvout();
+  void init_tvout_setting(SysGeneralSetting* sysGeneralSetting);
+  void save_tvout_setting();
+
+  GtkWidget* create_set_report();
+
+  GtkWidget* create_note_dicom();
+  void init_dicom_setting();
+  void save_dicom_setting();
+
+  GtkWidget* create_note_key_config();
+  void init_key_config();
+  void save_key_config();
+
+  GtkWidget* create_note_info();
+  void init_info_setting();
 
 private:
   static ViewSystem* m_instance;
@@ -252,6 +347,17 @@ private:
   GtkNotebook* m_notebook;
 
   GtkBox* m_box_peripheral;
+
+  // General
+  GtkEntry* m_entry_hospital;
+  GtkWidget* m_calendar;
+  GtkSpinButton* m_spinbutton_hour;
+  GtkSpinButton* m_spinbutton_minute;
+  GtkSpinButton* m_spinbutton_second;
+  GtkComboBoxText* m_combobox_language;
+  GtkComboBoxText* m_combobox_vga;
+  GtkComboBoxText* m_combobox_date_format;
+  GtkComboBoxText* m_combobox_screen_saver;
 
 
 public:
@@ -285,7 +391,6 @@ private:
 
     int m_kbIndex;
     bool m_vgaInterl;
-    GtkWidget *m_combobox_vga;
     //PItem m_itemIndex;
 
 
@@ -304,11 +409,7 @@ private:
 
 
     int m_current_note_page;
-    // general
-    GtkWidget *m_entry_hospital;
-    GtkWidget *m_combobox_language;
-    GtkWidget *m_combobox_date_format;
-    GtkWidget *m_combobox_screen_saver;
+
     // GtkWidget *m_notebookPrinter;
     GtkWidget *m_radiobutton_common;
     GtkWidget *m_radiobutton_specific;
@@ -319,10 +420,7 @@ private:
     GtkTreeSelection *m_selected_specific_printer;
     GtkWidget *m_treeview_common_print;
     GtkWidget *m_treeview_specific_print;
-    GtkWidget *m_calendar;
-    GtkWidget *m_spinbutton_hour;
-    GtkWidget *m_spinbutton_minute;
-    GtkWidget *m_spinbutton_second;
+
     //options
     // GtkWidget *m_radiobutton_biopsy_on;
     // GtkWidget *m_radiobutton_biopsy_off;
@@ -596,7 +694,7 @@ private:
         data->BtnCancelClicked(button);
     }
 
-    GtkWidget *create_set_report();
+
 
     bool UniqueItem(const string sections, const string templet = "%", const string childsection = "%");
     GtkTreeIter InsertUnique(GtkTreeModel* model, GtkTreeIter* iter, const string str);
@@ -726,39 +824,25 @@ private:
     GtkCellRenderer *m_cellrenderer_comment_text;
     GtkCellRenderer *m_cellrenderer_comment_text1;
 
-    GtkWidget* create_note_general();
-    void init_general_setting(SysGeneralSetting* sysGeneralSetting);
-    void save_general_setting();
-    GtkWidget* create_note_options();
-    void init_option_setting(SysOptions* sysOptions);
-    void save_option_setting();
-    GtkWidget* create_note_image();
-    void init_image_setting();
-    void save_image_setting();
+
+
+
+
+
     void save_new_item();
     void init_printer(SysGeneralSetting *sysGeneralSetting);
     void CreatePrinter();
-    void create_note_tvout();
-    void init_tvout_setting(SysGeneralSetting *sysGeneralSetting);
-    void save_tvout_setting();
-    GtkWidget* create_note_dicom();
-    void init_dicom_setting();
-    void save_dicom_setting();
-    GtkWidget* create_note_comment();
-    void init_comment_setting(SysNoteSetting* sysNote);
-    void save_comment_setting();
-    GtkWidget* create_note_measure();
-    void init_measure_setting(SysMeasurementSetting* sysMeasure);
-    void save_measure_setting();
-    GtkWidget* create_note_calc();
-    GtkWidget* create_note_calc_measure();
-    void init_calc_setting(SysCalculateSetting* sysCalc);
-    void save_calc_setting();
-    GtkWidget* create_note_key_config();
-    void init_key_config();
-    void save_key_config();
-    GtkWidget* create_note_info();
-    void init_info_setting();
+
+
+
+
+
+
+
+
+
+
+
     GtkTreeModel* create_common_print_model();
     GtkTreeModel* create_specific_print_model();
     GtkWidget* create_common_print_treeview();
@@ -787,14 +871,13 @@ private:
     void image_para_combo_box_set(GtkWidget *combobox, int value);
     void image_para_restrict(int probeIndex);
     // signal handle
-    void EntryHospitalInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    void BtnAdjustTimeClicked(GtkButton *button);
+
     void CommonRadioToggled(GtkToggleButton *togglebutton);
     void SpecificRadioToggled(GtkToggleButton *togglebutton);
     void BtnAddPrinterClicked(GtkButton *button);
     void BtnDelPrinterClicked(GtkButton *button);
 
-    void BtnGeneralDefaultClicked(GtkButton *button);
+
     void BtnOptionsDefaultClicked(GtkButton *button);
     void BtnMeasureDefaultClicked(GtkButton *button);
     void BtnCalculateDefaultClicked(GtkButton *button);
@@ -844,8 +927,7 @@ private:
     void ComboCfmPrf(GtkComboBox *box);
     void ComboSensitivity(GtkComboBox *box);
     void ClearComboBox(GtkComboBox *box);
-    void SpinbuttonInsertTime(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    void SpinbuttonInsertHour(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
+
     void SpinbuttonInsertGain(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     void add_columns_comment(GtkTreeView *treeview);
     void add_columns_comment1(GtkTreeView *treeview);
@@ -866,8 +948,7 @@ private:
     void DicomnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
     void CalcnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
 
-    void LanguageChanged(GtkComboBox *box);
-    void VgaChanged(GtkComboBox *box);
+
 
     void UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event);
 
@@ -891,12 +972,9 @@ private:
 
     void ButtonDownClicked(GtkButton *button);
     // signal connect
-    static void on_entry_hospital_insert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
-        data->EntryHospitalInsert(editable, new_text, new_text_length, position);
-    }
-    static void on_button_adjust_time_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnAdjustTimeClicked(button);
-    }
+
+
+
     static void on_common_radio_button_toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
         data->CommonRadioToggled(togglebutton);
     }
@@ -910,9 +988,7 @@ private:
         data->BtnDelPrinterClicked(button);
     }
 
-    static void on_button_general_default_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnGeneralDefaultClicked(button);
-    }
+
     static void on_button_options_default_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnOptionsDefaultClicked(button);
     }
@@ -1028,12 +1104,7 @@ private:
     static void HandleComboCfmSensitivity(GtkComboBox *box, ViewSystem *data) {
         data->ComboSensitivity(box);
     }
-    static void on_spinbutton_insert_hour(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
-        data->SpinbuttonInsertHour(editable, new_text, new_text_length, position);
-    }
-    static void on_spinbutton_insert_time(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
-        data->SpinbuttonInsertTime(editable, new_text, new_text_length, position);
-    }
+
     static void on_spinbutton_insert_gain(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
         data->SpinbuttonInsertGain(editable, new_text, new_text_length, position);
     }
@@ -1096,12 +1167,7 @@ private:
         data->CalcnotebookChanged(notebook, page, page_num);
     }
 
-    static void on_language_changed(GtkComboBox *widget, ViewSystem *data) {
-        data->LanguageChanged(widget);
-    }
-    static void on_vga_changed(GtkComboBox *widget, ViewSystem *data) {
-        data->VgaChanged(widget);
-    }
+
 
     static void HandleButtonSelectOneCommentClicked(GtkButton *button, ViewSystem *data) {
         if (data)

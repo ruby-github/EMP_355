@@ -9,12 +9,18 @@
 #include "utils/StringUtils.h"
 
 #include "calcPeople/MeaCalcFun.h"
+#include "calcPeople/MenuCalcNew.h"
 #include "calcPeople/ViewReport.h"
+#include "display/KnobMenu.h"
+#include "display/MenuArea.h"
 #include "imageProc/FreezeMode.h"
 #include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/MultiFuncFactory.h"
+#include "measure/MenuMeasure.h"
+#include "patient/ViewNewPat.h"
 #include "periDevice/DCMRegister.h"
+#include "sysMan/ScreenSaver.h"
 #include "sysMan/SysCalculateSetting.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/SysMeasurementSetting.h"
@@ -22,7 +28,6 @@
 #include "sysMan/SysOptions.h"
 
 #include "ViewMain.h"
-
 
 
 #include "display/gui_func.h"
@@ -667,6 +672,7 @@ void ViewCustomOB::AddToTable(gint type, int temp1, float temp2) {
 ViewSystem* ViewSystem::m_instance = NULL;
 
 extern bool g_authorizationOn;
+extern bool g_review_pic;
 
 string g_user_configure = "ItemPara.ini";
 bool g_system_save = false;
@@ -815,7 +821,7 @@ ViewSystem::~ViewSystem() {
 void ViewSystem::CreateWindow() {
   MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
 
-  m_dialog = Utils::create_dialog(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), _("System Setup"), 880, 660);
+  m_dialog = Utils::create_dialog(GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()), _("System Setup"), 800, 600);
 
   m_button_apply = Utils::add_dialog_button(m_dialog, _("Apply"), GTK_RESPONSE_APPLY, GTK_STOCK_APPLY);
   m_button_save = Utils::add_dialog_button(m_dialog, _("Save"), GTK_RESPONSE_OK, GTK_STOCK_SAVE);
@@ -914,125 +920,120 @@ string ViewSystem::GetUserName() {
 }
 
 bool ViewSystem::CheckFlagFromReportTemplet(int id) {
-  const char *templet;
-
   SysGeneralSetting sys;
   init_language = sys.GetLanguage();
 
   InitDB();
-  //LocalizationDB(); // 110~120ms
   OpenDB();
 
   ostringstream stream;
   stream << "SELECT record FROM CustomReport WHERE sections = '" << DEFAULT_STR << "' AND templet = '" << DEFAULT_STR << "' AND childsection = '" << DEFAULT_STR << "'";
-  sqlite3_stmt *stmt = NULL;
   string sql = stream.str();
-  string record;
+  sqlite3_stmt* stmt = NULL;
 
   if(sqlite3_prepare(CustomReport_db, sql.c_str(), sql.size(), &stmt, 0) != SQLITE_OK) {
-      MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR,   _("Database error!"), NULL);
-      if ((id == OTHERS_COMMENT_SHOW_ID) || (id == OTHERS_INDICTION_SHOW_ID)) {
-          return true;
-      }
-      return false;
+    MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Database error!"), NULL);
+    if ((id == OTHERS_COMMENT_SHOW_ID) || (id == OTHERS_INDICTION_SHOW_ID)) {
+      return true;
+    }
+
+    return false;
   }
+
+  string record;
 
   while (sqlite3_step(stmt) != SQLITE_DONE) {
-      if(strcmp(sqlite3_column_name(stmt, 0), "record") == 0)
-          record.assign((const char *)sqlite3_column_text(stmt, 0));
+    if(strcmp(sqlite3_column_name(stmt, 0), "record") == 0) {
+      record.assign((const char*)sqlite3_column_text(stmt, 0));
+    }
   }
+
   sqlite3_finalize(stmt);
 
+  string templet;
+
   if(record.length() > 0) {
-      templet = record.c_str();
+    templet = record;
   } else {
-      templet = TEMPLET1_STR[init_language].c_str();
+    templet = TEMPLET1_STR[init_language];
   }
+
   CloseDB();
 
   memset(ShowArr, UNCHECK_VALUE, sizeof(ShowArr));
   int maxsection = sizeof(SECTION_STR)/sizeof(SECTION_STR[0]);
 
   for(int t = 0; t < maxsection; t++) {
-      bool ret = false;
-      ret = ReadRecordFromDB(CUSTOM_STR[init_language], templet, SECTION_STR[t][init_language]);
+    bool ret = false;
+    ret = ReadRecordFromDB(CUSTOM_STR[init_language], templet, SECTION_STR[t][init_language]);
 
-      if(false == ret && OTHERS_M == t && ((id == OTHERS_COMMENT_SHOW_ID)||(id == OTHERS_INDICTION_SHOW_ID))) {
-          return true;
-      }
+    if(false == ret && OTHERS_M == t && ((id == OTHERS_COMMENT_SHOW_ID)||(id == OTHERS_INDICTION_SHOW_ID))) {
+      return true;
+    }
   }
 
-  if(CHECK_VALUE == ShowArr[id])
-      return true;
-  else
-      return false;
+  if(CHECK_VALUE == ShowArr[id]) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void ViewSystem::CreateDefineItemFormUsbToHost(string name) {
-  char path_defined[256];
-  if(name == "System Default")
-      sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, "SystemDefault", ".ini");
-  else
-      sprintf(path_defined, "%s%s%s%s", CFG_RES_PATH, EXAM_ITEM_FILE, name.c_str(), ".ini");
+  stringstream ss;
 
-  FILE *fp;
-  if((fp = fopen(path_defined, "r")) !=NULL) {
-      remove(path_defined);
-      fclose(fp);
+  if (name == "System Default") {
+    ss << CFG_RES_PATH << EXAM_ITEM_FILE << "SystemDefault" << ".ini";
+  } else {
+    ss << CFG_RES_PATH << EXAM_ITEM_FILE << name <<  ".ini";
   }
-  int fd = open(path_defined, O_RDWR |O_CREAT |O_TRUNC, 0666);
+
+  string path_defined = ss.str();
+
+  FILE* fp;
+  if ((fp = fopen(path_defined.c_str(), "r")) !=NULL) {
+    fclose(fp);
+  }
+
+  int fd = open(path_defined.c_str(), O_RDWR |O_CREAT |O_TRUNC, 0666);
   close(fd);
+
   IniFile ini_defined(path_defined);
-  IniFile *ptrIni1= &ini_defined;
 
-  char probelist[256];
-  char useritem[256];
-  char department[256];
-  char firstgenitem[256];
-  char src_group[256];
-  char userselect[256];
-  ExamItem exam;
+  ss.str("");
 
-  vector<string> useritemgroup;
-  ExamItem examitem;
-  char path[256];
+  if (name == "System Default") {
+    ss << CFG_RES_PATH << EXAM_FILE_OTHER;
+  } else {
+    ss << CFG_RES_PATH << EXAM_FILE_DIR << "userconfig/" << name << ".ini";
+  }
 
-  if(name == "System Default")
-      sprintf(path, "%s%s", CFG_RES_PATH, EXAM_FILE_OTHER);
-  else
-      sprintf(path, "%s%s%s%s%s", CFG_RES_PATH, EXAM_FILE_DIR, "userconfig/", name.c_str(),".ini");
+  IniFile ini(ss.str());
+  vector<string> useritemgroup = ini.GetGroupName();
 
-  IniFile ini(path);
-  IniFile *ptrIni= &ini;
-  useritemgroup = ptrIni->GetGroupName();
+  for (int i = 0; i < useritemgroup.size(); i++) {
+    string userselect = ini.ReadString(useritemgroup[i], "UserSelect");
 
-  int group_length(0);
-  group_length = useritemgroup.size();
-  for (int i= 0 ; i <  group_length; i++) {
-      sprintf(src_group ,"%s", useritemgroup[i].c_str());
-      strcpy(userselect,(char*)ptrIni->ReadString(src_group, "UserSelect").c_str());
-      if(strcmp(userselect , "") !=0) {
-          strcpy(probelist,(char*)ptrIni->ReadString(src_group, "ProbeType").c_str());
-          strcpy(useritem,(char*)ptrIni->ReadString(src_group, "ExamItem").c_str());
+    if (userselect != "") {
+      string probelist = ini.ReadString(useritemgroup[i], "ProbeType");
+      string useritem = ini.ReadString(useritemgroup[i], "ExamItem");
+      string department = ini.ReadString(useritemgroup[i], "Department");
+      string firstgenitem = ini.ReadString(useritemgroup[i], "GenFirstItem");
 
-          strcpy(department,(char*)ptrIni->ReadString(src_group, "Department").c_str());
-          strcpy(firstgenitem,(char*)ptrIni->ReadString(src_group, "GenFirstItem").c_str());
+      ini_defined.WriteString(useritemgroup[i], "UserSelect", name);
+      ini_defined.WriteString(useritemgroup[i], "ProbeType", probelist);
+      ini_defined.WriteString(useritemgroup[i], "ExamItem", useritem);
+      ini_defined.WriteString(useritemgroup[i], "Department", department);
+      ini_defined.WriteString(useritemgroup[i], "GenFirstItem", firstgenitem);
 
-          ptrIni1->WriteString(src_group, "UserSelect",name);
-          ptrIni1->WriteString(src_group, "ProbeType",probelist);
-          ptrIni1->WriteString(src_group, "ExamItem", useritem);
-
-          ptrIni1->WriteString(src_group, "Department", department);
-          ptrIni1->WriteString(src_group, "GenFirstItem", firstgenitem);
-
-          ptrIni1->SyncConfigFile();
-      }
+      ini_defined.SyncConfigFile();
+    }
   }
 }
 
 void ViewSystem::ChangeNoteBookPage(int page) {
   m_current_note_page = page;
-  gtk_notebook_set_current_page(GTK_NOTEBOOK(m_notebook), m_current_note_page);
+  gtk_notebook_set_current_page(m_notebook, m_current_note_page);
 }
 
 void ViewSystem::SetActiveUser(gint num) {
@@ -1045,24 +1046,27 @@ void ViewSystem::ShowList(const string name) {
 
 void ViewSystem::UpdateUserItem() {
   string name = GetUserName();
-  printf("name = %s\n", name.c_str());
-  if (name == "System Default" && name == "Умолчан системы" &&
-          name == "系统默认" && name == "Domyślne Systemu"  &&
-          name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto") {
-      stringstream ss;
-      ss << "userconfig/" << name << ".ini";
 
-      g_user_configure = ss.str();
+  if (name == "System Default" && name == "Умолчан системы" &&
+    name == "系统默认" && name == "Domyślne Systemu" && name == "Par défaut du sys." &&
+    name == "Systemvorgabe" && name == "Sistema por defecto") {
+    stringstream ss;
+    ss << "userconfig/" << name << ".ini";
+
+    g_user_configure = ss.str();
   } else {
     g_user_configure = "ItemPara.ini";
   }
+
   set_image_item_sensitive(false);
   save_itemIndex(-1);
 
   // rebuild the exam type treeview, in order to disppear the select box in gtk
   int index = GetProbeType();
-  if (index == -1)
-      return;
+  if (index == -1) {
+    return;
+  }
+
   ExamItem examItem;
   vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
   GtkTreeModel* model = create_exam_item_model(itemIndex);
@@ -1183,6 +1187,520 @@ void ViewSystem::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, g
   }
 }
 
+void ViewSystem::KeyEvent(unsigned char keyValue) {
+  FakeXEvent::KeyEvent(keyValue);
+
+  switch(keyValue) {
+  case KEY_ESC:
+  case KEY_SYSTEM:
+    if (!m_vgaInterl) {
+      gtk_combo_box_set_active(GTK_COMBO_BOX(ViewSystem::GetInstance()->GetVGACombobox()), 0);
+      break;
+    }
+  case KEY_P1:
+    {
+      g_timeout_add(100, signal_callback_exit_window_system, this);
+      FakeEscKey();
+
+      FreezeMode::GetInstance()->PressUnFreeze();
+      MultiFuncUndo();
+    }
+
+    break;
+  default:
+    break;
+  }
+}
+
+GtkWidget* ViewSystem::create_note_general() {
+  GtkTable* table = Utils::create_table(10, 6);
+
+  // Hospital Name
+  GtkLabel* label_hospital = Utils::create_label(_("Hospital Name:"));
+  m_entry_hospital = Utils::create_entry(9679);
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_hospital), 0, 1, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_hospital), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_hospital, 46);
+  g_signal_connect(G_OBJECT(m_entry_hospital), "insert_text", G_CALLBACK(signal_entry_insert_hospital), this);
+
+  // Date and Time
+  GtkFrame* frame_date_time = Utils::create_frame(_("Date and Time"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_date_time), 0, 6, 1, 6);
+
+  GtkTable* table_frame = Utils::create_table(5, 6);
+  gtk_container_set_border_width(GTK_CONTAINER(table_frame), 5);
+  gtk_container_add(GTK_CONTAINER(frame_date_time), GTK_WIDGET(table_frame));
+
+  m_calendar = gtk_calendar_new();
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(m_calendar), 0, 3, 0, 5);
+
+  GtkLabel* label_time_setting = Utils::create_label(_("Time Setting:"));
+
+  GtkAdjustment* adjustment_hour = GTK_ADJUSTMENT(gtk_adjustment_new(0, 0, 23, 1, 1, 0));
+  m_spinbutton_hour = Utils::create_spin_button(adjustment_hour, 1, 0);
+
+  GtkAdjustment* adjustment_minute = GTK_ADJUSTMENT(gtk_adjustment_new(0, 0, 59, 1, 1, 0));
+  m_spinbutton_minute = Utils::create_spin_button(adjustment_minute, 1, 0);
+
+  GtkAdjustment* adjustment_second = GTK_ADJUSTMENT(gtk_adjustment_new(0, 0, 59, 1, 1, 0));
+  m_spinbutton_second = Utils::create_spin_button(adjustment_second, 1, 0);
+
+  GtkLabel* label_time_format = Utils::create_label(_("HH:MM:SS"));
+  gtk_misc_set_alignment(GTK_MISC(label_time_format), 0, 0);
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_time_setting), 3, 5, 0, 1);
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(m_spinbutton_hour), 3, 4, 1, 2);
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(m_spinbutton_minute), 4, 5, 1, 2);
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(m_spinbutton_second), 5, 6, 1, 2);
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_time_format), 3, 5, 2, 3);
+
+  time_t now;
+  time(&now);
+  tm* now_tm = localtime(&now);
+
+  gtk_spin_button_set_value(m_spinbutton_hour, now_tm->tm_hour);
+  g_signal_connect(G_OBJECT(m_spinbutton_hour), "insert_text", G_CALLBACK(signal_spinbutton_insert_hour), this);
+
+  gtk_spin_button_set_value(m_spinbutton_minute, now_tm->tm_min);
+  g_signal_connect(G_OBJECT(m_spinbutton_minute), "insert_text", G_CALLBACK(signal_spinbutton_insert_time), this);
+
+  gtk_spin_button_set_value(m_spinbutton_second, now_tm->tm_sec);
+  g_signal_connect(G_OBJECT(m_spinbutton_second), "insert_text", G_CALLBACK(signal_spinbutton_insert_time), this);
+
+  GtkButton* button_adjust_time = Utils::create_button(_("Adjust Time&Date"));
+  gtk_table_attach(table_frame, GTK_WIDGET(button_adjust_time), 3, 5, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_adjust_time, "clicked", G_CALLBACK (signal_button_clicked_adjust_time), this);
+
+  // Language
+  GtkLabel* label_language = Utils::create_label(_("Language:"));
+  m_combobox_language = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_language), 0, 1, 6, 7);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_language), 1, 2, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_language, "English");
+  gtk_combo_box_text_append_text(m_combobox_language, "中文");
+  gtk_combo_box_text_append_text(m_combobox_language, "Русский язык");
+  gtk_combo_box_text_append_text(m_combobox_language, "Polski");
+  gtk_combo_box_text_append_text(m_combobox_language, "Français");
+  gtk_combo_box_text_append_text(m_combobox_language, "Español");
+  gtk_combo_box_text_append_text(m_combobox_language, "Deutsch");
+
+  g_signal_connect(GTK_COMBO_BOX(m_combobox_language), "changed", G_CALLBACK (signal_combobox_changed_language), this);
+
+  // VGA Source
+  GtkLabel* label_vga = Utils::create_label(_("VGA Source:"));
+  m_combobox_vga = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_vga), 2, 3, 6, 7);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_vga), 3, 4, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_vga, _("Internal"));
+  gtk_combo_box_text_append_text(m_combobox_vga, _("External"));
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_vga), 0);
+  g_signal_connect(GTK_COMBO_BOX(m_combobox_vga), "changed", G_CALLBACK (signal_combobox_changed_vga), this);
+
+  // Date Format
+  GtkLabel* label_date_format = Utils::create_label(_("Date Format:"));
+  m_combobox_date_format = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_date_format), 0, 1, 7, 8);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_date_format), 1, 2, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_date_format, _("Y/M/D"));
+  gtk_combo_box_text_append_text(m_combobox_date_format, _("M/D/Y"));
+  gtk_combo_box_text_append_text(m_combobox_date_format, _("D/M/Y"));
+
+  // Screen saver
+  GtkLabel* label_screen_saver = Utils::create_label(_("Screen Saver:"));
+  m_combobox_screen_saver = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_screen_saver), 2, 3, 7, 8);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_screen_saver), 3, 4, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("none"));
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("5 Min."));
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("10 Min."));
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("20 Min."));
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("30 Min."));
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("45 Min."));
+  gtk_combo_box_text_append_text(m_combobox_screen_saver, _("60 Min."));
+
+  // Default Factory
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_general_default), this);
+
+  return GTK_WIDGET(table);
+
+  /*GtkWidget *fixed_general;
+      //    GtkWidget *entry_hospital;
+      GtkWidget *label_hospital;
+      //    GtkWidget *combobox_language;
+      //    GtkWidget *combobox_screen_saver;
+      GtkWidget *label_screen_saver;
+      GtkWidget *label_date_format;
+      GtkWidget *label_language;
+
+      GtkWidget *combobox_video;
+      GtkWidget *label_video;
+      GtkWidget *label_vga;
+
+      GtkWidget *frame_datetime;
+      GtkWidget *fixed_datetime;
+      // GtkWidget *calendar;
+      GtkObject *spinbutton_hour_adj;
+      // GtkWidget *spinbutton_hour;
+      GtkObject *spinbutton_minute_adj;
+      // GtkWidget *spinbutton_minute;
+      GtkObject *spinbutton_second_adj;
+      // GtkWidget *spinbutton_second;
+      GtkWidget *label_time;
+      GtkWidget *label_datetime;
+      GtkWidget *label_time_format;
+      GtkWidget *button_adjust_time;
+      //GtkWidget *frame_print;
+
+      GtkWidget *button_default;
+
+      fixed_general = gtk_fixed_new ();
+      gtk_widget_show (fixed_general);
+
+      m_entry_hospital = gtk_entry_new ();
+      gtk_widget_show (m_entry_hospital);
+      gtk_fixed_put (GTK_FIXED (fixed_general), m_entry_hospital, 190+30, 20);
+      gtk_widget_set_size_request (m_entry_hospital, 250, 30);
+      gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_hospital), 9679);
+      gtk_entry_set_max_length(GTK_ENTRY(m_entry_hospital), 46);
+      g_signal_connect(G_OBJECT(m_entry_hospital), "insert_text", G_CALLBACK(on_entry_hospital_insert), this);
+
+      label_hospital = gtk_label_new (_("<b>Hospital Name:</b>"));
+      gtk_widget_show (label_hospital);
+      gtk_fixed_put (GTK_FIXED (fixed_general), label_hospital, 20+30, 20);
+      gtk_widget_set_size_request (label_hospital, 170, 30);
+      gtk_label_set_use_markup (GTK_LABEL (label_hospital), TRUE);
+      gtk_misc_set_alignment (GTK_MISC (label_hospital), 0.5, 0.5);
+
+      label_language = gtk_label_new (_("<b>Language:</b>"));
+      gtk_widget_show (label_language);
+      gtk_fixed_put (GTK_FIXED (fixed_general), label_language, 30+20, 350);
+      gtk_widget_set_size_request (label_language, 120, 30);
+      gtk_label_set_use_markup (GTK_LABEL (label_language), TRUE);
+      gtk_misc_set_alignment (GTK_MISC (label_language), 0.9, 0.5);
+
+      m_combobox_language = gtk_combo_box_new_text ();
+      gtk_widget_show (m_combobox_language);
+      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_language, 150+20, 350);
+      gtk_widget_set_size_request (m_combobox_language, 100, 30);
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "English");
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "中文");
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
+
+      label_vga=gtk_label_new(_("<b>VGA Source:</b>"));
+      gtk_widget_show(label_vga);
+      gtk_fixed_put(GTK_FIXED(fixed_general),label_vga,30+20,390);
+      gtk_widget_set_size_request (label_vga, 135, 30);
+      gtk_label_set_use_markup (GTK_LABEL (label_vga), TRUE);
+      gtk_misc_set_alignment (GTK_MISC (label_vga), 0.9, 0.5);
+      m_combobox_vga= gtk_combo_box_new_text();
+      gtk_widget_show (m_combobox_vga);
+      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_vga, 165+20, 390);
+      gtk_widget_set_size_request (m_combobox_vga, 100, 30);
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("Internal"));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("External"));
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_vga), 0);
+      g_signal_connect((gpointer)m_combobox_vga, "changed", G_CALLBACK (on_vga_changed), this);
+
+
+
+      label_date_format = gtk_label_new (_("<b>Date Format:</b>"));
+      gtk_widget_show (label_date_format);
+      // gtk_fixed_put (GTK_FIXED (fixed_general), label_date_format, 270, 350);
+      gtk_fixed_put (GTK_FIXED (fixed_general), label_date_format, 310-30, 350);
+      gtk_widget_set_size_request (label_date_format, 120+30, 30);
+      gtk_label_set_use_markup (GTK_LABEL (label_date_format), TRUE);
+      gtk_misc_set_alignment (GTK_MISC (label_date_format), 0.9, 0.5);
+
+      m_combobox_date_format = gtk_combo_box_new_text ();
+      gtk_widget_show (m_combobox_date_format);
+      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_date_format, 410+20, 350);
+      gtk_widget_set_size_request (m_combobox_date_format, 100, 30);
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("Y/M/D"));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("M/D/Y"));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("D/M/Y"));
+
+      label_screen_saver = gtk_label_new (_("<b>Screen saver:</b>"));
+      gtk_widget_show (label_screen_saver);
+      //gtk_fixed_put (GTK_FIXED (fixed_general), label_screen_saver, 510, 350);
+      gtk_fixed_put (GTK_FIXED (fixed_general), label_screen_saver, 560-30, 350);
+      gtk_widget_set_size_request (label_screen_saver, 120 +20+30, 30);
+      gtk_label_set_use_markup (GTK_LABEL (label_screen_saver), TRUE);
+      gtk_misc_set_alignment (GTK_MISC (label_screen_saver), 0.9, 0.5);
+
+      m_combobox_screen_saver = gtk_combo_box_new_text ();
+      gtk_widget_show (m_combobox_screen_saver);
+      // gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_screen_saver, 646 + 4, 350);
+      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_screen_saver, 660+40, 350);
+      gtk_widget_set_size_request (m_combobox_screen_saver, 100, 30);
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("none"));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("5 Min."));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("10 Min."));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("20 Min."));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("30 Min."));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("45 Min."));
+      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("60 Min."));
+
+    frame_datetime = gtk_frame_new (NULL);
+    gtk_widget_show (frame_datetime);
+    gtk_fixed_put (GTK_FIXED (fixed_general), frame_datetime, 20+30, 70);
+    gtk_widget_set_size_request (frame_datetime, 600, 240);
+    gtk_frame_set_label_align (GTK_FRAME (frame_datetime), 0.5, 0.5);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame_datetime), GTK_SHADOW_IN);
+
+    fixed_datetime = gtk_fixed_new ();
+    gtk_widget_show (fixed_datetime);
+    gtk_container_add (GTK_CONTAINER (frame_datetime), fixed_datetime);
+
+    m_calendar = gtk_calendar_new ();
+    gtk_widget_show (m_calendar);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_calendar, 30, 15);
+    gtk_widget_set_size_request (m_calendar, 280, 190);
+
+    time_t now;
+    struct tm *now_tm;
+    time(&now);
+    now_tm = localtime(&now);
+
+    spinbutton_hour_adj = gtk_adjustment_new (0, 0, 23, 1, 1, 0);
+    m_spinbutton_hour = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_hour_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_hour);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_hour, 330, 60);
+    gtk_widget_set_size_request (m_spinbutton_hour, 80, 25);
+    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_hour), now_tm->tm_hour);
+    g_signal_connect(G_OBJECT(m_spinbutton_hour), "insert_text", G_CALLBACK(on_spinbutton_insert_hour), this);
+
+    spinbutton_minute_adj = gtk_adjustment_new (0, 0, 59, 1, 1, 0);
+    m_spinbutton_minute = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_minute_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_minute);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_minute, 410, 60);
+    gtk_widget_set_size_request (m_spinbutton_minute, 80, 25);
+    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_minute), now_tm->tm_min);
+    g_signal_connect(G_OBJECT(m_spinbutton_minute), "insert_text", G_CALLBACK(on_spinbutton_insert_time), this);
+
+    spinbutton_second_adj = gtk_adjustment_new (0, 0, 59, 1, 1, 0);
+    m_spinbutton_second = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_second_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_second);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_second, 490, 60);
+    gtk_widget_set_size_request (m_spinbutton_second, 80, 25);
+    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_second), now_tm->tm_sec);
+    g_signal_connect(G_OBJECT(m_spinbutton_second), "insert_text", G_CALLBACK(on_spinbutton_insert_time), this);
+
+    label_time = gtk_label_new (_("Time Setting:"));
+    gtk_widget_show (label_time);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), label_time, 330, 16);
+    gtk_widget_set_size_request (label_time, 100+16, 45);
+    gtk_misc_set_alignment (GTK_MISC (label_time), 0, 0.5);
+
+    label_time_format = gtk_label_new (_("HH:MM:SS"));
+    gtk_widget_show (label_time_format);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), label_time_format, 330, 90);
+    gtk_widget_set_size_request (label_time_format, 100, 20);
+    gtk_misc_set_alignment (GTK_MISC (label_time_format), 0, 0.5);
+
+    label_datetime = gtk_label_new (_("<b>Date and Time</b>"));
+    gtk_widget_show (label_datetime);
+    gtk_frame_set_label_widget (GTK_FRAME (frame_datetime), label_datetime);
+    gtk_label_set_use_markup (GTK_LABEL (label_datetime), TRUE);
+
+    button_adjust_time = gtk_button_new_with_mnemonic (_("Adjust Time&Date"));
+    gtk_widget_show (button_adjust_time);
+    gtk_fixed_put (GTK_FIXED (fixed_datetime), button_adjust_time, 330, 160);
+    gtk_widget_set_size_request (button_adjust_time, 145, 40);
+    g_signal_connect ((gpointer) button_adjust_time, "clicked",
+                      G_CALLBACK (on_button_adjust_time_clicked),
+                      this);
+
+    button_default = gtk_button_new_with_mnemonic (_("Default Factory"));
+    gtk_widget_show (button_default);
+    gtk_fixed_put (GTK_FIXED (fixed_general), button_default, 50, 420+20);
+    gtk_widget_set_size_request (button_default, 120+28, 56-16);
+    g_signal_connect ((gpointer) button_default, "clicked", G_CALLBACK (on_button_general_default_clicked), this);
+
+  return fixed_general;*/
+}
+
+void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
+  if (sysGeneralSetting == NULL) {
+    sysGeneralSetting = new SysGeneralSetting();
+  }
+
+  string hospital_name = sysGeneralSetting->GetHospital();
+  gtk_entry_set_text(GTK_ENTRY(m_entry_hospital), hospital_name.c_str());
+
+  int index_lang = sysGeneralSetting->GetLanguage();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_language), index_lang);
+
+  int date_format = sysGeneralSetting->GetDateFormat();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), date_format);
+  int screen_saver = sysGeneralSetting->GetScreenProtect();
+  unsigned char index_screen_saver = 0;
+
+  switch (screen_saver) {
+  case 0:
+    index_screen_saver = 0;
+    break;
+  case 5:
+    index_screen_saver = 1;
+    break;
+  case 10:
+    index_screen_saver = 2;
+    break;
+  case 20:
+    index_screen_saver = 3;
+    break;
+  case 30:
+    index_screen_saver = 4;
+    break;
+  case 45:
+    index_screen_saver = 5;
+    break;
+  case 60:
+    index_screen_saver = 6;
+    break;
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_screen_saver), index_screen_saver);
+
+  delete sysGeneralSetting;
+}
+
+void ViewSystem::save_general_setting() {
+  SysGeneralSetting sysGeneralSetting;
+
+  const char * hospital_name = gtk_entry_get_text(GTK_ENTRY(m_entry_hospital));
+  if (hospital_name != NULL) {                   //in order to avoid segment default
+    sysGeneralSetting.SetHospital(hospital_name);
+  }
+
+    int langage = sysGeneralSetting.GetLanguage();
+    int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
+    if(langage != index_lang) {
+        char str_cmd[256];
+
+        if (ZH == index_lang) {
+            setenv("LANG", "zh_CN.UTF-8", 1);
+            setenv("LANGUAGE", "zh_CN:zh", 1);
+            setlocale(LC_ALL, "zh_CN.UTF-8");
+            sprintf(str_cmd, "setxkbmap -layout %s", "us");
+            _system_(str_cmd);
+            //system("setxkbmap -layout us");
+        } else if (RU == index_lang) {
+            setenv("LANG", "ru_RU.UTF-8", 1);
+            setenv("LANGUAGE", "ru_RU:ru", 1);
+            setlocale(LC_ALL, "ru_RU.UTF-8");
+            //system("setxkbmap -layout ru");
+            sprintf(str_cmd, "setxkbmap -layout %s", "ru");
+            _system_(str_cmd);
+        } else if (PL == index_lang) {
+            setenv("LANG", "pl_PL.UTF-8", 1);
+            setenv("LANGUAGE", "pl_PL:pl", 1);
+            setlocale(LC_ALL, "pl_PL.UTF-8");
+            //system("setxkbmap -layout pl qwertz");
+            sprintf(str_cmd, "setxkbmap -layout %s", "pl qwertz");
+            _system_(str_cmd);
+        } else if (ES == index_lang) {
+            setenv("LANG", "es_ES.UTF-8", 1);
+            setenv("LANGUAGE", "es_ES:es", 1);
+            setlocale(LC_ALL, "es_ES.UTF-8");
+            //system("setxkbmap -layout es");
+            sprintf(str_cmd, "setxkbmap -layout %s", "es");
+            _system_(str_cmd);
+        }
+
+        else if (FR == index_lang) {
+            setenv("LANG", "fr_FR.UTF-8", 1);
+            setenv("LANGUAGE", "fr_FR:fr", 1);
+            setlocale(LC_ALL, "fr_FR.UTF-8");
+            //system("setxkbmap -layout fr");
+            sprintf(str_cmd, "setxkbmap -layout %s", "fr");
+            _system_(str_cmd);
+        } else if (DE == index_lang) {
+            setenv("LANG", "de_DE.UTF-8", 1);
+            setenv("LANGUAGE", "de_DE:de", 1);
+            setlocale(LC_ALL, "de_DE.UTF-8");
+            //system("setxkbmap -layout de");
+            sprintf(str_cmd, "setxkbmap -layout %s", "de");
+            _system_(str_cmd);
+        } else {
+            setenv("LANG", "en_US.UTF-8", 1);
+            setenv("LANGUAGE", "en_US:en", 1);
+            setlocale(LC_ALL, "en_US.UTF-8");
+            //system("setxkbmap -layout us");
+            sprintf(str_cmd, "setxkbmap -layout %s", "us");
+            _system_(str_cmd);
+        }
+        // setlocale(LC_NUMERIC, "en_US.UTF-8");
+        // setlocale(LC_NUMERIC, "en_US.UTF-8");
+        ChangeKeymap();
+        sysGeneralSetting.SetLanguage(index_lang);
+    }
+
+    int date_format = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_date_format));
+    sysGeneralSetting.SetDateFormat(date_format);
+    MenuArea::GetInstance()->UpdateLabel();
+    KnobMenu::GetInstance()->Update();
+    if(!g_review_pic) {
+        UpdateHospitalandpart(date_format, hospital_name);
+    }
+
+    int ScreenSaverIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_screen_saver));
+    sysGeneralSetting.SetScreenProtect(ScreenSaverIndex);
+
+    unsigned char ScreenSaver = 0;
+    switch (ScreenSaverIndex) {
+    case 0:
+        ScreenSaver = 0;
+        break;
+    case 1:
+        ScreenSaver = 5;
+        break;
+    case 2:
+        ScreenSaver = 10;
+        break;
+    case 3:
+        ScreenSaver = 20;
+        break;
+    case 4:
+        ScreenSaver = 30;
+        break;
+    case 5:
+        ScreenSaver = 45;
+        break;
+    case 6:
+        ScreenSaver = 60;
+        break;
+    }
+    ScreenSaver::GetInstance()->SetPeriod(ScreenSaver * 60);
+
+    sysGeneralSetting.SyncFile();
+    //update calc menu
+    g_menuCalc.UpdateLabel();
+    g_menuMeasure.UpdateLabel();
+    ViewNewPat::GetInstance()->UpdateNameLength();
+}
+
+
+
+
 #include "periDevice/DCMMan.h"
 #include <string.h>
 #include <time.h>
@@ -1192,15 +1710,19 @@ void ViewSystem::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, g
 #include "imageControl/Update2D.h"
 #include "probe/ExamItem.h"
 #include "Def.h"
-#include "display/MenuArea.h"
+
 #include "sysMan/UpgradeMan.h"
 
 #include "display/gui_global.h"
 #include "periDevice/PeripheralMan.h"
 #include "periDevice/NetworkMan.h"
-#include "display/KnobMenu.h"
+
 #include "display/TopArea.h"
-#include "sysMan/ScreenSaver.h"
+
+
+
+
+
 #include "patient/PatientInfo.h"
 #include "sysMan/SysDicomSetting.h"
 #include "sysMan/SysUserDefinedKey.h"
@@ -1227,10 +1749,9 @@ void ViewSystem::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, g
 #include "sysMan/DicomServerSetting.h"
 #include "sysMan/DicomServiceSetting.h"
 #include <EmpAuthorization.h>
-#include "calcPeople/MenuCalcNew.h"
-#include "measure/MenuMeasure.h"
+
 #include "Init.h"
-#include "patient/ViewNewPat.h"
+
 
 #include "utils/Const.h"
 #include "calcPeople/MeasureDef.h"
@@ -3446,207 +3967,15 @@ void ViewSystem::apply_report_setting() {
 
 
 
-GtkWidget* ViewSystem::create_note_general() {
-    GtkWidget *fixed_general;
-    //    GtkWidget *entry_hospital;
-    GtkWidget *label_hospital;
-    //    GtkWidget *combobox_language;
-    //    GtkWidget *combobox_screen_saver;
-    GtkWidget *label_screen_saver;
-    GtkWidget *label_date_format;
-    GtkWidget *label_language;
 
-    GtkWidget *combobox_video;
-    GtkWidget *label_video;
-    GtkWidget *label_vga;
 
-    GtkWidget *frame_datetime;
-    GtkWidget *fixed_datetime;
-    // GtkWidget *calendar;
-    GtkObject *spinbutton_hour_adj;
-    // GtkWidget *spinbutton_hour;
-    GtkObject *spinbutton_minute_adj;
-    // GtkWidget *spinbutton_minute;
-    GtkObject *spinbutton_second_adj;
-    // GtkWidget *spinbutton_second;
-    GtkWidget *label_time;
-    GtkWidget *label_datetime;
-    GtkWidget *label_time_format;
-    GtkWidget *button_adjust_time;
-    //GtkWidget *frame_print;
 
-    GtkWidget *button_default;
 
-    fixed_general = gtk_fixed_new ();
-    gtk_widget_show (fixed_general);
 
-    m_entry_hospital = gtk_entry_new ();
-    gtk_widget_show (m_entry_hospital);
-    gtk_fixed_put (GTK_FIXED (fixed_general), m_entry_hospital, 190+30, 20);
-    gtk_widget_set_size_request (m_entry_hospital, 250, 30);
-    gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_hospital), 9679);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entry_hospital), 46);
-    g_signal_connect(G_OBJECT(m_entry_hospital), "insert_text", G_CALLBACK(on_entry_hospital_insert), this);
 
-    label_hospital = gtk_label_new (_("<b>Hospital Name:</b>"));
-    gtk_widget_show (label_hospital);
-    gtk_fixed_put (GTK_FIXED (fixed_general), label_hospital, 20+30, 20);
-    gtk_widget_set_size_request (label_hospital, 170, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_hospital), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_hospital), 0.5, 0.5);
 
-    label_language = gtk_label_new (_("<b>Language:</b>"));
-    gtk_widget_show (label_language);
-    gtk_fixed_put (GTK_FIXED (fixed_general), label_language, 30+20, 350);
-    gtk_widget_set_size_request (label_language, 120, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_language), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_language), 0.9, 0.5);
 
-    m_combobox_language = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_language);
-    gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_language, 150+20, 350);
-    gtk_widget_set_size_request (m_combobox_language, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "English");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "中文");
 
-    label_vga=gtk_label_new(_("<b>VGA Source:</b>"));
-    gtk_widget_show(label_vga);
-    gtk_fixed_put(GTK_FIXED(fixed_general),label_vga,30+20,390);
-    gtk_widget_set_size_request (label_vga, 135, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_vga), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_vga), 0.9, 0.5);
-    m_combobox_vga= gtk_combo_box_new_text();
-    gtk_widget_show (m_combobox_vga);
-    gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_vga, 165+20, 390);
-    gtk_widget_set_size_request (m_combobox_vga, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("Internal"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("External"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_vga), 0);
-    g_signal_connect((gpointer)m_combobox_vga, "changed", G_CALLBACK (on_vga_changed), this);
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Русский язык");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Polski");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Français");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Español");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "Deutsch");
-
-    g_signal_connect((gpointer)m_combobox_language, "changed", G_CALLBACK (on_language_changed), this);
-
-    label_date_format = gtk_label_new (_("<b>Date Format:</b>"));
-    gtk_widget_show (label_date_format);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), label_date_format, 270, 350);
-    gtk_fixed_put (GTK_FIXED (fixed_general), label_date_format, 310-30, 350);
-    gtk_widget_set_size_request (label_date_format, 120+30, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_date_format), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_date_format), 0.9, 0.5);
-
-    m_combobox_date_format = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_date_format);
-    gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_date_format, 410+20, 350);
-    gtk_widget_set_size_request (m_combobox_date_format, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("Y/M/D"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("M/D/Y"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("D/M/Y"));
-
-    label_screen_saver = gtk_label_new (_("<b>Screen saver:</b>"));
-    gtk_widget_show (label_screen_saver);
-    //gtk_fixed_put (GTK_FIXED (fixed_general), label_screen_saver, 510, 350);
-    gtk_fixed_put (GTK_FIXED (fixed_general), label_screen_saver, 560-30, 350);
-    gtk_widget_set_size_request (label_screen_saver, 120 +20+30, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_screen_saver), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_screen_saver), 0.9, 0.5);
-
-    m_combobox_screen_saver = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_screen_saver);
-    // gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_screen_saver, 646 + 4, 350);
-    gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_screen_saver, 660+40, 350);
-    gtk_widget_set_size_request (m_combobox_screen_saver, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("none"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("5 Min."));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("10 Min."));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("20 Min."));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("30 Min."));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("45 Min."));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("60 Min."));
-
-    frame_datetime = gtk_frame_new (NULL);
-    gtk_widget_show (frame_datetime);
-    gtk_fixed_put (GTK_FIXED (fixed_general), frame_datetime, 20+30, 70);
-    gtk_widget_set_size_request (frame_datetime, 600, 240);
-    gtk_frame_set_label_align (GTK_FRAME (frame_datetime), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_datetime), GTK_SHADOW_IN);
-
-    fixed_datetime = gtk_fixed_new ();
-    gtk_widget_show (fixed_datetime);
-    gtk_container_add (GTK_CONTAINER (frame_datetime), fixed_datetime);
-
-    m_calendar = gtk_calendar_new ();
-    gtk_widget_show (m_calendar);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_calendar, 30, 15);
-    gtk_widget_set_size_request (m_calendar, 280, 190);
-
-    time_t now;
-    struct tm *now_tm;
-    time(&now);
-    now_tm = localtime(&now);
-
-    spinbutton_hour_adj = gtk_adjustment_new (0, 0, 23, 1, 1, 0);
-    m_spinbutton_hour = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_hour_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_hour);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_hour, 330, 60);
-    gtk_widget_set_size_request (m_spinbutton_hour, 80, 25);
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_hour), now_tm->tm_hour);
-    g_signal_connect(G_OBJECT(m_spinbutton_hour), "insert_text", G_CALLBACK(on_spinbutton_insert_hour), this);
-
-    spinbutton_minute_adj = gtk_adjustment_new (0, 0, 59, 1, 1, 0);
-    m_spinbutton_minute = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_minute_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_minute);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_minute, 410, 60);
-    gtk_widget_set_size_request (m_spinbutton_minute, 80, 25);
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_minute), now_tm->tm_min);
-    g_signal_connect(G_OBJECT(m_spinbutton_minute), "insert_text", G_CALLBACK(on_spinbutton_insert_time), this);
-
-    spinbutton_second_adj = gtk_adjustment_new (0, 0, 59, 1, 1, 0);
-    m_spinbutton_second = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_second_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_second);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_second, 490, 60);
-    gtk_widget_set_size_request (m_spinbutton_second, 80, 25);
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_second), now_tm->tm_sec);
-    g_signal_connect(G_OBJECT(m_spinbutton_second), "insert_text", G_CALLBACK(on_spinbutton_insert_time), this);
-
-    label_time = gtk_label_new (_("Time Setting:"));
-    gtk_widget_show (label_time);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), label_time, 330, 16);
-    gtk_widget_set_size_request (label_time, 100+16, 45);
-    gtk_misc_set_alignment (GTK_MISC (label_time), 0, 0.5);
-
-    label_time_format = gtk_label_new (_("HH:MM:SS"));
-    gtk_widget_show (label_time_format);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), label_time_format, 330, 90);
-    gtk_widget_set_size_request (label_time_format, 100, 20);
-    gtk_misc_set_alignment (GTK_MISC (label_time_format), 0, 0.5);
-
-    label_datetime = gtk_label_new (_("<b>Date and Time</b>"));
-    gtk_widget_show (label_datetime);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_datetime), label_datetime);
-    gtk_label_set_use_markup (GTK_LABEL (label_datetime), TRUE);
-
-    button_adjust_time = gtk_button_new_with_mnemonic (_("Adjust Time&Date"));
-    gtk_widget_show (button_adjust_time);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), button_adjust_time, 330, 160);
-    gtk_widget_set_size_request (button_adjust_time, 145, 40);
-    g_signal_connect ((gpointer) button_adjust_time, "clicked",
-                      G_CALLBACK (on_button_adjust_time_clicked),
-                      this);
-
-    button_default = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_default);
-    gtk_fixed_put (GTK_FIXED (fixed_general), button_default, 50, 420+20);
-    gtk_widget_set_size_request (button_default, 120+28, 56-16);
-    g_signal_connect ((gpointer) button_default, "clicked", G_CALLBACK (on_button_general_default_clicked), this);
-
-    return fixed_general;
-}
 
 void ViewSystem::CommonRadioToggled(GtkToggleButton *togglebutton) {
     gboolean press = gtk_toggle_button_get_active(togglebutton);
@@ -3882,161 +4211,7 @@ string ViewSystem::specific_printer_selection() {
 }
 
 //  int date_format;
-void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
-    if (sysGeneralSetting == NULL)
-        sysGeneralSetting = new SysGeneralSetting;
 
-    string hospital_name = sysGeneralSetting->GetHospital();
-    gtk_entry_set_text(GTK_ENTRY(m_entry_hospital), hospital_name.c_str());
-
-    int index_lang = sysGeneralSetting->GetLanguage();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_language), index_lang);
-
-    int date_format = sysGeneralSetting->GetDateFormat();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), date_format);
-    int screen_saver = sysGeneralSetting->GetScreenProtect();
-    unsigned char index_screen_saver = 0;
-    switch (screen_saver) {
-    case 0:
-        index_screen_saver = 0;
-        break;
-    case 5:
-        index_screen_saver = 1;
-        break;
-    case 10:
-        index_screen_saver = 2;
-        break;
-    case 20:
-        index_screen_saver = 3;
-        break;
-    case 30:
-        index_screen_saver = 4;
-        break;
-    case 45:
-        index_screen_saver = 5;
-        break;
-    case 60:
-        index_screen_saver = 6;
-        break;
-    }
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_screen_saver), index_screen_saver);
-
-    delete sysGeneralSetting;
-}
-extern bool review_pic;
-void ViewSystem::save_general_setting() {
-    SysGeneralSetting sysGeneralSetting;
-
-    const char * hospital_name = gtk_entry_get_text(GTK_ENTRY(m_entry_hospital));
-    if (hospital_name != NULL) {                   //in order to avoid segment default
-        sysGeneralSetting.SetHospital(hospital_name);
-    }
-    int langage = sysGeneralSetting.GetLanguage();
-    int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
-    if(langage != index_lang) {
-        char str_cmd[256];
-
-        if (ZH == index_lang) {
-            setenv("LANG", "zh_CN.UTF-8", 1);
-            setenv("LANGUAGE", "zh_CN:zh", 1);
-            setlocale(LC_ALL, "zh_CN.UTF-8");
-            sprintf(str_cmd, "setxkbmap -layout %s", "us");
-            _system_(str_cmd);
-            //system("setxkbmap -layout us");
-        } else if (RU == index_lang) {
-            setenv("LANG", "ru_RU.UTF-8", 1);
-            setenv("LANGUAGE", "ru_RU:ru", 1);
-            setlocale(LC_ALL, "ru_RU.UTF-8");
-            //system("setxkbmap -layout ru");
-            sprintf(str_cmd, "setxkbmap -layout %s", "ru");
-            _system_(str_cmd);
-        } else if (PL == index_lang) {
-            setenv("LANG", "pl_PL.UTF-8", 1);
-            setenv("LANGUAGE", "pl_PL:pl", 1);
-            setlocale(LC_ALL, "pl_PL.UTF-8");
-            //system("setxkbmap -layout pl qwertz");
-            sprintf(str_cmd, "setxkbmap -layout %s", "pl qwertz");
-            _system_(str_cmd);
-        } else if (ES == index_lang) {
-            setenv("LANG", "es_ES.UTF-8", 1);
-            setenv("LANGUAGE", "es_ES:es", 1);
-            setlocale(LC_ALL, "es_ES.UTF-8");
-            //system("setxkbmap -layout es");
-            sprintf(str_cmd, "setxkbmap -layout %s", "es");
-            _system_(str_cmd);
-        }
-
-        else if (FR == index_lang) {
-            setenv("LANG", "fr_FR.UTF-8", 1);
-            setenv("LANGUAGE", "fr_FR:fr", 1);
-            setlocale(LC_ALL, "fr_FR.UTF-8");
-            //system("setxkbmap -layout fr");
-            sprintf(str_cmd, "setxkbmap -layout %s", "fr");
-            _system_(str_cmd);
-        } else if (DE == index_lang) {
-            setenv("LANG", "de_DE.UTF-8", 1);
-            setenv("LANGUAGE", "de_DE:de", 1);
-            setlocale(LC_ALL, "de_DE.UTF-8");
-            //system("setxkbmap -layout de");
-            sprintf(str_cmd, "setxkbmap -layout %s", "de");
-            _system_(str_cmd);
-        } else {
-            setenv("LANG", "en_US.UTF-8", 1);
-            setenv("LANGUAGE", "en_US:en", 1);
-            setlocale(LC_ALL, "en_US.UTF-8");
-            //system("setxkbmap -layout us");
-            sprintf(str_cmd, "setxkbmap -layout %s", "us");
-            _system_(str_cmd);
-        }
-        // setlocale(LC_NUMERIC, "en_US.UTF-8");
-        // setlocale(LC_NUMERIC, "en_US.UTF-8");
-        ChangeKeymap();
-        sysGeneralSetting.SetLanguage(index_lang);
-    }
-
-    int date_format = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_date_format));
-    sysGeneralSetting.SetDateFormat(date_format);
-    MenuArea::GetInstance()->UpdateLabel();
-    KnobMenu::GetInstance()->Update();
-    if(!review_pic) {
-        UpdateHospitalandpart(date_format, hospital_name);
-    }
-
-    int ScreenSaverIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_screen_saver));
-    sysGeneralSetting.SetScreenProtect(ScreenSaverIndex);
-
-    unsigned char ScreenSaver = 0;
-    switch (ScreenSaverIndex) {
-    case 0:
-        ScreenSaver = 0;
-        break;
-    case 1:
-        ScreenSaver = 5;
-        break;
-    case 2:
-        ScreenSaver = 10;
-        break;
-    case 3:
-        ScreenSaver = 20;
-        break;
-    case 4:
-        ScreenSaver = 30;
-        break;
-    case 5:
-        ScreenSaver = 45;
-        break;
-    case 6:
-        ScreenSaver = 60;
-        break;
-    }
-    ScreenSaver::GetInstance()->SetPeriod(ScreenSaver * 60);
-
-    sysGeneralSetting.SyncFile();
-    //update calc menu
-    g_menuCalc.UpdateLabel();
-    g_menuMeasure.UpdateLabel();
-    ViewNewPat::GetInstance()->UpdateNameLength();
-}
 
 GtkWidget* ViewSystem::create_note_options() {
     GtkWidget *fixed_options;
@@ -11227,34 +11402,9 @@ void ViewSystem::add_exam_item_column(GtkTreeView *treeview) {
     gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 }
 
-static gboolean ExitWindow(gpointer data) {
-    ViewSystem *tmp;
-    tmp = (ViewSystem *)data;
-    tmp->DestroyWindow();
-    return FALSE;
-}
 
-void ViewSystem::KeyEvent(unsigned char keyValue) {
-    FakeXEvent::KeyEvent(keyValue);
-    switch(keyValue) {
-    case KEY_ESC:
-    case KEY_SYSTEM:
-        if (!m_vgaInterl) {
-            gtk_combo_box_set_active(GTK_COMBO_BOX(ViewSystem::GetInstance()->GetVGACombobox()), 0);
-            return;
-        }
-    case KEY_P1:
-        g_timeout_add(100, ExitWindow, this);
-        FakeEscKey();
 
-        FreezeMode::GetInstance()->PressUnFreeze();
-        MultiFuncUndo();//2016.11.05--solve problem that biopsy verify don't exit.
 
-        break;
-    default:
-        break;
-    }
-}
 
 
 
@@ -11855,5 +12005,5 @@ void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
 }
 
 GtkWidget* ViewSystem::GetVGACombobox() {
-    return m_combobox_vga;
+    return GTK_WIDGET(m_combobox_vga);
 }
