@@ -168,6 +168,31 @@ GtkCheckButton* Utils::create_check_button(const string label) {
   return button;
 }
 
+GtkRadioButton* Utils::create_radio_button(GSList* group, const string label) {
+  GtkRadioButton* button = NULL;
+
+  if (label.empty()) {
+    button = GTK_RADIO_BUTTON(gtk_radio_button_new(group));
+  } else {
+    button = GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(group, label.c_str()));
+  }
+
+  set_font(gtk_bin_get_child(GTK_BIN(button)), "", "", 10);
+  gtk_button_set_alignment(GTK_BUTTON(button), 0, 0.5);
+
+  gtk_widget_set_size_request(GTK_WIDGET(button), -1, 30);
+
+  /*gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
+  gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_PRELIGHT, get_color("green"));
+  gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_SELECTED, get_color("green"));
+
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_ACTIVE, get_color("white"));
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_PRELIGHT, get_color("white"));
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_SELECTED, get_color("white"));*/
+
+  return button;
+}
+
 GtkSpinButton* Utils::create_spin_button(GtkAdjustment* adjustment, gdouble climb_rate, guint digits) {
   GtkSpinButton* spin_button = GTK_SPIN_BUTTON(gtk_spin_button_new(adjustment, climb_rate, digits));
 

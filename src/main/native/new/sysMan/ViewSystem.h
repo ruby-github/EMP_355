@@ -294,7 +294,7 @@ private:
   void KeyEvent(unsigned char keyValue);
 
   GtkWidget* create_note_general();
-  void init_general_setting(SysGeneralSetting* sysGeneralSetting);
+  void init_general_setting();
   void save_general_setting();
 
   GtkWidget* create_note_options();
@@ -359,6 +359,31 @@ private:
   GtkComboBoxText* m_combobox_date_format;
   GtkComboBoxText* m_combobox_screen_saver;
 
+  // Options
+  GtkRadioButton* m_radiobutton_tic;
+  GtkRadioButton* m_radiobutton_tib;
+  GtkRadioButton* m_radiobutton_tis;
+  GtkRadioButton* m_radiobutton_keyboard_sound_on;
+  GtkRadioButton* m_radiobutton_keyboard_sound_off;
+  GtkRadioButton* m_radiobutton_center_line_on;
+  GtkRadioButton* m_radiobutton_center_line_off;
+  GtkRadioButton* m_radiobutton_display_format_m_1;
+  GtkRadioButton* m_radiobutton_display_format_m_2;
+  GtkRadioButton* m_radiobutton_display_format_m_3;
+  GtkRadioButton* m_radiobutton_display_format_m_4;
+  GtkRadioButton* m_radiobutton_display_format_m_5;
+  GtkRadioButton* m_radiobutton_display_format_pw_cw_1;
+  GtkRadioButton* m_radiobutton_display_format_pw_cw_2;
+  GtkRadioButton* m_radiobutton_display_format_pw_cw_3;
+  GtkRadioButton* m_radiobutton_display_format_pw_cw_4;
+  GtkRadioButton* m_radiobutton_display_format_pw_cw_5;
+  GtkRadioButton* m_radiobutton_mouse_speed_high;
+  GtkRadioButton* m_radiobutton_mouse_speed_middle;
+  GtkRadioButton* m_radiobutton_mouse_speed_low;
+  GtkComboBoxText* m_combobox_img_format;
+  GtkComboBoxText* m_combobox_img_file;
+  GtkComboBoxText* m_combobox_video_format;
+  GtkComboBoxText* m_combobox_video_file;
 
 public:
     static const int MAX_KEY = 10;//8;//9;
@@ -367,13 +392,12 @@ public:
     int GetProbeType();
     int GetCommentProbeType();
     int GetKbType();
-    void UpdateHospitalandpart(int date_format, const char* hospital_name);
+    void UpdateHospitalandpart(int date_format, const string hospital_name);
 
     int get_active_user();
     void save_itemIndex(int itemIndex);
     int  get_itemIndex();
     void save_itemName(char *itemName);
-    GtkWidget* GetVGACombobox();
 
     void get_itemName(char *itemName);
     //char *get_itemName();
@@ -421,40 +445,24 @@ private:
     GtkWidget *m_treeview_common_print;
     GtkWidget *m_treeview_specific_print;
 
-    //options
-    // GtkWidget *m_radiobutton_biopsy_on;
-    // GtkWidget *m_radiobutton_biopsy_off;
-    GtkWidget *m_radiobutton_TIC;
-    GtkWidget *m_radiobutton_TIB;
-    GtkWidget *m_radiobutton_TIS;
-    GtkWidget *m_radiobutton_center_on;
-    GtkWidget *m_radiobutton_center_off;
-    GtkWidget *m_radiobutton_kb_sound_on;
-    GtkWidget *m_radiobutton_kb_sound_off;
-    GtkWidget *m_radiobutton_mouse_speed_low;
-    GtkWidget *m_radiobutton_mouse_speed_middle;
-    GtkWidget *m_radiobutton_mouse_speed_high;
-    GtkWidget *m_combobox_img_format;
-    GtkWidget *m_combobox_img_medium;
-    GtkWidget *m_combobox_img_file;
-    GtkWidget *m_combobox_video_format;
-    GtkWidget *m_combobox_video_medium;
-    GtkWidget *m_combobox_video_file;
 
-    GtkWidget *m_radiobtn_total;
+
+    /*GtkWidget *m_radiobtn_total;
     GtkWidget *m_radiobtn_ud_11;
     GtkWidget *m_radiobtn_ud_21;
     GtkWidget *m_radiobtn_ud_12;
     GtkWidget *m_radiobtn_lr_11;
+
     GtkWidget *m_radiobtn_total_pw;
     GtkWidget *m_radiobtn_ud_11_pw;
     GtkWidget *m_radiobtn_ud_21_pw;
     GtkWidget *m_radiobtn_ud_12_pw;
-    GtkWidget *m_radiobtn_lr_11_pw;
+    GtkWidget *m_radiobtn_lr_11_pw;*/
+
     GtkWidget *m_radiobtn_bm;
     GtkWidget *m_radiobtn_bpw;
-    int m_bmIndex;
-    int m_bpwIndex;
+
+
 
     //comment
     GtkWidget *m_radiobutton_font_big;

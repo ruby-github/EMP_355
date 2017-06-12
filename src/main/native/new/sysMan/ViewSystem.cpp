@@ -18,6 +18,8 @@
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/MultiFuncFactory.h"
 #include "measure/MenuMeasure.h"
+#include "patient/ImgMan.h"
+#include "patient/VideoMan.h"
 #include "patient/ViewNewPat.h"
 #include "periDevice/DCMRegister.h"
 #include "sysMan/ScreenSaver.h"
@@ -797,8 +799,6 @@ ViewSystem::ViewSystem() {
   m_p2_func_index = 0;
   m_imageItemSensitive = false;
   m_itemIndex = -1;
-  m_bmIndex = 0;
-  m_bpwIndex = 0;
   m_page_num = 0;
   m_calc_page_num = 0;
   m_itemName = NULL;
@@ -836,7 +836,7 @@ void ViewSystem::CreateWindow() {
 
   // General
   gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_general()), GTK_WIDGET(Utils::create_label(_("General"))));
-  init_general_setting(NULL);
+  init_general_setting();
 
   // Options
   gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_options()), GTK_WIDGET(Utils::create_label(_("Options"))));
@@ -1194,7 +1194,7 @@ void ViewSystem::KeyEvent(unsigned char keyValue) {
   case KEY_ESC:
   case KEY_SYSTEM:
     if (!m_vgaInterl) {
-      gtk_combo_box_set_active(GTK_COMBO_BOX(ViewSystem::GetInstance()->GetVGACombobox()), 0);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_vga), 0);
       break;
     }
   case KEY_P1:
@@ -1337,224 +1337,18 @@ GtkWidget* ViewSystem::create_note_general() {
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_general_default), this);
 
   return GTK_WIDGET(table);
-
-  /*GtkWidget *fixed_general;
-      //    GtkWidget *entry_hospital;
-      GtkWidget *label_hospital;
-      //    GtkWidget *combobox_language;
-      //    GtkWidget *combobox_screen_saver;
-      GtkWidget *label_screen_saver;
-      GtkWidget *label_date_format;
-      GtkWidget *label_language;
-
-      GtkWidget *combobox_video;
-      GtkWidget *label_video;
-      GtkWidget *label_vga;
-
-      GtkWidget *frame_datetime;
-      GtkWidget *fixed_datetime;
-      // GtkWidget *calendar;
-      GtkObject *spinbutton_hour_adj;
-      // GtkWidget *spinbutton_hour;
-      GtkObject *spinbutton_minute_adj;
-      // GtkWidget *spinbutton_minute;
-      GtkObject *spinbutton_second_adj;
-      // GtkWidget *spinbutton_second;
-      GtkWidget *label_time;
-      GtkWidget *label_datetime;
-      GtkWidget *label_time_format;
-      GtkWidget *button_adjust_time;
-      //GtkWidget *frame_print;
-
-      GtkWidget *button_default;
-
-      fixed_general = gtk_fixed_new ();
-      gtk_widget_show (fixed_general);
-
-      m_entry_hospital = gtk_entry_new ();
-      gtk_widget_show (m_entry_hospital);
-      gtk_fixed_put (GTK_FIXED (fixed_general), m_entry_hospital, 190+30, 20);
-      gtk_widget_set_size_request (m_entry_hospital, 250, 30);
-      gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_hospital), 9679);
-      gtk_entry_set_max_length(GTK_ENTRY(m_entry_hospital), 46);
-      g_signal_connect(G_OBJECT(m_entry_hospital), "insert_text", G_CALLBACK(on_entry_hospital_insert), this);
-
-      label_hospital = gtk_label_new (_("<b>Hospital Name:</b>"));
-      gtk_widget_show (label_hospital);
-      gtk_fixed_put (GTK_FIXED (fixed_general), label_hospital, 20+30, 20);
-      gtk_widget_set_size_request (label_hospital, 170, 30);
-      gtk_label_set_use_markup (GTK_LABEL (label_hospital), TRUE);
-      gtk_misc_set_alignment (GTK_MISC (label_hospital), 0.5, 0.5);
-
-      label_language = gtk_label_new (_("<b>Language:</b>"));
-      gtk_widget_show (label_language);
-      gtk_fixed_put (GTK_FIXED (fixed_general), label_language, 30+20, 350);
-      gtk_widget_set_size_request (label_language, 120, 30);
-      gtk_label_set_use_markup (GTK_LABEL (label_language), TRUE);
-      gtk_misc_set_alignment (GTK_MISC (label_language), 0.9, 0.5);
-
-      m_combobox_language = gtk_combo_box_new_text ();
-      gtk_widget_show (m_combobox_language);
-      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_language, 150+20, 350);
-      gtk_widget_set_size_request (m_combobox_language, 100, 30);
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "English");
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "中文");
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_language), "");
-
-      label_vga=gtk_label_new(_("<b>VGA Source:</b>"));
-      gtk_widget_show(label_vga);
-      gtk_fixed_put(GTK_FIXED(fixed_general),label_vga,30+20,390);
-      gtk_widget_set_size_request (label_vga, 135, 30);
-      gtk_label_set_use_markup (GTK_LABEL (label_vga), TRUE);
-      gtk_misc_set_alignment (GTK_MISC (label_vga), 0.9, 0.5);
-      m_combobox_vga= gtk_combo_box_new_text();
-      gtk_widget_show (m_combobox_vga);
-      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_vga, 165+20, 390);
-      gtk_widget_set_size_request (m_combobox_vga, 100, 30);
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("Internal"));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_vga), _("External"));
-      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_vga), 0);
-      g_signal_connect((gpointer)m_combobox_vga, "changed", G_CALLBACK (on_vga_changed), this);
-
-
-
-      label_date_format = gtk_label_new (_("<b>Date Format:</b>"));
-      gtk_widget_show (label_date_format);
-      // gtk_fixed_put (GTK_FIXED (fixed_general), label_date_format, 270, 350);
-      gtk_fixed_put (GTK_FIXED (fixed_general), label_date_format, 310-30, 350);
-      gtk_widget_set_size_request (label_date_format, 120+30, 30);
-      gtk_label_set_use_markup (GTK_LABEL (label_date_format), TRUE);
-      gtk_misc_set_alignment (GTK_MISC (label_date_format), 0.9, 0.5);
-
-      m_combobox_date_format = gtk_combo_box_new_text ();
-      gtk_widget_show (m_combobox_date_format);
-      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_date_format, 410+20, 350);
-      gtk_widget_set_size_request (m_combobox_date_format, 100, 30);
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("Y/M/D"));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("M/D/Y"));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_date_format), _("D/M/Y"));
-
-      label_screen_saver = gtk_label_new (_("<b>Screen saver:</b>"));
-      gtk_widget_show (label_screen_saver);
-      //gtk_fixed_put (GTK_FIXED (fixed_general), label_screen_saver, 510, 350);
-      gtk_fixed_put (GTK_FIXED (fixed_general), label_screen_saver, 560-30, 350);
-      gtk_widget_set_size_request (label_screen_saver, 120 +20+30, 30);
-      gtk_label_set_use_markup (GTK_LABEL (label_screen_saver), TRUE);
-      gtk_misc_set_alignment (GTK_MISC (label_screen_saver), 0.9, 0.5);
-
-      m_combobox_screen_saver = gtk_combo_box_new_text ();
-      gtk_widget_show (m_combobox_screen_saver);
-      // gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_screen_saver, 646 + 4, 350);
-      gtk_fixed_put (GTK_FIXED (fixed_general), m_combobox_screen_saver, 660+40, 350);
-      gtk_widget_set_size_request (m_combobox_screen_saver, 100, 30);
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("none"));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("5 Min."));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("10 Min."));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("20 Min."));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("30 Min."));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("45 Min."));
-      gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_screen_saver), _("60 Min."));
-
-    frame_datetime = gtk_frame_new (NULL);
-    gtk_widget_show (frame_datetime);
-    gtk_fixed_put (GTK_FIXED (fixed_general), frame_datetime, 20+30, 70);
-    gtk_widget_set_size_request (frame_datetime, 600, 240);
-    gtk_frame_set_label_align (GTK_FRAME (frame_datetime), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_datetime), GTK_SHADOW_IN);
-
-    fixed_datetime = gtk_fixed_new ();
-    gtk_widget_show (fixed_datetime);
-    gtk_container_add (GTK_CONTAINER (frame_datetime), fixed_datetime);
-
-    m_calendar = gtk_calendar_new ();
-    gtk_widget_show (m_calendar);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_calendar, 30, 15);
-    gtk_widget_set_size_request (m_calendar, 280, 190);
-
-    time_t now;
-    struct tm *now_tm;
-    time(&now);
-    now_tm = localtime(&now);
-
-    spinbutton_hour_adj = gtk_adjustment_new (0, 0, 23, 1, 1, 0);
-    m_spinbutton_hour = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_hour_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_hour);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_hour, 330, 60);
-    gtk_widget_set_size_request (m_spinbutton_hour, 80, 25);
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_hour), now_tm->tm_hour);
-    g_signal_connect(G_OBJECT(m_spinbutton_hour), "insert_text", G_CALLBACK(on_spinbutton_insert_hour), this);
-
-    spinbutton_minute_adj = gtk_adjustment_new (0, 0, 59, 1, 1, 0);
-    m_spinbutton_minute = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_minute_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_minute);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_minute, 410, 60);
-    gtk_widget_set_size_request (m_spinbutton_minute, 80, 25);
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_minute), now_tm->tm_min);
-    g_signal_connect(G_OBJECT(m_spinbutton_minute), "insert_text", G_CALLBACK(on_spinbutton_insert_time), this);
-
-    spinbutton_second_adj = gtk_adjustment_new (0, 0, 59, 1, 1, 0);
-    m_spinbutton_second = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_second_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_second);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), m_spinbutton_second, 490, 60);
-    gtk_widget_set_size_request (m_spinbutton_second, 80, 25);
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON(m_spinbutton_second), now_tm->tm_sec);
-    g_signal_connect(G_OBJECT(m_spinbutton_second), "insert_text", G_CALLBACK(on_spinbutton_insert_time), this);
-
-    label_time = gtk_label_new (_("Time Setting:"));
-    gtk_widget_show (label_time);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), label_time, 330, 16);
-    gtk_widget_set_size_request (label_time, 100+16, 45);
-    gtk_misc_set_alignment (GTK_MISC (label_time), 0, 0.5);
-
-    label_time_format = gtk_label_new (_("HH:MM:SS"));
-    gtk_widget_show (label_time_format);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), label_time_format, 330, 90);
-    gtk_widget_set_size_request (label_time_format, 100, 20);
-    gtk_misc_set_alignment (GTK_MISC (label_time_format), 0, 0.5);
-
-    label_datetime = gtk_label_new (_("<b>Date and Time</b>"));
-    gtk_widget_show (label_datetime);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_datetime), label_datetime);
-    gtk_label_set_use_markup (GTK_LABEL (label_datetime), TRUE);
-
-    button_adjust_time = gtk_button_new_with_mnemonic (_("Adjust Time&Date"));
-    gtk_widget_show (button_adjust_time);
-    gtk_fixed_put (GTK_FIXED (fixed_datetime), button_adjust_time, 330, 160);
-    gtk_widget_set_size_request (button_adjust_time, 145, 40);
-    g_signal_connect ((gpointer) button_adjust_time, "clicked",
-                      G_CALLBACK (on_button_adjust_time_clicked),
-                      this);
-
-    button_default = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_default);
-    gtk_fixed_put (GTK_FIXED (fixed_general), button_default, 50, 420+20);
-    gtk_widget_set_size_request (button_default, 120+28, 56-16);
-    g_signal_connect ((gpointer) button_default, "clicked", G_CALLBACK (on_button_general_default_clicked), this);
-
-  return fixed_general;*/
 }
 
-void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
-  if (sysGeneralSetting == NULL) {
-    sysGeneralSetting = new SysGeneralSetting();
-  }
+void ViewSystem::init_general_setting() {
+  SysGeneralSetting setting;
 
-  string hospital_name = sysGeneralSetting->GetHospital();
-  gtk_entry_set_text(GTK_ENTRY(m_entry_hospital), hospital_name.c_str());
+  gtk_entry_set_text(m_entry_hospital, setting.GetHospital().c_str());
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_language), setting.GetLanguage());
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), setting.GetDateFormat());
 
-  int index_lang = sysGeneralSetting->GetLanguage();
-  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_language), index_lang);
+  int index_screen_saver = 0;
 
-  int date_format = sysGeneralSetting->GetDateFormat();
-  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), date_format);
-  int screen_saver = sysGeneralSetting->GetScreenProtect();
-  unsigned char index_screen_saver = 0;
-
-  switch (screen_saver) {
+  switch (setting.GetScreenProtect()) {
   case 0:
     index_screen_saver = 0;
     break;
@@ -1579,126 +1373,485 @@ void ViewSystem::init_general_setting(SysGeneralSetting* sysGeneralSetting) {
   }
 
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_screen_saver), index_screen_saver);
-
-  delete sysGeneralSetting;
 }
 
 void ViewSystem::save_general_setting() {
-  SysGeneralSetting sysGeneralSetting;
+  SysGeneralSetting setting;
 
-  const char * hospital_name = gtk_entry_get_text(GTK_ENTRY(m_entry_hospital));
-  if (hospital_name != NULL) {                   //in order to avoid segment default
-    sysGeneralSetting.SetHospital(hospital_name);
+  string hospital_name = gtk_entry_get_text(m_entry_hospital);
+
+  if (!hospital_name.empty()) {
+    setting.SetHospital(hospital_name);
   }
 
-    int langage = sysGeneralSetting.GetLanguage();
-    int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
-    if(langage != index_lang) {
-        char str_cmd[256];
+  int langage = setting.GetLanguage();
+  int index_lang = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_language));
 
-        if (ZH == index_lang) {
-            setenv("LANG", "zh_CN.UTF-8", 1);
-            setenv("LANGUAGE", "zh_CN:zh", 1);
-            setlocale(LC_ALL, "zh_CN.UTF-8");
-            sprintf(str_cmd, "setxkbmap -layout %s", "us");
-            _system_(str_cmd);
-            //system("setxkbmap -layout us");
-        } else if (RU == index_lang) {
-            setenv("LANG", "ru_RU.UTF-8", 1);
-            setenv("LANGUAGE", "ru_RU:ru", 1);
-            setlocale(LC_ALL, "ru_RU.UTF-8");
-            //system("setxkbmap -layout ru");
-            sprintf(str_cmd, "setxkbmap -layout %s", "ru");
-            _system_(str_cmd);
-        } else if (PL == index_lang) {
-            setenv("LANG", "pl_PL.UTF-8", 1);
-            setenv("LANGUAGE", "pl_PL:pl", 1);
-            setlocale(LC_ALL, "pl_PL.UTF-8");
-            //system("setxkbmap -layout pl qwertz");
-            sprintf(str_cmd, "setxkbmap -layout %s", "pl qwertz");
-            _system_(str_cmd);
-        } else if (ES == index_lang) {
-            setenv("LANG", "es_ES.UTF-8", 1);
-            setenv("LANGUAGE", "es_ES:es", 1);
-            setlocale(LC_ALL, "es_ES.UTF-8");
-            //system("setxkbmap -layout es");
-            sprintf(str_cmd, "setxkbmap -layout %s", "es");
-            _system_(str_cmd);
-        }
+  if (langage != index_lang) {
+    string str_cmd = "setxkbmap -layout ";
 
-        else if (FR == index_lang) {
-            setenv("LANG", "fr_FR.UTF-8", 1);
-            setenv("LANGUAGE", "fr_FR:fr", 1);
-            setlocale(LC_ALL, "fr_FR.UTF-8");
-            //system("setxkbmap -layout fr");
-            sprintf(str_cmd, "setxkbmap -layout %s", "fr");
-            _system_(str_cmd);
-        } else if (DE == index_lang) {
-            setenv("LANG", "de_DE.UTF-8", 1);
-            setenv("LANGUAGE", "de_DE:de", 1);
-            setlocale(LC_ALL, "de_DE.UTF-8");
-            //system("setxkbmap -layout de");
-            sprintf(str_cmd, "setxkbmap -layout %s", "de");
-            _system_(str_cmd);
-        } else {
-            setenv("LANG", "en_US.UTF-8", 1);
-            setenv("LANGUAGE", "en_US:en", 1);
-            setlocale(LC_ALL, "en_US.UTF-8");
-            //system("setxkbmap -layout us");
-            sprintf(str_cmd, "setxkbmap -layout %s", "us");
-            _system_(str_cmd);
-        }
-        // setlocale(LC_NUMERIC, "en_US.UTF-8");
-        // setlocale(LC_NUMERIC, "en_US.UTF-8");
-        ChangeKeymap();
-        sysGeneralSetting.SetLanguage(index_lang);
+    if (index_lang == ZH) {
+      setenv("LANG", "zh_CN.UTF-8", 1);
+      setenv("LANGUAGE", "zh_CN:zh", 1);
+      setlocale(LC_ALL, "zh_CN.UTF-8");
+      _system_(str_cmd + "us");
+    } else if (index_lang == RU) {
+      setenv("LANG", "ru_RU.UTF-8", 1);
+      setenv("LANGUAGE", "ru_RU:ru", 1);
+      setlocale(LC_ALL, "ru_RU.UTF-8");
+      _system_(str_cmd + "ru");
+    } else if (index_lang == PL) {
+      setenv("LANG", "pl_PL.UTF-8", 1);
+      setenv("LANGUAGE", "pl_PL:pl", 1);
+      setlocale(LC_ALL, "pl_PL.UTF-8");
+      _system_(str_cmd + "pl qwertz");
+    } else if (index_lang == ES) {
+      setenv("LANG", "es_ES.UTF-8", 1);
+      setenv("LANGUAGE", "es_ES:es", 1);
+      setlocale(LC_ALL, "es_ES.UTF-8");
+      _system_(str_cmd + "es");
+    } else if (index_lang == FR) {
+      setenv("LANG", "fr_FR.UTF-8", 1);
+      setenv("LANGUAGE", "fr_FR:fr", 1);
+      setlocale(LC_ALL, "fr_FR.UTF-8");
+      _system_(str_cmd + "fr");
+    } else if (index_lang == DE) {
+      setenv("LANG", "de_DE.UTF-8", 1);
+      setenv("LANGUAGE", "de_DE:de", 1);
+      setlocale(LC_ALL, "de_DE.UTF-8");
+      _system_(str_cmd + "de");
+    } else {
+      setenv("LANG", "en_US.UTF-8", 1);
+      setenv("LANGUAGE", "en_US:en", 1);
+      setlocale(LC_ALL, "en_US.UTF-8");
+      _system_(str_cmd + "us");
     }
 
-    int date_format = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_date_format));
-    sysGeneralSetting.SetDateFormat(date_format);
-    MenuArea::GetInstance()->UpdateLabel();
-    KnobMenu::GetInstance()->Update();
-    if(!g_review_pic) {
-        UpdateHospitalandpart(date_format, hospital_name);
-    }
+    ChangeKeymap();
+    setting.SetLanguage(index_lang);
+  }
 
-    int ScreenSaverIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_screen_saver));
-    sysGeneralSetting.SetScreenProtect(ScreenSaverIndex);
+  int date_format = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_date_format));
+  setting.SetDateFormat(date_format);
+  MenuArea::GetInstance()->UpdateLabel();
+  KnobMenu::GetInstance()->Update();
+  if(!g_review_pic) {
+    UpdateHospitalandpart(date_format, hospital_name);
+  }
 
-    unsigned char ScreenSaver = 0;
-    switch (ScreenSaverIndex) {
-    case 0:
-        ScreenSaver = 0;
-        break;
-    case 1:
-        ScreenSaver = 5;
-        break;
-    case 2:
-        ScreenSaver = 10;
-        break;
-    case 3:
-        ScreenSaver = 20;
-        break;
-    case 4:
-        ScreenSaver = 30;
-        break;
-    case 5:
-        ScreenSaver = 45;
-        break;
-    case 6:
-        ScreenSaver = 60;
-        break;
-    }
-    ScreenSaver::GetInstance()->SetPeriod(ScreenSaver * 60);
+  int screenSaverIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_screen_saver));
+  setting.SetScreenProtect(screenSaverIndex);
 
-    sysGeneralSetting.SyncFile();
-    //update calc menu
-    g_menuCalc.UpdateLabel();
-    g_menuMeasure.UpdateLabel();
-    ViewNewPat::GetInstance()->UpdateNameLength();
+  int screenSaver = 0;
+
+  switch (screenSaverIndex) {
+  case 0:
+    screenSaver = 0;
+    break;
+  case 1:
+    screenSaver = 5;
+    break;
+  case 2:
+    screenSaver = 10;
+    break;
+  case 3:
+    screenSaver = 20;
+    break;
+  case 4:
+    screenSaver = 30;
+    break;
+  case 5:
+    screenSaver = 45;
+    break;
+  case 6:
+    screenSaver = 60;
+    break;
+  }
+
+  ScreenSaver::GetInstance()->SetPeriod(screenSaver * 60);
+
+  setting.SyncFile();
+
+  // update calc menu
+  g_menuCalc.UpdateLabel();
+  g_menuMeasure.UpdateLabel();
+  ViewNewPat::GetInstance()->UpdateNameLength();
 }
 
+GtkWidget* ViewSystem::create_note_options() {
+  GtkTable* table = Utils::create_table(10, 6);
 
+  // TI
+  GtkFrame* frame_ti = Utils::create_frame(_("TI"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_ti), 0, 2, 0, 2);
+
+  gtk_widget_set_sensitive(GTK_WIDGET(frame_ti), FALSE);
+
+  GtkTable* table_ti = Utils::create_table(1, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_ti), 5);
+  gtk_container_add(GTK_CONTAINER(frame_ti), GTK_WIDGET(table_ti));
+
+  m_radiobutton_tic = Utils::create_radio_button(NULL, _("TIC"));
+  GSList* radiobutton_ti_group = gtk_radio_button_get_group(m_radiobutton_tic);
+  m_radiobutton_tib = Utils::create_radio_button(radiobutton_ti_group, _("TIB"));
+  radiobutton_ti_group = gtk_radio_button_get_group(m_radiobutton_tib);
+  m_radiobutton_tis = Utils::create_radio_button(radiobutton_ti_group, _("TIS"));
+
+  gtk_table_attach_defaults(table_ti, GTK_WIDGET(m_radiobutton_tic), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_ti, GTK_WIDGET(m_radiobutton_tib), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_ti, GTK_WIDGET(m_radiobutton_tis), 2, 3, 0, 1);
+
+  // Keyboard Sound
+  GtkFrame* frame_keyboard_sound = Utils::create_frame(_("Keyboard Sound"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_keyboard_sound), 2, 4, 0, 2);
+
+  GtkTable* table_keyboard_sound = Utils::create_table(1, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_keyboard_sound), 5);
+  gtk_container_add(GTK_CONTAINER(frame_keyboard_sound), GTK_WIDGET(table_keyboard_sound));
+
+  m_radiobutton_keyboard_sound_on = Utils::create_radio_button(NULL, _("ON"));
+  GSList* radiobutton_keyboard_sound_group = gtk_radio_button_get_group(m_radiobutton_keyboard_sound_on);
+  m_radiobutton_keyboard_sound_off = Utils::create_radio_button(radiobutton_keyboard_sound_group, _("OFF"));
+
+  gtk_table_attach_defaults(table_keyboard_sound, GTK_WIDGET(m_radiobutton_keyboard_sound_on), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_keyboard_sound, GTK_WIDGET(m_radiobutton_keyboard_sound_off), 1, 2, 0, 1);
+
+  // Center Line
+  GtkFrame* frame_center_line = Utils::create_frame(_("Center Line"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_center_line), 4, 6, 0, 2);
+
+  GtkTable* table_center_line = Utils::create_table(1, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_center_line), 5);
+  gtk_container_add(GTK_CONTAINER(frame_center_line), GTK_WIDGET(table_center_line));
+
+  m_radiobutton_center_line_on = Utils::create_radio_button(NULL, _("ON"));
+  GSList* radiobutton_center_line_group = gtk_radio_button_get_group(m_radiobutton_center_line_on);
+  m_radiobutton_center_line_off = Utils::create_radio_button(radiobutton_center_line_group, _("OFF"));
+
+  gtk_table_attach_defaults(table_center_line, GTK_WIDGET(m_radiobutton_center_line_on), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_center_line, GTK_WIDGET(m_radiobutton_center_line_off), 1, 2, 0, 1);
+
+  // Display Format
+  GtkFrame* frame_display_format = Utils::create_frame(_("Display Format"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_display_format), 0, 4, 2, 6);
+
+  GtkTable* table_display_format = Utils::create_table(2, 6);
+  gtk_container_set_border_width(GTK_CONTAINER(table_display_format), 5);
+  gtk_container_add(GTK_CONTAINER(frame_display_format), GTK_WIDGET(table_display_format));
+
+  GtkLabel* label_display_format_m = Utils::create_label(_("M:"));
+
+  m_radiobutton_display_format_m_1 = Utils::create_radio_button(NULL);
+  GSList* radiobutton_display_format_m_group = gtk_radio_button_get_group(m_radiobutton_display_format_m_1);
+  m_radiobutton_display_format_m_2 = Utils::create_radio_button(radiobutton_display_format_m_group);
+  radiobutton_display_format_m_group = gtk_radio_button_get_group(m_radiobutton_display_format_m_2);
+  m_radiobutton_display_format_m_3 = Utils::create_radio_button(radiobutton_display_format_m_group);
+  radiobutton_display_format_m_group = gtk_radio_button_get_group(m_radiobutton_display_format_m_3);
+  m_radiobutton_display_format_m_4 = Utils::create_radio_button(radiobutton_display_format_m_group);
+  radiobutton_display_format_m_group = gtk_radio_button_get_group(m_radiobutton_display_format_m_4);
+  m_radiobutton_display_format_m_5 = Utils::create_radio_button(radiobutton_display_format_m_group);
+
+  GtkLabel* label_display_format_pw_cw = Utils::create_label(_("PW/CW"));
+
+  m_radiobutton_display_format_pw_cw_1 = Utils::create_radio_button(NULL);
+  GSList* radiobutton_display_format_pw_cw_group = gtk_radio_button_get_group(m_radiobutton_display_format_pw_cw_1);
+  m_radiobutton_display_format_pw_cw_2 = Utils::create_radio_button(radiobutton_display_format_pw_cw_group);
+  radiobutton_display_format_pw_cw_group = gtk_radio_button_get_group(m_radiobutton_display_format_pw_cw_2);
+  m_radiobutton_display_format_pw_cw_3 = Utils::create_radio_button(radiobutton_display_format_pw_cw_group);
+  radiobutton_display_format_pw_cw_group = gtk_radio_button_get_group(m_radiobutton_display_format_pw_cw_3);
+  m_radiobutton_display_format_pw_cw_4 = Utils::create_radio_button(radiobutton_display_format_pw_cw_group);
+  radiobutton_display_format_pw_cw_group = gtk_radio_button_get_group(m_radiobutton_display_format_pw_cw_4);
+  m_radiobutton_display_format_pw_cw_5 = Utils::create_radio_button(radiobutton_display_format_pw_cw_group);
+
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(label_display_format_m), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_m_1), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_m_2), 2, 3, 0, 1);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_m_3), 3, 4, 0, 1);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_m_4), 4, 5, 0, 1);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_m_5), 5, 6, 0, 1);
+
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(label_display_format_pw_cw), 0, 1, 1, 2);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_pw_cw_1), 1, 2, 1, 2);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_pw_cw_2), 2, 3, 1, 2);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_pw_cw_3), 3, 4, 1, 2);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_pw_cw_4), 4, 5, 1, 2);
+  gtk_table_attach_defaults(table_display_format, GTK_WIDGET(m_radiobutton_display_format_pw_cw_5), 5, 6, 1, 2);
+
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_m_1), Utils::create_image("./res/btn_format/1.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_m_2), Utils::create_image("./res/btn_format/2.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_m_3), Utils::create_image("./res/btn_format/3.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_m_4), Utils::create_image("./res/btn_format/4.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_m_5), Utils::create_image("./res/btn_format/5.jpg", 30, 30));
+
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_pw_cw_1), Utils::create_image("./res/btn_format/1.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_pw_cw_2), Utils::create_image("./res/btn_format/2.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_pw_cw_3), Utils::create_image("./res/btn_format/3.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_pw_cw_4), Utils::create_image("./res/btn_format/4.jpg", 30, 30));
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_display_format_pw_cw_5), Utils::create_image("./res/btn_format/5.jpg", 30, 30));
+
+  // Mouse Speed
+  GtkFrame* frame_mouse_speed = Utils::create_frame(_("Mouse Speed"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_mouse_speed), 4, 6, 2, 6);
+
+  GtkTable* table_mouse_speed = Utils::create_table(3, 1);
+  gtk_container_set_border_width(GTK_CONTAINER(table_mouse_speed), 5);
+  gtk_container_add(GTK_CONTAINER(frame_mouse_speed), GTK_WIDGET(table_mouse_speed));
+
+  m_radiobutton_mouse_speed_high = Utils::create_radio_button(NULL, _("High"));
+  GSList* radiobutton_mouse_speed_group = gtk_radio_button_get_group(m_radiobutton_mouse_speed_high);
+  m_radiobutton_mouse_speed_middle = Utils::create_radio_button(radiobutton_mouse_speed_group, _("Middle"));
+  radiobutton_mouse_speed_group = gtk_radio_button_get_group(m_radiobutton_mouse_speed_middle);
+  m_radiobutton_mouse_speed_low = Utils::create_radio_button(radiobutton_mouse_speed_group, _("Low"));
+
+  gtk_table_attach_defaults(table_mouse_speed, GTK_WIDGET(m_radiobutton_mouse_speed_high), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_mouse_speed, GTK_WIDGET(m_radiobutton_mouse_speed_middle), 0, 1, 1, 2);
+  gtk_table_attach_defaults(table_mouse_speed, GTK_WIDGET(m_radiobutton_mouse_speed_low), 0, 1, 2, 3);
+
+  // Image Options
+  GtkFrame* frame_image_options = Utils::create_frame(_("Image Options"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_image_options), 0, 3, 6, 9);
+
+  GtkTable* table_image_options = Utils::create_table(2, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_image_options), 5);
+  gtk_container_add(GTK_CONTAINER(frame_image_options), GTK_WIDGET(table_image_options));
+
+  GtkLabel* label_img_format = Utils::create_label(_("Storage format:"));
+  m_combobox_img_format = Utils::create_combobox_text();
+  GtkLabel* label_img_file = Utils::create_label(_("File name:"));
+  m_combobox_img_file = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_image_options, GTK_WIDGET(label_img_format), 0, 1, 0, 1);
+  gtk_table_attach(table_image_options, GTK_WIDGET(m_combobox_img_format), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_image_options, GTK_WIDGET(label_img_file), 0, 1, 1, 2);
+  gtk_table_attach(table_image_options, GTK_WIDGET(m_combobox_img_file), 1, 2, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_img_format, _("BMP"));
+  gtk_combo_box_text_append_text(m_combobox_img_format, _("JPEG"));
+  gtk_combo_box_text_append_text(m_combobox_img_format, _("EMP"));
+
+  gtk_combo_box_text_append_text(m_combobox_img_file, _("Manual"));
+  gtk_combo_box_text_append_text(m_combobox_img_file, _("Auto"));
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_file), 0);
+
+  // Video Options
+  GtkFrame* frame_video_options = Utils::create_frame(_("Video Options"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_video_options), 3, 6, 6, 9);
+
+  GtkTable* table_video_options = Utils::create_table(2, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_video_options), 5);
+  gtk_container_add(GTK_CONTAINER(frame_video_options), GTK_WIDGET(table_video_options));
+
+  GtkLabel* label_video_format = Utils::create_label(_("Storage format:"));
+  m_combobox_video_format = Utils::create_combobox_text();
+  GtkLabel* label_video_file = Utils::create_label(_("File name:"));
+  m_combobox_video_file = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_video_options, GTK_WIDGET(label_video_format), 0, 1, 0, 1);
+  gtk_table_attach(table_video_options, GTK_WIDGET(m_combobox_video_format), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_video_options, GTK_WIDGET(label_video_file), 0, 1, 1, 2);
+  gtk_table_attach(table_video_options, GTK_WIDGET(m_combobox_video_file), 1, 2, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_video_format, _("AVI"));
+  gtk_combo_box_text_append_text(m_combobox_video_format, _("CINE"));
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_format), 1);
+
+  gtk_combo_box_text_append_text(m_combobox_video_file, _("Manual"));
+  gtk_combo_box_text_append_text(m_combobox_video_file, _("Auto"));
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_file), 0);
+
+  // Default Factory
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_default, "clicked", G_CALLBACK(on_button_options_default_clicked), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_option_setting(SysOptions* sysOptions) {
+  if (sysOptions == NULL) {
+    sysOptions = new SysOptions();
+  }
+
+  int index_TI_type = sysOptions->GetTI();
+
+  if (index_TI_type == 0) {
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_tic), TRUE);
+  } else if (index_TI_type == 1) {
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_tib), TRUE);
+  } else if (index_TI_type == 2) {
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_tis), TRUE);
+  }
+
+  int index_keyboard_sound = sysOptions->GetKeyboardSound();
+
+  if (index_keyboard_sound == 0) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_keyboard_sound_on), TRUE);
+  } else {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_keyboard_sound_off), TRUE);
+  }
+
+  int index_center_display = sysOptions->GetCenterLine();
+
+  if (index_center_display == 0) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_line_on), TRUE);
+  } else {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_line_off), TRUE);
+  }
+
+  int mIndex = sysOptions->GetDisplayFormatM();
+  int pwIndex = sysOptions->GetDisplayFormatPW();
+
+  if (mIndex == 0) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_1), TRUE);
+  } else if (mIndex == 1) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_2), TRUE);
+  } else if (mIndex == 2) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_3), TRUE);
+  } else if (mIndex == 3) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_4), TRUE);
+  } else {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_5), TRUE);
+  }
+
+  if (pwIndex == 0) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_1), TRUE);
+  } else if (pwIndex == 1) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_2), TRUE);
+  } else if (pwIndex == 2) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_3), TRUE);
+  } else if (pwIndex == 3) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_4), TRUE);
+  } else {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_5), TRUE);
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_format), sysOptions->GetImageFormat());
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_file), sysOptions->GetImageAutoName());
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_format), sysOptions->GetCineFormat());
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_file), sysOptions->GetCineAutoName());
+
+  int mouse_speed = sysOptions->GetMouseSpeed();
+
+  if (mouse_speed <= 0) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_high), TRUE);
+  } else if (mouse_speed == 1) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_middle), TRUE);
+  } else if (mouse_speed >= 2) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_low), TRUE);
+  }
+
+  delete sysOptions;
+}
+
+void ViewSystem::save_option_setting() {
+  SysOptions sysOptions;
+
+  int TIIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_tic))) {
+    TIIndex = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_tib))) {
+    TIIndex = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_tis))) {
+    TIIndex = 2;
+  } else {
+  }
+
+  sysOptions.SetTI(TIIndex);
+
+  int kbSoundIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_keyboard_sound_on))) {
+    kbSoundIndex = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_keyboard_sound_off))) {
+    kbSoundIndex = 1;
+  } else {
+  }
+
+  sysOptions.SetKeyboardSound(kbSoundIndex);
+
+  if (kbSoundIndex) {
+    KeyboardSound(false);
+  } else {
+    KeyboardSound(true);
+  }
+
+  int centerLineIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_line_on))) {
+    centerLineIndex = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_line_off))) {
+    centerLineIndex = 1;
+  } else {
+  }
+
+  sysOptions.SetCenterLine(centerLineIndex);
+
+  int mouseSpeed = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_high))) {
+    mouseSpeed = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_middle))) {
+    mouseSpeed = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_low))) {
+    mouseSpeed = 2;
+  }
+
+  sysOptions.SetMouseSpeed(mouseSpeed);
+  g_keyInterface.SetMouseSpeed(mouseSpeed);
+
+  int mIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_1))) {
+    mIndex = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_2))) {
+    mIndex = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_3))) {
+    mIndex = 2;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_4))) {
+    mIndex = 3;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_m_5))) {
+    mIndex = 4;
+  } else {
+  }
+
+  sysOptions.SetDisplayFormatM(mIndex);
+
+  int pwIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_1))) {
+    pwIndex = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_2))) {
+    pwIndex = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_3))) {
+    pwIndex = 2;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_4))) {
+    pwIndex = 3;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_display_format_pw_cw_5))) {
+    pwIndex = 4;
+  }
+
+  sysOptions.SetDisplayFormatPW(pwIndex);
+
+  int imgFormatIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_img_format));
+  int imgFileIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_img_file));
+  sysOptions.SetImageFormat(imgFormatIndex);
+  sysOptions.SetImageAutoName(imgFileIndex);
+
+  int videoFormatIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video_format));
+  int videoFileIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video_file));
+  sysOptions.SetCineFormat(videoFormatIndex);
+  sysOptions.SetCineAutoName(videoFileIndex);
+
+  sysOptions.SyncFile();
+
+  ImgMan::GetInstance()->SetImgFormat(imgFormatIndex);
+  ImgMan::GetInstance()->SetImgNameMode(imgFileIndex);
+  VideoMan::GetInstance()->SetVideoFormat(videoFormatIndex);
+  VideoMan::GetInstance()->SetVideoNameMode(videoFileIndex);
+}
 
 
 #include "periDevice/DCMMan.h"
@@ -1718,16 +1871,10 @@ void ViewSystem::save_general_setting() {
 #include "periDevice/NetworkMan.h"
 
 #include "display/TopArea.h"
-
-
-
-
-
 #include "patient/PatientInfo.h"
 #include "sysMan/SysDicomSetting.h"
 #include "sysMan/SysUserDefinedKey.h"
-#include "patient/ImgMan.h"
-#include "patient/VideoMan.h"
+
 #include "imageControl/ImgPw.h"
 #include "imageControl/ImgCfm.h"
 #include "imageProc/ImgProc2D.h"
@@ -4048,21 +4195,20 @@ void ViewSystem::CommonTreeviewSelectionChanged(GtkTreeSelection *treeselection)
     }
 }
 
-void ViewSystem::ModebmRadioToggled(GtkToggleButton *togglebutton) {
-    int index_display_format = 0;
-    SysOptions sysOp;
-    index_display_format = sysOp.GetDisplayFormatM();
+/*void ViewSystem::ModebmRadioToggled(GtkToggleButton* togglebutton) {
+  SysOptions sysOp;
+  int index_display_format = sysOp.GetDisplayFormatM();
 
-    if (index_display_format == 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_total), TRUE);
-    else if (index_display_format == 1)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_11), TRUE);
-    else if (index_display_format == 2)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_21), TRUE);
-    else if (index_display_format == 3)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_12), TRUE);
-    else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_lr_11), TRUE);
+  if (index_display_format == 0)
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_total), TRUE);
+  else if (index_display_format == 1)
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_11), TRUE);
+  else if (index_display_format == 2)
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_21), TRUE);
+  else if (index_display_format == 3)
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_12), TRUE);
+  else
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_lr_11), TRUE);
 }
 
 void ViewSystem::ModebpwRadioToggled(GtkToggleButton *togglebutton) {
@@ -4079,9 +4225,9 @@ void ViewSystem::ModebpwRadioToggled(GtkToggleButton *togglebutton) {
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_12_pw), TRUE);
     else
         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_lr_11_pw), TRUE);
-}
+}*/
 
-void ViewSystem::OnRadiobtnDisplay_total(GtkToggleButton *togglebutton) {
+/*void ViewSystem::OnRadiobtnDisplay_total(GtkToggleButton *togglebutton) {
     SysOptions sysOp;
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_bm))) {
         m_bmIndex = 0;
@@ -4153,7 +4299,7 @@ void ViewSystem::OnRadiobtnDisplay_lr11(GtkToggleButton *togglebutton) {
         sysOp.SetDisplayFormatPW(m_bpwIndex);
     }
     sysOp.SyncFile();
-}
+}*/
 
 void ViewSystem::SpecificTreeviewSelectionChanged(GtkTreeSelection *treeselection) {
     GtkTreeModel *model;
@@ -4213,746 +4359,7 @@ string ViewSystem::specific_printer_selection() {
 //  int date_format;
 
 
-GtkWidget* ViewSystem::create_note_options() {
-    GtkWidget *fixed_options;
 
-    GtkWidget *frame_TI;
-    GtkWidget *hbox_TI;
-    GSList *radiobutton_TI_group = NULL;
-
-    GtkWidget *label_TI;
-    GtkWidget *frame_center_line;
-    GtkWidget *hbox_center;
-
-    GtkWidget *frame_display_format;
-    GtkWidget *label_display_foramt;
-
-    GSList *radiobutton_center_group = NULL;
-
-    //GtkWidget *m_radiobutton_center_on;
-    //GtkWidget *m_radiobutton_center_off;
-    GtkWidget *label_center_line;
-    GtkWidget *frame_kb_sound;
-    GtkWidget *hbox_kb_sound;
-    //GtkWidget *m_radiobutton_kb_sound_on;
-
-    GSList *radiobutton_kb_sound_group = NULL;
-    //GtkWidget *m_radiobutton_kb_sound_off;
-
-    GtkWidget *label_kb_sound;
-    GtkWidget *button_default_options;
-    GtkWidget *frame_image_options;
-    GtkWidget *table_img_options;
-
-    GtkWidget *hbox_display_format;
-    GSList *radiobtn_display_format_group_bm = NULL;
-    GSList *radiobtn_display_format_group_bpw = NULL;
-
-    //GtkWidget *combobox_img_format;
-    //GtkWidget *combobox_img_medium;
-    //GtkWidget *combobox_img_file;
-
-    GtkWidget *label_img_file;
-    //GtkWidget *label_img_medium;
-
-    GtkWidget *label_img_format;
-    GtkWidget *label_image_options;
-    GtkWidget *frame_video_options;
-    GtkWidget *table_video_options;
-
-    //GtkWidget *combobox_video_format;
-    //GtkWidget *combobox_video_medium;
-
-    GtkWidget *label_video_file;
-    //GtkWidget *label_video_medium;
-    GtkWidget *label_video_format;
-    //GtkWidget *combobox_video_file;
-
-    GtkWidget *label_video_options;
-    GtkWidget *fixed_display_format;
-    GtkWidget *label_mode_bm;
-    GtkWidget *label_mode_bpw;
-
-    fixed_options = gtk_fixed_new ();
-    gtk_widget_show (fixed_options);
-
-    // TI
-    frame_TI = gtk_frame_new (NULL);
-    gtk_widget_show (frame_TI);
-    //gtk_fixed_put (GTK_FIXED (fixed_options), frame_TI, 30, 30);
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_TI, 50, 30);
-    gtk_widget_set_size_request (frame_TI, 170, 60);
-
-    gtk_frame_set_label_align (GTK_FRAME (frame_TI), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_TI), GTK_SHADOW_IN);
-    gtk_widget_set_sensitive(frame_TI, FALSE);
-
-    label_TI = gtk_label_new (_("<b>TI</b>"));
-    gtk_widget_show (label_TI);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_TI), label_TI);
-    gtk_label_set_use_markup (GTK_LABEL (label_TI), TRUE);
-
-    hbox_TI = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_TI);
-    gtk_container_add (GTK_CONTAINER (frame_TI), hbox_TI);
-
-    m_radiobutton_TIC = gtk_radio_button_new_with_mnemonic (NULL, _("TIC"));
-    gtk_widget_show (m_radiobutton_TIC);
-    gtk_box_pack_start (GTK_BOX (hbox_TI), m_radiobutton_TIC, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_TIC), radiobutton_TI_group);
-    radiobutton_TI_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_TIC));
-
-    m_radiobutton_TIB = gtk_radio_button_new_with_mnemonic (NULL, _("TIB"));
-    gtk_widget_show (m_radiobutton_TIB);
-    gtk_box_pack_start (GTK_BOX (hbox_TI), m_radiobutton_TIB, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_TIB), radiobutton_TI_group);
-    radiobutton_TI_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_TIB));
-
-    m_radiobutton_TIS = gtk_radio_button_new_with_mnemonic (NULL, _("TIS"));
-    gtk_widget_show (m_radiobutton_TIS);
-    gtk_box_pack_start (GTK_BOX (hbox_TI), m_radiobutton_TIS, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_TIS), radiobutton_TI_group);
-    radiobutton_TI_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_TIS));
-
-    // center line
-    frame_center_line = gtk_frame_new (NULL);
-    gtk_widget_show (frame_center_line);
-    //gtk_fixed_put (GTK_FIXED (fixed_options), frame_center_line, 30, 120); //lihuamei 2012.09.28
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_center_line, 500+50, 30);
-    gtk_widget_set_size_request (frame_center_line, 170, 60);
-
-    gtk_frame_set_label_align (GTK_FRAME (frame_center_line), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_center_line), GTK_SHADOW_IN);
-
-    label_center_line = gtk_label_new (_("<b>Center Line</b>"));
-    gtk_widget_show (label_center_line);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_center_line), label_center_line);
-    gtk_label_set_use_markup (GTK_LABEL (label_center_line), TRUE);
-
-    hbox_center = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_center);
-    gtk_container_add (GTK_CONTAINER (frame_center_line), hbox_center);
-
-    m_radiobutton_center_on = gtk_radio_button_new_with_mnemonic (NULL, _("ON"));
-    gtk_widget_show (m_radiobutton_center_on);
-    gtk_box_pack_start (GTK_BOX (hbox_center), m_radiobutton_center_on, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_center_on), radiobutton_center_group);
-    radiobutton_center_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_center_on));
-
-    m_radiobutton_center_off = gtk_radio_button_new_with_mnemonic (NULL, _("OFF"));
-    gtk_widget_show (m_radiobutton_center_off);
-    gtk_box_pack_start (GTK_BOX (hbox_center), m_radiobutton_center_off, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_center_off), radiobutton_center_group);
-    radiobutton_center_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_center_off));
-
-    // sound of keyboard
-    frame_kb_sound = gtk_frame_new (NULL);
-    gtk_widget_show (frame_kb_sound);
-    // gtk_fixed_put (GTK_FIXED (fixed_options), frame_kb_sound, 240, 30);
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_kb_sound, 300, 30);
-    gtk_widget_set_size_request (frame_kb_sound, 170, 60);
-
-    gtk_frame_set_label_align (GTK_FRAME (frame_kb_sound), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_kb_sound), GTK_SHADOW_IN);
-
-    label_kb_sound = gtk_label_new (_("<b>Keyboard Sound</b>"));
-    gtk_widget_show (label_kb_sound);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_kb_sound), label_kb_sound);
-    gtk_label_set_use_markup (GTK_LABEL (label_kb_sound), TRUE);
-
-    hbox_kb_sound = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_kb_sound);
-    gtk_container_add (GTK_CONTAINER (frame_kb_sound), hbox_kb_sound);
-
-    m_radiobutton_kb_sound_on = gtk_radio_button_new_with_mnemonic (NULL, _("ON"));
-    gtk_widget_show (m_radiobutton_kb_sound_on);
-    gtk_box_pack_start (GTK_BOX (hbox_kb_sound), m_radiobutton_kb_sound_on, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_kb_sound_on), radiobutton_kb_sound_group);
-    radiobutton_kb_sound_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_kb_sound_on));
-
-    m_radiobutton_kb_sound_off = gtk_radio_button_new_with_mnemonic (NULL, _("OFF"));
-    gtk_widget_show (m_radiobutton_kb_sound_off);
-    gtk_box_pack_start (GTK_BOX (hbox_kb_sound), m_radiobutton_kb_sound_off, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_kb_sound_off), radiobutton_kb_sound_group);
-    radiobutton_kb_sound_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_kb_sound_off));
-
-    // mouse speed
-    GtkWidget *frame_mouse_speed = gtk_frame_new (_("<b>Mouse Speed</b>"));
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_mouse_speed, 660, 120);
-    gtk_widget_set_size_request (frame_mouse_speed, 160, 160);
-
-    gtk_frame_set_label_align (GTK_FRAME (frame_mouse_speed), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_mouse_speed), GTK_SHADOW_IN);
-    gtk_label_set_use_markup (GTK_LABEL(GTK_FRAME (frame_mouse_speed)->label_widget), TRUE);
-    GtkWidget *fixed_mouse_speed = gtk_fixed_new();
-    gtk_container_add(GTK_CONTAINER(frame_mouse_speed), fixed_mouse_speed);
-
-    GtkWidget *vbox_mouse_speed = gtk_vbox_new (TRUE, 20);
-    gtk_fixed_put (GTK_FIXED (fixed_mouse_speed), vbox_mouse_speed, 30, 20);
-
-    m_radiobutton_mouse_speed_low = gtk_radio_button_new_with_mnemonic (NULL, _("Low"));
-    gtk_box_pack_start (GTK_BOX (vbox_mouse_speed), m_radiobutton_mouse_speed_low, FALSE, FALSE, 0);
-
-    GSList *mouse_speed_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_mouse_speed_low));
-    m_radiobutton_mouse_speed_middle = gtk_radio_button_new_with_mnemonic (mouse_speed_group, _("Middle"));
-    gtk_box_pack_start (GTK_BOX (vbox_mouse_speed), m_radiobutton_mouse_speed_middle, FALSE, FALSE, 0);
-
-    mouse_speed_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_mouse_speed_low));
-    m_radiobutton_mouse_speed_high = gtk_radio_button_new_with_mnemonic (mouse_speed_group, _("High"));
-    gtk_box_pack_start (GTK_BOX (vbox_mouse_speed), m_radiobutton_mouse_speed_high, FALSE, FALSE, 0);
-    gtk_widget_show_all(frame_mouse_speed);
-
-    frame_display_format = gtk_frame_new (NULL);
-    gtk_widget_show (frame_display_format);
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_display_format, 50, 120);
-    gtk_widget_set_size_request (frame_display_format, 420+150, 160);
-
-    gtk_frame_set_label_align (GTK_FRAME (frame_display_format), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_display_format), GTK_SHADOW_IN);
-
-    label_display_foramt = gtk_label_new (_("<b>Display Format</b>"));
-    gtk_widget_show (label_display_foramt);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_display_format), label_display_foramt);
-    gtk_label_set_use_markup (GTK_LABEL (label_display_foramt), TRUE);
-
-    fixed_display_format = gtk_fixed_new ();
-    gtk_widget_show (fixed_display_format);
-    gtk_container_add (GTK_CONTAINER (frame_display_format), fixed_display_format);
-
-    m_radiobtn_total = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobtn_total);
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_total, FALSE, FALSE, 0);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_total, 70, 8);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_total), radiobtn_display_format_group_bm);
-    radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_total));
-    // g_signal_connect((gpointer)m_radiobtn_total, "toggled", G_CALLBACK (on_display_total_radio_button_toggled), this);
-
-    GtkWidget *vbox_format_1 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_1);
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_total), vbox_format_1);
-
-    GtkWidget *image_format_1 = create_pixmap ("./res/btn_format/1.jpg");
-    gtk_widget_show (image_format_1);
-    gtk_box_pack_start (GTK_BOX (vbox_format_1), image_format_1, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_1), 5, 10);
-
-    m_radiobtn_ud_11 = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobtn_ud_11);
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_11, FALSE, FALSE, 0);
-
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_11, 170, 8);
-
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11), radiobtn_display_format_group_bm);
-    radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11));
-    // g_signal_connect((gpointer)m_radiobtn_ud_11, "toggled", G_CALLBACK (on_display_ud11_radio_button_toggled), this);
-
-    GtkWidget *vbox_format_2 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_2);
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_11), vbox_format_2);
-
-    GtkWidget *image_format_2 = create_pixmap ("./res/btn_format/2.jpg");
-    gtk_widget_show (image_format_2);
-    gtk_box_pack_start (GTK_BOX (vbox_format_2), image_format_2, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_2), 5, 10);
-
-    m_radiobtn_ud_21 = gtk_radio_button_new(NULL);
-    gtk_widget_show (m_radiobtn_ud_21);
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_21, FALSE, FALSE, 0);
-
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_21, 270, 8);
-
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21), radiobtn_display_format_group_bm);
-    radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21));
-    // g_signal_connect((gpointer)m_radiobtn_ud_21, "toggled", G_CALLBACK (on_display_ud21_radio_button_toggled), this);
-
-    GtkWidget *vbox_format_3 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_3);
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_21), vbox_format_3);
-
-    GtkWidget *image_format_3 = create_pixmap ("./res/btn_format/3.jpg");
-    gtk_widget_show (image_format_3);
-    gtk_box_pack_start (GTK_BOX (vbox_format_3), image_format_3, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_3), 5, 10);
-
-    m_radiobtn_ud_12 = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobtn_ud_12);
-    //gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_12, FALSE, FALSE, 0);
-
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_12, 370, 8);
-
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12), radiobtn_display_format_group_bm);
-    radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12));
-    // g_signal_connect((gpointer)m_radiobtn_ud_12, "toggled", G_CALLBACK (on_display_ud12_radio_button_toggled), this);
-
-    GtkWidget *vbox_format_4 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_4);
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_12), vbox_format_4);
-
-    GtkWidget *image_format_4 = create_pixmap ("./res/btn_format/4.jpg");
-    gtk_widget_show (image_format_4);
-    gtk_box_pack_start (GTK_BOX (vbox_format_4), image_format_4, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_4), 5, 10);
-
-    m_radiobtn_lr_11 = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobtn_lr_11);
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_lr_11, FALSE, FALSE, 0);
-
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_lr_11, 470, 8);
-
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11), radiobtn_display_format_group_bm);
-    radiobtn_display_format_group_bm = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11));
-    // g_signal_connect((gpointer)m_radiobtn_lr_11, "toggled", G_CALLBACK (on_display_lr11_radio_button_toggled), this);
-
-    GtkWidget *vbox_format_5 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_5);
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_lr_11), vbox_format_5);
-
-    GtkWidget *image_format_5 = create_pixmap ("./res/btn_format/5.jpg");
-    gtk_widget_show (image_format_5);
-    gtk_box_pack_start (GTK_BOX (vbox_format_5), image_format_5, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_5), 5, 10);
-
-    label_mode_bm = gtk_label_new (_("<b>M: </b>"));
-    gtk_widget_show (label_mode_bm);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), label_mode_bm, 10, 23);
-    gtk_widget_set_size_request (label_mode_bm, 50, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_mode_bm), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_mode_bm), 0, 0.5);
-    //pw
-    m_radiobtn_total_pw = gtk_radio_button_new (NULL);
-
-    gtk_widget_show (m_radiobtn_total_pw);
-
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_total, FALSE, FALSE, 0);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_total_pw, 70, 70);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_total_pw), radiobtn_display_format_group_bpw);
-    radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_total_pw));
-
-    GtkWidget *vbox_format_1_pw = gtk_vbox_new (FALSE, 0);
-
-    gtk_widget_show (vbox_format_1_pw);
-
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_total_pw), vbox_format_1_pw);
-
-    GtkWidget *image_format_1_pw = create_pixmap ("./res/btn_format/1.jpg");
-
-    gtk_widget_show (image_format_1_pw);
-
-    gtk_box_pack_start (GTK_BOX (vbox_format_1_pw), image_format_1_pw, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_1_pw), 5, 10);
-
-    m_radiobtn_ud_11_pw = gtk_radio_button_new (NULL);
-
-    gtk_widget_show (m_radiobtn_ud_11_pw);
-
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_11, FALSE, FALSE, 0);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_11_pw, 170, 70);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11_pw), radiobtn_display_format_group_bpw);
-    radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_11_pw));
-
-    GtkWidget *vbox_format_2_pw = gtk_vbox_new (FALSE, 0);
-
-    gtk_widget_show (vbox_format_2_pw);
-
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_11_pw), vbox_format_2_pw);
-
-    GtkWidget *image_format_2_pw = create_pixmap ("./res/btn_format/2.jpg");
-
-    gtk_widget_show (image_format_2_pw);
-
-    gtk_box_pack_start (GTK_BOX (vbox_format_2_pw), image_format_2_pw, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_2_pw), 5, 10);
-
-    m_radiobtn_ud_21_pw = gtk_radio_button_new(NULL);
-
-    gtk_widget_show (m_radiobtn_ud_21_pw);
-
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_21, FALSE, FALSE, 0);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_21_pw, 270, 70);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21_pw), radiobtn_display_format_group_bpw);
-    radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_21_pw));
-
-    GtkWidget *vbox_format_3_pw = gtk_vbox_new (FALSE, 0);
-
-    gtk_widget_show (vbox_format_3_pw);
-
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_21_pw), vbox_format_3_pw);
-
-    GtkWidget *image_format_3_pw = create_pixmap ("./res/btn_format/3.jpg");
-
-    gtk_widget_show (image_format_3_pw);
-
-    gtk_box_pack_start (GTK_BOX (vbox_format_3_pw), image_format_3_pw, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_3_pw), 5, 10);
-
-
-    m_radiobtn_ud_12_pw = gtk_radio_button_new (NULL);
-
-    gtk_widget_show (m_radiobtn_ud_12_pw);
-
-    //gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_ud_12, FALSE, FALSE, 0);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_ud_12_pw, 370, 70);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12_pw), radiobtn_display_format_group_bpw);
-    radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_ud_12_pw));
-
-    GtkWidget *vbox_format_4_pw = gtk_vbox_new (FALSE, 0);
-
-    gtk_widget_show (vbox_format_4_pw);
-
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_ud_12_pw), vbox_format_4_pw);
-
-    GtkWidget *image_format_4_pw = create_pixmap ("./res/btn_format/4.jpg");
-
-    gtk_widget_show (image_format_4_pw);
-
-
-    gtk_box_pack_start (GTK_BOX (vbox_format_4_pw), image_format_4_pw, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_4_pw), 5, 10);
-
-    m_radiobtn_lr_11_pw = gtk_radio_button_new (NULL);
-
-    gtk_widget_show (m_radiobtn_lr_11_pw);
-
-    // gtk_box_pack_start (GTK_BOX (hbox_display_format), m_radiobtn_lr_11, FALSE, FALSE, 0);
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), m_radiobtn_lr_11_pw, 470, 70);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11_pw), radiobtn_display_format_group_bpw);
-    radiobtn_display_format_group_bpw = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobtn_lr_11_pw));
-
-    GtkWidget *vbox_format_5_pw = gtk_vbox_new (FALSE, 0);
-
-    gtk_widget_show (vbox_format_5_pw);
-
-    gtk_container_add (GTK_CONTAINER (m_radiobtn_lr_11_pw), vbox_format_5_pw);
-
-    GtkWidget *image_format_5_pw = create_pixmap ("./res/btn_format/5.jpg");
-
-    gtk_widget_show (image_format_5_pw);
-
-    gtk_box_pack_start (GTK_BOX (vbox_format_5_pw), image_format_5_pw, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_5_pw), 5, 10);
-
-    label_mode_bpw = gtk_label_new (_("<b>PW/CW: </b>"));
-    gtk_widget_show (label_mode_bpw);
-
-    gtk_fixed_put (GTK_FIXED (fixed_display_format), label_mode_bpw, 10, 85);
-    gtk_widget_set_size_request (label_mode_bpw, 60, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_mode_bpw), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_mode_bpw), 0, 0.5);
-
-    // factory default
-    button_default_options = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_default_options);
-    //gtk_fixed_put (GTK_FIXED (fixed_options), button_default_options, 30, 380);
-    //gtk_fixed_put (GTK_FIXED (fixed_options), button_default_options, 30, 420);
-    gtk_fixed_put (GTK_FIXED (fixed_options), button_default_options, 50, 420+20);
-    gtk_widget_set_size_request (button_default_options, 140+8, 40);
-    g_signal_connect ((gpointer) button_default_options, "clicked", G_CALLBACK (on_button_options_default_clicked), this);
-
-    // image option
-    frame_image_options = gtk_frame_new (NULL);
-    gtk_widget_show (frame_image_options);
-    // gtk_fixed_put (GTK_FIXED (fixed_options), frame_image_options, 30, 310);
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_image_options, 50, 310);
-
-    //gtk_widget_set_size_request (frame_image_options, 320, 100);
-    gtk_widget_set_size_request (frame_image_options, 320, 100);
-    gtk_frame_set_label_align (GTK_FRAME (frame_image_options), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_image_options), GTK_SHADOW_IN);
-
-    label_image_options = gtk_label_new (_("<b>Image Options</b>"));
-    gtk_widget_show (label_image_options);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_image_options), label_image_options);
-    gtk_label_set_use_markup (GTK_LABEL (label_image_options), TRUE);
-
-    SysGeneralSetting sysGS;
-    if(ES == sysGS.GetLanguage())
-        table_img_options = gtk_table_new (3, 2, FALSE);
-    else
-        table_img_options = gtk_table_new (3, 2, TRUE);
-    gtk_widget_show (table_img_options);
-    gtk_container_add (GTK_CONTAINER (frame_image_options), table_img_options);
-    gtk_container_set_border_width (GTK_CONTAINER (table_img_options), 10);
-    gtk_table_set_row_spacings (GTK_TABLE (table_img_options), 5);
-
-    m_combobox_img_format = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_img_format);
-    gtk_table_attach (GTK_TABLE (table_img_options), m_combobox_img_format, 1, 2, 0, 1,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_format), _("BMP"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_format), _("JPEG"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_format), _("EMP"));
-
-    m_combobox_img_file = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_img_file);
-    gtk_table_attach (GTK_TABLE (table_img_options), m_combobox_img_file, 1, 2, 1, 2,
-                      (GtkAttachOptions) (GTK_EXPAND|GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_file), _("Manual"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_img_file), _("Auto"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_file), 0);
-
-    label_img_file = gtk_label_new (_("<b>File name:</b>"));
-    gtk_widget_show (label_img_file);
-    gtk_table_attach (GTK_TABLE (table_img_options), label_img_file, 0, 1, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_img_file), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_img_file), 0, 0.5);
-
-    label_img_format = gtk_label_new (_("<b>Storage format: </b>"));
-    gtk_widget_show (label_img_format);
-    gtk_table_attach (GTK_TABLE (table_img_options), label_img_format, 0, 1, 0, 1,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_img_format), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_img_format), 0, 0.5);
-
-    // video option
-    frame_video_options = gtk_frame_new (NULL);
-    gtk_widget_show (frame_video_options);
-    // gtk_fixed_put (GTK_FIXED (fixed_options), frame_video_options, 390, 310);
-
-    gtk_fixed_put (GTK_FIXED (fixed_options), frame_video_options, 450, 310);
-    gtk_widget_set_size_request (frame_video_options, 320-10, 100);
-
-    //gtk_widget_set_size_request (frame_video_options, 320, 100);
-    gtk_frame_set_label_align (GTK_FRAME (frame_video_options), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_video_options), GTK_SHADOW_IN);
-
-    label_video_options = gtk_label_new (_("<b>Video Options</b>"));
-    gtk_widget_show (label_video_options);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_video_options), label_video_options);
-    gtk_label_set_use_markup (GTK_LABEL (label_video_options), TRUE);
-
-    if(ES ==sysGS.GetLanguage())
-        table_video_options = gtk_table_new (3, 2, FALSE);
-    else
-        table_video_options = gtk_table_new (3, 2, TRUE);
-    gtk_widget_show (table_video_options);
-    gtk_container_add (GTK_CONTAINER (frame_video_options), table_video_options);
-    gtk_container_set_border_width (GTK_CONTAINER (table_video_options), 10);
-    gtk_table_set_row_spacings (GTK_TABLE (table_video_options), 5);
-
-    m_combobox_video_format = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_video_format);
-    gtk_table_attach (GTK_TABLE (table_video_options), m_combobox_video_format, 1, 2, 0, 1,
-                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_format), _("AVI"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_format), _("CINE"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_format), 1);
-
-    label_video_file = gtk_label_new (_("<b>File name:</b>"));
-    gtk_widget_show (label_video_file);
-    gtk_table_attach (GTK_TABLE (table_video_options), label_video_file, 0, 1, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_video_file), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_video_file), 0, 0.5);
-
-    label_video_format = gtk_label_new (_("<b>Storage format: </b>"));
-    gtk_widget_show (label_video_format);
-    gtk_table_attach (GTK_TABLE (table_video_options), label_video_format, 0, 1, 0, 1,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_video_format), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_video_format), 0, 0.5);
-
-    m_combobox_video_file = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_video_file);
-    gtk_table_attach (GTK_TABLE (table_video_options), m_combobox_video_file, 1, 2, 1, 2,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (GTK_FILL), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_file), _("Manual"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video_file), _("Auto"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_file), 0);
-
-    return fixed_options;
-}
-
-void ViewSystem::init_option_setting(SysOptions* sysOptions) {
-    if (sysOptions == NULL)
-        sysOptions = new SysOptions;
-
-    int index_center_display = sysOptions->GetCenterLine();
-    if (index_center_display == 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_center_on), TRUE);
-    else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_center_off), TRUE);
-
-    int index_TI_type = sysOptions->GetTI();
-    if (index_TI_type == 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_TIC), TRUE);
-    else if (index_TI_type == 1)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_TIB), TRUE);
-    else if (index_TI_type == 2)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_TIS), TRUE);
-
-    int index_keyboard_sound = sysOptions->GetKeyboardSound();
-    if (index_keyboard_sound == 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_kb_sound_on), TRUE);
-    else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_kb_sound_off), TRUE);
-
-    int index_display_format = 0;
-    index_display_format = sysOptions->GetDisplayFormatM();
-    //  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobtn_bm), TRUE);
-    m_bmIndex = index_display_format;
-    m_bpwIndex = sysOptions->GetDisplayFormatPW();
-
-    if (index_display_format == 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_total), TRUE);
-    else if (index_display_format == 1)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_11), TRUE);
-    else if (index_display_format == 2)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_21), TRUE);
-    else if (index_display_format == 3)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_12), TRUE);
-    else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_lr_11), TRUE);
-
-    if ( m_bpwIndex == 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_total_pw), TRUE);
-    else if ( m_bpwIndex == 1)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_11_pw), TRUE);
-    else if (m_bpwIndex == 2)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_21_pw), TRUE);
-    else if (m_bpwIndex == 3)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_ud_12_pw), TRUE);
-    else
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobtn_lr_11_pw), TRUE);
-
-    int index_img_format = sysOptions->GetImageFormat();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_format), index_img_format);
-    //    int index_img_medium = sysOptions->GetImageMedia();
-    //    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_medium), index_img_medium);
-    int index_img_file = sysOptions->GetImageAutoName();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_img_file), index_img_file);
-    int index_video_format = sysOptions->GetCineFormat();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_format), index_video_format);
-    //    int index_video_medium = sysOptions->GetCineMedia();
-    //    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_medium), index_video_medium);
-    int index_video_file = sysOptions->GetCineAutoName();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video_file), index_video_file);
-
-    int mouse_speed = sysOptions->GetMouseSpeed();
-    if (mouse_speed <= 0)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_high), TRUE);
-    else if (mouse_speed == 1)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_middle), TRUE);
-    else if (mouse_speed >= 2)
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_low), TRUE);
-
-    delete sysOptions;
-}
-
-void ViewSystem::save_option_setting() {
-    SysOptions sysOptions;
-
-    unsigned char centerLineIndex = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_on)))
-        centerLineIndex = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_center_off)))
-        centerLineIndex = 1;
-    sysOptions.SetCenterLine(centerLineIndex);
-
-    unsigned char TIIndex = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_TIC)))
-        TIIndex = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_TIB)))
-        TIIndex = 1;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_TIS)))
-        TIIndex = 2;
-    sysOptions.SetTI(TIIndex);
-
-    unsigned char kbSoundIndex = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_kb_sound_on))) {
-        kbSoundIndex = 0;
-    } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_kb_sound_off)))
-        kbSoundIndex = 1;
-    sysOptions.SetKeyboardSound(kbSoundIndex);
-    if (kbSoundIndex) {
-        KeyboardSound(false);
-    } else {
-        KeyboardSound(true);
-    }
-    int mouseSpeed;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_low)))
-        mouseSpeed = 2;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_middle)))
-        mouseSpeed = 1;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_mouse_speed_high)))
-        mouseSpeed = 0;
-    sysOptions.SetMouseSpeed(mouseSpeed);
-    g_keyInterface.SetMouseSpeed(mouseSpeed);
-
-    unsigned char m_bmIndex = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_total))) {
-        m_bmIndex = 0;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_ud_11))) {
-        m_bmIndex = 1;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_ud_21))) {
-        m_bmIndex = 2;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_ud_12))) {
-        m_bmIndex = 3;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_lr_11))) {
-        m_bmIndex = 4;
-    }
-
-    sysOptions.SetDisplayFormatM(m_bmIndex);
-
-    unsigned char m_bpwIndex = 0;
-
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_total_pw))) {
-        m_bpwIndex = 0;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_ud_11_pw))) {
-        m_bpwIndex = 1;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_ud_21_pw))) {
-        m_bpwIndex = 2;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_ud_12_pw))) {
-        m_bpwIndex = 3;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobtn_lr_11_pw))) {
-        m_bpwIndex = 4;
-    }
-    sysOptions.SetDisplayFormatPW(m_bpwIndex);
-
-    unsigned char imgFormatIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_img_format));
-    sysOptions.SetImageFormat(imgFormatIndex);
-    //    unsigned char imgMediumIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_img_medium));
-    //    sysOptions.SetImageMedia(imgMediumIndex);
-    unsigned char imgFileIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_img_file));
-    sysOptions.SetImageAutoName(imgFileIndex);
-    unsigned char videoFormatIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video_format));
-    sysOptions.SetCineFormat(videoFormatIndex);
-    //    unsigned char videoMediumIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video_medium));
-    //    sysOptions.SetCineMedia(videoMediumIndex);
-    unsigned char videoFileIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video_file));
-    sysOptions.SetCineAutoName(videoFileIndex);
-
-    sysOptions.SyncFile();
-
-    ImgMan::GetInstance()->SetImgFormat(imgFormatIndex);
-    //ImgMan::GetInstance()->SetImgStorage(imgMediumIndex);
-    ImgMan::GetInstance()->SetImgNameMode(imgFileIndex);
-    VideoMan::GetInstance()->SetVideoFormat(videoFormatIndex);
-    //VideoMan::GetInstance()->SetVideoStorage(videoMediumIndex);
-    VideoMan::GetInstance()->SetVideoNameMode(videoFileIndex);
-}
 
 GtkWidget* ViewSystem::create_note_image() {
     GtkWidget *fixed_image;
@@ -5492,7 +4899,7 @@ GtkWidget* ViewSystem::create_note_image() {
     //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_scan_range, 105, 90);
     gtk_widget_set_size_request (m_combobox_scan_range, 100, 30);
     gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_scan_range, 1, 2, 2, 3);
-    for (i = 0; i < Img2D::MAX_ANGLE; i ++)	{
+    for (i = 0; i < Img2D::MAX_ANGLE; i ++) {
         sprintf(buf , "%d", i);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_scan_range), buf);
     }
@@ -5509,7 +4916,7 @@ GtkWidget* ViewSystem::create_note_image() {
     //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_dynamic_range, 370, 90);
     gtk_widget_set_size_request (m_combobox_dynamic_range, 100, 30);
     gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_dynamic_range, 3, 4, 2, 3);
-    for (i = 0; i < Calc2D::MAX_DYNAMIC_INDEX; i ++)	{
+    for (i = 0; i < Calc2D::MAX_DYNAMIC_INDEX; i ++)  {
         sprintf(buf , "%ddB", Img2D::DYNAMIC_DATA_D[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_dynamic_range), buf);
     }
@@ -5560,7 +4967,7 @@ GtkWidget* ViewSystem::create_note_image() {
     //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_steer, 105, 170);
     gtk_widget_set_size_request (m_combobox_steer, 100, 30);
     gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_steer, 1, 2, 4, 5);
-    for (i = 0; i < Img2D::MAX_STEER; i ++)	{
+    for (i = 0; i < Img2D::MAX_STEER; i ++) {
         sprintf(buf, "%d°", Img2D::STEER_ANGLE[i]);
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_steer), buf);
     }
@@ -11408,7 +10815,7 @@ void ViewSystem::add_exam_item_column(GtkTreeView *treeview) {
 
 
 
-void ViewSystem::UpdateHospitalandpart(int date_format, const char *hospital_name) {
+void ViewSystem::UpdateHospitalandpart(int date_format, const string hospital_name) {
     TopArea::GetInstance()->SetDateFormat(date_format);
     g_patientInfo.UpdateTopArea();
     TopArea::GetInstance()->UpdateHospitalName(hospital_name);
@@ -12002,8 +11409,4 @@ void ViewSystem::UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event) {
         gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
         gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
     }
-}
-
-GtkWidget* ViewSystem::GetVGACombobox() {
-    return GTK_WIDGET(m_combobox_vga);
 }

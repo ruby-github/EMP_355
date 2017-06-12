@@ -24,12 +24,10 @@ public:
     static TopArea * GetInstance();
 
     GtkWidget* Create(void);
-    void UpdateHospitalName(const char *name);
-#ifdef VET
-    void UpdatePatInfo(const char *animal_name, const char *owner_name, const char *species, const char *sex, const char *age, const char *id);
-#else
+    void UpdateHospitalName(const string name);
+
     void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
-#endif
+
     // void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
     void UpdateProbeType(const char *type);
     void UpdateFreq(const char *freq);

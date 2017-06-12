@@ -59,47 +59,23 @@ void TopArea::DrawLogo(void) {
     g_object_unref(pixbuf);
 }
 
-void TopArea::UpdateHospitalName(const char *name) {
+void TopArea::UpdateHospitalName(const string name) {
     const int y = 10;
     // sprintf(m_hospital, "%s", name);
 
-    PRINTF("hospital name====%s\n",name);
+
     //m_hospital = name;
-    sprintf(m_hospital, "%s", name);
+    sprintf(m_hospital, "%s", name.c_str());
     ClearArea(TOP_AREA_P1 + 5, y, 110, 45);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, name);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, name.c_str());
     int font_size = 24;
-    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name, 110);
+    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name.c_str(), 110);
     g_object_unref(layout);
 
-    DrawString(name, TOP_AREA_P1 + 5, y, g_white, font);
+    DrawString(name.c_str(), TOP_AREA_P1 + 5, y, g_white, font);
     pango_font_description_free(font);
 }
-#ifdef VET
-void TopArea::UpdatePatInfo(const char *animal_name, const char *owner_name, const char *species, const char *sex, const char *age, const char *id) {
-    const int x = TOP_AREA_P2 + 5;
-    const int y = 5;
 
-    char text_buf[256];
-    char *text_animal_name = _("Animal:");
-    char *text_owner_name = _("Owner:");
-    char *text_species = _("Species:");
-    char *text_sex = _("Gender:"); //_("Sex:");
-    char *text_age = _("Age:");
-    char *text_id = _("ID:");
-
-    sprintf(text_buf, "%s%s  %s%s  %s%s  %s%s  %s%s  %s%s", text_animal_name, animal_name, text_owner_name, owner_name, text_species, species, text_sex, sex, text_age, age, text_id, id);
-    ClearArea(x, y, 424, 20);
-
-    int font_size = 12;
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, text_buf);
-    PangoFontDescription* font = AdaptStringFont(FONT_STRING, "", font_size, layout, text_buf, 424);
-    g_object_unref(layout);
-
-    DrawString(text_buf, x, y, g_white, font);
-    pango_font_description_free(font);
-}
-#else
 void TopArea::UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id) {
     const int x = TOP_AREA_P2 + 5;
     const int y = 5;
@@ -122,7 +98,7 @@ void TopArea::UpdatePatInfo(const char *name, const char *sex, const char *age, 
     DrawString(text_buf, x, y, g_white, font);
     pango_font_description_free(font);
 }
-#endif
+
 void TopArea::UpdateProbeType(const char *type) {
     m_probeType_old = type;
     m_probeType = ProbeMan::GetInstance()->VerifyProbeName(type);

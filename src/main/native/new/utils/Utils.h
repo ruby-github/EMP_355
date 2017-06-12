@@ -21,6 +21,7 @@ public:
   static void set_button_image(GtkButton* button, GtkImage* image, const GtkPositionType position = GTK_POS_LEFT);
 
   static GtkCheckButton* create_check_button(const string label = "");
+  static GtkRadioButton* create_radio_button(GSList* group = NULL, const string label = "");
 
   static GtkSpinButton* create_spin_button(GtkAdjustment* adjustment, gdouble climb_rate, guint digits);
 
