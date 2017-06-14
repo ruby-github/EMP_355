@@ -489,7 +489,7 @@ GtkWidget* create_button_icon(GtkWidget *label, GtkWidget *icon_image) {
     GtkWidget *button = gtk_button_new_with_label(gtk_label_get_text(GTK_LABEL(label)));
     gtk_widget_set_size_request (button, 120, 70-size);
 
-    /*GtkWidget *alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
+    GtkWidget *alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
     gtk_container_add (GTK_CONTAINER (button), alignment);
 
     GtkWidget *hbox = gtk_hbox_new (FALSE, 2);
@@ -498,7 +498,7 @@ GtkWidget* create_button_icon(GtkWidget *label, GtkWidget *icon_image) {
     if (label)
         gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
 
-    gtk_button_set_focus_on_click(GTK_BUTTON(button), FALSE);*/
+    gtk_button_set_focus_on_click(GTK_BUTTON(button), FALSE);
     gtk_widget_show_all(button);
 
     modify_widget_bg(button);
@@ -515,8 +515,8 @@ GtkWidget* create_button_icon_only(GtkWidget *icon_image, guint width, guint hei
         gtk_widget_set_usize(button, width, -1);
     else if(width ==0 && height !=0)
         gtk_widget_set_usize(button, -1, height);
-    //if (icon_image)
-        //gtk_container_add(GTK_CONTAINER(button), icon_image);
+    if (icon_image)
+        gtk_container_add(GTK_CONTAINER(button), icon_image);
     if (color)
         gtk_widget_modify_bg(button, GTK_STATE_NORMAL, color);
 

@@ -29,6 +29,7 @@ public:
 
   static GtkEntry* create_entry(gunichar ch = 0);
   static GtkComboBoxText* create_combobox_text();
+  static GtkComboBoxEntry* create_combobox_entry();
   static GtkNotebook* create_notebook();
   static GtkProgressBar* create_progress_bar();
 

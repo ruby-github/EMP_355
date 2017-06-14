@@ -182,13 +182,13 @@ GtkRadioButton* Utils::create_radio_button(GSList* group, const string label) {
 
   gtk_widget_set_size_request(GTK_WIDGET(button), -1, 30);
 
-  /*gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
+  gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_ACTIVE, get_color("green"));
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_PRELIGHT, get_color("green"));
   gtk_widget_modify_bg(GTK_WIDGET(button), GTK_STATE_SELECTED, get_color("green"));
 
   gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_ACTIVE, get_color("white"));
   gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_PRELIGHT, get_color("white"));
-  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_SELECTED, get_color("white"));*/
+  gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(button)), GTK_STATE_SELECTED, get_color("white"));
 
   return button;
 }
@@ -237,6 +237,15 @@ GtkEntry* Utils::create_entry(gunichar ch) {
 
 GtkComboBoxText* Utils::create_combobox_text() {
   GtkComboBoxText* combobox = GTK_COMBO_BOX_TEXT(gtk_combo_box_text_new());
+
+  set_font(GTK_WIDGET(combobox), "", "", 10);
+  gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 30);
+
+  return combobox;
+}
+
+GtkComboBoxEntry* Utils::create_combobox_entry() {
+  GtkComboBoxEntry* combobox = GTK_COMBO_BOX_ENTRY(gtk_combo_box_entry_new_text());
 
   set_font(GTK_WIDGET(combobox), "", "", 10);
   gtk_widget_set_size_request(GTK_WIDGET(combobox), -1, 30);

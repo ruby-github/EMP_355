@@ -13,7 +13,11 @@
 #include "calcPeople/ViewReport.h"
 #include "display/KnobMenu.h"
 #include "display/MenuArea.h"
+#include "display/TopArea.h"
 #include "imageProc/FreezeMode.h"
+#include "imageProc/ImgProc2D.h"
+#include "imageProc/ImgProcCfm.h"
+#include "imageProc/ImgProcPw.h"
 #include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/MultiFuncFactory.h"
@@ -28,13 +32,10 @@
 #include "sysMan/SysMeasurementSetting.h"
 #include "sysMan/SysNoteSetting.h"
 #include "sysMan/SysOptions.h"
-
+#include "sysMan/UserSelect.h"
 #include "ViewMain.h"
 
-
 #include "display/gui_func.h"
-
-
 
 #define DEFALT_SCREEN_WIDTH   950
 #define GRAY_WIDTH            20
@@ -622,6 +623,7 @@ void ViewCustomOB::InsertList(GtkTreeModel* model, int table[]) {
 
 void ViewCustomOB::AddToTable(gint type, int temp1, float temp2) {
   float val = temp2 * 10.0;
+
   switch(type) {
   case 0:   // CER
     g_cer_custom[temp1] = val;
@@ -803,7 +805,6 @@ ViewSystem::ViewSystem() {
   m_calc_page_num = 0;
   m_itemName = NULL;
   m_save_or_new_flag = 0;
-  m_str_index = NULL;
   m_current_note_page = 0;
   m_frameRegisterInfo = NULL;
   m_powerOffFlag = false;
@@ -883,7 +884,7 @@ void ViewSystem::CreateWindow() {
   gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_info()), GTK_WIDGET(Utils::create_label(_("System Info"))));
   init_info_setting();
 
-  //g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
+  g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
   gtk_notebook_set_current_page(m_notebook, m_flag_notebook_image);
 
   gtk_widget_show_all(GTK_WIDGET(m_dialog));
@@ -1041,7 +1042,7 @@ void ViewSystem::SetActiveUser(gint num) {
 }
 
 void ViewSystem::ShowList(const string name) {
-  gtk_combo_box_append_text (GTK_COMBO_BOX(m_comboboxentry_user_select), name.c_str());
+  gtk_combo_box_append_text(GTK_COMBO_BOX(m_comboboxentry_user_select), name.c_str());
 }
 
 void ViewSystem::UpdateUserItem() {
@@ -1070,8 +1071,8 @@ void ViewSystem::UpdateUserItem() {
   ExamItem examItem;
   vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
   GtkTreeModel* model = create_exam_item_model(itemIndex);
-  gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
-  gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
+  gtk_tree_view_set_model(m_treeview_exam_type, model);
+  gtk_tree_view_expand_all(m_treeview_exam_type);
 }
 
 void ViewSystem::UpdateSpecificPrinterModel() {
@@ -1853,6 +1854,1530 @@ void ViewSystem::save_option_setting() {
   VideoMan::GetInstance()->SetVideoNameMode(videoFileIndex);
 }
 
+GtkWidget* ViewSystem::create_note_image() {
+  GtkTable* table = Utils::create_table(10, 18);
+
+  // User Select
+  GtkLabel* label_user_select = Utils::create_label(_("User Select:"));
+  m_comboboxentry_user_select = Utils::create_combobox_entry();
+  GtkButton* button_delete_user = Utils::create_button();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_user_select), 6, 9, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_user_select), 9, 15, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_delete_user), 15, 17, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  GtkWidget* bin_entry_dia = gtk_bin_get_child (GTK_BIN(m_comboboxentry_user_select));
+  gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 40);
+  g_signal_connect(G_OBJECT(bin_entry_dia), "insert_text", G_CALLBACK(signal_entry_insert_text_userselect), this);
+  g_signal_connect(G_OBJECT(bin_entry_dia), "focus-out-event", G_CALLBACK(signal_entry_focusout_userselect), this);
+
+  Utils::set_button_image(button_delete_user, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON)));
+  g_signal_connect(button_delete_user, "clicked", G_CALLBACK(signal_button_clicked_delete_user), this);
+
+  UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxentry_user_select));
+  UserSelect::GetInstance()->read_username_db(USERNAME_DB, GTK_COMBO_BOX(m_comboboxentry_user_select));
+  UserSelect::GetInstance()->set_active_user(GTK_COMBO_BOX(m_comboboxentry_user_select), UserSelect::GetInstance()->get_active_user());
+
+  ExamItem exam;
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_user_select), exam.ReadDefaultUserIndex(&ini));
+  g_signal_connect(GTK_COMBO_BOX(m_comboboxentry_user_select), "changed", G_CALLBACK(signal_combobox_changed_user_select), this);
+
+  string default_probe = exam.ReadDefaultProbe(&ini);
+
+  for (int i = 0; i < NUM_PROBE; i++) {
+    if (default_probe == g_probe_list[i]) {
+      save_itemIndex(i);
+
+      break;
+    }
+  }
+
+  // Probe Type
+  GtkLabel* label_probe_type = Utils::create_label(_("Probe Type:"));
+  m_combobox_probe_type = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_probe_type), 0, 3, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_probe_type), 3, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  for (int i = 0; i < NUM_PROBE; i++) {
+    string probeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
+    gtk_combo_box_text_append_text(m_combobox_probe_type, probeName.c_str());
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), 0);
+  g_signal_connect(m_combobox_probe_type, "changed", G_CALLBACK(signal_combobox_changed_probe_type), this);
+
+  // scrolled window
+  GtkScrolledWindow* scrolledwindow_exam_type = Utils::create_scrolled_window();
+  gtk_table_attach_defaults(table, GTK_WIDGET(scrolledwindow_exam_type), 0, 6, 1, 8);
+
+  vector<ExamItem::EItem> indexVec;
+  GtkTreeModel* model = create_exam_item_model(indexVec);
+
+  m_treeview_exam_type = Utils::create_tree_view(model);
+  gtk_container_add(GTK_CONTAINER(scrolledwindow_exam_type), GTK_WIDGET(m_treeview_exam_type));
+
+  add_exam_item_column(m_treeview_exam_type);
+  GtkTreeSelection* select = gtk_tree_view_get_selection(m_treeview_exam_type);
+  gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
+
+  g_signal_connect(select, "changed", G_CALLBACK(signal_combobox_changed_exam_type), this);
+
+  gtk_widget_add_events(GTK_WIDGET(m_treeview_exam_type), gtk_widget_get_events(GTK_WIDGET(m_treeview_exam_type)) | GDK_BUTTON_RELEASE_MASK);
+  g_signal_connect_after(m_treeview_exam_type, "button_release_event", G_CALLBACK(signal_treeview_button_release_exam_department), this);
+
+  GtkButton* button_add_item = Utils::create_button();
+  GtkButton* button_delete_item = Utils::create_button();
+
+  gtk_table_attach(table, GTK_WIDGET(button_add_item), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_delete_item), 2, 4, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  Utils::set_button_image(button_add_item, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_BUTTON)));
+  Utils::set_button_image(button_delete_item, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_BUTTON)));
+
+  g_signal_connect(button_add_item, "clicked", G_CALLBACK(signal_button_clicked_add_item), this);
+  g_signal_connect(button_delete_item, "clicked", G_CALLBACK(signal_button_clicked_delete_item), this);
+
+  // Button
+
+  GtkButton* button_save = Utils::create_button(_("Save"));
+  GtkButton* button_new = Utils::create_button(_("New"));
+  GtkButton* button_delete = Utils::create_button(_("Delete"));
+
+  gtk_table_attach(table, GTK_WIDGET(button_save), 6, 10, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_new), 10, 14, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_delete), 14, 18, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_save, "clicked", G_CALLBACK(signal_button_clicked_image_save), this);
+  g_signal_connect(button_new, "clicked", G_CALLBACK(signal_button_clicked_image_new), this);
+  g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_delete_item), this);
+
+  GtkButton* button_export = Utils::create_button(_("Export To USB"));
+  GtkButton* button_import = Utils::create_button(_("Import From USB"));
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+
+  gtk_table_attach(table, GTK_WIDGET(button_export), 6, 10, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_import), 10, 14, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 14, 18, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_export, "clicked", G_CALLBACK(signal_button_clicked_image_export), this);
+  g_signal_connect(button_import, "clicked", G_CALLBACK(signal_button_clicked_image_import), this);
+  g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_image_default), this);
+
+  // Exam Type
+
+  m_frame_new_check_part = Utils::create_frame();
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_frame_new_check_part), 6, 18, 3, 6);
+
+  GtkTable* table_new_check_part = Utils::create_table(2, 3);
+  gtk_container_add(GTK_CONTAINER(m_frame_new_check_part), GTK_WIDGET(table_new_check_part));
+
+  m_label_check_part = Utils::create_label(_("Exam Type:"));
+  m_entry_new_check_part = Utils::create_entry();
+  GtkButton* button_ok = Utils::create_button(_("OK"));
+  GtkButton* button_cancel = Utils::create_button(_("Cancel"));
+
+  gtk_table_attach_defaults(table_new_check_part, GTK_WIDGET(m_label_check_part), 0, 1, 0, 1);
+  gtk_table_attach(table_new_check_part, GTK_WIDGET(m_entry_new_check_part), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_new_check_part, GTK_WIDGET(button_ok), 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_new_check_part, GTK_WIDGET(button_cancel), 2, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  Utils::set_button_image(button_ok, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON)));
+  Utils::set_button_image(button_cancel, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON)));
+
+  g_signal_connect(button_ok, "clicked", G_CALLBACK(HandleNewCheckPartBtnOk), this);
+  g_signal_connect(button_cancel, "clicked", G_CALLBACK(HandleNewCheckPartBtnCancel), this);
+
+  // scrolled window
+
+  //GtkScrolledWindow* scrolled_window = Utils::create_scrolled_window();
+  //GtkWidget* viewport_img_set = gtk_viewport_new(NULL, NULL);
+  //gtk_container_add(GTK_CONTAINER(scrolled_window), viewport_img_set);
+
+  return GTK_WIDGET(table);
+
+
+  /*
+    // scroll window
+
+    viewport_img_set = gtk_viewport_new(NULL, NULL);
+    gtk_widget_hide (viewport_img_set);
+    //gtk_widget_show (viewport_img_set);
+    gtk_container_add (GTK_CONTAINER (scrolledwindow_img_set), viewport_img_set);
+
+    fixed_img_set = gtk_fixed_new ();
+    gtk_widget_show (fixed_img_set);
+    gtk_container_add (GTK_CONTAINER (viewport_img_set), fixed_img_set);
+
+    // comment
+    frame_comment = gtk_frame_new (NULL);
+    gtk_widget_show (frame_comment);
+    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_comment, 5, 5);
+    gtk_widget_set_size_request (frame_comment, 520, 70);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame_comment), GTK_SHADOW_OUT);
+
+    label_comment = gtk_label_new (_("<b>Common</b>"));
+    gtk_widget_show (label_comment);
+    gtk_frame_set_label_widget (GTK_FRAME (frame_comment), label_comment);
+    gtk_label_set_use_markup (GTK_LABEL (label_comment), TRUE);
+
+    fixed_comment = gtk_fixed_new ();
+    gtk_widget_show (fixed_comment);
+    gtk_container_add (GTK_CONTAINER (frame_comment), fixed_comment);
+
+    table_comment = gtk_table_new (1, 4, FALSE);
+    gtk_widget_show (table_comment);
+    gtk_fixed_put (GTK_FIXED (fixed_comment), table_comment, 20, 5);
+    gtk_widget_set_size_request (table_comment, 480, 30);
+    gtk_table_set_row_spacings (GTK_TABLE(table_comment), 10);
+
+    // MBP
+    label_mbp = gtk_label_new (_("MBP :"));
+    gtk_widget_show (label_mbp);
+    //gtk_fixed_put (GTK_FIXED (fixed_comment), label_mbp, 5, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_comment), label_mbp, 0, 1, 0, 1);
+    gtk_widget_set_size_request (label_mbp, -1, 30);
+
+    m_combobox_mbp = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_mbp);
+    //gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_mbp, 105, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_comment), m_combobox_mbp, 1, 2, 0, 1);
+    gtk_widget_set_size_request (m_combobox_mbp, 100, 30);
+    for (i = 0; i < Img2D::MAX_MBP_INDEX; i ++) {
+        sprintf(buf, "%d", Img2D::MBP[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_mbp), buf);
+    }
+
+    label_ao_power = gtk_label_new (_("AO / Power :"));
+    gtk_widget_show (label_ao_power);
+    //gtk_fixed_put (GTK_FIXED (fixed_comment), label_ao_power, 270, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_comment), label_ao_power, 2, 3, 0, 1);
+    gtk_widget_set_size_request (label_ao_power, -1, 30);
+
+    m_combobox_ao_power = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_ao_power);
+    //gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_ao_power, 370, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_comment), m_combobox_ao_power, 3, 4, 0, 1);
+    gtk_widget_set_size_request (m_combobox_ao_power, 100, 30);
+    for (i = 0; i < Img2D::MAX_POWER_INDEX; i ++) {
+        sprintf(buf, "%d", Img2D::POWER_DATA[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ao_power), buf);
+    }
+
+    // 2d and m mode
+    frame_2d_m_mode = gtk_frame_new (NULL);
+    gtk_widget_show (frame_2d_m_mode);
+    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_2d_m_mode, 5, 90);//90
+    gtk_widget_set_size_request (frame_2d_m_mode, 520, 700); //550
+    //gtk_widget_set_size_request (frame_2d_m_mode, 520, 605 - 40); //550
+    gtk_frame_set_shadow_type (GTK_FRAME (frame_2d_m_mode), GTK_SHADOW_OUT);
+
+    fixed_2d_m_mode = gtk_fixed_new ();
+    gtk_widget_show (fixed_2d_m_mode);
+    gtk_container_add (GTK_CONTAINER (frame_2d_m_mode), fixed_2d_m_mode);
+
+    label_2d_m_mode = gtk_label_new (_("<b>2D and M mode</b>"));
+    gtk_widget_show (label_2d_m_mode);
+    gtk_frame_set_label_widget (GTK_FRAME (frame_2d_m_mode), label_2d_m_mode);
+    gtk_label_set_use_markup (GTK_LABEL (label_2d_m_mode), TRUE);
+
+    table_2d_m_mode = gtk_table_new (16, 4, FALSE); //14
+    //table_2d_m_mode = gtk_table_new (15, 4, FALSE); //14
+    gtk_widget_show (table_2d_m_mode);
+    gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), table_2d_m_mode, 20, 5);
+    gtk_widget_set_size_request (table_2d_m_mode, 480, 520);//520
+    gtk_table_set_row_spacings (GTK_TABLE(table_2d_m_mode), 10);
+
+    // 2D gain
+    label_2d_gain = gtk_label_new (_("2D Gain:"));
+    gtk_widget_show (label_2d_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_gain, 5, 10);
+    gtk_widget_set_size_request (label_2d_gain, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_gain, 0, 1, 0, 1);
+
+    spinbutton_2d_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
+    m_spinbutton_2d_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_2d_gain_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_2d_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_spinbutton_2d_gain, 105, 12);
+    gtk_widget_set_size_request (m_spinbutton_2d_gain, -1, 27);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_spinbutton_2d_gain, 1, 2, 0, 1);
+    g_signal_connect(G_OBJECT(m_spinbutton_2d_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
+
+    // 2D freq index
+    label_2d_freq = gtk_label_new (_("Freq. :"));
+    gtk_widget_show (label_2d_freq);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_freq, 270, 10);
+    gtk_widget_set_size_request (label_2d_freq, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_freq, 2, 3, 0, 1);
+
+    m_combobox_2d_freq = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_2d_freq);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_2d_freq, 370, 10);
+    gtk_widget_set_size_request (m_combobox_2d_freq, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_2d_freq, 3, 4, 0, 1);
+
+    // focus sum
+    label_focus_sum = gtk_label_new (_("Focus sum:"));
+    gtk_widget_show (label_focus_sum);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_focus_sum, 5, 50);
+    gtk_widget_set_size_request (label_focus_sum, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_focus_sum , 0, 1, 1, 2);
+
+    m_combobox_focus_sum = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_focus_sum);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_focus_sum, 105, 50);
+    gtk_widget_set_size_request (m_combobox_focus_sum, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_focus_sum, 1, 2, 1, 2);
+    for (i = 1; i <= Img2D::MAX_FOCUS; i ++) {
+        sprintf(buf, "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_focus_sum), buf);
+    }
+    g_signal_connect (G_OBJECT(m_combobox_focus_sum), "changed", G_CALLBACK (HandleComboFocusSum), this);
+
+    // focus position
+    label_focus_pos = gtk_label_new (_("Focus Pos. Index:"));
+    gtk_widget_show (label_focus_pos);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_focus_pos, 260, 50);
+    gtk_widget_set_size_request (label_focus_pos, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_focus_pos, 2, 3, 1, 2);
+
+    m_combobox_focus_pos = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_focus_pos);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_focus_pos, 370, 50);
+    gtk_widget_set_size_request (m_combobox_focus_pos, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_focus_pos, 3, 4, 1, 2);
+
+    // scan range
+    label_scan_range = gtk_label_new (_("Scan Range:"));
+    gtk_widget_show (label_scan_range);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_scan_range, 5, 90);
+    gtk_widget_set_size_request (label_scan_range, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_scan_range, 0, 1, 2, 3);
+
+    m_combobox_scan_range = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_scan_range);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_scan_range, 105, 90);
+    gtk_widget_set_size_request (m_combobox_scan_range, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_scan_range, 1, 2, 2, 3);
+    for (i = 0; i < Img2D::MAX_ANGLE; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_scan_range), buf);
+    }
+
+    // dyanamic range
+    label_dynamic_range = gtk_label_new (_("Dynamic Range:"));
+    gtk_widget_show (label_dynamic_range);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_dynamic_range, 260, 90);
+    gtk_widget_set_size_request (label_dynamic_range, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_dynamic_range, 2, 3, 2, 3);
+
+    m_combobox_dynamic_range = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_dynamic_range);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_dynamic_range, 370, 90);
+    gtk_widget_set_size_request (m_combobox_dynamic_range, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_dynamic_range, 3, 4, 2, 3);
+    for (i = 0; i < Calc2D::MAX_DYNAMIC_INDEX; i ++)  {
+        sprintf(buf , "%ddB", Img2D::DYNAMIC_DATA_D[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_dynamic_range), buf);
+    }
+
+    // line density
+    label_2d_line_density = gtk_label_new (_("Line Density:"));
+    gtk_widget_show (label_2d_line_density);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_line_density, 5, 130);
+    gtk_widget_set_size_request (label_2d_line_density, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_line_density, 0, 1, 3, 4);
+
+    m_combobox_2d_line_density = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_2d_line_density);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_2d_line_density, 105, 130);
+    gtk_widget_set_size_request (m_combobox_2d_line_density, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_2d_line_density, 1, 2, 3, 4);
+    for (i = 0; i < Img2D::MAX_LINE_DENSITY; i ++) {
+        sprintf(buf , "%s", _(Img2D::LINE_DENSITY_DISPLAY[i].c_str()));
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_2d_line_density), buf);
+    }
+
+    // depth
+    label_depth = gtk_label_new (_("Depth Scale:"));
+    gtk_widget_show (label_depth);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_depth, 270, 130);
+    gtk_widget_set_size_request (label_depth, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_depth, 2, 3, 3, 4);
+
+    m_combobox_depth = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_depth);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_depth, 370, 130);
+    gtk_widget_set_size_request (m_combobox_depth, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_depth, 3, 4, 3, 4);
+    for (i = 0; i < Img2D::MAX_SCALE_INDEX; i ++) {
+        sprintf(buf, "%.1f", (float)Img2D::IMG_SCALE[i] / 10);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_depth), buf);
+    }
+
+    // steer
+    label_steer = gtk_label_new (_("Steer:"));
+    gtk_widget_show (label_steer);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_steer, 5, 170);
+    gtk_widget_set_size_request (label_steer, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_steer, 0, 1, 4, 5);
+
+    m_combobox_steer = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_steer);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_steer, 105, 170);
+    gtk_widget_set_size_request (m_combobox_steer, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_steer, 1, 2, 4, 5);
+    for (i = 0; i < Img2D::MAX_STEER; i ++) {
+        sprintf(buf, "%d°", Img2D::STEER_ANGLE[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_steer), buf);
+    }
+
+    // AGC
+    label_agc = gtk_label_new (_("AGC:"));
+    gtk_widget_show (label_agc);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_agc, 270, 170);
+    gtk_widget_set_size_request (label_agc, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_agc, 2, 3, 4, 5);
+
+    m_combobox_agc = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_agc);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_agc, 370, 170);
+    gtk_widget_set_size_request (m_combobox_agc, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_agc, 3, 4, 4, 5);
+    for (i = 0; i < Img2D::MAX_AGC; i++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_agc), buf);
+    }
+
+    // edge enhancement
+    label_edge_enh = gtk_label_new (_("Edge enh. :"));
+    gtk_widget_show (label_edge_enh);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_edge_enh, 5, 210);
+    gtk_widget_set_size_request (label_edge_enh, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_edge_enh, 0, 1, 5, 6);
+
+    m_combobox_edge_enh = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_edge_enh);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_edge_enh, 105, 210);
+    gtk_widget_set_size_request (m_combobox_edge_enh, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_edge_enh, 1, 2, 5, 6);
+    for (i = 0; i < Img2D::MAX_EDGE; i++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_edge_enh), buf);
+    }
+
+    // chroma
+    label_chroma = gtk_label_new (_("Chroma:"));
+    gtk_widget_show (label_chroma);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_chroma, 270, 210);
+    gtk_widget_set_size_request (label_chroma, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_chroma, 2, 3, 5, 6);
+
+    m_combobox_chroma = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_chroma);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_chroma, 370, 210);
+    gtk_widget_set_size_request (m_combobox_chroma, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_chroma, 3, 4, 5, 6);
+    for (i = 0; i < ImgProc2D::MAX_CHROMA; i++) {
+        sprintf(buf , "%s", _(ImgProc2D::CHROMA_TYPE[i].c_str()));
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_chroma), buf);
+    }
+
+    hseparator1 = gtk_hseparator_new ();
+    gtk_widget_show (hseparator1);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), hseparator1, 16, 250);
+    //gtk_widget_set_size_request (hseparator1, 472, 16);
+    gtk_table_attach (GTK_TABLE (table_2d_m_mode), hseparator1, 0, 4, 6, 7,
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), (GtkAttachOptions) (GTK_SHRINK), 0, 0);
+    gtk_widget_set_size_request (hseparator1, -1, 5);
+
+    // left-right
+    label_lr = gtk_label_new (_("L / R:"));
+    gtk_widget_show (label_lr);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_lr, 5, 270);
+    gtk_widget_set_size_request (label_lr, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_lr, 0, 1, 7, 8);
+
+    m_combobox_lr = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_lr);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_lr, 105, 270);
+    gtk_widget_set_size_request (m_combobox_lr, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_lr, 1, 2, 7, 8);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_lr), _("OFF"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_lr), _("ON"));
+
+    // up-down
+    label_ud = gtk_label_new (_("U / D:"));
+    gtk_widget_show (label_ud);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_ud, 270, 270);
+    gtk_widget_set_size_request (label_ud, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_ud, 2, 3, 7, 8);
+
+    m_combobox_ud = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_ud);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_ud, 370, 270);
+    gtk_widget_set_size_request (m_combobox_ud, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_ud, 3, 4, 7, 8);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ud), _("OFF"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ud), _("ON"));
+
+    // polarity
+    label_polarity = gtk_label_new (_("Polarity:"));
+    gtk_widget_show (label_polarity);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_polarity, 5, 310);
+    gtk_widget_set_size_request (label_polarity, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_polarity, 0, 1, 8, 9);
+
+    m_combobox_polarity = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_polarity);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_polarity, 105, 310);
+    gtk_widget_set_size_request (m_combobox_polarity, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_polarity, 1, 2, 8, 9);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_polarity), _("OFF"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_polarity), _("ON"));
+
+    // frame aver
+    label_frame = gtk_label_new (_("Frame aver. :"));
+    gtk_widget_show (label_frame);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_frame, 5, 350);
+    gtk_widget_set_size_request (label_frame, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_frame, 2, 3, 8, 9);
+    m_combobox_frame = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_frame);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_frame, 105, 350);
+    gtk_widget_set_size_request (m_combobox_frame, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_frame, 3, 4, 8, 9);
+    for (i = 0; i < ImgProc2D::MAX_FRAME; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_frame), buf);
+    }
+
+    // line aver
+    label_line_aver = gtk_label_new (_("Line aver. :"));
+    gtk_widget_show (label_line_aver);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_line_aver, 270, 350);
+    gtk_widget_set_size_request (label_line_aver, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_line_aver, 0, 1, 9, 10);
+
+    m_combobox_line_aver = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_line_aver);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_line_aver, 370, 350);
+    gtk_widget_set_size_request (m_combobox_line_aver, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_line_aver, 1, 2, 9, 10);
+    for (i = 0; i < ImgProc2D::MAX_LINE; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_line_aver), buf);
+    }
+
+    // smooth
+    label_2d_smooth = gtk_label_new (_("Smooth:"));
+    gtk_widget_show (label_2d_smooth);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_smooth, 5, 390);
+    gtk_widget_set_size_request (label_2d_smooth, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_smooth, 2, 3, 9, 10);
+
+    m_combobox_2d_smooth = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_2d_smooth);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_2d_smooth, 105, 390);
+    gtk_widget_set_size_request (m_combobox_2d_smooth, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_2d_smooth, 3, 4, 9, 10);
+    for (i = 0; i < ImgProc2D::MAX_SMOOTH; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_2d_smooth), buf);
+    }
+
+    // restric
+    label_restric = gtk_label_new (_("Reject:"));
+    gtk_widget_show (label_restric);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_restric, 270, 390);
+    gtk_widget_set_size_request (label_restric, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_restric, 0, 1, 10, 11);
+
+    m_combobox_restric = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_restric);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_restric, 370, 390);
+    gtk_widget_set_size_request (m_combobox_restric, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_restric, 1, 2, 10, 11);
+    for (i = 0; i < ImgProc2D::MAX_REJECT; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_restric), buf);
+    }
+
+    // gray transform
+    label_gray_transform = gtk_label_new (_("GrayTrans:"));
+    gtk_widget_show (label_gray_transform);
+    gtk_widget_set_size_request (label_gray_transform, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_gray_transform, 2, 3, 10, 11);
+
+    m_combobox_gray_trans = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_gray_trans);
+    gtk_widget_set_size_request (m_combobox_gray_trans, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_gray_trans, 3, 4, 10, 11);
+    //float value = 1.0;
+    //sprintf(buf , "%.1f", value);
+    //gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_gray_trans), 0, "C0");
+    for (i = 0; i < ImgProc2D::MAX_TRANS_CURVE; i ++) {
+        sprintf(buf , "C%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_gray_trans), buf);
+    }
+
+    hseparator2 = gtk_hseparator_new ();
+    gtk_widget_show (hseparator2);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), hseparator2, 10, 430);
+    //gtk_widget_set_size_request (hseparator2, 470, 16);
+    gtk_table_attach (GTK_TABLE (table_2d_m_mode), hseparator2, 0, 4, 11, 12,
+                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), (GtkAttachOptions) (GTK_SHRINK), 0, 0);
+    gtk_widget_set_size_request (hseparator2, -1, 5);
+
+    // THI
+    label_thi = gtk_label_new (_("THI:"));
+    gtk_widget_show (label_thi);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_thi, 5, 450);
+    gtk_widget_set_size_request (label_thi, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_thi, 0, 1, 12, 13);
+
+    m_combobox_thi = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_thi);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_thi, 105, 450);
+    gtk_widget_set_size_request (m_combobox_thi, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_thi, 1, 2, 12, 13);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_thi), _("OFF"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_thi), _("ON"));
+
+    // TSI
+    label_tsi = gtk_label_new (_("TSI:"));
+    gtk_widget_show (label_tsi);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_tsi, 270, 450);
+    gtk_widget_set_size_request (label_tsi, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_tsi, 2, 3, 12, 13);
+
+    m_combobox_tsi = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_tsi);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_tsi, 370, 450);
+    gtk_widget_set_size_request (m_combobox_tsi, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_tsi, 3, 4, 12, 13);
+    for (i = 0; i < Img2D::MAX_TSI; i ++) {
+        sprintf(buf , "%s", _(Img2D::TSI_DISPLAY[i].c_str()));
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_tsi), buf);
+    }
+
+    // image enhance
+    label_imgEnh = gtk_label_new (_("ePure:"));
+    gtk_widget_show (label_imgEnh);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_imgEnh, 5, 490);
+    gtk_widget_set_size_request (label_imgEnh, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_imgEnh, 0, 1, 13, 14);
+
+    m_combobox_imgEnh = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_imgEnh);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_imgEnh, 105, 490);
+    gtk_widget_set_size_request (m_combobox_imgEnh, 100, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_imgEnh, 1, 2, 13, 14);
+    for (i = 0; i < ImgProc2D::MAX_IMG_EHN; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_imgEnh), buf);
+    }
+
+    // M gain
+    label_m_gain = gtk_label_new (_("M Gain:"));
+    gtk_widget_show (label_m_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_m_gain, 270, 490);
+    gtk_widget_set_size_request (label_m_gain, -1, 30);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_m_gain, 2, 3, 13, 14);
+
+    spinbutton_m_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
+    m_spinbutton_m_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_m_gain_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_m_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_spinbutton_m_gain, 370, 490);
+    gtk_widget_set_size_request (m_spinbutton_m_gain, 100, 27);
+    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_spinbutton_m_gain, 3, 4, 13, 14);
+    g_signal_connect(G_OBJECT(m_spinbutton_m_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
+
+    //space compound
+    label_space_compound = gtk_label_new(_("SpaceCompound:"));
+    gtk_widget_show(label_space_compound);
+    gtk_widget_set_size_request(label_space_compound, -1, 30);
+    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), label_space_compound, 0, 1, 14, 15);
+    m_combobox_space_compound = gtk_combo_box_new_text();
+    gtk_widget_show(m_combobox_space_compound);
+    gtk_widget_set_size_request(m_combobox_space_compound, -1, 30);
+    gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_space_compound), 0, _("OFF"));
+    for(i = 1; i <Img2D::MAX_SPACE_COMPOUND; i ++) {
+        sprintf(buf, "%d", i);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_space_compound), buf);
+    }
+    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_space_compound, 1, 2, 14, 15);
+
+    //freq compound
+    label_freq_compound = gtk_label_new(_("FreqCompound:"));
+    gtk_widget_show(label_freq_compound);
+    gtk_widget_set_size_request(label_freq_compound, -1, 30);
+    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), label_freq_compound, 2, 3, 14, 15);
+    m_combobox_freq_compound = gtk_combo_box_new_text();
+    gtk_widget_show(m_combobox_freq_compound);
+    gtk_widget_set_size_request(m_combobox_freq_compound, -1, 30);
+    gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_freq_compound), 0, _("OFF"));
+    gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_freq_compound), 1, _("ON"));
+    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_freq_compound, 3, 4, 14, 15);
+
+    //thi freq
+    label_thi_freq = gtk_label_new(_("FH:"));
+    gtk_widget_show(label_thi_freq);
+    gtk_widget_set_size_request(label_thi_freq, -1, 30);
+    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), label_thi_freq, 0, 1, 15, 16);
+    m_combobox_thi_freq = gtk_combo_box_new_text();
+    gtk_widget_show(m_combobox_thi_freq);
+    gtk_widget_set_size_request(m_combobox_thi_freq, -1, 30);
+    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_thi_freq, 1, 2, 15, 16);
+
+    // pw mode
+    frame_pw_mode = gtk_frame_new (NULL);
+    gtk_widget_show (frame_pw_mode);
+    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_pw_mode, 5, 715); //660
+    //gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_pw_mode, 5, 715 - 40); //660
+    gtk_widget_set_size_request (frame_pw_mode, 520, 200);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame_pw_mode), GTK_SHADOW_OUT);
+
+    fixed_pw_mode = gtk_fixed_new ();
+    gtk_widget_show (fixed_pw_mode);
+    gtk_container_add (GTK_CONTAINER (frame_pw_mode), fixed_pw_mode);
+
+    label_pw_mode = gtk_label_new (_("<b>PW mode</b>"));
+    gtk_widget_show (label_pw_mode);
+    gtk_frame_set_label_widget (GTK_FRAME (frame_pw_mode), label_pw_mode);
+    gtk_label_set_use_markup (GTK_LABEL (label_pw_mode), TRUE);
+
+    table_pw_mode = gtk_table_new (5, 4, FALSE);
+    gtk_widget_show (table_pw_mode);
+    gtk_fixed_put (GTK_FIXED (fixed_pw_mode), table_pw_mode, 20, 5);
+    gtk_widget_set_size_request (table_pw_mode, 480, 170);
+    gtk_table_set_row_spacings (GTK_TABLE(table_pw_mode), 10);
+
+    // doppler freq
+    label_pw_freq = gtk_label_new (_("Freq. :"));
+    gtk_widget_show (label_pw_freq);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_freq, 5, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_freq, 0, 1, 0, 1);
+    gtk_widget_set_size_request (label_pw_freq, -1, 30);
+
+    m_combobox_pw_freq = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_pw_freq);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_freq, 105, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_freq, 1, 2, 0, 1);
+    gtk_widget_set_size_request (m_combobox_pw_freq, 100, 30);
+
+    // pw gain
+    label_pw_gain = gtk_label_new (_("PW Gain:"));
+    gtk_widget_show (label_pw_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_gain, 270, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_gain, 2, 3, 0, 1);
+    gtk_widget_set_size_request (label_pw_gain, -1, 30);
+
+    spinbutton_pw_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
+    m_spinbutton_pw_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_pw_gain_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_pw_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_spinbutton_pw_gain, 370, 12);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_spinbutton_pw_gain, 3, 4, 0, 1);
+    gtk_widget_set_size_request (m_spinbutton_pw_gain, 100, 27);
+    g_signal_connect(G_OBJECT(m_spinbutton_pw_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
+
+    // pw scale
+    label_pw_scale_prf = gtk_label_new (_("Scale PRF:"));
+    gtk_widget_show (label_pw_scale_prf);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_scale_prf, 5, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_scale_prf, 0, 1, 1, 2);
+    gtk_widget_set_size_request (label_pw_scale_prf, -1, 30);
+
+    m_combobox_pw_scale_prf = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_pw_scale_prf);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_scale_prf, 105, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_scale_prf, 1, 2, 1, 2);
+    gtk_widget_set_size_request (m_combobox_pw_scale_prf, 100, 30);
+    for (i = 0; i < ImgPw::MAX_PRF; i ++) {
+        sprintf(buf , "%dHz", ImgPw::PW_PRF[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_pw_scale_prf), buf);
+    }
+    g_signal_connect (G_OBJECT(m_combobox_pw_scale_prf ), "changed", G_CALLBACK (HandleComboPwPrf), this);
+
+    // wall filter
+    label_pw_wallfilter = gtk_label_new (_("Wall Filter:"));
+    gtk_widget_show (label_pw_wallfilter);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_wallfilter, 270, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_wallfilter, 2, 3, 1, 2);
+    gtk_widget_set_size_request (label_pw_wallfilter, -1, 30);
+
+    m_combobox_pw_wallfilter = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_pw_wallfilter);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_wallfilter, 370, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_wallfilter, 3, 4, 1, 2);
+    gtk_widget_set_size_request (m_combobox_pw_wallfilter, 100, 30);
+
+    // angle
+    label_pw_angle = gtk_label_new (_("Angle:"));
+    gtk_widget_show (label_pw_angle);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_angle, 0, 1, 2, 3);
+    gtk_widget_set_size_request (label_pw_angle , -1, 30);
+
+    spinbutton_pw_angle_adj = gtk_adjustment_new (0, -85, 85, 5, 1, 0);
+    m_spinbutton_pw_angle = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_pw_angle_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_pw_angle);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_spinbutton_pw_angle, 1, 2, 2, 3);
+    gtk_widget_set_size_request (m_spinbutton_pw_angle, 100, 27);
+    g_signal_connect(G_OBJECT(m_spinbutton_pw_angle), "insert_text", G_CALLBACK(on_spinbutton_insert_angle), this);
+    g_signal_connect(G_OBJECT(m_spinbutton_pw_angle), "output", G_CALLBACK(on_spinbutton_output_angle), this);
+
+    hseparator3 = gtk_hseparator_new ();
+    gtk_widget_show (hseparator3);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), hseparator3, 8, 88);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), hseparator3, 0, 4, 3, 4);
+    gtk_widget_set_size_request (hseparator3, -1, 5);
+
+    // invert
+    label_pw_invert = gtk_label_new (_("Spectrum Invert:"));
+    gtk_widget_show (label_pw_invert);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_invert, 5, 110);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_invert, 0, 1, 4, 5);
+    gtk_widget_set_size_request (label_pw_invert, -1, 30);
+
+    m_combobox_pw_invert = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_pw_invert);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_invert, 105, 110);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_invert, 1, 2, 4, 5);
+    gtk_widget_set_size_request (m_combobox_pw_invert, 100, 30);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_pw_invert), _("OFF"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_pw_invert), _("ON"));
+
+    // time resolustion
+    label_time_resolution = gtk_label_new (_("Time Resolution:"));
+    gtk_widget_show (label_time_resolution);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_time_resolution, 260, 110);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_time_resolution, 2, 3, 4, 5);
+    gtk_widget_set_size_request (label_time_resolution, -1, 30);
+
+    m_combobox_time_resolution = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_time_resolution);
+    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_time_resolution, 370, 110);
+    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_time_resolution, 3, 4, 4, 5);
+    gtk_widget_set_size_request (m_combobox_time_resolution, 100, 30);
+    for (i = 0; i < ImgProcPw::MAX_TIME_RES; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_time_resolution), buf);
+    }
+
+    // cfm mode
+    frame_cfm_mode = gtk_frame_new (NULL);
+    gtk_widget_show (frame_cfm_mode);
+    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_cfm_mode, 5, 935); //880
+    //gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_cfm_mode, 5, 935 - 40); //880
+    gtk_widget_set_size_request (frame_cfm_mode, 520, 260);
+    gtk_frame_set_shadow_type (GTK_FRAME (frame_cfm_mode), GTK_SHADOW_OUT);
+
+    fixed_cfm_mode = gtk_fixed_new ();
+    gtk_widget_show (fixed_cfm_mode);
+    gtk_container_add (GTK_CONTAINER (frame_cfm_mode), fixed_cfm_mode);
+
+    label_cfm_mode = gtk_label_new (_("<b>CFM mode</b>"));
+    gtk_widget_show (label_cfm_mode);
+    gtk_frame_set_label_widget (GTK_FRAME (frame_cfm_mode), label_cfm_mode);
+    gtk_label_set_use_markup (GTK_LABEL (label_cfm_mode), TRUE);
+
+    table_cfm_mode = gtk_table_new (6, 4, FALSE);
+    gtk_widget_show (table_cfm_mode);
+    gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), table_cfm_mode, 20, 5);
+    gtk_widget_set_size_request (table_cfm_mode, 480, 230);
+    gtk_table_set_row_spacings (GTK_TABLE(table_cfm_mode), 10);
+
+    // cfm gain
+    label_color_gain = gtk_label_new (_("Color Gain:"));
+    gtk_widget_show (label_color_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_color_gain, 5, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_color_gain, 0, 1, 0, 1);
+    gtk_widget_set_size_request (label_color_gain, -1, 30);
+
+    spinbutton_cfm_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
+    m_spinbutton_cfm_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_cfm_gain_adj), 1, 0);
+    gtk_widget_show (m_spinbutton_cfm_gain);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_spinbutton_cfm_gain, 105, 12);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_spinbutton_cfm_gain, 1, 2, 0, 1);
+    gtk_widget_set_size_request (m_spinbutton_cfm_gain, 100, 27);
+    g_signal_connect(G_OBJECT(m_spinbutton_cfm_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
+
+    // cfm scale
+    label_cfm_scale_prf = gtk_label_new (_("Scale PRF:"));
+    gtk_widget_show (label_cfm_scale_prf);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_scale_prf, 270, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_scale_prf, 2, 3, 0, 1);
+    gtk_widget_set_size_request (label_cfm_scale_prf, -1, 30);
+
+    m_combobox_cfm_scale_prf = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_cfm_scale_prf);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_scale_prf, 370, 10);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_scale_prf, 3, 4, 0, 1);
+    gtk_widget_set_size_request (m_combobox_cfm_scale_prf, 100, 30);
+    for (i = 0; i < ImgCfm::MAX_PRF_INDEX; i ++) {
+        sprintf(buf , "%dHz", ImgCfm::CFM_PRF[i]);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_scale_prf), buf);
+    }
+    g_signal_connect (G_OBJECT(m_combobox_cfm_scale_prf), "changed", G_CALLBACK (HandleComboCfmPrf), this);
+
+    // sensitive
+    label_sensitivity = gtk_label_new (_("Sensitivity:"));
+    gtk_widget_show (label_sensitivity);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_sensitivity, 5, 90);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_sensitivity, 0, 1, 1, 2);
+    gtk_widget_set_size_request (label_sensitivity, -1, 30);
+    m_combobox_sensitivity = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_sensitivity);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_sensitivity, 105, 90);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_sensitivity, 1, 2, 1, 2);
+    gtk_widget_set_size_request (m_combobox_sensitivity, 100, 30);
+
+    g_signal_connect (G_OBJECT(m_combobox_sensitivity), "changed", G_CALLBACK (HandleComboCfmSensitivity), this);
+
+    // cfm wall filter
+    label_cfm_wallfilter = gtk_label_new (_("Wall Filter:"));
+    gtk_widget_show (label_cfm_wallfilter);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_wallfilter, 5, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_wallfilter, 2, 3, 1, 2);
+    gtk_widget_set_size_request (label_cfm_wallfilter, -1, 30);
+
+    m_combobox_cfm_wallfilter = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_cfm_wallfilter);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_wallfilter, 105, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_wallfilter, 3, 4, 1, 2);
+    gtk_widget_set_size_request (m_combobox_cfm_wallfilter, 100, 30);
+
+    // color line density
+    label_cfm_line_density = gtk_label_new (_("Line Density:"));
+    gtk_widget_show (label_cfm_line_density);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_line_density, 270, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_line_density, 0, 1, 2, 3);
+    gtk_widget_set_size_request (label_cfm_line_density, -1, 30);
+
+    m_combobox_cfm_line_density = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_cfm_line_density);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_line_density, 370, 50);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_line_density, 1, 2, 2, 3);
+    gtk_widget_set_size_request (m_combobox_cfm_line_density, 100, 30);
+    for (i = 0; i < ImgCfm::MAX_LINE_DENSITY; i ++) {
+        sprintf(buf , "%s", _(ImgCfm::LINE_DENSITY_DISPLAY[i].c_str()));
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_line_density), buf);
+    }
+
+    // variance
+    label_variance = gtk_label_new (_("Variance:"));
+    gtk_widget_show (label_variance);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_variance, 270, 90);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_variance, 2, 3, 2, 3);
+    gtk_widget_set_size_request (label_variance, -1, 30);
+
+    m_combobox_variance = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_variance);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_variance, 370, 90);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_variance, 3, 4, 2, 3);
+    gtk_widget_set_size_request (m_combobox_variance, -1, 30);
+    for (i = 0; i < ImgCfm::MAX_TURB; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_variance), buf);
+    }
+
+    hseparator4 = gtk_hseparator_new ();
+    gtk_widget_show (hseparator4);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), hseparator4, 5, 130);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), hseparator4, 0, 4, 3, 4);
+    gtk_widget_set_size_request (hseparator4, -1, 5);
+
+    // invert
+    label_cfm_invert = gtk_label_new (_("Color Invert:"));
+    gtk_widget_show (label_cfm_invert);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_invert, 5, 150);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_invert, 0, 1, 4, 5);
+    gtk_widget_set_size_request (label_cfm_invert, -1, 30);
+
+    m_combobox_cfm_invert = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_cfm_invert);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_invert, 105, 150);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_invert, 1, 2, 4, 5);
+    gtk_widget_set_size_request (m_combobox_cfm_invert, 100, 30);
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_invert), _("OFF"));
+    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_invert), _("ON"));
+
+    // persistence
+    label_persistence = gtk_label_new (_("Persistence:"));
+    gtk_widget_show (label_persistence);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_persistence, 270, 150);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_persistence, 2, 3, 4, 5);
+    gtk_widget_set_size_request (label_persistence, -1, 30);
+
+    m_combobox_persistence = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_persistence);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_persistence, 370, 150);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_persistence, 3, 4, 4, 5);
+    gtk_widget_set_size_request (m_combobox_persistence, 100, 30);
+    for (i = 0; i < ImgProcCfm::MAX_PERSIST; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_persistence), buf);
+    }
+
+    // color rejection
+    label_color_rejection = gtk_label_new (_("Color Reject:"));
+    gtk_widget_show (label_color_rejection);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_color_rejection, 5, 190);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_color_rejection, 0, 1, 5, 6);
+    gtk_widget_set_size_request (label_color_rejection, -1, 30);
+
+    m_combobox_color_rejection = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_color_rejection);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_color_rejection, 105, 190);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_color_rejection, 1, 2, 5, 6);
+    gtk_widget_set_size_request (m_combobox_color_rejection, 100, 30);
+    for (i = 0; i < ImgProcCfm::MAX_REJECT; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_color_rejection), buf);
+    }
+
+    // cfm smooth
+    label_cfm_smooth = gtk_label_new (_("Smooth:"));
+    gtk_widget_show (label_cfm_smooth);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_smooth, 270, 190);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_smooth, 2, 3, 5, 6);
+    gtk_widget_set_size_request (label_cfm_smooth, -1, 30);
+
+    m_combobox_cfm_smooth = gtk_combo_box_new_text ();
+    gtk_widget_show (m_combobox_cfm_smooth);
+    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_smooth, 370, 190);
+    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_smooth, 3, 4, 5, 6);
+    gtk_widget_set_size_request (m_combobox_cfm_smooth, 100, 30);
+    for (i = 0; i < ImgProcCfm::MAX_SMOOTH; i ++) {
+        sprintf(buf , "%d", i);
+        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_smooth), buf);
+    }
+
+    return fixed_image;
+  */
+}
+
+void ViewSystem::init_image_setting() {
+  string probe_type = TopArea::GetInstance()->GetProbeType();
+
+  for (int i = 0; i < NUM_PROBE; ++i) {
+    if (probe_type == g_probe_list[i]) {
+      string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(probe_type);
+      gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), i);
+    }
+  }
+
+  set_image_item_sensitive(false);
+}
+
+void ViewSystem::save_image_setting() {
+  string name = GetUserName();
+  if (name == "System Default" && name == "Умолчан системы" &&
+    name == "系统默认" && name == "Domyślne Systemu" && name == "Par défaut du sys." &&
+    name == "Systemvorgabe" && name == "Sistema por defecto") {
+    UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
+  }
+
+  ExamItem::ParaItem paraItem;
+  GetImagePara(paraItem);
+
+  int probeIndex = 0;
+  int itemIndex = 0;
+  char* itemName = NULL;
+  GetImageNoteSelection(probeIndex, itemIndex, itemName);
+
+  if (probeIndex >= 0 && itemIndex >= 0) {
+    ExamItem examItem;
+    examItem.WriteExamItemPara(probeIndex, itemIndex, &paraItem, itemName);
+  }
+}
+
+GtkWidget* ViewSystem::create_note_measure() {
+  GtkTable* table = Utils::create_table(13, 6);
+
+  // Unit Setting
+  GtkFrame* frame_unit_setting = Utils::create_frame(_("Unit Setting"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_unit_setting), 0, 2, 0, 11);
+
+  GtkTable* table_unit_setting = Utils::create_table(7, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_unit_setting), 5);
+  gtk_container_add(GTK_CONTAINER(frame_unit_setting), GTK_WIDGET(table_unit_setting));
+
+  GtkLabel* label_unit_dist = Utils::create_label(_("Distance"));
+  m_combobox_unit_dist = Utils::create_combobox_text();
+
+  GtkLabel* label_unit_area = Utils::create_label(_("Area"));
+  m_combobox_unit_area = Utils::create_combobox_text();
+
+  GtkLabel* label_unit_vol = Utils::create_label(_("Volume"));
+  m_combobox_unit_vol = Utils::create_combobox_text();
+
+  GtkLabel* label_unit_time = Utils::create_label(_("Time"));
+  m_combobox_unit_time = Utils::create_combobox_text();
+
+  GtkLabel* label_unit_vel = Utils::create_label(_("Velocity"));
+  m_combobox_unit_vel = Utils::create_combobox_text();
+
+  GtkLabel* label_unit_accel = Utils::create_label(_("Accel"));
+  m_combobox_unit_accel = Utils::create_combobox_text();
+
+  GtkLabel* label_unit_efw = Utils::create_label(_("EFW"));
+  m_combobox_unit_efw = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_dist), 0, 1, 0, 1);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_dist), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_area), 0, 1, 1, 2);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_area), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_vol), 0, 1, 2, 3);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_vol), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_time), 0, 1, 3, 4);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_time), 1, 3, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_vel), 0, 1, 4, 5);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_vel), 1, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_accel), 0, 1, 5, 6);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_accel), 1, 3, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_efw), 0, 1, 6, 7);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_efw), 1, 3, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_unit_dist, "cm");
+  gtk_combo_box_text_append_text(m_combobox_unit_dist, "mm");
+  gtk_combo_box_text_append_text(m_combobox_unit_area, "cm²");
+  gtk_combo_box_text_append_text(m_combobox_unit_area,"mm²");
+  gtk_combo_box_text_append_text(m_combobox_unit_vol,"cm³");
+  gtk_combo_box_text_append_text(m_combobox_unit_vol, "mm³");
+  gtk_combo_box_text_append_text(m_combobox_unit_time, "s");
+  gtk_combo_box_text_append_text(m_combobox_unit_time, "ms");
+  gtk_combo_box_text_append_text(m_combobox_unit_vel, "cm/s");
+  gtk_combo_box_text_append_text(m_combobox_unit_vel, "mm/s");
+  gtk_combo_box_text_append_text(m_combobox_unit_vel, "m/s");
+  gtk_combo_box_text_append_text(m_combobox_unit_accel, "cm/s²");
+  gtk_combo_box_text_append_text(m_combobox_unit_accel, "mm/s²");
+  gtk_combo_box_text_append_text(m_combobox_unit_accel, "m/s²");
+  gtk_combo_box_text_append_text(m_combobox_unit_efw, "kg");
+  gtk_combo_box_text_append_text(m_combobox_unit_efw, "g");
+
+  // Heart Beat
+  GtkLabel* label_heart_beat = Utils::create_label(_("Heart Beat:"));
+  m_combobox_heart_beat = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_heart_beat), 0, 1, 11, 12);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_heart_beat), 1, 2, 11, 12, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "1");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "2");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "3");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "4");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "5");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "6");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "7");
+  gtk_combo_box_text_append_text(m_combobox_heart_beat, "8");
+
+  // Auto Spectrum Calculation Result
+  GtkFrame* frame_auto_spectrum = Utils::create_frame(_("Auto Spectrum Calculation Result"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_auto_spectrum), 2, 6, 0, 4);
+
+  GtkTable* table_auto_spectrum = Utils::create_table(3, 4);
+  gtk_container_set_border_width(GTK_CONTAINER(table_auto_spectrum), 5);
+  gtk_container_add(GTK_CONTAINER(frame_auto_spectrum), GTK_WIDGET(table_auto_spectrum));
+
+  m_checkbutton_autocalc_ps = Utils::create_check_button(_("PS"));
+  m_checkbutton_autocalc_ed = Utils::create_check_button(_("ED"));
+  m_checkbutton_autocalc_ri = Utils::create_check_button(_("RI"));
+  m_checkbutton_autocalc_sd = Utils::create_check_button(_("SD"));
+  m_checkbutton_autocalc_tamax = Utils::create_check_button(_("TA Max"));
+  m_checkbutton_autocalc_pi = Utils::create_check_button(_("PI"));
+  m_checkbutton_autocalc_time = Utils::create_check_button(_("Time"));
+  m_checkbutton_autocalc_hr = Utils::create_check_button(_("HR"));
+  m_checkbutton_autocalc_pgmax = Utils::create_check_button(_("PG Max"));
+  m_checkbutton_autocalc_pgmean = Utils::create_check_button(_("PG Mean"));
+
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_ps), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_ed), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_ri), 2, 3, 0, 1);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_sd), 3, 4, 0, 1);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_tamax), 0, 1, 1, 2);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_pi), 1, 2, 1, 2);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_time), 2, 3, 1, 2);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_hr), 3, 4, 1, 2);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_pgmax), 0, 1, 2, 3);
+  gtk_table_attach_defaults(table_auto_spectrum, GTK_WIDGET(m_checkbutton_autocalc_pgmean), 1, 2, 2, 3);
+
+  gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_autocalc_ps), FALSE);
+  gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_autocalc_ed), FALSE);
+  g_signal_connect(G_OBJECT(m_checkbutton_autocalc_tamax), "toggled", G_CALLBACK(signal_togglebutton_toggled_tamax), this);
+  g_signal_connect(G_OBJECT(m_checkbutton_autocalc_pi), "toggled", G_CALLBACK(signal_togglebutton_toggled_pi), this);
+  g_signal_connect(G_OBJECT(m_checkbutton_autocalc_hr), "toggled", G_CALLBACK(signal_togglebutton_toggled_hr), this);
+
+  // Line Color
+  GtkFrame* frame_line_color = Utils::create_frame(_("Line Color"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_line_color), 2, 6, 4, 6);
+
+  GtkTable* table_line_color = Utils::create_table(1, 4);
+  gtk_container_set_border_width(GTK_CONTAINER(table_line_color), 5);
+  gtk_container_add(GTK_CONTAINER(frame_line_color), GTK_WIDGET(table_line_color));
+
+  GtkLabel* label_current_line = Utils::create_label(_("Current Line:"));
+  m_combobox_current_line = Utils::create_combobox_text();
+  GtkLabel* label_confirmed_line = Utils::create_label(_("Confirmed Line:"));
+  m_combobox_confirmed_line = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_line_color, GTK_WIDGET(label_current_line), 0, 1, 0, 1);
+  gtk_table_attach(table_line_color, GTK_WIDGET(m_combobox_current_line), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_line_color, GTK_WIDGET(label_confirmed_line), 2, 3, 0, 1);
+  gtk_table_attach(table_line_color, GTK_WIDGET(m_combobox_confirmed_line), 3, 4, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_current_line, _("Red"));
+  gtk_combo_box_text_append_text(m_combobox_current_line, _("Yellow"));
+  gtk_combo_box_text_append_text(m_combobox_current_line, _("Green"));
+  gtk_combo_box_text_append_text(m_combobox_current_line, _("Blue"));
+  gtk_combo_box_text_append_text(m_combobox_current_line, _("White"));
+
+  gtk_combo_box_text_append_text(m_combobox_confirmed_line, _("Red"));
+  gtk_combo_box_text_append_text(m_combobox_confirmed_line, _("Yellow"));
+  gtk_combo_box_text_append_text(m_combobox_confirmed_line, _("Green"));
+  gtk_combo_box_text_append_text(m_combobox_confirmed_line, _("Blue"));
+  gtk_combo_box_text_append_text(m_combobox_confirmed_line, _("White"));
+
+  // Report Result Method
+  GtkFrame* frame_report_result = Utils::create_frame(_("Report Result Method"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_report_result), 2, 4, 6, 8);
+
+  GtkTable* table_report_result = Utils::create_table(1, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_report_result), 5);
+  gtk_container_add(GTK_CONTAINER(frame_report_result), GTK_WIDGET(table_report_result));
+
+  m_radiobutton_report_last = Utils::create_radio_button(NULL, _("Last"));
+  GSList* radiobutton_report_group = gtk_radio_button_get_group(m_radiobutton_report_last);
+  m_radiobutton_report_average = Utils::create_radio_button(radiobutton_report_group, _("Average"));
+
+  gtk_table_attach_defaults(table_report_result, GTK_WIDGET(m_radiobutton_report_last), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_report_result, GTK_WIDGET(m_radiobutton_report_average), 1, 2, 0, 1);
+
+  // Measure Result Font Size
+  GtkFrame* frame_measure_result = Utils::create_frame(_("Measure Result Font Size"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_measure_result), 4, 6, 6, 8);
+
+  GtkTable* table_measure_result = Utils::create_table(1, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_measure_result), 5);
+  gtk_container_add(GTK_CONTAINER(frame_measure_result), GTK_WIDGET(table_measure_result));
+
+  m_radiobutton_result_small = Utils::create_radio_button(NULL, _("Small"));
+  GSList* radiobutton_result_group = gtk_radio_button_get_group(m_radiobutton_result_small);
+  m_radiobutton_result_big = Utils::create_radio_button(radiobutton_result_group, _("Big"));
+
+  gtk_table_attach_defaults(table_measure_result, GTK_WIDGET(m_radiobutton_result_small), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_measure_result, GTK_WIDGET(m_radiobutton_result_big), 1, 2, 0, 1);
+
+  // Trace Method
+  GtkFrame* frame_trace_method = Utils::create_frame(_("Trace Method"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_trace_method), 2, 4, 8, 10);
+
+  GtkTable* table_trace_method = Utils::create_table(1, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_trace_method), 5);
+  gtk_container_add(GTK_CONTAINER(frame_trace_method), GTK_WIDGET(table_trace_method));
+
+  m_radiobutton_trace_point = Utils::create_radio_button(NULL, _("Point"));
+  GSList* radiobutton_trace_group = gtk_radio_button_get_group(m_radiobutton_trace_point);
+  m_radiobutton_trace_track = Utils::create_radio_button(radiobutton_trace_group, _("Track"));
+  radiobutton_trace_group = gtk_radio_button_get_group(m_radiobutton_trace_track);
+  m_radiobutton_trace_auto = Utils::create_radio_button(radiobutton_trace_group, _("Auto"));
+
+  gtk_table_attach_defaults(table_trace_method, GTK_WIDGET(m_radiobutton_trace_point), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_trace_method, GTK_WIDGET(m_radiobutton_trace_track), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_trace_method, GTK_WIDGET(m_radiobutton_trace_auto), 2, 3, 0, 1);
+
+  // Cursor Size
+  GtkFrame* frame_cursor_size = Utils::create_frame(_("Cursor Size"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_cursor_size), 4, 6, 8, 10);
+
+  GtkTable* table_cursor_size = Utils::create_table(1, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_cursor_size), 5);
+  gtk_container_add(GTK_CONTAINER(frame_cursor_size), GTK_WIDGET(table_cursor_size));
+
+  m_radiobutton_cursor_big = Utils::create_radio_button(NULL, _("Big"));
+  GSList* radiobutton_cursor_size_group = gtk_radio_button_get_group(m_radiobutton_cursor_big);
+  m_radiobutton_cursor_mid = Utils::create_radio_button(radiobutton_cursor_size_group, _("Mid"));
+  radiobutton_cursor_size_group = gtk_radio_button_get_group(m_radiobutton_cursor_mid);
+  m_radiobutton_cursor_small = Utils::create_radio_button(radiobutton_cursor_size_group, _("Small"));
+
+  gtk_table_attach_defaults(table_cursor_size, GTK_WIDGET(m_radiobutton_cursor_big), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_cursor_size, GTK_WIDGET(m_radiobutton_cursor_mid), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_cursor_size, GTK_WIDGET(m_radiobutton_cursor_small), 2, 3, 0, 1);
+
+  // Measure Line
+  GtkFrame* frame_measure_line = Utils::create_frame(_("Measure Line"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_measure_line), 2, 4, 10, 12);
+
+  GtkTable* table_measure_line = Utils::create_table(1, 2);
+  gtk_container_set_border_width(GTK_CONTAINER(table_measure_line), 5);
+  gtk_container_add(GTK_CONTAINER(frame_measure_line), GTK_WIDGET(table_measure_line));
+
+  m_radiobutton_measure_line_on = Utils::create_radio_button(NULL, _("ON"));
+  GSList* radiobutton_measure_line_group = gtk_radio_button_get_group(m_radiobutton_measure_line_on);
+  m_radiobutton_measure_line_off = Utils::create_radio_button(radiobutton_measure_line_group, _("OFF"));
+
+  gtk_table_attach_defaults(table_measure_line, GTK_WIDGET(m_radiobutton_measure_line_on), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_measure_line, GTK_WIDGET(m_radiobutton_measure_line_off), 1, 2, 0, 1);
+
+  // Default Factory
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_default, "clicked", G_CALLBACK (signal_button_clicked_measure_default), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
+  if (sysMeasure == NULL) {
+    sysMeasure = new SysMeasurementSetting();
+  }
+
+  // Unit Setting
+
+  int unitDist = sysMeasure->GetUnitDist();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_dist), unitDist);
+
+  int unitArea = sysMeasure->GetUnitArea();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_area), unitArea);
+
+  int unitVol = sysMeasure->GetUnitVol();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_vol), unitVol);
+
+  int unitTime = sysMeasure->GetUnitTime();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_time), unitTime);
+
+  int unitVel = sysMeasure->GetUnitVel();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_vel), unitVel);
+
+  int unitAccel = sysMeasure->GetUnitAccel();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_accel), unitAccel);
+
+  int unitEfw = sysMeasure->GetUnitEfw();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_efw), unitEfw);
+
+  // Heart Beat
+
+  int heartBeatCycleIndex = sysMeasure->GetHeartBeatCycle() - 1;
+  if (heartBeatCycleIndex < 0) {
+    heartBeatCycleIndex = 0;
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_heart_beat), heartBeatCycleIndex);
+
+  // Auto Spectrum Calculation Result
+
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ps), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ed), TRUE);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ri), sysMeasure->GetAutoCalcRI());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_sd), sysMeasure->GetAutoCalcSD());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_tamax), sysMeasure->GetAutoCalcTAmax());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pi), sysMeasure->GetAutoCalcPI());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_time), sysMeasure->GetAutoCalcTime());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_hr), sysMeasure->GetAutoCalcHR());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmax), sysMeasure->GetAutoCalcPGmax());
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmean), sysMeasure->GetAutoCalcPGmean());
+
+  // Line Color
+
+  int lineColor = sysMeasure->GetMeasureColorCur();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_current_line), lineColor);
+  lineColor = sysMeasure->GetMeasureColorConfirm();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_confirmed_line), lineColor);
+
+  // Report Result Method
+
+  int reportResult = sysMeasure->GetReportResult();
+  switch (reportResult) {
+  case 0:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_report_last), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_report_average), TRUE);
+    break;
+  }
+
+  // Measure Result Font Size
+
+  int meaResult = sysMeasure->GetMeasureResult();
+
+  switch (meaResult) {
+  case 0:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_small), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_big), TRUE);
+    break;
+  }
+
+  // Trace Method
+
+  int traceManual = sysMeasure->GetTraceMethod();
+
+  switch (traceManual) {
+  case 0:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_point), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_track), TRUE);
+    break;
+  case 2:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_auto), TRUE);
+    break;
+  }
+
+  // Cursor Size
+  int cursorSize = sysMeasure->GetMeasureCursorSize();
+
+  switch (cursorSize) {
+  case 0:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_big), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_mid), TRUE);
+    break;
+  case 2:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_small), TRUE);
+    break;
+  }
+
+  // Measure Line
+
+  int measureLine = sysMeasure->GetMeasureLineDisplay();
+
+  switch (measureLine) {
+  case 0:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_measure_line_on), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_measure_line_off), TRUE);
+    break;
+  }
+
+  delete sysMeasure;
+}
+
+void ViewSystem::save_measure_setting() {
+  SysMeasurementSetting sysMeasure;
+
+  // Unit Setting
+
+  int unitDist = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_dist));
+  sysMeasure.SetUnitDist(unitDist);
+
+  int unitArea = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_area));
+  sysMeasure.SetUnitArea(unitArea);
+
+  int unitVol = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_vol));
+  sysMeasure.SetUnitVol(unitVol);
+
+  int unitTime = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_time));
+  sysMeasure.SetUnitTime(unitTime);
+
+  int unitVel = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_vel));
+  sysMeasure.SetUnitVel(unitVel);
+
+  int unitAccel = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_accel));
+  sysMeasure.SetUnitAccel(unitAccel);
+
+  int unitEfw = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_efw));
+  sysMeasure.SetUnitEfw(unitEfw);
+
+  // Heart Beat
+
+  int heartBeatCycle = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_heart_beat));
+  sysMeasure.SetHeartBeatCycle(heartBeatCycle + 1);
+
+  // Auto Spectrum Calculation Result
+
+  sysMeasure.SetAutoCalcPS(true);
+  sysMeasure.SetAutoCalcED(true);
+  sysMeasure.SetAutoCalcRI(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ri)));
+  sysMeasure.SetAutoCalcSD(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_sd)));
+  sysMeasure.SetAutoCalcTAmax(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_tamax)));
+  sysMeasure.SetAutoCalcPI(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pi)));
+  sysMeasure.SetAutoCalcTime(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_time)));
+  sysMeasure.SetAutoCalcHR(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_hr)));
+  sysMeasure.SetAutoCalcPGmax(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmax)));
+  sysMeasure.SetAutoCalcPGmean(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmean)));
+
+  // Line Color
+
+  int colorIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_current_line));
+  sysMeasure.SetMeasureColorCur(colorIndex);
+  colorIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_confirmed_line));
+  sysMeasure.SetMeasureColorConfirm(colorIndex);
+
+  // Report Result Method
+
+  int reportResult = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_report_last))) {
+    reportResult = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_report_average))) {
+    reportResult = 1;
+  }
+
+  sysMeasure.SetReportResult(reportResult);
+
+  // Measure Result Font Size
+
+  int meaResult = 0; //小字体
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_small))) {
+    meaResult = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_big))) {
+    meaResult = 1;
+  }
+
+  sysMeasure.SetMeasureResult(meaResult);
+
+  // Trace Method
+
+  int trace = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_point))) {
+    trace = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_track))) {
+    trace = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_auto))) {
+    trace = 2;
+  }
+
+  sysMeasure.SetTraceMethod(trace);
+
+  // Cursor Size
+
+  int cursorSize = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_big))) {
+    cursorSize = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_mid))) {
+    cursorSize = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_small))) {
+    cursorSize = 2;
+  }
+
+  sysMeasure.SetMeasureCursorSize(cursorSize);
+
+  // Measure Line
+
+  int measureLine = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_measure_line_on))) {
+    measureLine = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_measure_line_off))) {
+    measureLine = 1;
+  }
+
+  sysMeasure.SetMeasureLineDisplay(measureLine);
+
+  sysMeasure.SyncFile();
+  sysMeasure.UpdateTraceItemSetting();
+  ImageArea::GetInstance()->UpdateMeaResultArea(meaResult);
+}
 
 #include "periDevice/DCMMan.h"
 #include <string.h>
@@ -1870,16 +3395,14 @@ void ViewSystem::save_option_setting() {
 #include "periDevice/PeripheralMan.h"
 #include "periDevice/NetworkMan.h"
 
-#include "display/TopArea.h"
+
 #include "patient/PatientInfo.h"
 #include "sysMan/SysDicomSetting.h"
 #include "sysMan/SysUserDefinedKey.h"
 
 #include "imageControl/ImgPw.h"
 #include "imageControl/ImgCfm.h"
-#include "imageProc/ImgProc2D.h"
-#include "imageProc/ImgProcPw.h"
-#include "imageProc/ImgProcCfm.h"
+
 #include "sysMan/UserDefineKey.h"
 #include "periDevice/ViewPrinterAdd.h"
 #include "probe/ProbeSelect.h"
@@ -1888,7 +3411,7 @@ void ViewSystem::save_option_setting() {
 #include "sysMan/CalcSetting.h"
 #include "sysMan/MeasureSetting.h"
 #include "patient/FileMan.h"
-#include "sysMan/UserSelect.h"
+
 #include "patient/ViewUdiskDataSelect.h"
 #include "sysMan/ConfigToUSB.h"
 #include "sysMan/ConfigToHost.h"
@@ -3370,11 +4893,12 @@ void ViewSystem::BtnNewCheckPartOkClicked(GtkButton *button) {
         char *check_part = (char*) gtk_entry_get_text(GTK_ENTRY(m_entry_new_check_part));
         AddCheckPart(check_part);
     }
-    gtk_widget_hide(m_frame_new_check_part);
+
+    gtk_widget_hide(GTK_WIDGET(m_frame_new_check_part));
 }
 
 void ViewSystem::BtnNewCheckPartCancelClicked(GtkButton *button) {
-    gtk_widget_hide(m_frame_new_check_part);
+    gtk_widget_hide(GTK_WIDGET(m_frame_new_check_part));
 }
 void ViewSystem::BtnOkClicked(GtkButton *button) {
     GtkTreeIter iter;
@@ -3473,7 +4997,7 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
     GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
     gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_TreeviewReportSet), new_path);
     GtkTreeViewColumn *column_tree_view = gtk_tree_view_get_column(GTK_TREE_VIEW(m_TreeviewReportSet), 0);
-    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(m_TreeviewReportSet),  new_path, column_tree_view,  renderer,  TRUE);
+    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(m_TreeviewReportSet),  new_path, column_tree_view,  m_renderer,  TRUE);
     gtk_tree_path_free (new_path);
 
     {
@@ -3823,10 +5347,10 @@ GtkWidget *ViewSystem::create_set_report() {
     g_signal_connect(G_OBJECT(gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet))), "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
     gtk_widget_add_events(GTK_WIDGET(m_TreeviewReportSet), (gtk_widget_get_events(GTK_WIDGET(m_TreeviewReportSet)) | GDK_BUTTON_RELEASE_MASK));
 
-    g_signal_connect_after(m_TreeviewReportSet, "button_release_event", G_CALLBACK(HandleExamDepartmentBtnClicked), this);
+    g_signal_connect_after(m_TreeviewReportSet, "button_release_event", G_CALLBACK(signal_treeview_button_release_exam_department), this);
 
-    renderer = gtk_cell_renderer_text_new();
-    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", renderer, "text", 0, NULL);
+    m_renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", m_renderer, "text", 0, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(m_TreeviewReportSet), column);
 
     gtk_widget_show (m_TreeviewReportSet);
@@ -4361,1248 +5885,12 @@ string ViewSystem::specific_printer_selection() {
 
 
 
-GtkWidget* ViewSystem::create_note_image() {
-    GtkWidget *fixed_image;
-    GtkWidget *label_probe_type;
-    // GtkWidget *combobox_probe_type;
-    GtkWidget *scrolledwindow_exam_type;
-    // GtkWidget *treeview_exam_type;
 
-    GtkWidget *button_delete_user;
-    GtkWidget *label_delete;
-    GtkWidget *img_delete;
-    GtkWidget *m_image_button_add;
-    GtkWidget *m_image_button_delete;
-
-    GtkWidget *button_edit_dept;
-    GtkWidget *button_return_dept;
-    GtkWidget *button_get_current;
-    GtkWidget *button_default_image;
-
-    GtkWidget *button_import_from_USB;
-    GtkWidget *button_export_to_USB;
-    GtkWidget *label_user_select;
-    GtkWidget *scrolledwindow_img_set;
-    GtkWidget *viewport_img_set;
-    GtkWidget *fixed_img_set;
-    GtkWidget *frame_comment;
-    GtkWidget *fixed_comment;
-    GtkWidget *table_comment;
-    GtkWidget *label_mbp;
-    // GtkWidget *combobox_mbp;
-    GtkWidget *label_ao_power;
-    // GtkWidget *combobox_ao_power;
-    // GtkWidget *label_note;
-    // GtkWidget *combobox_note;
-    // GtkWidget *label_bdmk;
-    // GtkWidget *combobox_bdmk;
-    GtkWidget *label_comment;
-    GtkWidget *frame_2d_m_mode;
-    GtkWidget *fixed_2d_m_mode;
-    GtkWidget *table_2d_m_mode;
-    GtkWidget *hseparator1;
-    GtkObject *spinbutton_2d_gain_adj;
-    // GtkWidget *spinbutton_2d_gain;
-    GtkWidget *label_focus_sum;
-    GtkWidget *label_steer;
-    GtkWidget *label_agc;
-    // GtkWidget *combobox_agc;
-    GtkWidget *label_edge_enh;
-    GtkWidget *label_chroma;
-    // GtkWidget *combobox_edge_enh;
-    // GtkWidget *combobox_steer;
-    // GtkWidget *combobox_focus_sum;
-    // GtkWidget *combobox_focus_pos;
-    // GtkWidget *combobox_depth;
-    GtkWidget *label_focus_pos;
-    GtkWidget *label_depth;
-    // GtkWidget *combobox_chroma;
-    GtkWidget *label_lr;
-    GtkWidget *label_ud;
-    // GtkWidget *combobox_lr;
-    // GtkWidget *combobox_ud;
-    GtkWidget *label_polarity;
-    // GtkWidget *combobox_rotation;
-    // GtkWidget *combobox_polarity;
-    // GtkWidget *label_rotation;
-    GtkWidget *label_line_aver;
-    // GtkWidget *combobox_frame;
-    GtkWidget *label_frame;
-    // GtkWidget *combobox_line_aver;
-    GtkWidget *label_restric;
-    // GtkWidget *combobox_restric;
-    // GtkWidget *combobox_thi;
-    GtkWidget *label_tsi;
-    // GtkWidget *combobox_tsi;
-    GtkWidget *label_imgEnh;
-    GtkWidget *label_m_gain;
-    GtkObject *spinbutton_m_gain_adj;
-    // GtkWidget *spinbutton_m_gain;
-    GtkWidget *label_thi;
-    GtkWidget *hseparator2;
-    GtkWidget *label_scan_range;
-    // GtkWidget *combobox_scan_range;
-    GtkWidget *label_dynamic_range;
-    // GtkWidget *combobox_dynamic_range;
-    GtkWidget *label_2d_freq;
-    // GtkWidget *combobox_2d_freq;
-    GtkWidget *label_2d_gain;
-    GtkWidget *label_2d_line_density;
-    // GtkWidget *combobox_2d_line_density;
-    GtkWidget *label_2d_smooth;
-    // GtkWidget *combobox_2d_smooth;
-    GtkWidget *label_2d_m_mode;
-    GtkWidget *label_gray_transform;
-    GtkWidget *label_space_compound;
-    GtkWidget *label_freq_compound;
-    GtkWidget *label_thi_freq;
-
-    GtkWidget *frame_pw_mode;
-    GtkWidget *fixed_pw_mode;
-    GtkWidget *table_pw_mode;
-    GtkWidget *label_pw_gain;
-    GtkObject *spinbutton_pw_gain_adj;
-    // GtkWidget *spinbutton_pw_gain;
-    GtkWidget *label_pw_scale_prf;
-
-    // GtkWidget *combobox_pw_scale_prf;
-    // GtkWidget *combobox_time_resolution;
-    GtkWidget *label_time_resolution;
-    GtkWidget *hseparator3;
-    // GtkWidget *combobox_pw_freq;
-
-    GtkWidget *label_pw_freq;
-    GtkWidget *label_pw_wallfilter;
-    GtkWidget *label_pw_angle;
-    GtkObject *spinbutton_pw_angle_adj;
-    // GtkWidget *combobox_pw_wallfilter;
-    GtkWidget *label_pw_invert;
-    // GtkWidget *combobox_pw_invert;
-    GtkWidget *label_pw_mode;
-    GtkWidget *frame_cfm_mode;
-    GtkWidget *fixed_cfm_mode;
-    GtkWidget *table_cfm_mode;
-    GtkWidget *label_color_gain;
-    GtkWidget *label_cfm_scale_prf;
-    GtkWidget *label_cfm_wallfilter;
-    GtkWidget *label_cfm_line_density;
-    // GtkWidget *combobox_cfm_line_density;
-    // GtkWidget *combobox_cfm_scale_prf;
-    GtkObject *spinbutton_cfm_gain_adj;
-    // GtkWidget *spinbutton_cfm_gain;
-    // GtkWidget *combobox_cfm_wallfilter;
-
-    GtkWidget *label_sensitivity;
-    GtkWidget *label_variance;
-    // GtkWidget *combobox_variance;
-    GtkWidget *label_cfm_invert;
-    // GtkWidget *combobox_cfm_invert;
-    GtkWidget *label_persistence;
-    // GtkWidget *combobox_persistence;
-    GtkWidget *label_cfm_smooth;
-    // GtkWidget *combobox_cfm_smooth;
-    // GtkWidget *combobox_color_rejection;
-    GtkWidget *label_color_rejection;
-    // GtkWidget *label_pdi_gain;
-    // GtkObject *spinbutton_pdi_gain_adj;
-    // GtkWidget *spinbutton_pdi_gain;
-    // GtkWidget *combobox_sensitivity;
-    GtkWidget *hseparator4;
-    GtkWidget *label_cfm_mode;
-
-    GtkWidget *bin_entry_dia;
-
-    SysGeneralSetting sysGS;
-
-    int i;
-    char buf[50];
-
-    fixed_image = gtk_fixed_new ();
-    gtk_widget_show (fixed_image);
-
-    //user select
-    label_user_select = gtk_label_new (_("<b>User Select: </b>"));
-
-    gtk_misc_set_alignment (GTK_MISC(label_user_select), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_user_select), TRUE);
-    gtk_widget_show (label_user_select);
-    gtk_fixed_put (GTK_FIXED (fixed_image), label_user_select, 340+20, 10+5);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), label_user_select, 10+20, 10);
-    gtk_widget_set_size_request (label_user_select, 100, 30);
-
-    m_comboboxentry_user_select = gtk_combo_box_entry_new_text ();
-    gtk_widget_show (m_comboboxentry_user_select);
-    gtk_fixed_put (GTK_FIXED (fixed_image), m_comboboxentry_user_select, 330+110+20, 10+5);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), m_comboboxentry_user_select, 110+20, 10);
-    gtk_widget_set_size_request (m_comboboxentry_user_select, 120+100, 30);
-    bin_entry_dia = gtk_bin_get_child (GTK_BIN(m_comboboxentry_user_select));
-    gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 40); //25 in order to display Умолчан системы
-    g_signal_connect(G_OBJECT(bin_entry_dia), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-    g_signal_connect(G_OBJECT(bin_entry_dia), "focus-out-event", G_CALLBACK(HandleUserSelectFocusOut), this);
-
-    img_delete = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
-    button_delete_user = create_button_icon_only(img_delete, 0, 0, NULL);
-    gtk_widget_show (button_delete_user);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_delete_user, 100+330+220+40, 10+5);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), button_delete_user, 220+40, 10);
-    gtk_widget_set_size_request (button_delete_user, 30, 30);
-    g_signal_connect(button_delete_user, "clicked", G_CALLBACK(HandleImageBtnDeleteUser), this);
-
-    UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxentry_user_select));
-    UserSelect::GetInstance()->read_username_db(USERNAME_DB, GTK_COMBO_BOX(m_comboboxentry_user_select));
-    int num = UserSelect::GetInstance()->get_active_user();
-    UserSelect::GetInstance()->set_active_user(GTK_COMBO_BOX(m_comboboxentry_user_select), num);
-
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini(path);
-    ExamItem exam;
-    int index_username = exam.ReadDefaultUserIndex(&ini);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_user_select), index_username);
-    g_signal_connect(GTK_COMBO_BOX(m_comboboxentry_user_select), "changed", G_CALLBACK(HandleUserChanged), this);
-
-    string default_probe;
-    default_probe=exam.ReadDefaultProbe(&ini);
-    for (i = 0; i < NUM_PROBE; i++) {
-        if(strcmp(default_probe.c_str(), g_probe_list[i].c_str())==0) {
-            save_itemIndex(i);
-            break;
-        }
-    }
-
-    // probe type
-    label_probe_type = gtk_label_new (_("<b>Probe Type: </b>"));
-    gtk_misc_set_alignment (GTK_MISC(label_probe_type), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_probe_type), TRUE);
-    gtk_widget_show (label_probe_type);
-    gtk_fixed_put (GTK_FIXED (fixed_image), label_probe_type, 10+20, 10);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), label_probe_type, 10+20, 40+10);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), label_probe_type, 30, 40);
-    gtk_widget_set_size_request (label_probe_type, 100+25, 30);
-
-    m_combobox_probe_type = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_probe_type);
-    gtk_fixed_put (GTK_FIXED (fixed_image), m_combobox_probe_type, 110+20, 10);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), m_combobox_probe_type, 110+20, 40+10);
-    gtk_widget_set_size_request (m_combobox_probe_type, 120+25+25, 30);
-    for (i = 0; i < NUM_PROBE; i++) {
-        string  newProbeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_type), newProbeName.c_str());
-    }
-
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), -1);
-
-    g_signal_connect(m_combobox_probe_type, "changed", G_CALLBACK(HandleProbeTypeChanged), this);
-
-    // exam type
-    scrolledwindow_exam_type = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_exam_type);
-
-    gtk_fixed_put (GTK_FIXED (fixed_image), scrolledwindow_exam_type, 10+20, 70+10-40);
-
-
-    gtk_widget_set_size_request (scrolledwindow_exam_type, 220+50, 275+48+40+40+77-30);
-
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_exam_type), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-
-    vector<ExamItem::EItem> test;
-    GtkTreeModel *model = create_exam_item_model(test);
-
-
-    m_treeview_exam_type = gtk_tree_view_new_with_model(model);
-
-    add_exam_item_column(GTK_TREE_VIEW(m_treeview_exam_type));
-
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_exam_type), m_treeview_exam_type);
-
-    GtkTreeSelection *select;
-    select = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
-    gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
-
-
-    g_object_set(renderer, "editable", TRUE, NULL);
-    g_signal_connect(renderer, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
-    g_signal_connect(renderer, "edited", G_CALLBACK(HandleCellRendererRename), this);
-
-    g_signal_connect(select, "changed", G_CALLBACK(HandleExamTypeChanged), this);
-    gtk_widget_add_events(GTK_WIDGET(m_treeview_exam_type), (gtk_widget_get_events(GTK_WIDGET(m_treeview_exam_type)) | GDK_BUTTON_RELEASE_MASK));
-    g_signal_connect_after(m_treeview_exam_type, "button_release_event", G_CALLBACK(HandleExamDepartmentBtnClicked), this);
-    //g_signal_connect(m_treeview_exam_type, "test-expand-row", G_CALLBACK(HandleExamTypeExpandBefore), this);
-    gtk_widget_show (m_treeview_exam_type);
-
-    m_image_button_add = gtk_image_new_from_stock ("gtk-add", GTK_ICON_SIZE_BUTTON);
-    m_button_add = create_button_icon_only(m_image_button_add, 0, 0, NULL);
-    gtk_widget_hide (m_button_add);
-    gtk_fixed_put (GTK_FIXED (fixed_image), m_button_add, 260, 50+30-2-40);
-    gtk_widget_set_size_request (m_button_add, 30-5, 30-5);
-    g_signal_connect(m_button_add, "clicked", G_CALLBACK(HandleAddItemClicked), this);
-
-    m_image_button_delete = gtk_image_new_from_stock ("gtk-remove", GTK_ICON_SIZE_BUTTON);
-    m_button_delete_item = create_button_icon_only(m_image_button_delete, 0, 0, NULL);
-    gtk_widget_hide (m_button_delete_item);
-    gtk_fixed_put (GTK_FIXED (fixed_image), m_button_delete_item, 295-10, 50+30-2-40);
-    gtk_widget_set_size_request (m_button_delete_item, 30-5, 30-5);
-    g_signal_connect(m_button_delete_item, "clicked", G_CALLBACK(HandleDeleteItemClicked), this);
-
-    const int dir = 20;
-    //new checkpart
-    m_frame_new_check_part = gtk_frame_new (NULL);
-    gtk_widget_hide (m_frame_new_check_part);
-    gtk_fixed_put (GTK_FIXED (fixed_image), m_frame_new_check_part, 330+20+40, 70);//90
-    gtk_widget_set_size_request (m_frame_new_check_part, 560-40-80, 155+40); //550
-    gtk_frame_set_shadow_type (GTK_FRAME (m_frame_new_check_part), GTK_SHADOW_IN);
-    GtkWidget *fixed_new_check_part = gtk_fixed_new ();
-    gtk_widget_show (fixed_new_check_part);
-    gtk_container_add (GTK_CONTAINER (m_frame_new_check_part), fixed_new_check_part);
-
-    m_label_check_part = gtk_label_new (_("Exam Type:"));
-    gtk_misc_set_alignment (GTK_MISC(m_label_check_part), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (m_label_check_part), TRUE);
-    gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_check_part), PANGO_WRAP_WORD);
-    gtk_widget_show (m_label_check_part);
-    gtk_fixed_put (GTK_FIXED (fixed_new_check_part), m_label_check_part, 22+10+20, 10+5+20-5);
-    //gtk_widget_set_size_request (m_label_check_part, 80, 30);
-    gtk_widget_set_size_request(m_label_check_part, 338, 30);
-
-    m_entry_new_check_part = gtk_entry_new ();
-    gtk_widget_show (m_entry_new_check_part);
-    gtk_fixed_put (GTK_FIXED (fixed_new_check_part), m_entry_new_check_part, 100+22+10+30, 10+5+20-5);
-    gtk_widget_set_size_request (m_entry_new_check_part, 200, 30);
-    //g_signal_connect(G_OBJECT(m_entry_new_check_part), "insert_text", G_CALLBACK(on_entry_new_check_part), this);
-    //g_signal_connect(G_OBJECT(m_entry_new_check_part), "focus-out-event", G_CALLBACK(HandleNewCheckPartFocusOut), this);
-
-    //确定
-    GtkWidget *imageOK = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *labelOK = gtk_label_new_with_mnemonic (_("OK"));
-    GtkWidget* button_ok = create_button_icon(labelOK, imageOK);
-    gtk_widget_show (button_ok);
-    gtk_fixed_put (GTK_FIXED (fixed_new_check_part), button_ok, 22+10+20, 120-50+30);
-    g_signal_connect(button_ok, "clicked", G_CALLBACK(HandleNewCheckPartBtnOk), this);
-
-    //取消
-    GtkWidget *imageCancel = gtk_image_new_from_stock (GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON);
-    GtkWidget *labelCancel = gtk_label_new_with_mnemonic (_("Cancel"));
-    GtkWidget* button_cancel = create_button_icon(labelCancel, imageCancel);
-    gtk_widget_show (button_cancel);
-    gtk_fixed_put (GTK_FIXED (fixed_new_check_part), button_cancel, 520-22-136-12-20-80, 120-50+30);
-    //gtk_widget_set_size_request (button_cancel, 136+12, 30+10);
-    g_signal_connect(button_cancel, "clicked", G_CALLBACK(HandleNewCheckPartBtnCancel), this);
-
-    // save
-    button_get_current = gtk_button_new_with_mnemonic (_("Save"));
-    gtk_widget_show (button_get_current);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_get_current, 340+20+10, 415-30-10-50-50-40+20+20+20);
-    gtk_widget_set_size_request (button_get_current, 136+12, 30+10+10);
-    g_signal_connect(button_get_current, "clicked", G_CALLBACK(HandleImageBtnSave), this);
-
-    // new
-    GtkWidget *button_new = gtk_button_new_with_mnemonic (_("New"));
-    gtk_widget_show (button_new);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_new, 340+20+10+136+12+dir, 415-30-10-50-50-40+20+20+20);
-    gtk_widget_set_size_request (button_new, 136+12, 30+10+10);
-    g_signal_connect(button_new, "clicked", G_CALLBACK(HandleImageBtnNew), this);
-
-    //delete
-    GtkWidget *button_delete = gtk_button_new_with_mnemonic (_("Delete"));
-    gtk_widget_show (button_delete);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_delete, 340+20+10+136+12+dir+136+12+dir, 415-30-10-50-50-40+20+20+20);
-    gtk_widget_set_size_request (button_delete, 136+12, 30+10+10);
-    g_signal_connect(button_delete, "clicked", G_CALLBACK(HandleDeleteItemClicked), this);
-
-    // factory default
-    button_default_image = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_default_image);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_default_image, 340+20+10+136+12+dir+136+12+dir, 415+20+20);
-    //gtk_fixed_put (GTK_FIXED (fixed_image), button_default_image, 340+20+10, 415);
-    gtk_widget_set_size_request (button_default_image, 136+12, 30+10-10);
-    g_signal_connect(button_default_image, "clicked", G_CALLBACK(HandleImageBtnDefault), this);
-
-    // export to USB
-    button_export_to_USB = gtk_button_new_with_mnemonic (_("Export To USB"));
-    gtk_widget_show (button_export_to_USB);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_export_to_USB, 340+20+10, 415-80+20+20);
-    gtk_widget_set_size_request (button_export_to_USB, 232, 30+10+10);
-    g_signal_connect(button_export_to_USB, "clicked", G_CALLBACK(HandleImageBtnExportToUSB), this);
-
-    // import from USB
-    button_import_from_USB = gtk_button_new_with_mnemonic (_("Import From USB"));
-    gtk_widget_show (button_import_from_USB);
-    gtk_fixed_put (GTK_FIXED (fixed_image), button_import_from_USB, 340+20+10+232+dir, 415-80+20+20);
-    gtk_widget_set_size_request (button_import_from_USB, 232, 30+10+10);
-    g_signal_connect(button_import_from_USB, "clicked", G_CALLBACK(HandleImageBtnImportFromUSB), this);
-
-    // scroll window
-    scrolledwindow_img_set = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_img_set);
-    gtk_fixed_put (GTK_FIXED (fixed_image), scrolledwindow_img_set, 300+30, 10);
-    gtk_widget_set_size_request (scrolledwindow_img_set, 560, 480);
-    //gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_img_set), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_img_set), GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_img_set), GTK_SHADOW_OUT);
-
-    viewport_img_set = gtk_viewport_new (NULL, NULL);
-    gtk_widget_hide (viewport_img_set);
-    //gtk_widget_show (viewport_img_set);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_img_set), viewport_img_set);
-
-    fixed_img_set = gtk_fixed_new ();
-    gtk_widget_show (fixed_img_set);
-    gtk_container_add (GTK_CONTAINER (viewport_img_set), fixed_img_set);
-
-    // comment
-    frame_comment = gtk_frame_new (NULL);
-    gtk_widget_show (frame_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_comment, 5, 5);
-    gtk_widget_set_size_request (frame_comment, 520, 70);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_comment), GTK_SHADOW_OUT);
-
-    label_comment = gtk_label_new (_("<b>Common</b>"));
-    gtk_widget_show (label_comment);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_comment), label_comment);
-    gtk_label_set_use_markup (GTK_LABEL (label_comment), TRUE);
-
-    fixed_comment = gtk_fixed_new ();
-    gtk_widget_show (fixed_comment);
-    gtk_container_add (GTK_CONTAINER (frame_comment), fixed_comment);
-
-    table_comment = gtk_table_new (1, 4, FALSE);
-    gtk_widget_show (table_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), table_comment, 20, 5);
-    gtk_widget_set_size_request (table_comment, 480, 30);
-    gtk_table_set_row_spacings (GTK_TABLE(table_comment), 10);
-
-    // MBP
-    label_mbp = gtk_label_new (_("MBP :"));
-    gtk_widget_show (label_mbp);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), label_mbp, 5, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_comment), label_mbp, 0, 1, 0, 1);
-    gtk_widget_set_size_request (label_mbp, -1, 30);
-
-    m_combobox_mbp = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_mbp);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_mbp, 105, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_comment), m_combobox_mbp, 1, 2, 0, 1);
-    gtk_widget_set_size_request (m_combobox_mbp, 100, 30);
-    for (i = 0; i < Img2D::MAX_MBP_INDEX; i ++) {
-        sprintf(buf, "%d", Img2D::MBP[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_mbp), buf);
-    }
-
-    label_ao_power = gtk_label_new (_("AO / Power :"));
-    gtk_widget_show (label_ao_power);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), label_ao_power, 270, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_comment), label_ao_power, 2, 3, 0, 1);
-    gtk_widget_set_size_request (label_ao_power, -1, 30);
-
-    m_combobox_ao_power = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ao_power);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_ao_power, 370, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_comment), m_combobox_ao_power, 3, 4, 0, 1);
-    gtk_widget_set_size_request (m_combobox_ao_power, 100, 30);
-    for (i = 0; i < Img2D::MAX_POWER_INDEX; i ++) {
-        sprintf(buf, "%d", Img2D::POWER_DATA[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ao_power), buf);
-    }
-
-    // 2d and m mode
-    frame_2d_m_mode = gtk_frame_new (NULL);
-    gtk_widget_show (frame_2d_m_mode);
-    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_2d_m_mode, 5, 90);//90
-    gtk_widget_set_size_request (frame_2d_m_mode, 520, 605); //550
-    //gtk_widget_set_size_request (frame_2d_m_mode, 520, 605 - 40); //550
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_2d_m_mode), GTK_SHADOW_OUT);
-
-    fixed_2d_m_mode = gtk_fixed_new ();
-    gtk_widget_show (fixed_2d_m_mode);
-    gtk_container_add (GTK_CONTAINER (frame_2d_m_mode), fixed_2d_m_mode);
-
-    label_2d_m_mode = gtk_label_new (_("<b>2D and M mode</b>"));
-    gtk_widget_show (label_2d_m_mode);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_2d_m_mode), label_2d_m_mode);
-    gtk_label_set_use_markup (GTK_LABEL (label_2d_m_mode), TRUE);
-
-    table_2d_m_mode = gtk_table_new (16, 4, FALSE); //14
-    //table_2d_m_mode = gtk_table_new (15, 4, FALSE); //14
-    gtk_widget_show (table_2d_m_mode);
-    gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), table_2d_m_mode, 20, 5);
-    gtk_widget_set_size_request (table_2d_m_mode, 480, 520);//520
-    gtk_table_set_row_spacings (GTK_TABLE(table_2d_m_mode), 10);
-
-    // 2D gain
-    label_2d_gain = gtk_label_new (_("2D Gain:"));
-    gtk_widget_show (label_2d_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_gain, 5, 10);
-    gtk_widget_set_size_request (label_2d_gain, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_gain, 0, 1, 0, 1);
-
-    spinbutton_2d_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
-    m_spinbutton_2d_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_2d_gain_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_2d_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_spinbutton_2d_gain, 105, 12);
-    gtk_widget_set_size_request (m_spinbutton_2d_gain, -1, 27);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_spinbutton_2d_gain, 1, 2, 0, 1);
-    g_signal_connect(G_OBJECT(m_spinbutton_2d_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
-
-    // 2D freq index
-    label_2d_freq = gtk_label_new (_("Freq. :"));
-    gtk_widget_show (label_2d_freq);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_freq, 270, 10);
-    gtk_widget_set_size_request (label_2d_freq, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_freq, 2, 3, 0, 1);
-
-    m_combobox_2d_freq = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_2d_freq);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_2d_freq, 370, 10);
-    gtk_widget_set_size_request (m_combobox_2d_freq, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_2d_freq, 3, 4, 0, 1);
-
-    // focus sum
-    label_focus_sum = gtk_label_new (_("Focus sum:"));
-    gtk_widget_show (label_focus_sum);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_focus_sum, 5, 50);
-    gtk_widget_set_size_request (label_focus_sum, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_focus_sum , 0, 1, 1, 2);
-
-    m_combobox_focus_sum = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_focus_sum);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_focus_sum, 105, 50);
-    gtk_widget_set_size_request (m_combobox_focus_sum, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_focus_sum, 1, 2, 1, 2);
-    for (i = 1; i <= Img2D::MAX_FOCUS; i ++) {
-        sprintf(buf, "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_focus_sum), buf);
-    }
-    g_signal_connect (G_OBJECT(m_combobox_focus_sum), "changed", G_CALLBACK (HandleComboFocusSum), this);
-
-    // focus position
-    label_focus_pos = gtk_label_new (_("Focus Pos. Index:"));
-    gtk_widget_show (label_focus_pos);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_focus_pos, 260, 50);
-    gtk_widget_set_size_request (label_focus_pos, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_focus_pos, 2, 3, 1, 2);
-
-    m_combobox_focus_pos = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_focus_pos);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_focus_pos, 370, 50);
-    gtk_widget_set_size_request (m_combobox_focus_pos, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_focus_pos, 3, 4, 1, 2);
-
-    // scan range
-    label_scan_range = gtk_label_new (_("Scan Range:"));
-    gtk_widget_show (label_scan_range);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_scan_range, 5, 90);
-    gtk_widget_set_size_request (label_scan_range, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_scan_range, 0, 1, 2, 3);
-
-    m_combobox_scan_range = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_scan_range);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_scan_range, 105, 90);
-    gtk_widget_set_size_request (m_combobox_scan_range, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_scan_range, 1, 2, 2, 3);
-    for (i = 0; i < Img2D::MAX_ANGLE; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_scan_range), buf);
-    }
-
-    // dyanamic range
-    label_dynamic_range = gtk_label_new (_("Dynamic Range:"));
-    gtk_widget_show (label_dynamic_range);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_dynamic_range, 260, 90);
-    gtk_widget_set_size_request (label_dynamic_range, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_dynamic_range, 2, 3, 2, 3);
-
-    m_combobox_dynamic_range = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_dynamic_range);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_dynamic_range, 370, 90);
-    gtk_widget_set_size_request (m_combobox_dynamic_range, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_dynamic_range, 3, 4, 2, 3);
-    for (i = 0; i < Calc2D::MAX_DYNAMIC_INDEX; i ++)  {
-        sprintf(buf , "%ddB", Img2D::DYNAMIC_DATA_D[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_dynamic_range), buf);
-    }
-
-    // line density
-    label_2d_line_density = gtk_label_new (_("Line Density:"));
-    gtk_widget_show (label_2d_line_density);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_line_density, 5, 130);
-    gtk_widget_set_size_request (label_2d_line_density, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_line_density, 0, 1, 3, 4);
-
-    m_combobox_2d_line_density = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_2d_line_density);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_2d_line_density, 105, 130);
-    gtk_widget_set_size_request (m_combobox_2d_line_density, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_2d_line_density, 1, 2, 3, 4);
-    for (i = 0; i < Img2D::MAX_LINE_DENSITY; i ++) {
-        sprintf(buf , "%s", _(Img2D::LINE_DENSITY_DISPLAY[i].c_str()));
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_2d_line_density), buf);
-    }
-
-    // depth
-    label_depth = gtk_label_new (_("Depth Scale:"));
-    gtk_widget_show (label_depth);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_depth, 270, 130);
-    gtk_widget_set_size_request (label_depth, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_depth, 2, 3, 3, 4);
-
-    m_combobox_depth = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_depth);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_depth, 370, 130);
-    gtk_widget_set_size_request (m_combobox_depth, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_depth, 3, 4, 3, 4);
-    for (i = 0; i < Img2D::MAX_SCALE_INDEX; i ++) {
-        sprintf(buf, "%.1f", (float)Img2D::IMG_SCALE[i] / 10);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_depth), buf);
-    }
-
-    // steer
-    label_steer = gtk_label_new (_("Steer:"));
-    gtk_widget_show (label_steer);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_steer, 5, 170);
-    gtk_widget_set_size_request (label_steer, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_steer, 0, 1, 4, 5);
-
-    m_combobox_steer = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_steer);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_steer, 105, 170);
-    gtk_widget_set_size_request (m_combobox_steer, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_steer, 1, 2, 4, 5);
-    for (i = 0; i < Img2D::MAX_STEER; i ++) {
-        sprintf(buf, "%d°", Img2D::STEER_ANGLE[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_steer), buf);
-    }
-
-    // AGC
-    label_agc = gtk_label_new (_("AGC:"));
-    gtk_widget_show (label_agc);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_agc, 270, 170);
-    gtk_widget_set_size_request (label_agc, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_agc, 2, 3, 4, 5);
-
-    m_combobox_agc = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_agc);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_agc, 370, 170);
-    gtk_widget_set_size_request (m_combobox_agc, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_agc, 3, 4, 4, 5);
-    for (i = 0; i < Img2D::MAX_AGC; i++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_agc), buf);
-    }
-
-    // edge enhancement
-    label_edge_enh = gtk_label_new (_("Edge enh. :"));
-    gtk_widget_show (label_edge_enh);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_edge_enh, 5, 210);
-    gtk_widget_set_size_request (label_edge_enh, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_edge_enh, 0, 1, 5, 6);
-
-    m_combobox_edge_enh = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_edge_enh);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_edge_enh, 105, 210);
-    gtk_widget_set_size_request (m_combobox_edge_enh, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_edge_enh, 1, 2, 5, 6);
-    for (i = 0; i < Img2D::MAX_EDGE; i++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_edge_enh), buf);
-    }
-
-    // chroma
-    label_chroma = gtk_label_new (_("Chroma:"));
-    gtk_widget_show (label_chroma);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_chroma, 270, 210);
-    gtk_widget_set_size_request (label_chroma, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_chroma, 2, 3, 5, 6);
-
-    m_combobox_chroma = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_chroma);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_chroma, 370, 210);
-    gtk_widget_set_size_request (m_combobox_chroma, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_chroma, 3, 4, 5, 6);
-    for (i = 0; i < ImgProc2D::MAX_CHROMA; i++) {
-        sprintf(buf , "%s", _(ImgProc2D::CHROMA_TYPE[i].c_str()));
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_chroma), buf);
-    }
-
-    hseparator1 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator1);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), hseparator1, 16, 250);
-    //gtk_widget_set_size_request (hseparator1, 472, 16);
-    gtk_table_attach (GTK_TABLE (table_2d_m_mode), hseparator1, 0, 4, 6, 7,
-                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), (GtkAttachOptions) (GTK_SHRINK), 0, 0);
-    gtk_widget_set_size_request (hseparator1, -1, 5);
-
-    // left-right
-    label_lr = gtk_label_new (_("L / R:"));
-    gtk_widget_show (label_lr);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_lr, 5, 270);
-    gtk_widget_set_size_request (label_lr, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_lr, 0, 1, 7, 8);
-
-    m_combobox_lr = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_lr);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_lr, 105, 270);
-    gtk_widget_set_size_request (m_combobox_lr, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_lr, 1, 2, 7, 8);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_lr), _("OFF"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_lr), _("ON"));
-
-    // up-down
-    label_ud = gtk_label_new (_("U / D:"));
-    gtk_widget_show (label_ud);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_ud, 270, 270);
-    gtk_widget_set_size_request (label_ud, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_ud, 2, 3, 7, 8);
-
-    m_combobox_ud = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ud);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_ud, 370, 270);
-    gtk_widget_set_size_request (m_combobox_ud, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_ud, 3, 4, 7, 8);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ud), _("OFF"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ud), _("ON"));
-
-    // polarity
-    label_polarity = gtk_label_new (_("Polarity:"));
-    gtk_widget_show (label_polarity);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_polarity, 5, 310);
-    gtk_widget_set_size_request (label_polarity, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_polarity, 0, 1, 8, 9);
-
-    m_combobox_polarity = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_polarity);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_polarity, 105, 310);
-    gtk_widget_set_size_request (m_combobox_polarity, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_polarity, 1, 2, 8, 9);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_polarity), _("OFF"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_polarity), _("ON"));
-
-    // frame aver
-    label_frame = gtk_label_new (_("Frame aver. :"));
-    gtk_widget_show (label_frame);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_frame, 5, 350);
-    gtk_widget_set_size_request (label_frame, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_frame, 2, 3, 8, 9);
-    m_combobox_frame = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_frame);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_frame, 105, 350);
-    gtk_widget_set_size_request (m_combobox_frame, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_frame, 3, 4, 8, 9);
-    for (i = 0; i < ImgProc2D::MAX_FRAME; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_frame), buf);
-    }
-
-    // line aver
-    label_line_aver = gtk_label_new (_("Line aver. :"));
-    gtk_widget_show (label_line_aver);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_line_aver, 270, 350);
-    gtk_widget_set_size_request (label_line_aver, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_line_aver, 0, 1, 9, 10);
-
-    m_combobox_line_aver = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_line_aver);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_line_aver, 370, 350);
-    gtk_widget_set_size_request (m_combobox_line_aver, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_line_aver, 1, 2, 9, 10);
-    for (i = 0; i < ImgProc2D::MAX_LINE; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_line_aver), buf);
-    }
-
-    // smooth
-    label_2d_smooth = gtk_label_new (_("Smooth:"));
-    gtk_widget_show (label_2d_smooth);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_2d_smooth, 5, 390);
-    gtk_widget_set_size_request (label_2d_smooth, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_2d_smooth, 2, 3, 9, 10);
-
-    m_combobox_2d_smooth = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_2d_smooth);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_2d_smooth, 105, 390);
-    gtk_widget_set_size_request (m_combobox_2d_smooth, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_2d_smooth, 3, 4, 9, 10);
-    for (i = 0; i < ImgProc2D::MAX_SMOOTH; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_2d_smooth), buf);
-    }
-
-    // restric
-    label_restric = gtk_label_new (_("Reject:"));
-    gtk_widget_show (label_restric);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_restric, 270, 390);
-    gtk_widget_set_size_request (label_restric, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_restric, 0, 1, 10, 11);
-
-    m_combobox_restric = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_restric);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_restric, 370, 390);
-    gtk_widget_set_size_request (m_combobox_restric, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_restric, 1, 2, 10, 11);
-    for (i = 0; i < ImgProc2D::MAX_REJECT; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_restric), buf);
-    }
-
-    // gray transform
-    label_gray_transform = gtk_label_new (_("GrayTrans:"));
-    gtk_widget_show (label_gray_transform);
-    gtk_widget_set_size_request (label_gray_transform, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_gray_transform, 2, 3, 10, 11);
-
-    m_combobox_gray_trans = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_gray_trans);
-    gtk_widget_set_size_request (m_combobox_gray_trans, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_gray_trans, 3, 4, 10, 11);
-    //float value = 1.0;
-    //sprintf(buf , "%.1f", value);
-    //gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_gray_trans), 0, "C0");
-    for (i = 0; i < ImgProc2D::MAX_TRANS_CURVE; i ++) {
-        sprintf(buf , "C%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_gray_trans), buf);
-    }
-
-    hseparator2 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator2);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), hseparator2, 10, 430);
-    //gtk_widget_set_size_request (hseparator2, 470, 16);
-    gtk_table_attach (GTK_TABLE (table_2d_m_mode), hseparator2, 0, 4, 11, 12,
-                      (GtkAttachOptions) (GTK_EXPAND | GTK_FILL), (GtkAttachOptions) (GTK_SHRINK), 0, 0);
-    gtk_widget_set_size_request (hseparator2, -1, 5);
-
-    // THI
-    label_thi = gtk_label_new (_("THI:"));
-    gtk_widget_show (label_thi);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_thi, 5, 450);
-    gtk_widget_set_size_request (label_thi, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_thi, 0, 1, 12, 13);
-
-    m_combobox_thi = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_thi);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_thi, 105, 450);
-    gtk_widget_set_size_request (m_combobox_thi, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_thi, 1, 2, 12, 13);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_thi), _("OFF"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_thi), _("ON"));
-
-    // TSI
-    label_tsi = gtk_label_new (_("TSI:"));
-    gtk_widget_show (label_tsi);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_tsi, 270, 450);
-    gtk_widget_set_size_request (label_tsi, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_tsi, 2, 3, 12, 13);
-
-    m_combobox_tsi = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_tsi);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_tsi, 370, 450);
-    gtk_widget_set_size_request (m_combobox_tsi, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_tsi, 3, 4, 12, 13);
-    for (i = 0; i < Img2D::MAX_TSI; i ++) {
-        sprintf(buf , "%s", _(Img2D::TSI_DISPLAY[i].c_str()));
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_tsi), buf);
-    }
-
-    // image enhance
-    label_imgEnh = gtk_label_new (_("ePure:"));
-    gtk_widget_show (label_imgEnh);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_imgEnh, 5, 490);
-    gtk_widget_set_size_request (label_imgEnh, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_imgEnh, 0, 1, 13, 14);
-
-    m_combobox_imgEnh = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_imgEnh);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_combobox_imgEnh, 105, 490);
-    gtk_widget_set_size_request (m_combobox_imgEnh, 100, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_combobox_imgEnh, 1, 2, 13, 14);
-    for (i = 0; i < ImgProc2D::MAX_IMG_EHN; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_imgEnh), buf);
-    }
-
-    // M gain
-    label_m_gain = gtk_label_new (_("M Gain:"));
-    gtk_widget_show (label_m_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), label_m_gain, 270, 490);
-    gtk_widget_set_size_request (label_m_gain, -1, 30);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), label_m_gain, 2, 3, 13, 14);
-
-    spinbutton_m_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
-    m_spinbutton_m_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_m_gain_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_m_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_2d_m_mode), m_spinbutton_m_gain, 370, 490);
-    gtk_widget_set_size_request (m_spinbutton_m_gain, 100, 27);
-    gtk_table_attach_defaults (GTK_TABLE (table_2d_m_mode), m_spinbutton_m_gain, 3, 4, 13, 14);
-    g_signal_connect(G_OBJECT(m_spinbutton_m_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
-
-    //space compound
-    label_space_compound = gtk_label_new(_("SpaceCompound:"));
-    gtk_widget_show(label_space_compound);
-    gtk_widget_set_size_request(label_space_compound, -1, 30);
-    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), label_space_compound, 0, 1, 14, 15);
-    m_combobox_space_compound = gtk_combo_box_new_text();
-    gtk_widget_show(m_combobox_space_compound);
-    gtk_widget_set_size_request(m_combobox_space_compound, -1, 30);
-    gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_space_compound), 0, _("OFF"));
-    for(i = 1; i <Img2D::MAX_SPACE_COMPOUND; i ++) {
-        sprintf(buf, "%d", i);
-        gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_space_compound), buf);
-    }
-    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_space_compound, 1, 2, 14, 15);
-
-    //freq compound
-    label_freq_compound = gtk_label_new(_("FreqCompound:"));
-    gtk_widget_show(label_freq_compound);
-    gtk_widget_set_size_request(label_freq_compound, -1, 30);
-    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), label_freq_compound, 2, 3, 14, 15);
-    m_combobox_freq_compound = gtk_combo_box_new_text();
-    gtk_widget_show(m_combobox_freq_compound);
-    gtk_widget_set_size_request(m_combobox_freq_compound, -1, 30);
-    gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_freq_compound), 0, _("OFF"));
-    gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_freq_compound), 1, _("ON"));
-    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_freq_compound, 3, 4, 14, 15);
-
-    //thi freq
-    label_thi_freq = gtk_label_new(_("FH:"));
-    gtk_widget_show(label_thi_freq);
-    gtk_widget_set_size_request(label_thi_freq, -1, 30);
-    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), label_thi_freq, 0, 1, 15, 16);
-    m_combobox_thi_freq = gtk_combo_box_new_text();
-    gtk_widget_show(m_combobox_thi_freq);
-    gtk_widget_set_size_request(m_combobox_thi_freq, -1, 30);
-    gtk_table_attach_defaults(GTK_TABLE(table_2d_m_mode), m_combobox_thi_freq, 1, 2, 15, 16);
-
-    // pw mode
-    frame_pw_mode = gtk_frame_new (NULL);
-    gtk_widget_show (frame_pw_mode);
-    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_pw_mode, 5, 715); //660
-    //gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_pw_mode, 5, 715 - 40); //660
-    gtk_widget_set_size_request (frame_pw_mode, 520, 200);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_pw_mode), GTK_SHADOW_OUT);
-
-    fixed_pw_mode = gtk_fixed_new ();
-    gtk_widget_show (fixed_pw_mode);
-    gtk_container_add (GTK_CONTAINER (frame_pw_mode), fixed_pw_mode);
-
-    label_pw_mode = gtk_label_new (_("<b>PW mode</b>"));
-    gtk_widget_show (label_pw_mode);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_pw_mode), label_pw_mode);
-    gtk_label_set_use_markup (GTK_LABEL (label_pw_mode), TRUE);
-
-    table_pw_mode = gtk_table_new (5, 4, FALSE);
-    gtk_widget_show (table_pw_mode);
-    gtk_fixed_put (GTK_FIXED (fixed_pw_mode), table_pw_mode, 20, 5);
-    gtk_widget_set_size_request (table_pw_mode, 480, 170);
-    gtk_table_set_row_spacings (GTK_TABLE(table_pw_mode), 10);
-
-    // doppler freq
-    label_pw_freq = gtk_label_new (_("Freq. :"));
-    gtk_widget_show (label_pw_freq);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_freq, 5, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_freq, 0, 1, 0, 1);
-    gtk_widget_set_size_request (label_pw_freq, -1, 30);
-
-    m_combobox_pw_freq = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_pw_freq);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_freq, 105, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_freq, 1, 2, 0, 1);
-    gtk_widget_set_size_request (m_combobox_pw_freq, 100, 30);
-
-    // pw gain
-    label_pw_gain = gtk_label_new (_("PW Gain:"));
-    gtk_widget_show (label_pw_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_gain, 270, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_gain, 2, 3, 0, 1);
-    gtk_widget_set_size_request (label_pw_gain, -1, 30);
-
-    spinbutton_pw_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
-    m_spinbutton_pw_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_pw_gain_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_pw_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_spinbutton_pw_gain, 370, 12);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_spinbutton_pw_gain, 3, 4, 0, 1);
-    gtk_widget_set_size_request (m_spinbutton_pw_gain, 100, 27);
-    g_signal_connect(G_OBJECT(m_spinbutton_pw_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
-
-    // pw scale
-    label_pw_scale_prf = gtk_label_new (_("Scale PRF:"));
-    gtk_widget_show (label_pw_scale_prf);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_scale_prf, 5, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_scale_prf, 0, 1, 1, 2);
-    gtk_widget_set_size_request (label_pw_scale_prf, -1, 30);
-
-    m_combobox_pw_scale_prf = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_pw_scale_prf);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_scale_prf, 105, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_scale_prf, 1, 2, 1, 2);
-    gtk_widget_set_size_request (m_combobox_pw_scale_prf, 100, 30);
-    for (i = 0; i < ImgPw::MAX_PRF; i ++) {
-        sprintf(buf , "%dHz", ImgPw::PW_PRF[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_pw_scale_prf), buf);
-    }
-    g_signal_connect (G_OBJECT(m_combobox_pw_scale_prf ), "changed", G_CALLBACK (HandleComboPwPrf), this);
-
-    // wall filter
-    label_pw_wallfilter = gtk_label_new (_("Wall Filter:"));
-    gtk_widget_show (label_pw_wallfilter);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_wallfilter, 270, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_wallfilter, 2, 3, 1, 2);
-    gtk_widget_set_size_request (label_pw_wallfilter, -1, 30);
-
-    m_combobox_pw_wallfilter = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_pw_wallfilter);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_wallfilter, 370, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_wallfilter, 3, 4, 1, 2);
-    gtk_widget_set_size_request (m_combobox_pw_wallfilter, 100, 30);
-
-    // angle
-    label_pw_angle = gtk_label_new (_("Angle:"));
-    gtk_widget_show (label_pw_angle);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_angle, 0, 1, 2, 3);
-    gtk_widget_set_size_request (label_pw_angle , -1, 30);
-
-    spinbutton_pw_angle_adj = gtk_adjustment_new (0, -85, 85, 5, 1, 0);
-    m_spinbutton_pw_angle = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_pw_angle_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_pw_angle);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_spinbutton_pw_angle, 1, 2, 2, 3);
-    gtk_widget_set_size_request (m_spinbutton_pw_angle, 100, 27);
-    g_signal_connect(G_OBJECT(m_spinbutton_pw_angle), "insert_text", G_CALLBACK(on_spinbutton_insert_angle), this);
-    g_signal_connect(G_OBJECT(m_spinbutton_pw_angle), "output", G_CALLBACK(on_spinbutton_output_angle), this);
-
-    hseparator3 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator3);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), hseparator3, 8, 88);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), hseparator3, 0, 4, 3, 4);
-    gtk_widget_set_size_request (hseparator3, -1, 5);
-
-    // invert
-    label_pw_invert = gtk_label_new (_("Spectrum Invert:"));
-    gtk_widget_show (label_pw_invert);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_pw_invert, 5, 110);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_pw_invert, 0, 1, 4, 5);
-    gtk_widget_set_size_request (label_pw_invert, -1, 30);
-
-    m_combobox_pw_invert = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_pw_invert);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_pw_invert, 105, 110);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_pw_invert, 1, 2, 4, 5);
-    gtk_widget_set_size_request (m_combobox_pw_invert, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_pw_invert), _("OFF"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_pw_invert), _("ON"));
-
-    // time resolustion
-    label_time_resolution = gtk_label_new (_("Time Resolution:"));
-    gtk_widget_show (label_time_resolution);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), label_time_resolution, 260, 110);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), label_time_resolution, 2, 3, 4, 5);
-    gtk_widget_set_size_request (label_time_resolution, -1, 30);
-
-    m_combobox_time_resolution = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_time_resolution);
-    //gtk_fixed_put (GTK_FIXED (fixed_pw_mode), m_combobox_time_resolution, 370, 110);
-    gtk_table_attach_defaults (GTK_TABLE (table_pw_mode), m_combobox_time_resolution, 3, 4, 4, 5);
-    gtk_widget_set_size_request (m_combobox_time_resolution, 100, 30);
-    for (i = 0; i < ImgProcPw::MAX_TIME_RES; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_time_resolution), buf);
-    }
-
-    // cfm mode
-    frame_cfm_mode = gtk_frame_new (NULL);
-    gtk_widget_show (frame_cfm_mode);
-    gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_cfm_mode, 5, 935); //880
-    //gtk_fixed_put (GTK_FIXED (fixed_img_set), frame_cfm_mode, 5, 935 - 40); //880
-    gtk_widget_set_size_request (frame_cfm_mode, 520, 260);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_cfm_mode), GTK_SHADOW_OUT);
-
-    fixed_cfm_mode = gtk_fixed_new ();
-    gtk_widget_show (fixed_cfm_mode);
-    gtk_container_add (GTK_CONTAINER (frame_cfm_mode), fixed_cfm_mode);
-
-    label_cfm_mode = gtk_label_new (_("<b>CFM mode</b>"));
-    gtk_widget_show (label_cfm_mode);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_cfm_mode), label_cfm_mode);
-    gtk_label_set_use_markup (GTK_LABEL (label_cfm_mode), TRUE);
-
-    table_cfm_mode = gtk_table_new (6, 4, FALSE);
-    gtk_widget_show (table_cfm_mode);
-    gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), table_cfm_mode, 20, 5);
-    gtk_widget_set_size_request (table_cfm_mode, 480, 230);
-    gtk_table_set_row_spacings (GTK_TABLE(table_cfm_mode), 10);
-
-    // cfm gain
-    label_color_gain = gtk_label_new (_("Color Gain:"));
-    gtk_widget_show (label_color_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_color_gain, 5, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_color_gain, 0, 1, 0, 1);
-    gtk_widget_set_size_request (label_color_gain, -1, 30);
-
-    spinbutton_cfm_gain_adj = gtk_adjustment_new (0, 0, 100, 1, 1, 0);
-    m_spinbutton_cfm_gain = gtk_spin_button_new (GTK_ADJUSTMENT (spinbutton_cfm_gain_adj), 1, 0);
-    gtk_widget_show (m_spinbutton_cfm_gain);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_spinbutton_cfm_gain, 105, 12);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_spinbutton_cfm_gain, 1, 2, 0, 1);
-    gtk_widget_set_size_request (m_spinbutton_cfm_gain, 100, 27);
-    g_signal_connect(G_OBJECT(m_spinbutton_cfm_gain), "insert_text", G_CALLBACK(on_spinbutton_insert_gain), this);
-
-    // cfm scale
-    label_cfm_scale_prf = gtk_label_new (_("Scale PRF:"));
-    gtk_widget_show (label_cfm_scale_prf);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_scale_prf, 270, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_scale_prf, 2, 3, 0, 1);
-    gtk_widget_set_size_request (label_cfm_scale_prf, -1, 30);
-
-    m_combobox_cfm_scale_prf = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_cfm_scale_prf);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_scale_prf, 370, 10);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_scale_prf, 3, 4, 0, 1);
-    gtk_widget_set_size_request (m_combobox_cfm_scale_prf, 100, 30);
-    for (i = 0; i < ImgCfm::MAX_PRF_INDEX; i ++) {
-        sprintf(buf , "%dHz", ImgCfm::CFM_PRF[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_scale_prf), buf);
-    }
-    g_signal_connect (G_OBJECT(m_combobox_cfm_scale_prf), "changed", G_CALLBACK (HandleComboCfmPrf), this);
-
-    // sensitive
-    label_sensitivity = gtk_label_new (_("Sensitivity:"));
-    gtk_widget_show (label_sensitivity);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_sensitivity, 5, 90);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_sensitivity, 0, 1, 1, 2);
-    gtk_widget_set_size_request (label_sensitivity, -1, 30);
-    m_combobox_sensitivity = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_sensitivity);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_sensitivity, 105, 90);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_sensitivity, 1, 2, 1, 2);
-    gtk_widget_set_size_request (m_combobox_sensitivity, 100, 30);
-
-    g_signal_connect (G_OBJECT(m_combobox_sensitivity), "changed", G_CALLBACK (HandleComboCfmSensitivity), this);
-
-    // cfm wall filter
-    label_cfm_wallfilter = gtk_label_new (_("Wall Filter:"));
-    gtk_widget_show (label_cfm_wallfilter);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_wallfilter, 5, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_wallfilter, 2, 3, 1, 2);
-    gtk_widget_set_size_request (label_cfm_wallfilter, -1, 30);
-
-    m_combobox_cfm_wallfilter = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_cfm_wallfilter);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_wallfilter, 105, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_wallfilter, 3, 4, 1, 2);
-    gtk_widget_set_size_request (m_combobox_cfm_wallfilter, 100, 30);
-
-    // color line density
-    label_cfm_line_density = gtk_label_new (_("Line Density:"));
-    gtk_widget_show (label_cfm_line_density);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_line_density, 270, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_line_density, 0, 1, 2, 3);
-    gtk_widget_set_size_request (label_cfm_line_density, -1, 30);
-
-    m_combobox_cfm_line_density = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_cfm_line_density);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_line_density, 370, 50);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_line_density, 1, 2, 2, 3);
-    gtk_widget_set_size_request (m_combobox_cfm_line_density, 100, 30);
-    for (i = 0; i < ImgCfm::MAX_LINE_DENSITY; i ++) {
-        sprintf(buf , "%s", _(ImgCfm::LINE_DENSITY_DISPLAY[i].c_str()));
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_line_density), buf);
-    }
-
-    // variance
-    label_variance = gtk_label_new (_("Variance:"));
-    gtk_widget_show (label_variance);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_variance, 270, 90);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_variance, 2, 3, 2, 3);
-    gtk_widget_set_size_request (label_variance, -1, 30);
-
-    m_combobox_variance = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_variance);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_variance, 370, 90);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_variance, 3, 4, 2, 3);
-    gtk_widget_set_size_request (m_combobox_variance, -1, 30);
-    for (i = 0; i < ImgCfm::MAX_TURB; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_variance), buf);
-    }
-
-    hseparator4 = gtk_hseparator_new ();
-    gtk_widget_show (hseparator4);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), hseparator4, 5, 130);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), hseparator4, 0, 4, 3, 4);
-    gtk_widget_set_size_request (hseparator4, -1, 5);
-
-    // invert
-    label_cfm_invert = gtk_label_new (_("Color Invert:"));
-    gtk_widget_show (label_cfm_invert);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_invert, 5, 150);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_invert, 0, 1, 4, 5);
-    gtk_widget_set_size_request (label_cfm_invert, -1, 30);
-
-    m_combobox_cfm_invert = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_cfm_invert);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_invert, 105, 150);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_invert, 1, 2, 4, 5);
-    gtk_widget_set_size_request (m_combobox_cfm_invert, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_invert), _("OFF"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_invert), _("ON"));
-
-    // persistence
-    label_persistence = gtk_label_new (_("Persistence:"));
-    gtk_widget_show (label_persistence);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_persistence, 270, 150);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_persistence, 2, 3, 4, 5);
-    gtk_widget_set_size_request (label_persistence, -1, 30);
-
-    m_combobox_persistence = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_persistence);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_persistence, 370, 150);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_persistence, 3, 4, 4, 5);
-    gtk_widget_set_size_request (m_combobox_persistence, 100, 30);
-    for (i = 0; i < ImgProcCfm::MAX_PERSIST; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_persistence), buf);
-    }
-
-    // color rejection
-    label_color_rejection = gtk_label_new (_("Color Reject:"));
-    gtk_widget_show (label_color_rejection);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_color_rejection, 5, 190);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_color_rejection, 0, 1, 5, 6);
-    gtk_widget_set_size_request (label_color_rejection, -1, 30);
-
-    m_combobox_color_rejection = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_color_rejection);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_color_rejection, 105, 190);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_color_rejection, 1, 2, 5, 6);
-    gtk_widget_set_size_request (m_combobox_color_rejection, 100, 30);
-    for (i = 0; i < ImgProcCfm::MAX_REJECT; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_color_rejection), buf);
-    }
-
-    // cfm smooth
-    label_cfm_smooth = gtk_label_new (_("Smooth:"));
-    gtk_widget_show (label_cfm_smooth);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), label_cfm_smooth, 270, 190);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), label_cfm_smooth, 2, 3, 5, 6);
-    gtk_widget_set_size_request (label_cfm_smooth, -1, 30);
-
-    m_combobox_cfm_smooth = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_cfm_smooth);
-    //gtk_fixed_put (GTK_FIXED (fixed_cfm_mode), m_combobox_cfm_smooth, 370, 190);
-    gtk_table_attach_defaults (GTK_TABLE (table_cfm_mode), m_combobox_cfm_smooth, 3, 4, 5, 6);
-    gtk_widget_set_size_request (m_combobox_cfm_smooth, 100, 30);
-    for (i = 0; i < ImgProcCfm::MAX_SMOOTH; i ++) {
-        sprintf(buf , "%d", i);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_cfm_smooth), buf);
-    }
-
-    return fixed_image;
-}
 
 
 void ViewSystem::RenameItemClicked(GtkButton *button) {
-
-    g_object_set(renderer, "editable", TRUE, NULL);
-
-    // g_signal_connect(renderer, "editable", G_CALLBACK(on_entry_user_item_insert), this);
-    g_signal_connect(renderer, "edited", G_CALLBACK(HandleCellRendererRename), this);
+    g_object_set(m_renderer, "editable", TRUE, NULL);
+    g_signal_connect(m_renderer, "edited", G_CALLBACK(signal_renderer_rename), this);
 }
 
 void ViewSystem::EntryItemInsert(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path) {
@@ -5639,6 +5927,8 @@ void ViewSystem::CreateDefineItem(int probeIndex, vector<ExamPara>& vecExamItem)
     exampara.dept_name = department;
     exampara.name = useritem;
     exampara.index = ExamItem::USERNAME;
+
+    cout << i << endl;
 
     if(userselectname == userselect ) {
       if (probeIndex >= 0 && probeIndex <= NUM_PROBE) {
@@ -5717,7 +6007,6 @@ bool ViewSystem::RenameNotice(int probe_type_index, char *new_text, char *dialog
 }
 
 void ViewSystem::TransEnglish(char *strname, char str[256],char *str_indexname,char str_index[256])
-
 {
     string newtext=_("New Item");
     string smallpart=_("Small Part");
@@ -6051,10 +6340,12 @@ void ViewSystem::AddItemClicked(GtkButton *button) {
     gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(m_treeview_exam_type),
                                      new_path,
                                      column_tree_view,
-                                     renderer,
+                                     m_renderer,
                                      TRUE);
     gtk_tree_path_free (new_path);
 }
+
+
 
 void ViewSystem::DeleteItemClicked(GtkButton *button) {
     GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
@@ -6255,7 +6546,7 @@ void ViewSystem::ExamCommentChanged(GtkComboBox *widget) {
     g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
 
     g_object_set(m_cellrenderer_comment_text, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
+    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text, "edited", G_CALLBACK(HandleCellRendererRenameSelectComment), this);
 
 }
@@ -6620,77 +6911,82 @@ void ViewSystem::ProbeCommentChanged(GtkComboBox *widget) {
     create_exam_comment_model(itemIndex);
 }
 
-void ViewSystem::ProbeTypeChanged(GtkComboBox *widget) {
-    int probeIndex = 0;
-    int examIndex = 0;
-    int i;
-    char *itemName;
-    char buf[50];
-    int index = GetProbeType();
-    if (index == -1) {
-        return;
+void ViewSystem::ProbeTypeChanged(GtkComboBox* combobox) {
+  int index = GetProbeType();
+
+  if (index == -1) {
+    return;
+  }
+
+  ExamItem examItem;
+  vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
+
+  GtkTreeModel* model = create_exam_item_model(itemIndex);
+  gtk_tree_view_set_model(m_treeview_exam_type, model);
+
+  if (m_str_index.empty()) {
+    GtkTreePath* path_tmp = gtk_tree_path_new_from_string("0:0");
+    gtk_tree_view_expand_all(m_treeview_exam_type);
+    gtk_tree_view_set_cursor(m_treeview_exam_type, path_tmp, NULL, TRUE);
+  } else {
+    GtkTreePath* path_tmp = gtk_tree_path_new_from_string(m_str_index.c_str());
+    gtk_tree_view_expand_all(m_treeview_exam_type);
+    gtk_tree_view_set_cursor(m_treeview_exam_type, path_tmp, NULL, TRUE);
+  }
+
+  int probeIndex = 0;
+  int examIndex = 0;
+  char* itemName = NULL;
+
+  GetImageNoteSelection(probeIndex, examIndex, itemName);
+
+  if (probeIndex != -1 && probeIndex < NUM_PROBE) {
+    char buf[50] = {0};
+
+    // update probe 2D freq
+    ClearComboBox(GTK_COMBO_BOX(m_combobox_2d_freq));
+
+    for (int i = 0; i < ProbeSocket::FREQ2D_SUM[probeIndex]; i ++) {
+      sprintf(buf , "%.1fMHz", (float)ProbeSocket::FREQ2D[probeIndex][i].emit / 20);
+      gtk_combo_box_append_text(GTK_COMBO_BOX (m_combobox_2d_freq), buf);
     }
-    ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[index]);
 
-    GtkTreeModel *model = create_exam_item_model(itemIndex);
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_exam_type), model);
+    // update doppler freq
+    ClearComboBox(GTK_COMBO_BOX(m_combobox_pw_freq));
 
-    GtkTreePath *path_tmp;
-    PRINTF("path:%s\n", m_str_index);
+    for (int i = 0; i < ProbeSocket::FREQ_DOPPLER_SUM[probeIndex]; i ++) {
+      sprintf(buf , "%.1f", (float)ProbeSocket::FREQ_DOPPLER[probeIndex][i] / 20);
+      gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_pw_freq), buf);
+    }
 
-    if(m_str_index == NULL) {
-        path_tmp = gtk_tree_path_new_from_string("0:0");
-        gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
-        gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
+    ClearComboBox(GTK_COMBO_BOX(m_combobox_thi_freq));
+
+    for (int i = 0; i < ProbeSocket::FREQ_THI_SUM[probeIndex]; i ++) {
+      if(ProbeSocket::FREQ_THI[i] != 0) {
+        sprintf(buf , "%.1fMHz", (float)ProbeSocket::FREQ_THI[probeIndex][i] / 10);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_thi_freq), buf);
+      }
+    }
+  }
+
+  string probeType = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_probe_type));
+
+  if (!probeType.empty()) {
+    if (probeType == "30P16A") {
+      ClearComboBox(GTK_COMBO_BOX(m_combobox_space_compound));
+      gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_space_compound), 0, _("OFF"));
     } else {
-        GtkTreePath *path_tmp = gtk_tree_path_new_from_string(m_str_index);
-        gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
-        gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
+      ClearComboBox(GTK_COMBO_BOX(m_combobox_space_compound));
+      gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_space_compound), 0, _("OFF"));
+
+      char buf[50] = {0};
+
+      for(int i = 1; i <Img2D::MAX_SPACE_COMPOUND; i ++) {
+        sprintf(buf, "%d", i);
+        gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_space_compound), buf);
+      }
     }
-    GetImageNoteSelection(probeIndex, examIndex,itemName);
-    gchar* probeType;
-    probeType = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_probe_type));
-
-    if ((probeIndex != -1) && (probeIndex < NUM_PROBE)) {
-        // update probe 2D freq
-        ClearComboBox(GTK_COMBO_BOX(m_combobox_2d_freq));
-        for (i = 0; i < ProbeSocket::FREQ2D_SUM[probeIndex]; i ++) {
-            sprintf(buf , "%.1fMHz", (float)ProbeSocket::FREQ2D[probeIndex][i].emit / 20);
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_2d_freq), buf);
-        }
-
-        // update doppler freq
-        ClearComboBox(GTK_COMBO_BOX(m_combobox_pw_freq));
-        for (i = 0; i < ProbeSocket::FREQ_DOPPLER_SUM[probeIndex]; i ++) {
-            sprintf(buf , "%.1f", (float)ProbeSocket::FREQ_DOPPLER[probeIndex][i] / 20);
-            gtk_combo_box_append_text (GTK_COMBO_BOX(m_combobox_pw_freq), buf);
-        }
-
-        ClearComboBox(GTK_COMBO_BOX(m_combobox_thi_freq));
-        for (i = 0; i < ProbeSocket::FREQ_THI_SUM[probeIndex]; i ++) {
-            if(ProbeSocket::FREQ_THI[i] != 0) {
-                sprintf(buf , "%.1fMHz", (float)ProbeSocket::FREQ_THI[probeIndex][i] / 10);
-                gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_thi_freq), buf);
-            }
-        }
-
-    }
-
-    if (probeType != NULL) {
-        if (strcmp(probeType, "30P16A") == 0) {
-            ClearComboBox(GTK_COMBO_BOX(m_combobox_space_compound));
-            gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_space_compound), 0, _("OFF"));
-        } else {
-            ClearComboBox(GTK_COMBO_BOX(m_combobox_space_compound));
-            gtk_combo_box_insert_text(GTK_COMBO_BOX(m_combobox_space_compound), 0, _("OFF"));
-            for(i = 1; i <Img2D::MAX_SPACE_COMPOUND; i ++) {
-                sprintf(buf, "%d", i);
-                gtk_combo_box_append_text(GTK_COMBO_BOX(m_combobox_space_compound), buf);
-            }
-        }
-        g_free(probeType);
-    }
+  }
 }
 
 
@@ -6714,7 +7010,7 @@ void ViewSystem::image_para_combo_box_set(GtkWidget *combobox, int value) {
 }
 
 void ViewSystem::SetImagePara(const ExamItem::ParaItem &item) {
-    image_para_combo_box_set((m_combobox_mbp), item.common.MBP);
+    /*image_para_combo_box_set((m_combobox_mbp), item.common.MBP);
     image_para_combo_box_set((m_combobox_ao_power), item.common.powerIndex);
 
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(m_spinbutton_2d_gain), (double)item.d2.gain2D);
@@ -6769,7 +7065,7 @@ void ViewSystem::SetImagePara(const ExamItem::ParaItem &item) {
     image_para_combo_box_set((m_combobox_cfm_invert), item.color.invert);
     image_para_combo_box_set((m_combobox_persistence), item.color.persist);
     image_para_combo_box_set((m_combobox_cfm_smooth), item.color.smooth);
-    image_para_combo_box_set((m_combobox_color_rejection), item.color.reject);
+    image_para_combo_box_set((m_combobox_color_rejection), item.color.reject);*/
 }
 
 void ViewSystem::save_image_para(ExamItem::ParaItem &item) {
@@ -6792,7 +7088,7 @@ void ViewSystem::save_image_para(ExamItem::ParaItem &item) {
 }
 
 void ViewSystem::GetImagePara(ExamItem::ParaItem &item) {
-    string gain;
+    /*string gain;
     string angle;
     item.common.MBP = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_mbp));
     item.common.powerIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ao_power));
@@ -6850,11 +7146,11 @@ void ViewSystem::GetImagePara(ExamItem::ParaItem &item) {
     item.color.persist = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_persistence));
     item.color.smooth = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_cfm_smooth));
     item.color.reject = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_color_rejection));
-    item.color.sensitive = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sensitivity));
+    item.color.sensitive = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_sensitivity));*/
 }
 
 void ViewSystem::image_para_restrict(int probeIndex) {
-    switch (probeIndex) {
+    /*switch (probeIndex) {
     case 0:                     // 35C40K
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
         break;
@@ -6898,7 +7194,7 @@ void ViewSystem::image_para_restrict(int probeIndex) {
         gtk_widget_set_sensitive(m_combobox_steer, FALSE);
         //gtk_widget_set_sensitive(m_combobox_thi, FALSE);
         break;
-    }
+    }*/
 }
 
 void ViewSystem::save_itemIndex(int itemIndex) {
@@ -6940,12 +7236,8 @@ void ViewSystem::tree_auto_scroll(GtkTreeView *tree_view, GtkTreeIter *iter, Gtk
     gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(tree_view), path, NULL, TRUE, 0.5, 0.5);
 }
 
-gboolean ViewSystem::BtnExamDepartmentClicked(GtkWidget *widget, GdkEventButton *event) {
-    if (event->button == 3)
-        return FALSE;
-    else if (event->button == 2)
-        return FALSE;
-    else if (event->button == 1) {
+void ViewSystem::BtnExamDepartmentClicked(GtkWidget *widget, GdkEventButton *event) {
+    if (event->button == 1) {
         if (event->type == GDK_BUTTON_RELEASE) {
             GtkTreeIter iter;
             GtkTreeModel *model;
@@ -6964,10 +7256,8 @@ gboolean ViewSystem::BtnExamDepartmentClicked(GtkWidget *widget, GdkEventButton 
                     gtk_tree_path_free(path);
                 }
             }
-            return TRUE;
         }
     }
-    return FALSE;
 }
 
 void ViewSystem::ExamTypeChanged(GtkTreeSelection *selection) {
@@ -7008,20 +7298,10 @@ bool ViewSystem::ExamTypeTestRowExpandBefore(GtkTreeView *tree_view, GtkTreeIter
     return FALSE; //必须要有返回值,才能触发事件
 }
 
-void ViewSystem::init_image_setting() {
-    string probe_type = TopArea::GetInstance()->GetProbeType();
-    for (int i = 0; i < NUM_PROBE; ++i) {
-        if (strcmp(probe_type.c_str(), g_probe_list[i].c_str()) == 0) {
-            string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(probe_type);
-            gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_type), i);
-        }
-    }
 
-    set_image_item_sensitive(false);
-}
 
 void ViewSystem::init_image_para() {
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_mbp), -1);
+    /*gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_mbp), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ao_power), -1);
 
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(m_spinbutton_2d_gain), (double)0);
@@ -7070,12 +7350,12 @@ void ViewSystem::init_image_para() {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_cfm_invert), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_persistence), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_cfm_smooth), -1);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_color_rejection), -1);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_color_rejection), -1);*/
 }
 
 void ViewSystem::set_image_item_sensitive(bool status) {
     m_imageItemSensitive = status;
-    if (!status)
+    /*if (!status)
         init_image_para();
 
     gtk_widget_set_sensitive(m_combobox_mbp, status);
@@ -7125,33 +7405,10 @@ void ViewSystem::set_image_item_sensitive(bool status) {
     gtk_widget_set_sensitive(m_combobox_cfm_invert, status);
     gtk_widget_set_sensitive(m_combobox_persistence, status);
     gtk_widget_set_sensitive(m_combobox_cfm_smooth, status);
-    gtk_widget_set_sensitive(m_combobox_color_rejection, status);
+    gtk_widget_set_sensitive(m_combobox_color_rejection, status);*/
 }
 
-void ViewSystem::save_image_setting() {
-    string name = GetUserName();
-    if (name == "System Default" && name == "Умолчан системы" &&
-            name == "系统默认" && name == "Domyślne Systemu"  &&
-            name == "Par défaut du sys." && name == "Systemvorgabe" && name == "Sistema por defecto")
 
-    {
-        UserSelect::GetInstance()->write_username(GTK_COMBO_BOX(m_comboboxentry_user_select), USERNAME_DB, name);
-
-    }
-
-    ExamItem examItem;
-    ExamItem::ParaItem paraItem;
-    GetImagePara(paraItem);
-
-    int probeIndex = 0;
-    int itemIndex = 0;
-    char *itemName = NULL;
-    GetImageNoteSelection(probeIndex, itemIndex, itemName);
-    if ((probeIndex >= 0) && (itemIndex >= 0)) {
-        examItem.WriteExamItemPara(probeIndex, itemIndex, &paraItem, itemName);
-    }
-
-}
 
 void ViewSystem::CreatePrinter() {
     GtkWidget* frame_print;
@@ -7748,7 +8005,7 @@ GtkWidget* ViewSystem::create_note_comment() {
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
 
     g_object_set(m_cellrenderer_comment_text, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
+    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text, "edited", G_CALLBACK(HandleCellRendererRenameSelectComment), this);
 
     gtk_widget_show (m_treeview_item_comment);
@@ -7772,7 +8029,7 @@ GtkWidget* ViewSystem::create_note_comment() {
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
 
     g_object_set(m_cellrenderer_comment_text1, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
+    g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text1, "edited", G_CALLBACK(HandleCellRendererRenameComment), this);
     gtk_widget_show (m_treeview_item_comment1);
 
@@ -9149,665 +9406,7 @@ void ViewSystem::save_comment_setting() {
     sysNoteSetting.SyncFile();
 }
 
-GtkWidget* ViewSystem::create_note_measure() {
-    GtkWidget *fixed_measure;
-    GtkWidget *frame_measure_line;
-    GtkWidget *hbox_measure_line;
-    GSList *radiobutton_ml_group = NULL;
-    GSList *radiobutton_measurt_result_group = NULL;
-    GtkWidget *label_measure_line;
-    GtkWidget *frame_cursor;
-    GtkWidget *hbox_cursor;
-    GSList *radiobutton_cursor_size_group = NULL;
-    GtkWidget *label_cursor;
 
-    GtkWidget *frame_line_color;
-    GtkWidget *fixed_line_color;
-    GtkWidget *label_current_line;
-    GtkWidget *label_confirmed_line;
-    GtkWidget *label_line_color;
-    GtkWidget *label_unit;
-
-    GtkWidget *frame_autocalc_para;
-    GtkWidget *fixed_autocalc_para;
-    GtkWidget *label_autocalc_para;
-
-    GtkWidget *frame_trace_method;
-    GtkWidget *hbox_trace_method;
-    GSList *radiobutton_trace_method_group = NULL;
-    GtkWidget *label_method_trace;
-
-    GtkWidget *frame_report_result;
-    GtkWidget *hbox_report_result;
-    GSList *radiobutton_report_result_group = NULL;
-    GtkWidget *label_report_result;
-
-    GtkWidget *frame_unit_line;
-    GtkWidget *fixed_unit_line;
-    GtkWidget *label_unit_dist;
-    GtkWidget *label_unit_area;
-    GtkWidget *label_unit_vol;
-    GtkWidget *label_unit_time;
-    GtkWidget *label_unit_vel;
-    GtkWidget *label_unit_slope;
-    GtkWidget *label_unit_accel;
-    GtkWidget *label_unit_efw;
-
-    //GtkWidget *hseparator_1;
-    GtkWidget *button_measure_default;
-    GtkWidget *label_heart_beat_cycle;
-
-    fixed_measure = gtk_fixed_new ();
-    gtk_widget_show (fixed_measure);
-
-    frame_measure_line = gtk_frame_new (NULL);
-    gtk_widget_show (frame_measure_line);
-    // gtk_fixed_put (GTK_FIXED (fixed_measure), frame_measure_line, 30, 30);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_measure_line, 310, 240+140);
-    gtk_widget_set_size_request (frame_measure_line, 255, 60);
-    gtk_frame_set_label_align (GTK_FRAME (frame_measure_line), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_measure_line), GTK_SHADOW_IN);
-
-    hbox_measure_line = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_measure_line);
-    gtk_container_add (GTK_CONTAINER (frame_measure_line), hbox_measure_line);
-
-    m_radiobutton_ml_on = gtk_radio_button_new_with_mnemonic (NULL, _("ON"));
-    gtk_widget_show (m_radiobutton_ml_on);
-    gtk_box_pack_start (GTK_BOX (hbox_measure_line), m_radiobutton_ml_on, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_ml_on), radiobutton_ml_group);
-    radiobutton_ml_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_ml_on));
-
-    m_radiobutton_ml_off = gtk_radio_button_new_with_mnemonic (NULL, _("OFF"));
-    gtk_widget_show (m_radiobutton_ml_off);
-    gtk_box_pack_start (GTK_BOX (hbox_measure_line), m_radiobutton_ml_off, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_ml_off), radiobutton_ml_group);
-    radiobutton_ml_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_ml_off));
-
-    label_measure_line = gtk_label_new (_("<b>Measure Line</b>"));
-    gtk_widget_show (label_measure_line);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_measure_line), label_measure_line);
-    gtk_label_set_use_markup (GTK_LABEL (label_measure_line), TRUE);
-
-    frame_cursor = gtk_frame_new (NULL);
-    gtk_widget_show (frame_cursor);
-    // gtk_fixed_put (GTK_FIXED (fixed_measure), frame_cursor, 490, 30);
-    // gtk_fixed_put (GTK_FIXED (fixed_measure), frame_cursor, 260, 30);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_cursor, 600, 240+70);
-    gtk_widget_set_size_request (frame_cursor, 255, 60);
-    gtk_frame_set_label_align (GTK_FRAME (frame_cursor), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_cursor), GTK_SHADOW_IN);
-
-    hbox_cursor = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_cursor);
-    gtk_container_add (GTK_CONTAINER (frame_cursor), hbox_cursor);
-
-    m_radiobutton_cursor_big = gtk_radio_button_new_with_mnemonic (NULL, _("Big"));
-    gtk_widget_show (m_radiobutton_cursor_big);
-    gtk_box_pack_start (GTK_BOX (hbox_cursor), m_radiobutton_cursor_big, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_cursor_big), radiobutton_cursor_size_group);
-    radiobutton_cursor_size_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_cursor_big));
-
-    m_radiobutton_cursor_mid = gtk_radio_button_new_with_mnemonic (NULL, _("Mid"));
-    gtk_widget_show (m_radiobutton_cursor_mid);
-    gtk_box_pack_start (GTK_BOX (hbox_cursor), m_radiobutton_cursor_mid, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_cursor_mid), radiobutton_cursor_size_group);
-    radiobutton_cursor_size_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_cursor_mid));
-
-    m_radiobutton_cursor_small = gtk_radio_button_new_with_mnemonic (NULL, _("Small"));
-    gtk_widget_show (m_radiobutton_cursor_small);
-    gtk_box_pack_start (GTK_BOX (hbox_cursor), m_radiobutton_cursor_small, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_cursor_small), radiobutton_cursor_size_group);
-    radiobutton_cursor_size_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_cursor_small));
-
-    label_cursor = gtk_label_new (_("<b>Cursor Size</b>"));
-    gtk_widget_show (label_cursor);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_cursor), label_cursor);
-    gtk_label_set_use_markup (GTK_LABEL (label_cursor), TRUE);
-
-    frame_line_color = gtk_frame_new (NULL);
-    gtk_widget_show (frame_line_color);
-    //gtk_fixed_put (GTK_FIXED (fixed_measure), frame_line_color, 30, 110);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_line_color, 310, 170);
-    gtk_widget_set_size_request (frame_line_color, 450 + 100, 60);
-    gtk_frame_set_label_align (GTK_FRAME (frame_line_color), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_line_color), GTK_SHADOW_IN);
-
-    fixed_line_color = gtk_fixed_new ();
-    gtk_widget_show (fixed_line_color);
-    gtk_container_add (GTK_CONTAINER (frame_line_color), fixed_line_color);
-
-    label_current_line = gtk_label_new (_("Current Line:"));
-    gtk_widget_show (label_current_line);
-    gtk_fixed_put (GTK_FIXED (fixed_line_color), label_current_line, 5, 5);
-    gtk_widget_set_size_request (label_current_line, 100 + 20, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_current_line), 0, 0.5);
-
-    m_combobox_current_line = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_current_line);
-    gtk_fixed_put (GTK_FIXED (fixed_line_color), m_combobox_current_line, 105 + 20, 5);
-    gtk_widget_set_size_request (m_combobox_current_line, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_current_line), _("Red"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_current_line), _("Yellow"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_current_line), _("Green"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_current_line), _("Blue"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_current_line), _("White"));
-
-    label_confirmed_line = gtk_label_new (_("Confirmed Line:"));
-    gtk_widget_show (label_confirmed_line);
-    gtk_fixed_put (GTK_FIXED (fixed_line_color), label_confirmed_line, 230 + 20, 5);
-    gtk_widget_set_size_request (label_confirmed_line, 110 + 60, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_confirmed_line), 0, 0.5);
-
-    m_combobox_confirmed_line = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_confirmed_line);
-    gtk_fixed_put (GTK_FIXED (fixed_line_color), m_combobox_confirmed_line, 340 + 80, 5);
-    gtk_widget_set_size_request (m_combobox_confirmed_line, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_confirmed_line), _("Red"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_confirmed_line), _("Yellow"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_confirmed_line), _("Green"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_confirmed_line), _("Blue"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_confirmed_line), _("White"));
-
-    label_line_color = gtk_label_new (_("<b>Line Color</b>"));
-    gtk_widget_show (label_line_color);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_line_color), label_line_color);
-    gtk_label_set_use_markup (GTK_LABEL (label_line_color), TRUE);
-
-    //measure result font size
-    GtkWidget* frame_measure_result = gtk_frame_new (NULL);
-    gtk_widget_show (frame_measure_result);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_measure_result, 600, 90+150);
-    gtk_widget_set_size_request (frame_measure_result, 255, 60);
-    gtk_frame_set_label_align (GTK_FRAME (frame_measure_result), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_measure_result), GTK_SHADOW_IN);
-
-    GtkWidget* hbox_measure_result = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_measure_result);
-    gtk_container_add (GTK_CONTAINER (frame_measure_result), hbox_measure_result);
-
-    m_radiobutton_result_small = gtk_radio_button_new_with_mnemonic (NULL, _("Small"));
-    gtk_widget_show (m_radiobutton_result_small);
-    gtk_box_pack_start (GTK_BOX (hbox_measure_result), m_radiobutton_result_small, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_result_small), radiobutton_measurt_result_group);
-    radiobutton_measurt_result_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_result_small));
-
-    m_radiobutton_result_big = gtk_radio_button_new_with_mnemonic (NULL, _("Big"));
-    gtk_widget_show (m_radiobutton_result_big);
-    gtk_box_pack_start (GTK_BOX (hbox_measure_result), m_radiobutton_result_big, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_result_big), radiobutton_measurt_result_group);
-    radiobutton_measurt_result_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_result_big));
-
-    GtkWidget* label_measure_result = gtk_label_new (_("<b>Measure Result Font Size</b>"));
-    gtk_widget_show (label_measure_result);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_measure_result), label_measure_result);
-    gtk_label_set_use_markup (GTK_LABEL (label_measure_result), TRUE);
-
-    frame_trace_method = gtk_frame_new (NULL);
-    gtk_widget_show (frame_trace_method);
-
-    //  gtk_fixed_put (GTK_FIXED (fixed_measure), frame_trace_method, 260, 210);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_trace_method, 310, 240+70);
-    gtk_widget_set_size_request (frame_trace_method, 255, 60);
-    gtk_frame_set_label_align (GTK_FRAME (frame_trace_method), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_trace_method), GTK_SHADOW_IN);
-
-    hbox_trace_method = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_trace_method);
-    gtk_container_add (GTK_CONTAINER (frame_trace_method), hbox_trace_method);
-
-    m_radiobutton_trace_point = gtk_radio_button_new_with_mnemonic (NULL, _("Point"));
-    gtk_widget_show (m_radiobutton_trace_point);
-    gtk_box_pack_start (GTK_BOX (hbox_trace_method), m_radiobutton_trace_point, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_trace_point), radiobutton_trace_method_group);
-    radiobutton_trace_method_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_trace_point));
-
-    m_radiobutton_trace_track = gtk_radio_button_new_with_mnemonic (NULL, _("Track"));
-    gtk_widget_show (m_radiobutton_trace_track);
-    gtk_box_pack_start (GTK_BOX (hbox_trace_method), m_radiobutton_trace_track, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_trace_track), radiobutton_trace_method_group);
-    radiobutton_trace_method_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_trace_track));
-
-    m_radiobutton_trace_auto = gtk_radio_button_new_with_mnemonic (NULL, _("Auto"));
-    gtk_widget_show (m_radiobutton_trace_auto);
-    gtk_box_pack_start (GTK_BOX (hbox_trace_method), m_radiobutton_trace_auto, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_trace_auto), radiobutton_trace_method_group);
-    radiobutton_trace_method_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_trace_auto));
-
-    label_method_trace = gtk_label_new (_("<b>Trace Method</b>"));
-    gtk_widget_show (label_method_trace);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_trace_method), label_method_trace);
-    gtk_label_set_use_markup (GTK_LABEL (label_method_trace), TRUE);
-
-    frame_report_result = gtk_frame_new (NULL);
-    gtk_widget_show (frame_report_result);
-    // gtk_fixed_put (GTK_FIXED (fixed_measure), frame_report_result, 30, 210);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_report_result, 310, 90+150);
-    gtk_widget_set_size_request (frame_report_result, 255, 60);
-    gtk_frame_set_label_align (GTK_FRAME (frame_report_result), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_report_result), GTK_SHADOW_IN);
-
-    hbox_report_result = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_report_result);
-    gtk_container_add (GTK_CONTAINER (frame_report_result), hbox_report_result);
-
-    m_radiobutton_report_last = gtk_radio_button_new_with_mnemonic (NULL, _("Last"));
-    gtk_widget_show (m_radiobutton_report_last);
-    gtk_box_pack_start (GTK_BOX (hbox_report_result), m_radiobutton_report_last, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_report_last), radiobutton_report_result_group);
-    radiobutton_report_result_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_report_last));
-
-    m_radiobutton_report_average = gtk_radio_button_new_with_mnemonic (NULL, _("Average"));
-    gtk_widget_show (m_radiobutton_report_average);
-    gtk_box_pack_start (GTK_BOX (hbox_report_result), m_radiobutton_report_average, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_report_average), radiobutton_report_result_group);
-    radiobutton_report_result_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_report_average));
-
-    label_report_result = gtk_label_new (_("<b>Report Result Method</b>"));
-    gtk_widget_show (label_report_result);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_report_result), label_report_result);
-    gtk_label_set_use_markup (GTK_LABEL (label_report_result), TRUE);
-
-    frame_autocalc_para = gtk_frame_new (NULL);
-    gtk_widget_show (frame_autocalc_para);
-
-    //  gtk_fixed_put (GTK_FIXED (fixed_measure), frame_autocalc_para, 30, 290);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), frame_autocalc_para, 310, 10);
-    gtk_widget_set_size_request (frame_autocalc_para, 610-80+20, 150);
-    gtk_frame_set_label_align (GTK_FRAME (frame_autocalc_para), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_autocalc_para), GTK_SHADOW_IN);
-
-    fixed_autocalc_para = gtk_fixed_new ();
-    gtk_widget_show (fixed_autocalc_para);
-    gtk_container_add (GTK_CONTAINER (frame_autocalc_para), fixed_autocalc_para);
-
-    m_checkbutton_autocalc_ps = gtk_check_button_new_with_mnemonic (("PS"));
-    gtk_widget_show (m_checkbutton_autocalc_ps);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_ps, 20, 10);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_ps, 100, 30);
-    gtk_widget_set_sensitive(m_checkbutton_autocalc_ps, FALSE);
-
-    m_checkbutton_autocalc_ed = gtk_check_button_new_with_mnemonic (("ED"));
-    gtk_widget_show (m_checkbutton_autocalc_ed);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_ed, 130+15, 10);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_ed, 100, 30);
-    gtk_widget_set_sensitive(m_checkbutton_autocalc_ed, FALSE);
-
-    m_checkbutton_autocalc_ri = gtk_check_button_new_with_mnemonic (("RI"));
-    gtk_widget_show (m_checkbutton_autocalc_ri);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_ri, 240+30, 10);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_ri, 100, 30);
-
-    m_checkbutton_autocalc_sd = gtk_check_button_new_with_mnemonic (("SD"));
-    gtk_widget_show (m_checkbutton_autocalc_sd);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_sd, 350+45, 10);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_sd, 100, 30);
-
-    m_checkbutton_autocalc_tamax = gtk_check_button_new_with_mnemonic (_("TA Max"));
-    gtk_widget_show (m_checkbutton_autocalc_tamax);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_tamax, 20, 50);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_tamax, 100, 30);
-    g_signal_connect(G_OBJECT(m_checkbutton_autocalc_tamax), "toggled", G_CALLBACK(HandleTAmaxToggled), this);
-
-    m_checkbutton_autocalc_pi = gtk_check_button_new_with_mnemonic (("PI"));
-    gtk_widget_show (m_checkbutton_autocalc_pi);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_pi, 135+10, 50);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_pi, 100, 30);
-    g_signal_connect(G_OBJECT(m_checkbutton_autocalc_pi), "toggled", G_CALLBACK(HandlePIToggled), this);
-
-    m_checkbutton_autocalc_time = gtk_check_button_new_with_mnemonic (("Time"));
-    gtk_widget_show (m_checkbutton_autocalc_time);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_time, 250+20, 50);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_time, 100, 30);
-
-    m_checkbutton_autocalc_hr = gtk_check_button_new_with_mnemonic (("HR"));
-    gtk_widget_show (m_checkbutton_autocalc_hr);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_hr, 365+30, 50);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_hr, 100, 30);
-    g_signal_connect(G_OBJECT(m_checkbutton_autocalc_hr), "toggled", G_CALLBACK(HandleHRToggled), this);
-
-    m_checkbutton_autocalc_pgmax = gtk_check_button_new_with_mnemonic (_("PG Max"));
-    gtk_widget_show (m_checkbutton_autocalc_pgmax);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_pgmax, 20, 90);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_pgmax, 100, 30);
-
-    m_checkbutton_autocalc_pgmean = gtk_check_button_new_with_mnemonic (_("PG Mean"));
-    gtk_widget_show (m_checkbutton_autocalc_pgmean);
-    gtk_fixed_put (GTK_FIXED (fixed_autocalc_para), m_checkbutton_autocalc_pgmean, 135+10, 90);
-    gtk_widget_set_size_request (m_checkbutton_autocalc_pgmean, 100, 30);
-
-    label_autocalc_para = gtk_label_new (_("<b>Auto Spectrum Calculation Result</b>"));
-    gtk_widget_show (label_autocalc_para);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_autocalc_para), label_autocalc_para);
-    gtk_label_set_use_markup (GTK_LABEL (label_autocalc_para), TRUE);
-
-    button_measure_default = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_measure_default);
-    //  gtk_fixed_put (GTK_FIXED (fixed_measure), button_measure_default, 30, 450);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), button_measure_default, 50, 450);
-    gtk_widget_set_size_request (button_measure_default, 140, 40);
-    g_signal_connect ((gpointer) button_measure_default, "clicked", G_CALLBACK (on_button_measure_default_clicked), this);
-
-    label_heart_beat_cycle = gtk_label_new (_("<b>Heart Beat:</b>"));
-    gtk_label_set_use_markup (GTK_LABEL (label_heart_beat_cycle ), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_heart_beat_cycle ), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED (fixed_measure), label_heart_beat_cycle , 50, 400);
-    gtk_widget_set_size_request (label_heart_beat_cycle, 100, 30);
-    gtk_widget_show (label_heart_beat_cycle );
-    m_combobox_heart_beat_cycle = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_heart_beat_cycle );
-    gtk_fixed_put (GTK_FIXED (fixed_measure), m_combobox_heart_beat_cycle , 100 + 60, 400);
-    gtk_widget_set_size_request (m_combobox_heart_beat_cycle , 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "1");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "2");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "3");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "4");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "5");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "6");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "7");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_heart_beat_cycle ), "8");
-
-    frame_unit_line = gtk_frame_new(NULL);
-    gtk_widget_show(frame_unit_line);
-    gtk_fixed_put(GTK_FIXED (fixed_measure), frame_unit_line, 50, 10);
-    gtk_widget_set_size_request(frame_unit_line,  240, 380-5);
-    gtk_frame_set_label_align(GTK_FRAME(frame_unit_line), 0.5, 0.5);
-    gtk_frame_set_shadow_type(GTK_FRAME(frame_unit_line), GTK_SHADOW_IN);
-
-    fixed_unit_line = gtk_fixed_new();
-    gtk_widget_show(fixed_unit_line);
-    gtk_container_add(GTK_CONTAINER(frame_unit_line), fixed_unit_line);
-
-    label_unit_dist = gtk_label_new(_("Distance"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_dist), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_dist), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_dist, 10, 10);
-    gtk_widget_set_size_request (label_unit_dist, 100, 30);
-    gtk_widget_show (label_unit_dist);
-    m_combobox_unit_dist = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_dist);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_dist, 110, 10);
-    gtk_widget_set_size_request (m_combobox_unit_dist, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_dist), "cm");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_dist), "mm");
-
-    label_unit_area = gtk_label_new(_("Area"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_area), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_area), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_area, 10, 60);
-    gtk_widget_set_size_request (label_unit_area, 100, 30);
-    gtk_widget_show (label_unit_area);
-    m_combobox_unit_area = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_area);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_area, 110, 60);
-    gtk_widget_set_size_request (m_combobox_unit_area, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_area), "cm²");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_area),"mm²");
-
-    label_unit_vol = gtk_label_new(_("Volume"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_vol), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_vol), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_vol, 10, 110);
-    gtk_widget_set_size_request (label_unit_vol, 100, 30);
-    gtk_widget_show (label_unit_vol);
-    m_combobox_unit_vol = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_vol);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_vol, 110, 110);
-    gtk_widget_set_size_request (m_combobox_unit_vol, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vol),"cm³");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vol), "mm³");
-
-    label_unit_time = gtk_label_new(_("Time"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_time), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_time), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_time, 10, 160);
-    gtk_widget_set_size_request (label_unit_time, 100, 30);
-    gtk_widget_show (label_unit_time);
-    m_combobox_unit_time = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_time);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_time, 110, 160);
-    gtk_widget_set_size_request (m_combobox_unit_time, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_time), "s");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_time), "ms");
-
-    label_unit_vel = gtk_label_new(_("Velocity"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_vel), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_vel), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_vel, 10, 210);
-    gtk_widget_set_size_request (label_unit_vel, 100, 30);
-    gtk_widget_show (label_unit_vel);
-    m_combobox_unit_vel = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_vel);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_vel, 110, 210);
-    gtk_widget_set_size_request (m_combobox_unit_vel, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vel), "cm/s");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vel), "mm/s");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_vel), "m/s");
-
-    label_unit_accel = gtk_label_new(_("Accel"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_accel), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_accel), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_accel, 10, 260);
-    gtk_widget_set_size_request (label_unit_accel, 100, 30);
-    gtk_widget_show (label_unit_accel);
-    m_combobox_unit_accel = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_accel);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_accel, 110, 260);
-    gtk_widget_set_size_request (m_combobox_unit_accel, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "cm/s²");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "mm/s²");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_accel), "m/s²");
-
-    label_unit_efw = gtk_label_new(_("EFW"));
-    gtk_label_set_use_markup (GTK_LABEL (label_unit_efw), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_unit_efw), 0, 0.5);
-    gtk_fixed_put (GTK_FIXED(fixed_unit_line), label_unit_efw, 10, 310);
-    gtk_widget_set_size_request (label_unit_efw, 100, 30);
-    gtk_widget_show (label_unit_efw);
-    m_combobox_unit_efw = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_unit_efw);
-    gtk_fixed_put (GTK_FIXED (fixed_unit_line), m_combobox_unit_efw, 110, 310);
-    gtk_widget_set_size_request (m_combobox_unit_efw, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_efw), "kg");
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_unit_efw), "g");
-
-    label_unit = gtk_label_new (_("<b>Unit Setting</b>"));
-    gtk_widget_show (label_unit);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_unit_line), label_unit);
-    gtk_label_set_use_markup (GTK_LABEL (label_unit), TRUE);
-
-    return fixed_measure;
-}
-
-void ViewSystem::init_measure_setting(SysMeasurementSetting* sysMeasure) {
-    if (sysMeasure == NULL)
-        sysMeasure = new SysMeasurementSetting;
-
-    int measureLine = sysMeasure->GetMeasureLineDisplay();
-    switch (measureLine) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_ml_on), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_ml_off), TRUE);
-        break;
-    }
-
-    int cursorSize = sysMeasure->GetMeasureCursorSize();
-    switch (cursorSize) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_cursor_big), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_cursor_mid), TRUE);
-        break;
-    case 2:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_cursor_small), TRUE);
-        break;
-    }
-
-    int lineColor = sysMeasure->GetMeasureColorCur();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_current_line), lineColor);
-    lineColor = sysMeasure->GetMeasureColorConfirm();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_confirmed_line), lineColor);
-
-    int meaResult = sysMeasure->GetMeasureResult();
-    switch (meaResult) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_result_small), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_result_big), TRUE);
-        break;
-    }
-
-    int traceManual = sysMeasure->GetTraceMethod();
-    switch (traceManual) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_point), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_track), TRUE);
-        break;
-    case 2:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_trace_auto), TRUE);
-        break;
-    }
-    int reportResult = sysMeasure->GetReportResult();
-    switch (reportResult) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_report_last), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_report_average), TRUE);
-        break;
-    }
-
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ps), TRUE);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ed), TRUE);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ri), sysMeasure->GetAutoCalcRI());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_sd), sysMeasure->GetAutoCalcSD());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_tamax), sysMeasure->GetAutoCalcTAmax());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pi), sysMeasure->GetAutoCalcPI());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_time), sysMeasure->GetAutoCalcTime());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_hr), sysMeasure->GetAutoCalcHR());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmax), sysMeasure->GetAutoCalcPGmax());
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmean), sysMeasure->GetAutoCalcPGmean());
-
-    int unitDist = sysMeasure->GetUnitDist();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_dist), unitDist);
-
-    int unitArea = sysMeasure->GetUnitArea();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_area), unitArea);
-
-    int unitVol = sysMeasure->GetUnitVol();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_vol), unitVol);
-
-    int unitTime = sysMeasure->GetUnitTime();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_time), unitTime);
-
-    int unitVel = sysMeasure->GetUnitVel();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_vel), unitVel);
-
-    int unitAccel = sysMeasure->GetUnitAccel();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_accel), unitAccel);
-
-    int unitEfw = sysMeasure->GetUnitEfw();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_unit_efw), unitEfw);
-
-    int heartBeatCycleIndex = sysMeasure->GetHeartBeatCycle() - 1;
-    if (heartBeatCycleIndex < 0)
-        heartBeatCycleIndex = 0;
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_heart_beat_cycle), heartBeatCycleIndex);
-
-    delete sysMeasure;
-}
-
-void ViewSystem::save_measure_setting() {
-    SysMeasurementSetting sysMeasure;
-    unsigned char measureLine = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_ml_on)))
-        measureLine = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_ml_off)))
-        measureLine = 1;
-    sysMeasure.SetMeasureLineDisplay(measureLine);
-
-    unsigned char cursorSize = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_big)))
-        cursorSize = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_mid)))
-        cursorSize = 1;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_cursor_small)))
-        cursorSize = 2;
-    sysMeasure.SetMeasureCursorSize(cursorSize);
-
-    unsigned char colorIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_current_line));
-    sysMeasure.SetMeasureColorCur(colorIndex);
-    colorIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_confirmed_line));
-    sysMeasure.SetMeasureColorConfirm(colorIndex);
-
-    unsigned int meaResult = 0;//小字体
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_small)))
-        meaResult = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_result_big)))
-        meaResult = 1;
-    sysMeasure.SetMeasureResult(meaResult);
-
-    unsigned char trace = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_point)))
-        trace = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_track)))
-        trace = 1;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_trace_auto)))
-        trace = 2;
-    sysMeasure.SetTraceMethod(trace);
-
-    unsigned char reportResult = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_report_last)))
-        reportResult = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_report_average)))
-        reportResult = 1;
-    sysMeasure.SetReportResult(reportResult);
-
-    sysMeasure.SetAutoCalcPS(true);
-    sysMeasure.SetAutoCalcED(true);
-    sysMeasure.SetAutoCalcRI(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_ri)));
-    sysMeasure.SetAutoCalcSD(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_sd)));
-    sysMeasure.SetAutoCalcTAmax(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_tamax)));
-    sysMeasure.SetAutoCalcPI(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pi)));
-    sysMeasure.SetAutoCalcTime(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_time)));
-    sysMeasure.SetAutoCalcHR(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_hr)));
-    sysMeasure.SetAutoCalcPGmax(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmax)));
-    sysMeasure.SetAutoCalcPGmean(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbutton_autocalc_pgmean)));
-
-    int unitDist = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_dist));
-    sysMeasure.SetUnitDist(unitDist);
-
-    int unitArea = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_area));
-    sysMeasure.SetUnitArea(unitArea);
-
-    int unitVol = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_vol));
-    sysMeasure.SetUnitVol(unitVol);
-
-    int unitTime = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_time));
-    sysMeasure.SetUnitTime(unitTime);
-
-    int unitVel = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_vel));
-    sysMeasure.SetUnitVel(unitVel);
-
-    int unitAccel = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_accel));
-    sysMeasure.SetUnitAccel(unitAccel);
-
-    int unitEfw = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_unit_efw));
-    sysMeasure.SetUnitEfw(unitEfw);
-
-    int heartBeatCycle = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_heart_beat_cycle));
-    sysMeasure.SetHeartBeatCycle(heartBeatCycle+1);
-
-    sysMeasure.SyncFile();
-    sysMeasure.UpdateTraceItemSetting();
-    ImageArea::GetInstance()->UpdateMeaResultArea(meaResult);
-}
 
 void ViewSystem::GetImageNoteSelection(int &probeIndex, int &itemIndex, char* &itemName) {
     // get probeIndex
@@ -10652,7 +10251,7 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
 
     g_object_set(m_cellrenderer_comment_text, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
+    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text, "edited", G_CALLBACK(HandleCellRendererRenameSelectComment), this);
 
     gtk_widget_show (m_treeview_item_comment);
@@ -10677,7 +10276,7 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
 
     g_object_set(m_cellrenderer_comment_text1, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(on_entry_user_item_insert), this);
+    g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text1, "edited", G_CALLBACK(HandleCellRendererRenameComment), this);
 
     gtk_widget_show (m_treeview_item_comment1);
@@ -10716,32 +10315,33 @@ GtkTreeModel* ViewSystem::create_exam_item_model(vector<ExamItem::EItem> indexVe
 
   for (iterItem = vecExamItem.begin(); iterItem != vecExamItem.end(); iterItem++) {
     if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
-        bool has_node = true;
-        char *strtmp;
-        while (has_node) {
-          gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, NAME_COLUMN, &strtmp, -1);
+      bool has_node = true;
+      char* strtmp = NULL;
 
-          if (iterItem->dept_name == strtmp) {
-            gtk_tree_store_append(store, &child_iter, &iter);
-            gtk_tree_store_set(store, &child_iter,
-              NAME_COLUMN, _(iterItem->name.c_str()),
-              INDEX_COLUMN, iterItem->index,
-              -1);
+      while (has_node) {
+        gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, NAME_COLUMN, &strtmp, -1);
 
-            if(str_check_part == iterItem->name && probe_index == probeIndex) {
-              GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &child_iter);
-              m_str_index = gtk_tree_path_to_string (path);
+        if (iterItem->dept_name == strtmp) {
+          gtk_tree_store_append(store, &child_iter, &iter);
+          gtk_tree_store_set(store, &child_iter,
+            NAME_COLUMN, _(iterItem->name.c_str()),
+            INDEX_COLUMN, iterItem->index,
+            -1);
 
-              gtk_tree_path_free(path);
-            } else if(probe_index != probeIndex) {
-              m_str_index = NULL;
-            }
+          if(str_check_part == iterItem->name && probe_index == probeIndex) {
+            GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &child_iter);
+            m_str_index = gtk_tree_path_to_string (path);
 
-            goto next;
-          } else {
-            has_node = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter);
+            gtk_tree_path_free(path);
+          } else if(probe_index != probeIndex) {
+            m_str_index = "";
           }
+
+          goto next;
+        } else {
+          has_node = gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter);
         }
+      }
     }
 
     if ((iterItem->name).empty()) {
@@ -10767,7 +10367,7 @@ GtkTreeModel* ViewSystem::create_exam_item_model(vector<ExamItem::EItem> indexVe
         m_str_index = gtk_tree_path_to_string (path);
         gtk_tree_path_free(path);
       } else if(probe_index != probeIndex) {
-        m_str_index = NULL;
+        m_str_index = "";
       }
     }
 
@@ -10799,14 +10399,15 @@ void ViewSystem::add_columns_comment1(GtkTreeView *treeview) {
     gtk_tree_view_column_set_clickable (GTK_TREE_VIEW_COLUMN (column), TRUE);
 }
 
-void ViewSystem::add_exam_item_column(GtkTreeView *treeview) {
-    //  GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
+void ViewSystem::add_exam_item_column(GtkTreeView* treeview) {
+    m_renderer = gtk_cell_renderer_text_new();
+    GtkTreeViewColumn* column = gtk_tree_view_column_new_with_attributes(_("Department"), m_renderer, "text", NAME_COLUMN, NULL);
 
-    renderer = gtk_cell_renderer_text_new();
-    column = gtk_tree_view_column_new_with_attributes(_("Department"), renderer, "text", NAME_COLUMN, NULL);
+    g_object_set(m_renderer, "editable", TRUE, NULL);
+    g_signal_connect(m_renderer, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
+    g_signal_connect(m_renderer, "edited", G_CALLBACK(signal_renderer_rename), this);
 
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+    gtk_tree_view_append_column(treeview, column);
 }
 
 
@@ -10922,8 +10523,8 @@ void ViewSystem::BtnImageDefaultClicked(GtkButton *button) {
     m_save_or_new_flag = 2;
     gtk_label_set_text(GTK_LABEL(m_label_check_part), (_("Clicking OK will override the previous data, whether\n to continue the operation.")));
     gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_check_part), PANGO_WRAP_WORD);
-    gtk_widget_show(m_frame_new_check_part);
-    gtk_widget_hide(m_entry_new_check_part);
+    //gtk_widget_show(m_frame_new_check_part);
+    //gtk_widget_hide(m_entry_new_check_part);
 
 }
 
@@ -11005,20 +10606,20 @@ void ViewSystem::BtnImageGetCurrentClicked(GtkButton *button) {
 void ViewSystem::BtnImageSaveClicked(GtkButton *button) {
     gtk_label_set_text(GTK_LABEL(m_label_check_part), (_("Clicking OK will override the previous data, whether\n to continue the operation.")));
     gtk_label_set_line_wrap_mode(GTK_LABEL(m_label_check_part), PANGO_WRAP_WORD);
-    gtk_widget_show(m_frame_new_check_part);
-    gtk_widget_hide(m_entry_new_check_part);
+    //gtk_widget_show(m_frame_new_check_part);
+    //gtk_widget_hide(m_entry_new_check_part);
     m_save_or_new_flag = 1;
     GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
     GtkTreeModel *model;
     GtkTreeIter iter;
     if ((gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE)) {
         GtkTreePath *path_tmp;
-        if(m_str_index == NULL) {
+        if(m_str_index.empty()) {
             path_tmp = gtk_tree_path_new_from_string("0:0");
             gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
         } else {
-            GtkTreePath *path_tmp = gtk_tree_path_new_from_string(m_str_index);
+            GtkTreePath *path_tmp = gtk_tree_path_new_from_string(m_str_index.c_str());
             gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
         }
@@ -11042,21 +10643,22 @@ void ViewSystem::get_current_and_save_image_para() {
 //获得当前值，新建检查部位
 void ViewSystem::BtnImageNewClicked(GtkButton *button) {
     m_save_or_new_flag = 0;
-    gtk_label_set_text(GTK_LABEL(m_label_check_part), (_("Exam Type:")));
-    gtk_entry_set_text(GTK_ENTRY(m_entry_new_check_part), "");
-    gtk_widget_show_all(m_frame_new_check_part);
-    gtk_widget_grab_focus(m_entry_new_check_part);
+    gtk_label_set_text(m_label_check_part, (_("Exam Type:")));
+    gtk_entry_set_text(m_entry_new_check_part, "");
+    gtk_widget_show_all(GTK_WIDGET(m_frame_new_check_part));
+    gtk_widget_grab_focus(GTK_WIDGET(m_entry_new_check_part));
+
     GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_exam_type));
     GtkTreeModel *model;
     GtkTreeIter iter;
     if ((gtk_tree_selection_get_selected(selection, &model, &iter) != TRUE)) {
         GtkTreePath *path_tmp;
-        if(m_str_index == NULL) {
+        if(m_str_index.empty()) {
             path_tmp = gtk_tree_path_new_from_string("0:0");
             gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
         } else {
-            GtkTreePath *path_tmp = gtk_tree_path_new_from_string(m_str_index);
+            GtkTreePath *path_tmp = gtk_tree_path_new_from_string(m_str_index.c_str());
             gtk_tree_view_expand_all(GTK_TREE_VIEW(m_treeview_exam_type));
             gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_exam_type), path_tmp, NULL, TRUE);
         }
@@ -11162,7 +10764,7 @@ void ViewSystem::ComboFocusSum(GtkComboBox *box) {
     int indexFocOrder;
     int index = gtk_combo_box_get_active(box);
 
-    if ((index != -1) && (index < Img2D::MAX_FOCUS)) {
+    /*if ((index != -1) && (index < Img2D::MAX_FOCUS)) {
         indexFocOrder = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_focus_pos));
 
         ClearComboBox(GTK_COMBO_BOX(m_combobox_focus_pos));
@@ -11174,7 +10776,7 @@ void ViewSystem::ComboFocusSum(GtkComboBox *box) {
         if (indexFocOrder >= Img2D::FOC_POS_INDEX_MAX[index])
             indexFocOrder = Img2D::FOC_POS_INDEX_MAX[index] / 2;
         gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_focus_pos), indexFocOrder);
-    }
+    }*/
 }
 
 void ViewSystem::ComboPwPrf(GtkComboBox *box) {

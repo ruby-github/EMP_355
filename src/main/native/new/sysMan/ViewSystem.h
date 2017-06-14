@@ -280,6 +280,140 @@ private:
     }
   }
 
+  // Image Preset
+
+  static void signal_entry_insert_text_userselect(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewSystem* data) {
+    if (data != NULL) {
+      data->EntryNameInsert(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static gboolean signal_entry_focusout_userselect(GtkWidget* widget, GdkEventFocus* event, ViewSystem* data) {
+    if (data != NULL) {
+      data->UserSelectFocusOut(widget, event);
+    }
+
+    return FALSE;
+  }
+
+  static void signal_button_clicked_delete_user(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnDeleteUserClicked(button);
+    }
+  }
+
+  static void signal_combobox_changed_user_select(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->UserChanged(combobox);
+    }
+  }
+
+  static void signal_combobox_changed_probe_type(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->ProbeTypeChanged(combobox);
+    }
+  }
+
+  static void signal_renderer_insert_user_item(GtkCellRenderer* cell, GtkCellEditable* editable, const gchar* path, ViewSystem* data) {
+    if (data != NULL) {
+      data->EntryItemInsert(cell, editable, path);
+    }
+  }
+
+  static void signal_renderer_rename(GtkCellRendererText* renderer, gchar* path, gchar* new_text, ViewSystem* data) {
+    if (data != NULL) {
+      data->CellRendererRename(renderer, path, new_text);
+    }
+  }
+
+  static void signal_combobox_changed_exam_type(GtkTreeSelection* selection, ViewSystem* data) {
+    if (data != NULL) {
+      data->ExamTypeChanged(selection);
+    }
+  }
+
+  static void signal_treeview_button_release_exam_department(GtkWidget* widget, GdkEventButton* event, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnExamDepartmentClicked(widget, event);
+    }
+  }
+
+  static void signal_button_clicked_add_item(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->AddItemClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_delete_item(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->DeleteItemClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_image_save(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnImageSaveClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_image_new(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnImageNewClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_image_export(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnImageExportToUSBClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_image_import(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnImageImportFromUSBClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_image_default(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnImageDefaultClicked(button);
+    }
+  }
+
+  // Measure
+
+  static void signal_togglebutton_toggled_tamax(GtkToggleButton* togglebutton, ViewSystem* data) {
+    if (data != NULL) {
+      data->ChkBtnTAmaxToggled(togglebutton);
+    }
+  }
+
+  static void signal_togglebutton_toggled_pi(GtkToggleButton* togglebutton, ViewSystem* data) {
+    if (data != NULL) {
+      data->ChkBtnPIToggled(togglebutton);
+    }
+  }
+
+  static void signal_togglebutton_toggled_hr(GtkToggleButton* togglebutton, ViewSystem* data) {
+    if (data != NULL) {
+      data->ChkBtnHRToggled(togglebutton);
+    }
+  }
+
+  static void signal_button_clicked_measure_default(GtkButton* button, ViewSystem* data) {
+    data->BtnMeasureDefaultClicked(button);
+  }
+
+
+
+  // Calc And Caliper
+
+  // Calculate
+
+  // Comment
+
+  // Peripheral
+
   // signal
 
   void ButtonClickedApply(GtkButton* button);
@@ -298,6 +432,45 @@ private:
 
   // Options
   void BtnOptionsDefaultClicked(GtkButton* button);
+
+  // Image Preset
+  void EntryNameInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void UserSelectFocusOut(GtkWidget* widget, GdkEventFocus* event);
+  void BtnDeleteUserClicked(GtkButton* button);
+  void UserChanged(GtkComboBox* combobox);
+  void ProbeTypeChanged(GtkComboBox* combobox);
+  void EntryItemInsert(GtkCellRenderer* cell, GtkCellEditable* editable, const gchar* path);
+  void CellRendererRename(GtkCellRendererText* renderer, gchar* path, gchar* new_text);
+  void ExamTypeChanged(GtkTreeSelection* selection);
+  void BtnExamDepartmentClicked(GtkWidget* widget, GdkEventButton* event);
+  void AddItemClicked(GtkButton* button);
+  void DeleteItemClicked(GtkButton* button);
+  void BtnImageSaveClicked(GtkButton* button);
+  void BtnImageNewClicked(GtkButton* button);
+  void BtnImageExportToUSBClicked(GtkButton* button);
+  void BtnImageImportFromUSBClicked(GtkButton* button);
+  void BtnImageDefaultClicked(GtkButton* button);
+
+  // Measure
+  void ChkBtnTAmaxToggled(GtkToggleButton* togglebutton);
+  void ChkBtnPIToggled(GtkToggleButton* togglebutton);
+  void ChkBtnHRToggled(GtkToggleButton* togglebutton);
+
+  // Calc And Caliper
+
+  // Calculate
+
+  // Comment
+
+  // Peripheral
+
+  // Custom Report
+
+  // DICOM
+
+  // P1-P3
+
+  // System Info
 
 private:
   ViewSystem();
@@ -396,7 +569,49 @@ private:
   GtkComboBoxText* m_combobox_video_format;
   GtkComboBoxText* m_combobox_video_file;
 
+  // Image Preset
+  GtkComboBoxText* m_combobox_probe_type;
+  GtkTreeView* m_treeview_exam_type;
+  GtkComboBoxEntry* m_comboboxentry_user_select;
+  GtkFrame* m_frame_new_check_part;
+  GtkLabel* m_label_check_part;
+  GtkEntry* m_entry_new_check_part;
+
+  string m_str_index;
+
   // Measure
+  GtkComboBoxText* m_combobox_unit_dist;
+  GtkComboBoxText* m_combobox_unit_area;
+  GtkComboBoxText* m_combobox_unit_vol;
+  GtkComboBoxText* m_combobox_unit_time;
+  GtkComboBoxText* m_combobox_unit_vel;
+  GtkComboBoxText* m_combobox_unit_accel;
+  GtkComboBoxText* m_combobox_unit_efw;
+  GtkComboBoxText* m_combobox_heart_beat;
+  GtkCheckButton* m_checkbutton_autocalc_ps;
+  GtkCheckButton* m_checkbutton_autocalc_ed;
+  GtkCheckButton* m_checkbutton_autocalc_ri;
+  GtkCheckButton* m_checkbutton_autocalc_sd;
+  GtkCheckButton* m_checkbutton_autocalc_tamax;
+  GtkCheckButton* m_checkbutton_autocalc_pi;
+  GtkCheckButton* m_checkbutton_autocalc_time;
+  GtkCheckButton* m_checkbutton_autocalc_hr;
+  GtkCheckButton* m_checkbutton_autocalc_pgmax;
+  GtkCheckButton* m_checkbutton_autocalc_pgmean;
+  GtkComboBoxText* m_combobox_current_line;
+  GtkComboBoxText* m_combobox_confirmed_line;
+  GtkRadioButton* m_radiobutton_report_last;
+  GtkRadioButton* m_radiobutton_report_average;
+  GtkRadioButton* m_radiobutton_result_small;
+  GtkRadioButton* m_radiobutton_result_big;
+  GtkRadioButton* m_radiobutton_trace_point;
+  GtkRadioButton* m_radiobutton_trace_track;
+  GtkRadioButton* m_radiobutton_trace_auto;
+  GtkRadioButton* m_radiobutton_cursor_big;
+  GtkRadioButton* m_radiobutton_cursor_mid;
+  GtkRadioButton* m_radiobutton_cursor_small;
+  GtkRadioButton* m_radiobutton_measure_line_on;
+  GtkRadioButton* m_radiobutton_measure_line_off;
 
 public:
     static const int MAX_KEY = 10;//8;//9;
@@ -437,11 +652,11 @@ private:
     int m_itemIndex;
     char *m_itemName;
     GtkCellRenderer *m_renderer1;
-    GtkWidget *m_button_add;
+    //GtkWidget *m_button_add;
     GtkWidget *m_button_rename;
-    GtkWidget *m_button_delete_item;
-    GtkWidget *m_frame_new_check_part;
-    GtkWidget *m_label_check_part;
+    //GtkWidget *m_button_delete_item;
+    //GtkWidget *m_frame_new_check_part;
+    //GtkWidget *m_label_check_part;
     int m_save_or_new_flag;
 
 
@@ -458,22 +673,6 @@ private:
     GtkWidget *m_treeview_common_print;
     GtkWidget *m_treeview_specific_print;
 
-
-
-    /*GtkWidget *m_radiobtn_total;
-    GtkWidget *m_radiobtn_ud_11;
-    GtkWidget *m_radiobtn_ud_21;
-    GtkWidget *m_radiobtn_ud_12;
-    GtkWidget *m_radiobtn_lr_11;
-
-    GtkWidget *m_radiobtn_total_pw;
-    GtkWidget *m_radiobtn_ud_11_pw;
-    GtkWidget *m_radiobtn_ud_21_pw;
-    GtkWidget *m_radiobtn_ud_12_pw;
-    GtkWidget *m_radiobtn_lr_11_pw;*/
-
-    GtkWidget *m_radiobtn_bm;
-    GtkWidget *m_radiobtn_bpw;
 
 
 
@@ -507,47 +706,11 @@ private:
     //vector<string> vecItemComment;
     vector<string> vecExamItem_comment;
     // measure
-    GtkWidget *m_radiobutton_ml_on;
-    GtkWidget *m_radiobutton_ml_off;
-    GtkWidget *m_radiobutton_ml_high;
-    GtkWidget *m_radiobutton_ml_mid;
-    GtkWidget *m_radiobutton_ml_low;
-    GtkWidget *m_radiobutton_cursor_big;
-    GtkWidget *m_radiobutton_cursor_mid;
-    GtkWidget *m_radiobutton_cursor_small;
-    GtkWidget *m_radiobutton_seq_default;
-    GtkWidget *m_radiobutton_seq_repeat;
-    GtkWidget *m_radiobutton_seq_none;
-    GtkWidget *m_combobox_current_line;
-    GtkWidget *m_combobox_confirmed_line;
-    // GtkWidget *m_radiobutton_trace_auto;
-    // GtkWidget *m_radiobutton_trace_manual;
-    GtkWidget *m_radiobutton_trace_point;
-    GtkWidget *m_radiobutton_trace_track;
-    GtkWidget *m_radiobutton_trace_auto;
-    GtkWidget *m_radiobutton_report_last;
-    GtkWidget *m_radiobutton_report_average;
-    GtkWidget *m_checkbutton_autocalc_ps;
-    GtkWidget *m_checkbutton_autocalc_ed;
-    GtkWidget *m_checkbutton_autocalc_ri;
-    GtkWidget *m_checkbutton_autocalc_sd;
-    GtkWidget *m_checkbutton_autocalc_tamax;
-    GtkWidget *m_checkbutton_autocalc_pi;
-    GtkWidget *m_checkbutton_autocalc_time;
-    GtkWidget *m_checkbutton_autocalc_hr;
-    GtkWidget *m_checkbutton_autocalc_pgmax;
-    GtkWidget *m_checkbutton_autocalc_pgmean;
-    GtkWidget *m_radiobutton_result_small;
-    GtkWidget *m_radiobutton_result_big;
-    GtkWidget *m_combobox_heart_beat_cycle;
-    GtkWidget *m_combobox_unit_dist;
-    GtkWidget *m_combobox_unit_area;
-    GtkWidget *m_combobox_unit_vol;
-    GtkWidget *m_combobox_unit_time;
-    GtkWidget *m_combobox_unit_vel;
+
+
+
     GtkWidget *m_combobox_unit_slope;
-    GtkWidget *m_combobox_unit_accel;
-    GtkWidget *m_combobox_unit_efw;
+
 
     //calculate
     GtkWidget *m_obWindow;
@@ -568,7 +731,7 @@ private:
 
 
     GtkTreeIter topIter;
-    GtkCellRenderer *renderer;
+    GtkCellRenderer *m_renderer;
     GtkWidget *m_combobox_childsection;
     GtkWidget *m_entry_templet;
 
@@ -593,7 +756,7 @@ private:
     int init_language;
     guint m_flag_notebook_coustomreport;
     guint m_flag_notebook_image;
-    GtkWidget *m_entry_new_check_part;
+    //GtkWidget *m_entry_new_check_part;
 
     ///> optional
     GtkWidget *m_treeOption ;
@@ -641,8 +804,8 @@ private:
     void BtnDeleteClicked(GtkButton *button);
     void BtnOkClicked(GtkButton *button);
     void BtnCancelClicked(GtkButton *button);
-    void DeleteItemClicked(GtkButton *button);
-    void EntryItemInsert(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path);
+
+
     void ChangeCommentExamBox(int probe_type, char *check_part);
     void ChangeCommentExamBoxDelete(int probe_type);
 
@@ -656,30 +819,21 @@ private:
     static void  on_combobox_video_changed(GtkComboBox *widget,ViewSystem *data) {
         data->BtnComboVideoChanged();
     }
-    static void  on_entry_user_item_insert(GtkCellRenderer *cell, GtkCellEditable *editable, const gchar *path, ViewSystem *data) {
-        data->EntryItemInsert(cell, editable, path);
-    }
+
     static void on_entry_insert_custom_item(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
         data->EntryItemLengthInsert(editable, new_text, new_text_length, position);
     }
 
     void BtnComboVideoChanged();
-    void CellRendererRename(GtkCellRendererText *renderer, gchar *path, gchar *new_text);
+
     void CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_comment_text1, gchar *path, gchar *new_text);
     void CellRendererRenameSelectComment(GtkCellRendererText *m_cellrenderer_comment_text, gchar *path, gchar *new_text);
     void RenameItemClicked(GtkButton *button);
     static void HandleRenameItemClicked(GtkButton *button, ViewSystem *data) {
         data->RenameItemClicked(button);
     }
-    static void HandleDeleteItemClicked(GtkButton *button, ViewSystem *data) {
-        data->DeleteItemClicked(button);
-    }
-    static void HandleAddItemClicked(GtkButton *button, ViewSystem *data) {
-        data->AddItemClicked(button);
-    }
-    static void HandleCellRendererRename(GtkCellRendererText *renderer, gchar *path, gchar *new_text, ViewSystem *data) {
-        data->CellRendererRename(renderer, path, new_text);
-    }
+
+
     static void HandleCellRendererRenameComment(GtkCellRendererText *m_cellrenderer_comment_text1, gchar *path, gchar *new_text, ViewSystem *data) {
         data->CellRendererRenameComment(m_cellrenderer_comment_text1, path, new_text);
     }
@@ -688,7 +842,7 @@ private:
     }
 
     bool ExamTypeTestRowExpandBefore(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path);
-    gboolean BtnExamDepartmentClicked(GtkWidget *widget, GdkEventButton *event);
+
 
     static void HandleTreeSelectionChanged(GtkTreeSelection *selection, ViewSystem *data) {
         data->TreeSelectionChanged(selection);
@@ -776,16 +930,13 @@ private:
     GtkWidget *m_radiobutton_key_p1[MAX_KEY];
     GtkWidget *m_radiobutton_key_p2[MAX_KEY];
     GtkWidget *m_radiobutton_key_p3[MAX_KEY];
-    //user imagepreset
-    GtkWidget *m_comboboxentry_user_select;
+
 
     //info
     GtkWidget *m_textview_version;
 
     //image
-    GtkWidget *m_combobox_probe_type;
-    GtkWidget *m_treeview_exam_type;
-    GtkWidget *m_combobox_mbp;
+    /*GtkWidget *m_combobox_mbp;
     GtkWidget *m_combobox_ao_power;
     GtkWidget *m_spinbutton_2d_gain;
     GtkWidget *m_combobox_agc;
@@ -796,7 +947,7 @@ private:
     GtkWidget *m_combobox_depth;
     GtkWidget *m_combobox_chroma;
     GtkWidget *m_combobox_lr;
-    GtkWidget *m_combobox_ud;
+    GtkWidget *m_combobox_ud;*/
 
     //comment
     GtkWidget *scrolledwindow_item_comment1;
@@ -839,7 +990,7 @@ private:
     GtkWidget *m_combobox_color_rejection;
     // GtkWidget *m_spinbutton_pdi_gain;
     GtkWidget *m_combobox_sensitivity;
-    gchar *m_str_index;
+
     GtkTreeIter m_optionIter;
 
     GtkCellRenderer *m_cellrenderer_comment_text;
@@ -912,37 +1063,33 @@ private:
     void EntryDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     void EntryFracDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     void BtnOBCustomClicked(GtkButton *button);
-    void EntryNameInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position); //addey by LL 2012-9-17
 
-    void ChkBtnTAmaxToggled(GtkToggleButton *togglebutton);
-    void ChkBtnPIToggled(GtkToggleButton *togglebutton);
-    void ChkBtnHRToggled(GtkToggleButton *togglebutton);
+
 
     //void ChkBtnTotalToggled(GtkToggleButton *togglebutton);
-    void AddItemClicked(GtkButton *button);
+
     void AddCheckPart(char *checkpart);
 
     void RadioP1Toggled(GtkToggleButton *togglebutton);
 
     void RadioP2Toggled(GtkToggleButton *togglebutton);
     void TreeFuncChanged(GtkTreeSelection *selection);
-    void ExamTypeChanged(GtkTreeSelection *selection);
-    void ProbeTypeChanged(GtkComboBox *widget);
+
+
     void ProbeCommentChanged(GtkComboBox *widget);
     void ExamCommentChanged(GtkComboBox *widget);
     void DepartmentCommentChanged(GtkComboBox *widget);
 
-    void UserChanged(GtkComboBox *widget);
+
     void BtnUpgradeClicked(GtkButton *button);
-    void BtnImageDefaultClicked(GtkButton *button);
+
     void image_default_setting();
     void BtnImageGetCurrentClicked(GtkButton *button);
-    void BtnImageSaveClicked(GtkButton *button);
+
     void get_current_and_save_image_para();
-    void BtnImageNewClicked(GtkButton *button);
-    void BtnImageExportToUSBClicked(GtkButton *button);
-    void BtnImageImportFromUSBClicked(GtkButton *button);
-    void BtnDeleteUserClicked(GtkButton *button);
+
+
+
     void ComboFocusSum(GtkComboBox *box);
     void ComboPwPrf(GtkComboBox *box);
     void ComboCfmPrf(GtkComboBox *box);
@@ -971,7 +1118,7 @@ private:
 
 
 
-    void UserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event);
+
 
     void ButtonSelectOneCommentClicked(GtkButton *button);
     void ButtonSelectAllCommentClicked(GtkButton *button);
@@ -1011,9 +1158,7 @@ private:
 
 
 
-    static void on_button_measure_default_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnMeasureDefaultClicked(button);
-    }
+
     static void on_button_calc_default_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnCalculateDefaultClicked(button);
     }
@@ -1042,15 +1187,7 @@ private:
         data->BtnUpgradeClicked(button);
     }
 
-    static void HandleTAmaxToggled(GtkToggleButton *togglebutton, ViewSystem *data) {
-        data->ChkBtnTAmaxToggled(togglebutton);
-    }
-    static void HandlePIToggled(GtkToggleButton *togglebutton, ViewSystem *data) {
-        data->ChkBtnPIToggled(togglebutton);
-    }
-    static void HandleHRToggled(GtkToggleButton *togglebutton, ViewSystem *data) {
-        data->ChkBtnHRToggled(togglebutton);
-    }
+
 
     static void HandleP1Toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
         data->RadioP1Toggled(togglebutton);
@@ -1069,47 +1206,26 @@ private:
     static void HandleProbeCommentChanged(GtkComboBox *widget, ViewSystem *data) {
         data->ProbeCommentChanged(widget);
     }
-    static void HandleProbeTypeChanged(GtkComboBox *widget, ViewSystem *data) {
-        data->ProbeTypeChanged(widget);
-    }
+
     static void HandleDepartmentCommentChanged(GtkComboBox *widget, ViewSystem *data) {
         data->DepartmentCommentChanged(widget);
     }
 
-    static void HandleUserChanged(GtkComboBox *widget, ViewSystem *data) {
-        data->UserChanged(widget);
-    }
-    static void HandleExamTypeChanged(GtkTreeSelection *selection, ViewSystem *data) {
-        data->ExamTypeChanged(selection);
-    }
+
+
+
     static bool HandleExamTypeExpandBefore(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path, ViewSystem *data) {
         return data->ExamTypeTestRowExpandBefore(tree_view, iter, path);
     }
-    static void HandleExamDepartmentBtnClicked(GtkWidget *widget, GdkEventButton *event, ViewSystem *data) {
-        data->BtnExamDepartmentClicked(widget, event);
-    }
 
-    static void HandleImageBtnDefault(GtkButton *button, ViewSystem *data) {
-        data->BtnImageDefaultClicked(button);
-    }
+
+
     static void HandleImageBtnGetCurrent(GtkButton *button, ViewSystem *data) {
         data->BtnImageGetCurrentClicked(button);
     }
-    static void HandleImageBtnSave(GtkButton *button, ViewSystem *data) {
-        data->BtnImageSaveClicked(button);
-    }
-    static void HandleImageBtnNew(GtkButton *button, ViewSystem *data) {
-        data->BtnImageNewClicked(button);
-    }
-    static void HandleImageBtnExportToUSB(GtkButton *button, ViewSystem *data) {
-        data->BtnImageExportToUSBClicked(button);
-    }
-    static void HandleImageBtnImportFromUSB(GtkButton *button, ViewSystem *data) {
-        data->BtnImageImportFromUSBClicked(button);
-    }
-    static void HandleImageBtnDeleteUser(GtkButton *button, ViewSystem *data) {
-        data->BtnDeleteUserClicked(button);
-    }
+
+
+
 
     static void HandleComboFocusSum(GtkComboBox *box, ViewSystem *data) {
         data->ComboFocusSum(box);
@@ -1167,14 +1283,7 @@ private:
         data->OnRadiobtnDisplay_lr11(togglebutton);
     }
 
-    static void on_entry_name_insert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
-        data->EntryNameInsert(editable, new_text, new_text_length, position);
-    }
 
-    static gboolean HandleUserSelectFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewSystem *data) {
-        data->UserSelectFocusOut(widget, event);
-        return FALSE;
-    }
 
 
 
