@@ -26,6 +26,8 @@
 #include "patient/VideoMan.h"
 #include "patient/ViewNewPat.h"
 #include "periDevice/DCMRegister.h"
+#include "sysMan/CalcSetting.h"
+#include "sysMan/MeasureSetting.h"
 #include "sysMan/ScreenSaver.h"
 #include "sysMan/SysCalculateSetting.h"
 #include "sysMan/SysGeneralSetting.h"
@@ -802,7 +804,6 @@ ViewSystem::ViewSystem() {
   m_imageItemSensitive = false;
   m_itemIndex = -1;
   m_page_num = 0;
-  m_calc_page_num = 0;
   m_itemName = NULL;
   m_save_or_new_flag = 0;
   m_current_note_page = 0;
@@ -857,7 +858,7 @@ void ViewSystem::CreateWindow() {
   gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc_measure()), GTK_WIDGET(Utils::create_label(_("Calc And Caliper"))));
 
   // Calculate
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc()), GTK_WIDGET(Utils::create_label(_("OB"))));
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc()), GTK_WIDGET(Utils::create_label(_("Calculate"))));
   init_calc_setting(NULL);
 
   // Comment
@@ -884,7 +885,7 @@ void ViewSystem::CreateWindow() {
   gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_info()), GTK_WIDGET(Utils::create_label(_("System Info"))));
   init_info_setting();
 
-  g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
+  //g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);
   gtk_notebook_set_current_page(m_notebook, m_flag_notebook_image);
 
   gtk_widget_show_all(GTK_WIDGET(m_dialog));
@@ -3379,6 +3380,273 @@ void ViewSystem::save_measure_setting() {
   ImageArea::GetInstance()->UpdateMeaResultArea(meaResult);
 }
 
+GtkWidget* ViewSystem::create_note_calc_measure() {
+  GtkNotebook* notebook = Utils::create_notebook();
+  gtk_notebook_set_tab_pos(notebook, GTK_POS_LEFT);
+
+  GtkWidget* calcSetting = CalcSetting::GetInstance()->CreateCalcWindow(GTK_WIDGET(m_dialog));
+  GtkWidget* measureSetting = MeasureSetting::GetInstance()->CreateMeasureWindow(GTK_WIDGET(m_dialog));
+
+  gtk_notebook_append_page(notebook, GTK_WIDGET(calcSetting), GTK_WIDGET(Utils::create_label(_("Calculate"))));
+  gtk_notebook_append_page(notebook, GTK_WIDGET(measureSetting), GTK_WIDGET(Utils::create_label(_("Measure"))));
+
+  g_signal_connect(G_OBJECT(notebook), "switch-page", G_CALLBACK(on_calc_notebook_switch_page), this);
+
+  return GTK_WIDGET(notebook);
+}
+
+GtkWidget* ViewSystem::create_note_calc() {
+  GtkTable* table = Utils::create_table(10, 9);
+
+  // OB Calc Method
+
+  GtkFrame* frame_ob_calc = Utils::create_frame(_("OB Calc Method"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_ob_calc), 0, 9, 0, 6);
+
+  GtkTable* table_ob_calc = Utils::create_table(5, 9);
+  gtk_container_set_border_width(GTK_CONTAINER(table_ob_calc), 5);
+  gtk_container_add(GTK_CONTAINER(frame_ob_calc), GTK_WIDGET(table_ob_calc));
+
+  GtkLabel* label_ob_cer = Utils::create_label(_("CER:"));
+  m_combobox_ob_cer = Utils::create_combobox_text();
+  GtkLabel* label_ob_hl = Utils::create_label(_("HL:"));
+  m_combobox_ob_hl = Utils::create_combobox_text();
+  GtkLabel* label_ob_bpd = Utils::create_label(_("BPD:"));
+  m_combobox_ob_bpd = Utils::create_combobox_text();
+
+  GtkLabel* label_ob_fl = Utils::create_label(_("FL:"));
+  m_combobox_ob_fl = Utils::create_combobox_text();
+  GtkLabel* label_ob_crl = Utils::create_label(_("CRL:"));
+  m_combobox_ob_crl = Utils::create_combobox_text();
+  GtkLabel* label_ob_gs = Utils::create_label(_("GS:"));
+  m_combobox_ob_gs = Utils::create_combobox_text();
+
+  GtkLabel* label_ob_ac = Utils::create_label(_("AC:"));
+  m_combobox_ob_ac = Utils::create_combobox_text();
+  GtkLabel* label_ob_hc = Utils::create_label(_("HC:"));
+  m_combobox_ob_hc = Utils::create_combobox_text();
+  GtkLabel* label_ob_tad = Utils::create_label(_("TAD:"));
+  m_combobox_ob_tad = Utils::create_combobox_text();
+
+  GtkLabel* label_ob_apad = Utils::create_label(_("APAD:"));
+  m_combobox_ob_apad = Utils::create_combobox_text();
+  GtkLabel* label_ob_thd = Utils::create_label(_("THD:"));
+  m_combobox_ob_thd = Utils::create_combobox_text();
+  GtkLabel* label_ob_ofd = Utils::create_label(_("OFD:"));
+  m_combobox_ob_ofd = Utils::create_combobox_text();
+
+  GtkLabel* label_ob_efw = Utils::create_label(_("EFW:"));
+  m_combobox_ob_efw = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_cer), 0, 1, 0, 1);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_cer), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_hl), 3, 4, 0, 1);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_hl), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_bpd), 6, 7, 0, 1);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_bpd), 7, 9, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_fl), 0, 1, 1, 2);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_fl), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_crl), 3, 4, 1, 2);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_crl), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_gs), 6, 7, 1, 2);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_gs), 7, 9, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_ac), 0, 1, 2, 3);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_ac), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_hc), 3, 4, 2, 3);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_hc), 4, 6, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_tad), 6, 7, 2, 3);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_tad), 7, 9, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_apad), 0, 1, 3, 4);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_apad), 1, 3, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_thd), 3, 4, 3, 4);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_thd), 4, 6, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_ofd), 6, 7, 3, 4);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_ofd), 7, 9, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_efw), 0, 1, 4, 5);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_efw), 1, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_ob_cer, _("Goldstein"));
+  gtk_combo_box_text_append_text(m_combobox_ob_cer, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_hl, _("Jeanty"));
+  gtk_combo_box_text_append_text(m_combobox_ob_hl, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_bpd, _("Hadlock"));
+  gtk_combo_box_text_append_text(m_combobox_ob_bpd, _("Merz"));
+  gtk_combo_box_text_append_text(m_combobox_ob_bpd, _("Lasser"));
+  gtk_combo_box_text_append_text(m_combobox_ob_bpd, _("Rempen"));
+  gtk_combo_box_text_append_text(m_combobox_ob_bpd, _("Tokyo"));
+  gtk_combo_box_text_append_text(m_combobox_ob_bpd, _("Custom"));
+
+  gtk_combo_box_text_append_text(m_combobox_ob_fl, _("Hadlock"));
+  gtk_combo_box_text_append_text(m_combobox_ob_fl, _("Merz"));
+  gtk_combo_box_text_append_text(m_combobox_ob_fl, _("Jeanty"));
+  gtk_combo_box_text_append_text(m_combobox_ob_fl, _("Tokyo"));
+  gtk_combo_box_text_append_text(m_combobox_ob_fl, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_crl, _("Hadlock"));
+  gtk_combo_box_text_append_text(m_combobox_ob_crl, _("Robinson"));
+  gtk_combo_box_text_append_text(m_combobox_ob_crl, _("Hansmenn"));
+  gtk_combo_box_text_append_text(m_combobox_ob_crl, _("Lasser"));
+  gtk_combo_box_text_append_text(m_combobox_ob_crl, _("Tokyo"));
+  gtk_combo_box_text_append_text(m_combobox_ob_crl, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_gs, _("Hellman"));
+  gtk_combo_box_text_append_text(m_combobox_ob_gs, _("Rempen"));
+  gtk_combo_box_text_append_text(m_combobox_ob_gs, _("Tokyo"));
+  gtk_combo_box_text_append_text(m_combobox_ob_gs, _("Custom"));
+
+  gtk_combo_box_text_append_text(m_combobox_ob_ac, _("Hadlock"));
+  gtk_combo_box_text_append_text(m_combobox_ob_ac, _("Merz"));
+  gtk_combo_box_text_append_text(m_combobox_ob_ac, _("Lasser"));
+  gtk_combo_box_text_append_text(m_combobox_ob_ac, _("Tokyo"));
+  gtk_combo_box_text_append_text(m_combobox_ob_ac, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_hc, _("Hadlock"));
+  gtk_combo_box_text_append_text(m_combobox_ob_hc, _("Merz"));
+  gtk_combo_box_text_append_text(m_combobox_ob_hc, _("Lasser"));
+  gtk_combo_box_text_append_text(m_combobox_ob_hc, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_tad, _("Merz"));
+  gtk_combo_box_text_append_text(m_combobox_ob_tad, _("Custom"));
+
+  gtk_combo_box_text_append_text(m_combobox_ob_apad, _("Merz"));
+  gtk_combo_box_text_append_text(m_combobox_ob_apad, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_thd, _("Hansmenn"));
+  gtk_combo_box_text_append_text(m_combobox_ob_thd, _("Custom"));
+  gtk_combo_box_text_append_text(m_combobox_ob_ofd, _("Korean"));
+  gtk_combo_box_text_append_text(m_combobox_ob_ofd, _("Custom"));
+
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Hadlock1"));
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Hadlock2"));
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Hadlock3"));
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Hadlock4"));
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Shepard"));
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Hansmenn"));
+  gtk_combo_box_text_append_text(m_combobox_ob_efw, _("Tokyo"));
+
+  // OB Custom, BSA
+  GtkButton* button_ob_custom = Utils::create_button(_("OB Custom"));
+  GtkLabel* label_bsa = Utils::create_label(_("BSA:"));
+  m_combobox_bsa = Utils::create_combobox_text();
+
+  gtk_table_attach(table, GTK_WIDGET(button_ob_custom), 0, 2, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_bsa), 3, 4, 6, 7);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_bsa), 4, 6, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_ob_custom, "clicked", G_CALLBACK(signal_button_clicked_ob_custom), this);
+
+  gtk_combo_box_text_append_text(m_combobox_bsa, _("Oriental"));
+  gtk_combo_box_text_append_text(m_combobox_bsa, _("Occidental"));
+
+  // Default Factory
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 2, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_calc_default), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_calc_setting(SysCalculateSetting* sysCalc) {
+  if (sysCalc == NULL) {
+    sysCalc = new SysCalculateSetting();
+  }
+
+  int cer = sysCalc->GetCerMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_cer), cer);
+
+  int hl = sysCalc->GetHlMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_hl), hl);
+
+  int bpd = sysCalc->GetBpdMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_bpd), bpd);
+
+  int fl = sysCalc->GetFlMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_fl), fl);
+
+  int crl = sysCalc->GetCrlMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_crl), crl);
+
+  int gs = sysCalc->GetGsMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_gs), gs);
+
+  int ac = sysCalc->GetAcMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_ac), ac);
+
+  int hc = sysCalc->GetHcMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_hc), hc);
+
+  int tad = sysCalc->GetTadMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_tad), tad);
+
+  int apad = sysCalc->GetApadMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_apad), apad);
+
+  int thd = sysCalc->GetThdMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_thd), thd);
+
+  int ofd = sysCalc->GetOfdMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_ofd), ofd);
+
+  int efw = sysCalc->GetEfwMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_efw), efw);
+
+  int bsa = sysCalc->GetBSAMethod();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_bsa), bsa);
+
+  delete sysCalc;
+}
+
+void ViewSystem::save_calc_setting() {
+  SysCalculateSetting sysCalc;
+
+  int cer = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_cer));
+  sysCalc.SetCerMethod(cer);
+
+  int hl = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_hl));
+  sysCalc.SetHlMethod(hl);
+
+  int bpd = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_bpd));
+  sysCalc.SetBpdMethod(bpd);
+
+  int fl = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_fl));
+  sysCalc.SetFlMethod(fl);
+
+  int crl = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_crl));
+  sysCalc.SetCrlMethod(crl);
+
+  int gs = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_gs));
+  sysCalc.SetGsMethod(gs);
+
+  int ac = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_ac));
+  sysCalc.SetAcMethod(ac);
+
+  int hc = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_hc));
+  sysCalc.SetHcMethod(hc);
+
+  int tad = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_tad));
+  sysCalc.SetTadMethod(tad);
+
+  int apad = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_apad));
+  sysCalc.SetApadMethod(apad);
+
+  int thd = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_thd));
+  sysCalc.SetThdMethod(thd);
+
+  int ofd = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_ofd));
+  sysCalc.SetOfdMethod(ofd);
+
+  int efw = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_efw));
+  sysCalc.SetEfwMethod(efw);
+
+  int bsa = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_bsa));
+  sysCalc.SetBSAMethod(bsa);
+
+  sysCalc.SyncFile();
+  sysCalc.UpdateOBSetting();
+
+  g_menuCalc.UpdateEfwItem(efw);
+}
+
 #include "periDevice/DCMMan.h"
 #include <string.h>
 #include <time.h>
@@ -3408,8 +3676,7 @@ void ViewSystem::save_measure_setting() {
 #include "probe/ProbeSelect.h"
 #include "periDevice/Printer.h"
 #include "measure/MeasureMan.h"
-#include "sysMan/CalcSetting.h"
-#include "sysMan/MeasureSetting.h"
+
 #include "patient/FileMan.h"
 
 #include "patient/ViewUdiskDataSelect.h"
@@ -7747,42 +8014,7 @@ void ViewSystem::BtnTVOutDefaultClicked(GtkButton *button) {
     init_tvout_setting(sysGeneralSetting);
 }
 
-GtkWidget* ViewSystem::create_note_calc_measure() {
-    GtkWidget *fixed_calc_measure;
-    GtkWidget *fixed_calc;
-    GtkWidget *label_calc;
-    GtkWidget *fixed_measure;
-    GtkWidget *label_measure;
 
-    fixed_calc_measure = gtk_fixed_new ();
-    gtk_widget_show (fixed_calc_measure);
-
-    m_calc_notebook = gtk_notebook_new();
-    gtk_fixed_put (GTK_FIXED (fixed_calc_measure), m_calc_notebook, 40, 20);
-    gtk_widget_set_size_request (m_calc_notebook, 850, 470);
-    gtk_notebook_set_tab_pos(GTK_NOTEBOOK (m_calc_notebook),GTK_POS_LEFT);
-    gtk_widget_show (m_calc_notebook);
-
-    int calc_notebook_page = 0;
-
-    fixed_calc = CalcSetting::GetInstance()->CreateCalcWindow(GTK_WIDGET(m_dialog));
-    gtk_container_add (GTK_CONTAINER (m_calc_notebook), fixed_calc);
-
-    label_calc = gtk_label_new (_("Calculate"));
-    gtk_widget_show (label_calc);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_calc_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_calc_notebook), calc_notebook_page++), label_calc);
-
-    fixed_measure = MeasureSetting::GetInstance()->CreateMeasureWindow(GTK_WIDGET(m_dialog));
-    gtk_container_add (GTK_CONTAINER (m_calc_notebook), fixed_measure);
-
-    label_measure = gtk_label_new (_("Measure"));
-    gtk_widget_show (label_measure);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_calc_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_calc_notebook), calc_notebook_page++), label_measure);
-
-    g_signal_connect(G_OBJECT(m_calc_notebook), "switch-page", G_CALLBACK(on_calc_notebook_switch_page), this);
-
-    return fixed_calc_measure;
-}
 
 GtkWidget* ViewSystem::create_note_dicom() {
     GtkWidget *fixed_dicom;
@@ -9561,380 +9793,13 @@ void ViewSystem::save_key_config() {
     sysDefine.SyncFile();
 }
 
-GtkWidget *ViewSystem::create_note_calc() {
-    GtkWidget *fixed_calc;
 
-    GtkWidget *label_bsa;
-
-    GtkWidget *frame_ob_method;
-    GtkWidget *fixed_ob_method;
-
-    GtkWidget *label_ob_hl;
-    GtkWidget *label_ob_bpd;
-    GtkWidget *label_ob_crl;
-
-    GtkWidget *label_ob_gs;
-    GtkWidget *label_ob_cer;
-    GtkWidget *label_ob_fl;
-    GtkWidget *label_ob_ac;
-    GtkWidget *label_ob_apad;
-    GtkWidget *label_ob_hc;
-    GtkWidget *label_ob_thd;
-    GtkWidget *label_ob_tad;
-    GtkWidget *label_ob_ofd;
-    GtkWidget *label_ob_efw;
-
-    GtkWidget *label_ob_method;
-    GtkWidget *button_ob_custom;
-    GtkWidget *button_calc_default;
-
-    fixed_calc = gtk_fixed_new ();
-    gtk_widget_show (fixed_calc);
-
-    frame_ob_method = gtk_frame_new (NULL);
-    gtk_widget_show (frame_ob_method);
-    // gtk_fixed_put (GTK_FIXED (fixed_calc), frame_ob_method, 30, 30);
-    gtk_fixed_put (GTK_FIXED (fixed_calc), frame_ob_method, 50, 30);
-    gtk_widget_set_size_request (frame_ob_method, 650, 200);
-    gtk_frame_set_label_align (GTK_FRAME (frame_ob_method), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_ob_method), GTK_SHADOW_IN);
-
-    fixed_ob_method = gtk_fixed_new ();
-    gtk_widget_show (fixed_ob_method);
-    gtk_container_add (GTK_CONTAINER (frame_ob_method), fixed_ob_method);
-
-    m_combobox_ob_crl = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_crl);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_crl, 320, 40);
-    gtk_widget_set_size_request (m_combobox_ob_crl, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_crl), _("Hadlock"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_crl), _("Robinson"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_crl), _("Hansmenn"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_crl), _("Lasser"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_crl), _("Tokyo"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_crl), _("Custom"));
-
-    m_combobox_ob_fl = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_fl);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_fl, 105, 40);
-    gtk_widget_set_size_request (m_combobox_ob_fl, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_fl), _("Hadlock"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_fl), _("Merz"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_fl), _("Jeanty"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_fl), _("Tokyo"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_fl), _("Custom"));
-
-    m_combobox_ob_ac = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_ac);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_ac, 105, 75);
-    gtk_widget_set_size_request (m_combobox_ob_ac, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ac), _("Hadlock"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ac), _("Merz"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ac), _("Lasser"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ac), _("Tokyo"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ac), _("Custom"));
-
-    m_combobox_ob_bpd = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_bpd);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_bpd, 535, 5);
-    gtk_widget_set_size_request (m_combobox_ob_bpd, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_bpd), _("Hadlock"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_bpd), _("Merz"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_bpd), _("Lasser"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_bpd), _("Rempen"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_bpd), _("Tokyo"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_bpd), _("Custom"));
-
-    m_combobox_ob_gs = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_gs);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_gs, 535, 40);
-    gtk_widget_set_size_request (m_combobox_ob_gs, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_gs), _("Hellman"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_gs), _("Rempen"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_gs), _("Tokyo"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_gs), _("Custom"));
-
-    m_combobox_ob_hc = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_hc);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_hc, 320, 75);
-    gtk_widget_set_size_request (m_combobox_ob_hc, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_hc), _("Hadlock"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_hc), _("Merz"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_hc), _("Lasser"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_hc), _("Custom"));
-
-    m_combobox_ob_hl = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_hl);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_hl, 320, 5);
-    gtk_widget_set_size_request (m_combobox_ob_hl, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_hl), _("Jeanty"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_hl), _("Custom"));
-
-    m_combobox_ob_cer = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_cer);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_cer, 105, 5);
-    gtk_widget_set_size_request (m_combobox_ob_cer, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_cer), _("Goldstein"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_cer), _("Custom"));
-
-    label_ob_hl = gtk_label_new (_("<b>HL :</b>"));
-    gtk_widget_show (label_ob_hl);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_hl, 220, 5);
-    gtk_widget_set_size_request (label_ob_hl, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_hl), TRUE);
-
-    label_ob_bpd = gtk_label_new (_("<b>BPD :</b>"));
-    gtk_widget_show (label_ob_bpd);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_bpd, 435, 5);
-    gtk_widget_set_size_request (label_ob_bpd, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_bpd), TRUE);
-
-    label_ob_crl = gtk_label_new (_("<b>CRL :</b>"));
-    gtk_widget_show (label_ob_crl);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_crl, 220, 40);
-    gtk_widget_set_size_request (label_ob_crl, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_crl), TRUE);
-
-    m_combobox_ob_tad = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_tad);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_tad, 535, 75);
-    gtk_widget_set_size_request (m_combobox_ob_tad, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_tad), _("Merz"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_tad), _("Custom"));
-
-    label_ob_gs = gtk_label_new (_("<b>GS :</b>"));
-    gtk_widget_show (label_ob_gs);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_gs, 435, 40);
-    gtk_widget_set_size_request (label_ob_gs, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_gs), TRUE);
-
-    label_ob_cer = gtk_label_new (_("<b>CER :</b>"));
-    gtk_widget_show (label_ob_cer);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_cer, 5, 5);
-    gtk_widget_set_size_request (label_ob_cer, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_cer), TRUE);
-
-    label_ob_fl = gtk_label_new (_("<b>FL :</b>"));
-    gtk_widget_show (label_ob_fl);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_fl, 5, 40);
-    gtk_widget_set_size_request (label_ob_fl, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_fl), TRUE);
-
-    label_ob_ac = gtk_label_new (_("<b>AC :</b>"));
-    gtk_widget_show (label_ob_ac);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_ac, 5, 75);
-    gtk_widget_set_size_request (label_ob_ac, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_ac), TRUE);
-
-    label_ob_apad = gtk_label_new (_("<b>APAD :</b>"));
-    gtk_widget_show (label_ob_apad);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_apad, 5, 110);
-    gtk_widget_set_size_request (label_ob_apad, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_apad), TRUE);
-
-    m_combobox_ob_apad = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_apad);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_apad, 105, 110);
-    gtk_widget_set_size_request (m_combobox_ob_apad, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_apad), _("Merz"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_apad), _("Custom"));
-
-    label_ob_hc = gtk_label_new (_("<b>HC :</b>"));
-    gtk_widget_show (label_ob_hc);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_hc, 220, 75);
-    gtk_widget_set_size_request (label_ob_hc, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_hc), TRUE);
-
-    label_ob_thd = gtk_label_new (_("<b>THD :</b>"));
-    gtk_widget_show (label_ob_thd);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_thd, 220, 110);
-    gtk_widget_set_size_request (label_ob_thd, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_thd), TRUE);
-
-    m_combobox_ob_thd = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_thd);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_thd, 320, 110);
-    gtk_widget_set_size_request (m_combobox_ob_thd, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_thd), _("Hansmenn"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_thd), _("Custom"));
-
-    label_ob_tad = gtk_label_new (_("<b>TAD :</b>"));
-    gtk_widget_show (label_ob_tad);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_tad, 435, 75);
-    gtk_widget_set_size_request (label_ob_tad, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_tad), TRUE);
-
-    label_ob_ofd = gtk_label_new (_("<b>OFD :</b>"));
-    gtk_widget_show (label_ob_ofd);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_ofd, 435, 110);
-    gtk_widget_set_size_request (label_ob_ofd, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_ofd), TRUE);
-
-    m_combobox_ob_ofd = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_ofd);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_ofd, 535, 110);
-    gtk_widget_set_size_request (m_combobox_ob_ofd, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ofd), _("Korean"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_ofd), _("Custom"));
-
-    label_ob_efw = gtk_label_new (_("<b>EFW :</b>"));
-    gtk_widget_show (label_ob_efw);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), label_ob_efw, 5, 145);
-    gtk_widget_set_size_request (label_ob_efw, 100, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_efw), TRUE);
-
-    m_combobox_ob_efw = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_ob_efw);
-    gtk_fixed_put (GTK_FIXED (fixed_ob_method), m_combobox_ob_efw, 105, 145);
-    gtk_widget_set_size_request (m_combobox_ob_efw, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Hadlock1"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Hadlock2"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Hadlock3"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Hadlock4"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Shepard"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Hansmenn"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_ob_efw), _("Tokyo"));
-
-    label_ob_method = gtk_label_new (_("<b>OB Calc Method</b>"));
-    gtk_widget_show (label_ob_method);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_ob_method), label_ob_method);
-    gtk_label_set_use_markup (GTK_LABEL (label_ob_method), TRUE);
-
-    button_ob_custom = gtk_button_new_with_mnemonic (_("OB Custom"));
-    gtk_widget_show (button_ob_custom);
-    //gtk_fixed_put (GTK_FIXED (fixed_calc), button_ob_custom, 30, 260);
-    gtk_fixed_put (GTK_FIXED (fixed_calc), button_ob_custom, 80, 260);
-    gtk_widget_set_size_request (button_ob_custom, 115, 30);
-    g_signal_connect ((gpointer) button_ob_custom, "clicked",
-                      G_CALLBACK (on_button_ob_custom_clicked),
-                      this);
-
-    label_bsa = gtk_label_new (_("<b>BSA :</b>"));
-    gtk_widget_show (label_bsa);
-    gtk_fixed_put (GTK_FIXED (fixed_calc), label_bsa, 245+20, 260);
-    gtk_widget_set_size_request (label_bsa, 108, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_bsa), TRUE);
-
-    m_combobox_bsa = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_bsa);
-    gtk_fixed_put (GTK_FIXED (fixed_calc), m_combobox_bsa, 345, 260);
-    gtk_widget_set_size_request (m_combobox_bsa, 100, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bsa), _("Oriental"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bsa), _("Occidental"));
-
-    button_calc_default = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_calc_default);
-    //gtk_fixed_put (GTK_FIXED (fixed_calc), button_calc_default, 30, 450);
-    gtk_fixed_put (GTK_FIXED (fixed_calc), button_calc_default, 50, 450);
-    gtk_widget_set_size_request (button_calc_default, 140+8, 40);
-    g_signal_connect ((gpointer) button_calc_default, "clicked", G_CALLBACK (on_button_calc_default_clicked), this);
-
-    return fixed_calc;
-}
 
 void ViewSystem::BtnOBCustomClicked(GtkButton *button) {
     ViewCustomOB::GetInstance()->CreateWindow(GTK_WIDGET(m_dialog));
 }
 
-void ViewSystem::init_calc_setting(SysCalculateSetting* sysCalc) {
-    if (sysCalc == NULL) {
-        sysCalc = new SysCalculateSetting;
-    }
 
-    int bsa = sysCalc->GetBSAMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_bsa), bsa);
-
-    int cer = sysCalc->GetCerMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_cer), cer);
-
-    int hl = sysCalc->GetHlMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_hl), hl);
-
-    int bpd = sysCalc->GetBpdMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_bpd), bpd);
-
-    int fl = sysCalc->GetFlMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_fl), fl);
-
-    int crl = sysCalc->GetCrlMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_crl), crl);
-
-    int gs = sysCalc->GetGsMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_gs), gs);
-
-    int ac = sysCalc->GetAcMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_ac), ac);
-
-    int hc = sysCalc->GetHcMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_hc), hc);
-
-    int tad = sysCalc->GetTadMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_tad), tad);
-
-    int apad = sysCalc->GetApadMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_apad), apad);
-
-    int thd = sysCalc->GetThdMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_thd), thd);
-
-    int ofd = sysCalc->GetOfdMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_ofd), ofd);
-
-    int efw = sysCalc->GetEfwMethod();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_ob_efw), efw);
-    delete sysCalc;
-}
-
-void ViewSystem::save_calc_setting() {
-    SysCalculateSetting sysCalc;
-
-    int bsa = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_bsa));
-    sysCalc.SetBSAMethod(bsa);
-
-    int cer = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_cer));
-    sysCalc.SetCerMethod(cer);
-
-    int hl = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_hl));
-    sysCalc.SetHlMethod(hl);
-
-    int bpd = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_bpd));
-    sysCalc.SetBpdMethod(bpd);
-
-    int fl = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_fl));
-    sysCalc.SetFlMethod(fl);
-
-    int crl = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_crl));
-    sysCalc.SetCrlMethod(crl);
-
-    int gs = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_gs));
-    sysCalc.SetGsMethod(gs);
-
-    int ac = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_ac));
-    sysCalc.SetAcMethod(ac);
-
-    int hc = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_hc));
-    sysCalc.SetHcMethod(hc);
-
-    int tad = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_tad));
-    sysCalc.SetTadMethod(tad);
-
-    int apad = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_apad));
-    sysCalc.SetApadMethod(apad);
-
-    int thd = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_thd));
-    sysCalc.SetThdMethod(thd);
-
-    int ofd = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_ofd));
-    sysCalc.SetOfdMethod(ofd);
-
-    int efw = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_efw));
-    sysCalc.SetEfwMethod(efw);
-
-    sysCalc.SyncFile();
-    sysCalc.UpdateOBSetting();
-
-    g_menuCalc.UpdateEfwItem(efw);
-}
 
 GtkWidget* ViewSystem::create_note_info() {
     GtkWidget *fixed_info;

@@ -401,14 +401,28 @@ private:
   }
 
   static void signal_button_clicked_measure_default(GtkButton* button, ViewSystem* data) {
-    data->BtnMeasureDefaultClicked(button);
+    if (data != NULL) {
+      data->BtnMeasureDefaultClicked(button);
+    }
   }
-
-
 
   // Calc And Caliper
 
+  static void on_calc_notebook_switch_page(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num, ViewSystem* data) {
+    if (data != NULL) {
+      data->CalcnotebookChanged(notebook, page, page_num);
+    }
+  }
+
   // Calculate
+
+  static void signal_button_clicked_ob_custom(GtkButton *button, ViewSystem *data) {
+    data->BtnOBCustomClicked(button);
+  }
+
+  static void signal_button_clicked_calc_default(GtkButton *button, ViewSystem *data) {
+    data->BtnCalculateDefaultClicked(button);
+  }
 
   // Comment
 
@@ -455,8 +469,10 @@ private:
   void ChkBtnTAmaxToggled(GtkToggleButton* togglebutton);
   void ChkBtnPIToggled(GtkToggleButton* togglebutton);
   void ChkBtnHRToggled(GtkToggleButton* togglebutton);
+  void BtnMeasureDefaultClicked(GtkButton* button);
 
   // Calc And Caliper
+  void CalcnotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num);
 
   // Calculate
 
@@ -613,6 +629,22 @@ private:
   GtkRadioButton* m_radiobutton_measure_line_on;
   GtkRadioButton* m_radiobutton_measure_line_off;
 
+  // Calculate
+  GtkComboBoxText* m_combobox_ob_cer;
+  GtkComboBoxText* m_combobox_ob_hl;
+  GtkComboBoxText* m_combobox_ob_bpd;
+  GtkComboBoxText* m_combobox_ob_fl;
+  GtkComboBoxText* m_combobox_ob_crl;
+  GtkComboBoxText* m_combobox_ob_gs;
+  GtkComboBoxText* m_combobox_ob_ac;
+  GtkComboBoxText* m_combobox_ob_hc;
+  GtkComboBoxText* m_combobox_ob_tad;
+  GtkComboBoxText* m_combobox_ob_apad;
+  GtkComboBoxText* m_combobox_ob_thd;
+  GtkComboBoxText* m_combobox_ob_ofd;
+  GtkComboBoxText* m_combobox_ob_efw;
+  GtkComboBoxText* m_combobox_bsa;
+
 public:
     static const int MAX_KEY = 10;//8;//9;
 
@@ -710,25 +742,6 @@ private:
 
 
     GtkWidget *m_combobox_unit_slope;
-
-
-    //calculate
-    GtkWidget *m_obWindow;
-    GtkWidget *m_combobox_bsa;
-    GtkWidget *m_combobox_ob_crl;
-    GtkWidget *m_combobox_ob_fl;
-    GtkWidget *m_combobox_ob_ac;
-    GtkWidget *m_combobox_ob_bpd;
-    GtkWidget *m_combobox_ob_gs;
-    GtkWidget *m_combobox_ob_hc;
-    GtkWidget *m_combobox_ob_hl;
-    GtkWidget *m_combobox_ob_cer;
-    GtkWidget *m_combobox_ob_tad;
-    GtkWidget *m_combobox_ob_apad;
-    GtkWidget *m_combobox_ob_thd;
-    GtkWidget *m_combobox_ob_ofd;
-    GtkWidget *m_combobox_ob_efw;
-
 
     GtkTreeIter topIter;
     GtkCellRenderer *m_renderer;
@@ -901,9 +914,6 @@ private:
         data->BtnNewCheckPartCancelClicked(button);
     }
 
-    //calc
-    GtkWidget *m_calc_notebook;
-    int  m_calc_page_num ;
 
     // TV Out
     GtkWidget *m_fixed_tvout;
@@ -1051,7 +1061,7 @@ private:
 
 
 
-    void BtnMeasureDefaultClicked(GtkButton *button);
+
     void BtnCalculateDefaultClicked(GtkButton *button);
     void BtnCommentDefaultClicked(GtkButton *button);
     void BtnTVOutDefaultClicked(GtkButton *button);
@@ -1114,7 +1124,7 @@ private:
 
 
     void DicomnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
-    void CalcnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
+
 
 
 
@@ -1159,9 +1169,7 @@ private:
 
 
 
-    static void on_button_calc_default_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnCalculateDefaultClicked(button);
-    }
+
     static void on_button_comment_default_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnCommentDefaultClicked(button);
     }
@@ -1257,9 +1265,7 @@ private:
         data->SpecificTreeviewSelectionChanged(treeselection);
     }
 
-    static void on_button_ob_custom_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnOBCustomClicked(button);
-    }
+
 
     static void on_modebm_radio_button_toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
         data->ModebmRadioToggled(togglebutton);
@@ -1291,9 +1297,7 @@ private:
         data->DicomnotebookChanged(notebook, page, page_num);
     }
 
-    static void on_calc_notebook_switch_page(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, ViewSystem *data) {
-        data->CalcnotebookChanged(notebook, page, page_num);
-    }
+
 
 
 
