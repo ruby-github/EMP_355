@@ -416,12 +416,16 @@ private:
 
   // Calculate
 
-  static void signal_button_clicked_ob_custom(GtkButton *button, ViewSystem *data) {
-    data->BtnOBCustomClicked(button);
+  static void signal_button_clicked_ob_custom(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnOBCustomClicked(button);
+    }
   }
 
-  static void signal_button_clicked_calc_default(GtkButton *button, ViewSystem *data) {
-    data->BtnCalculateDefaultClicked(button);
+  static void signal_button_clicked_calc_default(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnCalculateDefaultClicked(button);
+    }
   }
 
   // Comment
@@ -475,6 +479,8 @@ private:
   void CalcnotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num);
 
   // Calculate
+  void BtnOBCustomClicked(GtkButton* button);
+  void BtnCalculateDefaultClicked(GtkButton* button);
 
   // Comment
 
@@ -645,6 +651,28 @@ private:
   GtkComboBoxText* m_combobox_ob_efw;
   GtkComboBoxText* m_combobox_bsa;
 
+  // Comment
+  GtkComboBoxText* m_combobox_probe_comment;
+  GtkComboBoxText* m_combobox_exam_comment;
+  GtkComboBoxText* m_combobox_department_comment;
+  GtkTreeView* m_treeview_item_comment;
+  GtkTreeView* m_treeview_item_comment1;
+  GtkCellRenderer* m_cellrenderer_comment_text;
+  GtkCellRenderer* m_cellrenderer_comment_text1;
+  GtkRadioButton* m_radiobutton_font_big;
+  GtkRadioButton* m_radiobutton_font_mid;
+  GtkRadioButton* m_radiobutton_font_small;
+  GtkRadioButton* m_radiobutton_bodymark_big;
+  GtkRadioButton* m_radiobutton_bodymark_mid;
+  GtkRadioButton* m_radiobutton_bodymark_small;
+  GtkComboBoxText* m_combobox_font_color;
+  GtkComboBoxText* m_combobox_bodymark_color;
+
+  GtkScrolledWindow* m_scrolledwindow_item_comment;
+  GtkScrolledWindow* m_scrolledwindow_item_comment1;
+
+  GtkWidget *fixed_comment;
+
 public:
     static const int MAX_KEY = 10;//8;//9;
 
@@ -709,31 +737,12 @@ private:
 
 
     //comment
-    GtkWidget *m_radiobutton_font_big;
-    GtkWidget *m_radiobutton_font_mid;
-    GtkWidget *m_radiobutton_font_small;
-    GtkWidget *m_radiobutton_bodymark_big;
-    GtkWidget *m_radiobutton_bodymark_mid;
-    GtkWidget *m_radiobutton_bodymark_small;
-    GtkWidget *m_combobox_comment_color;
-    GtkWidget *m_combobox_bodymark_color;
-    GtkWidget *m_combobox_probe_comment;
-    GtkWidget *m_combobox_exam_comment;
-    GtkWidget *m_combobox_department_comment;
-    GtkWidget *fixed_comment;
-    GtkWidget* m_treeView_comment;
+
+
+
     GtkWidget* m_scrolled_all;
     GtkWidget* m_treeView_all;
-    GtkWidget* m_button_select_one;
-    GtkWidget *m_button_back_all;
-    GtkWidget *m_button_back_one;
-    GtkWidget *m_button_select_all;
-    GtkWidget *m_button_comment_add;
-    GtkWidget *m_button_comment_delete;
-    GtkWidget *m_button_comment_delete_all;
-    GtkWidget *m_button_comment_up;
-    GtkWidget *m_button_comment_down;
-    GtkWidget *m_button_comment_delete_select;
+
 
     //vector<string> vecItemComment;
     vector<string> vecExamItem_comment;
@@ -960,11 +969,7 @@ private:
     GtkWidget *m_combobox_ud;*/
 
     //comment
-    GtkWidget *scrolledwindow_item_comment1;
-    GtkWidget *scrolledwindow_item_comment;
 
-    GtkWidget *m_treeview_item_comment;
-    GtkWidget *m_treeview_item_comment1;
     GtkWidget *m_combobox_polarity;
     GtkWidget *m_combobox_frame;
     GtkWidget *m_combobox_line_aver;
@@ -1003,8 +1008,7 @@ private:
 
     GtkTreeIter m_optionIter;
 
-    GtkCellRenderer *m_cellrenderer_comment_text;
-    GtkCellRenderer *m_cellrenderer_comment_text1;
+
 
 
 
@@ -1041,12 +1045,12 @@ private:
 
     int  DepartmentIndex();
     void create_exam_comment_model(std::vector<ExamItem::EItem> index);
-    void  DepartmentName(char department[256], int index);
-    void CreateItemList_Comment(char *department,vector<ExamPara>& vecItemComment, int number);
-    void CreateItemList_Note(char *department,vector<ExamPara>& vecItemComment, int number);
+    string DepartmentName(int index);
+    void CreateItemList_Comment(string department,vector<ExamPara>& vecItemComment, int number);
+    void CreateItemList_Note(string department,vector<ExamPara>& vecItemComment, int number);
     void CreateItemList_Comment1(string probe_exam,vector<ExamPara>& vecItemComment1);
-    void CreateItemList_Delete_Comment1(char *select_name, string probe_exam,vector<ExamPara>& vecItemComment1);
-    void CreateItemList_Delete_Comment(char *select_name, char *department, vector<ExamPara>& vecDeleteComment);
+    void CreateItemList_Delete_Comment1(string select_name, string probe_exam,vector<ExamPara>& vecItemComment1);
+    void CreateItemList_Delete_Comment(string select_name, string department, vector<ExamPara>& vecDeleteComment);
     void add_exam_item_column(GtkTreeView *treeview);
     void init_image_para();
     void set_image_item_sensitive(bool status);
@@ -1062,7 +1066,7 @@ private:
 
 
 
-    void BtnCalculateDefaultClicked(GtkButton *button);
+
     void BtnCommentDefaultClicked(GtkButton *button);
     void BtnTVOutDefaultClicked(GtkButton *button);
     void ComboNetMethodChanged(GtkComboBox *widget);
@@ -1072,7 +1076,7 @@ private:
     //    void EntryIPChanged(GtkEditable *editable);
     void EntryDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     void EntryFracDigitInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    void BtnOBCustomClicked(GtkButton *button);
+
 
 
 

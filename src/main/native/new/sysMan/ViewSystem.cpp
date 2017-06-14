@@ -3647,6 +3647,287 @@ void ViewSystem::save_calc_setting() {
   g_menuCalc.UpdateEfwItem(efw);
 }
 
+GtkWidget* ViewSystem::create_note_comment() {
+  GtkTable* table = Utils::create_table(12, 6);
+
+  // Probe Type
+  GtkLabel* label_probe_comment = Utils::create_label(_("Probe Type:"));
+  m_combobox_probe_comment = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_probe_comment), 0, 1, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_probe_comment), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  for (int i = 0; i < NUM_PROBE; i++) {
+    string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
+    gtk_combo_box_text_append_text(m_combobox_probe_comment, newProbeName.c_str());
+  }
+
+  ExamItem exam;
+  IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
+
+  string default_probe = exam.ReadDefaultProbe(&ini);
+  int probe_comment_index = 0;
+
+  for (int i = 0; i < NUM_PROBE; i++) {
+    if (default_probe == g_probe_list[i]) {
+      probe_comment_index = i;
+
+      break;
+    } else {
+      probe_comment_index = 0;
+    }
+  }
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_comment), probe_comment_index);
+  g_signal_connect(m_combobox_probe_comment, "changed", G_CALLBACK(HandleProbeCommentChanged), this);
+
+  // Exam Type
+  GtkLabel* label_exam_comment = Utils::create_label(_("Exam Type:"));
+  m_combobox_exam_comment = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_exam_comment), 3, 4, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_exam_comment), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  ExamItem examItem;
+  vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[probe_comment_index]);
+  create_exam_comment_model(itemIndex);
+
+  g_signal_connect(m_combobox_exam_comment, "changed", G_CALLBACK(HandleExamCommentChanged), this);
+
+  // frame
+  GtkFrame* frame = Utils::create_frame();
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame), 0, 6, 1, 7);
+
+  GtkTable* table_frame = Utils::create_table(5, 6);
+  gtk_container_set_border_width(GTK_CONTAINER(table_frame), 5);
+  gtk_container_add(GTK_CONTAINER(frame), GTK_WIDGET(table_frame));
+
+  // Select Lexicon
+  GtkLabel* label_department_comment = Utils::create_label(_("Select Lexicon:"));
+  m_combobox_department_comment = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_department_comment), 0, 1, 0, 1);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_department_comment), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Abdomen"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Urology"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Cardiac"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Obstetrics"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Gynecology"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Small Part"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Vascular"));
+  gtk_combo_box_text_append_text(m_combobox_department_comment, _("Orthopedic"));
+
+  //gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), department_index);
+  g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
+
+  // left scrolled window
+  GtkScrolledWindow* scrolledwindow_item = Utils::create_scrolled_window();
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(scrolledwindow_item), 0, 2, 1, 6);
+
+  GtkTreeModel* model = create_item_comment_model(0);
+  m_treeview_item_comment = Utils::create_tree_view(model);
+  gtk_container_add(GTK_CONTAINER(scrolledwindow_item), GTK_WIDGET(m_treeview_item_comment));
+
+  g_object_set(m_cellrenderer_comment_text, "editable", TRUE, NULL);
+  g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
+  g_signal_connect(m_cellrenderer_comment_text, "edited", G_CALLBACK(HandleCellRendererRenameSelectComment), this);
+
+  // button
+  GtkButton* button_select_one = Utils::create_button(_(">"));
+  GtkButton* button_select_all = Utils::create_button(_(">>"));
+  GtkButton* button_comment_add = Utils::create_button(_("Add"));
+  GtkButton* button_comment_delete_select = Utils::create_button(_("Delete"));
+
+  gtk_table_attach(table_frame, GTK_WIDGET(button_select_one), 2, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_select_all), 2, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_add), 2, 3, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete_select), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_select_one, "clicked", G_CALLBACK(HandleButtonSelectOneCommentClicked), this);
+  g_signal_connect(button_select_all, "clicked", G_CALLBACK(HandleButtonSelectAllCommentClicked), this);
+  g_signal_connect(button_comment_add, "clicked", G_CALLBACK(HandleButtonAddClicked), this);
+  g_signal_connect(button_comment_delete_select, "clicked", G_CALLBACK(HandleButtonDeleteSelectClicked), this);
+
+  // right scrolled window
+  GtkScrolledWindow* scrolledwindow_item_right = Utils::create_scrolled_window();
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(scrolledwindow_item_right), 3, 5, 1, 6);
+
+  GtkTreeModel* model_right = create_item_comment_model1();
+  m_treeview_item_comment1 = Utils::create_tree_view(model_right);
+  gtk_container_add(GTK_CONTAINER(scrolledwindow_item_right), GTK_WIDGET(m_treeview_item_comment1));
+
+  add_columns_comment1(m_treeview_item_comment1);
+
+  g_object_set(m_cellrenderer_comment_text1, "editable", TRUE, NULL);
+  g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
+  g_signal_connect(m_cellrenderer_comment_text1, "edited", G_CALLBACK(HandleCellRendererRenameComment), this);
+
+  // button
+  GtkButton* button_comment_up = Utils::create_button(_("Up"));
+  GtkButton* button_comment_down = Utils::create_button(_("Down"));
+  GtkButton* button_comment_delete = Utils::create_button(_("Delete"));
+  GtkButton* button_comment_delete_all = Utils::create_button(_("All Delete"));
+
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_up), 2, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_down), 2, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete), 2, 3, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete_all), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_comment_up, "clicked", G_CALLBACK(HandleButtonUpClicked), this);
+  g_signal_connect(button_comment_down, "clicked", G_CALLBACK(HandleButtonDownClicked), this);
+  g_signal_connect(button_comment_delete, "clicked", G_CALLBACK(HandleButtonDeleteClicked), this);
+  g_signal_connect(button_comment_delete_all, "clicked", G_CALLBACK(HandleButtonDeleteAllClicked), this);
+
+  // Font Size
+  GtkFrame* frame_font_size = Utils::create_frame(_("Font Size"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_font_size), 0, 3, 7, 9);
+
+  GtkTable* table_font_size = Utils::create_table(1, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_font_size), 5);
+  gtk_container_add(GTK_CONTAINER(frame_font_size), GTK_WIDGET(table_font_size));
+
+  m_radiobutton_font_big = Utils::create_radio_button(NULL, _("Big"));
+  GSList* radiobutton_font_size_group = gtk_radio_button_get_group(m_radiobutton_font_big);
+  m_radiobutton_font_mid = Utils::create_radio_button(radiobutton_font_size_group, _("Mid"));
+  radiobutton_font_size_group = gtk_radio_button_get_group(m_radiobutton_font_mid);
+  m_radiobutton_font_small = Utils::create_radio_button(radiobutton_font_size_group, _("Small"));
+
+  gtk_table_attach_defaults(table_font_size, GTK_WIDGET(m_radiobutton_font_big), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_font_size, GTK_WIDGET(m_radiobutton_font_mid), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_font_size, GTK_WIDGET(m_radiobutton_font_small), 2, 3, 0, 1);
+
+  // Bodymark Size
+  GtkFrame* frame_bodymark_size = frame = Utils::create_frame(_("Bodymark Size"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_bodymark_size), 0, 3, 9, 11);
+
+  GtkTable* table_bodymark_size = Utils::create_table(1, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_bodymark_size), 5);
+  gtk_container_add(GTK_CONTAINER(frame_bodymark_size), GTK_WIDGET(table_bodymark_size));
+
+  m_radiobutton_bodymark_big = Utils::create_radio_button(NULL, _("Big"));
+  GSList* radiobutton_bodymark_size_group = gtk_radio_button_get_group(m_radiobutton_bodymark_big);
+  m_radiobutton_bodymark_mid = Utils::create_radio_button(radiobutton_bodymark_size_group, _("Mid"));
+  radiobutton_bodymark_size_group = gtk_radio_button_get_group(m_radiobutton_bodymark_mid);
+  m_radiobutton_bodymark_small = Utils::create_radio_button(radiobutton_bodymark_size_group, _("Small"));
+
+  gtk_table_attach_defaults(table_bodymark_size, GTK_WIDGET(m_radiobutton_bodymark_big), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_bodymark_size, GTK_WIDGET(m_radiobutton_bodymark_mid), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_bodymark_size, GTK_WIDGET(m_radiobutton_bodymark_small), 2, 3, 0, 1);
+
+  // Font Color
+  GtkLabel* label_font_color = Utils::create_label(_("Font Color:"));
+  m_combobox_font_color = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_font_color), 3, 4, 7, 8);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_font_color), 4, 6, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_font_color, _("Red"));
+  gtk_combo_box_text_append_text(m_combobox_font_color, _("Green"));
+  gtk_combo_box_text_append_text(m_combobox_font_color, _("Blue"));
+  gtk_combo_box_text_append_text(m_combobox_font_color, _("White"));
+
+  // Probe Mark Color
+  GtkLabel* label_bodymark_color = Utils::create_label(_("Probe Mark Color:"));
+  m_combobox_bodymark_color = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_bodymark_color), 3, 4, 9, 10);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_bodymark_color), 4, 6, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("White"));
+  gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("Gray"));
+  gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("Red"));
+  gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("Green"));
+  gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("Yellow"));
+  gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("Blue"));
+
+  // Default Factory
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 2, 11, 12, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_default, "clicked", G_CALLBACK (on_button_comment_default_clicked), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_comment_setting(SysNoteSetting* sysNoteSetting) {
+  if (sysNoteSetting == NULL) {
+    sysNoteSetting = new SysNoteSetting();
+  }
+
+  int index_font_size = sysNoteSetting->GetFontSize();
+
+  switch (index_font_size) {
+  case 0:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_font_big), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_font_mid), TRUE);
+    break;
+  case 2:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_font_small), TRUE);
+    break;
+  }
+
+  int index_bdmk_size = sysNoteSetting->GetBodyMarkSize();
+
+  switch (index_bdmk_size) {
+  case 2:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_big), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_mid), TRUE);
+    break;
+  case 0:
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_small), TRUE);
+    break;
+  }
+
+  int index_font_color = sysNoteSetting->GetFontColor();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_font_color), index_font_color);
+
+  int index_bdmk_color = sysNoteSetting->GetBodyMarkColor();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_bodymark_color), index_bdmk_color);
+
+  delete sysNoteSetting;
+}
+
+void ViewSystem::save_comment_setting() {
+  SysNoteSetting sysNoteSetting;
+
+  int fontSizeIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_big))) {
+    fontSizeIndex = 0;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_mid))) {
+    fontSizeIndex = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_small))) {
+    fontSizeIndex = 2;
+  }
+
+  sysNoteSetting.SetFontSize(fontSizeIndex);
+
+  int bdmkSizeIndex = 0;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_big))) {
+    bdmkSizeIndex = 2;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_mid))) {
+    bdmkSizeIndex = 1;
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_small))) {
+    bdmkSizeIndex = 0;
+  }
+
+  sysNoteSetting.SetBodyMarkSize(bdmkSizeIndex);
+
+  int fontColorIndex  = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_font_color));
+  sysNoteSetting.SetFontColor(fontColorIndex);
+
+  int bdmkColorIndex  = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_bodymark_color));
+  sysNoteSetting.SetBodyMarkColor(bdmkColorIndex);
+
+  sysNoteSetting.SyncFile();
+}
+
 #include "periDevice/DCMMan.h"
 #include <string.h>
 #include <time.h>
@@ -6829,106 +7110,94 @@ void ViewSystem::DepartmentCommentChanged(GtkComboBox *widget) {
 }
 
 GtkTreeModel* ViewSystem::create_item_comment_model1() {
-    int index1 = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
-    gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_comment));
+  int index1 = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
+  gchar* exam_type_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_exam_comment));
 
-    if(!exam_type_name)
-        return NULL;
+  if(!exam_type_name)
+      return NULL;
 
-    ExamItem exam;
-    string exam_type = exam.TransItemName(exam_type_name);
+  ExamItem exam;
+  string exam_type = exam.TransItemName(exam_type_name);
 
-    vector<ExamPara> vecItemComment1;
-    vecItemComment1.clear();
-    CreateItemList_Comment1(g_probe_list[index1] + "-" +exam_type, vecItemComment1);
-    int item_size(0);
-    item_size = vecItemComment1.size();
+  vector<ExamPara> vecItemComment1;
+  vecItemComment1.clear();
+  CreateItemList_Comment1(g_probe_list[index1] + "-" +exam_type, vecItemComment1);
+  int item_size(0);
+  item_size = vecItemComment1.size();
 
-    if(vecItemComment1.empty())
-        return NULL;
+  if(vecItemComment1.empty())
+      return NULL;
 
-    GtkTreeIter iter;
-    GtkTreeStore *store = gtk_tree_store_new(N_COLUMNS,
-                          G_TYPE_STRING,
-                          G_TYPE_INT);
+  GtkTreeIter iter;
+  GtkTreeStore *store = gtk_tree_store_new(N_COLUMNS,
+                        G_TYPE_STRING,
+                        G_TYPE_INT);
 
-    vector<ExamPara>::iterator iterItem;
-    for (iterItem = vecItemComment1.begin(); iterItem != vecItemComment1.end(); iterItem++) {
+  vector<ExamPara>::iterator iterItem;
+  for (iterItem = vecItemComment1.begin(); iterItem != vecItemComment1.end(); iterItem++) {
 
-        gtk_tree_store_append(store, &iter, NULL);
+      gtk_tree_store_append(store, &iter, NULL);
 
-        SysGeneralSetting sysGS;
-        if(sysGS.GetLanguage() ==ZH) {
+      SysGeneralSetting sysGS;
+      if(sysGS.GetLanguage() ==ZH) {
 
-            gtk_tree_store_set(store, &iter,
-                               NAME_COLUMN, _(iterItem->name.c_str()),
-                               INDEX_COLUMN, iterItem->index,
-                               -1);
-        } else {
-            gtk_tree_store_set(store, &iter,
-                               NAME_COLUMN, iterItem->name.c_str(),
-                               INDEX_COLUMN, iterItem->index,
-                               -1);
-        }
-    }
+          gtk_tree_store_set(store, &iter,
+                             NAME_COLUMN, _(iterItem->name.c_str()),
+                             INDEX_COLUMN, iterItem->index,
+                             -1);
+      } else {
+          gtk_tree_store_set(store, &iter,
+                             NAME_COLUMN, iterItem->name.c_str(),
+                             INDEX_COLUMN, iterItem->index,
+                             -1);
+      }
+  }
 
-    return GTK_TREE_MODEL(store);
+  return GTK_TREE_MODEL(store);
 }
 
 GtkTreeModel* ViewSystem::create_item_comment_model(int index) {
+  int  department_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department_comment));
 
-    char path1[256];
-    sprintf(path1, "%s%s", CFG_RES_PATH, NOTE_FILE);
-    IniFile new_ini(path1);
-    IniFile *new_ptrIni= &new_ini;
-    int number;
-    int  department_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department_comment));
-    if(department_index== -1)
-        return NULL;
-    char department[256];
-    DepartmentName(department, department_index);
+  if(department_index== -1) {
+    return NULL;
+  }
 
-    number = new_ptrIni->ReadInt(department, "Number");
-    vector<ExamPara> vecItemComment;
-    vecItemComment.clear();
-    CreateItemList_Comment(department, vecItemComment, number);
+  string department = DepartmentName(department_index);
 
-    int item_size(0);
-    item_size = vecItemComment.size();
+  IniFile new_ini(string(CFG_RES_PATH) + string(NOTE_FILE));
+  int number = new_ini.ReadInt(department, "Number");
 
-    if(vecItemComment.empty())
-        return NULL;
+  vector<ExamPara> vecItemComment;
+  CreateItemList_Comment(department, vecItemComment, number);
 
-    GtkTreeIter iter;
-    GtkTreeStore *store = gtk_tree_store_new(N_COLUMNS,
-                          G_TYPE_STRING,
-                          G_TYPE_INT);
+  int item_size = vecItemComment.size();
 
-    vector<ExamPara>::iterator iterItem;
-    for (iterItem = vecItemComment.begin(); iterItem != vecItemComment.end(); iterItem++) {
+  if(vecItemComment.empty()) {
+    return NULL;
+  }
 
-        gtk_tree_store_append(store, &iter, NULL);
+  GtkTreeIter iter;
+  GtkTreeStore* store = gtk_tree_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_INT);
 
-        SysGeneralSetting sysGS;
-        if(sysGS.GetLanguage() ==ZH) {
+  vector<ExamPara>::iterator iterItem;
+  for (iterItem = vecItemComment.begin(); iterItem != vecItemComment.end(); iterItem++) {
+    gtk_tree_store_append(store, &iter, NULL);
 
-            gtk_tree_store_set(store, &iter,
-                               NAME_COLUMN,  _(iterItem->name.c_str()),
-                               INDEX_COLUMN, iterItem->index,
-                               -1);
-            // PRINTF("------------------------%s\n", iterItem->name.c_str());
-        } else {
-            gtk_tree_store_set(store, &iter,
-                               NAME_COLUMN,  iterItem->name.c_str(),
-                               INDEX_COLUMN, iterItem->index,
-                               -1);
+    SysGeneralSetting sysGS;
 
-        }
-next:
-        continue;
+    if (sysGS.GetLanguage() ==ZH) {
+      gtk_tree_store_set(store, &iter,
+        NAME_COLUMN, iterItem->name.c_str(),
+        INDEX_COLUMN, iterItem->index, -1);
+    } else {
+      gtk_tree_store_set(store, &iter,
+        NAME_COLUMN,  iterItem->name.c_str(),
+        INDEX_COLUMN, iterItem->index, -1);
     }
+  }
 
-    return GTK_TREE_MODEL(store);
+  return GTK_TREE_MODEL(store);
 }
 
 int ViewSystem::DepartmentIndex() {
@@ -6989,29 +7258,27 @@ int ViewSystem::DepartmentIndex() {
 
 }
 
-void ViewSystem::DepartmentName(char department[256], int index) {
-    if(index == 0) {
-        strcpy(department, "Abdomen");
-    } else if(index == 1) {
-        strcpy(department, "Urology");
-    } else if(index == 2) {
-        strcpy(department, "Cardiac");
-    } else if(index == 3) {
-        strcpy(department, "Obstetrics");
-    }
-
-    else if(index == 4) {
-        strcpy(department, "Gynecology");
-    } else if(index == 5) {
-        strcpy(department, "Small Part");
-    } else if(index == 6) {
-        strcpy(department, "Vascular");
-    } else {
-        strcpy(department, "Orthopedic");
-    }
+string ViewSystem::DepartmentName(int index) {
+  if (index == 0) {
+    return "Abdomen";
+  } else if(index == 1) {
+    return "Urology";
+  } else if(index == 2) {
+    return "Cardiac";
+  } else if(index == 3) {
+    return "Obstetrics";
+  } else if(index == 4) {
+    return "Gynecology";
+  } else if(index == 5) {
+    return "Small Part";
+  } else if(index == 6) {
+    return "Vascular";
+  } else {
+    return "Orthopedic";
+  }
 }
 
-void ViewSystem::CreateItemList_Delete_Comment1(char *select_name, string probe_exam,vector<ExamPara>& vecItemComment1) {
+void ViewSystem::CreateItemList_Delete_Comment1(string select_name, string probe_exam,vector<ExamPara>& vecItemComment1) {
 
     char path1[256];
     sprintf(path1, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
@@ -7046,19 +7313,19 @@ void ViewSystem::CreateItemList_Delete_Comment1(char *select_name, string probe_
         exampara.name = ptrIni->ReadString(probeExam, NoteNumber).c_str();
         exampara.index=ExamItem::USERNAME;
         if(sysGS.GetLanguage() ==ZH) {
-            if(strcmp(select_name, _(exampara.name.c_str()))!=0) {
+            if(select_name != exampara.name) {
                 vecItemComment1.push_back(exampara);
             }
 
         } else {
-            if(strcmp(select_name, exampara.name.c_str())!=0) {
+            if(select_name != exampara.name) {
                 vecItemComment1.push_back(exampara);
             }
         }
     }
 }
 
-void ViewSystem::CreateItemList_Delete_Comment(char *select_name, char *department, vector<ExamPara>& vecDeleteComment) {
+void ViewSystem::CreateItemList_Delete_Comment(string select_name, string department, vector<ExamPara>& vecDeleteComment) {
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, NOTE_FILE);
     IniFile ini(path);
@@ -7080,8 +7347,8 @@ void ViewSystem::CreateItemList_Delete_Comment(char *select_name, char *departme
         exampara.name = ptrIni->ReadString(department, NoteNumber).c_str();
         exampara.index=ExamItem::USERNAME;
         SysGeneralSetting sysGS;
-        printf("select_name = %s, exam_name = %s\n", select_name, _(exampara.name.c_str()));
-        if(strcmp(select_name, _(exampara.name.c_str()))!=0) {
+        printf("select_name = %s, exam_name = %s\n", select_name.c_str(), _(exampara.name.c_str()));
+        if(select_name != exampara.name) {
             vecDeleteComment.push_back(exampara);
         }
     }
@@ -7124,7 +7391,7 @@ void ViewSystem::CreateItemList_Comment1(string probe_exam,vector<ExamPara>& vec
     }
 }
 
-void ViewSystem::CreateItemList_Note(char *department,vector<ExamPara>& vecItemComment, int number) {
+void ViewSystem::CreateItemList_Note(string department,vector<ExamPara>& vecItemComment, int number) {
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, DEFAULT_NOTE_FILE);
     IniFile ini(path);
@@ -7145,7 +7412,7 @@ void ViewSystem::CreateItemList_Note(char *department,vector<ExamPara>& vecItemC
     }
 }
 
-void ViewSystem::CreateItemList_Comment(char *department,vector<ExamPara>& vecItemComment, int number) {
+void ViewSystem::CreateItemList_Comment(string department,vector<ExamPara>& vecItemComment, int number) {
     char path[256];
     sprintf(path, "%s%s", CFG_RES_PATH, NOTE_FILE);
     IniFile ini(path);
@@ -8110,321 +8377,7 @@ void ViewSystem::LanguageChanged(GtkComboBox *box) {
         gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_date_format), 2);  //set date format to d:m:y)
 }
 
-GtkWidget* ViewSystem::create_note_comment() {
-    //GtkWidget *fixed_comment;
-    GtkWidget *frame_comment_font;
-    GtkWidget *hbox_comment_font;
-    GSList *radiobutton_font_group = NULL;
-    GtkWidget *label_comment_font;
-    GtkWidget *frame_bodymark_size;
-    GtkWidget *hbox_bodymark_size;
-    GSList *radiobutton_bodymark_group = NULL;
-    GtkWidget *label_bodymark_size;
-    GtkWidget *section_frame;
 
-    GtkWidget *button_comment_default;
-    GtkWidget *label_comment_color;
-    GtkWidget *label_bodymark_color;
-    GtkWidget *frame_fixed_comment;
-    fixed_comment = gtk_fixed_new ();
-    gtk_widget_show (fixed_comment);
-
-    GtkWidget *label_probe_comment = gtk_label_new (_("Probe Type: "));
-    gtk_misc_set_alignment (GTK_MISC(label_probe_comment), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_probe_comment), TRUE);
-    gtk_widget_show (label_probe_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), label_probe_comment, 10+20+20, 10+10+5);
-    gtk_widget_set_size_request (label_probe_comment, 100, 30);
-
-    int probe_comment_index = 0;
-    char path[256];
-    sprintf(path, "%s%s", CFG_RES_PATH, STORE_DEFAULT_ITEM_PATH);
-    IniFile ini(path);
-    ExamItem exam;
-
-    string default_probe;
-    default_probe=exam.ReadDefaultProbe(&ini);
-    for (int j = 0; j < NUM_PROBE; j++) {
-        if(strcmp(default_probe.c_str(), g_probe_list[j].c_str())==0) {
-            probe_comment_index = j;
-            break;
-        } else
-            probe_comment_index = 0;
-    }
-
-    m_combobox_probe_comment = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_probe_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_probe_comment, 110+20+20+20-30, 10+10+5);
-    gtk_widget_set_size_request (m_combobox_probe_comment, 120, 30);
-    for (int i = 0; i < NUM_PROBE; i++) {
-        string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
-        gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_probe_comment), newProbeName.c_str());
-    }
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_probe_comment), probe_comment_index);//-1);
-    g_signal_connect(m_combobox_probe_comment, "changed", G_CALLBACK(HandleProbeCommentChanged), this);
-
-    GtkWidget *label_exam_comment = gtk_label_new (_("Exam Type:"));
-    gtk_misc_set_alignment (GTK_MISC(label_exam_comment), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_exam_comment), TRUE);
-    gtk_widget_show (label_exam_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), label_exam_comment, 200+200-100+30-5-17, 10+10+5);
-    gtk_widget_set_size_request (label_exam_comment, 100+17, 30);
-
-    m_combobox_exam_comment = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_exam_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_exam_comment, 300+210-100-30+40-5, 10+10+5);
-    gtk_widget_set_size_request (m_combobox_exam_comment, 120, 30);
-
-    ExamItem examItem;
-    vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[probe_comment_index]);
-    create_exam_comment_model(itemIndex);
-    //gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_exam_comment), 0);//-1);
-    g_signal_connect(m_combobox_exam_comment, "changed", G_CALLBACK(HandleExamCommentChanged), this);
-
-    int department_index = DepartmentIndex();
-    GtkWidget *label_department_comment = gtk_label_new (_("Select Lexicon:"));
-    gtk_misc_set_alignment (GTK_MISC(label_department_comment), 0, 0.5);
-    gtk_label_set_use_markup (GTK_LABEL (label_department_comment), TRUE);
-    gtk_widget_show (label_department_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), label_department_comment, 90, 10+20+50-10);//300+310-50+40, 10+10+5);
-    gtk_widget_set_size_request (label_department_comment, 100, 30);
-
-    m_combobox_department_comment = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_department_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_department_comment, 190, 10+20+50-10);//300+310+150+10-100+30, 10+10+5);
-    gtk_widget_set_size_request (m_combobox_department_comment, 120, 30);
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Abdomen"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Urology"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Cardiac"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Obstetrics"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Gynecology"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Small Part"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Vascular"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Orthopedic"));
-
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), department_index);//0);
-
-    g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
-
-    section_frame = gtk_frame_new (NULL);
-    gtk_widget_show (section_frame);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), section_frame, 50, 100-40);
-    gtk_widget_set_size_request (section_frame, 600+200, 488-244+30+20+30-10);
-    gtk_frame_set_shadow_type (GTK_FRAME (section_frame), GTK_SHADOW_IN);
-
-    scrolledwindow_item_comment = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_item_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), scrolledwindow_item_comment, 50+40, 10+20+50-5+40-5);
-    gtk_widget_set_size_request (scrolledwindow_item_comment, 120+100, 200+63+20-40+10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_item_comment), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-
-    GtkTreeModel *model = create_item_comment_model(0);
-    m_treeview_item_comment = gtk_tree_view_new_with_model(model);
-    add_columns_comment(GTK_TREE_VIEW(m_treeview_item_comment));
-
-    gtk_widget_modify_base(m_treeview_item_comment, GTK_STATE_NORMAL, g_deep);
-
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_item_comment), m_treeview_item_comment);
-
-    GtkTreeSelection *select;
-    select = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_comment));
-    gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
-
-    g_object_set(m_cellrenderer_comment_text, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
-    g_signal_connect(m_cellrenderer_comment_text, "edited", G_CALLBACK(HandleCellRendererRenameSelectComment), this);
-
-    gtk_widget_show (m_treeview_item_comment);
-
-    scrolledwindow_item_comment1 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_item_comment1);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), scrolledwindow_item_comment1, 50+40+220+40+80+40, 10+20+50-5+40-5);//-3-2);
-    gtk_widget_set_size_request (scrolledwindow_item_comment1, 120+100, 200+63+20-40+10);//200+63+20+5+3+2);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_item_comment1), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-
-    GtkTreeModel *model1 = create_item_comment_model1();
-    m_treeview_item_comment1 = gtk_tree_view_new_with_model(model1);
-    add_columns_comment1(GTK_TREE_VIEW(m_treeview_item_comment1));
-
-    gtk_widget_modify_base(m_treeview_item_comment1, GTK_STATE_NORMAL, g_deep);
-
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_item_comment1), m_treeview_item_comment1);
-
-    GtkTreeSelection *select1;
-    select1 = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_comment1));
-    gtk_tree_selection_set_mode(select, GTK_SELECTION_BROWSE);
-
-    g_object_set(m_cellrenderer_comment_text1, "editable", TRUE, NULL);
-    g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
-    g_signal_connect(m_cellrenderer_comment_text1, "edited", G_CALLBACK(HandleCellRendererRenameComment), this);
-    gtk_widget_show (m_treeview_item_comment1);
-
-    m_button_select_one = gtk_button_new_with_mnemonic (_(">"));
-    gtk_widget_show (m_button_select_one);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_select_one, 350-15, 137);//70+30+20+30-5);
-    gtk_widget_set_size_request (m_button_select_one, 80+30, 30);
-    g_signal_connect(m_button_select_one, "clicked", G_CALLBACK(HandleButtonSelectOneCommentClicked), this);
-
-    m_button_select_all = gtk_button_new_with_mnemonic (_(">>"));
-    gtk_widget_show (m_button_select_all);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_select_all, 350-15, 194);//140+20+100-30);
-    gtk_widget_set_size_request (m_button_select_all, 80+30, 30);
-    g_signal_connect(m_button_select_all, "clicked", G_CALLBACK(HandleButtonSelectAllCommentClicked), this);
-
-    m_button_comment_add = gtk_button_new_with_mnemonic (_("Add"));
-    gtk_widget_show (m_button_comment_add);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_comment_add, 350-15, 251);//130-50+40+200+220+112+50+10, 70+58+58+58+5);//130);
-    gtk_widget_set_size_request (m_button_comment_add, 80+30, 30);
-    g_signal_connect(m_button_comment_add, "clicked", G_CALLBACK(HandleButtonAddClicked), this);
-
-    m_button_comment_delete_select = gtk_button_new_with_mnemonic (_("Delete"));
-    gtk_widget_show (m_button_comment_delete_select);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_comment_delete_select, 350-15, 308);//260+110+40-25-20, 158-63+38+38+38+20+20);//130-50+40+200+220+112+50+10, 70+58+58+58+5);//130);
-    gtk_widget_set_size_request (m_button_comment_delete_select, 80+30, 30);
-    g_signal_connect(m_button_comment_delete_select, "clicked", G_CALLBACK(HandleButtonDeleteSelectClicked), this);
-
-    m_button_comment_up = gtk_button_new_with_mnemonic (_("Up"));
-    gtk_widget_show (m_button_comment_up);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_comment_up, 730-15, 137);//180);
-    gtk_widget_set_size_request (m_button_comment_up, 80+30, 30);
-    g_signal_connect(m_button_comment_up, "clicked", G_CALLBACK(HandleButtonUpClicked), this);
-
-    m_button_comment_down = gtk_button_new_with_mnemonic (_("Down"));
-    gtk_widget_show (m_button_comment_down);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_comment_down, 730-15, 194);//230);
-    gtk_widget_set_size_request (m_button_comment_down, 80+30, 30);
-    g_signal_connect(m_button_comment_down, "clicked", G_CALLBACK(HandleButtonDownClicked), this);
-
-    m_button_comment_delete = gtk_button_new_with_mnemonic (_("Delete"));
-    gtk_widget_show (m_button_comment_delete);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_comment_delete, 730-15, 251);//260+110+40-25-20, 158-63+38+38+38+20+20);//180);
-    gtk_widget_set_size_request (m_button_comment_delete, 80+30, 30);
-    g_signal_connect(m_button_comment_delete, "clicked", G_CALLBACK(HandleButtonDeleteClicked), this);
-
-    m_button_comment_delete_all = gtk_button_new_with_mnemonic (_("All Delete"));
-    gtk_widget_show (m_button_comment_delete_all);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_button_comment_delete_all,  730-15, 308);//260+110+40-25-20, 158-63+38+38+38+38+20+20);//230);
-    gtk_widget_set_size_request (m_button_comment_delete_all, 80+30, 30);
-    g_signal_connect(m_button_comment_delete_all, "clicked", G_CALLBACK(HandleButtonDeleteAllClicked), this);
-
-    frame_comment_font = gtk_frame_new (NULL);
-    gtk_widget_show (frame_comment_font);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), frame_comment_font, 50, 30+330+10+30-10);
-    gtk_widget_set_size_request (frame_comment_font, 240, 70-20);
-    gtk_frame_set_label_align (GTK_FRAME (frame_comment_font), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_comment_font), GTK_SHADOW_IN);
-
-    hbox_comment_font = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_comment_font);
-    gtk_container_add (GTK_CONTAINER (frame_comment_font), hbox_comment_font);
-
-    m_radiobutton_font_big = gtk_radio_button_new_with_mnemonic (NULL, _("Big"));
-    gtk_widget_show (m_radiobutton_font_big);
-    gtk_box_pack_start (GTK_BOX (hbox_comment_font), m_radiobutton_font_big, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_font_big), radiobutton_font_group);
-    radiobutton_font_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_font_big));
-
-    m_radiobutton_font_mid = gtk_radio_button_new_with_mnemonic (NULL, _("Mid"));
-    gtk_widget_show (m_radiobutton_font_mid);
-    gtk_box_pack_start (GTK_BOX (hbox_comment_font), m_radiobutton_font_mid, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_font_mid), radiobutton_font_group);
-    radiobutton_font_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_font_mid));
-
-    m_radiobutton_font_small = gtk_radio_button_new_with_mnemonic (NULL, _("Small"));
-    gtk_widget_show (m_radiobutton_font_small);
-    gtk_box_pack_start (GTK_BOX (hbox_comment_font), m_radiobutton_font_small, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_font_small), radiobutton_font_group);
-    radiobutton_font_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_font_small));
-
-    label_comment_font = gtk_label_new (_("<b>Font Size</b>"));
-    gtk_widget_show (label_comment_font);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_comment_font), label_comment_font);
-    gtk_label_set_use_markup (GTK_LABEL (label_comment_font), TRUE);
-
-    frame_bodymark_size = gtk_frame_new (NULL);
-    gtk_widget_show (frame_bodymark_size);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), frame_bodymark_size, 50, 420+10+30-10);
-
-    gtk_widget_set_size_request (frame_bodymark_size, 240, 70-20);
-    gtk_frame_set_label_align (GTK_FRAME (frame_bodymark_size), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_bodymark_size), GTK_SHADOW_IN);
-
-    hbox_bodymark_size = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_bodymark_size);
-    gtk_container_add (GTK_CONTAINER (frame_bodymark_size), hbox_bodymark_size);
-
-    m_radiobutton_bodymark_big = gtk_radio_button_new_with_mnemonic (NULL, _("Big"));
-    gtk_widget_show (m_radiobutton_bodymark_big);
-    gtk_box_pack_start (GTK_BOX (hbox_bodymark_size), m_radiobutton_bodymark_big, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_bodymark_big), radiobutton_bodymark_group);
-    radiobutton_bodymark_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_bodymark_big));
-
-    m_radiobutton_bodymark_mid = gtk_radio_button_new_with_mnemonic (NULL, _("Mid"));
-    gtk_widget_show (m_radiobutton_bodymark_mid);
-    gtk_box_pack_start (GTK_BOX (hbox_bodymark_size), m_radiobutton_bodymark_mid, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_bodymark_mid), radiobutton_bodymark_group);
-    radiobutton_bodymark_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_bodymark_mid));
-
-    m_radiobutton_bodymark_small = gtk_radio_button_new_with_mnemonic (NULL, _("Small"));
-    gtk_widget_show (m_radiobutton_bodymark_small);
-    gtk_box_pack_start (GTK_BOX (hbox_bodymark_size), m_radiobutton_bodymark_small, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_bodymark_small), radiobutton_bodymark_group);
-    radiobutton_bodymark_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_bodymark_small));
-
-    label_bodymark_size = gtk_label_new (_("<b>Bodymark Size</b>"));
-    gtk_widget_show (label_bodymark_size);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_bodymark_size), label_bodymark_size);
-    gtk_label_set_use_markup (GTK_LABEL (label_bodymark_size), TRUE);
-
-    label_comment_color = gtk_label_new (_("Font Color: "));
-    gtk_widget_show (label_comment_color);
-    // gtk_fixed_put (GTK_FIXED (fixed_comment), label_comment_color, 300, 50);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), label_comment_color, 370, 50+330+10+30-10);
-
-    gtk_widget_set_size_request (label_comment_color, 130+40+20+20, 30);
-
-    m_combobox_comment_color = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_comment_color);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_comment_color, 430+12, 50);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_comment_color, 500+40+20+20, 50+330+10+30-10);
-    gtk_widget_set_size_request (m_combobox_comment_color, 130, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_comment_color), _("Red"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_comment_color), _("Green"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_comment_color), _("Blue"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_comment_color), _("White"));
-
-    label_bodymark_color = gtk_label_new (_("Probe Mark Color: "));
-    gtk_widget_show (label_bodymark_color);
-    // gtk_fixed_put (GTK_FIXED (fixed_comment), label_bodymark_color, 300, 160);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), label_bodymark_color, 370, 160+330-50+30-10);
-    gtk_widget_set_size_request (label_bodymark_color, 130+40+20+20, 30);
-
-    m_combobox_bodymark_color = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_bodymark_color);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_bodymark_color, 430+12, 160);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_bodymark_color, 500+40+20+20,100+330+10+30-10);
-    gtk_widget_set_size_request (m_combobox_bodymark_color, 130, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bodymark_color), _("White"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bodymark_color), _("Gray"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bodymark_color), _("Red"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bodymark_color), _("Green"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bodymark_color), _("Yellow"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_bodymark_color), _("Blue"));
-
-    button_comment_default = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_hide (button_comment_default);
-    //gtk_fixed_put (GTK_FIXED (fixed_comment), button_comment_default, 30, 450);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), button_comment_default, 50, 450+50);
-    gtk_widget_set_size_request (button_comment_default, 140+8, 40);
-    g_signal_connect ((gpointer) button_comment_default, "clicked", G_CALLBACK (on_button_comment_default_clicked), this);
-    return fixed_comment;
-}
 
 int ViewSystem::GetCommentProbeType() {
     return  gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_probe_comment));
@@ -8600,8 +8553,7 @@ void ViewSystem::ButtonSelectAllCommentClicked(GtkButton *button) {
     IniFile new_ini(path1);
     IniFile *new_ptrIni= &new_ini;
     int department_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department_comment));
-    char department_name[256];
-    DepartmentName(department_name, department_index);
+    string department_name = DepartmentName(department_index);
     int number;
     number = new_ptrIni->ReadInt(department_name, "Number");
 
@@ -8720,14 +8672,11 @@ void ViewSystem::ButtonDownClicked(GtkButton *button) {
         gtk_tree_path_next(path);
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE);
         //在词条下移时，更新滚动条
-        /*    gdouble value = gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
-            gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)), value+18);
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
-         */
+
         if(item_length-path_num >2)
             gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE, 1.0, 1.0);//移动后的选中词条置底
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));//保证在最下端的词条移动后能够正常显示
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_scrolledwindow_item_comment1)));//保证在最下端的词条移动后能够正常显示
         gtk_tree_path_free (path);
     }
 }
@@ -8807,14 +8756,11 @@ void ViewSystem::ButtonUpClicked(GtkButton *button) {
     if(gtk_tree_path_prev(path)) {
         gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE);
         //在词条上移时，更新滚动条
-        /*gdouble value = gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
-          gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)), value-18);
-          gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
-         */
+
         if(item_length-path_num >12)
             gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE, 0.0, 1.0);// 移动后选中词条置顶
         else
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));//保证在最上端的词条移动时能够正确显示
+            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_scrolledwindow_item_comment1)));//保证在最上端的词条移动时能够正确显示
     }
     gtk_tree_path_free (path);
 }
@@ -9099,7 +9045,7 @@ void ViewSystem::ButtonDeleteClicked(GtkButton *button) {
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_comment1), new_model1);
 //设置光标，更新滚动条的值
     gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, TRUE);
-    gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment1)));
+    gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_scrolledwindow_item_comment1)));
     //gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment1), path, NULL, FALSE, 1.0, 1.0);
     gtk_tree_path_free (path);
 }
@@ -9122,8 +9068,7 @@ void ViewSystem::ButtonDeleteSelectClicked(GtkButton *button) {
     char* select_name;
     gtk_tree_model_get(model, &iter, 0, &select_name, -1);
     int  department_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department_comment));
-    char department[256];
-    DepartmentName(department, department_index);
+    string department = DepartmentName(department_index);
     char path2[256];
     sprintf(path2, "%s%s", CFG_RES_PATH, DEFAULT_NOTE_FILE);
     IniFile ini(path2);
@@ -9182,7 +9127,7 @@ void ViewSystem::ButtonDeleteSelectClicked(GtkButton *button) {
     gtk_tree_view_set_model(GTK_TREE_VIEW(m_treeview_item_comment), new_model1);
 //设置光标，更新滚动条的值
     gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_treeview_item_comment), path, NULL, TRUE);
-    gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment)));
+    gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(m_scrolledwindow_item_comment)));
     //   gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment), path, NULL, FALSE, 1.0, 1.0);
 
     gtk_tree_path_free (path);
@@ -9203,8 +9148,7 @@ void ViewSystem::ButtonAddClicked(GtkButton *button) {
     IniFile *ptrIni= &new_ini;
     int number;
     int department_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_department_comment));
-    char department[256];
-    DepartmentName(department, department_index);
+    string department = DepartmentName(department_index);
     number = ptrIni->ReadInt(department, "Number");
     vector<ExamPara> vecItemComment;
     vecItemComment.clear();
@@ -9304,10 +9248,6 @@ void ViewSystem::ButtonAddClicked(GtkButton *button) {
                                          TRUE);
 
         //更新滚动条
-        /*  gdouble value = gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment)));
-            gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment)), value+21);
-            gtk_adjustment_value_changed(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow_item_comment)));
-         */
         gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(m_treeview_item_comment), path, NULL, FALSE, 1.0, 1.0);
         gtk_tree_path_free (path);
     }
@@ -9378,8 +9318,7 @@ void ViewSystem::CellRendererRenameSelectComment(GtkCellRendererText *m_cellrend
     if(department_index ==-1)
         return;
 
-    char department[256];
-    DepartmentName(department, department_index);
+    string department = DepartmentName(department_index);
     char path2[256];
     sprintf(path2, "%s%s", CFG_RES_PATH, DEFAULT_NOTE_FILE);
     IniFile ini(path2);
@@ -9571,72 +9510,7 @@ void ViewSystem::CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_c
 
 }
 
-void ViewSystem::init_comment_setting(SysNoteSetting* sysNoteSetting) {
-    if (sysNoteSetting == NULL) {
-        sysNoteSetting = new SysNoteSetting;
-    }
 
-    int index_font_size = sysNoteSetting->GetFontSize();
-    switch (index_font_size) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_font_big), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_font_mid), TRUE);
-        break;
-    case 2:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_font_small), TRUE);
-        break;
-    }
-    int index_bdmk_size = sysNoteSetting->GetBodyMarkSize();
-    switch (index_bdmk_size) {
-    case 2:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_big), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_mid), TRUE);
-        break;
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_small), TRUE);
-        break;
-    }
-
-    int index_font_color = sysNoteSetting->GetFontColor();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_comment_color), index_font_color);
-
-    int index_bdmk_color = sysNoteSetting->GetBodyMarkColor();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_bodymark_color), index_bdmk_color);
-
-    delete sysNoteSetting;
-}
-
-void ViewSystem::save_comment_setting() {
-    SysNoteSetting sysNoteSetting;
-    unsigned char fontSizeIndex = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_big)))
-        fontSizeIndex = 0;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_mid)))
-        fontSizeIndex = 1;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_font_small)))
-        fontSizeIndex = 2;
-    sysNoteSetting.SetFontSize(fontSizeIndex);
-
-    unsigned char bdmkSizeIndex = 0;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_big)))
-        bdmkSizeIndex = 2;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_mid)))
-        bdmkSizeIndex = 1;
-    else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_bodymark_small)))
-        bdmkSizeIndex = 0;
-    sysNoteSetting.SetBodyMarkSize(bdmkSizeIndex);
-
-    unsigned char fontColorIndex  = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_comment_color));
-    sysNoteSetting.SetFontColor(fontColorIndex);
-
-    unsigned char bdmkColorIndex  = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_bodymark_color));
-    sysNoteSetting.SetBodyMarkColor(bdmkColorIndex);
-    sysNoteSetting.SyncFile();
-}
 
 
 
@@ -10048,10 +9922,10 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     gtk_fixed_put (GTK_FIXED (fixed_comment), label_exam_comment, 330-5-17, 10+10+5);
     gtk_widget_set_size_request (label_exam_comment, 100+17, 30);
 
-    m_combobox_exam_comment = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_exam_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_exam_comment, 415, 10+10+5);
-    gtk_widget_set_size_request (m_combobox_exam_comment, 120, 30);
+    m_combobox_exam_comment = GTK_COMBO_BOX_TEXT(gtk_combo_box_new_text ());
+    gtk_widget_show (GTK_WIDGET(m_combobox_exam_comment));
+    gtk_fixed_put (GTK_FIXED (fixed_comment), GTK_WIDGET(m_combobox_exam_comment), 415, 10+10+5);
+    gtk_widget_set_size_request (GTK_WIDGET(m_combobox_exam_comment), 120, 30);
     for (int i = 0; i < exam_size; i++) {
         gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_exam_comment), _(vecExamItem_comment[i].c_str()));
     }
@@ -10076,10 +9950,10 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     g_signal_connect(m_combobox_exam_comment, "changed", G_CALLBACK(HandleExamCommentChanged), this);
 
     int department_index = DepartmentIndex();
-    m_combobox_department_comment = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_department_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), m_combobox_department_comment, 190, 10+20+50-10);//300+310+150+10-100+30, 10+10+5);
-    gtk_widget_set_size_request (m_combobox_department_comment, 120, 30);
+    m_combobox_department_comment = GTK_COMBO_BOX_TEXT(gtk_combo_box_new_text ());
+    gtk_widget_show (GTK_WIDGET(m_combobox_department_comment));
+    gtk_fixed_put (GTK_FIXED (fixed_comment), GTK_WIDGET(m_combobox_department_comment), 190, 10+20+50-10);//300+310+150+10-100+30, 10+10+5);
+    gtk_widget_set_size_request (GTK_WIDGET(m_combobox_department_comment), 120, 30);
 
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Abdomen"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_department_comment), _("Urology"));
@@ -10097,19 +9971,19 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_department_comment), department_index);
     g_signal_connect(m_combobox_department_comment, "changed", G_CALLBACK(HandleDepartmentCommentChanged), this);
 
-    scrolledwindow_item_comment = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_item_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), scrolledwindow_item_comment, 90, 10+20+50-5+40-5);
-    gtk_widget_set_size_request (scrolledwindow_item_comment, 120+100, 200+63+20-40+10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_item_comment), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    m_scrolledwindow_item_comment = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new (NULL, NULL));
+    gtk_widget_show (GTK_WIDGET(m_scrolledwindow_item_comment));
+    gtk_fixed_put (GTK_FIXED (fixed_comment), GTK_WIDGET(m_scrolledwindow_item_comment), 90, 10+20+50-5+40-5);
+    gtk_widget_set_size_request (GTK_WIDGET(m_scrolledwindow_item_comment), 120+100, 200+63+20-40+10);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (m_scrolledwindow_item_comment), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
     GtkTreeModel *model = create_item_comment_model(0);
-    m_treeview_item_comment = gtk_tree_view_new_with_model(model);
+    m_treeview_item_comment = GTK_TREE_VIEW(gtk_tree_view_new_with_model(model));
     add_columns_comment(GTK_TREE_VIEW(m_treeview_item_comment));
 
-    gtk_widget_modify_base(m_treeview_item_comment, GTK_STATE_NORMAL, g_deep);
+    gtk_widget_modify_base(GTK_WIDGET(m_treeview_item_comment), GTK_STATE_NORMAL, g_deep);
 
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_item_comment), m_treeview_item_comment);
+    gtk_container_add (GTK_CONTAINER (m_scrolledwindow_item_comment), GTK_WIDGET(m_treeview_item_comment));
 
     GtkTreeSelection *select;
     select = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_comment));
@@ -10119,22 +9993,22 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     g_signal_connect(m_cellrenderer_comment_text, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text, "edited", G_CALLBACK(HandleCellRendererRenameSelectComment), this);
 
-    gtk_widget_show (m_treeview_item_comment);
+    gtk_widget_show (GTK_WIDGET(m_treeview_item_comment));
 
     //select note item
-    scrolledwindow_item_comment1 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_item_comment1);
-    gtk_fixed_put (GTK_FIXED (fixed_comment), scrolledwindow_item_comment1, 470, 10+20+50-5+40-5);//-3-2);
-    gtk_widget_set_size_request (scrolledwindow_item_comment1, 120+100, 200+63+20-40+10);//+5+3+2);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_item_comment1), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    m_scrolledwindow_item_comment1 = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new (NULL, NULL));
+    gtk_widget_show (GTK_WIDGET(m_scrolledwindow_item_comment1));
+    gtk_fixed_put (GTK_FIXED (fixed_comment), GTK_WIDGET(m_scrolledwindow_item_comment1), 470, 10+20+50-5+40-5);//-3-2);
+    gtk_widget_set_size_request (GTK_WIDGET(m_scrolledwindow_item_comment1), 120+100, 200+63+20-40+10);//+5+3+2);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (m_scrolledwindow_item_comment1), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
     GtkTreeModel *model1 = create_item_comment_model1();
-    m_treeview_item_comment1 = gtk_tree_view_new_with_model(model1);
+    m_treeview_item_comment1 = GTK_TREE_VIEW(gtk_tree_view_new_with_model(model1));
     add_columns_comment1(GTK_TREE_VIEW(m_treeview_item_comment1));
 
-    gtk_widget_modify_base(m_treeview_item_comment1, GTK_STATE_NORMAL, g_deep);
+    gtk_widget_modify_base(GTK_WIDGET(m_treeview_item_comment1), GTK_STATE_NORMAL, g_deep);
 
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_item_comment1), m_treeview_item_comment1);
+    gtk_container_add (GTK_CONTAINER (m_scrolledwindow_item_comment1), GTK_WIDGET(m_treeview_item_comment1));
 
     GtkTreeSelection *select1;
     select1 = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_item_comment1));
@@ -10144,7 +10018,7 @@ void  ViewSystem::create_exam_comment_model(vector<ExamItem::EItem> indexVec) {
     g_signal_connect(m_cellrenderer_comment_text1, "editing_started", G_CALLBACK(signal_renderer_insert_user_item), this);
     g_signal_connect(m_cellrenderer_comment_text1, "edited", G_CALLBACK(HandleCellRendererRenameComment), this);
 
-    gtk_widget_show (m_treeview_item_comment1);
+    gtk_widget_show (GTK_WIDGET(m_treeview_item_comment1));
 
 }
 
