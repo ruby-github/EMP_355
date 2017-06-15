@@ -1,5 +1,6 @@
 #include "sysMan/ViewSystem.h"
 
+#include <cmath>
 #include <errno.h>
 #include <sys/wait.h>
 
@@ -26,7 +27,12 @@
 #include "patient/VideoMan.h"
 #include "patient/ViewNewPat.h"
 #include "periDevice/DCMRegister.h"
+#include "periDevice/PeripheralMan.h"
+#include "periDevice/Printer.h"
 #include "sysMan/CalcSetting.h"
+#include "sysMan/DicomLocalSetting.h"
+#include "sysMan/DicomServerSetting.h"
+#include "sysMan/DicomServiceSetting.h"
 #include "sysMan/MeasureSetting.h"
 #include "sysMan/ScreenSaver.h"
 #include "sysMan/SysCalculateSetting.h"
@@ -34,8 +40,12 @@
 #include "sysMan/SysMeasurementSetting.h"
 #include "sysMan/SysNoteSetting.h"
 #include "sysMan/SysOptions.h"
+#include "sysMan/SysUserDefinedKey.h"
+#include "sysMan/UpgradeMan.h"
 #include "sysMan/UserSelect.h"
 #include "ViewMain.h"
+
+#include <EmpAuthorization.h>
 
 #include "display/gui_func.h"
 
@@ -866,8 +876,7 @@ void ViewSystem::CreateWindow() {
   init_comment_setting(NULL);
 
   // Peripheral
-  m_box_peripheral = Utils::create_hbox(); // create_note_tvout();
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(m_box_peripheral), GTK_WIDGET(Utils::create_label(_("Peripheral"))));
+  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_tvout()), GTK_WIDGET(Utils::create_label(_("Peripheral"))));
 
   // Custom Report
   gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_set_report()), GTK_WIDGET(Utils::create_label(_("Custom Report"))));
@@ -890,6 +899,9 @@ void ViewSystem::CreateWindow() {
 
   gtk_widget_show_all(GTK_WIDGET(m_dialog));
   g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  init_tvout_setting(NULL);
+  init_report_setting();
 
   g_keyInterface.Push(this);
   SetSystemCursorToCenter();
@@ -1155,7 +1167,7 @@ void ViewSystem::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, g
     GtkTreeIter iter;
     GtkTreeModel* model = NULL;
 
-    GtkTreeSelection* selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection* selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
 
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) == TRUE) {
       GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
@@ -1175,10 +1187,6 @@ void ViewSystem::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, g
     gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
     gtk_widget_set_sensitive(GTK_WIDGET(m_button_save), FALSE);
   } else if(page_num == m_flag_notebook_tvout) {
-    create_note_tvout();
-    init_tvout_setting(NULL);
-    CreatePrinter();
-    init_printer(NULL);
     gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), TRUE);
     gtk_widget_set_sensitive(GTK_WIDGET(m_button_save), TRUE);
     gtk_widget_set_sensitive(GTK_WIDGET(m_button_exit), TRUE);
@@ -3922,6 +3930,526 @@ void ViewSystem::save_comment_setting() {
   sysNoteSetting.SyncFile();
 }
 
+GtkWidget* ViewSystem::create_note_tvout() {
+  GtkTable* table = Utils::create_table(12, 6);
+
+  // Video Standard
+  GtkLabel* label_video = Utils::create_label(_("Video Standard:"));
+  m_combobox_video = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_video), 0, 1, 0, 1);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_video), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_video, _("NTSC"));
+  gtk_combo_box_text_append_text(m_combobox_video, _("PAL"));
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), 0);
+  g_signal_connect(m_combobox_video, "changed", G_CALLBACK(signal_combobox_changed_video), this);
+
+  // TV Out Format
+  GtkFrame* frame_tvout = Utils::create_frame();
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_tvout), 0, 6, 1, 6);
+
+  SysGeneralSetting sg;
+
+  if (sg.GetConnectorType()) {
+    gtk_frame_set_label(frame_tvout, _("TV Out Format (Restart to complete changes)"));
+  } else {
+    gtk_frame_set_label(frame_tvout, _("TV Out Format"));
+  }
+
+  GtkTable* table_tvout = Utils::create_table(1, 3);
+  gtk_container_set_border_width(GTK_CONTAINER(table_tvout), 5);
+  gtk_container_add(GTK_CONTAINER(frame_tvout), GTK_WIDGET(table_tvout));
+
+  m_radiobutton_format_1 = Utils::create_radio_button(NULL, _("Full Screen"));
+  GSList* radiobutton_format_group = gtk_radio_button_get_group(m_radiobutton_format_1);
+  m_radiobutton_format_2 = Utils::create_radio_button(radiobutton_format_group, _("Hide Menu Area"));
+  radiobutton_format_group = gtk_radio_button_get_group(m_radiobutton_format_2);
+  m_radiobutton_format_3 = Utils::create_radio_button(radiobutton_format_group, _("Image Area Only"));
+
+  gtk_table_attach_defaults(table_tvout, GTK_WIDGET(m_radiobutton_format_1), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table_tvout, GTK_WIDGET(m_radiobutton_format_2), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table_tvout, GTK_WIDGET(m_radiobutton_format_3), 2, 3, 0, 1);
+
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_format_1), Utils::create_image("./res/btn_format/tv-out-1.png"), GTK_POS_TOP);
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_format_2), Utils::create_image("./res/btn_format/tv-out-2.png"), GTK_POS_TOP);
+  Utils::set_button_image(GTK_BUTTON(m_radiobutton_format_3), Utils::create_image("./res/btn_format/tv-out-3.png"), GTK_POS_TOP);
+
+  // Printer
+  GtkFrame* frame_printer = Utils::create_frame(_("Printer"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_printer), 0, 6, 6, 11);
+
+  GtkTable* table_printer = Utils::create_table(4, 6);
+  gtk_container_set_border_width(GTK_CONTAINER(table_printer), 5);
+  gtk_container_add(GTK_CONTAINER(frame_printer), GTK_WIDGET(table_printer));
+
+  m_scrolledwindow_common = Utils::create_scrolled_window();
+  m_scrolledwindow_specific = Utils::create_scrolled_window();
+
+  gtk_table_attach_defaults(table_printer, GTK_WIDGET(m_scrolledwindow_common), 0, 4, 0, 4);
+  gtk_table_attach_defaults(table_printer, GTK_WIDGET(m_scrolledwindow_specific), 0, 4, 0, 4);
+
+  m_treeview_common_print = create_common_print_treeview();
+  gtk_container_add(GTK_CONTAINER(m_scrolledwindow_common), GTK_WIDGET(m_treeview_common_print));
+  m_selected_common_printer = gtk_tree_view_get_selection(m_treeview_common_print);
+
+  m_treeview_specific_print = create_specific_print_treeview();
+  gtk_container_add(GTK_CONTAINER(m_scrolledwindow_specific), GTK_WIDGET(m_treeview_specific_print));
+  m_selected_specific_printer = gtk_tree_view_get_selection(m_treeview_specific_print);
+
+  g_signal_connect(m_selected_common_printer, "changed", G_CALLBACK(on_common_treeview_selection_changed), this);
+  g_signal_connect(m_selected_specific_printer, "changed", G_CALLBACK(on_specific_treeview_selection_changed), this);
+
+  m_radiobutton_common = Utils::create_radio_button(NULL, _("Common"));
+  GSList* radiobutton_printer_group = gtk_radio_button_get_group(m_radiobutton_common);
+  m_radiobutton_specific = Utils::create_radio_button(radiobutton_printer_group, _("Specific"));
+
+  gtk_table_attach_defaults(table_printer, GTK_WIDGET(m_radiobutton_common), 4, 6, 0, 1);
+  gtk_table_attach_defaults(table_printer, GTK_WIDGET(m_radiobutton_specific), 4, 6, 1, 2);
+
+  g_signal_connect(m_radiobutton_common, "toggled", G_CALLBACK(signal_radio_button_toggled_common), this);
+  g_signal_connect(m_radiobutton_specific, "toggled", G_CALLBACK(signal_radio_button_toggled_specific), this);
+
+  GtkButton* button_add_printer = Utils::create_button(_("Add"));
+  GtkButton* button_del_printer = Utils::create_button(_("Delete"));
+
+  gtk_table_attach(table_printer, GTK_WIDGET(button_add_printer), 4, 5, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_printer, GTK_WIDGET(button_del_printer), 4, 5, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_add_printer, "clicked", G_CALLBACK(signal_button_clicked_add_printer), this);
+  g_signal_connect(button_del_printer, "clicked", G_CALLBACK(signal_button_clicked_del_printer), this);
+
+  // Default Factory
+  GtkButton* button_default = Utils::create_button(_("Default Factory"));
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 11, 12, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_tvout_default), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_tvout_setting(SysGeneralSetting* sysGeneralSetting) {
+  if (sysGeneralSetting == NULL) {
+    sysGeneralSetting = new SysGeneralSetting();
+  }
+
+  int index_video_mode = sysGeneralSetting->GetVideoMode();
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), index_video_mode);
+
+  int tvout_format = sysGeneralSetting->GetVideoFormat();
+
+  switch (tvout_format) {
+  case 0:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_1), TRUE);
+    break;
+  case 1:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_2), TRUE);
+    break;
+  case 2:
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_3), TRUE);
+    break;
+  }
+
+  if (sysGeneralSetting->GetPrinterMethod() == 0) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_common), TRUE);
+
+    gtk_widget_show_all(GTK_WIDGET(m_scrolledwindow_common));
+    gtk_widget_hide_all(GTK_WIDGET(m_scrolledwindow_specific));
+
+    int index_printer = sysGeneralSetting->GetPrinter();
+
+    stringstream ss;
+    ss << index_printer;
+
+    GtkTreePath* path = gtk_tree_path_new_from_string(ss.str().c_str());
+    gtk_tree_selection_select_path(gtk_tree_view_get_selection(m_treeview_common_print), path);
+  } else {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_specific), TRUE);
+
+    gtk_widget_hide_all(GTK_WIDGET(m_scrolledwindow_common));
+    gtk_widget_show_all(GTK_WIDGET(m_scrolledwindow_specific));
+  }
+
+  delete sysGeneralSetting;
+}
+
+void ViewSystem::save_tvout_setting() {
+  SysGeneralSetting sysGeneralSetting;
+
+  int tvout_format = 0;
+  string command;
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_1))) {
+    tvout_format = 0;
+    command = "--mode 1024x768 --pos 0x0";
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_2))) {
+    tvout_format = 1;
+    command = "--mode 848x660 --pos 180x0";
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_3))) {
+    tvout_format = 2;
+    command = "--mode 848x560 --pos 180x100";
+  }
+
+  int videoModeIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video));
+
+  if (sysGeneralSetting.GetVideoMode() != videoModeIndex || sysGeneralSetting.GetVideoFormat() != tvout_format) {
+    if (videoModeIndex) {
+      command = "xrandr --output TV1 --set mode NTSC-M " + command;
+    } else {
+      command = "xrandr --output TV1 --set mode PAL " + command;
+    }
+
+    if(!sysGeneralSetting.GetConnectorType()) {
+      _system_(command.c_str());
+    }
+
+    sysGeneralSetting.SetVideoMode(videoModeIndex);
+    sysGeneralSetting.SetVideoFormat(tvout_format);
+  }
+
+  // save printer
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_common))) {
+    int printIndex = common_printer_selection();
+
+    if (printIndex != -1) {
+      sysGeneralSetting.SetPrinterMethod(0);
+      sysGeneralSetting.SetPrinter(printIndex);
+    }
+  } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_specific))) {
+    string default_print = specific_printer_selection();
+
+    if (!default_print.empty()) {
+      Printer print;
+      sysGeneralSetting.SetPrinterMethod(1);
+      print.SetDefault(default_print.c_str());
+      PeripheralMan::GetInstance()->SwitchPrinterDriver();
+      UpdateSpecificPrinterModel();
+    }
+  }
+
+  sysGeneralSetting.SyncFile();
+}
+
+GtkWidget* ViewSystem::create_set_report() {
+  InitReportVar();
+
+  GtkTable* table = Utils::create_table(10, 7);
+
+  // scrolled_window
+  GtkScrolledWindow* scrolled_window = Utils::create_scrolled_window();
+  gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window), 0, 2, 0, 9);
+
+  m_treeviewReportSet = Utils::create_tree_view(CreateTreeModel());
+  gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_treeviewReportSet));
+
+  gtk_tree_view_set_enable_search(m_treeviewReportSet, FALSE);
+  gtk_tree_view_set_rules_hint(m_treeviewReportSet, TRUE);
+  gtk_tree_view_set_headers_visible(m_treeviewReportSet, FALSE);
+  gtk_tree_selection_set_mode(gtk_tree_view_get_selection(m_treeviewReportSet), GTK_SELECTION_SINGLE);
+
+  GtkTreePath* path = gtk_tree_path_new_first();
+  gtk_tree_view_set_cursor(m_treeviewReportSet, path, NULL, TRUE);
+  gtk_tree_path_free(path);
+
+  m_renderer = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* column = gtk_tree_view_column_new_with_attributes("", m_renderer, "text", 0, NULL);
+  gtk_tree_view_append_column(m_treeviewReportSet, column);
+
+  g_signal_connect(G_OBJECT(gtk_tree_view_get_selection(m_treeviewReportSet)), "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
+  gtk_widget_add_events(GTK_WIDGET(m_treeviewReportSet), (gtk_widget_get_events(GTK_WIDGET(m_treeviewReportSet)) | GDK_BUTTON_RELEASE_MASK));
+  g_signal_connect_after(m_treeviewReportSet, "button_release_event", G_CALLBACK(signal_treeview_button_release_exam_department), this);
+
+  // button
+  m_button_report_recovery = Utils::create_button(_("Recovery"));
+  m_button_report_add = Utils::create_button(_("Insert"));
+
+  m_label_templet = Utils::create_label(_("Please Input New Name:"));
+  m_entry_templet = Utils::create_entry(9679);
+
+  m_label_childsection = Utils::create_label(_("Please Select Exam Type:"));
+  m_combobox_childsection = Utils::create_combobox_text();
+
+  m_button_report_save = Utils::create_button(_("Save"));
+  m_button_report_delete = Utils::create_button(_("Delete"));
+
+  m_button_report_ok = Utils::create_button(_("OK"));
+  m_button_report_cancel = Utils::create_button(_("Cancel"));
+
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_recovery), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_add), 1, 2, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_templet), 1, 3, 9, 10);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_templet), 3, 5, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_childsection), 1, 3, 9, 10);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_childsection), 3, 5, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_save), 5, 6, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_delete), 6, 7, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_ok), 5, 6, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_cancel), 6, 7, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_templet, 46);
+
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Abdomen"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Cardiac"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Urology"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Obstetrics"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Gynecology"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Small Part"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Fetal Cardio"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Vascular"));
+  gtk_combo_box_text_append_text(m_combobox_childsection, _("Others"));
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_childsection), 0);
+
+  g_signal_connect(m_button_report_recovery, "clicked", G_CALLBACK(signal_button_clicked_report_recovery), this);
+  g_signal_connect(m_button_report_add, "clicked", G_CALLBACK(signal_button_clicked_report_add), this);
+  g_signal_connect(m_button_report_save, "clicked", G_CALLBACK(signal_button_clicked_report_save), this);
+  g_signal_connect(m_button_report_delete, "clicked", G_CALLBACK(signal_button_clicked_report_delete), this);
+  g_signal_connect(m_button_report_ok, "clicked", G_CALLBACK (signal_button_clicked_report_ok), this);
+  g_signal_connect(m_button_report_cancel, "clicked", G_CALLBACK (signal_button_clicked_report_cancel), this);
+  g_signal_connect(G_OBJECT(m_entry_templet), "insert_text", G_CALLBACK(signal_entry_insert_templet), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_report_setting() {
+  gtk_widget_hide(GTK_WIDGET(m_label_templet));
+  gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+
+  gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+  gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+
+  gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+  gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
+  gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+  gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
+}
+
+GtkWidget* ViewSystem::create_note_dicom() {
+    GtkWidget *fixed_dicom;
+    GtkWidget *fixed_local;
+    GtkWidget *label_local;
+
+    GtkWidget *fixed_server;
+    GtkWidget *label_server;
+
+    GtkWidget *fixed_service;
+    GtkWidget *label_service;
+
+    fixed_dicom = gtk_fixed_new ();
+    gtk_widget_show (fixed_dicom);
+
+    m_dicom_notebook = gtk_notebook_new ();
+    gtk_fixed_put (GTK_FIXED (fixed_dicom), m_dicom_notebook, 40, 20);
+    gtk_widget_set_size_request (m_dicom_notebook, 850, 470);
+    // gtk_widget_set_size_request (m_notebook, w - 40, 540);
+    gtk_notebook_set_tab_pos(GTK_NOTEBOOK (m_dicom_notebook),GTK_POS_LEFT);
+    gtk_widget_show (m_dicom_notebook);
+
+    int dicom_notebook_page = 0;
+
+    // create note local
+    // fixed_local = Create_note_local();
+    fixed_local = DicomLocalSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
+    gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_local);
+    DicomLocalSetting::GetInstance()->InitLocalSetting();
+
+    label_local = gtk_label_new (_("Local"));
+    gtk_widget_show (label_local);
+    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_local);
+
+    // create note server
+    fixed_server = DicomServerSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
+    gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_server);
+    // DicomServerSetting::GetInstance()-> InitServerSetting();
+
+    label_server = gtk_label_new (_("Server"));
+    gtk_widget_show (label_server);
+    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_server);
+
+    //create note service
+    fixed_service = DicomServiceSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
+    gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_service);
+    // DicomServiceSetting::GetInstance()->InitServiceSetting();
+
+    label_service = gtk_label_new (_("Service"));
+    gtk_widget_show (label_service);
+    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_service);
+
+    g_signal_connect(G_OBJECT(m_dicom_notebook), "switch-page", G_CALLBACK(on_dicom_notebook_switch_page), this);
+
+    return fixed_dicom;
+}
+
+GtkWidget* ViewSystem::create_note_key_config() {
+  GtkTable* table = Utils::create_table(10, 6);
+
+  // P1
+  GtkFrame* frame_key_p1 = Utils::create_frame(_("P1"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_key_p1), 0, 6, 0, 3);
+
+  GtkTable* table_key_p1 = Utils::create_table(ceil(MAX_KEY / 5.0), 5);
+  gtk_container_set_border_width(GTK_CONTAINER(table_key_p1), 5);
+  gtk_container_add(GTK_CONTAINER(frame_key_p1), GTK_WIDGET(table_key_p1));
+
+  GSList* radiobutton_key_p1_group = NULL;
+
+  for (int i= 0; i < MAX_KEY; i++) {
+    if (KeyFunctionList[i] == "Print Screen") {
+      m_radiobutton_key_p1[i] = Utils::create_radio_button(radiobutton_key_p1_group, _("Print"));
+    } else {
+      m_radiobutton_key_p1[i] = Utils::create_radio_button(radiobutton_key_p1_group, KeyFunctionList[i].c_str());
+    }
+
+    int raw = i / 5;
+    int col = i % 5;
+
+    radiobutton_key_p1_group = gtk_radio_button_get_group(m_radiobutton_key_p1[i]);
+    gtk_table_attach_defaults(table_key_p1, GTK_WIDGET(m_radiobutton_key_p1[i]), col, col + 1, raw, raw + 1);
+  }
+
+  // P2
+  GtkFrame* frame_key_p2 = Utils::create_frame(_("P2"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_key_p2), 0, 6, 3, 6);
+
+  GtkTable* table_key_p2 = Utils::create_table(ceil(MAX_KEY / 5.0), 5);
+  gtk_container_set_border_width(GTK_CONTAINER(table_key_p2), 5);
+  gtk_container_add(GTK_CONTAINER(frame_key_p2), GTK_WIDGET(table_key_p2));
+
+  GSList* radiobutton_key_p2_group = NULL;
+
+  for (int i= 0; i < MAX_KEY; i++) {
+    if (KeyFunctionList[i] == "Print Screen") {
+      m_radiobutton_key_p2[i] = Utils::create_radio_button(radiobutton_key_p2_group, _("Print"));
+    } else {
+      m_radiobutton_key_p2[i] = Utils::create_radio_button(radiobutton_key_p2_group, KeyFunctionList[i].c_str());
+    }
+
+    int raw = i / 5;
+    int col = i % 5;
+
+    radiobutton_key_p2_group = gtk_radio_button_get_group(m_radiobutton_key_p2[i]);
+    gtk_table_attach_defaults(table_key_p2, GTK_WIDGET(m_radiobutton_key_p2[i]), col, col + 1, raw, raw + 1);
+  }
+
+  // P3
+  GtkFrame* frame_key_p3 = Utils::create_frame(_("P3"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_key_p3), 0, 6, 6, 9);
+
+  GtkTable* table_key_p3 = Utils::create_table(ceil(MAX_KEY / 5.0), 5);
+  gtk_container_set_border_width(GTK_CONTAINER(table_key_p3), 5);
+  gtk_container_add(GTK_CONTAINER(frame_key_p3), GTK_WIDGET(table_key_p3));
+
+  GSList* radiobutton_key_p3_group = NULL;
+
+  for (int i= 0; i < MAX_KEY; i++) {
+    if (KeyFunctionList[i] == "Print Screen") {
+      m_radiobutton_key_p3[i] = Utils::create_radio_button(radiobutton_key_p3_group, _("Print"));
+    } else {
+      m_radiobutton_key_p3[i] = Utils::create_radio_button(radiobutton_key_p3_group, KeyFunctionList[i].c_str());
+    }
+
+    int raw = i / 5;
+    int col = i % 5;
+
+    radiobutton_key_p3_group = gtk_radio_button_get_group(m_radiobutton_key_p3[i]);
+    gtk_table_attach_defaults(table_key_p3, GTK_WIDGET(m_radiobutton_key_p3[i]), col, col + 1, raw, raw + 1);
+  }
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_key_config() {
+  SysUserDefinedKey sysDefine;
+  m_p1_func_index = sysDefine.GetFuncP1();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[m_p1_func_index]), TRUE);
+
+  m_p2_func_index = sysDefine.GetFuncP2();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p2[m_p2_func_index]), TRUE);
+
+  m_p3_func_index = sysDefine.GetFuncP3();
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[m_p3_func_index]), TRUE);
+}
+
+void ViewSystem::save_key_config() {
+  SysUserDefinedKey sysDefine;
+
+  for(int i = 0; i < MAX_KEY; i++) {
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[i]))) {
+      m_p1_func_index = i;
+    }
+
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p2[i]))) {
+      m_p2_func_index = i;
+    }
+
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[i]))) {
+      m_p3_func_index = i;
+    }
+  }
+
+  sysDefine.SetFuncP1(m_p1_func_index);
+  sysDefine.SetFuncP2(m_p2_func_index);
+  sysDefine.SetFuncP3(m_p3_func_index);
+  sysDefine.SyncFile();
+}
+
+GtkWidget* ViewSystem::create_note_info() {
+  GtkTable* table = Utils::create_table(10, 6);
+
+  // frame
+  GtkFrame* frame_version = Utils::create_frame(_("Software and FPGA Version"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame_version), 0, 4, 0, 4);
+
+  GtkScrolledWindow* scrolled_window = Utils::create_scrolled_window();
+  gtk_container_add(GTK_CONTAINER(frame_version), GTK_WIDGET(scrolled_window));
+
+  m_textview_version = Utils::create_text_view();
+  gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_textview_version));
+  gtk_text_view_set_editable(m_textview_version, FALSE);
+
+  // button
+  GtkButton* button_upgrade = Utils::create_button(_("Upgrade"));
+  gtk_table_attach(table, GTK_WIDGET(button_upgrade), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_upgrade, "clicked", G_CALLBACK (signal_button_clicked_upgrade), this);
+
+  return GTK_WIDGET(table);
+}
+
+void ViewSystem::init_info_setting() {
+  string machine = UpgradeMan::GetInstance()->GetMachineType();
+  string soft = UpgradeMan::GetInstance()->GetSoftVersion();
+  string fpga = UpgradeMan::GetInstance()->GetFpgaVersion();
+
+  stringstream ss;
+
+  string soft_version = _("Software version");
+  string fpga_version = _("FPGA version");
+
+  if (g_authorizationOn) {
+    int rest = CEmpAuthorization::GetRestTime();
+
+    if (rest == CEmpAuthorization::PERMANENTDAY) {
+      ss << soft_version << ": " << soft << "\n" <<
+        _("This is charging software, the period of validity is permanent.") << "\n\n" <<
+        fpga_version << ": " << fpga;
+    } else {
+      ss << soft_version << ": " << soft << "\n" <<
+        _("This is charging software, the period of validity is ") << rest << _("days.") << "\n\n" <<
+        fpga_version << ": " << fpga;
+    }
+  } else {
+    ss << soft_version << ": " << soft << "\n\n" <<
+      fpga_version << ": " << fpga;
+  }
+
+  gtk_text_buffer_set_text(gtk_text_view_get_buffer(m_textview_version), ss.str().c_str(), -1);
+}
+
+
 #include "periDevice/DCMMan.h"
 #include <string.h>
 #include <time.h>
@@ -3932,16 +4460,16 @@ void ViewSystem::save_comment_setting() {
 #include "probe/ExamItem.h"
 #include "Def.h"
 
-#include "sysMan/UpgradeMan.h"
+
 
 #include "display/gui_global.h"
-#include "periDevice/PeripheralMan.h"
+
 #include "periDevice/NetworkMan.h"
 
 
 #include "patient/PatientInfo.h"
 #include "sysMan/SysDicomSetting.h"
-#include "sysMan/SysUserDefinedKey.h"
+
 
 #include "imageControl/ImgPw.h"
 #include "imageControl/ImgCfm.h"
@@ -3949,7 +4477,7 @@ void ViewSystem::save_comment_setting() {
 #include "sysMan/UserDefineKey.h"
 #include "periDevice/ViewPrinterAdd.h"
 #include "probe/ProbeSelect.h"
-#include "periDevice/Printer.h"
+
 #include "measure/MeasureMan.h"
 
 #include "patient/FileMan.h"
@@ -3957,10 +4485,8 @@ void ViewSystem::save_comment_setting() {
 #include "patient/ViewUdiskDataSelect.h"
 #include "sysMan/ConfigToUSB.h"
 #include "sysMan/ConfigToHost.h"
-#include "sysMan/DicomLocalSetting.h"
-#include "sysMan/DicomServerSetting.h"
-#include "sysMan/DicomServiceSetting.h"
-#include <EmpAuthorization.h>
+
+
 
 #include "Init.h"
 
@@ -4408,34 +4934,34 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
     ostringstream stream;
 
     if(tree_depth == 1) {
-        gtk_widget_show(button_add);
-        gtk_widget_hide(button_save);
-        gtk_widget_hide(button_delete);
-        gtk_widget_hide(label_childsection);
-        gtk_widget_hide(m_combobox_childsection);
-        gtk_widget_hide(label_templet);
-        gtk_widget_hide(m_entry_templet);
-        gtk_widget_hide(button_ok);
-        gtk_widget_hide(button_cancel);
+        gtk_widget_show(GTK_WIDGET(m_button_report_add));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
+        gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_label_templet));
+        gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
         if(show_window)gtk_widget_hide_all (show_window);
         gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
     } else if(tree_depth == 2) {
         gtk_tree_model_get(model, &iter, 0, &temp, -1);
 
         if(NULL != strstr(temp, DEFAULT_FLAG.c_str()) || StrCmpTemplet1String(temp, NULL)) {
-            gtk_widget_hide(button_delete);
+            gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
         } else {
-            gtk_widget_show(button_delete);
+            gtk_widget_show(GTK_WIDGET(m_button_report_delete));
         }
 
-        gtk_widget_show(button_add);
-        gtk_widget_hide(button_save);
-        gtk_widget_hide(label_childsection);
-        gtk_widget_hide(m_combobox_childsection);
-        gtk_widget_hide(label_templet);
-        gtk_widget_hide(m_entry_templet);
-        gtk_widget_hide(button_ok);
-        gtk_widget_hide(button_cancel);
+        gtk_widget_show(GTK_WIDGET(m_button_report_add));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+        gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_label_templet));
+        gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
         if(show_window)gtk_widget_hide_all (show_window);
         gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), TRUE);
     } else if (tree_depth == 3) {
@@ -4549,19 +5075,19 @@ void ViewSystem::TreeSelectionChanged(GtkTreeSelection *selection) {
         }
 
         if(StrCmpTemplet1String(temp, NULL)) {
-            gtk_widget_hide(button_delete);
+            gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
         } else {
-            gtk_widget_show(button_delete);
+            gtk_widget_show(GTK_WIDGET(m_button_report_delete));
         }
 
-        gtk_widget_hide(button_add);
-        gtk_widget_show(button_save);
-        gtk_widget_hide(label_childsection);
-        gtk_widget_hide(m_combobox_childsection);
-        gtk_widget_hide(label_templet);
-        gtk_widget_hide(m_entry_templet);
-        gtk_widget_hide(button_ok);
-        gtk_widget_hide(button_cancel);
+        gtk_widget_hide(GTK_WIDGET(m_button_report_add));
+        gtk_widget_show(GTK_WIDGET(m_button_report_save));
+        gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_label_templet));
+        gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
         gtk_widget_set_sensitive(GTK_WIDGET(m_button_apply), FALSE);
     }
 }
@@ -5446,7 +5972,7 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
     GtkTreeIter iter;
     GtkTreeModel *model;
 
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE)return;
 
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -5537,15 +6063,15 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
     gtk_tree_store_append(GTK_TREE_STORE(model), &iter_new, &iter);
     gtk_tree_store_set(GTK_TREE_STORE(model), &iter_new, 0, new_string, -1);
     GtkTreePath *new_path = gtk_tree_model_get_path(model, &iter_new);
-    gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_TreeviewReportSet), new_path);
-    GtkTreeViewColumn *column_tree_view = gtk_tree_view_get_column(GTK_TREE_VIEW(m_TreeviewReportSet), 0);
-    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(m_TreeviewReportSet),  new_path, column_tree_view,  m_renderer,  TRUE);
+    gtk_tree_view_expand_to_path(m_treeviewReportSet, new_path);
+    GtkTreeViewColumn *column_tree_view = gtk_tree_view_get_column(m_treeviewReportSet, 0);
+    gtk_tree_view_set_cursor_on_cell(m_treeviewReportSet,  new_path, column_tree_view,  m_renderer,  TRUE);
     gtk_tree_path_free (new_path);
 
     {
         GtkTreeIter iter;
         GtkTreeModel *model;
-        GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+        GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
         if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE)return;
 
         GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -5553,61 +6079,60 @@ void ViewSystem::BtnOkClicked(GtkButton *button) {
         gtk_tree_path_free (path);
 
         if(tree_depth == 1) {
-            gtk_widget_show(button_add);
-            gtk_widget_hide(button_delete);
-            gtk_widget_hide(button_save);
+            gtk_widget_show(GTK_WIDGET(m_button_report_add));
+            gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
+            gtk_widget_hide(GTK_WIDGET(m_button_report_save));
         } else if(tree_depth == 2) {
-            gtk_widget_show(button_add);
-            gtk_widget_show(button_delete);
-            gtk_widget_hide(button_save);
+            gtk_widget_show(GTK_WIDGET(m_button_report_add));
+            gtk_widget_show(GTK_WIDGET(m_button_report_delete));
+            gtk_widget_hide(GTK_WIDGET(m_button_report_save));
         } else {
-            gtk_widget_hide(button_add);
-            gtk_widget_show(button_delete);
-            gtk_widget_show(button_save);
+            gtk_widget_hide(GTK_WIDGET(m_button_report_add));
+            gtk_widget_show(GTK_WIDGET(m_button_report_delete));
+            gtk_widget_show(GTK_WIDGET(m_button_report_save));
         }
     }
-    gtk_widget_hide(label_childsection);
-    gtk_widget_hide(m_combobox_childsection);
-    gtk_widget_hide(label_templet);
-    gtk_widget_hide(m_entry_templet);
-    gtk_widget_hide(button_ok);
-    gtk_widget_hide(button_cancel);
+    gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_label_templet));
+    gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
 }
 
 void ViewSystem::BtnCancelClicked(GtkButton *button) {
     GtkTreeIter iter;
     GtkTreeModel *model;
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE)return;
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
     gint tree_depth = gtk_tree_path_get_depth(path);
     gtk_tree_path_free (path);
 
     if(tree_depth == 1) {
-        gtk_widget_show(button_add);
-        gtk_widget_hide(button_delete);
+        gtk_widget_show(GTK_WIDGET(m_button_report_add));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
     } else if(tree_depth == 2) {
-        gtk_widget_show(button_add);
-        gtk_widget_show(button_delete);
+        gtk_widget_show(GTK_WIDGET(m_button_report_add));
+        gtk_widget_show(GTK_WIDGET(m_button_report_delete));
     } else {
-        gtk_widget_hide(button_add);
-        gtk_widget_show(button_delete);
+        gtk_widget_hide(GTK_WIDGET(m_button_report_add));
+        gtk_widget_show(GTK_WIDGET(m_button_report_delete));
     }
 
-    gtk_widget_hide(button_save);
-    gtk_widget_hide(label_childsection);
-    gtk_widget_hide(m_combobox_childsection);
-
-    gtk_widget_hide(label_templet);
-    gtk_widget_hide(m_entry_templet);
-    gtk_widget_hide(button_ok);
-    gtk_widget_hide(button_cancel);
+    gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+    gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_label_templet));
+    gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
 }
 
 void ViewSystem::BtnAddClicked(GtkButton *button) {
     GtkTreeIter iter;
     GtkTreeModel *model;
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE)return;
 
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -5615,28 +6140,26 @@ void ViewSystem::BtnAddClicked(GtkButton *button) {
     gtk_tree_path_free (path);
 
     if(tree_depth == 2) {
-        gtk_widget_hide(button_add);
-        gtk_widget_hide(button_save);
-        gtk_widget_hide(button_delete);
-        gtk_widget_hide(label_templet);
-        gtk_widget_hide(m_entry_templet);
-
-        gtk_widget_show(label_childsection);
-        gtk_widget_show(m_combobox_childsection);
-        gtk_widget_show(button_ok);
-        gtk_widget_show(button_cancel);
+        gtk_widget_hide(GTK_WIDGET(m_button_report_add));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
+        gtk_widget_hide(GTK_WIDGET(m_label_templet));
+        gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+        gtk_widget_show(GTK_WIDGET(m_label_childsection));
+        gtk_widget_show(GTK_WIDGET(m_combobox_childsection));
+        gtk_widget_show(GTK_WIDGET(m_button_report_ok));
+        gtk_widget_show(GTK_WIDGET(m_button_report_cancel));
     } else if(tree_depth == 1) {
-        gtk_widget_hide(button_add);
-        gtk_widget_hide(button_save);
-        gtk_widget_hide(button_delete);
-        gtk_widget_hide(label_childsection);
-        gtk_widget_hide(m_combobox_childsection);
-
-        gtk_widget_show(label_templet);
-        gtk_widget_show(m_entry_templet);
-        gtk_widget_grab_focus(m_entry_templet);
-        gtk_widget_show(button_ok);
-        gtk_widget_show(button_cancel);
+        gtk_widget_hide(GTK_WIDGET(m_button_report_add));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+        gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
+        gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+        gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+        gtk_widget_show(GTK_WIDGET(m_label_templet));
+        gtk_widget_show(GTK_WIDGET(m_entry_templet));
+        gtk_widget_grab_focus(GTK_WIDGET(m_entry_templet));
+        gtk_widget_show(GTK_WIDGET(m_button_report_ok));
+        gtk_widget_show(GTK_WIDGET(m_button_report_cancel));
     }
 
 }
@@ -5644,7 +6167,7 @@ void ViewSystem::BtnAddClicked(GtkButton *button) {
 void ViewSystem::BtnSave2Clicked(GtkButton *button) {
     GtkTreeIter iter;
     GtkTreeModel *model;
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) return;
 
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -5708,23 +6231,22 @@ void ViewSystem::BtnRecoveryClicked(GtkButton *button) {
     if ( !remove(CustomReport_PATH) && InitDB()) ret = true;
     if(show_window)gtk_widget_hide_all(show_window);
 
-    gtk_widget_show(button_add);
-    gtk_widget_hide(button_delete);
-    gtk_widget_hide(button_save);
-    gtk_widget_hide(label_childsection);
-    gtk_widget_hide(m_combobox_childsection);
-
-    gtk_widget_hide(label_templet);
-    gtk_widget_hide(m_entry_templet);
-    gtk_widget_hide(button_ok);
-    gtk_widget_hide(button_cancel);
+    gtk_widget_show(GTK_WIDGET(m_button_report_add));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+    gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_label_templet));
+    gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
 
     GtkTreeModel *modelnew = CreateTreeModel();
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_TreeviewReportSet), modelnew);
+    gtk_tree_view_set_model(m_treeviewReportSet, modelnew);
     g_object_unref (modelnew);
 
     GtkTreePath *path = gtk_tree_path_new_first();
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_TreeviewReportSet), path, NULL, TRUE);
+    gtk_tree_view_set_cursor(m_treeviewReportSet, path, NULL, TRUE);
     gtk_tree_path_free(path);
 
     if(ret) {
@@ -5737,7 +6259,7 @@ void ViewSystem::BtnRecoveryClicked(GtkButton *button) {
 void ViewSystem::BtnDeleteClicked(GtkButton *button) {
     GtkTreeIter iter;
     GtkTreeModel *model;
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE) return;
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
     gint tree_depth = gtk_tree_path_get_depth(path);
@@ -5812,31 +6334,31 @@ void ViewSystem::BtnDeleteClicked(GtkButton *button) {
     gtk_tree_store_remove(GTK_TREE_STORE(model), &topIter);
 
     GtkTreeModel *modelnew = CreateTreeModel();
-    gtk_tree_view_set_model(GTK_TREE_VIEW(m_TreeviewReportSet), modelnew);
+    gtk_tree_view_set_model(m_treeviewReportSet, modelnew);
     g_object_unref (modelnew);
 
-    gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_TreeviewReportSet), parent_path);
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_TreeviewReportSet), parent_path, NULL, TRUE);
+    gtk_tree_view_expand_to_path(m_treeviewReportSet, parent_path);
+    gtk_tree_view_set_cursor(m_treeviewReportSet, parent_path, NULL, TRUE);
     gint parent_depth = gtk_tree_path_get_depth(parent_path);
     gtk_tree_path_free (parent_path);
 
     if(show_window)gtk_widget_hide_all(show_window);
 
     if(parent_depth == 1) {
-        gtk_widget_hide(button_delete);
+        gtk_widget_hide(GTK_WIDGET(m_button_report_delete));
     } else if(parent_depth == 2) {
-        gtk_widget_show(button_delete);
+        gtk_widget_show(GTK_WIDGET(m_button_report_delete));
     }
 
-    gtk_widget_show(button_add);
-    gtk_widget_hide(button_save);
-    gtk_widget_hide(label_childsection);
-    gtk_widget_hide(m_combobox_childsection);
+    gtk_widget_show(GTK_WIDGET(m_button_report_add));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_save));
+    gtk_widget_hide(GTK_WIDGET(m_label_childsection));
+    gtk_widget_hide(GTK_WIDGET(m_combobox_childsection));
 
-    gtk_widget_hide(label_templet);
-    gtk_widget_hide(m_entry_templet);
-    gtk_widget_hide(button_ok);
-    gtk_widget_hide(button_cancel);
+    gtk_widget_hide(GTK_WIDGET(m_label_templet));
+    gtk_widget_hide(GTK_WIDGET(m_entry_templet));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_ok));
+    gtk_widget_hide(GTK_WIDGET(m_button_report_cancel));
 }
 
 void ViewSystem::InitReportVar() {
@@ -5855,7 +6377,7 @@ void ViewSystem::InitReportVar() {
     m_WindowANOB = NULL;
 
     m_FixedReportSet = NULL;
-    m_TreeviewReportSet = NULL;
+    m_treeviewReportSet = NULL;
     memset(ShowArr, UNCHECK_VALUE, sizeof(ShowArr));
     memset(CheckButtonArr, 0, sizeof(CheckButtonArr));
 
@@ -5863,128 +6385,7 @@ void ViewSystem::InitReportVar() {
     init_language = sys.GetLanguage();
 }
 
-GtkWidget *ViewSystem::create_set_report() {
-    InitReportVar();
-    GtkWidget* fixed = gtk_fixed_new ();
-    gtk_widget_show (fixed);
 
-    GtkWidget* scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
-    gtk_fixed_put (GTK_FIXED (fixed), scrolledwindow, GRAY_WIDTH, 20);
-    gtk_widget_set_size_request (scrolledwindow, TREE_WINDOW_WIDTH, 430);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), GTK_SHADOW_OUT);
-    gtk_widget_show (scrolledwindow);
-
-    GtkTreeModel *model = CreateTreeModel();
-    m_TreeviewReportSet = gtk_tree_view_new_with_model(model);
-    g_object_unref (model);
-
-    gtk_tree_view_set_enable_search (GTK_TREE_VIEW(m_TreeviewReportSet), FALSE);
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (m_TreeviewReportSet), TRUE);
-    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(m_TreeviewReportSet), FALSE);
-    gtk_tree_selection_set_mode (gtk_tree_view_get_selection(GTK_TREE_VIEW (m_TreeviewReportSet)), GTK_SELECTION_SINGLE);
-    GtkTreePath *path = gtk_tree_path_new_first();
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_TreeviewReportSet), path, NULL, TRUE);
-    gtk_tree_path_free(path);
-    g_signal_connect(G_OBJECT(gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet))), "changed", G_CALLBACK(HandleTreeSelectionChanged), this);
-    gtk_widget_add_events(GTK_WIDGET(m_TreeviewReportSet), (gtk_widget_get_events(GTK_WIDGET(m_TreeviewReportSet)) | GDK_BUTTON_RELEASE_MASK));
-
-    g_signal_connect_after(m_TreeviewReportSet, "button_release_event", G_CALLBACK(signal_treeview_button_release_exam_department), this);
-
-    m_renderer = gtk_cell_renderer_text_new();
-    GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes("", m_renderer, "text", 0, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(m_TreeviewReportSet), column);
-
-    gtk_widget_show (m_TreeviewReportSet);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow), m_TreeviewReportSet);
-
-    int y = 465, w = 148, h = 40;
-
-    //create buttons: delete, add, save, recovery
-    GtkWidget *button_recovery= gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_recovery);
-    gtk_fixed_put (GTK_FIXED (fixed), button_recovery, 10, y);
-    gtk_widget_set_size_request (button_recovery, w, h);
-
-    button_add = gtk_button_new_with_mnemonic (_("Insert"));
-    gtk_widget_show (button_add);
-    gtk_fixed_put (GTK_FIXED (fixed), button_add, 170, y);
-    gtk_widget_set_size_request (button_add, w, h);
-
-    button_save = gtk_button_new_with_mnemonic (_("Save"));
-    gtk_widget_hide (button_save);
-    gtk_fixed_put (GTK_FIXED (fixed), button_save, 170, y);
-    gtk_widget_set_size_request (button_save, w, h);
-
-    button_delete = gtk_button_new_with_mnemonic (_("Delete"));
-    gtk_widget_hide (button_delete);
-    gtk_fixed_put (GTK_FIXED (fixed), button_delete, 330, y);
-    gtk_widget_set_size_request (button_delete, w, h);
-
-    g_signal_connect ((gpointer) button_recovery, "clicked", G_CALLBACK (on_button_recovery_clicked), this);
-    g_signal_connect ((gpointer) button_add, "clicked", G_CALLBACK (on_button_add_clicked), this);
-    g_signal_connect ((gpointer) button_save, "clicked", G_CALLBACK (on_button_save2_clicked), this);
-    g_signal_connect ((gpointer) button_delete, "clicked", G_CALLBACK (on_button_delete_clicked), this);
-
-    //create insert template
-    label_templet = gtk_label_new (_("<b>Please Input New Name:</b>"));
-    gtk_widget_hide (label_templet);
-    gtk_fixed_put (GTK_FIXED (fixed), label_templet, 170, y);
-    gtk_widget_set_size_request (label_templet, 200, h);
-    gtk_label_set_use_markup (GTK_LABEL (label_templet), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_templet), 0.9, 0.5);
-
-    m_entry_templet = gtk_entry_new ();
-    gtk_widget_hide (m_entry_templet);
-    gtk_fixed_put (GTK_FIXED (fixed), m_entry_templet, 380, y);
-    gtk_widget_set_size_request (m_entry_templet, w, h);
-    gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_templet), 9679);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entry_templet), 46);
-    g_signal_connect(G_OBJECT(m_entry_templet), "insert_text", G_CALLBACK(on_entry_templet_insert), this);
-
-    //create insert childsection
-    label_childsection = gtk_label_new (_("<b>Please Select Exam Type:</b>"));
-    gtk_widget_hide (label_childsection);
-    gtk_fixed_put (GTK_FIXED (fixed), label_childsection, 170, y);
-    gtk_widget_set_size_request (label_childsection, 200, h);
-    gtk_label_set_use_markup (GTK_LABEL (label_childsection), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_childsection), 0.9, 0.5);
-
-    m_combobox_childsection = gtk_combo_box_new_text ();
-    gtk_widget_hide (m_combobox_childsection);
-    gtk_fixed_put (GTK_FIXED (fixed), m_combobox_childsection, 380, y);
-    gtk_widget_set_size_request (m_combobox_childsection, w, h);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Abdomen"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Cardiac"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Urology"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Obstetrics"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Gynecology"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Small Part"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Fetal Cardio"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Vascular"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_childsection), _("Others"));
-
-    gtk_combo_box_set_active((GtkComboBox*)(m_combobox_childsection), 0);
-
-    //create buttons: ok, cancel
-    button_ok = gtk_button_new_with_mnemonic (_("OK"));
-    gtk_widget_hide (button_ok);
-    gtk_fixed_put (GTK_FIXED (fixed), button_ok, 540, y);
-    gtk_widget_set_size_request (button_ok, w, h);
-
-    button_cancel = gtk_button_new_with_mnemonic (_("Cancel"));
-    gtk_widget_hide (button_cancel);
-    gtk_fixed_put (GTK_FIXED (fixed), button_cancel, 700, y);
-    gtk_widget_set_size_request (button_cancel, w, h);
-
-    g_signal_connect ((gpointer) button_ok, "clicked", G_CALLBACK (on_button_ok_clicked), this);
-    g_signal_connect ((gpointer) button_cancel, "clicked", G_CALLBACK (on_button_cancel_clicked), this);
-    return fixed;
-}
 
 bool ViewSystem::InitRecordFromShowArr(const string childsection, int* start, int* end) {
     bool ret = false;
@@ -6113,7 +6514,7 @@ void ViewSystem::apply_report_setting() {
     GtkTreeModel *model;
     char *templet;
 
-    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_TreeviewReportSet));
+    GtkTreeSelection *selected_node = gtk_tree_view_get_selection(m_treeviewReportSet);
     if (gtk_tree_selection_get_selected(selected_node, &model, &iter) != TRUE)return;
 
     GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
@@ -6156,10 +6557,10 @@ void ViewSystem::apply_report_setting() {
             GtkTreePath *parent_path = gtk_tree_model_get_path(model, &parent_iter);
 
             GtkTreeModel *modelnew = CreateTreeModel();
-            gtk_tree_view_set_model(GTK_TREE_VIEW(m_TreeviewReportSet), modelnew);
+            gtk_tree_view_set_model(m_treeviewReportSet, modelnew);
             g_object_unref (modelnew);
-            gtk_tree_view_expand_to_path(GTK_TREE_VIEW(m_TreeviewReportSet), parent_path);
-            gtk_tree_view_set_cursor(GTK_TREE_VIEW(m_TreeviewReportSet), parent_path, NULL, TRUE);
+            gtk_tree_view_expand_to_path(m_treeviewReportSet, parent_path);
+            gtk_tree_view_set_cursor(m_treeviewReportSet, parent_path, NULL, TRUE);
             gtk_tree_path_free (parent_path);
             if(show_window)gtk_widget_hide_all(show_window);
         } else {
@@ -6190,20 +6591,22 @@ void ViewSystem::apply_report_setting() {
 
 
 
-void ViewSystem::CommonRadioToggled(GtkToggleButton *togglebutton) {
-    gboolean press = gtk_toggle_button_get_active(togglebutton);
-    if (press) {
-        gtk_widget_show_all(m_scrolledwindow_common);
-        gtk_widget_hide_all(m_fixed_specific);
-    }
+void ViewSystem::CommonRadioToggled(GtkToggleButton* togglebutton) {
+  gboolean press = gtk_toggle_button_get_active(togglebutton);
+
+  if (press) {
+    gtk_widget_show_all(GTK_WIDGET(m_scrolledwindow_common));
+    gtk_widget_hide_all(GTK_WIDGET(m_scrolledwindow_specific));
+  }
 }
 
-void ViewSystem::SpecificRadioToggled(GtkToggleButton *togglebutton) {
-    gboolean press = gtk_toggle_button_get_active(togglebutton);
-    if (press) {
-        gtk_widget_show_all(m_fixed_specific);
-        gtk_widget_hide_all(m_scrolledwindow_common);
-    }
+void ViewSystem::SpecificRadioToggled(GtkToggleButton* togglebutton) {
+  gboolean press = gtk_toggle_button_get_active(togglebutton);
+
+  if (press) {
+    gtk_widget_hide_all(GTK_WIDGET(m_scrolledwindow_common));
+    gtk_widget_show_all(GTK_WIDGET(m_scrolledwindow_specific));
+  }
 }
 
 void ViewSystem::SpinbuttonInsertHour(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
@@ -6396,33 +6799,37 @@ void ViewSystem::BtnDelPrinterClicked(GtkButton *button) {
 }
 
 int ViewSystem::common_printer_selection() {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
+  GtkTreeModel* model = NULL;
+  GtkTreeIter iter;
 
-    if (gtk_tree_selection_get_selected(m_selected_common_printer, &model, &iter) != TRUE)
-        return -1;
+  if (gtk_tree_selection_get_selected(m_selected_common_printer, &model, &iter) != TRUE) {
+    return -1;
+  }
 
-    GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-    gchar *index_str = gtk_tree_path_to_string (path);
-    return atoi(index_str);
+  GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+  gchar* index_str = gtk_tree_path_to_string(path);
+  return atoi(index_str);
 }
 
 string ViewSystem::specific_printer_selection() {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    string ret_val;
+  GtkTreeModel* model = NULL;
+  GtkTreeIter iter;
+  string ret_val;
 
-    if (gtk_tree_selection_get_selected(m_selected_specific_printer, &model, &iter) != TRUE)
-        return ret_val;
-
-    char *value;
-    gtk_tree_model_get(model, &iter, PRT_NAME, &value, -1);
-    if (value)
-        ret_val = value;
+  if (gtk_tree_selection_get_selected(m_selected_specific_printer, &model, &iter) != TRUE) {
     return ret_val;
+  }
+
+  char* value = NULL;
+  gtk_tree_model_get(model, &iter, PRT_NAME, &value, -1);
+
+  if (value != NULL) {
+    ret_val = value;
+  }
+
+  return ret_val;
 }
 
-//  int date_format;
 
 
 
@@ -7921,329 +8328,9 @@ void ViewSystem::set_image_item_sensitive(bool status) {
 
 
 
-void ViewSystem::CreatePrinter() {
-    GtkWidget* frame_print;
-    GtkWidget *fixed_printer;
-    GSList *radiobutton_printer_group = NULL;
-    GtkWidget *scrolledwindow_specific;
-    GtkWidget *label_print;
-    static const int DIR_MAP = 20;
 
-    frame_print = gtk_frame_new (NULL);
-    gtk_widget_show (frame_print);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), frame_print, 20, 140 - 70 + 180 + 10 + 20);
-    gtk_widget_set_size_request (frame_print, 615, 190);
-    gtk_frame_set_label_align (GTK_FRAME (frame_print), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_print), GTK_SHADOW_IN);
 
-    fixed_printer = gtk_fixed_new ();
-    gtk_widget_show (fixed_printer);
-    gtk_container_add (GTK_CONTAINER (frame_print), fixed_printer);
 
-    m_radiobutton_common = gtk_radio_button_new_with_mnemonic (NULL, _("Common"));
-    gtk_widget_show (m_radiobutton_common);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_radiobutton_common, 320 + 10 + 20 + 20 + 10 + DIR_MAP, 10);
-    gtk_widget_set_size_request (m_radiobutton_common, 100, 30);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_common), radiobutton_printer_group);
-    radiobutton_printer_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_common));
-    g_signal_connect((gpointer)m_radiobutton_common, "toggled", G_CALLBACK (on_common_radio_button_toggled), this);
-
-    m_radiobutton_specific = gtk_radio_button_new_with_mnemonic (NULL, _("Specific"));
-    gtk_widget_show (m_radiobutton_specific);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_radiobutton_specific, 320 + 10 + 20 + 20 + 10 + DIR_MAP, 10 + 30 + 10);
-    gtk_widget_set_size_request (m_radiobutton_specific, 100, 30);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_specific), radiobutton_printer_group);
-    radiobutton_printer_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_specific));
-    g_signal_connect((gpointer)m_radiobutton_specific, "toggled", G_CALLBACK (on_specific_radio_button_toggled), this);
-
-    m_scrolledwindow_common = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_set_size_request (m_scrolledwindow_common, 320+20, 145);
-    gtk_widget_show (m_scrolledwindow_common);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_scrolledwindow_common, 10 + DIR_MAP, 10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (m_scrolledwindow_common), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (m_scrolledwindow_common), GTK_SHADOW_IN);
-
-    m_treeview_common_print = create_common_print_treeview();
-    gtk_widget_show (m_treeview_common_print);
-    m_selected_common_printer = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_common_print));
-    gtk_tree_selection_set_mode(m_selected_common_printer, GTK_SELECTION_SINGLE);
-    gtk_container_add (GTK_CONTAINER (m_scrolledwindow_common), m_treeview_common_print);
-
-    m_fixed_specific = gtk_fixed_new ();
-    gtk_widget_show (m_fixed_specific);
-    gtk_widget_set_size_request (m_fixed_specific, 320+20, 170);
-    gtk_fixed_put (GTK_FIXED (fixed_printer), m_fixed_specific, 10 + DIR_MAP, 10);
-
-    scrolledwindow_specific = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_specific);
-    gtk_fixed_put(GTK_FIXED(m_fixed_specific), scrolledwindow_specific, 5, 5);
-    gtk_widget_set_size_request(scrolledwindow_specific, 320, 145);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_specific), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_specific), GTK_SHADOW_IN);
-
-    m_treeview_specific_print = create_specific_print_treeview();
-    gtk_widget_show (m_treeview_specific_print);
-    m_selected_specific_printer = gtk_tree_view_get_selection(GTK_TREE_VIEW(m_treeview_specific_print));
-    gtk_tree_selection_set_mode(m_selected_specific_printer, GTK_SELECTION_SINGLE);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_specific), m_treeview_specific_print);
-
-    GtkWidget *button_add_printer = gtk_button_new_with_mnemonic (_("Add"));
-    gtk_widget_show (button_add_printer);
-    gtk_fixed_put (GTK_FIXED (m_fixed_specific), button_add_printer, 320 + 10 + 20 + 20 + 10, 30 + 10 + 30 + 10);
-    gtk_widget_set_size_request (button_add_printer, 100+30, 30);
-    g_signal_connect((gpointer)button_add_printer, "clicked", G_CALLBACK (on_button_add_printer_clicked), this);
-
-    GtkWidget *button_del_printer = gtk_button_new_with_mnemonic (_("Delete"));
-    gtk_widget_show (button_del_printer);
-    gtk_fixed_put (GTK_FIXED (m_fixed_specific), button_del_printer, 320 + 10 + 20 + 20 + 10, 30 + 10 + 30 + 10 + 30 + 10);
-    gtk_widget_set_size_request (button_del_printer, 100+30, 30);
-    g_signal_connect((gpointer)button_del_printer, "clicked", G_CALLBACK (on_button_del_printer_clicked), this);
-
-    label_print = gtk_label_new (_("<b>Printer</b>"));
-    gtk_widget_show (label_print);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_print), label_print);
-    gtk_label_set_use_markup (GTK_LABEL (label_print), TRUE);
-
-    g_signal_connect((gpointer)m_selected_common_printer, "changed", G_CALLBACK (on_common_treeview_selection_changed), this);
-    g_signal_connect((gpointer)m_selected_specific_printer, "changed", G_CALLBACK (on_specific_treeview_selection_changed), this);
-
-}
-
-void ViewSystem::init_printer(SysGeneralSetting *sysGeneralSetting) {
-    if(sysGeneralSetting == NULL)
-        sysGeneralSetting = new SysGeneralSetting;
-    if (sysGeneralSetting->GetPrinterMethod() == 0) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_common), TRUE);
-        gtk_widget_show_all(m_scrolledwindow_common);
-        gtk_widget_hide_all(m_fixed_specific);
-        char printer_path[3];
-        int index_printer = sysGeneralSetting->GetPrinter();
-        sprintf(printer_path, "%d", index_printer);
-        GtkTreePath *path = gtk_tree_path_new_from_string(printer_path);
-        gtk_tree_selection_select_path(m_selected_common_printer, path);
-    } else if (sysGeneralSetting->GetPrinterMethod() == 1) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_radiobutton_specific), TRUE);
-        gtk_widget_hide_all(m_scrolledwindow_common);
-        gtk_widget_show_all(m_fixed_specific);
-    }
-    delete sysGeneralSetting;
-}
-
-void ViewSystem::create_note_tvout() {
-    GtkWidget *label_video;
-    GtkWidget *label_connector_type;
-    GtkWidget *label_connector_hint;
-
-    GtkWidget *frame_tvout_setting;
-    GtkWidget *frame_tvout;
-    GtkWidget *hbox_tvout;
-    GSList *radiobutton_format_group = NULL;
-    GtkWidget *vbox_format_1;
-    GtkWidget *image_format_1;
-    GtkWidget *label_format_1;
-    GtkWidget *vbox_format_2;
-    GtkWidget *image_format_2;
-    GtkWidget *label_format_2;
-    GtkWidget *vbox_format_3;
-    GtkWidget *image_format_3;
-    GtkWidget *label_format_3;
-    GtkWidget *label_tvout_format;
-    GtkWidget *button_default;
-    static const int ADJUST_PIXEL_X = 30;
-    static const int ADJUST_PIXEL_Y = 70;
-    static const int FRAME_TVOUT_SETTING_W = DEFALT_SCREEN_WIDTH - 40 - 15;
-    static const int FRAME_TVOUT_SETTING_H = 140 - ADJUST_PIXEL_Y + 180 - 30 + 10 ;
-    label_video = gtk_label_new (_("<b>Video Standard:</b>"));
-
-    gtk_widget_show (label_video);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), label_video, 50 - ADJUST_PIXEL_X, 30 - 5);
-    gtk_widget_set_size_request (label_video, 125, 30);
-    gtk_label_set_use_markup (GTK_LABEL (label_video), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label_video), 0.9, 0.5);
-
-    m_combobox_video = gtk_combo_box_new_text ();
-    gtk_widget_show (m_combobox_video);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), m_combobox_video, 175 - ADJUST_PIXEL_X, 30 - 5);
-
-    gtk_widget_set_size_request (m_combobox_video, 120, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video), _("NTSC"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_combobox_video), _("PAL"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), 0);
-
-    g_signal_connect ((gpointer) m_combobox_video, "changed",
-                      G_CALLBACK (on_combobox_video_changed),
-                      this);
-
-    frame_tvout = gtk_frame_new (NULL);
-    gtk_widget_show (frame_tvout);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), frame_tvout, 50 - ADJUST_PIXEL_X, 140 - ADJUST_PIXEL_Y);
-    gtk_widget_set_size_request (frame_tvout, 600 + 15, 180);
-    gtk_frame_set_label_align (GTK_FRAME (frame_tvout), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_tvout), GTK_SHADOW_IN);
-
-    hbox_tvout = gtk_hbox_new (TRUE, 0);
-    gtk_widget_show (hbox_tvout);
-    gtk_container_add (GTK_CONTAINER (frame_tvout), hbox_tvout);
-
-    m_radiobutton_format_1 = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobutton_format_1);
-    gtk_box_pack_start (GTK_BOX (hbox_tvout), m_radiobutton_format_1, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_format_1), radiobutton_format_group);
-    radiobutton_format_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_format_1));
-
-    vbox_format_1 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_1);
-    gtk_container_add (GTK_CONTAINER (m_radiobutton_format_1), vbox_format_1);
-
-    image_format_1 = create_pixmap ("./res/btn_format/tv-out-1.png");
-    gtk_widget_show (image_format_1);
-    gtk_box_pack_start (GTK_BOX (vbox_format_1), image_format_1, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_1), 5, 10);
-
-    label_format_1 = gtk_label_new (_("Full Screen"));
-    gtk_widget_modify_fg(label_format_1, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_1, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_1);
-    gtk_box_pack_start (GTK_BOX (vbox_format_1), label_format_1, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_1), TRUE);
-
-    m_radiobutton_format_2 = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobutton_format_2);
-    gtk_box_pack_start (GTK_BOX (hbox_tvout), m_radiobutton_format_2, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_format_2), radiobutton_format_group);
-    radiobutton_format_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_format_2));
-
-    vbox_format_2 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_2);
-    gtk_container_add (GTK_CONTAINER (m_radiobutton_format_2), vbox_format_2);
-
-    image_format_2 = create_pixmap ("./res/btn_format/tv-out-2.png");
-    gtk_widget_show (image_format_2);
-    gtk_box_pack_start (GTK_BOX (vbox_format_2), image_format_2, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_2), 5, 10);
-
-    label_format_2 = gtk_label_new (_("Hide Menu Area"));
-    gtk_widget_modify_fg(label_format_2, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_2, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_2);
-    gtk_box_pack_start (GTK_BOX (vbox_format_2), label_format_2, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_2), TRUE);
-
-    m_radiobutton_format_3 = gtk_radio_button_new (NULL);
-    gtk_widget_show (m_radiobutton_format_3);
-    gtk_box_pack_start (GTK_BOX (hbox_tvout), m_radiobutton_format_3, FALSE, FALSE, 0);
-    gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_format_3), radiobutton_format_group);
-    radiobutton_format_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_format_3));
-
-    vbox_format_3 = gtk_vbox_new (FALSE, 0);
-    gtk_widget_show (vbox_format_3);
-    gtk_container_add (GTK_CONTAINER (m_radiobutton_format_3), vbox_format_3);
-
-    image_format_3 = create_pixmap ("./res/btn_format/tv-out-3.png");
-    gtk_widget_show (image_format_3);
-    gtk_box_pack_start (GTK_BOX (vbox_format_3), image_format_3, TRUE, TRUE, 0);
-    gtk_misc_set_padding (GTK_MISC (image_format_3), 5, 10);
-
-    label_format_3 = gtk_label_new (_("Image Area Only"));
-    gtk_widget_modify_fg(label_format_3, GTK_STATE_PRELIGHT, g_white);
-    gtk_widget_modify_fg(label_format_3, GTK_STATE_ACTIVE, g_white);
-    gtk_widget_show (label_format_3);
-    gtk_box_pack_start (GTK_BOX (vbox_format_3), label_format_3, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label_format_3), TRUE);
-
-    SysGeneralSetting sg;
-    if (sg.GetConnectorType())
-        label_tvout_format = gtk_label_new (_("<b>TV Out Format (Restart to complete changes)</b>"));
-    else
-        label_tvout_format = gtk_label_new (_("<b>TV Out Format</b>"));
-
-    gtk_widget_show (label_tvout_format);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_tvout), label_tvout_format);
-    gtk_label_set_use_markup (GTK_LABEL (label_tvout_format), TRUE);
-
-    button_default = gtk_button_new_with_mnemonic (_("Default Factory"));
-    gtk_widget_show (button_default);
-    gtk_fixed_put (GTK_FIXED (m_fixed_tvout), button_default, 340+20+10+136+12+20+136+12+20, 415+20);
-    gtk_widget_set_size_request (button_default, 140+8, 40);
-    g_signal_connect ((gpointer) button_default, "clicked", G_CALLBACK (on_button_tvout_default_clicked), this);
-}
-
-void ViewSystem::init_tvout_setting(SysGeneralSetting *sysGeneralSetting) {
-    if (sysGeneralSetting == NULL)
-        sysGeneralSetting = new SysGeneralSetting;
-
-    int index_video_mode = sysGeneralSetting->GetVideoMode();
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_video), index_video_mode);
-
-    int tvout_format = sysGeneralSetting->GetVideoFormat();
-    switch (tvout_format) {
-    case 0:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_format_1), TRUE);
-        break;
-    case 1:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_format_2), TRUE);
-        break;
-    case 2:
-        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_format_3), TRUE);
-        break;
-    }
-    delete sysGeneralSetting;
-}
-
-void ViewSystem::save_tvout_setting() {
-    SysGeneralSetting sysGeneralSetting;
-
-    int VideoModeIndex = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_video));
-    int tvout_format = 0;
-    string command;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_1))) {
-        tvout_format = 0;
-        command = "--mode 1024x768 --pos 0x0";
-    } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_2))) {
-        tvout_format = 1;
-        command = "--mode 848x660 --pos 180x0";
-    } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_format_3))) {
-        tvout_format = 2;
-        command = "--mode 848x560 --pos 180x100";
-    }
-
-    if(sysGeneralSetting.GetVideoMode() != VideoModeIndex || sysGeneralSetting.GetVideoFormat() != tvout_format) {
-        if (VideoModeIndex) {
-            //command = "xrandr --output TV --set TV_FORMAT NTSC-M " + command;
-            command = "xrandr --output TV1 --set mode NTSC-M " + command;
-        } else {
-            //command = "xrandr --output TV --set TV_FORMAT PAL " + command;
-            command = "xrandr --output TV1 --set mode PAL " + command;
-        }
-
-        if(!sysGeneralSetting.GetConnectorType()) {
-            //system(command.c_str());
-            _system_(command.c_str());
-        }
-
-        sysGeneralSetting.SetVideoMode(VideoModeIndex);
-        sysGeneralSetting.SetVideoFormat(tvout_format);
-    }
-    //save printer
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_common))) {
-        int printIndex = common_printer_selection();
-        if (printIndex != -1) {
-            sysGeneralSetting.SetPrinterMethod(0);
-            sysGeneralSetting.SetPrinter(printIndex);
-        }
-    } else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_specific))) {
-        string default_print = specific_printer_selection();
-        if (!default_print.empty()) {
-            Printer print;
-            sysGeneralSetting.SetPrinterMethod(1);
-            print.SetDefault(default_print.c_str());
-            PeripheralMan::GetInstance()->SwitchPrinterDriver();
-            UpdateSpecificPrinterModel();
-        }
-    }
-
-    sysGeneralSetting.SyncFile();
-}
 
 void ViewSystem::BtnTVOutDefaultClicked(GtkButton *button) {
     SysGeneralSetting *sysGeneralSetting = new SysGeneralSetting;
@@ -8260,61 +8347,7 @@ void ViewSystem::BtnTVOutDefaultClicked(GtkButton *button) {
 
 
 
-GtkWidget* ViewSystem::create_note_dicom() {
-    GtkWidget *fixed_dicom;
-    GtkWidget *fixed_local;
-    GtkWidget *label_local;
 
-    GtkWidget *fixed_server;
-    GtkWidget *label_server;
-
-    GtkWidget *fixed_service;
-    GtkWidget *label_service;
-
-    fixed_dicom = gtk_fixed_new ();
-    gtk_widget_show (fixed_dicom);
-
-    m_dicom_notebook = gtk_notebook_new ();
-    gtk_fixed_put (GTK_FIXED (fixed_dicom), m_dicom_notebook, 40, 20);
-    gtk_widget_set_size_request (m_dicom_notebook, 850, 470);
-    // gtk_widget_set_size_request (m_notebook, w - 40, 540);
-    gtk_notebook_set_tab_pos(GTK_NOTEBOOK (m_dicom_notebook),GTK_POS_LEFT);
-    gtk_widget_show (m_dicom_notebook);
-
-    int dicom_notebook_page = 0;
-
-    // create note local
-    // fixed_local = Create_note_local();
-    fixed_local = DicomLocalSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
-    gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_local);
-    DicomLocalSetting::GetInstance()->InitLocalSetting();
-
-    label_local = gtk_label_new (_("Local"));
-    gtk_widget_show (label_local);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_local);
-
-    // create note server
-    fixed_server = DicomServerSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
-    gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_server);
-    // DicomServerSetting::GetInstance()-> InitServerSetting();
-
-    label_server = gtk_label_new (_("Server"));
-    gtk_widget_show (label_server);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_server);
-
-    //create note service
-    fixed_service = DicomServiceSetting::GetInstance()->CreateDicomWindow(GTK_WIDGET(m_dialog));
-    gtk_container_add (GTK_CONTAINER (m_dicom_notebook), fixed_service);
-    // DicomServiceSetting::GetInstance()->InitServiceSetting();
-
-    label_service = gtk_label_new (_("Service"));
-    gtk_widget_show (label_service);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (m_dicom_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (m_dicom_notebook), dicom_notebook_page++), label_service);
-
-    g_signal_connect(G_OBJECT(m_dicom_notebook), "switch-page", G_CALLBACK(on_dicom_notebook_switch_page), this);
-
-    return fixed_dicom;
-}
 
 void ViewSystem::DicomnotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num) {
     m_page_num = page_num;
@@ -9514,135 +9547,7 @@ void ViewSystem::GetImageNoteSelection(int &probeIndex, int &itemIndex, char* &i
 
 
 
-GtkWidget* ViewSystem::create_note_key_config() {
-    GtkWidget *fixed_key_config;
 
-    GtkWidget *fixed_key;
-
-    GSList *radiobutton_key_p1_group = NULL;
-    GSList *radiobutton_key_p2_group = NULL;
-    GSList *radiobutton_key_p3_group = NULL;
-
-    GtkWidget *label_key_p1;
-    GtkWidget *label_key_p2;
-    GtkWidget *label_key_p3;
-
-    GtkWidget *frame_key_p1;
-    GtkWidget *frame_key_p2;
-    GtkWidget *frame_key_p3;
-    GtkWidget *fixed_key_p1;
-    GtkWidget *fixed_key_p2;
-    GtkWidget *fixed_key_p3;
-
-    fixed_key_config = gtk_fixed_new ();
-    gtk_widget_show (fixed_key_config);
-
-    frame_key_p1 = gtk_frame_new (NULL);
-    gtk_widget_show (frame_key_p1);
-    gtk_fixed_put (GTK_FIXED (fixed_key_config), frame_key_p1, 50, 30);
-    gtk_widget_set_size_request (frame_key_p1, 810, 120);
-    gtk_frame_set_label_align (GTK_FRAME (frame_key_p1), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_key_p1), GTK_SHADOW_IN);
-
-    fixed_key_p1 = gtk_fixed_new ();
-    gtk_widget_show (fixed_key_p1);
-    gtk_container_add (GTK_CONTAINER (frame_key_p1), fixed_key_p1);
-    for(int i=0; i<MAX_KEY; i++) {
-        if(KeyFunctionList[i] == "Print Screen")
-            m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _("Print"));
-        else
-            m_radiobutton_key_p1[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
-        gtk_widget_show (m_radiobutton_key_p1[i]);
-        gtk_fixed_put (GTK_FIXED (fixed_key_p1), m_radiobutton_key_p1[i], 20+(i%5)*150, 20+(i/5)*40);
-        gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p1[i]), radiobutton_key_p1_group);
-        radiobutton_key_p1_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_key_p1[i]));
-    }
-
-    label_key_p1 = gtk_label_new (_("<b>P1</b>"));
-
-    gtk_widget_show (label_key_p1);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_key_p1), label_key_p1);
-    gtk_label_set_use_markup (GTK_LABEL (label_key_p1), TRUE);
-    //p2
-    frame_key_p2 = gtk_frame_new (NULL);
-    gtk_widget_show (frame_key_p2);
-    gtk_fixed_put (GTK_FIXED (fixed_key_config), frame_key_p2, 50, 170);
-    gtk_widget_set_size_request (frame_key_p2, 810, 120);
-    gtk_frame_set_label_align (GTK_FRAME (frame_key_p2), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_key_p2), GTK_SHADOW_IN);
-
-    fixed_key_p2 = gtk_fixed_new ();
-    gtk_widget_show (fixed_key_p2);
-    gtk_container_add (GTK_CONTAINER (frame_key_p2), fixed_key_p2);
-    for(int i=0; i<MAX_KEY; i++) {
-        m_radiobutton_key_p2[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
-        gtk_widget_show (m_radiobutton_key_p2[i]);
-        gtk_fixed_put (GTK_FIXED (fixed_key_p2), m_radiobutton_key_p2[i], 20+(i%5)*150, 20+(i/5)*40);
-        gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p2[i]), radiobutton_key_p2_group);
-        radiobutton_key_p2_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_key_p2[i]));
-    }
-
-    label_key_p2 = gtk_label_new (_("<b>P2</b>"));
-
-    gtk_widget_show (label_key_p2);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_key_p2), label_key_p2);
-    gtk_label_set_use_markup (GTK_LABEL (label_key_p2), TRUE);
-
-    frame_key_p3 = gtk_frame_new (NULL);
-    gtk_widget_show (frame_key_p3);
-    gtk_fixed_put (GTK_FIXED (fixed_key_config), frame_key_p3, 50, 310);
-    gtk_widget_set_size_request (frame_key_p3, 810, 120);
-    gtk_frame_set_label_align (GTK_FRAME (frame_key_p3), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_key_p3), GTK_SHADOW_IN);
-
-    fixed_key_p3 = gtk_fixed_new ();
-    gtk_widget_show (fixed_key_p3);
-    gtk_container_add (GTK_CONTAINER (frame_key_p3), fixed_key_p3);
-    for(int i=0; i<MAX_KEY; i++) {
-        m_radiobutton_key_p3[i] = gtk_radio_button_new_with_mnemonic (NULL, _(KeyFunctionList[i].c_str()));
-        gtk_widget_show (m_radiobutton_key_p3[i]);
-        gtk_fixed_put (GTK_FIXED (fixed_key_p3), m_radiobutton_key_p3[i], 20+(i%5)*150, 20+(i/5)*40);
-        gtk_radio_button_set_group (GTK_RADIO_BUTTON (m_radiobutton_key_p3[i]), radiobutton_key_p3_group);
-        radiobutton_key_p3_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (m_radiobutton_key_p3[i]));
-    }
-    label_key_p3 = gtk_label_new (_("<b>P3</b>"));
-    gtk_widget_show (label_key_p3);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_key_p3), label_key_p3);
-    gtk_label_set_use_markup (GTK_LABEL (label_key_p3), TRUE);
-
-    return fixed_key_config;
-
-}
-
-void ViewSystem::init_key_config() {
-    SysUserDefinedKey sysDefine;
-    m_p1_func_index = sysDefine.GetFuncP1();
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[m_p1_func_index]), TRUE);
-
-    m_p2_func_index = sysDefine.GetFuncP2();
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p2[m_p2_func_index]), TRUE);
-
-    m_p3_func_index = sysDefine.GetFuncP3();
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[m_p3_func_index]), TRUE);
-}
-
-void ViewSystem::save_key_config() {
-    SysUserDefinedKey sysDefine;
-
-    for(int i = 0; i < MAX_KEY; i++) {
-        if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p1[i])))
-            m_p1_func_index = i;
-        if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p2[i])))
-            m_p2_func_index = i;
-        if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_radiobutton_key_p3[i])))
-            m_p3_func_index = i;
-    }
-
-    sysDefine.SetFuncP1(m_p1_func_index);
-    sysDefine.SetFuncP2(m_p2_func_index);
-    sysDefine.SetFuncP3(m_p3_func_index);
-    sysDefine.SyncFile();
-}
 
 
 
@@ -9652,206 +9557,94 @@ void ViewSystem::BtnOBCustomClicked(GtkButton *button) {
 
 
 
-GtkWidget* ViewSystem::create_note_info() {
-    GtkWidget *fixed_info;
 
-    GtkWidget *frame_info_model;
-    GtkWidget *scrolledwindow_info_model;
-    GtkWidget *label_info_model;
-    GtkWidget *frame_version;
-    GtkWidget *scrolledwindow_version;
-    //    GtkWidget *textview_version;
-    GtkWidget *label_version;
-    GtkWidget *button_upgrade;
 
-    fixed_info = gtk_fixed_new ();
-    gtk_widget_show (fixed_info);
-    frame_info_model = gtk_frame_new (NULL);
-    gtk_widget_hide (frame_info_model);
-    // gtk_fixed_put (GTK_FIXED (fixed_info), frame_info_model, 30, 30);
-    gtk_fixed_put (GTK_FIXED (fixed_info), frame_info_model, 50, 30);
-    gtk_widget_set_size_request (frame_info_model, 250, 120);
-    gtk_frame_set_label_align (GTK_FRAME (frame_info_model), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_info_model), GTK_SHADOW_IN);
+GtkTreeView* ViewSystem::create_common_print_treeview() {
+  GtkTreeView* treeview = Utils::create_tree_view(create_common_print_model());
+  gtk_tree_view_set_enable_search(treeview, FALSE);
+  gtk_tree_selection_set_mode(gtk_tree_view_get_selection(treeview), GTK_SELECTION_SINGLE);
 
-    scrolledwindow_info_model = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_hide (scrolledwindow_info_model);
-    gtk_container_add (GTK_CONTAINER (frame_info_model), scrolledwindow_info_model);
-    gtk_container_set_border_width (GTK_CONTAINER (scrolledwindow_info_model), 5);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_info_model), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_info_model), GTK_SHADOW_IN);
+  GtkCellRenderer* render_brand = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_brand = gtk_tree_view_column_new_with_attributes(_("Brand"), render_brand, "text", PRT_BRAND, NULL);
+  gtk_tree_view_append_column(treeview, col_brand);
 
-    label_info_model = gtk_label_new (_("<b>Model</b>"));
-    gtk_widget_hide (label_info_model);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_info_model), label_info_model);
-    gtk_label_set_use_markup (GTK_LABEL (label_info_model), TRUE);
+  GtkCellRenderer* render_model = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_model = gtk_tree_view_column_new_with_attributes(_("Model"), render_model, "text", PRT_MODEL, NULL);
+  gtk_tree_view_append_column(treeview, col_model);
 
-    frame_version = gtk_frame_new (NULL);
-    gtk_widget_show (frame_version);
-    // gtk_fixed_put (GTK_FIXED (fixed_info), frame_version, 350, 30);
-    gtk_fixed_put (GTK_FIXED (fixed_info), frame_version, 450, 30);
-    gtk_widget_set_size_request (frame_version, 360, 224);
-    gtk_frame_set_label_align (GTK_FRAME (frame_version), 0.5, 0.5);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame_version), GTK_SHADOW_IN);
-
-    scrolledwindow_version = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_version);
-    gtk_container_add (GTK_CONTAINER (frame_version), scrolledwindow_version);
-    gtk_container_set_border_width (GTK_CONTAINER (scrolledwindow_version), 5);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_version), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_version), GTK_SHADOW_IN);
-
-    m_textview_version = gtk_text_view_new ();
-    gtk_widget_show (m_textview_version);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_version), m_textview_version);
-    gtk_text_view_set_editable (GTK_TEXT_VIEW (m_textview_version), FALSE);
-    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (m_textview_version), GTK_WRAP_WORD);
-    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (m_textview_version), FALSE);
-    //  gtk_text_buffer_set_text (gtk_text_view_get_buffer (GTK_TEXT_VIEW (m_textview_version)), _("Software version:\n\nFPGA version:"), -1);
-
-    label_version = gtk_label_new (_("<b>Software and FPGA Version</b>"));
-    gtk_widget_show (label_version);
-    gtk_frame_set_label_widget (GTK_FRAME (frame_version), label_version);
-    gtk_label_set_use_markup (GTK_LABEL (label_version), TRUE);
-
-    button_upgrade = gtk_button_new_with_mnemonic (_("Upgrade"));
-    gtk_widget_show (button_upgrade);
-    // gtk_fixed_put (GTK_FIXED (fixed_info), button_upgrade, 350, 280);
-    gtk_fixed_put (GTK_FIXED (fixed_info), button_upgrade, 450, 280);
-
-    gtk_widget_set_size_request (button_upgrade, 120, 40);
-
-    g_signal_connect ((gpointer) button_upgrade, "clicked",
-                      G_CALLBACK (on_button_upgrade_clicked),
-                      this);
-
-    return fixed_info;
-}
-
-void ViewSystem::init_info_setting() {
-    string machine = UpgradeMan::GetInstance()->GetMachineType();
-    string soft = UpgradeMan::GetInstance()->GetSoftVersion();
-    string fpga = UpgradeMan::GetInstance()->GetFpgaVersion();
-
-    gchar *buf;
-    gchar *b1 = _("Software version");
-    gchar *b2 = _("FPGA version");
-
-    if(g_authorizationOn) {
-        int rest = CEmpAuthorization::GetRestTime();
-        if (rest == CEmpAuthorization::PERMANENTDAY) {
-            buf = g_strdup_printf("%s: %s\n%s\n\n%s: %s", b1, soft.c_str(), _("This is charging software, the period of validity is permanent."), b2, fpga.c_str());
-        } else {
-            buf = g_strdup_printf("%s: %s\n%s %d %s\n\n%s: %s", b1, soft.c_str(), _("This is charging software, the period of validity is"), rest, _("days."), b2, fpga.c_str());
-        }
-    } else
-        buf = g_strdup_printf("%s: %s\n\n%s: %s", b1, soft.c_str(), b2, fpga.c_str());
-    gtk_text_buffer_set_text (gtk_text_view_get_buffer (GTK_TEXT_VIEW (m_textview_version)), buf, -1);
-    g_free(buf);
-}
-
-GtkWidget* ViewSystem::create_common_print_treeview() {
-    GtkWidget *treeview;
-    GtkTreeModel *model;
-
-    GtkCellRenderer *render_brand, *render_model;
-    GtkTreeViewColumn *col_brand, *col_model;
-
-    treeview = gtk_tree_view_new ();
-    gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
-
-    render_brand = gtk_cell_renderer_text_new();
-    col_brand = gtk_tree_view_column_new_with_attributes(_("Brand"), render_brand, "text", PRT_BRAND, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col_brand);
-
-    render_model = gtk_cell_renderer_text_new();
-    col_model = gtk_tree_view_column_new_with_attributes(_("Model"), render_model, "text", PRT_MODEL, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col_model);
-
-    model = create_common_print_model();
-    if (model != NULL)
-        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
-    g_object_unref (model); /* destroy model automatically with view */
-
-    return treeview;
+  return treeview;
 }
 
 GtkTreeModel* ViewSystem::create_common_print_model() {
-    GtkListStore  *store;
-    GtkTreeIter    iter;
+  GtkTreeIter iter;
 
-    store = gtk_list_store_new(CNUM_COLS, G_TYPE_STRING, G_TYPE_STRING);
-    for (unsigned int i = 0; i < G_N_ELEMENTS(COMMON_PRINTER_DATA); i++) {
-        gtk_list_store_append (store, &iter);
-        gtk_list_store_set(store, &iter,
-                           PRT_BRAND, COMMON_PRINTER_DATA[i].brand.c_str(),
-                           PRT_MODEL, COMMON_PRINTER_DATA[i].model.c_str(),
-                           -1);
-    }
-    return GTK_TREE_MODEL (store);
+  GtkListStore* store = gtk_list_store_new(CNUM_COLS, G_TYPE_STRING, G_TYPE_STRING);
+  for (unsigned int i = 0; i < G_N_ELEMENTS(COMMON_PRINTER_DATA); i++) {
+    gtk_list_store_append (store, &iter);
+    gtk_list_store_set(store, &iter,
+      PRT_BRAND, COMMON_PRINTER_DATA[i].brand.c_str(),
+      PRT_MODEL, COMMON_PRINTER_DATA[i].model.c_str(),
+      -1);
+  }
+
+  return GTK_TREE_MODEL(store);
 }
 
-GtkWidget* ViewSystem::create_specific_print_treeview() {
-    GtkWidget *treeview;
-    GtkTreeModel *model;
+GtkTreeView* ViewSystem::create_specific_print_treeview() {
+  GtkTreeView* treeview = Utils::create_tree_view(create_specific_print_model());
+  gtk_tree_view_set_enable_search(treeview, FALSE);
+  gtk_tree_selection_set_mode(gtk_tree_view_get_selection(treeview), GTK_SELECTION_SINGLE);
 
-    GtkCellRenderer *render_default, *render_name, *render_status, *render_message;
-    GtkTreeViewColumn *col_default, *col_name, *col_status, *col_message;
+  GtkCellRenderer* render_name = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_name = gtk_tree_view_column_new_with_attributes(_("Printer"), render_name, "text", PRT_NAME, NULL);
+  gtk_tree_view_append_column(treeview, col_name);
 
-    treeview = gtk_tree_view_new ();
-    gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
+  GtkCellRenderer* render_default = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_default = gtk_tree_view_column_new_with_attributes(_("Default"), render_default, "text", PRT_DEFAULT, NULL);
+  gtk_tree_view_append_column(treeview, col_default);
 
-    render_name = gtk_cell_renderer_text_new();
-    col_name = gtk_tree_view_column_new_with_attributes(_("Printer"), render_name, "text", PRT_NAME, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col_name);
+  GtkCellRenderer* render_status = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_status = gtk_tree_view_column_new_with_attributes(_("Status"), render_status, "text", PRT_STATUS, NULL);
+  gtk_tree_view_append_column(treeview, col_status);
 
-    render_default = gtk_cell_renderer_text_new();
-    col_default = gtk_tree_view_column_new_with_attributes(_("Default"), render_default, "text", PRT_DEFAULT, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col_default);
+  GtkCellRenderer* render_message = gtk_cell_renderer_text_new();
+  GtkTreeViewColumn* col_message = gtk_tree_view_column_new_with_attributes(_("Message"), render_message, "text", PRT_MESSAGE, NULL);
+  gtk_tree_view_append_column(treeview, col_message);
 
-    render_status = gtk_cell_renderer_text_new();
-    col_status = gtk_tree_view_column_new_with_attributes(_("Status"), render_status, "text", PRT_STATUS, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col_status);
-
-    render_message = gtk_cell_renderer_text_new();
-    col_message = gtk_tree_view_column_new_with_attributes(_("Message"), render_message, "text", PRT_MESSAGE, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), col_message);
-
-    model = create_specific_print_model();
-    if (model != NULL)
-        gtk_tree_view_set_model (GTK_TREE_VIEW(treeview), model);
-    g_object_unref (model); /* destroy model automatically with view */
-
-    return treeview;
+  return treeview;
 }
 
 GtkTreeModel* ViewSystem::create_specific_print_model() {
-    GtkListStore  *store;
-    GtkTreeIter    iter;
+  GtkTreeIter iter;
 
-    store = gtk_list_store_new(SNUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+  GtkListStore* store = gtk_list_store_new(SNUM_COLS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
-    Printer print_data;
-    if (print_data.GetPrinters()) {
-        const vector<Printer::printer_attr> *vec_prt = print_data.get_printers();
-        vector<Printer::printer_attr>::const_iterator iter_prt;
-        for (iter_prt = vec_prt->begin(); iter_prt != vec_prt->end(); ++iter_prt) {
-            string tag_default;
-            if (iter_prt->isDefault)
-                tag_default = "*";
-            else
-                tag_default = "";
+  Printer print_data;
 
-            gtk_list_store_append (store, &iter);
-            gtk_list_store_set(store, &iter,
-                               PRT_NAME, iter_prt->name.c_str(),
-                               PRT_DEFAULT, tag_default.c_str(),
-                               PRT_STATUS, iter_prt->status.c_str(),
-                               PRT_MESSAGE, iter_prt->message.c_str(),
-                               -1);
-        }
+  if (print_data.GetPrinters()) {
+    const vector<Printer::printer_attr>* vec_prt = print_data.get_printers();
+    vector<Printer::printer_attr>::const_iterator iter_prt;
+
+    for (iter_prt = vec_prt->begin(); iter_prt != vec_prt->end(); ++iter_prt) {
+      string tag_default;
+
+      if (iter_prt->isDefault) {
+        tag_default = "*";
+      } else {
+        tag_default = "";
+      }
+
+      gtk_list_store_append (store, &iter);
+      gtk_list_store_set(store, &iter,
+        PRT_NAME, iter_prt->name.c_str(),
+        PRT_DEFAULT, tag_default.c_str(),
+        PRT_STATUS, iter_prt->status.c_str(),
+        PRT_MESSAGE, iter_prt->message.c_str(),
+        -1);
     }
-    return GTK_TREE_MODEL (store);
+  }
+
+  return GTK_TREE_MODEL(store);
 }
 
 GtkWidget * ViewSystem::create_key_function_treeview(const string function_list[], unsigned int size) {

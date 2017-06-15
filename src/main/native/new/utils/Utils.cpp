@@ -259,7 +259,7 @@ GtkNotebook* Utils::create_notebook() {
   gtk_notebook_set_scrollable(notebook, TRUE);
   gtk_container_set_border_width(GTK_CONTAINER(notebook), 0);
 
-  gtk_widget_modify_bg(GTK_WIDGET(notebook), GTK_STATE_NORMAL, get_color("gray"));
+  gtk_widget_modify_bg(GTK_WIDGET(notebook), GTK_STATE_NORMAL, get_color("#545454"));
 
   return notebook;
 }
@@ -303,6 +303,16 @@ GtkTreeView* Utils::create_tree_view(GtkTreeModel* mode) {
   gtk_tree_selection_set_mode(gtk_tree_view_get_selection(tree_view), GTK_SELECTION_BROWSE);
 
   return tree_view;
+}
+
+GtkTextView* Utils::create_text_view() {
+  GtkTextView* text_view = GTK_TEXT_VIEW(gtk_text_view_new());
+
+  gtk_text_view_set_editable(text_view, FALSE);
+  gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
+  gtk_text_view_set_cursor_visible(text_view, FALSE);
+
+  return text_view;
 }
 
 GtkFrame* Utils::create_frame(const string label) {

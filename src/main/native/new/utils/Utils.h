@@ -37,6 +37,7 @@ public:
 
   static GtkScrolledWindow* create_scrolled_window();
   static GtkTreeView* create_tree_view(GtkTreeModel* mode = NULL);
+  static GtkTextView* create_text_view();
   static GtkFrame* create_frame(const string label = "");
 
   static GtkHSeparator* create_hseparator();

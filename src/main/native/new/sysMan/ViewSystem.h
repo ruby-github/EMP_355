@@ -513,6 +513,96 @@ private:
 
   // Peripheral
 
+  static void signal_combobox_changed_video(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnComboVideoChanged();
+    }
+  }
+
+  static void signal_button_clicked_tvout_default(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnTVOutDefaultClicked(button);
+    }
+  }
+
+  static void signal_radio_button_toggled_common(GtkToggleButton* togglebutton, ViewSystem* data) {
+    if (data != NULL) {
+      data->CommonRadioToggled(togglebutton);
+    }
+  }
+
+  static void signal_radio_button_toggled_specific(GtkToggleButton* togglebutton, ViewSystem* data) {
+    if (data != NULL) {
+      data->SpecificRadioToggled(togglebutton);
+    }
+  }
+
+  static void signal_button_clicked_add_printer(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnAddPrinterClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_del_printer(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnDelPrinterClicked(button);
+    }
+  }
+
+  // Custom Report
+
+  static void signal_button_clicked_report_recovery(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnRecoveryClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_report_add(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnAddClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_report_save(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnSave2Clicked(button);
+    }
+  }
+
+  static void signal_button_clicked_report_delete(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnDeleteClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_report_ok(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnOkClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_report_cancel(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnCancelClicked(button);
+    }
+  }
+
+  static void signal_entry_insert_templet(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewSystem* data) {
+    if (data != NULL) {
+      data->EntrytempletInsert(editable, new_text, new_text_length, position);
+    }
+  }
+
+  // DICOM
+
+  // P1-P3
+
+  // System Info
+
+  static void signal_button_clicked_upgrade(GtkButton* button, ViewSystem* data) {
+    data->BtnUpgradeClicked(button);
+  }
+
   // signal
 
   void ButtonClickedApply(GtkButton* button);
@@ -580,14 +670,29 @@ private:
   void CellRendererRenameComment(GtkCellRendererText* cellrenderer, gchar* path_str, gchar* new_text);
 
   // Peripheral
+  void BtnComboVideoChanged();
+  void BtnTVOutDefaultClicked(GtkButton* button);
+  void CommonRadioToggled(GtkToggleButton* togglebutton);
+  void SpecificRadioToggled(GtkToggleButton* togglebutton);
+  void BtnAddPrinterClicked(GtkButton* button);
+  void BtnDelPrinterClicked(GtkButton* button);
 
   // Custom Report
+  void BtnRecoveryClicked(GtkButton* button);
+  void BtnAddClicked(GtkButton* button);
+  void BtnSave2Clicked(GtkButton* button);
+  void BtnDeleteClicked(GtkButton* button);
+  void BtnOkClicked(GtkButton* button);
+  void BtnCancelClicked(GtkButton* button);
+  void EntrytempletInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
 
   // DICOM
 
   // P1-P3
 
+
   // System Info
+  void BtnUpgradeClicked(GtkButton* button);
 
 private:
   ViewSystem();
@@ -620,15 +725,14 @@ private:
   void init_comment_setting(SysNoteSetting* sysNote);
   void save_comment_setting();
 
-  void create_note_tvout();
+  GtkWidget* create_note_tvout();
   void init_tvout_setting(SysGeneralSetting* sysGeneralSetting);
   void save_tvout_setting();
 
   GtkWidget* create_set_report();
+  void init_report_setting();
 
   GtkWidget* create_note_dicom();
-  void init_dicom_setting();
-  void save_dicom_setting();
 
   GtkWidget* create_note_key_config();
   void init_key_config();
@@ -765,11 +869,50 @@ private:
   GtkComboBoxText* m_combobox_font_color;
   GtkComboBoxText* m_combobox_bodymark_color;
 
+  // Peripheral
+  GtkComboBoxText* m_combobox_video;
+  GtkRadioButton* m_radiobutton_format_1;
+  GtkRadioButton* m_radiobutton_format_2;
+  GtkRadioButton* m_radiobutton_format_3;
+  GtkScrolledWindow* m_scrolledwindow_common;
+  GtkScrolledWindow* m_scrolledwindow_specific;
+  GtkTreeView* m_treeview_common_print;
+  GtkTreeView* m_treeview_specific_print;
+  GtkTreeSelection* m_selected_common_printer;
+  GtkTreeSelection* m_selected_specific_printer;
+  GtkRadioButton* m_radiobutton_common;
+  GtkRadioButton* m_radiobutton_specific;
 
+  // Custom Report
+  GtkTreeView* m_treeviewReportSet;
+  GtkButton* m_button_report_recovery;
+  GtkButton* m_button_report_add;
+  GtkButton* m_button_report_save;
+  GtkButton* m_button_report_delete;
+  GtkButton* m_button_report_ok;
+  GtkButton* m_button_report_cancel;
+  GtkLabel* m_label_templet;
+  GtkEntry* m_entry_templet;
+  GtkLabel* m_label_childsection;
+  GtkComboBoxText* m_combobox_childsection;
 
+  // DICOM
+
+  // P1-P3
+  static const int MAX_KEY = 10;
+
+  GtkRadioButton* m_radiobutton_key_p1[MAX_KEY];
+  GtkRadioButton* m_radiobutton_key_p2[MAX_KEY];
+  GtkRadioButton* m_radiobutton_key_p3[MAX_KEY];
+  int m_p1_func_index;
+  int m_p2_func_index;
+  int m_p3_func_index;
+
+  // System Info
+  GtkTextView* m_textview_version;
 
 public:
-    static const int MAX_KEY = 10;//8;//9;
+    //8;//9;
 
     void DoDicomTest();
     int GetProbeType();
@@ -817,16 +960,7 @@ private:
 
     int m_current_note_page;
 
-    // GtkWidget *m_notebookPrinter;
-    GtkWidget *m_radiobutton_common;
-    GtkWidget *m_radiobutton_specific;
-    GtkWidget *m_scrolledwindow_common;
-    GtkWidget *m_fixed_specific;
 
-    GtkTreeSelection *m_selected_common_printer;
-    GtkTreeSelection *m_selected_specific_printer;
-    GtkWidget *m_treeview_common_print;
-    GtkWidget *m_treeview_specific_print;
 
 
 
@@ -849,8 +983,7 @@ private:
 
     GtkTreeIter topIter;
     GtkCellRenderer *m_renderer;
-    GtkWidget *m_combobox_childsection;
-    GtkWidget *m_entry_templet;
+
 
     GtkWidget* show_window;
     GtkWidget* m_WindowABD;
@@ -866,10 +999,7 @@ private:
 
     GtkWidget* m_WindowANOB;
     GtkWidget *m_FixedReportSet;
-    GtkWidget *m_TreeviewReportSet;
 
-    GtkWidget *button_add, *button_save, *button_delete, *button_ok, *button_cancel;
-    GtkWidget *label_templet, *label_childsection;
     int init_language;
     guint m_flag_notebook_coustomreport;
     guint m_flag_notebook_image;
@@ -894,7 +1024,7 @@ private:
     bool LocalizationDB();
 
     void AddTempletBySection( sqlite3 *db);
-    void BtnRecoveryClicked(GtkButton *button);
+
 
     void ChkBtnClicked(GtkButton *button);
 
@@ -916,11 +1046,7 @@ private:
 
     GtkTreeModel *CreateTreeModel();
     void TreeSelectionChanged(GtkTreeSelection *selection);
-    void BtnAddClicked(GtkButton *button);
-    void BtnSave2Clicked(GtkButton *button);
-    void BtnDeleteClicked(GtkButton *button);
-    void BtnOkClicked(GtkButton *button);
-    void BtnCancelClicked(GtkButton *button);
+
 
 
     void ChangeCommentExamBox(int probe_type, char *check_part);
@@ -933,15 +1059,13 @@ private:
     void TransEnglish(char *strname, char str[256],char *str_indexname,char str_index[256]);
 
     std::vector <string> GetUserGroup();
-    static void  on_combobox_video_changed(GtkComboBox *widget,ViewSystem *data) {
-        data->BtnComboVideoChanged();
-    }
+
 
     static void on_entry_insert_custom_item(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
         data->EntryItemLengthInsert(editable, new_text, new_text_length, position);
     }
 
-    void BtnComboVideoChanged();
+
 
 
 
@@ -964,24 +1088,7 @@ private:
     static void HandleChkBtnClicked(GtkButton *button, ViewSystem *data) {
         data->ChkBtnClicked(button);
     }
-    static void on_button_recovery_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnRecoveryClicked(button);
-    }
-    static void on_button_add_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnAddClicked(button);
-    }
-    static void on_button_save2_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnSave2Clicked(button);
-    }
-    static void on_button_delete_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnDeleteClicked(button);
-    }
-    static void on_button_ok_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnOkClicked(button);
-    }
-    static void on_button_cancel_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnCancelClicked(button);
-    }
+
 
 
 
@@ -993,13 +1100,11 @@ private:
     bool ReadRecordFromDB(const string sections, const string templet, const string childsection);
     void apply_report_setting();
 
-    void EntrytempletInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
+
     void BtnNewCheckPartOkClicked(GtkButton *button);
     void BtnNewCheckPartCancelClicked(GtkButton *button);
 
-    static void on_entry_templet_insert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewSystem *data) {
-        data->EntrytempletInsert(editable, new_text, new_text_length, position);
-    }
+
 
     void GetImageNoteSelection(int &probeIndex, int &itemIndex, char *&itemName);
 
@@ -1018,11 +1123,8 @@ private:
 
     // TV Out
     GtkWidget *m_fixed_tvout;
-    GtkWidget *m_combobox_video;
     GtkWidget *m_combobox_connect_type;
-    GtkWidget *m_radiobutton_format_1;
-    GtkWidget *m_radiobutton_format_2;
-    GtkWidget *m_radiobutton_format_3;
+
     int m_flag_notebook_tvout;
 
     //dicom
@@ -1034,17 +1136,10 @@ private:
     GtkWidget *m_entry_function_p1;
     GtkWidget *m_entry_function_p2;
     GtkWidget *m_entry_function_p3;
-    int m_p1_func_index;
-    int m_p2_func_index;
-    int m_p3_func_index;
-
-    GtkWidget *m_radiobutton_key_p1[MAX_KEY];
-    GtkWidget *m_radiobutton_key_p2[MAX_KEY];
-    GtkWidget *m_radiobutton_key_p3[MAX_KEY];
 
 
-    //info
-    GtkWidget *m_textview_version;
+
+
 
     //image
     /*GtkWidget *m_combobox_mbp;
@@ -1108,8 +1203,7 @@ private:
 
 
     void save_new_item();
-    void init_printer(SysGeneralSetting *sysGeneralSetting);
-    void CreatePrinter();
+
 
 
 
@@ -1123,8 +1217,8 @@ private:
 
     GtkTreeModel* create_common_print_model();
     GtkTreeModel* create_specific_print_model();
-    GtkWidget* create_common_print_treeview();
-    GtkWidget* create_specific_print_treeview();
+    GtkTreeView* create_common_print_treeview();
+    GtkTreeView* create_specific_print_treeview();
 
     int common_printer_selection();
     std::string specific_printer_selection();
@@ -1150,17 +1244,14 @@ private:
     void image_para_restrict(int probeIndex);
     // signal handle
 
-    void CommonRadioToggled(GtkToggleButton *togglebutton);
-    void SpecificRadioToggled(GtkToggleButton *togglebutton);
-    void BtnAddPrinterClicked(GtkButton *button);
-    void BtnDelPrinterClicked(GtkButton *button);
 
 
 
 
 
 
-    void BtnTVOutDefaultClicked(GtkButton *button);
+
+
     void ComboNetMethodChanged(GtkComboBox *widget);
     void BtnDicomTest(GtkButton *button);
     void BtnDicomReset(GtkButton *button);
@@ -1185,7 +1276,7 @@ private:
 
 
 
-    void BtnUpgradeClicked(GtkButton *button);
+
 
     void image_default_setting();
     void BtnImageGetCurrentClicked(GtkButton *button);
@@ -1240,27 +1331,14 @@ private:
 
 
 
-    static void on_common_radio_button_toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
-        data->CommonRadioToggled(togglebutton);
-    }
-    static void on_specific_radio_button_toggled(GtkToggleButton *togglebutton, ViewSystem *data) {
-        data->SpecificRadioToggled(togglebutton);
-    }
-    static void on_button_add_printer_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnAddPrinterClicked(button);
-    }
-    static void on_button_del_printer_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnDelPrinterClicked(button);
-    }
 
 
 
 
 
 
-    static void on_button_tvout_default_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnTVOutDefaultClicked(button);
-    }
+
+
     //static void HandleNetMethodChanged(GtkComboBox *widget, ViewSystem *data) { data->ComboNetMethodChanged(widget); }
     static void HandleDicomTest(GtkButton *button, ViewSystem *data) {
         data->BtnDicomTest(button);
@@ -1276,9 +1354,7 @@ private:
         data->EntryDigitInsert(editable, new_text, new_text_length, position);
     }
 
-    static void on_button_upgrade_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnUpgradeClicked(button);
-    }
+
 
 
 
