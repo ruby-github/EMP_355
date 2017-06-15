@@ -430,6 +430,87 @@ private:
 
   // Comment
 
+  static void signal_combobox_changed_probe_comment(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->ProbeCommentChanged(combobox);
+    }
+  }
+
+  static void signal_combobox_changed_exam_comment(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->ExamCommentChanged(combobox);
+    }
+  }
+
+  static void signal_combobox_changed_department_comment(GtkComboBox* combobox, ViewSystem* data) {
+    if (data != NULL) {
+      data->DepartmentCommentChanged(combobox);
+    }
+  }
+
+  static void signal_button_clicked_selectone_comment(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonSelectOneCommentClicked(button);
+    }
+  }
+  static void signal_button_clicked_selectall_comment(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonSelectAllCommentClicked(button);
+    }
+  }
+  static void signal_button_clicked_add(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonAddClicked(button);
+    }
+  }
+  static void signal_button_clicked_deleteselect(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonDeleteSelectClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_up(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonUpClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_down(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonDownClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_delete(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonDeleteClicked(button);
+    }
+  }
+
+  static void signal_button_clicked_deleteall(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->ButtonDeleteAllClicked(button);
+    }
+  }
+
+  static void on_button_comment_default_clicked(GtkButton* button, ViewSystem* data) {
+    if (data != NULL) {
+      data->BtnCommentDefaultClicked(button);
+    }
+  }
+
+  static void signal_renderer_rename_selectcomment(GtkCellRendererText* cellrenderer, gchar* path, gchar* new_text, ViewSystem* data) {
+    if (data != NULL) {
+      data->CellRendererRenameSelectComment(cellrenderer, path, new_text);
+    }
+  }
+
+  static void signal_renderer_rename_comment(GtkCellRendererText* cellrenderer, gchar* path, gchar* new_text, ViewSystem* data) {
+    if (data != NULL) {
+      data->CellRendererRenameComment(cellrenderer, path, new_text);
+    }
+  }
+
   // Peripheral
 
   // signal
@@ -483,6 +564,20 @@ private:
   void BtnCalculateDefaultClicked(GtkButton* button);
 
   // Comment
+  void ProbeCommentChanged(GtkComboBox* combobox);
+  void ExamCommentChanged(GtkComboBox* combobox);
+  void DepartmentCommentChanged(GtkComboBox* combobox);
+  void ButtonSelectOneCommentClicked(GtkButton* button);
+  void ButtonSelectAllCommentClicked(GtkButton* button);
+  void ButtonAddClicked(GtkButton* button);
+  void ButtonDeleteSelectClicked(GtkButton* button);
+  void ButtonUpClicked(GtkButton* button);
+  void ButtonDownClicked(GtkButton* button);
+  void ButtonDeleteClicked(GtkButton* button);
+  void ButtonDeleteAllClicked(GtkButton* button);
+  void BtnCommentDefaultClicked(GtkButton* button);
+  void CellRendererRenameSelectComment(GtkCellRendererText* cellrenderer, gchar* path_str, gchar* new_text);
+  void CellRendererRenameComment(GtkCellRendererText* cellrenderer, gchar* path_str, gchar* new_text);
 
   // Peripheral
 
@@ -655,10 +750,12 @@ private:
   GtkComboBoxText* m_combobox_probe_comment;
   GtkComboBoxText* m_combobox_exam_comment;
   GtkComboBoxText* m_combobox_department_comment;
+  GtkScrolledWindow* m_scrolledwindow_item_comment;
+  GtkScrolledWindow* m_scrolledwindow_item_comment_selected;
   GtkTreeView* m_treeview_item_comment;
-  GtkTreeView* m_treeview_item_comment1;
+  GtkTreeView* m_treeview_item_comment_selected;
   GtkCellRenderer* m_cellrenderer_comment_text;
-  GtkCellRenderer* m_cellrenderer_comment_text1;
+  GtkCellRenderer* m_cellrenderer_comment_text_selected;
   GtkRadioButton* m_radiobutton_font_big;
   GtkRadioButton* m_radiobutton_font_mid;
   GtkRadioButton* m_radiobutton_font_small;
@@ -668,10 +765,8 @@ private:
   GtkComboBoxText* m_combobox_font_color;
   GtkComboBoxText* m_combobox_bodymark_color;
 
-  GtkScrolledWindow* m_scrolledwindow_item_comment;
-  GtkScrolledWindow* m_scrolledwindow_item_comment1;
 
-  GtkWidget *fixed_comment;
+
 
 public:
     static const int MAX_KEY = 10;//8;//9;
@@ -848,20 +943,17 @@ private:
 
     void BtnComboVideoChanged();
 
-    void CellRendererRenameComment(GtkCellRendererText *m_cellrenderer_comment_text1, gchar *path, gchar *new_text);
-    void CellRendererRenameSelectComment(GtkCellRendererText *m_cellrenderer_comment_text, gchar *path, gchar *new_text);
+
+
+
     void RenameItemClicked(GtkButton *button);
     static void HandleRenameItemClicked(GtkButton *button, ViewSystem *data) {
         data->RenameItemClicked(button);
     }
 
 
-    static void HandleCellRendererRenameComment(GtkCellRendererText *m_cellrenderer_comment_text1, gchar *path, gchar *new_text, ViewSystem *data) {
-        data->CellRendererRenameComment(m_cellrenderer_comment_text1, path, new_text);
-    }
-    static void HandleCellRendererRenameSelectComment(GtkCellRendererText *m_cellrenderer_comment_text, gchar *path, gchar *new_text, ViewSystem *data) {
-        data->CellRendererRenameSelectComment(m_cellrenderer_comment_text, path, new_text);
-    }
+
+
 
     bool ExamTypeTestRowExpandBefore(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTreePath *path);
 
@@ -1041,7 +1133,7 @@ private:
     GtkWidget * create_key_function_treeview(const std::string function_list[], unsigned int size);
     GtkTreeModel* create_exam_item_model(std::vector<ExamItem::EItem> index);
     GtkTreeModel* create_item_comment_model(int index);
-    GtkTreeModel* create_item_comment_model1();
+    GtkTreeModel* create_item_comment_model_selected();
 
     int  DepartmentIndex();
     void create_exam_comment_model(std::vector<ExamItem::EItem> index);
@@ -1067,7 +1159,7 @@ private:
 
 
 
-    void BtnCommentDefaultClicked(GtkButton *button);
+
     void BtnTVOutDefaultClicked(GtkButton *button);
     void ComboNetMethodChanged(GtkComboBox *widget);
     void BtnDicomTest(GtkButton *button);
@@ -1090,9 +1182,7 @@ private:
     void TreeFuncChanged(GtkTreeSelection *selection);
 
 
-    void ProbeCommentChanged(GtkComboBox *widget);
-    void ExamCommentChanged(GtkComboBox *widget);
-    void DepartmentCommentChanged(GtkComboBox *widget);
+
 
 
     void BtnUpgradeClicked(GtkButton *button);
@@ -1111,8 +1201,8 @@ private:
     void ClearComboBox(GtkComboBox *box);
 
     void SpinbuttonInsertGain(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
-    void add_columns_comment(GtkTreeView *treeview);
-    void add_columns_comment1(GtkTreeView *treeview);
+    void add_columns_comment(GtkTreeView* treeview);
+    void add_columns_comment_selected(GtkTreeView* treeview);
 
     void SpinbuttonInsertAngle(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position);
     gboolean SpinbuttonOutputAngle(GtkSpinButton *spin);
@@ -1134,15 +1224,8 @@ private:
 
 
 
-    void ButtonSelectOneCommentClicked(GtkButton *button);
-    void ButtonSelectAllCommentClicked(GtkButton *button);
 
-    //    void ButtonEditClicked(GtkButton *button);
-    void ButtonDeleteClicked(GtkButton *button);
-    void ButtonAddClicked(GtkButton *button);
-    void ButtonDeleteSelectClicked(GtkButton *button);
-    void ButtonDeleteAllClicked(GtkButton *button);
-    void ButtonUpClicked(GtkButton *button);
+
 
     ///>optional function
     void TreeCursorChanged(GtkTreeView *treeview);
@@ -1152,7 +1235,7 @@ private:
     void BtnExportClicked(GtkButton *button);
     void BtnRegisterClicked(GtkButton *button);
 
-    void ButtonDownClicked(GtkButton *button);
+
     // signal connect
 
 
@@ -1174,9 +1257,7 @@ private:
 
 
 
-    static void on_button_comment_default_clicked(GtkButton *button, ViewSystem *data) {
-        data->BtnCommentDefaultClicked(button);
-    }
+
     static void on_button_tvout_default_clicked(GtkButton *button, ViewSystem *data) {
         data->BtnTVOutDefaultClicked(button);
     }
@@ -1212,16 +1293,8 @@ private:
     static void HandleTreeFuncChanged(GtkTreeSelection *selection, ViewSystem *data) {
         data->TreeFuncChanged(selection);
     }
-    static void HandleExamCommentChanged(GtkComboBox *widget, ViewSystem *data) {
-        data->ExamCommentChanged(widget);
-    }
-    static void HandleProbeCommentChanged(GtkComboBox *widget, ViewSystem *data) {
-        data->ProbeCommentChanged(widget);
-    }
 
-    static void HandleDepartmentCommentChanged(GtkComboBox *widget, ViewSystem *data) {
-        data->DepartmentCommentChanged(widget);
-    }
+
 
 
 
@@ -1305,40 +1378,12 @@ private:
 
 
 
-    static void HandleButtonSelectOneCommentClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonSelectOneCommentClicked(button);
-    }
-    static void HandleButtonSelectAllCommentClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonSelectAllCommentClicked(button);
-    }
 
-    static void HandleButtonDeleteClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonDeleteClicked(button);
-    }
-    static void HandleButtonAddClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonAddClicked(button);
-    }
-    static void HandleButtonDeleteSelectClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonDeleteSelectClicked(button);
-    }
 
-    static void HandleButtonDeleteAllClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonDeleteAllClicked(button);
-    }
-    static void HandleButtonDownClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonDownClicked(button);
-    }
-    static void HandleButtonUpClicked(GtkButton *button, ViewSystem *data) {
-        if (data)
-            data->ButtonUpClicked(button);
-    }
+
+
+
+
 
     ///>optional functions
     static void HandleOptionCursorChanged(GtkTreeView *treeview, ViewSystem *data) {
