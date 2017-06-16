@@ -492,7 +492,6 @@ GdkColor* Utils::get_color(const string color_name) {
 #include "sysMan/ViewSystem.h"
 
 void Utils::test(GtkWidget* widget) {
-  ViewSystem::GetInstance()->CreateWindow();
 
   //GtkDialog* dialog = create_dialog(NULL, "test", 600, 450);
   //gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(dialog)), GTK_WIDGET(w));
