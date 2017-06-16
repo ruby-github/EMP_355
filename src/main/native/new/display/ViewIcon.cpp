@@ -1,250 +1,242 @@
-#include <gtk/gtk.h>
+#include "display/ViewIcon.h"
 
 #include "Def.h"
-#include "display/gui_global.h"
-#include "display/gui_func.h"
-#include "display/ViewIcon.h"
 #include "periDevice/Battery.h"
 
-namespace {
-const char* ScanIconPath[5] = {
-    "res/icon/scan-00.png",
-    "res/icon/scan-25.png",
-    "res/icon/scan-50.png",
-    "res/icon/scan-75.png",
-    "res/icon/scan-100.png",
+const string NetworkIconPath[] = {
+  "res/icon/network-offline.png",
+  "res/icon/network-idle.png"
 };
 
-const char* NetworkIconPath[2] = {
-    "res/icon/network-offline.png",
-    "res/icon/network-idle.png",
+const string SoundIconPath[] = {
+  "res/icon/audio-muted.png",
+  "res/icon/audio-on.png"
 };
 
-const char* SoundIconPath[2] = {
-    "res/icon/audio-muted.png",
-    "res/icon/audio-on.png",
+const string ScanIconPath[] = {
+  "res/icon/scan-00.png",
+  "res/icon/scan-25.png",
+  "res/icon/scan-50.png",
+  "res/icon/scan-75.png",
+  "res/icon/scan-100.png"
 };
 
-const char* ChargeIconPath[7] = {
-    "res/icon/charge0.jpg",
-    "res/icon/charge1.jpg",
-    "res/icon/charge2.jpg",
-    "res/icon/charge3.jpg",
-    "res/icon/charge4.jpg",
-    "res/icon/charge5.jpg",
-    "res/icon/charge.jpg",
+const string ChargeIconPath[] = {
+  "res/icon/charge0.jpg",
+  "res/icon/charge1.jpg",
+  "res/icon/charge2.jpg",
+  "res/icon/charge3.jpg",
+  "res/icon/charge4.jpg",
+  "res/icon/charge5.jpg",
+  "res/icon/charge.jpg"
 };
 
-const char* ReplayIconPath = "res/icon/replay.png";
-const char* FlashIconPath = "res/icon/flashkey.png";
-const char* CdromIconPath = "res/icon/cdrom.png";
-//const char* PrinterIconPath = "res/icon/printer.png";
+const string ReplayIconPath = "res/icon/replay.png";
+const string FlashIconPath = "res/icon/flashkey.png";
+const string CdromIconPath = "res/icon/cdrom.png";
+
+ViewIcon* ViewIcon::m_instance = NULL;
+
+// ---------------------------------------------------------
+
+ViewIcon* ViewIcon::GetInstance() {
+  if (m_instance == NULL) {
+    m_instance = new ViewIcon();
+  }
+
+  return m_instance;
 }
 
-ViewIcon* ViewIcon::m_ptrInstance = NULL;
+ViewIcon::ViewIcon() {
+  m_network = NULL;
+  m_sound = NULL;
+  m_replay = NULL;
+  m_udisk = NULL;
+  m_cdrom = NULL;
+  m_charge = NULL;
 
-ViewIcon::ViewIcon(void) {
-    m_countScanIcon = 0;
-    m_timeout = 0;
+  m_count_scanicon = 0;
 }
 
 ViewIcon::~ViewIcon() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
 }
 
-ViewIcon* ViewIcon::GetInstance(void) {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new ViewIcon;
-    return m_ptrInstance;
-}
+GtkWidget* ViewIcon::Create() {
+  GtkTable* table = Utils::create_table(1, 6);
 
-void ViewIcon::Create(void) {
-    const int num = 6;
-    m_table = gtk_table_new(1, num, TRUE);
-//    gtk_widget_set_size_request (m_table, 180, 32);
-    gtk_widget_set_size_request (m_table, 26*num, 24);
-    gtk_table_set_col_spacings (GTK_TABLE (m_table), 5);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+  gtk_table_set_row_spacings(table, 1);
+  gtk_table_set_col_spacings(table, 1);
 
-    m_network = create_pixmap (NetworkIconPath[0]);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_network, 0, 1, 0, 1);
+  m_network = Utils::create_image(NetworkIconPath[0]);
+  m_sound = Utils::create_image(SoundIconPath[0]);
+  m_replay = Utils::create_image();
+  m_udisk = Utils::create_image();
+  m_cdrom = Utils::create_image();
+  m_charge = Utils::create_image();
 
-    m_sound = create_pixmap (SoundIconPath[0]);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_sound, 1, 2, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_network), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_sound), 1, 2, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_replay), 2, 3, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_udisk), 3, 4, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_cdrom), 4, 5, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_charge), 5, 6, 0, 1);
 
-    m_replay = create_pixmap (NULL); //(ScanIconPath[0]);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_replay, 2, 3, 0, 1);
+  InitCharge();
 
-    m_udisk = create_pixmap (NULL); //(FlashIconPath);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_udisk, 3, 4, 0, 1);
-
-    m_cdrom = create_pixmap (NULL); //(CdromIconPath);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_cdrom, 4, 5, 0, 1);
-
-    m_charge = create_pixmap (NULL); //(CdromIconPath);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_charge, 5, 6, 0, 1);
-#if 0
-    m_printer = create_pixmap(NULL);
-    gtk_table_attach_defaults (GTK_TABLE (m_table), m_printer, 5, 6, 0, 1);
-#endif
-
-#ifdef EMP_355
-    InitCharge();
-#endif
-
-}
-
-GtkWidget * ViewIcon::GetIconArea(void) {
-    return m_table;
-}
-
-void ViewIcon::ScanIcon(const char *iconName) {
-    gtk_image_set_from_file(GTK_IMAGE(m_replay), iconName);
-}
-
-gboolean ScrollScanIcon(gpointer data) {
-    char path[256];
-    ViewIcon *tmp;
-    tmp = (ViewIcon *)data;
-    int count = tmp->GetCountScanIcon();
-    switch (count) {
-    case 0:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ScanIconPath[0]);
-        break;
-    case 1:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ScanIconPath[1]);
-        break;
-    case 2:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ScanIconPath[2]);
-        break;
-    case 3:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ScanIconPath[3]);
-        break;
-    case 4:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ScanIconPath[4]);
-        break;
-    }
-    tmp->ScanIcon(path);
-
-    if (count < 4)
-        count++;
-    else
-        count = 0;
-
-    tmp->SetCountScanIcon(count);
-    return TRUE;
-}
-
-void ViewIcon::Replay(bool on) {
-    if (on) {
-        if (m_timeout > 0) {
-            g_source_remove(m_timeout);
-            m_timeout = 0;
-        }
-        ScanIcon(ReplayIconPath);
-    } else {
-        if(m_timeout == 0)
-            m_timeout = g_timeout_add(500, ScrollScanIcon, this);
-    }
+  return GTK_WIDGET(table);
 }
 
 void ViewIcon::Network(bool on) {
-    char path[256];
-    if (on)
-        sprintf(path, "%s/%s", CFG_RES_PATH, NetworkIconPath[1]);
-    else
-        sprintf(path, "%s/%s", CFG_RES_PATH, NetworkIconPath[0]);
-    gtk_image_set_from_file(GTK_IMAGE(m_network), path);
+  string path;
+
+  if (on) {
+    path = string(CFG_RES_PATH) + NetworkIconPath[1];
+  } else {
+    path = string(CFG_RES_PATH) + NetworkIconPath[0];
+  }
+
+  gtk_image_set_from_file(m_network, path.c_str());
 }
 
 void ViewIcon::Sound(bool on) {
-    char path[256];
-    if (on)
-        sprintf(path, "%s/%s", CFG_RES_PATH, SoundIconPath[1]);
-    else
-        sprintf(path, "%s/%s", CFG_RES_PATH, SoundIconPath[0]);
-    gtk_image_set_from_file(GTK_IMAGE(m_sound), path);
+  string path;
+
+  if (on) {
+    path = string(CFG_RES_PATH) + SoundIconPath[1];
+  } else {
+    path = string(CFG_RES_PATH) + SoundIconPath[0];
+  }
+
+  gtk_image_set_from_file(m_sound, path.c_str());
+}
+
+void ViewIcon::Replay(bool on) {
+  if (on) {
+    ScanIcon(ReplayIconPath);
+  } else {
+    g_timeout_add(500, signal_callback_scroll_scanicon, this);
+  }
 }
 
 void ViewIcon::Udisk(bool on) {
-    char path[256];
-    if (on) {
-        sprintf(path, "%s/%s", CFG_RES_PATH, FlashIconPath);
-        gtk_image_set_from_file(GTK_IMAGE(m_udisk), path);
-    } else
-        gtk_image_set_from_file(GTK_IMAGE(m_udisk), NULL);
+  if (on) {
+    string path = string(CFG_RES_PATH) + FlashIconPath;
+    gtk_image_set_from_file(m_udisk, path.c_str());
+  } else {
+    gtk_image_set_from_file(m_udisk, NULL);
+  }
 }
 
 void ViewIcon::Cdrom(bool on) {
-    char path[256];
-    if (on) {
-        sprintf(path, "%s/%s", CFG_RES_PATH, CdromIconPath);
-        gtk_image_set_from_file(GTK_IMAGE(m_cdrom), path);
-    } else
-        gtk_image_set_from_file(GTK_IMAGE(m_cdrom), NULL);
-
+  if (on) {
+    string path = string(CFG_RES_PATH) + CdromIconPath;
+    gtk_image_set_from_file(m_cdrom, path.c_str());
+  } else {
+    gtk_image_set_from_file(m_cdrom, NULL);
+  }
 }
 
 void ViewIcon::Printer(bool on) {
-#if 0
-    char path[256];
-    if (on) {
-        sprintf(path, "%s/%s", CFG_RES_PATH, PrinterIconPath);
-        gtk_image_set_from_file(GTK_IMAGE(m_printer), path);
-    } else
-        gtk_image_set_from_file(GTK_IMAGE(m_printer), NULL);
-#endif
 }
 
-void ViewIcon::Charge(int data) {
-    char path[256];
-    int value = 80 / 4;
-    int count = 0;
-    if (data < 10)
-        count = 0;
-    else if (data > 90)
-        count = 5;
-    else
-        count = 1 + (data - 10) / value;
-    PRINTF("--count =%d\n", count);
-    switch (count) {
-    case 0:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[0]);
-        break;
-    case 1:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[1]);
-        break;
-    case 2:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[2]);
-        break;
-    case 3:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[3]);
-        break;
-    case 4:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[4]);
-        break;
-    case 5:
-        sprintf(path, "%s/%s", CFG_RES_PATH, ChargeIconPath[5]);
-        break;
+// ---------------------------------------------------------
 
-    }
+void ViewIcon::ScrollScanIcon() {
+  int count = GetCountScanIcon();
 
-    gtk_image_set_from_file(GTK_IMAGE(m_charge), path);
+  string path = string(CFG_RES_PATH) + ScanIconPath[0];
+
+  switch (count) {
+  case 0:
+    path = string(CFG_RES_PATH) + ScanIconPath[0];
+    break;
+  case 1:
+    path = string(CFG_RES_PATH) + ScanIconPath[1];
+    break;
+  case 2:
+    path = string(CFG_RES_PATH) + ScanIconPath[2];
+    break;
+  case 3:
+    path = string(CFG_RES_PATH) + ScanIconPath[3];
+    break;
+  case 4:
+    path = string(CFG_RES_PATH) + ScanIconPath[4];
+    break;
+  }
+
+  ScanIcon(path);
+
+  if (count < 4) {
+    count++;
+  } else {
+    count = 0;
+  }
+
+  SetCountScanIcon(count);
 }
 
 void ViewIcon::UpdateCharge() {
-    Battery battery;
-    Charge(battery.GetCapacity());
-}
-
-gboolean CallBackUpdateCharge(gpointer data) {
-    ViewIcon *tmp;
-    tmp = (ViewIcon *)data;
-    tmp->UpdateCharge();
-    return true;
+  Battery battery;
+  Charge(battery.GetCapacity());
 }
 
 void ViewIcon::InitCharge() {
-    UpdateCharge();
-    g_timeout_add( 6000, CallBackUpdateCharge, this );
+  UpdateCharge();
+  g_timeout_add(6000, signal_callback_updatecharge, this );
+}
+
+void ViewIcon::ScanIcon(const string iconName) {
+  gtk_image_set_from_file(m_replay, iconName.c_str());
+}
+
+int ViewIcon::GetCountScanIcon() {
+  return m_count_scanicon;
+}
+
+void ViewIcon::SetCountScanIcon(int count) {
+  m_count_scanicon = count;
+}
+
+void ViewIcon::Charge(int data) {
+  int value = 80 / 4;
+  int count = 0;
+
+  if (data < 10) {
+    count = 0;
+  } else if (data > 90) {
+    count = 5;
+  } else {
+    count = 1 + (data - 10) / value;
+  }
+
+  string path = string(CFG_RES_PATH) + ChargeIconPath[0];
+
+  switch (count) {
+  case 0:
+    path = string(CFG_RES_PATH) + ChargeIconPath[0];
+    break;
+  case 1:
+    path = string(CFG_RES_PATH) + ChargeIconPath[1];
+    break;
+  case 2:
+    path = string(CFG_RES_PATH) + ChargeIconPath[2];
+    break;
+  case 3:
+    path = string(CFG_RES_PATH) + ChargeIconPath[3];
+    break;
+  case 4:
+    path = string(CFG_RES_PATH) + ChargeIconPath[4];
+    break;
+  case 5:
+    path = string(CFG_RES_PATH) + ChargeIconPath[5];
+    break;
+  }
+
+  gtk_image_set_from_file(m_charge, path.c_str());
 }

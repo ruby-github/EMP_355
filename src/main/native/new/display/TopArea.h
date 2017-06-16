@@ -1,4 +1,3 @@
-// -*- c++ -*-
 #ifndef TOPAREA_H
 #define TOPAREA_H
 

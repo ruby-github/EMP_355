@@ -48,7 +48,7 @@ void KnobCfmCreate() {
 
 ///> sync
 void SyncKnobCfm(EKnobCfm type, const char* s, EKnobReturn status, bool draw) {
-    sprintf(KnobCfmMenu[type].value, "%s", s);
+    KnobCfmMenu[type].value = s;
     KnobCfmMenu[type].status = status;
     if (draw)
         KnobMenu::GetInstance()->Update();

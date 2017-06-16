@@ -1448,8 +1448,7 @@ void ViewMain::Create() {
   gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_hintArea, HINT_AREA_X, HINT_AREA_Y);
 
   // icon view
-  ViewIcon::GetInstance()->Create();
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), ViewIcon::GetInstance()->GetIconArea(), 844, 733); // 740
+  gtk_fixed_put(GTK_FIXED(m_fixedWindow), ViewIcon::GetInstance()->Create(), 844, 733); // 740
 
   // Menu Area
   GtkWidget *tableMenu;

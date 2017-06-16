@@ -1,704 +1,373 @@
-#include <gtk/gtk.h>
-#include <string.h>
-#include "display/gui_func.h"
 #include "display/KnobMenu.h"
-#include "display/gui_global.h"
+
 #include "imageProc/GlobalClassMan.h"
 
-KnobMenu* KnobMenu::m_ptrInstance = NULL;
+KnobMenu* KnobMenu::m_instance = NULL;
+
+// ---------------------------------------------------------
 
 KnobMenu* KnobMenu::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance  = new KnobMenu;
-    return m_ptrInstance;
+  if (m_instance == NULL) {
+    m_instance  = new KnobMenu();
+  }
+
+  return m_instance;
 }
 
-KnobMenu::KnobMenu(void) {
-    m_tableKnob = 0;
-    m_knobType = D2;
+KnobMenu::KnobMenu() {
+  m_knobType = D2;
 }
 
-void KnobMenu::SetItem(KnobItem *item, unsigned int total_item, EKnobType type) {
-    m_KnobItem = item;
-    if ((total_item % KNOB_NUM) == 0)
-        m_MaxLevel = (total_item/ KNOB_NUM) - 1;
-    else
-        m_MaxLevel = total_item/ KNOB_NUM;
-    m_CurLevel = 0;
-    m_knobType = type;
-    Update();
+KnobMenu::~KnobMenu() {
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
 }
 
-KnobMenu::KnobItem* KnobMenu::GetItem(void) {
-    return m_KnobItem;
+GtkWidget* KnobMenu::Create() {
+  GtkTable* table = Utils::create_table(1, 14);
+
+  gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+  gtk_table_set_row_spacings(table, 1);
+  gtk_table_set_col_spacings(table, 1);
+
+  m_button_left = Utils::create_button("≪");
+  m_button_Knob[0] = Utils::create_button("knob1");
+  m_button_Knob[1] = Utils::create_button("knob2");
+  m_button_Knob[2] = Utils::create_button("knob3");
+  m_button_Knob[3] = Utils::create_button("knob4");
+  m_button_Knob[4] = Utils::create_button("knob5");
+  m_button_Knob[5] = Utils::create_button("knob6");
+  m_button_right = Utils::create_button("≪");
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_left), 0, 1, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 1, 3, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 3, 5, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 5, 7, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 7, 9, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 9, 11, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 11, 13, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_right), 13, 14, 0, 1);
+
+  Utils::set_button_image(m_button_Knob[0], Utils::create_image("res/menu/menu1.png"), GTK_POS_TOP);
+  Utils::set_button_image(m_button_Knob[1], Utils::create_image("res/menu/menu2.png"), GTK_POS_TOP);
+  Utils::set_button_image(m_button_Knob[2], Utils::create_image("res/menu/menu3.png"), GTK_POS_TOP);
+  Utils::set_button_image(m_button_Knob[3], Utils::create_image("res/menu/menu4.png"), GTK_POS_TOP);
+  Utils::set_button_image(m_button_Knob[4], Utils::create_image("res/menu/menu5.png"), GTK_POS_TOP);
+  Utils::set_button_image(m_button_Knob[5], Utils::create_image("res/menu/menu6.png"), GTK_POS_TOP);
+
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_left), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[0]), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[1]), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[2]), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[3]), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[4]), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[5]), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_right), GTK_CAN_FOCUS);
+
+  return GTK_WIDGET(table);
 }
 
-GtkWidget * KnobMenu::Create(void) {
-#if defined (EMP_322)
-    GtkWidget *m_tableKnob = gtk_table_new(1, 20, TRUE);
-    m_labelLeft = create_label("≪", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelLeft, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelLeft, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn_left = create_button(m_labelLeft, 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), btn_left, 9, 10, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn_left, GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(btn_left, GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[0] = create_label("knob1", 0, 0, g_lightGray, NULL);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[0]), GTK_JUSTIFY_CENTER);
-    gtk_widget_modify_fg(m_labelKnob[0], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[0], GTK_STATE_ACTIVE, g_lightGray);
-    m_btnKnob[0] = create_button(m_labelKnob[0], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob),m_btnKnob[0], 0, 3, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[0], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[0], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[1] = create_label("knob2", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[1], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[1], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[1]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[1] = create_button(m_labelKnob[1], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[1], 3, 6, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[1], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[1], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[2] = create_label("knob3", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[2], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[2], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[2]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[2] = create_button(m_labelKnob[2], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[2], 6, 9, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[2], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[2], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[3] = create_label("knob4", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[3], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[3], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[3]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[3] = create_button(m_labelKnob[3], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[3], 11, 14, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[3], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[3], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[4] = create_label("knob5", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[4], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[4], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[4]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[4] = create_button(m_labelKnob[4], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[4], 14, 17, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[4], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[4], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[5] = create_label("knob6", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[5], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[5], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[5]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[5] = create_button(m_labelKnob[5], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[5], 17, 20, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[5], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[5], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelRight = create_label("≫", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelRight, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelRight, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn_right = create_button(m_labelRight, 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), btn_right, 10, 11, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn_right, GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(btn_right, GTK_STATE_INSENSITIVE, g_deepGray);
-
-    gtk_widget_set_usize(m_tableKnob, KNOB_AREA_W, KNOB_AREA_Y);
-#elif defined (EMP_313)
-    GtkWidget *m_tableKnob = gtk_table_new(1, 20, TRUE);
-
-    m_labelLeft = create_label("≪", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelLeft, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelLeft, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn_left = create_button(m_labelLeft, 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), btn_left, 0, 1, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn_left, GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(btn_left, GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[0] = create_label("knob1", 0, 0, g_lightGray, NULL);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[0]), GTK_JUSTIFY_CENTER);
-    gtk_widget_modify_fg(m_labelKnob[0], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[0], GTK_STATE_ACTIVE, g_lightGray);
-    m_btnKnob[0] = create_button(m_labelKnob[0], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob),m_btnKnob[0], 1, 4, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[0], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[0], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[1] = create_label("knob2", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[1], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[1], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[1]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[1] = create_button(m_labelKnob[1], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[1], 4, 7, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[1], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[1], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[2] = create_label("knob3", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[2], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[2], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[2]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[2] = create_button(m_labelKnob[2], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[2], 7, 10, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[2], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[2], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[3] = create_label("knob4", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[3], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[3], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[3]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[3] = create_button(m_labelKnob[3], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[3], 10, 13, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[3], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[3], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[4] = create_label("knob5", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[4], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[4], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[4]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[4] = create_button(m_labelKnob[4], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[4], 13, 16, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[4], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[4], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[5] = create_label("knob6", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[5], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[5], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[5]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[5] = create_button(m_labelKnob[5], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[5], 16, 19, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[5], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[5], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelRight = create_label("≫", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelRight, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelRight, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn_right = create_button(m_labelRight, 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), btn_right, 19, 20, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn_right, GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(btn_right, GTK_STATE_INSENSITIVE, g_deepGray);
-
-    gtk_widget_set_usize(m_tableKnob, KNOB_AREA_W, KNOB_AREA_Y);
-#else
-
-    GtkWidget *m_tableKnob = gtk_table_new(1, 22, TRUE);
-    m_labelLeft = create_label("≪", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelLeft, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelLeft, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn_left = create_button(m_labelLeft, 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), btn_left, 0, 1, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn_left, GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(btn_left, GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[0] = create_label("knob1", 0, 0, g_lightGray, NULL);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[0]), GTK_JUSTIFY_CENTER);
-    gtk_widget_modify_fg(m_labelKnob[0], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[0], GTK_STATE_ACTIVE, g_lightGray);
-    m_btnKnob[0] = create_button(m_labelKnob[0], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[0], 1, 5, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[0], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[0], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[1] = create_label("knob2", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[1], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[1], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[1]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[1] = create_button(m_labelKnob[1], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[1], 5, 9, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[1], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[1], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[2] = create_label("knob3", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[2], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[2], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[2]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[2] = create_button(m_labelKnob[2], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[2], 9, 13, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[2], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[2], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[3] = create_label("knob4", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[3], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[3], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[3]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[3] = create_button(m_labelKnob[3], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[3], 13, 17, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[3], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[3], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelKnob[4] = create_label("knob5", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelKnob[4], GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelKnob[4], GTK_STATE_ACTIVE, g_lightGray);
-    gtk_label_set_justify(GTK_LABEL(m_labelKnob[4]), GTK_JUSTIFY_CENTER);
-    m_btnKnob[4] = create_button(m_labelKnob[4], 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), m_btnKnob[4], 17, 21, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (m_btnKnob[4], GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(m_btnKnob[4], GTK_STATE_INSENSITIVE, g_deepGray);
-
-    m_labelRight = create_label("≫", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelRight, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelRight, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn_right = create_button(m_labelRight, 0, 0, g_deep);
-    gtk_table_attach_defaults(GTK_TABLE(m_tableKnob), btn_right, 21, 22, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn_right, GTK_CAN_FOCUS);
-
-    gtk_widget_modify_bg(btn_right, GTK_STATE_INSENSITIVE, g_deepGray);
-
-    gtk_widget_set_usize(m_tableKnob, KNOB_AREA_W, KNOB_AREA_Y);
-#endif
-    return m_tableKnob;
-}
-
-void KnobMenu::PageUp(void) {
-    if (m_CurLevel > 0)
-        --m_CurLevel;
-    Update();
-}
-
-void KnobMenu::PageDown(void) {
-    if (m_CurLevel < m_MaxLevel)
-        ++m_CurLevel;
-    Update();
-}
-
-void KnobMenu::Refresh(void) {
-    FormatCfm::EFormatCfm formatCfm = FormatCfm::GetInstance()->GetFormat();
-    Format2D::EFormat2D format2D = Format2D::GetInstance()->GetFormat();
-
-    // samples
-    DSCCONTROLATTRIBUTES* m_ptrDscPara = DscMan::GetInstance()->GetDscPara();
-    bool cfmIsDirection = m_ptrDscPara->dcaCFMIsDirection;
-
-    gtk_widget_queue_draw(m_labelLeft);
-    gtk_widget_queue_draw(m_labelRight);
-    char type = GlobalClassMan::GetInstance()->GetProbeType();
-    int i;
-    for (i = 0; i < KNOB_NUM; i ++) {
-        gtk_widget_queue_draw(m_labelKnob[i]);
-        gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_lightGray);
-
-        if((type == 'L') || (type == 'l')) {
-            if(strcmp(m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Scan Angle") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-            if(strcmp(m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "EFVI") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-        } else {
-            if(strcmp( m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Steer") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-            if(strcmp(m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "TP-View") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-        }
-        if((type != 'P') && (type != 'p')) {
-            if(strcmp( m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Scan Line") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-        }
-
-        if(!cfmIsDirection && (ScanMode::GetInstance()->GetScanMode() != ScanMode::PWPDI)) {
-            if(strcmp( m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Baseline") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-        }
-
-        if((ScanMode::GetInstance()->GetScanMode() == ScanMode::CFM)
-                ||(ScanMode::GetInstance()->GetScanMode() == ScanMode::PDI)
-                ||(ScanMode::GetInstance()->GetScanMode() == ScanMode::PDI_VS_2D)) {
-            if(strcmp( m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Simult") == 0)
-                gtk_widget_modify_fg(m_labelKnob[i], GTK_STATE_NORMAL, g_deepGray);
-        }
-    }
-}
-
-void KnobMenu::Display(KnobItem item, char *buf, const char *tmp) {
-    if (strcmp(item.name, "") == 0) {
-        sprintf(buf, " ");
-        return ;
-    }
-
-    if (item.status == MIN) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n◁  %s  ▶", _(item.name), tmp, _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n◁  %s  ▶", _(item.name), tmp, item.value);
-    }
-
-    else if (item.status == MAX) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n◀  %s  ▷", _(item.name), tmp, _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n◀  %s  ▷", _(item.name), tmp, item.value);
-    } else if (item.status == OK) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n◀  %s  ▶", _(item.name), tmp, _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n◀  %s  ▶", _(item.name), tmp, item.value);
-    } else if (item.status == PRESS) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n【  %s  】", _(item.name), tmp, _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n【  %s  】", _(item.name), tmp, item.value);
-    } else if (item.status == ERROR) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "<span color='#505050'>%s\n%s\n   %s   </span>", _(item.name), tmp, _(item.value));
-        else
-            sprintf(buf, "<span color='#505050'>%s\n%s\n   %s   </span>", _(item.name), tmp, item.value);
-    }
-}
-
-/*void KnobMenu::Display(KnobItem item, char *buf, char *tmp)
-{
-    if (strcmp(item.name, "") == 0){
-	sprintf(buf, " ");
-    return ;
-    }
-
-    if (item.status == MIN) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n◁  %s  ▶\n%s", _(item.name),  _(item.value),tmp);
-        else
-            sprintf(buf, "%s\n◁  %s  ▶\n%s", _(item.name),  item.value,tmp);
-    }
-    else if (item.status == MAX) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n◀  %s  ▷\n%s", _(item.name),  _(item.value),tmp);
-        else
-            sprintf(buf, "%s\n◀  %s  ▷\n%s", _(item.name),  item.value,tmp);
-    }
-    else if (item.status == OK) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n◀  %s  ▶\n%s", _(item.name),  _(item.value),tmp);
-        else
-            sprintf(buf, "%s\n◀  %s  ▶\n%s", _(item.name),  item.value,tmp);
-    }
-    else if (item.status == PRESS) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n【  %s  】\n%s", _(item.name),  _(item.value),tmp);
-        else
-            sprintf(buf, "%s\n【  %s  】\n%s", _(item.name),  item.value,tmp);
-    }
-    else if (item.status == ERROR) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "<span color='#505050'>%s\n   %s   </span>\n%s", _(item.name), _(item.value),tmp);
-        else
-            sprintf(buf, "<span color='#505050'>%s\n   %s   </span>\n%s", _(item.name),  item.value, tmp);
-    }
-}
-
-void KnobMenu::Display(KnobItem item, char *buf, const char *tmp)
-{
-    printf("tmp:%s\n", tmp);
-    if (strcmp(item.name, "") == 0){
-	sprintf(buf, " ");
-    return ;
-    }
-
-    if (item.status == MIN) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n◁  %s  ▶", tmp, _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n◁  %s  ▶", tmp,_(item.name),  item.value);
-    }
-    else if (item.status == MAX) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n◀  %s  ▷", tmp,_(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n◀  %s  ▷", tmp,_(item.name),  item.value);
-    }
-    else if (item.status == OK) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n◀  %s  ▶", tmp,_(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n◀  %s  ▶", tmp,_(item.name),  item.value);
-    }
-    else if (item.status == PRESS) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n%s\n【  %s  】", tmp,_(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n%s\n【  %s  】", tmp,_(item.name),  item.value);
-    }
-    else if (item.status == ERROR) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n<span color='#505050'>%s\n   %s   </span>", tmp, _(item.name), _(item.value));
-        else
-            sprintf(buf, "%s\n<span color='#505050'>%s\n   %s   </span>", tmp,_(item.name),  item.value);
-    }
-}
-*/
-
-/*void KnobMenu::Display(KnobItem item, char *buf)
-{
-    if (strcmp(item.name, "") == 0){
-	sprintf(buf, " ");
-    return ;
-    }
-#if 1
-    if (item.status == MIN) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n\n◁  %s  ▶",  _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n\n◁  %s  ▶", _(item.name),  item.value);
-    }
-    else if (item.status == MAX) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n\n◀  %s  ▷", _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n\n◀  %s  ▷", _(item.name),  item.value);
-    }
-    else if (item.status == OK) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n\n◀  %s  ▶", _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n\n◀  %s  ▶", _(item.name),  item.value);
-    }
-    else if (item.status == PRESS) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n\n【  %s  】", _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n\n【  %s  】", _(item.name),  item.value);
-    }
-    else if (item.status == ERROR) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "<span color='#505050'>%s\n\n   %s   </span>",_(item.name), _(item.value));
-        else
-            sprintf(buf, "<span color='#505050'>%s\n\n   %s   </span>", _(item.name),  item.value);
-    }
-#else
-    if (item.status == MIN) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n◁  %s  ▶",  _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n◁  %s  ▶", _(item.name),  item.value);
-    }
-    else if (item.status == MAX) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n◀  %s  ▷", _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n◀  %s  ▷", _(item.name),  item.value);
-    }
-    else if (item.status == OK) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n◀  %s  ▶", _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n◀  %s  ▶", _(item.name),  item.value);
-    }
-    else if (item.status == PRESS) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "%s\n【  %s  】", _(item.name),  _(item.value));
-        else
-            sprintf(buf, "%s\n【  %s  】", _(item.name),  item.value);
-    }
-    else if (item.status == ERROR) {
-        if (strcmp(item.value, ""))
-            sprintf(buf, "<span color='#505050'>%s\n   %s   </span>",_(item.name), _(item.value));
-        else
-            sprintf(buf, "<span color='#505050'>%s\n   %s   </span>", _(item.name),  item.value);
-    }
-#endif
-}
-*/
-void KnobMenu::Update(void) {
-    char buf[80];
-    char tmp[20];
-    memset(buf, 0, sizeof(buf));
-    memset(tmp, 0, sizeof(tmp));
-    int i;
-    for (i = 0; i < KNOB_NUM; i ++) {
-
-#ifdef EMP_3410
-        if(!CManRegister::GetInstance()->IsAuthorize("eFci"))
-            if(strcmp(m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Freq. Compound") == 0) {
-                m_KnobItem[m_CurLevel * KNOB_NUM + i].name = "";
-                strcpy(m_KnobItem[m_CurLevel * KNOB_NUM + i].value,  "");
-                m_KnobItem[m_CurLevel * KNOB_NUM + i].status = ERROR;
-                m_KnobItem[m_CurLevel * KNOB_NUM + i].pf = NULL;
-                m_KnobItem[m_CurLevel * KNOB_NUM + i].pfPress = NULL;
-            }
-#endif
-        if(strcmp(m_KnobItem[m_CurLevel * KNOB_NUM + i].name, "Focus") == 0)
-            sprintf(tmp, "%s", _("FocusNum"));
-        else
-            sprintf(tmp, "");
-
-        Display(m_KnobItem[m_CurLevel * KNOB_NUM + i], buf, tmp);
-        //Display(m_KnobItem[m_CurLevel * KNOB_NUM + i], buf);
-        gtk_label_set_markup(GTK_LABEL(m_labelKnob[i]), buf);
-    }
-
-    if (m_CurLevel == 0 && m_MaxLevel == 0) {
-        gtk_label_set_text(GTK_LABEL(m_labelLeft), "");
-        gtk_label_set_text(GTK_LABEL(m_labelRight), "");
-    } else if (m_CurLevel == 0 && m_MaxLevel > 0) {
-        gtk_label_set_text(GTK_LABEL(m_labelLeft), "");
-        gtk_label_set_text(GTK_LABEL(m_labelRight), ">>");
-    } else if (m_CurLevel > 0 && m_CurLevel == m_MaxLevel) {
-        gtk_label_set_text(GTK_LABEL(m_labelLeft), "<<");
-        gtk_label_set_text(GTK_LABEL(m_labelRight), "");
-    } else if (m_CurLevel > 0 && m_CurLevel < m_MaxLevel) {
-        gtk_label_set_text(GTK_LABEL(m_labelLeft), "<<");
-        gtk_label_set_text(GTK_LABEL(m_labelRight), ">>");
-    }
-
-    Refresh();
-}
-
-/*
- * @brief set new knob value, replace the old value
- *
- * @para index[in] index of current knob item in knob menu
- * @para value[in] string of new value
- * @para status[in] status of current item knob
- */
 void KnobMenu::SetValue(int index, const string value, EKnobReturn status) {
-    sprintf(m_KnobItem[index].value, "%s", value.c_str());
-    m_KnobItem[index].status = status;
-    Update();
+  m_KnobItem[index].value = value;
+  m_KnobItem[index].status = status;
+
+  Update();
+}
+
+void KnobMenu::SetItem(KnobItem* item, unsigned int total_item, EKnobType type) {
+  m_KnobItem = item;
+
+  if (total_item % KNOB_NUM == 0)
+    m_MaxLevel = (total_item / KNOB_NUM) - 1;
+  else
+    m_MaxLevel = total_item / KNOB_NUM;
+
+  m_CurLevel = 0;
+  m_knobType = type;
+  Update();
+}
+
+void KnobMenu::Update() {
+  string tmp;
+
+  for (int i = 0; i < KNOB_NUM; i ++) {
+    if(m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Focus") {
+      tmp = _("FocusNum");
+    } else {
+      tmp = "";
+    }
+
+    string buf = Display(m_KnobItem[m_CurLevel * KNOB_NUM + i], tmp);
+    gtk_button_set_label(m_button_Knob[i], buf.c_str());
+  }
+
+  if (m_CurLevel == 0 && m_MaxLevel == 0) {
+    gtk_button_set_label(m_button_left, "");
+    gtk_button_set_label(m_button_right, "");
+  } else if (m_CurLevel == 0 && m_MaxLevel > 0) {
+    gtk_button_set_label(m_button_left, "");
+    gtk_button_set_label(m_button_right, ">>");
+  } else if (m_CurLevel > 0 && m_CurLevel == m_MaxLevel) {
+    gtk_button_set_label(m_button_left, "<<");
+    gtk_button_set_label(m_button_right, "");
+  } else if (m_CurLevel > 0 && m_CurLevel < m_MaxLevel) {
+    gtk_button_set_label(m_button_left, "<<");
+    gtk_button_set_label(m_button_right, ">>");
+  }
+
+  Refresh();
+}
+
+void KnobMenu::PageUp() {
+  if (m_CurLevel > 0) {
+    --m_CurLevel;
+  }
+
+  Update();
+}
+
+void KnobMenu::PageDown() {
+  if (m_CurLevel < m_MaxLevel) {
+    ++m_CurLevel;
+  }
+
+  Update();
+}
+
+void KnobMenu::Knob1_Press() {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 0;
+
+  if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  (*(m_KnobItem[index].pfPress))();
+}
+
+void KnobMenu::Knob2_Press() {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 1;
+
+  if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  (*(m_KnobItem[index].pfPress))();
+}
+
+void KnobMenu::Knob3_Press() {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 2;
+
+  if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  (*(m_KnobItem[index].pfPress))();
+}
+
+void KnobMenu::Knob4_Press() {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 3;
+
+  if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  (*(m_KnobItem[index].pfPress))();
+}
+
+void KnobMenu::Knob5_Press() {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 4;
+
+  if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  (*(m_KnobItem[index].pfPress))();
+}
+
+void KnobMenu::Knob6_Press() {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 5;
+
+  if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  (*(m_KnobItem[index].pfPress))();
 }
 
 void KnobMenu::Knob1_Screw(int cw) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 0;
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 0;
 
-    if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR)
-        return ;
+  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
 
-    if (cw == 1) {
-        (*(m_KnobItem[index].pf))(ADD);
-    } else if (cw == 0) {
-        (*(m_KnobItem[index].pf))(SUB);
-    }
+  if (cw == 1) {
+    (*(m_KnobItem[index].pf))(ADD);
+  } else if (cw == 0) {
+    (*(m_KnobItem[index].pf))(SUB);
+  }
 }
 
 void KnobMenu::Knob2_Screw(int cw) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 1;
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 1;
 
-    if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR)
-        return ;
+  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
 
-    if (cw == 1) {
-        (*(m_KnobItem[index].pf))(ADD);
-    } else if (cw == 0) {
-        (*(m_KnobItem[index].pf))(SUB);
-    }
+  if (cw == 1) {
+    (*(m_KnobItem[index].pf))(ADD);
+  } else if (cw == 0) {
+    (*(m_KnobItem[index].pf))(SUB);
+  }
 }
+
 void KnobMenu::Knob3_Screw(int cw) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 2;
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 2;
 
-    if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR)
-        return ;
+  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
 
-    if (cw == 1) {
-        (*(m_KnobItem[index].pf))(ADD);
-    } else if (cw == 0) {
-        (*(m_KnobItem[index].pf))(SUB);
-    }
-
+  if (cw == 1) {
+    (*(m_KnobItem[index].pf))(ADD);
+  } else if (cw == 0) {
+    (*(m_KnobItem[index].pf))(SUB);
+  }
 }
+
 void KnobMenu::Knob4_Screw(int cw) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 3;
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 3;
 
-    if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR)
-        return ;
+  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
 
-    if (cw == 1) {
-        (*(m_KnobItem[index].pf))(ADD);
-    } else if (cw == 0) {
-        (*(m_KnobItem[index].pf))(SUB);
-    }
-
+  if (cw == 1) {
+    (*(m_KnobItem[index].pf))(ADD);
+  } else if (cw == 0) {
+    (*(m_KnobItem[index].pf))(SUB);
+  }
 }
+
 void KnobMenu::Knob5_Screw(int cw) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 4;
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 4;
 
-    if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR)
-        return ;
+  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
 
-    if (cw == 1) {
-        (*(m_KnobItem[index].pf))(ADD);
-    } else if (cw == 0) {
-        (*(m_KnobItem[index].pf))(SUB);
+  if (cw == 1) {
+    (*(m_KnobItem[index].pf))(ADD);
+  } else if (cw == 0) {
+    (*(m_KnobItem[index].pf))(SUB);
+  }
+}
+
+void KnobMenu::Knob6_Screw(int cw) {
+  int index = 0;
+  index = KNOB_NUM * m_CurLevel + 5;
+
+  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
+    return;
+  }
+
+  if (cw == 1) {
+    (*(m_KnobItem[index].pf))(ADD);
+  } else if (cw == 0) {
+    (*(m_KnobItem[index].pf))(SUB);
+  }
+}
+
+// ---------------------------------------------------------
+
+string KnobMenu::Display(KnobItem item, const string tmp) {
+  if (item.name == "") {
+    return "";
+  }
+
+  stringstream ss;
+
+  if (item.status == MIN) {
+    ss << item.name << "\n" << tmp << "\n◁  " << item.value << "  ▶";
+  } else if (item.status == MAX) {
+    ss << item.name << "\n" << tmp << "\n◀  " << item.value << "  ▷";
+  } else if (item.status == OK) {
+    ss << item.name << "\n" << tmp << "\n◀  " << item.value << "  ▶";
+  } else if (item.status == PRESS) {
+    ss << item.name << "\n" << tmp << "\n【  " << item.value << "  】";
+  } else if (item.status == ERROR) {
+    ss << "<span color='#505050'>" << item.name << "\n" << tmp << "\n   " << item.value << "   </span>";
+  }
+
+  return ss.str();
+}
+
+void KnobMenu::Refresh() {
+  FormatCfm::EFormatCfm formatCfm = FormatCfm::GetInstance()->GetFormat();
+  Format2D::EFormat2D format2D = Format2D::GetInstance()->GetFormat();
+
+  // samples
+  DSCCONTROLATTRIBUTES* m_ptrDscPara = DscMan::GetInstance()->GetDscPara();
+  bool cfmIsDirection = m_ptrDscPara->dcaCFMIsDirection;
+
+  gtk_widget_queue_draw(GTK_WIDGET(m_button_left));
+  gtk_widget_queue_draw(GTK_WIDGET(m_button_right));
+
+  char type = GlobalClassMan::GetInstance()->GetProbeType();
+
+  for (int i = 0; i < KNOB_NUM; i ++) {
+    gtk_widget_queue_draw(GTK_WIDGET(m_button_Knob[i]));
+    gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+
+    if (type == 'L' || type == 'l') {
+      if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Scan Angle") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      } else if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "EFVI") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      } else {
+      }
+    } else {
+      if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Steer") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      } else if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "TP-View") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      }
     }
-}
 
-void KnobMenu::Knob1_Press(void) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 0;
+    if(type != 'P' && type != 'p') {
+      if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Scan Line") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      }
+    } else {
+    }
 
-    if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR)
-        return ;
+    if(!cfmIsDirection && (ScanMode::GetInstance()->GetScanMode() != ScanMode::PWPDI)) {
+      if(m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Baseline") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      }
+    }
 
-    (*(m_KnobItem[index].pfPress))();
-}
-
-void KnobMenu::Knob2_Press(void) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 1;
-
-    if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR)
-        return ;
-
-    (*(m_KnobItem[index].pfPress))();
-
-}
-void KnobMenu::Knob3_Press(void) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 2;
-
-    if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR)
-        return ;
-
-    (*(m_KnobItem[index].pfPress))();
-
-}
-void KnobMenu::Knob4_Press(void) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 3;
-
-    if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR)
-        return ;
-
-    (*(m_KnobItem[index].pfPress))();
-}
-void KnobMenu::Knob5_Press(void) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 4;
-
-    if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR)
-        return ;
-
-    (*(m_KnobItem[index].pfPress))();
-}
-void KnobMenu::Knob6_Press(void) {
-    int index = 0;
-    index = KNOB_NUM * m_CurLevel + 5;
-
-    if (m_KnobItem[index].pfPress == NULL || m_KnobItem[index].status == ERROR)
-        return ;
-
-    (*(m_KnobItem[index].pfPress))();
+    if (ScanMode::GetInstance()->GetScanMode() == ScanMode::CFM
+      || ScanMode::GetInstance()->GetScanMode() == ScanMode::PDI
+      || ScanMode::GetInstance()->GetScanMode() == ScanMode::PDI_VS_2D) {
+      if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Simult") {
+        gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      }
+    }
+  }
 }

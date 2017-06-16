@@ -99,11 +99,11 @@ void KnobCineCreate() {
 void SyncKnobReplay(EKnobReplay type, const char* s, EKnobReturn status, bool draw) {
     if(ViewSuperuser::GetInstance()->GetDemoStatus()) {
         if(type == REPLAY_CTRL) {
-            sprintf(DemoKnobReplayMenu[type].value, N_("%s"), s);
+            DemoKnobReplayMenu[type].value = s;
             DemoKnobReplayMenu[type].status = status;
         }
     } else {
-        sprintf(KnobReplayMenu[type].value, N_("%s"), s);
+        KnobReplayMenu[type].value = s;
         KnobReplayMenu[type].status = status;
     }
     if (draw)

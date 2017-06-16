@@ -39,7 +39,7 @@ void KnobLoadSnapCreate() {
 }
 ///> knob menu need to be sync
 void SyncKnobReview(EKnobReview type, const char* s, EKnobReturn status, bool update) {
-    sprintf(KnobLoadSnapMenu[type].value, "%s", s);
+    KnobLoadSnapMenu[type].value = s;
     KnobLoadSnapMenu[type].status = status;
     if (update)
         KnobMenu::GetInstance()->Update();

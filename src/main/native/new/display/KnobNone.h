@@ -1,10 +1,8 @@
-// -*- c++ -*-
-#ifndef KNOB_NONE_H
-#define KNOB_NONE_H
-
-#include "Def.h"
+#ifndef __KNOB_NONE_H__
+#define __KNOB_NONE_H__
 
 void KnobNoneCreate();
 
 extern void KnobUndo();
+
 #endif

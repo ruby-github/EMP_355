@@ -1,53 +1,71 @@
-// -*- c++ -*-
-#ifndef _VIEW_ICON_H_
-#define _VIEW_ICON_H_
+#ifndef __VIEW_ICON_H__
+#define __VIEW_ICON_H__
 
-#include <gtk/gtk.h>
-#include <string>
-
-using std::string;
-
-gboolean ScrollScanIcon(gpointer data);
+#include "utils/Utils.h"
 
 class ViewIcon {
 public:
-    ~ViewIcon();
-    static ViewIcon* GetInstance(void);
-    GtkWidget * GetIconArea(void);
-    void Create(void);
+  static ViewIcon* GetInstance();
 
-    void Network(bool on);
-    void Sound(bool on);
-    void Replay(bool on);
-    void Udisk(bool on);
-    void Cdrom(bool on);
-    void Printer(bool on);
-    void Charge(int data);
+public:
+  ~ViewIcon();
 
-    void ScanIcon(const char *iconName);
-    int GetCountScanIcon(void) {
-        return m_countScanIcon;
-    }
-    void SetCountScanIcon(int count) {
-        m_countScanIcon = count;
-    }
-    void InitCharge();
-    void UpdateCharge();
+  GtkWidget* Create();
+
+  void Network(bool on);
+  void Sound(bool on);
+  void Replay(bool on);
+  void Udisk(bool on);
+  void Cdrom(bool on);
+  void Printer(bool on);
+
 private:
-    ViewIcon(void);
-    static ViewIcon* m_ptrInstance;
+  // signal
 
-    GtkWidget *m_table;
+  static gboolean signal_callback_scroll_scanicon(gpointer data) {
+    ViewIcon* viewicon = (ViewIcon*)data;
 
-    GtkWidget *m_network;
-    GtkWidget *m_sound;
-    GtkWidget *m_replay;
-    GtkWidget *m_udisk;
-    GtkWidget *m_cdrom;
-    //GtkWidget *m_printer;
-    GtkWidget *m_charge;
+    if (viewicon != NULL) {
+      viewicon->ScrollScanIcon();
+    }
 
-    int m_countScanIcon;
-    int m_timeout;
+    return TRUE;
+  }
+
+  static gboolean signal_callback_updatecharge(gpointer data) {
+    ViewIcon* viewicon = (ViewIcon*)data;
+
+    if (viewicon != NULL) {
+      viewicon->UpdateCharge();
+    }
+
+    return TRUE;
+  }
+
+  void ScrollScanIcon();
+  void UpdateCharge();
+
+private:
+  ViewIcon();
+
+  void ScanIcon(const string iconName);
+  int GetCountScanIcon();
+  void SetCountScanIcon(int count);
+
+  void InitCharge();
+  void Charge(int data);
+
+private:
+  static ViewIcon* m_instance;
+
+private:
+  GtkImage* m_network;
+  GtkImage* m_sound;
+  GtkImage* m_replay;
+  GtkImage* m_udisk;
+  GtkImage* m_cdrom;
+  GtkImage* m_charge;
+
+  int m_count_scanicon;
 };
 #endif
