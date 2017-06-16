@@ -146,7 +146,7 @@ void DicomLocalSetting::InitLocalSetting() {
 
     int host_port = CDCMMan::GetMe()->GetLocalPort();
     char tmp[256] = {0};
-    sprintf(tmp,"%d",host_port);
+    sprintf(tmp, "%d", host_port);
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_port), tmp);
 
     delete sysDicomSetting;
