@@ -67,11 +67,11 @@ void KnobAnatomicMCreate() {
 
 ///> knob menu need to be sync
 void SyncKnobM(EKnobM type, const char* s, EKnobReturn status, bool draw) {
-    sprintf(KnobMMenu[type].value, "%s", s);
+    KnobMMenu[type].value = s;
     KnobMMenu[type].status = status;
 #if not defined(EMP_322)
     if (type == M_FREQ) {
-        sprintf(KnobAnatomicMMenu[type].value, "%s", s);
+        KnobAnatomicMMenu[type].value = s;
         KnobAnatomicMMenu[type].status = status;
     }
 #endif

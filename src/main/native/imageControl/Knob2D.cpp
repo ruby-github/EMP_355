@@ -128,7 +128,7 @@ void KnobD2Create() {
 
 ///> knob menu need to be sync
 void SyncKnobD2(EKnobD2 type, const char* s, EKnobReturn status, bool draw) {
-    sprintf(Knob2DMenu[type].value, "%s", s);
+    Knob2DMenu[type].value = s;
     Knob2DMenu[type].status = status;
     if (draw)
         KnobMenu::GetInstance()->Update();

@@ -109,13 +109,13 @@ void KnobEFOVReviewCreate() {
 }
 
 void SyncKnobEFOV(EKnobEFOV type, const char* s, EKnobReturn status) {
-    sprintf(KnobEFOVViewMenu[type].value, "%s", s);
+    KnobEFOVViewMenu[type].value = s;
     KnobEFOVViewMenu[type].status = status;
     KnobMenu::GetInstance()->Update();
 }
 
 void SyncKnobEFOVReview(EKnobEFOVReview type, const char* s, EKnobReturn status) {
-    sprintf(KnobEFOVReviewMenu[type].value, "%s", s);
+    KnobEFOVReviewMenu[type].value = s;
     KnobEFOVReviewMenu[type].status = status;
     KnobMenu::GetInstance()->Update();
 }

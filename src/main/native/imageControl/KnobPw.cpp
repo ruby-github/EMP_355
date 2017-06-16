@@ -73,7 +73,7 @@ void KnobPwCreate() {
 
 //sync
 void SyncKnobPw(EKnobPw type, const char* s, EKnobReturn status, bool draw) {
-    sprintf(KnobPwMenu[type].value, "%s", s);
+    KnobPwMenu[type].value = s;
     KnobPwMenu[type].status = status;
     if (draw)
         KnobMenu::GetInstance()->Update();
