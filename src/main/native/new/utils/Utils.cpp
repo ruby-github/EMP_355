@@ -17,7 +17,7 @@ GtkWindow* Utils::create_app_window(const string title, const int width, const i
 
   g_signal_connect(G_OBJECT(window), "delete_event", G_CALLBACK(gtk_main_quit), NULL);
 
-  gtk_widget_modify_bg(GTK_WIDGET(window), GTK_STATE_NORMAL, get_color("DimGrey"));
+  gtk_widget_modify_bg(GTK_WIDGET(window), GTK_STATE_NORMAL, get_color("black"));
 
   return window;
 }

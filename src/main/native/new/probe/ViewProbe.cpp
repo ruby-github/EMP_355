@@ -11,6 +11,7 @@
 #include "imageProc/ModeStatus.h"
 #include "imageProc/ScanMode.h"
 #include "keyboard/KeyDef.h"
+#include "keyboard/KeyValueOpr.h"
 #include "keyboard/LightDef.h"
 #include "probe/BiopsyMan.h"
 #include "sysMan/UserSelect.h"

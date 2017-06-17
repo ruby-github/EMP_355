@@ -4,6 +4,7 @@
 
 #include "display/ImageArea.h"
 #include "display/KnobNone.h"
+#include "keyboard/KeyValueOpr.h"
 #include "ViewMain.h"
 
 enum EKnobArrow {

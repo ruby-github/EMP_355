@@ -298,15 +298,15 @@ string KnobMenu::Display(KnobItem item, const string tmp) {
   stringstream ss;
 
   if (item.status == MIN) {
-    ss << str << "\n    " << item.value << "    ";
+    ss << str << "\n" << item.value;
   } else if (item.status == MAX) {
-    ss << str << "\n    " << item.value << "    ";
+    ss << str << "\n" << item.value;
   } else if (item.status == OK) {
-    ss << str << "\n    " << item.value << "    ";
+    ss << str << "\n" << item.value;
   } else if (item.status == PRESS) {
     ss << str << "\n【 " << item.value << " 】";
   } else if (item.status == ERROR) {
-    ss << "<span color='#505050'>" << str << "\n    " << item.value << "    </span>";
+    ss << "<span color='#505050'>" << str << "\n" << item.value << "</span>";
   }
 
   return ss.str();

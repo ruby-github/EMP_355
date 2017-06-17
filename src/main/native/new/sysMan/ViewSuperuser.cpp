@@ -4,6 +4,7 @@
 #include "utils/MainWindowConfig.h"
 
 #include "keyboard/KeyDef.h"
+#include "keyboard/KeyValueOpr.h"
 #include "keyboard/MultiFuncFactory.h"
 #include "imageControl/Img2D.h"
 #include "periDevice/MonitorControl.h"

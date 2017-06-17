@@ -7,6 +7,7 @@
 #include "display/HintArea.h"
 #include "imageProc/ModeStatus.h"
 #include "keyboard/KeyFunc.h"
+#include "keyboard/KeyValueOpr.h"
 #include "keyboard/LightDef.h"
 #include "sysMan/SysNoteSetting.h"
 #include "ViewMain.h"

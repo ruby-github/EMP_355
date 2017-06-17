@@ -1,98 +1,59 @@
-#include <gtk/gtk.h>
-#include <gdk/gdkkeysyms.h>
-#include "display/ImageArea.h"
-#include "display/KnobMenu.h"
 #include "ViewMain.h"
-#include "display/gui_global.h"
-#include "display/gui_func.h"
-#include "display/TopArea.h"
-#include "imageControl/Knob2D.h"
-#include "comment/NoteArea.h"
-#include "probe/ViewProbe.h"
+
 #include "calcPeople/ViewReport.h"
-#include "patient/ViewArchive.h"
-#include "patient/ViewNewPat.h"
+#include "comment/NoteArea.h"
+#include "display/HintArea.h"
+#include "display/ImageArea.h"
+#include "display/MenuArea.h"
+#include "display/KnobMenu.h"
+#include "display/TopArea.h"
 #include "display/ViewIcon.h"
-#include "keyboard/KeyDef.h"
-#include "keyboard/MultiFuncFactory.h"
-#include "keyboard/KeyFunc.h"
-#include "imageProc/ImgProc2D.h"
-#include "imageControl/KnobPw.h"
-#include "imageProc/ModeStatus.h"
-#include "imageProc/FreezeMode.h"
-#include "imageProc/ScanMode.h"
+#include "imageControl/Knob2D.h"
 #include "imageProc/Format2D.h"
+#include "imageProc/FormatCfm.h"
 #include "imageProc/FormatM.h"
 #include "imageProc/FormatPw.h"
-#include "imageProc/FormatCfm.h"
-#include "Def.h"
-#include <pthread.h>
-#include "sysMan/SysGeneralSetting.h"
-#include "measure/MeasureMan.h"
-#include "sysMan/ViewSystem.h"
-#include "sysMan/UserDefineKey.h"
-#include "display/HintArea.h"
-#include "sysMan/ViewSuperuser.h"
+#include "imageProc/FreezeMode.h"
 #include "imageProc/GlobalClassMan.h"
-#include "keyboard/LightDef.h"
-#include "probe/ProbeMan.h"
-#include "sysMan/ViewDicomSupervise.h"
-#include <EmpAuthorization.h>
+#include "imageProc/ImgProc2D.h"
 #include "imageProc/ImgProcPw.h"
 #include "imageProc/MenuPW.h"
-#include "measure/MeasureD.h"
+#include "imageProc/ModeStatus.h"
+#include "imageProc/ScanMode.h"
 #include "imageProc/Zoom.h"
-#include "periDevice/ManRegister.h"
+#include "keyboard/KeyDef.h"
+#include "keyboard/KeyFunc.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/LightDef.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "measure/MeasureMan.h"
+#include "patient/ViewArchive.h"
+#include "patient/ViewNewPat.h"
 #include "periDevice/MonitorControl.h"
-#include "sysMan/UserSelect.h"           //addec by LL
+#include "probe/ProbeMan.h"
+#include "probe/ViewProbe.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/UserDefineKey.h"
+#include "sysMan/UserSelect.h"
+#include "sysMan/ViewDicomSupervise.h"
+#include "sysMan/ViewSuperuser.h"
+#include "sysMan/ViewSystem.h"
 
-
-#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
 
-#include "imageControl/FpgaCtrl2D.h"
-extern MenuPW g_menuPW;
-// test_Artifact
-// #include "imageProc/ImgProcCfm.h"
+#include <EmpAuthorization.h>
 
-////////////////////////////[static function]/////////////////////////////
-int g_tgcSlider[8] = {128, 128, 128, 128, 128, 128, 128, 128}; // global variable of tgc control
-
-bool ViewMain::m_cursorVisible = true;
 extern bool g_authorizationOn;
 
-//manual/auto trace in freeze pw
-int g_setFunc = 1; //1: no useful, 2: adjust is using, 3: finish to calc auto trace
-//current operation (1: start line of cycle, 2: ps positoin, 3: ed position, 4: end line of cycle)
-int g_curOper = 1;
-/**
- * 1: 【Set】is 确认in pw freeze,
- * 2: 【Set】is 校正
- * 3:  not in manual or trace in freeze pw
- */
+int g_curOper = 1;  // current operation (1: start line of cycle, 2: ps positoin, 3: ed position, 4: end line of cycle)
+int g_setFunc = 1;  // manual/auto trace in freeze pw(1: no useful, 2: adjust is using, 3: finish to calc auto trace)
+int g_tgcSlider[] = {128, 128, 128, 128, 128, 128, 128, 128}; // global variable of tgc control
 
-// only for test
-gboolean test(gpointer data) {
-  if (!ModeStatus::IsFreezeMode()) {
-    FreezeMode::GetInstance()->PressFreeze();
-  }
+ViewMain* ViewMain::m_instance = NULL;
+bool ViewMain::m_cursorVisible = true;
 
-  ViewSystem::GetInstance()->CreateWindow();
-
-  return FALSE;
-}
-
-gboolean ClickArchive(gpointer data) {
-  if (ModeStatus::IsUnFreezeMode()) {
-    FreezeMode::GetInstance()->PressFreeze();
-  }
-
-  FreezeMode::GetInstance()->ExitAutoReplay();
-  ViewArchive::GetInstance()->CreateWindow();
-
-  return FALSE;
-}
+// ---------------------------------------------------------
 
 void InvisibleCursor(bool invisible, bool resetCursor) {
   if (!invisible) {
@@ -113,71 +74,179 @@ void InvisibleCursor(bool invisible, bool resetCursor) {
 }
 
 void ChangeSystemCursor(GdkCursorType type) {
-  GtkWidget* widget = ViewMain::GetInstance()->GetMainWindow();
   GdkDisplay* display = gdk_display_get_default();
   GdkCursor* cursor = gdk_cursor_new_for_display(display, type);
-  gdk_window_set_cursor(widget->window, cursor);
+  gdk_window_set_cursor(ViewMain::GetInstance()->GetMainWindow()->window, cursor);
   gdk_cursor_unref(cursor);
 }
 
-void TestMode(unsigned char keyValue) {
-  switch(keyValue) {
-  case 'q':
-    break;
-  case 'a':
-    break;
-  case 'w':
-    break;
+// ---------------------------------------------------------
+
+ViewMain* ViewMain::GetInstance() {
+  if (m_instance == NULL) {
+    m_instance = new ViewMain();
+  }
+
+  return m_instance;
+}
+
+ViewMain::ViewMain() {
+  m_window = NULL;
+  countN = 0;
+  keyTSIN = 0;
+}
+
+ViewMain::~ViewMain() {
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
+}
+
+void ViewMain::Create() {
+  // UserSelect
+  UserSelect::GetInstance()->create_userconfig_dir();
+  UserSelect::GetInstance()->create_userdefined_dir();
+  UserSelect::GetInstance()->create_commentdefined_dir();
+  UserSelect::GetInstance()->create_usercalcdefined_dir();
+  UserSelect::GetInstance()->creat_username_db(USERNAME_DB);
+  UserSelect::GetInstance()->save_active_user_id(0);
+
+  // Window
+  m_window = Utils::create_app_window("CT", SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  GtkBox* vbox = Utils::create_vbox();
+  gtk_container_add(GTK_CONTAINER(m_window), GTK_WIDGET(vbox));
+
+  // TOP
+  GtkBox* hbox_top = Utils::create_hbox();
+
+  // Knob Menu Area
+  GtkWidget* knobMenu = KnobMenu::GetInstance()->Create();
+  gtk_widget_set_size_request(GTK_WIDGET(knobMenu), -1, KNOB_AREA_H);
+
+  // BOTTOM
+  GtkBox* hbox_bottom = Utils::create_hbox();
+  gtk_widget_set_size_request(GTK_WIDGET(hbox_bottom), -1, HINT_AREA_H);
+
+  gtk_box_pack_start(vbox, GTK_WIDGET(hbox_top), TRUE, TRUE, 0);
+  gtk_box_pack_start(vbox, knobMenu, FALSE, FALSE, 0);
+  gtk_box_pack_start(vbox, GTK_WIDGET(hbox_bottom), FALSE, FALSE, 0);
+
+  // TOP LEFT
+  GtkBox* vbox_top_left = Utils::create_vbox();
+
+  // Menu Area
+  GtkWidget* menuArea = MenuArea::GetInstance()->Create();
+  gtk_widget_set_size_request(menuArea, -1, MENU_AREA_H);
+
+  gtk_box_pack_start(hbox_top, GTK_WIDGET(vbox_top_left), TRUE, TRUE, 0);
+  gtk_box_pack_start(hbox_top, menuArea, FALSE, FALSE, 0);
+
+  // Hint Area
+  GtkWidget* hintArea = HintArea::GetInstance()->Create();
+  gtk_widget_set_size_request(hintArea, HINT_AREA_W, -1);
+
+  // Icon
+  GtkWidget* viewIcon = ViewIcon::GetInstance()->Create();
+
+  gtk_box_pack_start(hbox_bottom, hintArea, FALSE, FALSE, 0);
+  gtk_box_pack_start(hbox_bottom, viewIcon, TRUE, TRUE, 0);
+
+  // Top area
+  GtkWidget* topArea = TopArea::GetInstance()->Create(TOP_AREA_W, TOP_AREA_H);
+  TopArea::GetInstance()->AddTimeOut();
+
+  // Fixed
+  GtkWidget* fixed = gtk_fixed_new();
+
+  gtk_box_pack_start(vbox_top_left, topArea, FALSE, FALSE, 0);
+  gtk_box_pack_start(vbox_top_left, fixed, TRUE, TRUE, 0);
+
+  // Image Area
+  GtkWidget* imageArea = ImageArea::GetInstance()->Create();
+
+  // Note Area
+  GtkWidget* noteArea = NoteArea::GetInstance()->Create();
+
+  gtk_fixed_put(GTK_FIXED(fixed), imageArea, 0, 0);
+  gtk_fixed_put(GTK_FIXED(fixed), noteArea, IMAGE_X, IMAGE_Y);
+
+  // 2D knob menu
+  KnobD2Create();
+
+  g_keyInterface.Push(this);
+
+  gtk_widget_show_all(GTK_WIDGET(m_window));
+  NoteArea::GetInstance()->Hide();
+
+  // update top area
+  SysGeneralSetting sysGeneralSetting;
+  string hospital_name = sysGeneralSetting.GetHospital();
+  TopArea::GetInstance()->UpdateHospitalName(hospital_name);
+
+  // patient info
+  g_patientInfo.UpdateTopArea();
+
+  if (g_authorizationOn) {
+    CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 1);
   }
 }
 
+void ViewMain::ShowMenu() {
+  /*m_daMenu = gtk_drawing_area_new();
+  gtk_widget_modify_bg(m_daMenu, GTK_STATE_NORMAL, g_black);
+  gtk_drawing_area_size(GTK_DRAWING_AREA(m_daMenu), MENU_AREA_W, MENU_AREA_H - TOP_AREA_H);
+  gtk_fixed_put(GTK_FIXED(m_fixedWindow), m_daMenu, 844, TOP_AREA_H);*/
+  //gtk_widget_hide(m_daMenu);
+}
+
+void ViewMain::HideMenu() {
+  //gtk_widget_show(m_daMenu);
+}
+
+GtkWidget* ViewMain::GetMainWindow() {
+  return GTK_WIDGET(m_window);
+}
+
 void ViewMain::KeyEvent(unsigned char keyValue) {
-  KnobMenu* ptrKnob = KnobMenu::GetInstance();
-  AbsMultiFunc* ptrMultiFunc = MultiFuncFactory::GetInstance()->GetObject();
-
-  ProbeSocket::ProbePara para;
-  ProbeMan::GetInstance()->GetCurProbe(para);
-  char type = Img2D::GetInstance()->ReviseProbeType(para.type);
-
   MonitorControl monitorCtl;
+
   switch(keyValue) {
   case KEY_BRIGHT_ADD:
     {
       monitorCtl.SetBrightAdd();
-
       break;
     }
   case KEY_BRIGHT_SUB:
     {
       monitorCtl.SetBrightSub();
-
       break;
     }
   case KEY_CONTRAST_ADD:
     {
       monitorCtl.SetContrastAdd();
-
       break;
     }
   case KEY_CONTRAST_SUB:
     {
       monitorCtl.SetContrastSub();
-
       break;
     }
   case KEY_AUTOADJUST:
     {
       monitorCtl.AutoAdjust();
-
       break;
     }
   case KEY_AUTOBALANCE:
     {
       monitorCtl.AutoBalance();
-
       break;
     }
   }
+
+  AbsMultiFunc* ptrMultiFunc = MultiFuncFactory::GetInstance()->GetObject();
 
   if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW &&
     ViewSuperuser::GetInstance()->GetDemoStatus()) {
@@ -185,14 +254,12 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
     case KEY_SET:
       {
         ptrMultiFunc->Do();
-
         break;
       }
     case KEY_CURSOR:
       {
         KeyCursor kc;
         kc.Execute();
-
         break;
       }
     default:
@@ -214,6 +281,10 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
 
     return;
   }
+
+  ProbeSocket::ProbePara para;
+  ProbeMan::GetInstance()->GetCurProbe(para);
+  char type = Img2D::GetInstance()->ReviseProbeType(para.type);
 
   switch (keyValue) {
   case KEY_POWER:
@@ -287,14 +358,12 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
     }
   case KEY_PAGEUP:
     {
-      ptrKnob->PageUp();
-
+      KnobMenu::GetInstance()->PageUp();
       break;
     }
   case KEY_PAGEDOWM:
     {
-      ptrKnob->PageDown();
-
+      KnobMenu::GetInstance()->PageDown();
       break;
     }
   case KEY_F1ADD:
@@ -309,7 +378,6 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
   case KEY_F5SUB:
     {
       CKnobEvent::FEvent(keyValue);
-
       break;
     }
   case KEY_DUAL:
@@ -381,7 +449,6 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
     {
       if (ModeStatus::IsEFOVMode()) {
         HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
-
         break;
       }
 
@@ -420,7 +487,6 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
   case KEY_UPDATE:
     {
       ptrMultiFunc->Update();
-
       break;
     }
   case KEY_CW:
@@ -1024,8 +1090,8 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
         m_super_timer = 0;
       }
 
-      m_statusSuperAuthen = TRUE;
-      m_super_timer = g_timeout_add(5000, HandleSuperAuthen, NULL);
+      m_statusSuperAuthen = true;
+      m_super_timer = g_timeout_add(5000, signal_callback_superauthen, this);
 
       break;
     }
@@ -1052,7 +1118,7 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
 
       m_vecAuthenInfo.push_back(keyValue);
       m_statusAuthen = TRUE;
-      m_timer = g_timeout_add(5000, HandleAuthen, NULL);
+      m_timer = g_timeout_add(5000, signal_callback_authen, this);
 
       break;
     }
@@ -1077,6 +1143,45 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
         m_vecSuperAuthenInfo.push_back(keyValue);
       }
 
+      break;
+    }
+  default:
+      break;
+  }
+}
+
+void ViewMain::KnobKeyEvent(unsigned char keyValue) {
+  KnobMenu* knobMenu = KnobMenu::GetInstance();
+
+  switch(keyValue) {
+  case KEY_F1:
+    {
+      knobMenu->Knob1_Press();
+      break;
+    }
+  case KEY_F2:
+    {
+      knobMenu->Knob2_Press();
+      break;
+    }
+  case KEY_F3:
+    {
+      knobMenu->Knob3_Press();
+      break;
+    }
+  case KEY_F4:
+    {
+      knobMenu->Knob4_Press();
+      break;
+    }
+  case KEY_F5:
+    {
+      knobMenu->Knob5_Press();
+      break;
+    }
+  case KEY_F6:
+    {
+      knobMenu->Knob6_Press();
       break;
     }
   default:
@@ -1110,16 +1215,21 @@ void ViewMain::MenuReviewCallBack() {
   }
 }
 
-gboolean ViewMain::IsAuthenValid() {
+bool ViewMain::GetCursorVisible() {
+  return m_cursorVisible;
+}
+
+void ViewMain::SetCursorVisible(bool visible) {
+  m_cursorVisible = visible;
+}
+
+// ---------------------------------------------------------
+
+void ViewMain::IsAuthenValid() {
   m_statusAuthen = false;
 
-  if (m_timer > 0) {
-    g_source_remove(m_timer);
-    m_timer = 0;
-  }
-
   if(!m_vecAuthenInfo.empty()) {
-    unsigned char info[AUTHEN_NUM+1] = {0};
+    unsigned char info[AUTHEN_NUM + 1] = {0};
 
     for (int i = 0; i < m_vecAuthenInfo.size(); i ++) {
       info[i] = m_vecAuthenInfo[i];
@@ -1129,24 +1239,17 @@ gboolean ViewMain::IsAuthenValid() {
     m_vecAuthenInfo.clear();
 
     // compare
-    if (strcmp((const char*)info, "dicome") == 0) {
+    if (string((char*)info) == "dicome") {
       ViewDicomSupervise::GetInstance()->CreateWindow();
     }
   }
-
-  return FALSE;
 }
 
-gboolean ViewMain::IsSuperAuthenValid(void) {
+void ViewMain::IsSuperAuthenValid() {
   m_statusSuperAuthen = false;
 
-  if (m_super_timer > 0) {
-    g_source_remove(m_super_timer);
-    m_super_timer = 0;
-  }
-
   if(!m_vecSuperAuthenInfo.empty()) {
-    unsigned char info[SUPER_AUTHEN_NUM+1] = {0};
+    unsigned char info[SUPER_AUTHEN_NUM + 1] = {0};
 
     for (int i = 0; i < m_vecSuperAuthenInfo.size(); i ++) {
       info[i] = m_vecSuperAuthenInfo[i];
@@ -1156,24 +1259,18 @@ gboolean ViewMain::IsSuperAuthenValid(void) {
     m_vecSuperAuthenInfo.clear();
 
     // compare
-    if (strcmp((const char*)info, "emperor1997") == 0) {
+    if (string((char*)info) == "emperor1997") {
       ViewSuperuser::GetInstance()->CreateWindow();
     }
 
     // compare
-    if (strcmp((const char*)info, "e1997") == 0) {
+    if (string((char*)info) == "e1997") {
       ViewSuperuser::GetInstance()->CreateDemoWindow();
     }
   }
-
-  return FALSE;
 }
 
 void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
-  AbsMultiFunc* ptrMultiFunc = MultiFuncFactory::GetInstance()->GetObject();
-  ModeStatus s;
-  ScanMode::EScanMode mode = s.GetScanMode();
-
   if (offset != 1 && offset != 0) {
     offset = 1;
   }
@@ -1188,7 +1285,6 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
     knob = ADD;
   }
 
-  //close knob event in demo. lhm
   if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW &&
     ViewSuperuser::GetInstance()->GetDemoStatus()) {
     return;
@@ -1197,7 +1293,7 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
   switch (keyValue) {
   case KNOB_VALUE:
     {
-      ptrMultiFunc->Value(knob);
+      MultiFuncFactory::GetInstance()->GetObject()->Value(knob);
       break;
     }
   case KNOB_GAIN:
@@ -1207,7 +1303,6 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
 
       if (ModeStatus::IsEFOVMode()) {
         HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
-
         break;
       }
 
@@ -1237,256 +1332,7 @@ void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
   default:
     {
       CKnobEvent::KnobEvent(keyValue, offset);
-
       break;
     }
   }
-}
-
-int g_tgcTimer = 0;
-
-gboolean TgcCallBack(gpointer data) {
-  ModeStatus s;
-  int mode = s.GetScanMode();
-
-  Img2D::GetInstance()->ChangeTgc2D(g_tgcSlider);
-
-  if (mode == ScanMode::M || mode == ScanMode::M_INIT) {
-    Img2D::GetInstance()->ChangeTgcM(g_tgcSlider);
-  }
-
-  g_tgcTimer = 0;
-
-  return false;
-}
-
-void ViewMain::SliderEvent(unsigned char keyValue, unsigned char offset) {
-  if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW &&
-    ViewSuperuser::GetInstance()->GetDemoStatus()) {
-
-    return;
-  }
-
-  if (ModeStatus::IsEFOVMode()) {
-    HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
-
-    if (offset >= SLIDER_OFF && offset <= (SLIDER_OFF + 8)) {
-      g_tgcSlider[offset - SLIDER_OFF] = keyValue;
-    }
-
-    return ;
-  }
-
-  if (offset >= SLIDER_OFF && offset <= (SLIDER_OFF + 7)) {
-    g_tgcSlider[offset - SLIDER_OFF] = keyValue;
-
-    // remove timer if is start-up
-    if (g_tgcTimer > 0) {
-      if (!g_source_remove(g_tgcTimer)) {
-        PRINTF("remove tgc timer error[%d]\n", offset-SLIDER_OFF);
-
-        return;
-      }
-
-      g_tgcTimer = 0;
-    }
-
-    // start-up timer
-    int interval = 10;
-    g_tgcTimer = g_timeout_add(interval, TgcCallBack, NULL);
-  }
-}
-
-void ViewMain::MouseEvent(char offsetX, char offsetY) {
-  AbsMultiFunc* ptrMulti = MultiFuncFactory::GetInstance()->GetObject();
-  ptrMulti->Mouse(offsetX, offsetY);
-}
-
-void ViewMain::KnobKeyEvent(unsigned char keyValue) {
-  KnobMenu* ptrKnob = KnobMenu::GetInstance();
-
-  switch(keyValue) {
-  case KEY_F1:
-    {
-      ptrKnob->Knob1_Press();
-      break;
-    }
-  case KEY_F2:
-    {
-      ptrKnob->Knob2_Press();
-      break;
-    }
-  case KEY_F3:
-    {
-      ptrKnob->Knob3_Press();
-      break;
-    }
-  case KEY_F4:
-    {
-      ptrKnob->Knob4_Press();
-      break;
-    }
-  case KEY_F5:
-    {
-      ptrKnob->Knob5_Press();
-      break;
-    }
-  case KEY_F6:
-    {
-      ptrKnob->Knob6_Press();
-      break;
-    }
-  default:
-      break;
-  }
-
-}
-
-
-////////////////////////////[ViewMain]/////////////////////////////
-ViewMain* ViewMain::m_ptrInstance = NULL;
-
-ViewMain::ViewMain() {
-  m_mainWindow = 0;
-  countN = 0;
-  m_ptrKnob = KnobMenu::GetInstance();
-  m_ptrImgArea = ImageArea::GetInstance();
-  m_ptrTopArea = TopArea::GetInstance();
-  m_ptrHintArea = HintArea::GetInstance();
-  m_ptrMenuArea = MenuArea::GetInstance();
-  m_ptrNoteArea = NoteArea::GetInstance();
-
-  keyTSIN = 0;
-}
-
-ViewMain::~ViewMain() {
-  if (m_ptrInstance != NULL) {
-    delete m_ptrInstance;
-  }
-
-  m_ptrInstance = NULL;
-}
-
-ViewMain* ViewMain::GetInstance() {
-  if (m_ptrInstance == NULL) {
-    m_ptrInstance = new ViewMain();
-  }
-
-  return m_ptrInstance;
-}
-
-GtkWidget* ViewMain::GetMainWindow() {
-  return m_mainWindow;
-}
-
-void ViewMain::Show() {
-  gtk_widget_show_all(m_mainWindow);
-}
-
-void ViewMain::Hide() {
-  gtk_widget_hide_all(m_mainWindow);
-}
-
-void ViewMain::ShowMenu() {
-  gtk_widget_hide(m_daMenu);
-}
-
-void ViewMain::HideMenu() {
-  gtk_widget_show(m_daMenu);
-}
-
-void ViewMain::Create() {
-  UserSelect::GetInstance()->create_userconfig_dir();//addec by LL
-  UserSelect::GetInstance()->create_userdefined_dir();
-  UserSelect::GetInstance()->create_commentdefined_dir();
-  UserSelect::GetInstance()->create_usercalcdefined_dir();
-  UserSelect::GetInstance()->creat_username_db(USERNAME_DB);
-  UserSelect::GetInstance()->save_active_user_id(0);
-
-  m_mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  //gtk_window_set_decorated(GTK_WINDOW(m_mainWindow), FALSE);
-  gtk_window_set_position(GTK_WINDOW(m_mainWindow), GTK_WIN_POS_CENTER);
-  //gtk_window_set_resizable(GTK_WINDOW(m_mainWindow), FALSE);
-  gtk_widget_set_size_request(m_mainWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
-  gtk_container_set_border_width(GTK_CONTAINER(m_mainWindow), 0);
-  gtk_widget_modify_bg(m_mainWindow, GTK_STATE_NORMAL, g_deep);
-
-  //  g_signal_connect(m_mainWindow,"key-press-event",G_CALLBACK(HandleKeyPressEvent),this);
-
-  m_fixedWindow = gtk_fixed_new();
-  gtk_widget_set_usize(m_fixedWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
-  gtk_widget_set_uposition(m_fixedWindow, 0, 0);
-  gtk_container_add(GTK_CONTAINER(m_mainWindow), m_fixedWindow);
-
-  // Top area
-  GtkWidget *da_topArea;
-  da_topArea = m_ptrTopArea->Create(TOP_AREA_W, TOP_AREA_H);
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_topArea, TOP_AREA_X, TOP_AREA_Y);
-  m_ptrTopArea->AddTimeOut();
-
-  // image area
-  GtkWidget *da_image;
-  da_image = m_ptrImgArea->Create();
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_image, IMG_AREA_X, IMG_AREA_Y);
-  m_ptrImgArea->AddTimeOutFps();
-
-  // note area
-  GtkWidget *canvas_note;
-  canvas_note = m_ptrNoteArea->Create();
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), canvas_note, IMG_AREA_X + IMAGE_X, IMG_AREA_Y + IMAGE_Y);
-
-  // Knob Area
-  GtkWidget *tableKnob;
-  tableKnob = m_ptrKnob->Create();
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableKnob, KNOB_AREA_X, KNOB_AREA_Y);
-  gtk_widget_set_usize(tableKnob, KNOB_AREA_W, KNOB_AREA_H + 20);
-
-  // hint
-  GtkWidget *da_hintArea;
-  da_hintArea = m_ptrHintArea->Create();
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_hintArea, HINT_AREA_X, HINT_AREA_Y);
-
-  // icon view
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), ViewIcon::GetInstance()->Create(), 844, 733); // 740
-
-  // Menu Area
-  GtkWidget *tableMenu;
-  tableMenu = m_ptrMenuArea->Create();
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableMenu, 844, 0);
-
-  m_daMenu = gtk_drawing_area_new();
-  gtk_widget_modify_bg(m_daMenu, GTK_STATE_NORMAL, g_black);
-  gtk_drawing_area_size(GTK_DRAWING_AREA(m_daMenu), MENU_AREA_W, MENU_AREA_H - TOP_AREA_H);
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), m_daMenu, 844, TOP_AREA_H);
-
-  // 2D knob menu
-  KnobD2Create();
-
-  g_keyInterface.Push(this);
-
-  Show();
-  gtk_widget_hide(m_daMenu);
-
-  m_ptrNoteArea->Hide();
-
-  // update top area
-  SysGeneralSetting *sysGeneralSetting = new SysGeneralSetting;
-  string hospital_name = sysGeneralSetting->GetHospital();
-  delete sysGeneralSetting;
-
-  m_ptrTopArea->UpdateHospitalName(hospital_name.c_str());
-
-  // patient info
-  g_patientInfo.UpdateTopArea();
-
-  if (g_authorizationOn) {
-    CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 1);
-  }
-
-  Utils::test(m_mainWindow);
-}
-
-void ViewMain::MySleep(int msecond) {
-  int sum = Img2D::GetInstance()->GetFocSum();
-  usleep(msecond * sum);
 }

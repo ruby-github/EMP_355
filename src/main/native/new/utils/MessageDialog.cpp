@@ -5,6 +5,7 @@
 #include "utils/Utils.h"
 
 #include "keyboard/KeyDef.h"
+#include "keyboard/KeyValueOpr.h"
 #include "ViewMain.h"
 
 #include <sstream>

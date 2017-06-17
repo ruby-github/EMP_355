@@ -1,86 +1,102 @@
-// -*- c++ -*-
-#ifndef VIEWMAIN_H
-#define VIEWMAIN_H
+#ifndef __VIEW_MAIN_H__
+#define __VIEW_MAIN_H__
 
-#include "keyboard/KeyValueOpr.h"
 #include "keyboard/KnobEvent.h"
+#include "utils/Utils.h"
 
-gboolean UpdateTopArea(gpointer data);
-void InvisibleCursor(bool invisible, bool resetCursor=TRUE);
+void InvisibleCursor(bool invisible, bool resetCursor = true);
 void ChangeSystemCursor(GdkCursorType type);
 
-class ImageArea;
-class HintArea;
-class KnobMenu;
-class MenuArea;
-class TopArea;
-class NoteArea;
-
-class ViewMain:public CKnobEvent {
+class ViewMain: public CKnobEvent {
 public:
-    ~ViewMain();
-    static ViewMain* GetInstance();
+  static ViewMain* GetInstance();
 
-    void Create(void);
-    void Show(void);
-    void Hide(void);
-    void ShowMenu(void);
-    void HideMenu(void);
+public:
+  ~ViewMain();
 
-    void MenuReviewCallBack(void);
+  void Create();
+  void ShowMenu();
+  void HideMenu();
 
-    GtkWidget* GetMainWindow(void);
-    void KeyEvent(unsigned char keyValue);
-    void KnobEvent(unsigned char keyValue, unsigned char offset);
-    void SliderEvent(unsigned char keyValue, unsigned char offset);
-    void MouseEvent(char offsetX, char offsetY);
-    void KnobKeyEvent(unsigned char keyValue);
-    bool GetCursorVisible(void) {
-        return m_cursorVisible;
-    }
-    void SetCursorVisible(bool visible) {
-        m_cursorVisible = visible;
-    }
+  GtkWidget* GetMainWindow();
+
+  void KeyEvent(unsigned char keyValue);
+  void KnobKeyEvent(unsigned char keyValue);
+  void MenuReviewCallBack();
+
+  bool GetCursorVisible();
+  void SetCursorVisible(bool visible);
 
 private:
-    ViewMain();
+  // signal
+
+  static gboolean signal_callback_authen(gpointer data) {
+    ViewMain* viewMain = (ViewMain*)data;
+
+    if (viewMain != NULL) {
+      viewMain->IsAuthenValid();
+    }
+
+    return FALSE;
+  }
+
+  static gboolean signal_callback_superauthen(gpointer data) {
+    ViewMain* viewMain = (ViewMain*)data;
+
+    if (viewMain != NULL) {
+      viewMain->IsSuperAuthenValid();
+    }
+
+    return FALSE;
+  }
+
+  void IsAuthenValid();
+  void IsSuperAuthenValid();
+
+private:
+  ViewMain();
+
+  void KnobEvent(unsigned char keyValue, unsigned char offset);
+
+private:
+  static ViewMain* m_instance;
+  static bool m_cursorVisible;
+
+  static const unsigned int AUTHEN_NUM = 6;
+  static const unsigned int SUPER_AUTHEN_NUM = 11;
+
+private:
+  GtkWindow* m_window;
+
+  bool m_statusAuthen;
+  bool m_statusSuperAuthen;
+  vector<unsigned char> m_vecAuthenInfo;
+  vector<unsigned char> m_vecSuperAuthenInfo;
+
+private:
+
 
     unsigned char m_keyValue;
-    static ViewMain* m_ptrInstance;
-    static bool m_cursorVisible;
+
     int countN;
-    GtkWidget* m_mainWindow;
-    GtkWidget* m_fixedWindow;
-    GtkWidget* m_daMenu;
-    KnobMenu* m_ptrKnob;
-    ImageArea* m_ptrImgArea;
-    TopArea* m_ptrTopArea;
-    HintArea* m_ptrHintArea;
-    MenuArea* m_ptrMenuArea;
-    NoteArea* m_ptrNoteArea;
+
+
     //signal handle
     //signal connect
 
-    void MySleep(int msecond);
+
     int keyTSIN;
 
-    static const unsigned int SUPER_AUTHEN_NUM = 11;
-    static const unsigned int AUTHEN_NUM = 6;
+
     // anthen
-    std::vector<unsigned char> m_vecAuthenInfo;
-    std::vector<unsigned char> m_vecSuperAuthenInfo;
-    bool m_statusAuthen;
-    bool m_statusSuperAuthen;
+
+
+
+
     int m_timer;
     int m_super_timer;
-    gboolean IsAuthenValid(void);
-    gboolean IsSuperAuthenValid(void);
-    static gboolean HandleAuthen(gpointer data) {
-        return m_ptrInstance->IsAuthenValid();
-    }
-    static gboolean HandleSuperAuthen(gpointer data) {
-        return m_ptrInstance->IsSuperAuthenValid();
-    }
+
+
 
 };
 
