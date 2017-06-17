@@ -697,11 +697,7 @@ PangoFontDescription* AdaptStringFont(const char *font_family, const char *font_
     return font;
 }
 
-void SetTheme(const char *rc_path) {
-    gtk_rc_parse(rc_path);
-    gtk_rc_reparse_all();
-    gtk_rc_reset_styles(gtk_settings_get_default());
-}
+
 
 
 

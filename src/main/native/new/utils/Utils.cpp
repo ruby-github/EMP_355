@@ -1,9 +1,5 @@
 #include "utils/Utils.h"
 
-#include <sstream>
-
-using namespace std;
-
 GdkColor* Utils::m_color = NULL;
 
 // ---------------------------------------------------------
@@ -485,6 +481,12 @@ GdkColor* Utils::get_color(const string color_name) {
   gdk_color_parse(color_name.c_str(), m_color);
 
   return m_color;
+}
+
+void Utils::SetTheme(const string rc_path) {
+  gtk_rc_parse(rc_path.c_str());
+  gtk_rc_reparse_all();
+  gtk_rc_reset_styles(gtk_settings_get_default());
 }
 
 // ---------------------------------------------------------

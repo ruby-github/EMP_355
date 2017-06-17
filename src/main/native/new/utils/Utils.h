@@ -60,6 +60,8 @@ public:
 
   static GdkColor* get_color(const string color_name);
 
+  static void SetTheme(const string rc_path);
+
 private:
   static GdkColor* m_color;
 

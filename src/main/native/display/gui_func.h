@@ -71,10 +71,6 @@ template <typename T> T min_3(const T &a, const T &b, const T &c) {
     return a < b ? (a < c ? a : c) : (b < c ? b : c);
 }
 
-void SetTheme(const char *rc_path);
-
-
-
 void modify_widget_bg(GtkWidget* widget);
 
 #endif

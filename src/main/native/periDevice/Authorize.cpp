@@ -13,6 +13,7 @@
 #include "sysMan/ViewSystem.h"
 
 #include "utils/FakeXUtils.h"
+#include "utils/Utils.h"
 
 //using namespace std;
 /*
@@ -105,7 +106,7 @@ void CAuthorize::Excute(int argc, char *argv[]) {
         gdk_threads_init();
         gtk_init(&argc, &argv);
 
-        SetTheme(RC_PATH);
+        Utils::SetTheme(RC_PATH);
         if (status == -1)
             CLicenseDialog::GetInstance()->Create(CLicenseDialog::NODEVICE, true);
         else if (status == -2)
