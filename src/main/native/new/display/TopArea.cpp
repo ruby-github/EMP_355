@@ -46,9 +46,11 @@ GtkWidget* TopArea::Create(const int width, const int height) {
 
   GtkTable* table = Utils::create_table(2, 12);
   gtk_container_set_border_width(GTK_CONTAINER(table), 5);
+  gtk_table_set_row_spacings(table, 5);
+  gtk_table_set_col_spacings(table, 5);
 
   // logo
-  GtkImage* image = Utils::create_image(string(CFG_RES_PATH) + string("res/logo.png"), m_cell_width * 2 - 10, m_cell_height * 2 - 10);
+  GtkImage* image = Utils::create_image(string(CFG_RES_PATH) + string("res/logo.png"), m_cell_width * 2 - 6, m_cell_height * 2 - 6);
   gtk_table_attach_defaults(table, GTK_WIDGET(image), 0, 2, 0, 2);
 
   // hospital
@@ -102,11 +104,28 @@ void TopArea::UpdateImageParam(const string param) {
 }
 
 void TopArea::UpdatePatInfo(const string name, const string sex, const string age, const string id) {
+  string tmp_name = name;
+  string tmp_sex = sex;
+  string tmp_age = age;
+  string tmp_id = id;
+
+  if (tmp_name.empty()) {
+    tmp_name = "      ";
+  }
+
+  if (tmp_sex.empty()) {
+    tmp_sex = "    ";
+  }
+
+  if (tmp_age.empty()) {
+    tmp_age = "    ";
+  }
+
   stringstream ss;
-  ss << _("Name:") << " " << name
-    << "    " << _("Gender:") << " " << sex
-    << "    " << _("Age:") << " " << age
-    << "    " << _("ID:") << " " << id;
+  ss << _("Name:") << " " << tmp_name
+    << "    " << _("Gender:") << " " << tmp_sex << "  "
+    << "    " << _("Age:") << " " << tmp_age << "  "
+    << "    " << _("ID:") << " " << tmp_id;
 
   gtk_label_set_text(m_label_patient_info, ss.str().c_str());
 }
@@ -180,16 +199,16 @@ void TopArea::DrawingExpose(GtkWidget* widget, GdkEventExpose* event) {
   cairo_move_to(cr, m_cell_width * 4, m_cell_height);
   cairo_line_to(cr, m_cell_width * 10, m_cell_height);
 
-  cairo_move_to(cr, 0, m_cell_height * 2);
-  cairo_line_to(cr, m_cell_width * 12, m_cell_height * 2);
+  cairo_move_to(cr, 5, m_cell_height * 2);
+  cairo_line_to(cr, m_cell_width * 12 - 5, m_cell_height * 2);
 
-  cairo_move_to(cr, m_cell_width * 4, 0);
+  cairo_move_to(cr, m_cell_width * 4, 5);
   cairo_line_to(cr, m_cell_width * 4, m_cell_height * 2);
 
   cairo_move_to(cr, m_cell_width * 9, m_cell_height);
   cairo_line_to(cr, m_cell_width * 9, m_cell_height * 2);
 
-  cairo_move_to(cr, m_cell_width * 10, 0);
+  cairo_move_to(cr, m_cell_width * 10, 5);
   cairo_line_to(cr, m_cell_width * 10, m_cell_height * 2);
 
   cairo_stroke(cr);
