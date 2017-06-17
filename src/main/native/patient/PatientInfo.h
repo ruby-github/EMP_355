@@ -128,4 +128,5 @@ private:
 };
 
 extern PatientInfo g_patientInfo;
+
 #endif

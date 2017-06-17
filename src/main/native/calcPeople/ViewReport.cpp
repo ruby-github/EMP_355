@@ -35,8 +35,8 @@
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
 
-extern pthread_t pidInitTable;
-extern gboolean ReportInit;
+extern pthread_t g_pidInitTable;
+extern bool g_reportInit;
 
 //static void* ThreadLoadData1(void* argv);
 //static void* ThreadLoadData2(void* argv);
@@ -354,8 +354,8 @@ void ViewReport::CreateWindow(void) {
     SetSystemCursorToCenter();
 #endif
 
-    if(!ReportInit)
-        pthread_join(pidInitTable, NULL);	//Waiting for the init thread
+    if(!g_reportInit)
+        pthread_join(g_pidInitTable, NULL);	//Waiting for the init thread
 
 #ifdef VET
 

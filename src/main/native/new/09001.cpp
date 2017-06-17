@@ -17,6 +17,8 @@ extern CUIS4DReceiveInterface g_uis4d_ri;
 
 pthread_t pidDsc;
 
+#include "display/gui_func.h"
+
 // ---------------------------------------------------------
 
 void* ThreadDsc(void* argv) {
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]) {
   Utils::SetTheme(RC_PATH);
 
   ChangeKeymap();
-  init_colors();
+  init_colors(); ///
 
   (*sysLog) << "main: run gui, create main view!" << endl;
   init.CreatMainWindow();
