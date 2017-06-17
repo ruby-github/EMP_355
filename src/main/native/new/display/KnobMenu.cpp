@@ -33,22 +33,22 @@ GtkWidget* KnobMenu::Create() {
   gtk_table_set_row_spacings(table, 1);
   gtk_table_set_col_spacings(table, 1);
 
-  m_button_left = Utils::create_button("≪");
+  m_button_left = Utils::create_button("<<");
   m_button_Knob[0] = Utils::create_button("knob1");
   m_button_Knob[1] = Utils::create_button("knob2");
   m_button_Knob[2] = Utils::create_button("knob3");
   m_button_Knob[3] = Utils::create_button("knob4");
   m_button_Knob[4] = Utils::create_button("knob5");
   m_button_Knob[5] = Utils::create_button("knob6");
-  m_button_right = Utils::create_button("≪");
+  m_button_right = Utils::create_button(">>");
 
   gtk_table_attach_defaults(table, GTK_WIDGET(m_button_left), 0, 1, 0, 1);
   gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 1, 3, 0, 1);
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 3, 5, 0, 1);
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 5, 7, 0, 1);
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 7, 9, 0, 1);
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 9, 11, 0, 1);
-  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[0]), 11, 13, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[1]), 3, 5, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[2]), 5, 7, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[3]), 7, 9, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[4]), 9, 11, 0, 1);
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_button_Knob[5]), 11, 13, 0, 1);
   gtk_table_attach_defaults(table, GTK_WIDGET(m_button_right), 13, 14, 0, 1);
 
   Utils::set_button_image(m_button_Knob[0], Utils::create_image("res/menu/menu1.png"), GTK_POS_TOP);
@@ -59,13 +59,15 @@ GtkWidget* KnobMenu::Create() {
   Utils::set_button_image(m_button_Knob[5], Utils::create_image("res/menu/menu6.png"), GTK_POS_TOP);
 
   GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_left), GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[0]), GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[1]), GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[2]), GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[3]), GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[4]), GTK_CAN_FOCUS);
-  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[5]), GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_right), GTK_CAN_FOCUS);
+
+  gtk_widget_modify_bg(GTK_WIDGET(m_button_left), GTK_STATE_NORMAL, Utils::get_color("black"));
+  gtk_widget_modify_bg(GTK_WIDGET(m_button_right), GTK_STATE_NORMAL, Utils::get_color("black"));
+
+  for (int i = 0; i < KNOB_NUM; i++) {
+    GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_Knob[i]), GTK_CAN_FOCUS);
+    gtk_widget_modify_bg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("black"));
+  }
 
   return GTK_WIDGET(table);
 }
@@ -278,21 +280,6 @@ void KnobMenu::Knob5_Screw(int cw) {
   }
 }
 
-void KnobMenu::Knob6_Screw(int cw) {
-  int index = 0;
-  index = KNOB_NUM * m_CurLevel + 5;
-
-  if (m_KnobItem[index].pf == NULL || m_KnobItem[index].status == ERROR) {
-    return;
-  }
-
-  if (cw == 1) {
-    (*(m_KnobItem[index].pf))(ADD);
-  } else if (cw == 0) {
-    (*(m_KnobItem[index].pf))(SUB);
-  }
-}
-
 // ---------------------------------------------------------
 
 string KnobMenu::Display(KnobItem item, const string tmp) {
@@ -300,18 +287,26 @@ string KnobMenu::Display(KnobItem item, const string tmp) {
     return "";
   }
 
+  string str;
+
+  if (tmp.empty()) {
+    str = item.name;
+  } else {
+    str = item.name + "\n" + tmp;
+  }
+
   stringstream ss;
 
   if (item.status == MIN) {
-    ss << item.name << "\n" << tmp << "\n◁  " << item.value << "  ▶";
+    ss << str << "\n    " << item.value << "    ";
   } else if (item.status == MAX) {
-    ss << item.name << "\n" << tmp << "\n◀  " << item.value << "  ▷";
+    ss << str << "\n    " << item.value << "    ";
   } else if (item.status == OK) {
-    ss << item.name << "\n" << tmp << "\n◀  " << item.value << "  ▶";
+    ss << str << "\n    " << item.value << "    ";
   } else if (item.status == PRESS) {
-    ss << item.name << "\n" << tmp << "\n【  " << item.value << "  】";
+    ss << str << "\n【 " << item.value << " 】";
   } else if (item.status == ERROR) {
-    ss << "<span color='#505050'>" << item.name << "\n" << tmp << "\n   " << item.value << "   </span>";
+    ss << "<span color='#505050'>" << str << "\n    " << item.value << "    </span>";
   }
 
   return ss.str();
@@ -332,7 +327,8 @@ void KnobMenu::Refresh() {
 
   for (int i = 0; i < KNOB_NUM; i ++) {
     gtk_widget_queue_draw(GTK_WIDGET(m_button_Knob[i]));
-    gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+    /*
+    gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("black"));
 
     if (type == 'L' || type == 'l') {
       if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Scan Angle") {
@@ -369,5 +365,6 @@ void KnobMenu::Refresh() {
         gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
       }
     }
+    */
   }
 }

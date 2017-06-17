@@ -26,51 +26,19 @@
 #include "sysMan/ViewSuperuser.h"
 
 using std::deque;
-#if (defined (EMP_322) || defined(EMP_313))
-KnobMenu::KnobItem KnobReplayMenu[6] = {
-    {N_("Replay"), "", MIN, NULL, ReplayChgCtrl},
-    {N_("Replay Speed"), "", MIN, NULL, PressChgSpeed},
-    {N_("Trim Left"),"", PRESS, NULL, ReplayChgTrimLeft},
-    {N_("Trim Right"),"", PRESS, NULL, ReplayChgTrimRight},
-    {N_("Reset Trim"),N_("Press"), PRESS, NULL, ReplayChgResetTrim},
-    {N_("Save Cine"), N_("Press"), PRESS, NULL, ReplayChgSaveCine},
-    // {"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL}
-};
-#elif (defined (EMP_460) || defined(EMP_355))
-KnobMenu::KnobItem KnobReplayMenu[5] = {
+
+KnobMenu::KnobItem KnobReplayMenu[] = {
     {N_("Replay"), "", MIN, ReplayChgSpeed, NULL},
+    {N_("Replay Speed"), "", MIN, NULL, PressChgSpeed},
     {N_("Trim Left"),"", PRESS, ReplayChgTrimLeft460, NULL},
     {N_("Trim Right"),"", PRESS, ReplayChgTrimRight460, NULL},
     {N_("Reset Trim"),N_("Press"), PRESS, ReplayChgResetTrim460, NULL},
-    {N_("Save Cine"), N_("Press"), PRESS, ReplayChgSaveCine460, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL}
+    {N_("Save Cine"), N_("Press"), PRESS, ReplayChgSaveCine460, NULL}
 };
-#else
-KnobMenu::KnobItem KnobReplayMenu[5] = {
-    {N_("Replay/Speed"), "", MIN, ReplayChgSpeed, ReplayChgCtrl},
-    {N_("Trim Left"),"", PRESS, NULL, ReplayChgTrimLeft},
-    {N_("Trim Right"),"", PRESS, NULL, ReplayChgTrimRight},
-    {N_("Reset Trim"),N_("Press"), PRESS, NULL, ReplayChgResetTrim},
-    {N_("Save Cine"), N_("Press"), PRESS, NULL, ReplayChgSaveCine},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL}
-};
-#endif
 
-KnobMenu::KnobItem DemoKnobReplayMenu[5] = {
+KnobMenu::KnobItem DemoKnobReplayMenu[] = {
     {N_("Replay/Speed"), "", MIN, ReplayChgSpeed, ReplayChgCtrl},
-    //{N_("Trim Left"),"", PRESS, NULL, ReplayChgTrimLeft},
-    //{N_("Trim Right"),"", PRESS, NULL, ReplayChgTrimRight},
-    //{N_("Reset Trim"),N_("Press"), PRESS, NULL, ReplayChgResetTrim},
-    //{N_("Save Cine"), N_("Press"), PRESS, NULL, ReplayChgSaveCine},
+    {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
@@ -130,33 +98,17 @@ EKnobReturn PressChgSpeed(void) {
 }
 
 EKnobReturn ReplayChgTrimLeft(void) {
-#ifndef EMP_460
-#ifndef EMP_355
-    Replay::GetInstance()->SetTrimLeft();
-#endif
-#endif
     return PRESS;
 }
 
 EKnobReturn ReplayChgTrimRight(void) {
-#ifndef EMP_460
-#ifndef EMP_355
-    Replay::GetInstance()->SetTrimRight();
-#endif
-#endif
     return PRESS;
 }
 
 EKnobReturn ReplayChgResetTrim(void) {
-#ifndef EMP_460
-#ifndef EMP_355
-    Replay::GetInstance()->ResetTrim();
-#endif
-#endif
     return PRESS;
 }
 
-#if (defined(EMP_460) || defined(EMP_355))
 EKnobReturn ReplayChgTrimLeft460(EKnobOper oper) {
     Replay::GetInstance()->SetTrimLeft(oper);
     return PRESS;
@@ -171,7 +123,6 @@ EKnobReturn ReplayChgResetTrim460(EKnobOper oper) {
     Replay::GetInstance()->ResetTrim(oper);
     return PRESS;
 }
-#endif
 
 static VideoMan::VideoItem item;
 static gboolean DelayToSaveCine(gpointer data) {
@@ -215,14 +166,11 @@ static int SaveCine(gpointer data) {
 }
 
 EKnobReturn ReplayChgSaveCine(void) {
-    //get current image para
-//	VideoMan::VideoItem item;
     if (!Replay::GetInstance()->GetCineImg(&(item.deq), item.begin, item.frames, item.width, item.height, item.frame_rate)) {
         HintArea::GetInstance()->UpdateHint(_("[Replay]: No image can be saved."), 1);
         return ERROR;
     }
-//int size = item.deq->size();
-//printf("size = %d item.begin = %d item.end = %d item.width = %d item.height = %d\n",size,item.begin,item.frames,item.width,item.height);
+
     SysOptions so;
     if(!so.GetCineAutoName()) {
         if(!ModeStatus::IsFreezeMode())
@@ -248,16 +196,13 @@ EKnobReturn ReplayChgSaveCine(void) {
 
     return PRESS;
 }
-#if (defined(EMP_460) || defined(EMP_355))
+
 EKnobReturn ReplayChgSaveCine460(EKnobOper oper) {
-    //get current image para
-//	VideoMan::VideoItem item;
     if (!Replay::GetInstance()->GetCineImg(&(item.deq), item.begin, item.frames, item.width, item.height, item.frame_rate)) {
         HintArea::GetInstance()->UpdateHint(_("[Replay]: No image can be saved."), 1);
         return ERROR;
     }
-//int size = item.deq->size();
-//printf("size = %d item.begin = %d item.end = %d item.width = %d item.height = %d\n",size,item.begin,item.frames,item.width,item.height);
+
     SysOptions so;
     if(!so.GetCineAutoName()) {
         if(!ModeStatus::IsFreezeMode())
@@ -283,4 +228,3 @@ EKnobReturn ReplayChgSaveCine460(EKnobOper oper) {
 
     return PRESS;
 }
-#endif

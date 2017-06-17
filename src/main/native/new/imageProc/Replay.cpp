@@ -34,11 +34,9 @@ gboolean EFOVReviewCallBack(gpointer data) {
 }
 
 Replay* Replay::m_ptrInstance = NULL;
-#if (defined(EMP_460) || defined(EMP_355))
+
 const float Replay::REPLAY_SPEED[MAX_SPEED] = {0, 2.0,1.0,0.5};
-#else
-const float Replay::REPLAY_SPEED[MAX_SPEED] = {0.5, 1.0, 2.0};
-#endif
+
 Replay* Replay::GetInstance() {
     if(m_ptrInstance == NULL)
         m_ptrInstance = new Replay;

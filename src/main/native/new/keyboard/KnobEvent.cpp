@@ -18,22 +18,22 @@ void CKnobEvent::FEvent(unsigned char keyValue) {
   case KEY_F2SUB: //F2
     ptrKnob->Knob2_Screw(0);
     break;
-  case KEY_F3ADD: //F2
+  case KEY_F3ADD: //F3
     ptrKnob->Knob3_Screw(1);
     break;
-  case KEY_F3SUB: //F2
+  case KEY_F3SUB: //F3
     ptrKnob->Knob3_Screw(0);
     break;
-  case KEY_F4ADD: //F2
+  case KEY_F4ADD: //F4
     ptrKnob->Knob4_Screw(1);
     break;
-  case KEY_F4SUB: //F2
+  case KEY_F4SUB: //F4
     ptrKnob->Knob4_Screw(0);
     break;
-  case KEY_F5ADD: //F2
+  case KEY_F5ADD: //F5
     ptrKnob->Knob5_Screw(1);
     break;
-  case KEY_F5SUB: //F2
+  case KEY_F5SUB: //F5
     ptrKnob->Knob5_Screw(0);
     break;
   }

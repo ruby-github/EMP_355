@@ -29,9 +29,9 @@ public:
     void ClearReplayBar();
 
     void ReplayCtrl(bool on );
-#if (defined (EMP_322) || defined(EMP_313))
+
     void SpeedCtrl(int indexSpeed);
-#endif
+
     void ReplayCtrl(bool on, int indexSpeed, EKnobReturn status);
 
     void ReplayTrimLeft(int data);

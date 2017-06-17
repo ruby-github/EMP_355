@@ -1,20 +1,8 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: KnobLoadSnap
- * @brief: knob in freeze mode
- *
- * version: V1.0
- * date: 2009-8-31
- * @author: zhanglei
- */
-
 #include "patient/KnobLoadSnap.h"
 #include "display/KnobMenu.h"
 #include "Def.h"
 #include "imageProc/MenuReview.h"
 
-#if (defined (EMP_322) || defined(EMP_313))
 KnobMenu::KnobItem KnobLoadSnapMenu[6] = {
     {N_("Next Snap"), N_("Press"), PRESS, NULL, ReviewNextSnap},
     {N_("Previous Snap"), N_("Press"), PRESS, NULL, ReviewPreviousSnap},
@@ -23,17 +11,7 @@ KnobMenu::KnobItem KnobLoadSnapMenu[6] = {
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL}
 };
-#else
-KnobMenu::KnobItem KnobLoadSnapMenu[5] = {
-    //{N_("Next Snap"), N_("Press"), PRESS, NULL, ReviewNextSnap},
-    {N_("Snap"), "", MIN, ChgReviewSnap, NULL},
-    //{N_("Previous Snap"), N_("Press"), PRESS, NULL, ReviewPreviousSnap},
-    {N_("Slide Play"), "", MIN, ReviewSlidePlay, PressReviewSlidePlay},
-    {N_("Slide Speed"), "", MIN, ReviewSlideSpeed, PressReviewSlideSpeed},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL}
-};
-#endif
+
 void KnobLoadSnapCreate() {
     KnobMenu::GetInstance()->SetItem(KnobLoadSnapMenu, sizeof(KnobLoadSnapMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::SNAP);
 }

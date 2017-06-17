@@ -1,14 +1,3 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: Knob2D.cpp
- * @brief: knob in 2D mode
- *
- * version: V1.0
- * date: 2009-7-22
- * @author: zhanglei
- */
-
 #include "imageControl/Knob2D.h"
 #include "imageControl/Img2D.h"
 #include "display/KnobMenu.h"
@@ -19,108 +8,28 @@
 #include "imageProc/Zoom.h"
 #include "probe/MenuBiopsy.h"
 
-#if defined(K24C)
-KnobMenu::KnobItem Knob2DMenu[15] = {
-    {N_("Freq."), "", MIN, D2ChgFreq, NULL},
-    {N_("Scan Angle"), "", MIN, D2ChgScanAngle, NULL},
-    {N_("Space Compound"), "", MIN, D2ChgSpaceCompound, NULL},
-    {N_("Freq. Compound"), "", MIN, D2ChgFreqCompound, NULL},
-    {N_("【Chroma】"), "", MIN, D2ChgChroma, D2PressChroma},
-    {N_("Dynamic Range"), "", MIN, D2ChgDynamicRange, NULL},
-    {N_("THI"), "", MIN, D2ChgTHI, NULL},
-    {N_("Steer"), "", MIN, D2ChgSteer, NULL},
-    {N_("TP-View"), "", MIN, NULL, D2PressChgTpView},
-    {N_("EFVI"), "", MIN, NULL, D2PressChgEFVI},
-    {N_("TSI"), "", MIN, D2ChgTSI, NULL},
-    {N_("Line Density"), "", MIN, D2ChgLineDensity, NULL},
-    {N_("Edge"), "", MIN, D2ChgEdge, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-};
-#elif defined(EMP_322) || defined(EMP_313)
-KnobMenu::KnobItem Knob2DMenu[12] = {
-    // {N_("Freq."), "", MIN, D2ChgFreq, NULL},
-    {N_("Scan Angle"), "", MIN, D2ChgScanAngle, D2PressChgScanAngle},
-    {N_("Space Compound"), "", MIN, D2ChgSpaceCompound, D2PressChgSpaceCompound},
-    {N_("Freq. Compound"), "", MIN, D2ChgFreqCompound, D2PressChgFreqCompound},
-    {N_("Dynamic Range"), "", MIN, D2ChgDynamicRange, D2PressChgDynamicRange},
-    //{N_("THI"), "", MIN, D2ChgTHI, D2PressChgTHI},
-    {N_("Line Density"), "", MIN, D2ChgLineDensity, D2PressChgLineDensity},
-    {N_("Steer"), "", MIN, NULL, D2PressChgSteer},
-    {N_("TP-View"), "", MIN, NULL, D2PressChgTpView},
-    {N_("EFVI"), "", MIN, NULL, D2PressChgEFVI},
-    {N_("Edge"), "", MIN, D2ChgEdge, D2PressChgEdge},
-    {N_("MBP"),"", MIN, NULL, D2PressChgMBP},
-    {N_("Sound Power"),"", MIN, NULL, D2PressChgSoundPower},
-    {N_("Scan Line"), "", MIN, NULL, D2PressChgScanLine},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    // {"", "", ERROR, NULL, NULL},
-};
-#elif (defined(EMP_460) || defined(EMP_355))
-KnobMenu::KnobItem Knob2DMenu[20] = {
+KnobMenu::KnobItem Knob2DMenu[] = {
     {N_("Freq."), "", MIN, D2ChgFreq, D2PresssChgStatusTHI},
     {N_("Dynamic Range"), "", MIN, D2ChgDynamicRange, NULL},
     {N_("Focus"), "", MIN, D2ChgFocPos, D2PressFocus},
     {N_("Space Compound"), "", MIN, D2ChgSpaceCompound, NULL},
     {N_("【Chroma】"), "", MIN, D2ChgChroma, D2PressChroma},
     {N_("Freq. Compound"), "", MIN, D2ChgFreqCompound, NULL},
+
     {N_("Scan Angle"), "", MIN, D2ChgScanAngle, NULL},
     {N_("Steer"), "", MIN, D2ChgSteer, NULL},
     {N_("TP-View"), "", MIN, D2ChgTpView, NULL},
     {N_("TSI"), "", MIN, D2ChgTSI, NULL},
     {N_("Line Density"), "", MIN, D2ChgLineDensity, NULL},
     {N_("Edge"), "", MIN, D2ChgEdge, NULL},
+
     {N_("EFVI"), "", MIN, D2ChgEFVI, NULL},
     {N_("Scan Line"), "", MIN, D2ChgScanLine, NULL},
     {N_("Polarity"), "", MIN, D2ChgPolarity, NULL},
     {N_("Pwr"), "", MIN, D2ChgPwr, NULL},//增加pwr+/-
     {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL}
 };
-#elif defined(EMP_3410)
-KnobMenu::KnobItem Knob2DMenu[15] = {
-    {N_("Freq."), "", MIN, D2ChgFreq, D2PresssChgStatusTHI},
-    {N_("Dynamic Range"), "", MIN, D2ChgDynamicRange, NULL},
-    {N_("Focus"), "", MIN, D2ChgFocPos, D2PressFocus},
-    {N_("Space Compound"), "", MIN, D2ChgSpaceCompound, NULL},
-    {N_("【Chroma】"), "", MIN, D2ChgChroma, D2PressChroma},
-    {N_("Scan Angle"), "", MIN, D2ChgScanAngle, NULL},
-    {N_("Steer"), "", MIN, D2ChgSteer, NULL},
-    {N_("TP-View"), "", MIN, D2ChgTpView, NULL},
-    {N_("TSI"), "", MIN, D2ChgTSI, NULL},
-    {N_("Line Density"), "", MIN, D2ChgLineDensity, NULL},
-    {N_("Edge"), "", MIN, D2ChgEdge, NULL},
-    {N_("EFVI"), "", MIN, D2ChgEFVI, NULL},
-    {N_("Scan Line"), "", MIN, D2ChgScanLine, NULL},
-    {N_("Polarity"), "", MIN, D2ChgPolarity, NULL},
-    {N_("Freq. Compound"), "", MIN, D2ChgFreqCompound, NULL},
-};
-#else
-KnobMenu::KnobItem Knob2DMenu[15] = {
-    {N_("Freq."), "", MIN, D2ChgFreq, D2PresssChgStatusTHI},
-    {N_("Dynamic Range"), "", MIN, D2ChgDynamicRange, NULL},
-    {N_("Focus"), "", MIN, D2ChgFocPos, D2PressFocus},
-    {N_("Space Compound"), "", MIN, D2ChgSpaceCompound, NULL},
-    {N_("【Chroma】"), "", MIN, D2ChgChroma, D2PressChroma},
-    {N_("Freq. Compound"), "", MIN, D2ChgFreqCompound, NULL},
-    {N_("Scan Angle"), "", MIN, D2ChgScanAngle, NULL},
-    {N_("Steer"), "", MIN, D2ChgSteer, NULL},
-    {N_("TP-View"), "", MIN, D2ChgTpView, NULL},
-    {N_("TSI"), "", MIN, D2ChgTSI, NULL},
-    {N_("Line Density"), "", MIN, D2ChgLineDensity, NULL},
-    {N_("Edge"), "", MIN, D2ChgEdge, NULL},
-    {N_("EFVI"), "", MIN, D2ChgEFVI, NULL},
-    {N_("Scan Line"), "", MIN, D2ChgScanLine, NULL},
-    {N_("Polarity"), "", MIN, D2ChgPolarity, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-    //{"", "", ERROR, NULL, NULL},
-};
-#endif
 
 void KnobD2Create() {
     KnobMenu::GetInstance()->SetItem(Knob2DMenu, sizeof(Knob2DMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::D2);

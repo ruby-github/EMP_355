@@ -18,44 +18,22 @@
 #include "display/HintArea.h"
 #include "keyboard/KeyFunc.h"
 
-#if defined (EMP_322) || defined(EMP_313)
-KnobMenu::KnobItem KnobMMenu[6] = {
-//	{_("Freq."), "", MIN, MChgFreq, NULL},
-    {_("M Speed"), "", MIN, MChgSpeed, MPressChgSpeed},
-//   {_("【Chroma】"), "", MIN, MChgChroma, MPressChroma},
-    {N_("MBP"),"", MIN, NULL, MPressChgMBP},
-    {N_("Sound Power"),"", MIN, NULL, MPressChgSoundPower},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-
-};
-KnobMenu::KnobItem KnobAnatomicMMenu[6] = {
-//	{_("Freq."), "", MIN, MChgFreq, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-
-};
-#else
-KnobMenu::KnobItem KnobMMenu[5] = {
+KnobMenu::KnobItem KnobMMenu[] = {
     {_("Freq."), "", MIN, MChgFreq, MPressChgStatusTHI},
     {_("M Speed"), "", MIN, MChgSpeed, NULL},
     {_("【Chroma】"), "", MIN, MChgChroma, MPressChroma},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL}
 };
-KnobMenu::KnobItem KnobAnatomicMMenu[5] = {
+KnobMenu::KnobItem KnobAnatomicMMenu[] = {
     {_("Freq."), "", MIN, MChgFreq, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL}
 };
-#endif
 
 void KnobMCreate() {
     KnobMenu::GetInstance()->SetItem(KnobMMenu, sizeof(KnobMMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::M);

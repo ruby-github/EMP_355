@@ -15,6 +15,7 @@ KnobMenu::KnobItem KnobArrowMenu[] = {
   {_("Size"), "", MIN, MultiFuncArrow::SetSize, NULL},
   {_("Color"), "", MIN, MultiFuncArrow::SetColor, NULL},
   {"", "", ERROR, NULL, NULL},
+  {"", "", ERROR, NULL, NULL},
   {"", "", ERROR, NULL, NULL}
 };
 

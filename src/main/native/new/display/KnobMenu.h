@@ -49,7 +49,6 @@ public:
   void Knob3_Screw(int cw);
   void Knob4_Screw(int cw);
   void Knob5_Screw(int cw);
-  void Knob6_Screw(int cw);
 
 private:
   KnobMenu();

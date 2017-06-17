@@ -1,14 +1,3 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: KnobPw.cpp
- * @brief: knob in Pw mode
- *
- * version: V1.0
- * date: 2009-7-24
- * @author: zhanglei
- */
-
 #include "imageControl/KnobPw.h"
 #include "imageControl/ImgPw.h"
 #include "imageControl/Img2D.h"
@@ -20,52 +9,29 @@
 #include "keyboard/KeyFunc.h"
 #include "imageProc/ScanMode.h"
 #include "imageProc/GlobalClassMan.h"
-#if (defined(EMP_460) || defined(EMP_355))
-KnobMenu::KnobItem KnobPwMenu[15] = {
+
+KnobMenu::KnobItem KnobPwMenu[] = {
     {_("SV Length"), "", MIN, PwChgSVLength, NULL},
     {_("Fast Angle"), "", MIN, PwChgAngleFast, PwPressAngleFast},
     {_("Scale"), "", MIN, PwChgScale, NULL},
     {_("Baseline"), "", MIN, PwChgBaseline, NULL},
     {_("Steer"), "", MIN, PwChgSteer, NULL},
-
     {_("Doppler Freq."), "", MIN, PwChgDopFreq, NULL},
+
     {_("Wall Filter"), "", MIN, PwChgWallFilter, NULL},
     {_("Spectrum Speed"), "", MIN, PwChgSpeed, NULL},
     {_("Dynamic Range"), "", MIN, PwChgDynamicRange, NULL},
     {_("Noise Threshold"), "", MIN, PwChgNoise, NULL},
-
     {_("Simult"), "", MIN, PwChgSimult, NULL},
     {_("HPRF"), "", MIN, PwChgHPRF, NULL},
+
     {_("Sound"), "Off", MIN, PwChgSoundStatus, NULL},
-    //{_("PW Map"), "", MIN, PwChgMap, NULL},
-    //{_("Log"), "", MIN, PwChgLog, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL}
 };
-#else
-KnobMenu::KnobItem KnobPwMenu[15] = {
-    {_("SV Length"), "", MIN, PwChgSVLength, NULL},
-    {_("Angle"), "", MIN, PwChgAngle, PwPressAngleFast},
-    {_("Scale"), "", MIN, PwChgScale, NULL},
-    {_("Baseline"), "", MIN, PwChgBaseline, NULL},
-    {_("Steer"), "", MIN, PwChgSteer, NULL},
-
-    {_("Doppler Freq."), "", MIN, PwChgDopFreq, NULL},
-    {_("Wall Filter"), "", MIN, PwChgWallFilter, NULL},
-    {_("Spectrum Speed"), "", MIN, PwChgSpeed, NULL},
-    {_("Dynamic Range"), "", MIN, PwChgDynamicRange, NULL},
-    {_("Noise Threshold"), "", MIN, PwChgNoise, NULL},
-
-    {_("Simult"), "", MIN, PwChgSimult, NULL},
-    {_("HPRF"), "", MIN, PwChgHPRF, NULL},
-    {_("Sound"), "Off", MIN, PwChgSoundStatus, NULL},
-    //{_("PW Map"), "", MIN, PwChgMap, NULL},
-    //{_("Log"), "", MIN, PwChgLog, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-};
-
-#endif
 
 void KnobPwCreate() {
     KnobMenu::GetInstance()->SetItem(KnobPwMenu, sizeof(KnobPwMenu)/sizeof(KnobMenu::KnobItem), KnobMenu::PW);

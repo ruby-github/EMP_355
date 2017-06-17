@@ -1,17 +1,3 @@
-/*
- * 2009, 深圳恩普电子技术有限公司
- *
- * @file: ImgPw.cpp
- * @brief: control the imaging parameter of pw/cw scan mdoe.
- * @note: steer->sv pos->PRF|->wallFilter
- *							|->Spectrum speed->sound interpolation
- *		  "->" means affact
- *
- * version: V1.0
- * date: 2009-5-21
- * @author: zhanglei
- */
-
 #include <math.h>
 #include "imageControl/ImgPw.h"
 #include "imageControl/Img2D.h"

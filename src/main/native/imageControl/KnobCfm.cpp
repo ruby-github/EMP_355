@@ -13,33 +13,27 @@
 #include "imageProc/GlobalClassMan.h"
 #include "imageProc/Zoom.h"
 
-KnobMenu::KnobItem KnobCfmMenu[15] = {
+KnobMenu::KnobItem KnobCfmMenu[] = {
     {N_("Scale"), "", MIN, CfmChgScale, NULL},
     {N_("Baseline"), "", MIN, CfmChgBaseline, NULL},
     {N_("Wall Filter"), "", MIN, CfmChgWallFilter, NULL},
-    //{N_("Steer"), "", MIN, D2ChgSteer, NULL},
     {N_("Steer"), "", MIN, PwChgSteer, NULL},
     {N_("Sensitivity"), "", MIN, CfmChgSensitive, NULL},
-
     {N_("Doppler Freq."), "", MIN, CfmChgDopFreq, NULL},
+
     {N_("Simult"), "", MIN, CfmChgSimult, NULL},
     {N_("Flow Opt."), "", MIN, CfmChgFlowOpt, NULL},
     {N_("Color Invert"), "", MIN, CfmChgInvert, NULL},
     {N_("Color Focus"), "", MIN, CfmChgColorFoc, NULL},
-
     {N_("Color Line Density"), "", MIN, CfmChgLineDensity, NULL},
     {N_("Color Map"), "", MIN, CfmChgMap, NULL},
-    {N_("Scan Line"), "", MIN, CfmChgScanLines, NULL},
-    //{N_("Variance"), "", MIN, CfmChgTurbo, NULL},
-    //{N_("Tissue"), "6000", MIN, CfmChgTissue, NULL},
-    //{N_("Noise"), "11", MIN, CfmChgNoise, NULL},
 
-    //{N_("Rate"), "40", MIN, CfmChgRate, NULL},
-    //{N_("Variance"), "828", MIN, CfmChgVariance, NULL},
-    //{N_("Gain Gate"), "", MIN, CfmChgGainGate, NULL},
-    //{"", "", ERROR, NULL, NULL},
+    {N_("Scan Line"), "", MIN, CfmChgScanLines, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL}
 };
 
 void KnobCfmCreate() {

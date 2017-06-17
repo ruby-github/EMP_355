@@ -26,9 +26,9 @@
 #define KEY_F5ADD         0xC5
 #define KEY_F5SUB         0xC6
 #define KEY_MENU          0xB8
-#define KEY_P3            0xC9
 #define KEY_P1            0xC7
 #define KEY_P2            0xC8
+#define KEY_P3            0xC9
 #define KEY_PAGEUP        0xE7
 #define KEY_PAGEDOWM      0xE0
 #define KEY_LOCALZOOM     0x8C
@@ -74,6 +74,7 @@
 #define KEY_F3            0xE3
 #define KEY_F4            0xE4
 #define KEY_F5            0xE5
+#define KEY_F6            0xE6
 #define KEY_PWRADD        0xDD
 #define KEY_PWRSUB        0xDE
 #define KEY_MBP           0xE9

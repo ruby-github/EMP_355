@@ -20,6 +20,7 @@ KnobMenu::KnobItem KnobBodymarkMenu[] = {
   {_("ProbeMark Color"), "", MIN, MultiFuncBodyMark::SetProbeMarkColor, NULL},
   {_("Hide BodyMark"), "Press", PRESS,MultiFuncBodyMark::PressSetHideBodyMark, NULL},
   {"", "", ERROR, NULL, NULL},
+  {"", "", ERROR, NULL, NULL},
   {"", "", ERROR, NULL, NULL}
 };
 

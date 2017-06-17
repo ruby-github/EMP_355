@@ -13,8 +13,8 @@
 #include "imageProc/KnobReplay.h"
 
 extern const char * EFOVROISizeName[3];
-#if defined (EMP_322) || defined(EMP_313)
-KnobMenu::KnobItem KnobEFOVNone[6] = {
+
+KnobMenu::KnobItem KnobEFOVNone[] = {
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
@@ -23,67 +23,33 @@ KnobMenu::KnobItem KnobEFOVNone[6] = {
     {"", "", ERROR, NULL, NULL}
 };
 
-KnobMenu::KnobItem KnobEFOVPrepareMenu[6] = {
-    {N_("ROI Size"), "", MIN, KnobEFOVROISize, KnobEFOVPressChgROISize},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL}
-};
-
-KnobMenu::KnobItem KnobEFOVViewMenu[6] = {
-    {N_("Zoom"), "", MIN, KnobEFOVZoom, KnobEFOVPressChgZoom},
-    {N_("Rotate"), "", MIN, KnobEFOVRotate, KnobEFOVPressChgRotate},
-    {N_("Review"), N_("Press"), PRESS, NULL, KnobEFOVReviewPress},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL}
-};
-
-KnobMenu::KnobItem KnobEFOVReviewMenu[6] = {
-    {N_("Replay"), "", PRESS, NULL, KnobEFOVReplayPress},
-    {N_("Save Cine"), N_("Press"), ERROR, NULL, KnobEFOVSavePress},
-    // {N_("ReadCine"), N_("Press"), PRESS, NULL, KnobEFOVReadPress},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL}
-};
-#else
-KnobMenu::KnobItem KnobEFOVNone[5] = {
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL},
-    {"", "", ERROR, NULL, NULL}
-};
-
-KnobMenu::KnobItem KnobEFOVPrepareMenu[5] = {
+KnobMenu::KnobItem KnobEFOVPrepareMenu[] = {
     {N_("ROI Size"), "", MIN, KnobEFOVROISize, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL}
 };
 
-KnobMenu::KnobItem KnobEFOVViewMenu[5] = {
+KnobMenu::KnobItem KnobEFOVViewMenu[] = {
     {N_("Zoom"), "", MIN, KnobEFOVZoom, NULL},
     {N_("Rotate"), "", MIN, KnobEFOVRotate, NULL},
     {N_("Review"), N_("Press"), PRESS, NULL, KnobEFOVReviewPress},
     {"", "", ERROR, NULL, NULL},
+    {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL}
 };
 
-KnobMenu::KnobItem KnobEFOVReviewMenu[5] = {
+KnobMenu::KnobItem KnobEFOVReviewMenu[] = {
     {N_("Replay"), "", PRESS, NULL, KnobEFOVReplayPress},
     {N_("Save Cine"), N_("Press"), ERROR, NULL, KnobEFOVSavePress},
-    // {N_("ReadCine"), N_("Press"), PRESS, NULL, KnobEFOVReadPress},
+    {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL},
     {"", "", ERROR, NULL, NULL}
 };
-#endif
+
 void KnobEFOVNoneCreate() {
     KnobMenu::GetInstance()->SetItem(KnobEFOVNone, sizeof(KnobEFOVNone)/sizeof(KnobMenu::KnobItem), KnobMenu::EFOV);
 }

@@ -17,6 +17,7 @@ KnobMenu::KnobItem KnobNoneMenu[] = {
   {"", "", ERROR, NULL, NULL},
   {"", "", ERROR, NULL, NULL},
   {"", "", ERROR, NULL, NULL},
+  {"", "", ERROR, NULL, NULL}
 };
 
 // ---------------------------------------------------------

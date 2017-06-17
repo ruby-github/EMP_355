@@ -1331,6 +1331,11 @@ void ViewMain::KnobKeyEvent(unsigned char keyValue) {
       ptrKnob->Knob5_Press();
       break;
     }
+  case KEY_F6:
+    {
+      ptrKnob->Knob6_Press();
+      break;
+    }
   default:
       break;
   }
@@ -1441,6 +1446,7 @@ void ViewMain::Create() {
   GtkWidget *tableKnob;
   tableKnob = m_ptrKnob->Create();
   gtk_fixed_put(GTK_FIXED(m_fixedWindow), tableKnob, KNOB_AREA_X, KNOB_AREA_Y);
+  gtk_widget_set_usize(tableKnob, KNOB_AREA_W, KNOB_AREA_H + 20);
 
   // hint
   GtkWidget *da_hintArea;
