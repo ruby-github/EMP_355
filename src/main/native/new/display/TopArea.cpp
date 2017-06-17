@@ -1,419 +1,278 @@
-#include <gtk/gtk.h>
+#include "display/TopArea.h"
+
 #include <time.h>
 
-#include "Def.h"
-#include "display/TopArea.h"
-#include "display/gui_func.h"
-#include "display/gui_global.h"
-#include "sysMan/SysGeneralSetting.h"
 #include "probe/ProbeMan.h"
+#include "sysMan/SysGeneralSetting.h"
 
-#include "utils/MainWindowConfig.h"
+TopArea* TopArea::m_instance = NULL;
 
-using std::string;
-
-TopArea* TopArea::m_ptrInstance = NULL;
+// ---------------------------------------------------------
 
 TopArea* TopArea::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new TopArea;
-    return m_ptrInstance;
+  if (m_instance == NULL) {
+    m_instance = new TopArea();
+  }
+
+  return m_instance;
 }
 
-TopArea::TopArea(void) {
-    m_pixmapTop = 0;
-    sprintf(m_freq, " ");
-    m_probeType = " ";
-    m_probeType_old = " ";
-    sprintf(m_checkPart, " ");
-#ifdef VET
-    sprintf(m_hospital, " ");
-#endif
+TopArea::TopArea() {
+  m_label_hospital = NULL;
+  m_label_patient_info = NULL;
+  m_label_sys_info = NULL;
+  m_label_tis = NULL;
+  m_label_time = NULL;
 
-    m_depth = 0;
-    m_MI = 0.0;
-    m_TIS = 0.0;
-    m_inReadImg = false;
-    m_timeout = 0;
+  m_cell_width = 0;
+  m_cell_height = 0;
+  m_inReadImg = false;
 
-    m_image_param = "";
-
-    SysGeneralSetting sys;
-    m_dateFormat = sys.GetDateFormat();
+  SysGeneralSetting sys;
+  m_dateFormat = sys.GetDateFormat();
 }
 
 TopArea::~TopArea() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
+
+  m_instance = NULL;
 }
 
-void TopArea::DrawLogo(void) {
-    GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file((string(CFG_RES_PATH) + string("res/logo.png")).c_str(), NULL);
-    GdkPixbuf* pixbuf_scale = gdk_pixbuf_scale_simple(pixbuf, 120, 50, GDK_INTERP_BILINEAR);
+GtkWidget* TopArea::Create(const int width, const int height) {
+  m_cell_width = width / 12;
+  m_cell_height = height / 2;
 
-    GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    gdk_draw_pixbuf(m_pixmapTop, gc, pixbuf_scale, 0, 0, 0, 5, -1, -1, GDK_RGB_DITHER_NORMAL, 0, 0);
-    g_object_unref(gc);
+  GtkTable* table = Utils::create_table(2, 12);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 5);
 
-    g_object_unref(pixbuf_scale);
-    g_object_unref(pixbuf);
+  // logo
+  GtkImage* image = Utils::create_image(string(CFG_RES_PATH) + string("res/logo.png"), m_cell_width * 2 - 10, m_cell_height * 2 - 10);
+  gtk_table_attach_defaults(table, GTK_WIDGET(image), 0, 2, 0, 2);
+
+  // hospital
+  m_label_hospital = Utils::create_label("");
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_hospital), 2, 4, 0, 2);
+
+  gtk_misc_set_alignment(GTK_MISC(m_label_hospital), 0.5, 0.5);
+
+  // patient info
+  m_label_patient_info = Utils::create_label("");
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_patient_info), 4, 10, 0, 1);
+
+  // sys info
+  m_label_sys_info = Utils::create_label("");
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_sys_info), 4, 9, 1, 2);
+
+  // tis
+  m_label_tis = Utils::create_label("");
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_tis), 9, 10, 1, 2);
+
+  // time
+  m_label_time = Utils::create_label("");
+  gtk_table_attach_defaults(table, GTK_WIDGET(m_label_time), 10, 12, 0, 2);
+
+  gtk_misc_set_alignment(GTK_MISC(m_label_time), 0.5, 0.5);
+
+  // drawing
+  gtk_signal_connect(GTK_OBJECT(table), "expose_event", G_CALLBACK(signal_expose_event), this);
+
+  return GTK_WIDGET(table);
+}
+
+void TopArea::UpdateCheckPart(const string part) {
+  m_checkPart = part;
+  UpdateSysInfo();
+}
+
+void TopArea::UpdateFreq(const string freq) {
+  m_freq = freq;
+  UpdateSysInfo();
 }
 
 void TopArea::UpdateHospitalName(const string name) {
-    const int y = 10;
-    // sprintf(m_hospital, "%s", name);
-
-
-    //m_hospital = name;
-    sprintf(m_hospital, "%s", name.c_str());
-    ClearArea(TOP_AREA_P1 + 5, y, 110, 45);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, name.c_str());
-    int font_size = 24;
-    PangoFontDescription* font = AdaptStringFont("WenQuanYi Zen Hei", "bold", font_size, layout, name.c_str(), 110);
-    g_object_unref(layout);
-
-    DrawString(name.c_str(), TOP_AREA_P1 + 5, y, g_white, font);
-    pango_font_description_free(font);
+  gtk_label_set_text(m_label_hospital, name.c_str());
+  Utils::adjust_font_size(GTK_WIDGET(m_label_hospital), "", "", 24, m_cell_width * 2 - 5, m_cell_height * 2 - 5);
 }
 
-void TopArea::UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id) {
-    const int x = TOP_AREA_P2 + 5;
-    const int y = 5;
-
-    char text_buf[256];
-    char *text_name = _("Name:");
-    //char *text_sex = _("Sex:");
-    char *text_sex = _("Gender:");
-    char *text_age = _("Age:");
-    char *text_id = _("ID:");
-
-    sprintf(text_buf, "%s %s    %s %s    %s %s    %s %s", text_name, name, text_sex, sex, text_age, age, text_id, id);
-    ClearArea(x, y, 424, 20);
-
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, text_buf);
-    int font_size = 12;
-    PangoFontDescription* font = AdaptStringFont("DejaVu Sans", "Book", font_size, layout, text_buf, 424);
-    g_object_unref(layout);
-
-    DrawString(text_buf, x, y, g_white, font);
-    pango_font_description_free(font);
+void TopArea::UpdateImageParam(const string param) {
+  m_imageParam = param;
+  UpdateSysInfo();
 }
 
-void TopArea::UpdateProbeType(const char *type) {
-    m_probeType_old = type;
-    m_probeType = ProbeMan::GetInstance()->VerifyProbeName(type);
-    UpdateSysInfo();
+void TopArea::UpdatePatInfo(const string name, const string sex, const string age, const string id) {
+  stringstream ss;
+  ss << _("Name:") << " " << name
+    << "    " << _("Gender:") << " " << sex
+    << "    " << _("Age:") << " " << age
+    << "    " << _("ID:") << " " << id;
+
+  gtk_label_set_text(m_label_patient_info, ss.str().c_str());
 }
 
-void TopArea::UpdateCheckPart(const char *part) {
-    sprintf(m_checkPart, "%s", part);
-    UpdateSysInfo();
+void TopArea::UpdateProbeType(const string type) {
+  m_probeType = type;
+  UpdateSysInfo();
 }
 
-void TopArea::UpdateFreq(const char *freq) {
-    sprintf(m_freq, "%s", freq);
-    UpdateSysInfo();
-}
+void TopArea::UpdateTIS(double tis) {
+  stringstream ss;
 
-void TopArea::UpdateDepth(int depth) {
-    m_depth = depth;
-    UpdateSysInfo();
-}
+  if (tis >= 0.0001) {
+    double tmp = (int)(tis * 10) / 10.0;
 
-void TopArea::UpdateMI(double MI) {
-    m_MI = MI;
-    UpdateSysInfo();
-}
-
-void TopArea::UpdateTIS(double TIS) {
-    m_TIS = TIS;
-    UpdateSysInfo();
-}
-
-void TopArea::UpdateSysInfo(void) {
-    char probe_info[100];
-    char other_info[100];
-    string probe_type;
-    if (m_probeType.empty()) {
-        probe_type = _("No Probe");
+    if (tmp < 0.4) {
+      ss << "TIS < 0.4";
     } else {
-        probe_type = m_probeType;
+      ss << "TIS " << tmp;
     }
+  }
 
-    if (m_image_param.empty()) {
-        sprintf(probe_info, "%s    %s", probe_type.c_str(), m_checkPart);
-    } else {
-        sprintf(probe_info, "%s    %s    %s", m_image_param.c_str(), probe_type.c_str(), m_checkPart);
-    }
-
-    //sprintf(probe_info, "%s /%3dmm\n%s", probe_type.c_str(), m_depth, m_checkPart);
-    ClearArea(TOP_AREA_P2+5, 35, TOP_AREA_P3-TOP_AREA_P2-10, 20); //LL
-    DrawString(probe_info, TOP_AREA_P2+5, 35, g_white, NULL);
-
-    //tis = m_TIS;
-    float tis = m_TIS;
-#if (defined (EMP_322) || defined(EMP_313))
-    if (tis < 0.0001) {
-        sprintf(other_info, "          ");
-    } else {
-        if (m_probeType.empty()) {
-            sprintf(m_freq, "   ");
-        } else {
-            sprintf(m_freq,"   ");
-        }
-        tis = (int)(tis / 0.2) * 0.2;
-
-        if (tis < 0.4) {
-            sprintf(other_info, "%s\nTIS < 0.4", m_freq);
-        } else {
-            sprintf(other_info, "%s\nTIS   %.1f", m_freq, tis);
-        }
-    }
-#else
-    if (tis < 0.0001) {
-        sprintf(other_info, "          ");
-    } else {
-        tis = (int)(tis / 0.2) * 0.2;
-
-        if (tis < 0.4)
-            sprintf(other_info, "TIS < 0.4");
-        else
-            sprintf(other_info, "TIS   %.1f", tis);
-    }
-#endif
-    ClearArea(TOP_AREA_P3+5, 35, TOP_AREA_P4-TOP_AREA_P3-10, 20); //LL
-    DrawString(other_info, TOP_AREA_P3+5, 35, g_white, NULL);
-}
-
-void TopArea::GetTIS(string& TIS) {
-    char TempTis[30];
-    memset(TempTis,0,30);
-    float tisTemp = m_TIS;
-    if (tisTemp < 0.0001) {
-        sprintf(TempTis, "          ");
-    } else {
-        tisTemp = (int)(tisTemp / 0.2) * 0.2;
-
-        if (tisTemp < 0.4)
-            sprintf(TempTis, "TIS < 0.4  ");
-        else
-            sprintf(TempTis, "TIS   %.1f  ", tisTemp);
-    }
-
-    // sprintf(TempTis,"%.1f",m_TIS);
-    //sprintf(TempTis,"%.1f",);
-    TIS = TempTis;
+  gtk_label_set_text(m_label_tis, ss.str().c_str());
 }
 
 string TopArea::GetCheckPart() {
   return m_checkPart;
 }
 
-void TopArea::GetDepth(int& Depth) {
-    Depth = m_depth;
-}
-
 string TopArea::GetHospitalName() {
-    return m_hospital;
+  return gtk_label_get_text(m_label_hospital);
 }
 
-void TopArea::DrawDateTime(void) {
-    time_t now;
-    struct tm *now_tm;
-    char buf[50];
-    char buf_week[10];
-
-// Get Time
-    time(&now);
-    now_tm = localtime(&now);
-    switch (now_tm->tm_wday) {
-    case 0:
-        sprintf(buf_week, _("Sun."));
-        break;
-    case 1:
-        sprintf(buf_week, _("Mon."));
-        break;
-    case 2:
-        sprintf(buf_week, _("Tues."));
-        break;
-    case 3:
-        sprintf(buf_week, _("Wed."));
-        break;
-    case 4:
-        sprintf(buf_week, _("Thur."));
-        break;
-    case 5:
-        sprintf(buf_week, _("Fri."));
-        break;
-    case 6:
-        sprintf(buf_week, _("Sat."));
-        break;
-    default:
-        break;
-    }
-
-    switch (m_dateFormat) {
-    case 0:
-        sprintf(buf, "%04d-%02d-%02d %s\n%02d:%02d:%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
-        break;
-    case 1:
-        sprintf(buf, "%02d-%02d-%04d %s\n%02d:%02d:%02d", now_tm->tm_mon+1, now_tm->tm_mday, now_tm->tm_year+1900, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
-        break;
-    case 2:
-        sprintf(buf, "%02d-%02d-%04d %s\n%02d:%02d:%02d", now_tm->tm_mday, now_tm->tm_mon+1, now_tm->tm_year+1900, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
-        break;
-    default:
-        sprintf(buf, "%04d-%02d-%02d %s\n%02d:%02d:%02d", now_tm->tm_year+1900, now_tm->tm_mon+1, now_tm->tm_mday, buf_week, now_tm->tm_hour, now_tm->tm_min, now_tm->tm_sec);
-        break;
-    }
-
-    ClearArea(TOP_AREA_P4+10, 10, 130, 40);
-    DrawString(buf, TOP_AREA_P4+10, 10, g_white, NULL);
+string TopArea::GetProbeType() {
+  return m_probeType;
 }
 
-GtkWidget * TopArea::Create(void) {
-    m_topArea = gtk_drawing_area_new();
-    gtk_drawing_area_size(GTK_DRAWING_AREA(m_topArea), TOP_AREA_W, TOP_AREA_H);
-    g_signal_connect(G_OBJECT(m_topArea), "configure_event", G_CALLBACK(HandleTopAreaConfigure), this);
-    g_signal_connect(G_OBJECT(m_topArea), "expose_event", G_CALLBACK(HandleTopAreaExpose), this);
-
-    return m_topArea;
+string TopArea::GetTIS() {
+  return gtk_label_get_text(m_label_tis);
 }
 
-gboolean UpdateDateTime(gpointer data) {
-    TopArea *tmp;
-    tmp = (TopArea *)data;
-    tmp->DrawDateTime();
-    return TRUE;
+bool TopArea::GetReadImg() {
+  return m_inReadImg;
 }
 
-void TopArea::AddTimeOut() {
-    if(m_timeout > 0) {
-        g_source_remove(m_timeout);
-        m_timeout = 0;
-    }
-
-//	m_timeout = g_timeout_add_seconds(1, UpdateDateTime, this);
-    m_timeout = g_timeout_add(500, UpdateDateTime, this);
-}
-
-void TopArea::DelTimeOut() {
-    if(m_timeout > 0) {
-        g_source_remove(m_timeout);
-        m_timeout = 0;
-    }
-}
-
-void TopArea::TopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event) {
-    if (m_pixmapTop)
-        g_object_unref(m_pixmapTop);
-
-    m_pixmapTop = gdk_pixmap_new(widget->window,
-                                 widget->allocation.width,
-                                 widget->allocation.height,
-                                 -1);
-
-    m_pixmapTopBak = gdk_pixmap_new(widget->window,
-                                    widget->allocation.width,
-                                    widget->allocation.height,
-                                    -1);
-
-    GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    gdk_gc_set_foreground(gc, g_black);
-    gdk_draw_rectangle(m_pixmapTop, gc, TRUE, 0, 0, widget->allocation.width, widget->allocation.height);
-
-    // draw spacing line
-    gdk_gc_set_foreground(gc, g_gray);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P2, 5,  TOP_AREA_P2, 58);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P3, 30,  TOP_AREA_P3, 58);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P4, 5,  TOP_AREA_P4, 58);
-    gdk_draw_line(m_pixmapTop, gc, TOP_AREA_P2,   30, TOP_AREA_P4, 30);
-    gdk_draw_line(m_pixmapTop, gc, 5,   58, 839, 58);
-    g_object_unref(gc);
-
-    DrawLogo();
-}
-
-void TopArea::TopAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
-    gdk_draw_drawable(widget->window,
-                      widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
-                      m_pixmapTop,
-                      0, 0,
-                      0, 0,
-                      TOP_AREA_W, TOP_AREA_H);
-}
-
-void TopArea::DrawString(const char *str, int x, int y, GdkColor *color, PangoFontDescription *font) {
-    int width, height;
-
-    GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_topArea, str);
-    if (font)
-        pango_layout_set_font_description(layout, font);
-    pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
-    pango_layout_get_pixel_size(layout, &width, &height);
-    gdk_gc_set_foreground(gc, g_black);
-    gdk_draw_rectangle(m_pixmapTop, gc, TRUE, x, y, width, height);
-
-    gdk_gc_set_foreground(gc, color);
-    gdk_draw_layout(m_pixmapTop, gc, x, y, layout);
-
-    g_object_unref(layout);
-    g_object_unref(gc);
-
-    UpdateTopArea();
+void TopArea::SetDateFormat(int dateFormat) {
+  m_dateFormat = dateFormat;
 }
 
 void TopArea::SetReadImg(bool status) {
-    m_inReadImg = status;
+  m_inReadImg = status;
 
-    GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    if (status) {
-        gdk_draw_drawable(m_pixmapTopBak,
-                          gc,
-                          m_pixmapTop,
-                          0, 0,
-                          0, 0,
-                          TOP_AREA_W, TOP_AREA_H);
-        DelTimeOut();
-    } else {
-        gdk_draw_drawable(m_pixmapTop,
-                          gc,
-                          m_pixmapTopBak,
-                          0, 0,
-                          0, 0,
-                          TOP_AREA_W, TOP_AREA_H);
-        AddTimeOut();
-        UpdateTopArea();
-    }
-    g_object_unref(gc);
+  if (status) {
+    gtk_widget_queue_draw(GTK_WIDGET(m_label_sys_info));
+    gtk_widget_queue_draw(GTK_WIDGET(m_label_tis));
+  }
 }
 
-void TopArea::DrawSnap(GdkPixbuf *pixbuf, int src_x, int src_y, int width, int height) {
-    GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    gdk_gc_set_function(gc, GDK_COPY);
-
-    gdk_draw_pixbuf(m_pixmapTop,
-                    gc,
-                    pixbuf,
-                    src_x, src_y, 0, 0,
-                    width, height,
-                    GDK_RGB_DITHER_NORMAL, 0, 0);
-    g_object_unref(gc);
-
-    UpdateTopArea();
+void TopArea::AddTimeOut() {
+  g_timeout_add(500, signal_callback_update_datetime, this);
 }
 
-void TopArea::ClearArea(int x, int y, int width, int height) {
-    GdkGC *gc = gdk_gc_new(m_pixmapTop);
-    gdk_gc_set_foreground(gc, g_black);
+// ---------------------------------------------------------
 
-    gdk_draw_rectangle(m_pixmapTop, gc, TRUE, x, y, width, height);
-    g_object_unref(gc);
+void TopArea::DrawingExpose(GtkWidget* widget, GdkEventExpose* event) {
+  cairo_t* cr = gdk_cairo_create(widget->window);
+
+  cairo_set_source_rgb(cr, 255, 255, 255);
+  cairo_set_line_width (cr, 1);
+
+  cairo_move_to(cr, m_cell_width * 4, m_cell_height);
+  cairo_line_to(cr, m_cell_width * 10, m_cell_height);
+
+  cairo_move_to(cr, 0, m_cell_height * 2);
+  cairo_line_to(cr, m_cell_width * 12, m_cell_height * 2);
+
+  cairo_move_to(cr, m_cell_width * 4, 0);
+  cairo_line_to(cr, m_cell_width * 4, m_cell_height * 2);
+
+  cairo_move_to(cr, m_cell_width * 9, m_cell_height);
+  cairo_line_to(cr, m_cell_width * 9, m_cell_height * 2);
+
+  cairo_move_to(cr, m_cell_width * 10, 0);
+  cairo_line_to(cr, m_cell_width * 10, m_cell_height * 2);
+
+  cairo_stroke(cr);
+  cairo_destroy(cr);
 }
 
-void TopArea::UpdateImageParam(std::string param) {
-    m_image_param = param;
+void TopArea::UpdateSysInfo() {
+  stringstream ss;
 
-    UpdateSysInfo();
+  if (!m_imageParam.empty()) {
+    ss << m_imageParam << "    ";
+  }
+
+  string probeType = ProbeMan::GetInstance()->VerifyProbeName(m_probeType);
+
+  if (probeType.empty()) {
+    ss << _("No Probe");
+  } else {
+    ss << probeType;
+  }
+
+  ss << "    ";
+  ss << m_checkPart;
+
+  gtk_label_set_text(m_label_sys_info, ss.str().c_str());
+}
+
+void TopArea::DrawDateTime() {
+  time_t now;
+  time(&now);
+
+  tm* timeinfo = localtime(&now);
+
+  string week;
+
+  switch (timeinfo->tm_wday) {
+  case 0:
+    week = _("Sun.");
+    break;
+  case 1:
+    week = _("Mon.");
+    break;
+  case 2:
+    week = _("Tues.");
+    break;
+  case 3:
+    week = _("Wed.");
+    break;
+  case 4:
+    week = _("Thur.");
+    break;
+  case 5:
+    week = _("Fri.");
+    break;
+  case 6:
+    week = _("Sat.");
+    break;
+  default:
+    break;
+  }
+
+  char buffer_date[20] = {0};
+
+  switch (m_dateFormat) {
+  case 0:
+    strftime(buffer_date, 20, "%Y-%m-%d", timeinfo);
+    break;
+  case 1:
+    strftime(buffer_date, 20, "%m-%d-%Y", timeinfo);
+    break;
+  case 2:
+    strftime(buffer_date, 20, "%d-%m-%Y", timeinfo);
+    break;
+  default:
+    strftime(buffer_date, 20, "%Y-%m-%d", timeinfo);
+    break;
+  }
+
+  char buffer_time[20] = {0};
+  strftime(buffer_time, 20, "%H:%M:%S", timeinfo);
+
+  stringstream ss;
+  ss << buffer_date << " " << week << "\n" << buffer_time;
+
+  gtk_label_set_text(m_label_time, ss.str().c_str());
 }

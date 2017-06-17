@@ -256,7 +256,7 @@ void D4FuncMan::GetProbeInfo() {
 }
 
 void D4FuncMan::GetTIS() {
-    TopArea::GetInstance()->GetTIS(m_tis);
+    m_tis = TopArea::GetInstance()->GetTIS();
     m_Para4d.tis = m_tis;
     return;
 }
@@ -270,7 +270,6 @@ void D4FuncMan::GetCheckPart() {
 void D4FuncMan::GetDepth() {
     int depth;
     depth = Img2D::GetInstance()->GetDepth();
-    //TopArea::GetInstance()->GetDepth(depth);
     printf("depth:%d\n", depth);
     m_Para4d.depth = depth;
 }

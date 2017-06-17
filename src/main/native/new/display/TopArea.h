@@ -1,105 +1,87 @@
-#ifndef TOPAREA_H
-#define TOPAREA_H
+#ifndef __TOPAREA_H__
+#define __TOPAREA_H__
 
-#include <gtk/gtk.h>
-#include <string>
-
-using std::string;
-
-/*
- *      Logo |    Hospital        |  Probe     |  TIS |  Time
- *           |                    |            |      |
- *    --------------------------------------------------------------
- *	  0      P1                   P2           P3     P4          844
- */
-#define TOP_AREA_P1 130
-#define TOP_AREA_P2 260
-#define TOP_AREA_P3 614
-#define TOP_AREA_P4 694
+#include "utils/Utils.h"
 
 class TopArea {
 public:
-    ~TopArea();
-    static TopArea * GetInstance();
+  static TopArea* GetInstance();
 
-    GtkWidget* Create(void);
-    void UpdateHospitalName(const string name);
+public:
+  ~TopArea();
 
-    void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
+  GtkWidget* Create(const int width, const int height);
 
-    // void UpdatePatInfo(const char *name, const char *sex, const char *age, const char *id);
-    void UpdateProbeType(const char *type);
-    void UpdateFreq(const char *freq);
-    void UpdateCheckPart(const char *part);
-    void UpdateDepth(int depth);
-    void UpdateMI(double MI);
-    void UpdateTIS(double TIS);
-    void DrawDateTime(void);
-    void SetReadImg(bool status);
-    bool GetReadImg() {
-        return m_inReadImg;
-    }
-    void DrawSnap(GdkPixbuf *pixbuf, int src_x, int src_y, int width, int height);
-    void AddTimeOut();
-    void DelTimeOut();
-    void GetTIS(std::string& TIS);
-    string GetCheckPart();
-    void GetDepth(int& Depth);
-    string GetHospitalName();
-    void SetDateFormat(int DateFormat) {
-        m_dateFormat = DateFormat;
-    }
-    std::string GetProbeType(void) {
-        return m_probeType_old;
-    }
+  void UpdateCheckPart(const string part);
+  void UpdateFreq(const string freq);
+  void UpdateHospitalName(const string name);
+  void UpdateImageParam(const string param);
+  void UpdatePatInfo(const string name, const string sex, const string age, const string id);
+  void UpdateProbeType(const string type);
+  void UpdateTIS(double tis);
 
-    void UpdateImageParam(std::string param);
+  string GetCheckPart();
+  string GetHospitalName();
+  string GetTIS();
+  string GetProbeType();
+  bool GetReadImg();
+
+  void SetDateFormat(int dateFormat);
+  void SetReadImg(bool status);
+  void AddTimeOut();
+
+public:
 
 private:
-    TopArea();
-    void UpdateSysInfo(void);
-    void DrawString(const char *str, int x, int y, GdkColor *color, PangoFontDescription *font);
-    void DrawLogo(void);
-    void ClearArea(int x, int y, int width, int height);
-    void UpdateTopArea(void);
+  // signal
 
-    static TopArea* m_ptrInstance;
-    GtkWidget *m_topArea;
-    GdkPixmap *m_pixmapTop;
-    GdkPixmap *m_pixmapTopBak;
-    bool m_inReadImg;
-    guint m_timeout;
+  static gboolean signal_callback_update_datetime(gpointer data) {
+    TopArea* toparea = (TopArea*)data;
 
-    string m_probeType_old;
-    string m_probeType;
-    char m_freq[30];
-    char m_checkPart[30];
-    // std::string m_hospital;
-    char m_hospital[256];
-
-    int m_depth;
-    double m_MI;
-    double m_TIS;
-    // float tis;
-    int m_dateFormat;
-
-    std::string m_image_param;
-
-//signal handle
-    void TopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event);
-    void TopAreaExpose(GtkWidget *widget, GdkEventExpose *event);
-//signal connect
-    static gboolean HandleTopAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, TopArea *data) {
-        data->TopAreaConfigure(widget, event);
-        return FALSE;
+    if (toparea != NULL) {
+      toparea->DrawDateTime();
     }
-    static gboolean HandleTopAreaExpose(GtkWidget *widget, GdkEventExpose *event, TopArea *data) {
-        data->TopAreaExpose(widget, event);
-        return FALSE;
+
+    return TRUE;
+  }
+
+  static gboolean signal_expose_event(GtkWidget* widget, GdkEventExpose* event, TopArea* data) {
+    TopArea* toparea = (TopArea*)data;
+
+    if (toparea != NULL) {
+      toparea->DrawingExpose(widget, event);
     }
+
+    return FALSE;
+  }
+
+  void DrawingExpose(GtkWidget* widget, GdkEventExpose* event);
+
+private:
+  TopArea();
+
+  void UpdateSysInfo();
+  void DrawDateTime();
+
+private:
+  static TopArea* m_instance;
+
+private:
+  GtkLabel* m_label_hospital;
+  GtkLabel* m_label_patient_info;
+  GtkLabel* m_label_sys_info;
+  GtkLabel* m_label_tis;
+  GtkLabel* m_label_time;
+
+  int m_cell_width;
+  int m_cell_height;
+
+  string m_checkPart;
+  string m_freq;
+  string m_imageParam;
+  string m_probeType;
+  bool m_inReadImg;
+  int m_dateFormat;
 };
 
-inline void TopArea::UpdateTopArea(void) {
-    gtk_widget_queue_draw(m_topArea);
-}
 #endif

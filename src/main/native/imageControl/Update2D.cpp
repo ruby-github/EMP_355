@@ -232,7 +232,6 @@ void Update2D::Steer(int angle, EKnobReturn status) {
 void Update2D::Depth(int depth) {
     //m_ptrImgPara->DrawGeneralPara();
     //update system head
-    //TopArea::GetInstance()->UpdateDepth(depth);
 
     m_ptrImgPara->UpdateDepth(depth);
     m_ptrImgDraw->Update();

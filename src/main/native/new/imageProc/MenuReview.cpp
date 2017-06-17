@@ -575,7 +575,7 @@ void MenuReview::LoadSnapToScreen(const char* path) {
     height = gdk_pixbuf_get_height(item.pixbuf);
 
     //默认显示待字符的图像，存在Frm图像先加载好，待进入测量后通过刷新将Frm图像刷新出来，从而去掉字符信息
-    m_ptrTopArea->DrawSnap(item.pixbuf, 0, 0, width, TOP_AREA_H);
+    // m_ptrTopArea->DrawSnap(item.pixbuf, 0, 0, width, TOP_AREA_H);
     m_ptrImgArea->DrawSnap(item.pixbuf, 0, IMG_AREA_Y, width, height-IMG_AREA_Y);
     if(!ViewSuperuser::GetInstance()->GetDemoStatus()) {
         if(m_limit != 2) {

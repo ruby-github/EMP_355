@@ -1342,13 +1342,6 @@ void ViewMain::KnobKeyEvent(unsigned char keyValue) {
 
 }
 
-gboolean UpdateTopArea(gpointer data) {
-  TopArea *tmp;
-  tmp = (TopArea *)data;
-  tmp->DrawDateTime();
-
-  return TRUE;
-}
 
 ////////////////////////////[ViewMain]/////////////////////////////
 ViewMain* ViewMain::m_ptrInstance = NULL;
@@ -1427,7 +1420,7 @@ void ViewMain::Create() {
 
   // Top area
   GtkWidget *da_topArea;
-  da_topArea = m_ptrTopArea->Create();
+  da_topArea = m_ptrTopArea->Create(TOP_AREA_W, TOP_AREA_H);
   gtk_fixed_put(GTK_FIXED(m_fixedWindow), da_topArea, TOP_AREA_X, TOP_AREA_Y);
   m_ptrTopArea->AddTimeOut();
 
