@@ -388,7 +388,7 @@ void Utils::set_font(GtkWidget* widget, const string family, const string sytle,
   if (!family.empty()) {
     pango_font_description_set_family(font, family.c_str());
   } else {
-    pango_font_description_set_family(font, "WenQuanYi Zen Hei");
+    pango_font_description_set_family(font, "Consolas");
   }
 
   if (size > 0) {
@@ -426,7 +426,7 @@ void Utils::adjust_font_size(GtkWidget* widget, const string family, const strin
         if (!family.empty()) {
           pango_font_description_set_family(font, family.c_str());
         } else {
-          pango_font_description_set_family(font, "WenQuanYi Zen Hei");
+          pango_font_description_set_family(font, "Consolas");
         }
 
         int width = 0;

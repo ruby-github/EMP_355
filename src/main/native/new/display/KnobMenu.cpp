@@ -1,6 +1,7 @@
 #include "display/KnobMenu.h"
 
 #include "imageProc/GlobalClassMan.h"
+#include "utils/StringUtils.h"
 
 KnobMenu* KnobMenu::m_instance = NULL;
 
@@ -287,36 +288,41 @@ string KnobMenu::Display(KnobItem item, const string tmp) {
     return "";
   }
 
+  string value = item.value;
+
+  if (item.status == PRESS) {
+    value = "【 " + item.value + " 】";
+  }
+
+  int max_size = item.name.size();
+
+  if (value.size() > max_size) {
+    max_size = value.size();
+  }
+
+  if (tmp.size() > max_size) {
+    max_size = tmp.size();
+  }
+
   string str;
 
   if (tmp.empty()) {
-    str = item.name;
+    str = string_center(item.name, max_size);
   } else {
-    str = item.name + "\n" + tmp;
+    str = string_center(item.name, max_size) + "\n" + string_center(tmp, max_size);
   }
 
-  stringstream ss;
-
-  if (item.status == MIN) {
-    ss << str << "\n" << item.value;
-  } else if (item.status == MAX) {
-    ss << str << "\n" << item.value;
-  } else if (item.status == OK) {
-    ss << str << "\n" << item.value;
-  } else if (item.status == PRESS) {
-    ss << str << "\n【 " << item.value << " 】";
-  } else if (item.status == ERROR) {
-    ss << "<span color='#505050'>" << str << "\n" << item.value << "</span>";
+  if (item.status == MIN || item.status == MAX || item.status == OK || item.status == PRESS || item.status == ERROR) {
+    return str + "\n" + string_center(value, max_size);
+  } else {
+    return "";
   }
-
-  return ss.str();
 }
 
 void KnobMenu::Refresh() {
   FormatCfm::EFormatCfm formatCfm = FormatCfm::GetInstance()->GetFormat();
   Format2D::EFormat2D format2D = Format2D::GetInstance()->GetFormat();
 
-  // samples
   DSCCONTROLATTRIBUTES* m_ptrDscPara = DscMan::GetInstance()->GetDscPara();
   bool cfmIsDirection = m_ptrDscPara->dcaCFMIsDirection;
 
@@ -327,8 +333,8 @@ void KnobMenu::Refresh() {
 
   for (int i = 0; i < KNOB_NUM; i ++) {
     gtk_widget_queue_draw(GTK_WIDGET(m_button_Knob[i]));
-    /*
-    gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("black"));
+
+    gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("white"));
 
     if (type == 'L' || type == 'l') {
       if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Scan Angle") {
@@ -342,17 +348,18 @@ void KnobMenu::Refresh() {
         gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
       } else if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "TP-View") {
         gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+      } else {
       }
     }
 
-    if(type != 'P' && type != 'p') {
+    if (type != 'P' && type != 'p') {
       if (m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Scan Line") {
         gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
       }
     } else {
     }
 
-    if(!cfmIsDirection && (ScanMode::GetInstance()->GetScanMode() != ScanMode::PWPDI)) {
+    if (!cfmIsDirection && (ScanMode::GetInstance()->GetScanMode() != ScanMode::PWPDI)) {
       if(m_KnobItem[m_CurLevel * KNOB_NUM + i].name == "Baseline") {
         gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
       }
@@ -365,6 +372,13 @@ void KnobMenu::Refresh() {
         gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
       }
     }
-    */
+
+    if (m_KnobItem[m_CurLevel * KNOB_NUM + i].status == PRESS) {
+      gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("blue"));
+    }
+
+    if (m_KnobItem[m_CurLevel * KNOB_NUM + i].status == ERROR) {
+      gtk_widget_modify_fg(GTK_WIDGET(m_button_Knob[i]), GTK_STATE_NORMAL, Utils::get_color("DimGrey"));
+    }
   }
 }

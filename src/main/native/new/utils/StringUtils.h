@@ -9,6 +9,8 @@ string lstrip(const string str);
 string rstrip(const string str);
 string strip(const string str);
 
+string string_center(const string str, int size);
+
 bool IsNum(const string str);
 
 #endif
