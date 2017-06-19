@@ -67,7 +67,7 @@ public:
     static void DrawImgDataFreeze(void* pBits, int nWidth, int nHeight);
     static void CopyImgDataToReplay(void);
 
-    GtkWidget* Create(void);
+    GtkWidget* Create(const int width, const int height);
     inline void UpdateImgArea(void);
     void ClearArea(bool update = false);
     void ClearScreen(bool update=true);

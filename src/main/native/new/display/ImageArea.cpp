@@ -271,9 +271,9 @@ void ImageArea::ClearCFMPreBox(const RectArea& area) {
     }
 }
 
-GtkWidget * ImageArea::Create(void) {
+GtkWidget * ImageArea::Create(const int width, const int height) {
     m_imageDA = gtk_drawing_area_new();
-    gtk_drawing_area_size(GTK_DRAWING_AREA(m_imageDA), IMG_AREA_W, IMG_AREA_H);
+    gtk_drawing_area_size(GTK_DRAWING_AREA(m_imageDA), width, height);
     g_signal_connect(G_OBJECT(m_imageDA), "configure_event", G_CALLBACK(HandleImageAreaConfigure), this);
     g_signal_connect(G_OBJECT(m_imageDA), "expose_event", G_CALLBACK(HandleImageAreaExpose), this);
     return m_imageDA;
