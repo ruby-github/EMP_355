@@ -165,13 +165,13 @@ void ViewMain::Create() {
   gtk_box_pack_start(vbox_top_left, fixed, TRUE, TRUE, 0);
 
   // Image Area
-  GtkWidget* imageArea = ImageArea::GetInstance()->Create();
+  GtkWidget* imageArea = ImageArea::GetInstance()->Create(IMAGE_AREA_W, IMAGE_AREA_H);
 
   // Note Area
-  GtkWidget* noteArea = NoteArea::GetInstance()->Create();
+  GtkWidget* canvasArea = NoteArea::GetInstance()->Create(CANVAS_AREA_W, CANVAS_AREA_H);
 
   gtk_fixed_put(GTK_FIXED(fixed), imageArea, 0, 0);
-  gtk_fixed_put(GTK_FIXED(fixed), noteArea, IMAGE_X, IMAGE_Y);
+  gtk_fixed_put(GTK_FIXED(fixed), canvasArea, CANVAS_AREA_X - IMAGE_AREA_X, CANVAS_AREA_Y - IMAGE_AREA_Y);
 
   // 2D knob menu
   KnobD2Create();

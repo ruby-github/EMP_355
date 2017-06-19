@@ -4,8 +4,6 @@
 #include "utils/FakeXEvent.h"
 #include "utils/Utils.h"
 
-#include "display/ImageArea.h"
-
 class NoteArea: public FakeXEvent {
 public:
   static NoteArea* GetInstance();
@@ -13,7 +11,7 @@ public:
 public:
   ~NoteArea();
 
-  GtkWidget* Create();
+  GtkWidget* Create(const int width, const int height);
 
   void SetNewText(const string text);
   void Enter();
@@ -36,7 +34,7 @@ public:
 
   struct TextItem {
     TextInfo info;
-    GooCanvasItem *item;
+    GooCanvasItem* item;
   };
 
 private:
@@ -126,7 +124,6 @@ private:
 
 private:
   GooCanvas* m_canvas;
-  ImageArea* m_ptrImgArea;
 
   GdkColor* m_color;
   GList* m_listItem;

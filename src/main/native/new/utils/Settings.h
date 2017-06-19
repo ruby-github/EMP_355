@@ -8,4 +8,9 @@
 
 using namespace std;
 
+typedef struct tagPOINT {
+  int x;
+  int y;
+} POINT, *PPOINT;
+
 #endif

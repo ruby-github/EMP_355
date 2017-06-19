@@ -4,6 +4,7 @@
 #include "utils/MainWindowConfig.h"
 
 #include "comment/MenuNote.h"
+#include "display/ImageArea.h"
 #include "display/KnobNone.h"
 #include "display/MenuArea.h"
 #include "keyboard/KeyDef.h"
@@ -30,7 +31,6 @@ NoteArea* NoteArea::GetInstance() {
 
 NoteArea::NoteArea() {
   m_canvas = NULL;
-  m_ptrImgArea = ImageArea::GetInstance();
 
   m_color = NULL;
   m_listItem = NULL;
@@ -47,7 +47,6 @@ NoteArea::NoteArea() {
   m_itemY = 0.0;
 
   GetNoteSetting();
-  PRINTF("end of NoteArea struct\n");
 }
 
 NoteArea::~NoteArea() {
@@ -58,36 +57,36 @@ NoteArea::~NoteArea() {
   m_instance = NULL;
 }
 
-GtkWidget* NoteArea::Create() {
-  m_canvas = Utils::create_canvas(IMG_W, IMG_H);
-  goo_canvas_set_bounds(m_canvas, 0, 0, IMG_W, IMG_H);
+GtkWidget* NoteArea::Create(const int width, const int height) {
+  m_canvas = Utils::create_canvas(width, height);
+  goo_canvas_set_bounds(m_canvas, 0, 0, width, height);
 
   return GTK_WIDGET(m_canvas);
 }
 
 void NoteArea::SetNewText(const string text) {
-  int x = m_sysCursor.x - (IMG_AREA_X + IMAGE_X);
-  int y = m_sysCursor.y - (IMG_AREA_Y + IMAGE_Y);
+  int x = m_sysCursor.x - CANVAS_AREA_X;
+  int y = m_sysCursor.y - CANVAS_AREA_Y;
   int h;
 
   GetNoteSetting();
 
-  char font_desc[100];
-  sprintf(font_desc, "%s, %d", FONT_STRING, m_sizeFont);
-  PRINTF("Font desc is '%s'\n", font_desc);
-  PangoFontDescription *font = pango_font_description_from_string(font_desc);
+  stringstream ss;
+  ss << DEFAULT_FONT << ", " << m_sizeFont;
+
+  PangoFontDescription* font = pango_font_description_from_string(ss.str().c_str());
 
   GtkEntry* entry = CreateEntry(font, m_color);
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(m_entry), NULL);
   pango_layout_get_pixel_size(layout, NULL, &h);
   g_object_unref(layout);
-  PRINTF("text height = %d\n", h);
-  if( y+h > IMAGE_H ) {
-    y = IMAGE_H - h - 3;
+
+  if( y + h > CANVAS_AREA_H ) {
+    y = CANVAS_AREA_H - h - 3;
   }
 
   // add new text to m_sysCursor
-  GooCanvasItem *item = AddTextItem(text, x, y);
+  GooCanvasItem* item = AddTextItem(text, x, y);
 
   gtk_widget_destroy(GTK_WIDGET(m_entry));
 
@@ -105,14 +104,14 @@ void NoteArea::Enter() {
 
   g_keyInterface.Push(this);
 
-  GdkCursor *cursor = CustomCursor();
+  GdkCursor* cursor = CustomCursor();
   //GdkCursor *cursor = gdk_cursor_new(GDK_XTERM);
   gdk_window_set_cursor(gtk_widget_get_window(GTK_WIDGET(m_canvas)), cursor);
   gdk_cursor_unref(cursor);
 
   // set system cusor
-  m_sysCursor.x = IMG_AREA_X+IMAGE_X+IMG_W/2;
-  m_sysCursor.y = IMG_AREA_Y+IMAGE_Y+IMG_H/2;
+  m_sysCursor.x = CANVAS_AREA_X + CANVAS_AREA_W / 2;
+  m_sysCursor.y = CANVAS_AREA_Y + CANVAS_AREA_H / 2;
   SetSystemCursor(m_sysCursor.x, m_sysCursor.y);
 
   // show MenuNote
@@ -152,7 +151,7 @@ void NoteArea::Show() {
   GdkPixbuf *pixbuf = NULL;
   GooCanvasItem *root = goo_canvas_get_root_item(m_canvas);
 
-  pixbuf = m_ptrImgArea->GetDrawingAreaImage();
+  pixbuf = ImageArea::GetInstance()->GetDrawingAreaImage();
   m_itemImage = goo_canvas_image_new(root, pixbuf, 0, 0, NULL);
   Focus();
   g_signal_connect(G_OBJECT(m_itemImage), "key-press-event", G_CALLBACK(signal_goocanvas_item_key_press_image), this);
@@ -210,10 +209,10 @@ void NoteArea::Hide() {
 void NoteArea::StartEdit(gdouble x, gdouble y) {
   GetNoteSetting();
 
-  char font_desc[100];
-  sprintf(font_desc, "%s, %d", FONT_STRING, m_sizeFont);
-  PRINTF("Font desc is '%s'\n", font_desc);
-  PangoFontDescription *font = pango_font_description_from_string(font_desc);
+  stringstream ss;
+  ss << DEFAULT_FONT << ", " << m_sizeFont;
+
+  PangoFontDescription *font = pango_font_description_from_string(ss.str().c_str());
   GooCanvasItem *root = goo_canvas_get_root_item(m_canvas);
 
   m_entry = CreateEntry(font, m_color);
@@ -222,19 +221,18 @@ void NoteArea::StartEdit(gdouble x, gdouble y) {
   PangoLayout *layout = gtk_widget_create_pango_layout(GTK_WIDGET(m_entry), NULL);
   pango_layout_get_pixel_size(layout, NULL, &h);
   g_object_unref(layout);
-  PRINTF("text height = %d\n", h);
 
   if(m_sizeFont ==0) {
-    if(double(y+h) > IMAGE_H) {
-      y = IMAGE_H - h -20;
+    if (y + h > CANVAS_AREA_H) {
+      y = CANVAS_AREA_H - h - 20;
     }
   } else if(m_sizeFont == 1) {
-    if(double(y+h) > IMAGE_H ) {
-      y = IMAGE_H - h - 1;
+    if (y + h > CANVAS_AREA_H ) {
+      y = CANVAS_AREA_H - h - 1;
     }
   } else {
-    if(double(y+h) > IMAGE_H ) {
-      y = IMAGE_H - h +20;
+    if (y + h > CANVAS_AREA_H ) {
+      y = CANVAS_AREA_H - h + 20;
     }
   }
 
@@ -275,7 +273,7 @@ void NoteArea::EndEdit() {
 }
 
 void NoteArea::Focus() {
-  goo_canvas_grab_focus(m_canvas, m_itemImage); // if not grab focus, cannot recive key-press-event
+  goo_canvas_grab_focus(m_canvas, m_itemImage);
 }
 
 void NoteArea::Undo() {
@@ -317,10 +315,12 @@ void NoteArea::Undo() {
 // ---------------------------------------------------------
 
 gboolean NoteArea::ItemKeyPressImage(GooCanvasItem* item, GooCanvasItem* target_item, GdkEventKey* event) {
-  PRINTF("keyval = %d, string = %s, name = %s\n", event->keyval, event->string, gdk_keyval_name(event->keyval));
+  cout << "keyval = " << event->keyval << ", "
+    << "string = " << event->string << ", "
+    << "name = " << gdk_keyval_name(event->keyval) << endl;
 
   if(m_state == NORMAL) {
-    StartEdit(m_sysCursor.x-IMG_AREA_X-IMAGE_X, m_sysCursor.y-IMG_AREA_Y-IMAGE_Y-1);
+    StartEdit(m_sysCursor.x - CANVAS_AREA_X, m_sysCursor.y - CANVAS_AREA_Y - 1);
 
     if(strcmp(gdk_keyval_name(event->keyval), "Shift_L") != 0) {
       if(!FakeAlphabet(g_key_note)) {
@@ -447,8 +447,8 @@ void NoteArea::StartDrag(GooCanvasItem* item) {
   GdkEventButton* event = (GdkEventButton*)gdk_event_new(GDK_BUTTON_PRESS);
   event->type = GDK_BUTTON_PRESS;
   event->button = 1;	 //left button
-  event->x = m_sysCursor.x - IMAGE_X - IMG_AREA_X + 0.5;
-  event->y = m_sysCursor.y - IMAGE_Y - IMG_AREA_Y + 0.5;
+  event->x = m_sysCursor.x - CANVAS_AREA_X + 0.5;
+  event->y = m_sysCursor.y - CANVAS_AREA_Y + 0.5;
   event->time = GDK_CURRENT_TIME;
 
   TextItemButtonPress(item, item, event);
@@ -623,15 +623,15 @@ void NoteArea::DeleteTextItem(GooCanvasItem* item) {
 
 void NoteArea::ListAllTextItem(GList* list) {
   if(g_list_length(list) > 0) {
-    PRINTF("length = %d\n", g_list_length(list));
+    cout << "length = " << g_list_length(list) << endl;
     list = g_list_first(list);
 
     while(list) {
-      PRINTF("string=%s\n", ((TextInfo)((TextItem*)list->data)->info).str.c_str());
+      cout << "string=" << ((TextInfo)((TextItem*)list->data)->info).str << endl;
       list = list->next;
     }
   } else {
-    PRINTF("List is NULL\n");
+    cout << "List is NULL" << endl;
   }
 }
 
@@ -640,9 +640,10 @@ GooCanvasItem* NoteArea::AddTextItem(const string text, gdouble x, gdouble y) {
 
   GetNoteSetting();
 
-  sprintf(font_desc, "%s, %d", FONT_STRING, m_sizeFont);
-  PRINTF("Font desc is '%s'\n", font_desc);
-  PangoFontDescription *font = pango_font_description_from_string(font_desc);
+  stringstream ss;
+  ss << DEFAULT_FONT << ", " << m_sizeFont;
+
+  PangoFontDescription *font = pango_font_description_from_string(ss.str().c_str());
   GooCanvasItem* root = goo_canvas_get_root_item(m_canvas);
 
   GooCanvasItem* item = goo_canvas_text_new(root, text.c_str(), x, y, -1,
@@ -684,8 +685,6 @@ void NoteArea::GetNoteSetting() {
     break;
   }
 
-  PRINTF("font_size = %d\n", m_sizeFont);
-
   switch(sns.GetFontColor()) {
   case 0:
     m_strColor = "red";
@@ -705,8 +704,6 @@ void NoteArea::GetNoteSetting() {
   }
 
   m_color = Utils::get_color(m_strColor);
-
-  PRINTF("m_strColor = %s\n", m_strColor.c_str());
 }
 
 void NoteArea::SetupTextItemHandle(GooCanvasItem* item) {
@@ -730,35 +727,38 @@ GtkEntry* NoteArea::CreateEntry(PangoFontDescription* font, GdkColor* color) {
 }
 
 GdkCursor* NoteArea::CustomCursor() {
-  char logo_file[255];
   GetNoteSetting();
 
-  if(strcmp(m_strColor.c_str(),"red")==0)
-    sprintf(logo_file, "%s/%s", CFG_RES_PATH, "res/icon/red.png");
-  else if(strcmp(m_strColor.c_str(),"blue")==0)
-    sprintf(logo_file, "%s/%s", CFG_RES_PATH, "res/icon/blue.png");
-  else if(strcmp(m_strColor.c_str(),"lime")==0)
-    sprintf(logo_file, "%s/%s", CFG_RES_PATH, "res/icon/green.png");
-  else
-    sprintf(logo_file, "%s/%s", CFG_RES_PATH, "res/icon/white.png");
+  string logo_file;
 
-  GError* error = NULL;
-  GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(logo_file, &error);
-  int Width;
-  int Height;
-
-  if(m_sizeFont==32) {
-    Width = gdk_pixbuf_get_width(pixbuf) *1.4;
-    Height = gdk_pixbuf_get_height(pixbuf) * 1.5;
-  } else if(m_sizeFont==12) {
-    Width = gdk_pixbuf_get_width(pixbuf) *1.0;
-    Height = gdk_pixbuf_get_height(pixbuf) * 0.6;
+  if (m_strColor == "red") {
+    logo_file = string(CFG_RES_PATH) + string("res/icon/red.png");
+  } else if (m_strColor == "blue") {
+    logo_file = string(CFG_RES_PATH) + string("res/icon/blue.png");
+  } else if (m_strColor == "lime") {
+    logo_file = string(CFG_RES_PATH) + string("res/icon/green.png");
   } else {
-    Width = gdk_pixbuf_get_width(pixbuf) *1.0;
-    Height = gdk_pixbuf_get_height(pixbuf) * 0.9;
+    logo_file = string(CFG_RES_PATH) + string("res/icon/white.png");
   }
 
-  GdkPixbuf* pixbuf_scale = gdk_pixbuf_scale_simple(pixbuf, Width, Height, GDK_INTERP_NEAREST);
+  GError* error = NULL;
+  GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file(logo_file.c_str(), &error);
+
+  int width = 0;
+  int height = 0;
+
+  if(m_sizeFont==32) {
+    width = gdk_pixbuf_get_width(pixbuf) *1.4;
+    height = gdk_pixbuf_get_height(pixbuf) * 1.5;
+  } else if(m_sizeFont==12) {
+    width = gdk_pixbuf_get_width(pixbuf) *1.0;
+    height = gdk_pixbuf_get_height(pixbuf) * 0.6;
+  } else {
+    width = gdk_pixbuf_get_width(pixbuf) *1.0;
+    height = gdk_pixbuf_get_height(pixbuf) * 0.9;
+  }
+
+  GdkPixbuf* pixbuf_scale = gdk_pixbuf_scale_simple(pixbuf, width, height, GDK_INTERP_NEAREST);
   GdkDisplay* display = gdk_display_get_default();
 
   GdkCursor* cursor = gdk_cursor_new_from_pixbuf(display, pixbuf_scale,2,2);

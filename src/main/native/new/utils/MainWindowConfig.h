@@ -27,38 +27,55 @@
 //  | 35 |                                   Hint                          | SystemStatus  |
 // ---   |-----------------------------------------------------------------|---------------|
 
-#define SCREEN_WIDTH 1024
+#define SCREEN_WIDTH  1024
 #define SCREEN_HEIGHT 768
 
 // TOP
-#define TOP_AREA_X  0
-#define TOP_AREA_Y  0
-#define TOP_AREA_W  (SCREEN_WIDTH - 180)
-#define TOP_AREA_H  60
+#define TOP_AREA_X    0
+#define TOP_AREA_Y    0
+#define TOP_AREA_W    (SCREEN_WIDTH - 180)
+#define TOP_AREA_H    60
 
 // HINT
-#define HINT_AREA_X 0
-#define HINT_AREA_Y (SCREEN_HEIGHT - 35)
-#define HINT_AREA_W (SCREEN_WIDTH - 180)
-#define HINT_AREA_H 35
+#define HINT_AREA_X   0
+#define HINT_AREA_Y   (SCREEN_HEIGHT - 35)
+#define HINT_AREA_W   (SCREEN_WIDTH - 180)
+#define HINT_AREA_H   35
 
 // KNOB
-#define KNOB_AREA_X 0
-#define KNOB_AREA_Y (SCREEN_HEIGHT - HINT_AREA_H - 105)
-#define KNOB_AREA_W (SCREEN_WIDTH - 180)
-#define KNOB_AREA_H 105
+#define KNOB_AREA_X   0
+#define KNOB_AREA_Y   (SCREEN_HEIGHT - HINT_AREA_H - 105)
+#define KNOB_AREA_W   (SCREEN_WIDTH - 180)
+#define KNOB_AREA_H   105
 
 // MENU
-#define MENU_AREA_X  TOP_AREA_W
-#define MENU_AREA_Y  0
-#define MENU_AREA_W 180
-#define MENU_AREA_H (SCREEN_HEIGHT - KNOB_AREA_H - HINT_AREA_H)
+#define MENU_AREA_X   TOP_AREA_W
+#define MENU_AREA_Y   0
+#define MENU_AREA_W   180
+#define MENU_AREA_H   (SCREEN_HEIGHT - KNOB_AREA_H - HINT_AREA_H)
+
+// IMAGE
+#define IMAGE_AREA_X  0
+#define IMAGE_AREA_Y  TOP_AREA_H
+#define IMAGE_AREA_W  TOP_AREA_W
+#define IMAGE_AREA_H  (SCREEN_HEIGHT - TOP_AREA_H - KNOB_AREA_H - HINT_AREA_H)
+
+// CANVAS
+#define CANVAS_AREA_X (IMAGE_AREA_X + 100)
+#define CANVAS_AREA_Y (IMAGE_AREA_Y + 20)
+#define CANVAS_AREA_W (IMAGE_AREA_W - 200)
+#define CANVAS_AREA_H (IMAGE_AREA_H - 120)
+
+
+
 
 // IMG
 #define IMG_AREA_X  0
 #define IMG_AREA_Y  TOP_AREA_H
 #define IMG_AREA_W  (SCREEN_WIDTH - 180)
 #define IMG_AREA_H  (SCREEN_HEIGHT - TOP_AREA_H - KNOB_AREA_H - HINT_AREA_H)
+
+
 
 // IMAGE
 #define IMAGE_X     100

@@ -599,6 +599,7 @@ void MenuArea::NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, gui
 }
 
 void MenuArea::HideAllMenu() {
+  /*
   g_menu2D.Hide();
   g_menuM.Hide();
   g_menuPW.Hide();
@@ -617,4 +618,5 @@ void MenuArea::HideAllMenu() {
 
   m_2d_only = false;
   gtk_notebook_set_show_tabs(m_notebook, FALSE);
+  */
 }

@@ -319,7 +319,7 @@ void MultiFuncArrow::Do() {
       m_pos.y = m_arrow->GetArrowPos().y;
       //show hand cursor, add...
       InvisibleCursor(FALSE);
-      SetSystemCursor(IMG_AREA_X + IMAGE_X + m_pos.x, IMG_AREA_Y + IMAGE_Y + m_pos.y);
+      SetSystemCursor(CANVAS_AREA_X + m_pos.x, CANVAS_AREA_Y + m_pos.y);
       ChangeSystemCursor(GDK_HAND1);
     }
 
@@ -390,7 +390,7 @@ void MultiFuncArrow::Mouse(int offsetX, int offsetY) {
   m_arrow->SetArrowPos(m_pos);
 
   if (m_arrowOpr == MODIFY) {
-    SetSystemCursor(IMG_AREA_X + IMAGE_X + m_pos.x, IMG_AREA_Y + IMAGE_Y + m_pos.y);
+    SetSystemCursor(CANVAS_AREA_X + m_pos.x, CANVAS_AREA_Y + m_pos.y);
   }
 }
 

@@ -1,11 +1,11 @@
 #include "utils/FakeXUtils.h"
 
-#include "Def.h"
 #include "keyboard/KeyDef.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/SysNoteSetting.h"
 #include "utils/Logger.h"
 #include "utils/MainWindowConfig.h"
+#include "utils/Settings.h"
 
 #define XK_PUBLISHING
 #include <X11/keysymdef.h>

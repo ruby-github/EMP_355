@@ -1,6 +1,7 @@
 #ifndef ABS_UPDATE_IMG_2D_H
 #define ABS_UPDATE_IMG_2D_H
 
+#include "utils/Settings.h"
 #include "Def.h"
 
 /*

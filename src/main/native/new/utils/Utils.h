@@ -7,6 +7,8 @@
 
 #include "utils/Settings.h"
 
+#define DEFAULT_FONT "Consolas"
+
 class Utils {
 public:
   static GtkWindow* create_app_window(const string title = "", const int width = 800, const int height = 600);

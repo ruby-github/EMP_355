@@ -266,6 +266,8 @@
 #endif
 #endif
 
+#include "utils/Settings.h"
+
 ///> define new type
 enum EKnobOper {SUB, ADD, ROTATE};
 
@@ -284,10 +286,6 @@ enum EStudy {ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
 #endif
 //enum EStudy{ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
 #endif
-typedef struct tagPOINT {
-    int x;
-    int y;
-} POINT, *PPOINT;
 
 /* The RGBTRIPLE structure describes a color consisting of relative intensities of red, green, and blue.
 */
