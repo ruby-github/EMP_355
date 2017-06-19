@@ -1196,8 +1196,7 @@ EKnobReturn Img2D::ChangeScanLines(EKnobOper oper) {
     //ImgPw::GetInstance()->ResetSv();
     if(ModeStatus::IsColorMode()) {
         //show 2D menu
-        int menuIndex;
-        MenuArea::GetInstance()->GetMenuIndex(menuIndex);
+        int menuIndex = MenuArea::GetInstance()->GetMenuIndex();
         if(menuIndex == 0)
             ImgCfm::GetInstance()->SetScanLines();
     }

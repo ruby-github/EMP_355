@@ -1,86 +1,84 @@
-// -*- c++ -*-
 #ifndef __MENU_AREA_H__
 #define __MENU_AREA_H__
 
-#include <gtk/gtk.h>
+#include "utils/Utils.h"
 
 class MenuArea {
 public:
-    ~MenuArea() {
-        if (m_ptrInstance != NULL) delete m_ptrInstance;
-    }
-    static MenuArea* GetInstance();
+  static MenuArea* GetInstance();
 
-// enum EMenuType {MAIN, D2, M, PW, CW, CFM, PDI, PWCFM, CWCFM, MEASURE, BDMK, REVIEW, CALC, NOTE, BIOPSY, SYSTEM, EFOV};
-    enum EMenuType {MAIN, D2, M, PW, CW, CFM, PDI, PWCFM, CWCFM, MEASURE, BDMK, REVIEW, CALC, NOTE, BIOPSY, SYSTEM, EFOV,BIOPSYBRACKET,BIOPSYVERIFY};
-    void ShowEFOVPrepare(void);
-    void ShowEFOVCapture(void);
-    void ShowEFOVView(void);
-    void ShowEFOVReview(void);
+public:
+  ~MenuArea();
 
-    EMenuType GetMenuType(void);
-    bool GetMenuVisible() {
-        return m_menuVisbible;
-    }
-    void SwitchMenu(EMenuType type);
-    EMenuType GetNotebookType(void);
+  enum EMenuType {
+    MAIN, D2, M, PW, CW, CFM, PWCFM, CWCFM,
+    MEASURE, BDMK, REVIEW, CALC, NOTE,
+    BIOPSY, BIOPSYBRACKET, BIOPSYVERIFY, EFOV,
+    SYSTEM
+  };
 
-    GtkWidget* Create(void);
-    void ShowMenu(void);
-    void HideMenu(void);
-    void UpdateLabel(void);
-    void UpdateSubMenu(void);
-    void ShowMainMenu(void);
-    void Show2DMenu(void);
-    void ShowMMenu(void);
-    void ShowPWMenu(void);
-    void ShowCWMenu(void);
-    void ShowCFMMenu(void);
-    void ShowCWCFMMenu(bool currentCw);
-    void ShowPWCFMMenu(bool currentPw);
-    void ShowMeasureMenu(void);
-    void ShowBDMKMenu(void);
-    void ShowReviewMenu(void);
-    void ShowCalcMenu(void);
-    void ShowNoteMenu(void);
-    void ShowBiopsyMenu(void);
-    void ShowBioBracketMenu(void);
-    void ShowBioVerifyMenu(void);
-    void ShowSystemMenu(void);
+  GtkWidget* Create();
 
-    void GetMenuIndex(int &index);
+  EMenuType GetMenuType();
+  int GetMenuIndex();
+  bool GetMenuVisible();
+
+  void ShowMenu();
+  void HideMenu();
+
+  void ShowMainMenu();
+  void Show2DMenu();
+  void ShowMMenu();
+  void ShowPWMenu();
+  void ShowCWMenu();
+  void ShowCFMMenu();
+  void ShowPWCFMMenu(bool currentPw);
+  void ShowCWCFMMenu(bool currentCw);
+
+  void ShowMeasureMenu();
+  void ShowBDMKMenu();
+  void ShowReviewMenu();
+  void ShowCalcMenu();
+  void ShowNoteMenu();
+  void ShowBiopsyMenu();
+  void ShowBioBracketMenu();
+  void ShowBioVerifyMenu();
+  void ShowEFOVPrepare();
+  void ShowEFOVCapture();
+  void ShowEFOVView();
+  void ShowEFOVReview();
+  void ShowSystemMenu();
+
+  void SwitchMenu(EMenuType type);
+  void UpdateLabel();
 
 private:
-    MenuArea();
-    static MenuArea *m_ptrInstance;
+  // signal
 
-    void HideCurMenuChild(void);
-
-    EMenuType m_menuType;
-    bool m_menuVisbible;
-
-    GtkWidget *m_tableMenu;
-    GtkWidget *m_fixedMenu;
-    GtkWidget *m_labelSub;
-    GtkWidget *m_btnExit;
-
-    GtkWidget *m_noteBook;
-    GtkWidget *m_label2D;
-    GtkWidget *m_labelM;
-    GtkWidget *m_labelPW;
-    GtkWidget *m_labelCW;
-    GtkWidget *m_labelCFM;
-    GtkWidget *m_labelEFOV;
-    bool m_in2DOnly;
-//signal handle
-    void MainMenuClk(GtkButton *button);
-    void NotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num);
-//signal connect
-    static void HandleNotebookChanged(GtkNotebook *notebook, GtkNotebookPage *page, guint page_num, MenuArea *data) {
-        data->NotebookChanged(notebook, page, page_num);
+  static void signal_notebook_changed(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num, MenuArea* data) {
+    if (data != NULL) {
+      data->NotebookChanged(notebook, page, page_num);
     }
+  }
 
-    void HideAllOtherMenu(void);
+  void NotebookChanged(GtkNotebook* notebook, GtkNotebookPage* page, guint page_num);
+
+private:
+  MenuArea();
+
+  void HideAllMenu();
+
+private:
+  static MenuArea* m_instance;
+
+private:
+  GtkBox* m_vbox;
+  GtkLabel* m_label_sub;
+  GtkNotebook* m_notebook;
+
+  EMenuType m_menuType;
+  bool m_2d_only;
+  bool m_menuVisbible;
 };
 
 extern void MenuShowUndo();

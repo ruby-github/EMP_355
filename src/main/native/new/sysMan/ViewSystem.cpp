@@ -852,51 +852,51 @@ void ViewSystem::CreateWindow() {
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(m_notebook));
 
   // General
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_general()), GTK_WIDGET(Utils::create_label(_("General"))));
+  gtk_notebook_append_page(m_notebook, create_note_general(), GTK_WIDGET(Utils::create_label(_("General"))));
   init_general_setting();
 
   // Options
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_options()), GTK_WIDGET(Utils::create_label(_("Options"))));
+  gtk_notebook_append_page(m_notebook, create_note_options(), GTK_WIDGET(Utils::create_label(_("Options"))));
   init_option_setting(NULL);
 
   // Image Preset
   m_flag_notebook_image = gtk_notebook_get_n_pages(m_notebook);
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_image()), GTK_WIDGET(Utils::create_label(_("Image"))));
+  gtk_notebook_append_page(m_notebook, create_note_image(), GTK_WIDGET(Utils::create_label(_("Image"))));
 
   // Measure
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_measure()), GTK_WIDGET(Utils::create_label(_("Measure"))));
+  gtk_notebook_append_page(m_notebook, create_note_measure(), GTK_WIDGET(Utils::create_label(_("Measure"))));
   init_measure_setting(NULL);
 
   // Calculate And Measure
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc_measure()), GTK_WIDGET(Utils::create_label(_("Calc & Measure"))));
+  gtk_notebook_append_page(m_notebook, create_note_calc_measure(), GTK_WIDGET(Utils::create_label(_("Calc & Measure"))));
 
   // OB
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_calc()), GTK_WIDGET(Utils::create_label(_("OB"))));
+  gtk_notebook_append_page(m_notebook, create_note_calc(), GTK_WIDGET(Utils::create_label(_("OB"))));
   init_calc_setting(NULL);
 
   // Comment
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_comment()), GTK_WIDGET(Utils::create_label(_("Comment"))));
+  gtk_notebook_append_page(m_notebook, create_note_comment(), GTK_WIDGET(Utils::create_label(_("Comment"))));
   init_comment_setting(NULL);
 
   // Peripheral
   m_flag_notebook_tvout = gtk_notebook_get_n_pages(m_notebook);
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_tvout()), GTK_WIDGET(Utils::create_label(_("Peripheral"))));
+  gtk_notebook_append_page(m_notebook, create_note_tvout(), GTK_WIDGET(Utils::create_label(_("Peripheral"))));
 
   // Custom Report
   m_flag_notebook_coustomreport = gtk_notebook_get_n_pages(m_notebook);
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_set_report()), GTK_WIDGET(Utils::create_label(_("Report"))));
+  gtk_notebook_append_page(m_notebook, create_set_report(), GTK_WIDGET(Utils::create_label(_("Report"))));
 
   // DICOM
   if (CDCMRegister::GetMe()->IsAuthorize()) {
-    gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_dicom()), GTK_WIDGET(Utils::create_label(_("DICOM"))));
+    gtk_notebook_append_page(m_notebook, create_note_dicom(), GTK_WIDGET(Utils::create_label(_("DICOM"))));
   }
 
   // P1-P3
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_key_config()), GTK_WIDGET(Utils::create_label(_("P1-P3"))));
+  gtk_notebook_append_page(m_notebook, create_note_key_config(), GTK_WIDGET(Utils::create_label(_("P1-P3"))));
   init_key_config();
 
   // System Info
-  gtk_notebook_append_page(m_notebook, GTK_WIDGET(create_note_info()), GTK_WIDGET(Utils::create_label(_("System"))));
+  gtk_notebook_append_page(m_notebook, create_note_info(), GTK_WIDGET(Utils::create_label(_("System"))));
   init_info_setting();
 
   g_signal_connect(G_OBJECT(m_notebook), "switch-page", G_CALLBACK(signal_notebook_switch_page), this);

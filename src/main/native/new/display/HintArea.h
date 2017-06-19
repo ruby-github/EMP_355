@@ -1,46 +1,43 @@
-// -*- c++ -*-
-#ifndef _HINT_AREA_H_
-#define _HINT_AREA_H_
+#ifndef __HINT_AREA_H__
+#define __HINT_AREA_H__
 
-#define HINT_AREA_W 844 //ModLayout 844 PreLayout 804
-#define HINT_AREA_H 35
+#include "utils/Utils.h"
 
 class HintArea {
 public:
-    ~HintArea();
-    static HintArea *GetInstance();
-    GtkWidget * Create(void);
-    void UpdateHint(const char *text, int timeout=0);
-    void ClearHint(void);
+  static HintArea* GetInstance();
 
-    guint m_timeout;
+public:
+  ~HintArea();
+
+  GtkWidget* Create();
+
+  void UpdateHint(const string text, int timeout = 0);
+  void ClearHint();
+
+public:
+
 private:
-    HintArea();
-    void UpdateHintArea(void);
-    void DrawString(const char *str, int x, int y, GdkColor *color, PangoFontDescription *font);
+  // signal
 
-    static HintArea* m_ptrInstance;
-    GtkWidget *m_hintArea;
-    GdkPixmap *m_pixmapHint;
-    int m_width;
-    int m_height;
+  static gboolean signal_callback_clearhint(gpointer data) {
+    HintArea* hintArea = (HintArea*)data;
 
-//signal handle
-    void HintAreaConfigure(GtkWidget *widget, GdkEventConfigure *event);
-    void HintAreaExpose(GtkWidget *widget, GdkEventExpose *event);
-//signal connect
-    static gboolean HandleHintAreaConfigure(GtkWidget *widget, GdkEventConfigure *event, HintArea *data) {
-        data->HintAreaConfigure(widget, event);
-        return FALSE;
+    if (hintArea != NULL) {
+      hintArea->ClearHint();
     }
-    static gboolean HandleHintAreaExpose(GtkWidget *widget, GdkEventExpose *event, HintArea *data) {
-        data->HintAreaExpose(widget, event);
-        return FALSE;
-    }
+
+    return FALSE;
+  }
+
+private:
+  HintArea();
+
+private:
+  static HintArea* m_instance;
+
+private:
+  GtkLabel* m_label_hint;
 };
-
-inline void HintArea::UpdateHintArea(void) {
-    gtk_widget_queue_draw(m_hintArea);
-}
 
 #endif
