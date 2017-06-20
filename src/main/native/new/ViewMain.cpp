@@ -115,6 +115,7 @@ void ViewMain::Create() {
 
   // Window
   m_window = Utils::create_app_window("CT", SCREEN_WIDTH, SCREEN_HEIGHT);
+  gtk_window_set_decorated(m_window, FALSE);
 
   GtkBox* vbox = Utils::create_vbox();
   gtk_container_add(GTK_CONTAINER(m_window), GTK_WIDGET(vbox));

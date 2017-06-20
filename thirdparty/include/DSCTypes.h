@@ -156,8 +156,8 @@ typedef struct tagDSCControlAttributes
 */
 typedef void (*UPDATEFRAME) (void *pBits, int nWidth, int nHeight);
 
-const int IWIDTH = IMG_W; //628;				//!< constant, the width of image.
-const int IHEIGHT = IMG_H; //440;			//!< constant, the height of image.
+//const int IWIDTH = IMG_W; //628;				//!< constant, the width of image.
+//const int IHEIGHT = IMG_H; //440;			//!< constant, the height of image.
 //const float PI = 3.1415926f;		//!< constant, PI.
 
 /** @brief A enum type.

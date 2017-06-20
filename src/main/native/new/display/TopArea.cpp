@@ -197,19 +197,19 @@ void TopArea::DrawingExpose(GtkWidget* widget, GdkEventExpose* event) {
   cairo_set_line_width (cr, 1);
 
   cairo_move_to(cr, m_cell_width * 4, m_cell_height);
-  cairo_line_to(cr, m_cell_width * 10 + 10, m_cell_height);
+  cairo_line_to(cr, m_cell_width * 10, m_cell_height);
 
   cairo_move_to(cr, 2, m_cell_height * 2 + 2);
-  cairo_line_to(cr, m_cell_width * 12 + 2, m_cell_height * 2 + 2);
+  cairo_line_to(cr, m_cell_width * 12, m_cell_height * 2 + 2);
 
   cairo_move_to(cr, m_cell_width * 4, 2);
   cairo_line_to(cr, m_cell_width * 4, m_cell_height * 2 + 2);
 
-  cairo_move_to(cr, m_cell_width * 9 + 2, m_cell_height);
-  cairo_line_to(cr, m_cell_width * 9 + 2, m_cell_height * 2 + 2);
+  cairo_move_to(cr, m_cell_width * 9, m_cell_height);
+  cairo_line_to(cr, m_cell_width * 9, m_cell_height * 2 + 2);
 
-  cairo_move_to(cr, m_cell_width * 10 + 10, 2);
-  cairo_line_to(cr, m_cell_width * 10 + 10, m_cell_height * 2 + 2);
+  cairo_move_to(cr, m_cell_width * 10, 2);
+  cairo_line_to(cr, m_cell_width * 10, m_cell_height * 2 + 2);
 
   cairo_stroke(cr);
   cairo_destroy(cr);

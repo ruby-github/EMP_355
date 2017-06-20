@@ -1,144 +1,143 @@
-#ifndef IMAGE_AREA_PARA_H
-#define IMAGE_AREA_PARA_H
+#ifndef __IMAGE_AREA_PARA_H__
+#define __IMAGE_AREA_PARA_H__
 
-#include <string>
 #include "display/ImageArea.h"
-
-using std::string;
 
 class ImageAreaPara {
 public:
-    ~ImageAreaPara();
-    static ImageAreaPara* GetInstance();
-    int GetGenFpsReplay();
-    int GetGenFps();
+  static ImageAreaPara* GetInstance();
 
-    void DrawGeneralPara();
-    void Draw2DPara();
-    void DrawMPara();
-    void DrawPwPara();
-    void DrawCwPara();
-    void DrawCfmPara();
-    void DrawPdiPara();
+public:
+  ~ImageAreaPara();
 
-    void UpdateGenPwr(int data, bool draw = TRUE);
-    void UpdateGenZoomScale(double data, bool draw = TRUE);
-#ifndef EMP_355
-    void UpdateGenFps(int data, bool draw = TRUE);
-#else
-    void UpdateGenFps(int receiveFps, int processFps, bool draw = TRUE);
-#endif
-    void UpdateVolume(int data, bool draw = TRUE);
+  // General
+  void UpdateGenPwr(int data, bool draw = true);
+  void UpdateGenFps(int receiveFps, int processFps, bool draw = true);
+  void UpdateVolume(int data, bool draw = true);
+  void UpdateGenZoomScale(double data, bool draw = true);
+  void UpdateAutoOptimize(bool data, bool draw = true);
 
-    void Update2DGain(int data, bool draw = TRUE);
-    void Update2DDynamicRange(int data, bool draw = TRUE);
-    void Update2DLineDensity(const char* data, bool draw = TRUE);
-    void Update2DMBP(int data, bool draw = TRUE);
-    void Update2DTHI(bool data, bool draw = TRUE);
-    void Update2DTSI(const char* data, bool draw = TRUE);
+  // 2D
+  void Update2DGain(int data, bool draw = true);
+  void Update2DDynamicRange(int data, bool draw = true);
+  void Update2DMBP(int data, bool draw = true);
+  void UpdateDepth(int depth, bool draw = true);
+  void Update2DTHI(bool data, bool draw = true);
+  void Update2DTSI(const string data, bool draw = true);
+  void Update2DLineDensity(const string data, bool draw = true);
+  void UpdateFreq(const string freq, bool draw = true);
 
-    void UpdateMGain(int data, bool draw = TRUE);
-    void UpdateMDynamicRange(int data, bool draw = TRUE);
+  // M
+  void UpdateMGain(int data, bool draw = true);
+  void UpdateMDynamicRange(int data, bool draw = true);
 
-    void UpdateCwGain(int data, bool draw = TRUE);
-    void UpdatePwGain(int data, bool draw = TRUE);
-    void UpdatePwWF(int data, bool draw = TRUE);
-    void UpdatePwSV(double data, bool draw = TRUE);
-    void UpdatePwPRF(double data, bool draw = TRUE);
-    void UpdatePwAngle(int data, bool draw = TRUE);
-    void UpdatePwSVPos(double data, bool draw = TRUE);
-    void UpdatePwHPRFStatus(bool on, bool draw = TRUE);
+  // Pw
+  void UpdateCwGain(int data, bool draw = true);
+  void UpdatePwGain(int data, bool draw = true);
+  void UpdatePwWF(int data, bool draw = true);
+  void UpdatePwAngle(int data, bool draw = true);
+  void UpdatePwPRF(double data, bool draw = true);
+  void UpdatePwSVPos(double data, bool draw = true);
+  void UpdatePwSV(double data, bool draw = true);
+  void UpdatePwHPRFStatus(bool on, bool draw = true);
 
-    //void UpdateCwGain(int data, bool draw = TRUE);
-    void UpdateCwWF(int data, bool draw = TRUE);
-    void UpdateCwPRF(double data, bool draw = TRUE);
-    void UpdateCwAngle(int data, bool draw = TRUE);
-    void UpdateCwSVPos(double data, bool draw = TRUE);
+  // Cw
+  void UpdateCwWF(int data, bool draw = true);
+  void UpdateCwAngle(int data, bool draw = true);
+  void UpdateCwPRF(double data, bool draw = true);
+  void UpdateCwSVPos(double data, bool draw = true);
 
-    void UpdateCfmGain(int data, bool draw = TRUE);
-    void UpdateCfmWF(int data, bool draw = TRUE);
-    void UpdateCfmPRF(int data, bool draw = TRUE);
-    void UpdateCfmPersist(int data, bool draw = TRUE);
-    void UpdateCfmSensitive(int data, bool draw = TRUE);
+  // Cfm
+  void UpdateCfmGain(int data, bool draw = true);
+  void UpdateCfmWF(int data, bool draw = true);
+  void UpdateCfmPRF(int data, bool draw = true);
+  void UpdateCfmPersist(int data, bool draw = true);
+  void UpdateCfmSensitive(int data, bool draw = true);
+  void UpdateCfmDopplerFreq(const string freq, bool draw = true);
 
-    void UpdatePdiGain(int data, bool draw = TRUE);
-    void UpdatePdiWF(int data, bool draw = TRUE);
-    void UpdatePdiPersist(int data, bool draw = TRUE);
-    void UpdatePdiSensitive(int data, bool draw = TRUE);
-    void UpdateAutoOptimize(bool data, bool draw = TRUE);
-    void UpdateFreq(const char* freq, bool draw=TRUE);
-    void UpdateCfmDopplerFreq(const char* freq, bool draw=TRUE);
-    void UpdatePdiDopplerFreq(const char* freq, bool draw=TRUE);
-    void UpdateDepth(int depth, bool draw=TRUE);
-    void FillRectangle(int x, int y, int w, int h);
+  // Pdi
+  void UpdatePdiGain(int data, bool draw = true);
+  void UpdatePdiWF(int data, bool draw = true);
+  void UpdatePdiPersist(int data, bool draw = true);
+  void UpdatePdiSensitive(int data, bool draw = true);
+  void UpdatePdiDopplerFreq(const string freq, bool draw = true);
 
-#ifdef TRANSDUCER
-    void UpdateTransducer(int data,bool draw =TRUE);
-    void DrawTransducer(void);
-    void ReDrawTransducer(void);
-#endif
+  int GetGenFpsReplay();
+  int GetGenFps();
+
+  void DrawGeneralPara();
+  void Draw2DPara();
+  void DrawMPara();
+  void DrawCfmPara();
+  void DrawPdiPara();
+  void DrawPwPara();
+  void DrawCwPara();
+
+  void FillRectangle(int x, int y, int w, int h);
 
 private:
-    ImageAreaPara();
+  ImageAreaPara();
 
-    void DrawPwGenPara(void);
-    void DrawPwGen2Para(void);
+  void DrawPwGenPara();
+  void DrawPwGen2Para();
 
-    static ImageAreaPara* m_ptrInstance;
-    static char * Level[2];
+private:
+  static ImageAreaPara* m_instance;
 
-    ImageArea* m_ptrImg;
+private:
+  ImageArea* m_ptrImg;
+  ImageArea::DrawAttr m_draw_attr;
 
-    char m_bufText[100];
-    char m_freq[100];
-    char m_freqDoppler[100];
-    int m_depth;
+  char m_bufText[100];
 
-    int m_pwr;
-    double m_zoomScale;
-    int m_fps;
-    int m_fpsBak;
-    int m_fpsForReplay;
-#ifdef TRANSDUCER
-    int m_transducer;
-    int m_transducerBak;
-#endif
-    int m_gain2D;
-    int m_dynamicRange;
-    string m_lineDensity;
-    int m_mbp;
-    int m_gainM;
-    bool m_thi;
-    string m_tsi;
+  // General
+  int m_pwr;
+  int m_fps;
+  int m_fpsBak;
+  int m_fpsForReplay;
+  int m_volumePw;
+  double m_zoomScale;
+  bool m_optimize;
 
-    int m_gainPw;
-    int m_wfPw;
-    double m_svPw;
-    double m_PRFPw;
-    int m_anglePw;
-    int m_volumePw;
-    double m_svPosPw;
-    bool m_HPRFStatus;
+  // 2D
+  int m_gain2D;
+  int m_dynamicRange;
+  int m_mbp;
+  int m_depth;
+  bool m_thi;
+  string m_tsi;
+  string m_lineDensity;
+  string m_freq;
 
-    int m_gainCw;
-    int m_wfCw;
-    double m_PRFCw;
-    int m_angleCw;
-    double m_svPosCw;
+  // M
+  int m_gainM;
 
-    int m_gainCfm;
-    int m_wfCfm;
-    int m_prfCfm;
-    int m_persistCfm;
-    int m_sensitiveCfm;
+  // Pw
+  int m_gainCw;
+  int m_gainPw;
+  int m_wfPw;
+  int m_anglePw;
+  double m_PRFPw;
+  double m_svPosPw;
+  double m_svPw;
+  bool m_HPRFStatus;
 
-    int m_gainPdi;
-    bool m_optimize;
+  // Cw
+  int m_wfCw;
+  int m_angleCw;
+  double m_PRFCw;
+  double m_svPosCw;
 
-    ImageArea::DrawAttr m_attr;
-    static const int m_eareH = 20;
-    static const int m_eareWl = 220;
-    static const int m_eareWs = 40;
+  // Cfm
+  int m_gainCfm;
+  int m_wfCfm;
+  int m_prfCfm;
+  int m_persistCfm;
+  int m_sensitiveCfm;
 
+  // Pdi
+  int m_gainPdi;
+  string m_freqDoppler;
 };
+
 #endif
