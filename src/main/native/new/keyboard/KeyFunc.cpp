@@ -21,6 +21,7 @@
 #include "imageProc/ScanMode.h"
 #include "imageProc/Zoom.h"
 #include "keyboard/LightDef.h"
+#include "keyboard/MultiFuncFactory.h"
 #include "measure/DrawHistogram.h"
 #include "measure/MeasureFactory.h"
 #include "measure/MeasureMan.h"

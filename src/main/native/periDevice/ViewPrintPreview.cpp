@@ -845,10 +845,10 @@ void ViewPrintPreview::Item_To_Get() {
 
     for (i=0; i<imageNums; i++) { //现在最多能传入2幅图片
         if(ImgMan::GetInstance()->ReadSnap(imageName[i].c_str(), &printImg[i]) == 0) {
-            buf[i] = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, IMG_W*imgScale, IMG_H*imgScale);
+            buf[i] = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, CANVAS_AREA_W*imgScale, CANVAS_AREA_H*imgScale);
             //buf[i] = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, width_w, height_w);
             //gdk_pixbuf_scale(printImg[i].pixbuf, buf[i], 0, 0, width_w, height_w, (-80)*imgScale, (-120)*imgScale, imgScale, imgScale, GDK_INTERP_HYPER);
-            gdk_pixbuf_scale(printImg[i].pixbuf, buf[i], 0, 0, IMG_W*imgScale, IMG_H*imgScale, (-80)*imgScale, (-120)*imgScale, imgScale, imgScale, GDK_INTERP_HYPER);
+            gdk_pixbuf_scale(printImg[i].pixbuf, buf[i], 0, 0, CANVAS_AREA_W*imgScale, CANVAS_AREA_H*imgScale, (-80)*imgScale, (-120)*imgScale, imgScale, imgScale, GDK_INTERP_HYPER);
             lenOfLine = gdk_pixbuf_get_rowstride(buf[i]);
             item.image_data[i] = (char*)gdk_pixbuf_get_pixels(buf[i]);
             g_object_unref(printImg[i].pixbuf);
@@ -886,14 +886,14 @@ void ViewPrintPreview::Draw_To_Report(struct print_re_item Item, int lenOfline, 
     int height;
     int offsetY = 15;
     float scale = 0.7;
-    int width_w = IMG_W * scale;
-    int height_w = IMG_H * scale;
+    int width_w = CANVAS_AREA_W * scale;
+    int height_w = CANVAS_AREA_H * scale;
     GdkPixbuf *selectImg[2];
     int w(0), h(0);
 
 #if 0
     ///test
-    int size = (int) IMG_W*IMG_H*3*scale*scale;
+    int size = (int) CANVAS_AREA_W*CANVAS_AREA_H*3*scale*scale;
     char temp[size];
     memset(temp, 126, sizeof(temp));
     Item.image_data[0] = temp;

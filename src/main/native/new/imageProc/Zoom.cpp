@@ -3,6 +3,9 @@
 #include "display/HintArea.h"
 #include "imageProc/ImgProc2D.h"
 
+#include "keyboard/MultiFuncFactory.h"
+#include "utils/MainWindowConfig.h"
+
 Zoom* Zoom::m_ptrInstance = NULL;
 const double Zoom::GLOBAL_SCALE[MAX_GLOBAL_SCALE] = {1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};
 const double Zoom::PIP_SCALE[MAX_PIP_SCALE] = {1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};
@@ -14,20 +17,20 @@ Zoom::Zoom() {
 
     m_globalCtrl = FALSE;
     m_globalScale = 0;
-    m_globalPos.x = IMG_W/2;
-    m_globalPos.y = IMG_H/2;
+    m_globalPos.x = CANVAS_AREA_W/2;
+    m_globalPos.y = CANVAS_AREA_H/2;
     m_globalOffsetX = m_globalPos.x;
     m_globalOffsetY = m_globalPos.y;
 
     m_PIPScale = 0;
-    m_PIPPos.x = IMG_W/2;
-    m_PIPPos.y = IMG_H/2;
+    m_PIPPos.x = CANVAS_AREA_W/2;
+    m_PIPPos.y = CANVAS_AREA_H/2;
 
     m_localCtrl = FALSE;
     m_localLineBegin = 60;
     m_localLineEnd = 140;
-    m_localDotBegin = IMG_H/2 - 120;
-    m_localDotEnd = IMG_H/2 + 120;
+    m_localDotBegin = CANVAS_AREA_H/2 - 120;
+    m_localDotEnd = CANVAS_AREA_H/2 + 120;
     m_localScale = 1.0;
     m_timeout = 0;
 }
@@ -48,16 +51,16 @@ void Zoom::GlobalZoomCtrl(bool on) {
         m_globalCtrl = TRUE;
 
         m_globalScale = 0;
-        m_globalPos.x = IMG_W/2;
-        m_globalPos.y = IMG_H/2;
-        m_globalOffsetX = IMG_W / GLOBAL_SCALE[m_globalScale] / 2;
-        m_globalOffsetY = IMG_H / GLOBAL_SCALE[m_globalScale] / 2;
+        m_globalPos.x = CANVAS_AREA_W/2;
+        m_globalPos.y = CANVAS_AREA_H/2;
+        m_globalOffsetX = CANVAS_AREA_W / GLOBAL_SCALE[m_globalScale] / 2;
+        m_globalOffsetY = CANVAS_AREA_H / GLOBAL_SCALE[m_globalScale] / 2;
         SetGlobalInfo(m_globalPos, m_globalScale);
     } else {
         m_globalCtrl = FALSE;
         m_globalScale = 0;
-        m_globalPos.x = IMG_W/2;
-        m_globalPos.y = IMG_H/2;
+        m_globalPos.x = CANVAS_AREA_W/2;
+        m_globalPos.y = CANVAS_AREA_H/2;
         m_globalOffsetX = m_globalPos.x;
         m_globalOffsetY = m_globalPos.y;
 
@@ -85,18 +88,18 @@ bool Zoom::GlobalZoomScale(EKnobOper oper) {
     }
 
     m_ptrDscMan->GetWriteLock();
-    m_globalOffsetX = IMG_W / GLOBAL_SCALE[m_globalScale] / 2;
-    m_globalOffsetY = IMG_H / GLOBAL_SCALE[m_globalScale] / 2;
+    m_globalOffsetX = CANVAS_AREA_W / GLOBAL_SCALE[m_globalScale] / 2;
+    m_globalOffsetY = CANVAS_AREA_H / GLOBAL_SCALE[m_globalScale] / 2;
 
     if (m_globalPos.y < m_globalOffsetY)
         m_globalPos.y = m_globalOffsetY;
-    else if (m_globalPos.y > IMG_H - m_globalOffsetY)
-        m_globalPos.y = IMG_H - m_globalOffsetY;
+    else if (m_globalPos.y > CANVAS_AREA_H - m_globalOffsetY)
+        m_globalPos.y = CANVAS_AREA_H - m_globalOffsetY;
 
     if (m_globalPos.x < m_globalOffsetX)
         m_globalPos.x = m_globalOffsetX;
-    else if (m_globalPos.x > IMG_W - m_globalOffsetX)
-        m_globalPos.x = IMG_W - m_globalOffsetX;
+    else if (m_globalPos.x > CANVAS_AREA_W - m_globalOffsetX)
+        m_globalPos.x = CANVAS_AREA_W - m_globalOffsetX;
 
     SetGlobalInfo(m_globalPos, m_globalScale);
     m_ptrDscMan->ReadWriteUnlock();
@@ -113,15 +116,15 @@ bool Zoom::GlobalZoomScroll(int offsetX, int offsetY) {
 
     // x
     m_globalPos.x += stepx;
-    if (m_globalPos.x > (IMG_W - m_globalOffsetX))
-        m_globalPos.x = IMG_W - m_globalOffsetX;
+    if (m_globalPos.x > (CANVAS_AREA_W - m_globalOffsetX))
+        m_globalPos.x = CANVAS_AREA_W - m_globalOffsetX;
     else if (m_globalPos.x < m_globalOffsetX)
         m_globalPos.x = m_globalOffsetX;
 
     // y
     m_globalPos.y += stepy;
-    if (m_globalPos.y > (IMG_H - m_globalOffsetY))
-        m_globalPos.y = IMG_H - m_globalOffsetY;
+    if (m_globalPos.y > (CANVAS_AREA_H - m_globalOffsetY))
+        m_globalPos.y = CANVAS_AREA_H - m_globalOffsetY;
     else if (m_globalPos.y < m_globalOffsetY)
         m_globalPos.y = m_globalOffsetY;
 
@@ -135,7 +138,7 @@ void Zoom::GetGlobalZoomInfo(double &scale, int &offsetInOriginal) {
     bool UDStatus = ImgProc2D::GetInstance()->GetUDStatus();
 
     if (UDStatus)
-        offsetInOriginal = IMG_H - m_globalOffsetY - m_globalPos.y;
+        offsetInOriginal = CANVAS_AREA_H - m_globalOffsetY - m_globalPos.y;
     else
         offsetInOriginal = m_globalPos.y - m_globalOffsetY;
 
@@ -149,8 +152,8 @@ void Zoom::PIPZoomCtrl(bool on) {
         ImageAreaDraw::GetInstance()->SetClearStatus(false);
 #endif
         m_PIPScale = 0;
-        m_PIPPos.x = IMG_W/2;
-        m_PIPPos.y = IMG_H/2;
+        m_PIPPos.x = CANVAS_AREA_W/2;
+        m_PIPPos.y = CANVAS_AREA_H/2;
         SetPIPInfo(m_PIPPos, m_PIPScale);
 
         m_ptrDscMan->GetWriteLock();
@@ -213,15 +216,15 @@ bool Zoom::PIPZoomPos(int offsetX, int offsetY) {
 
     // x
     m_PIPPos.x += stepx;
-    if (m_PIPPos.x > IMG_W)
-        m_PIPPos.x = IMG_W;
+    if (m_PIPPos.x > CANVAS_AREA_W)
+        m_PIPPos.x = CANVAS_AREA_W;
     else if (m_PIPPos.x < 0)
         m_PIPPos.x = 0;
 
     // y
     m_PIPPos.y += stepy;
-    if (m_PIPPos.y > IMG_H)
-        m_PIPPos.y = IMG_H;
+    if (m_PIPPos.y > CANVAS_AREA_H)
+        m_PIPPos.y = CANVAS_AREA_H;
     else if (m_PIPPos.y < 0)
         m_PIPPos.y = 0;
 
@@ -256,12 +259,12 @@ void Zoom::LocalZoomInit() {
     m_localLineEnd = lineCenter + lineQuarter;
 
     // init dot
-    int dotCenter = IMG_H / 2;
-    int dotWidthHalf = IMG_H * (m_localLineEnd - m_localLineBegin + 1) / (scanRange[1] - scanRange[0] + 1) / 2;
+    int dotCenter = CANVAS_AREA_H / 2;
+    int dotWidthHalf = CANVAS_AREA_H * (m_localLineEnd - m_localLineBegin + 1) / (scanRange[1] - scanRange[0] + 1) / 2;
     m_localDotBegin = abs(dotCenter - dotWidthHalf);
     m_localDotEnd = dotCenter + dotWidthHalf;
-    if(m_localDotEnd > IMG_H)
-        m_localDotEnd = IMG_H;
+    if(m_localDotEnd > CANVAS_AREA_H)
+        m_localDotEnd = CANVAS_AREA_H;
     //printf("dotCenter:%d dotWidthHalf:%d\n", dotCenter, dotWidthHalf);
 
     //printf("localLineBegin: %d End:%d, dotBegin:%d dotEnd:%d\n", m_localLineBegin, m_localLineEnd, m_localDotBegin, m_localDotEnd);
@@ -335,7 +338,7 @@ bool Zoom::LocalZoomBoxPos(int offsetX, int offsetY) {
             m_localLineEnd += stepLine;
         }
 
-        if (((m_localDotBegin + stepDot) >= 0) && ((m_localDotEnd + stepDot) <= (IMG_H-1))) {
+        if (((m_localDotBegin + stepDot) >= 0) && ((m_localDotEnd + stepDot) <= (CANVAS_AREA_H-1))) {
             m_localDotBegin += stepDot;
             m_localDotEnd += stepDot;
         }
@@ -351,7 +354,7 @@ bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOv
     int stepLine = offsetX;
     int interDot = 100;
     //int stepDot = -offsetY;
-    int stepDot = IMG_H * stepLine / (scanLine[1] - scanLine[0] + 1);
+    int stepDot = CANVAS_AREA_H * stepLine / (scanLine[1] - scanLine[0] + 1);
 
     if (!m_localCtrl) {
         // line
@@ -381,8 +384,8 @@ bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOv
                 m_localDotBegin = m_localDotEnd - interDot;
         } else {
             m_localDotEnd += stepDot;
-            if (m_localDotEnd > (IMG_H-1))
-                m_localDotEnd = IMG_H - 1;
+            if (m_localDotEnd > (CANVAS_AREA_H-1))
+                m_localDotEnd = CANVAS_AREA_H - 1;
             if ((m_localDotEnd - m_localDotBegin) < interDot)
                 m_localDotEnd = m_localDotBegin + interDot;
         }
@@ -410,20 +413,20 @@ bool Zoom::LocalZoomBoxSize(int offsetX, int offsetY, bool lrOverturn, bool udOv
                 m_localLineBegin -= stepLine;
             if (m_localLineEnd + stepLine <= scanLine[1])
                 m_localLineEnd += stepLine;
-            int offsetDot = IMG_H * (m_localLineEnd - m_localLineBegin + 1) / (scanLine[1] - scanLine[0] + 1);
-            if ((m_localDotBegin + m_localDotEnd) / 2 - offsetDot / 2 >= 0 && (m_localDotBegin + m_localDotEnd) / 2 + offsetDot / 2 < IMG_H) {
+            int offsetDot = CANVAS_AREA_H * (m_localLineEnd - m_localLineBegin + 1) / (scanLine[1] - scanLine[0] + 1);
+            if ((m_localDotBegin + m_localDotEnd) / 2 - offsetDot / 2 >= 0 && (m_localDotBegin + m_localDotEnd) / 2 + offsetDot / 2 < CANVAS_AREA_H) {
                 m_localDotBegin = (m_localDotEnd + m_localDotBegin) / 2 - offsetDot / 2;
                 m_localDotEnd = m_localDotBegin + offsetDot;
             } else if ((m_localDotBegin + m_localDotEnd) / 2 - offsetDot / 2 < 0) {
                 m_localDotBegin = 0;
                 m_localDotEnd = m_localDotBegin + offsetDot - 1;
-            } else if ((m_localDotBegin + m_localDotEnd) / 2 + offsetDot / 2 >= IMG_H) {
-                m_localDotEnd = IMG_H - 1;
+            } else if ((m_localDotBegin + m_localDotEnd) / 2 + offsetDot / 2 >= CANVAS_AREA_H) {
+                m_localDotEnd = CANVAS_AREA_H - 1;
                 m_localDotBegin = m_localDotEnd - offsetDot + 1;
             }
         } else if (offsetY < 0) {
             if (m_localLineBegin - stepLine < m_localLineEnd + stepLine - interLine) {
-                int offsetDot = IMG_H * (m_localLineEnd - m_localLineBegin + 2 * stepLine) / (scanLine[1] - scanLine[0] + 1);
+                int offsetDot = CANVAS_AREA_H * (m_localLineEnd - m_localLineBegin + 2 * stepLine) / (scanLine[1] - scanLine[0] + 1);
                 m_localLineBegin -= stepLine;
                 m_localLineEnd += stepLine;
                 m_localDotBegin = (m_localDotEnd + m_localDotBegin) / 2 - offsetDot / 2;
@@ -541,7 +544,7 @@ void Zoom::SetLocalInfo(int lineBegin, int lineEnd, int dotBegin, int dotEnd) {
     int scanRange[2];
     Img2D::GetInstance()->GetScanRange(scanRange);
     float scaleLine = (scanRange[1] - scanRange[0] + 1) / (float)dLine;
-    float scaleDot =  IMG_H / (float)dDot;
+    float scaleDot =  CANVAS_AREA_H / (float)dDot;
 
     m_localScale = (scaleLine < scaleDot)? scaleLine:scaleDot;
 

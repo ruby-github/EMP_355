@@ -1,7 +1,8 @@
 #include "bodymark/BodyMark.h"
 
-#include "utils/FakeXUtils.h"
 #include "sysMan/SysNoteSetting.h"
+#include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
 BodyMark* BodyMark::m_this = NULL;
 

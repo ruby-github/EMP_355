@@ -8,6 +8,8 @@
 #include "imageProc/Zoom.h"
 #include "probe/MenuBiopsy.h"
 
+#include "keyboard/MultiFuncFactory.h"
+
 KnobMenu::KnobItem Knob2DMenu[] = {
     {N_("Freq."), "", MIN, D2ChgFreq, D2PresssChgStatusTHI},
     {N_("Dynamic Range"), "", MIN, D2ChgDynamicRange, NULL},

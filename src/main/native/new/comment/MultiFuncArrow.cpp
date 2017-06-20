@@ -1,10 +1,13 @@
 #include "comment/MultiFuncArrow.h"
 
 #include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
 #include "display/ImageArea.h"
 #include "display/KnobNone.h"
+#include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
+#include "keyboard/MultiFuncFactory.h"
 #include "ViewMain.h"
 
 enum EKnobArrow {
@@ -263,8 +266,8 @@ MultiFuncArrow::MultiFuncArrow()
   :m_arrow(NULL), m_pressMode(CLICK), m_arrowOpr(ADD), m_knobItemBku(NULL) {
   g_keyInterface.Push(this);
 
-  m_pos.x = IMAGE_W / 2;
-  m_pos.y = IMAGE_H / 2;
+  m_pos.x = CANVAS_AREA_W / 2;
+  m_pos.y = CANVAS_AREA_H / 2;
   m_arrow = new CArrow(*this, m_pos);
   PRINTF("new arrow\n");
 
@@ -517,12 +520,12 @@ void MultiFuncArrow::DrawArrow(POINT pos, unsigned int direction, double scale,
 }
 
 POINT MultiFuncArrow::GetPoint(int offsetX, int offsetY) {
-  if (((m_pos.x + offsetX) >= 0) &&((m_pos.x + offsetX) <= IMG_W)) {
+  if (((m_pos.x + offsetX) >= 0) &&((m_pos.x + offsetX) <= CANVAS_AREA_W)) {
     m_pos.x += offsetX;
   }
 
   offsetY = -offsetY;
-  if (((m_pos.y + offsetY) >= 0) &&((m_pos.y + offsetY) <= IMG_H)) {
+  if (((m_pos.y + offsetY) >= 0) &&((m_pos.y + offsetY) <= CANVAS_AREA_H)) {
     m_pos.y += offsetY;
   }
 

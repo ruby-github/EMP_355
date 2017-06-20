@@ -13,6 +13,8 @@
 #include "probe/ProbeMan.h"
 #include "display/HintArea.h"
 
+#include "utils/MainWindowConfig.h"
+
 ///> dynamic range
 const int Calc2D::DYNAMIC_DATA[MAX_DYNAMIC_INDEX] = {197, 197, 197, 197, 197, 197, 197, 197, 197, 197, 197, 197, 197, 197, 197, 197};
 const Calc2D::LogPair Calc2D::m_logPara[MAX_DYNAMIC_INDEX] = {
@@ -512,7 +514,7 @@ void Calc2D::CalcTgc(int gain, int tgcY[],AbsUpdate2D* ptrUpdate, int section) {
 void Calc2D::CalcTgcDigital(int gain, int section, int maxValue) {
     //digital tgc cycle
     int depth = m_calcPara->depth;
-    int dots = IMG_H;
+    int dots = CANVAS_AREA_H;
     int freq = SAMPLE_FREQ;
     float speed = SOUND_SPEED;
     unsigned short tgc;

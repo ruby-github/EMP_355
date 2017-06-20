@@ -1,130 +1,813 @@
 #include "display/ImageArea.h"
-#include "ViewMain.h"
-#include "utils/CalcTime.h"
 
-
-
-#include <math.h>
-#include "imageProc/Replay.h"
-#include "imageProc/MenuReview.h"
-#include "display/ImageAreaPara.h"
-#include "measure/MeasureFactory.h"
-#include "measure/DrawHistogram.h"
 #include "display/ImageAreaDraw.h"
-#include "imageProc/ImgProcPw.h"
 #include "imageProc/ImgProc2D.h"
-#include <pango-1.0/pango/pangoft2.h>
-#include <ImageMix.h>
-#include <DSCTypes.h>
+#include "imageProc/ImgProcPw.h"
+#include "imageProc/MenuReview.h"
+#include "imageProc/Replay.h"
 #include "measure/CDrawIMT.h"
+#include "measure/DrawHistogram.h"
 #include "sysMan/SysMeasurementSetting.h"
-#include "keyboard/KeyDef.h"
-#include "sysMan/SysGeneralSetting.h"
-#include "sysMan/ViewSystem.h"
+#include "utils/CalcTime.h"
+#include "ViewMain.h"
 
-#include "utils/MainWindowConfig.h"
+#include <ImageMix.h>
 
-namespace {
-//	const int MeasureResult_H = 17;	// 测量结果每行高度(像素)
-const int kHistogramWidth = 256+2;
-const int kHistogramHeight = 150+2;
-const int kHistogramX = IMAGE_X + IMAGE_W - kHistogramWidth;
-const int kHistogramY = IMAGE_Y + IMAGE_H - kHistogramHeight - 5;
-const int kEFOVSpeedbarWidth = 100;
-}
+#define EFOV_SPEEDBAR_X       600
+#define EFOV_SPEEDBAR_Y       10
 
-GtkWidget *ImageArea::m_imageDA = 0;
+#define REPLAY_BAR_X          425
+#define REPLAY_BAR_Y          505
+#define REPLAY_BAR_W          380
+#define REPLAY_BAR_H          24
+
+#define FPS_POS_X             109
+#define FPS_POS_Y             5
+#define FPS_POS_W             55
+#define FPS_POS_H             17
+
+ImageArea* ImageArea::m_instance = NULL;
+GtkWidget* ImageArea::m_image_da = NULL;
+
+ImageArea::RectArea ImageArea::m_spectraArea = {CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H};
+ImageArea::RectArea ImageArea::m_symbolArea = {CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H};
+
 unsigned char ImageArea::m_bitsImg[];
 unsigned char ImageArea::m_TpbitsIMT[];
-//unsigned char ImageArea::m_bitsReplay[];
-unsigned char ImageArea::m_bitsLastReplay[];
-unsigned char ImageArea::m_bitsReplayMix[];
-unsigned char ImageArea::m_bitsMix[];
-unsigned char ImageArea::m_bitsIMT[];
-ImageArea::RectArea ImageArea::m_symbolArea = {IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H};
-ImageArea::RectArea ImageArea::m_spectraArea = {IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H};
-
 unsigned char ImageArea::m_bitsEFOV[];
+unsigned char ImageArea::m_bitsIMT[];
+unsigned char ImageArea::m_bitsLastReplay[];
+unsigned char ImageArea::m_bitsMix[];
+unsigned char ImageArea::m_bitsReplayMix[];
+
+
+
+const int kHistogramWidth = 256+2;
+const int kHistogramHeight = 150+2;
+const int kHistogramX = CANVAS_IMAGE_X + CANVAS_AREA_W - kHistogramWidth;
+const int kHistogramY = CANVAS_IMAGE_Y + CANVAS_AREA_W - kHistogramHeight - 5;
+const int kEFOVSpeedbarWidth = 100;
+
+
+
+
+
+
+
+#include "Def.h"
+#include "display/gui_global.h"
+#include "keyboard/MultiFuncFactory.h"
+#include "display/gui_func.h"
+#include "keyboard/KeyDef.h"
+
 
 int ImageArea::m_counts = 0;
 
 bool g_flagImageData = true;
 
-ImageArea* ImageArea::m_ptrInstance = NULL;
+
 int ImageArea::m_cineRemoveImg = 0;
 
-#ifdef EMP_355
+
 extern int g_fps;
-#endif
+
+
+// ---------------------------------------------------------
 
 ImageArea* ImageArea::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new ImageArea;
-    return m_ptrInstance;
+  if (m_instance == NULL) {
+    m_instance = new ImageArea();
+  }
+
+  return m_instance;
 }
 
-ImageArea::ImageArea(void) {
-    m_imgPixbuf = 0;
-    m_snapPixbufBak = 0;
-    m_drawPwTrace = false;
+ImageArea::ImageArea() {
+  m_imgPixbuf = 0;
+  m_snapPixbufBak = 0;
+  m_drawPwTrace = false;
 
-    m_imageSymbol = 0;
-    m_imageIMT = 0; //hlx
-    m_imageSpectra = 0;
-    m_imagePara = 0;
-    m_imagePreBox = 0;
-    m_mixPixbuf = 0;
-    m_mixReplayPixbuf = 0;
-    m_frmPixbuf = 0;
+  m_imageSymbol = 0;
+  m_imageIMT = 0;
+  m_imageSpectra = 0;
+  m_imagePara = 0;
+  m_imagePreBox = 0;
+  m_mixPixbuf = 0;
+  m_mixReplayPixbuf = 0;
+  m_frmPixbuf = 0;
 
-    m_pixmapFps = 0;
-    m_pixmapHistogram = 0;
-    m_pixmapArea = 0;
-    m_pixmapReplayBar = 0;
-    m_pixmapPwTrace = 0;
-    m_pixmapMeaResult = 0;
-    for(int i=0; i<4; i++) {
-        m_pixmapBDMK[i] = 0;
-        m_bdmkPos[i].x = 0;
-        m_bdmkPos[i].y = 0;
-        m_bdmkWidth[i] = 0;
-        m_bdmkHeight[i] = 0;
-    }
-    m_inBDMK = false;
-    m_bdmkLast = 0;
+  m_pixmapFps = 0;
+  m_pixmapHistogram = 0;
+  m_pixmapArea = 0;
+  m_pixmapReplayBar = 0;
+  m_pixmapPwTrace = 0;
+  m_pixmapMeaResult = 0;
+  for(int i=0; i<4; i++) {
+      m_pixmapBDMK[i] = 0;
+      m_bdmkPos[i].x = 0;
+      m_bdmkPos[i].y = 0;
+      m_bdmkWidth[i] = 0;
+      m_bdmkHeight[i] = 0;
+  }
+  m_inBDMK = false;
+  m_bdmkLast = 0;
 
-    m_gcTrace = 0;
-    m_gcMeaResult = 0;
+  m_gcTrace = 0;
+  m_gcMeaResult = 0;
 
-    m_inReadImg = false;
-    m_meaResultLineH = 18;
-    m_meaResultPos.clear();
-    m_tmFps = 0;
-    m_counts = 0;
-    m_baseFont = pango_font_description_from_string("DejaVu Sans Mono, Book, 10");
-    m_cineRemoveImg = 0;
-    m_speedbarDraw = false;
-#ifdef TRANSDUCER
-    m_pixmapTransducer =0;
-    m_transducerGainBak = 0;
-#endif
-    m_curCountLines = 0;
+  m_inReadImg = false;
+  m_meaResultLineH = 18;
+  m_meaResultPos.clear();
+  m_tmFps = 0;
+  m_counts = 0;
+  m_baseFont = pango_font_description_from_string("DejaVu Sans Mono, Book, 10");
+  m_cineRemoveImg = 0;
+  m_speedbarDraw = false;
+  m_curCountLines = 0;
 }
 
 ImageArea::~ImageArea() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
 
-    cvReleaseImage(&m_imageSymbol);
-    cvReleaseImage(&m_imageIMT);
-    cvReleaseImage(&m_imageSpectra);
-    cvReleaseImage(&m_imagePara);
-    cvReleaseImage(&m_imagePreBox);
-    pango_font_description_free(m_baseFont);
-    g_object_unref(m_gcTrace);
-    g_object_unref(m_gcMeaResult);
-    g_object_unref(m_layout);
+  m_instance = NULL;
+
+  cvReleaseImage(&m_imageSymbol);
+  cvReleaseImage(&m_imageIMT);
+  cvReleaseImage(&m_imageSpectra);
+  cvReleaseImage(&m_imagePara);
+  cvReleaseImage(&m_imagePreBox);
+  pango_font_description_free(m_baseFont);
+  g_object_unref(m_gcTrace);
+  g_object_unref(m_gcMeaResult);
+  g_object_unref(m_layout);
 }
+
+GtkWidget* ImageArea::Create(const int width, const int height) {
+  m_image_da = gtk_drawing_area_new();
+  gtk_drawing_area_size(GTK_DRAWING_AREA(m_image_da), width, height);
+
+  g_signal_connect(G_OBJECT(m_image_da), "configure_event", G_CALLBACK(signal_configure_event_imagearea), this);
+  g_signal_connect(G_OBJECT(m_image_da), "expose_event", G_CALLBACK(signal_expose_event_imagearea), this);
+
+  return m_image_da;
+}
+
+// ---------------------------------------------------------
+
+void ImageArea::ImageAreaConfigure(GtkWidget* widget, GdkEventConfigure* event) {
+  m_layout = gtk_widget_create_pango_layout(m_image_da, NULL);
+  pango_layout_set_text(m_layout, "_", -1);
+  pango_layout_set_font_description(m_layout, m_baseFont);
+
+  // cvCreateImage
+  m_imagePara = cvCreateImage(cvSize(IMAGE_AREA_W, IMAGE_AREA_H), IPL_DEPTH_8U, 3);
+  cvZero(m_imagePara);
+
+  m_imageIMT = cvCreateImage(cvSize(CANVAS_AREA_W, CANVAS_AREA_H), IPL_DEPTH_8U, 3);
+  cvZero(m_imageIMT);
+
+  m_imagePreBox = cvCreateImage(cvSize(CANVAS_AREA_W, CANVAS_AREA_H), IPL_DEPTH_8U, 3);
+  cvZero(m_imagePreBox);
+
+  m_imageSpectra = cvCreateImage(cvSize(CANVAS_AREA_W, CANVAS_AREA_H), IPL_DEPTH_8U, 3);
+  cvZero(m_imageSpectra);
+
+  m_imageSymbol = cvCreateImage(cvSize(CANVAS_AREA_W, CANVAS_AREA_H), IPL_DEPTH_8U, 3);
+  cvZero(m_imageSymbol);
+
+  // Pixbuf
+
+  m_IMTPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsIMT,
+    GDK_COLORSPACE_RGB, FALSE, 8, IMAGE_AREA_W, IMAGE_AREA_H, IMAGE_AREA_W * 3, NULL, NULL);
+
+  m_lastReplayPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsLastReplay,
+    GDK_COLORSPACE_RGB, FALSE, 8, IMAGE_AREA_W, IMAGE_AREA_H, IMAGE_AREA_W * 3, NULL, NULL);
+
+  m_mixPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsMix,
+    GDK_COLORSPACE_RGB, FALSE, 8, IMAGE_AREA_W, IMAGE_AREA_H, IMAGE_AREA_W * 3, NULL, NULL);
+
+  m_mixReplayPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsReplayMix,
+    GDK_COLORSPACE_RGB, FALSE, 8, IMAGE_AREA_W, IMAGE_AREA_H, IMAGE_AREA_W * 3, NULL, NULL);
+
+  m_imgPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsImg,
+    GDK_COLORSPACE_RGB, FALSE, 8, CANVAS_AREA_W, CANVAS_AREA_H, CANVAS_AREA_W * 3, NULL, NULL);
+
+  if (m_pixmapFps != NULL) {
+    g_object_unref(m_pixmapFps);
+  }
+
+  m_pixmapFps = gdk_pixmap_new(widget->window, FPS_POS_W, FPS_POS_H, -1);
+  GdkGC* gc_fps = gdk_gc_new(m_pixmapFps);
+  gdk_gc_set_foreground(gc_fps, Utils::get_color("black"));
+  gdk_draw_rectangle(m_pixmapFps, gc_fps, TRUE, 0, 0, FPS_POS_W, FPS_POS_H);
+  g_object_unref(gc_fps);
+
+  // Histogram
+  if (m_pixmapHistogram != NULL) {
+    g_object_unref(m_pixmapHistogram);
+  }
+
+  m_pixmapHistogram = gdk_pixmap_new(widget->window, kHistogramWidth, kHistogramHeight, -1);
+  GdkGC* gc_histogram = gdk_gc_new(m_pixmapHistogram);
+  gdk_gc_set_foreground(gc_histogram, Utils::get_color("black"));
+  gdk_draw_rectangle(m_pixmapHistogram, gc_histogram, TRUE, 0, 0, kHistogramWidth, kHistogramHeight);
+  g_object_unref(gc_histogram);
+
+  if (m_pixmapArea) {
+    g_object_unref(m_pixmapArea);
+  }
+
+  m_pixmapArea = gdk_pixmap_new(widget->window, CANVAS_AREA_W, CANVAS_AREA_H, -1);
+  GdkGC* gc_meaArea = gdk_gc_new(m_pixmapArea);
+  gdk_gc_set_foreground(gc_meaArea, Utils::get_color("black"));
+  gdk_draw_rectangle(m_pixmapArea, gc_meaArea, TRUE, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
+  g_object_unref(gc_meaArea);
+
+  // Replay Area
+  if (m_pixmapReplayBar) {
+    g_object_unref(m_pixmapReplayBar);
+  }
+
+  m_pixmapReplayBar = gdk_pixmap_new(widget->window, REPLAY_BAR_W, REPLAY_BAR_H, -1);
+  GdkGC* gc_replayBar = gdk_gc_new(m_pixmapReplayBar);
+  gdk_gc_set_foreground(gc_replayBar, Utils::get_color("black"));
+  gdk_draw_rectangle(m_pixmapReplayBar, gc_replayBar, TRUE, 0, 0, REPLAY_BAR_W, REPLAY_BAR_H);
+  g_object_unref(gc_replayBar);
+
+  // Pw Trace Area
+  if (m_pixmapPwTrace) {
+    g_object_unref(m_pixmapPwTrace);
+  }
+
+  m_pixmapPwTrace = gdk_pixmap_new(widget->window, CANVAS_AREA_W, CANVAS_AREA_H, -1);
+
+  if (!m_gcTrace) {
+    m_gcTrace = gdk_gc_new(m_pixmapPwTrace);
+  }
+
+  gdk_gc_set_foreground(m_gcTrace, Utils::get_color("black"));
+  gdk_draw_rectangle(m_pixmapPwTrace, m_gcTrace, TRUE, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
+
+  // MeasureResult Area
+  SysMeasurementSetting sysMeasure;
+  m_meaResultFontSize = sysMeasure.GetMeasureResult();
+
+  int meaResult = 10;
+
+  if (m_meaResultFontSize == 0) {
+    meaResult = 10;
+  } else if (m_meaResultFontSize == 1) {
+    meaResult = 14;
+  } else {
+    meaResult = 10;
+  }
+
+  m_meaResultFontSize = meaResult;
+
+  stringstream ss;
+  ss << DEFAULT_FONT << ", " << meaResult;
+
+  PangoFontDescription* des = pango_font_description_from_string(ss.str().c_str());
+  pango_layout_set_font_description(m_layout, des);
+  pango_font_description_free(des);
+  pango_layout_set_alignment(m_layout, PANGO_ALIGN_LEFT);
+
+  pango_layout_get_pixel_size(m_layout, NULL, &m_meaResultLineH);
+
+  if (m_meaResultFontSize == 14) {
+    if (m_meaResultLineH >25) {
+      m_meaResultLineH = 25;
+    }
+  } else {
+    if (m_meaResultLineH >18) {
+      m_meaResultLineH = 18;
+    }
+  }
+
+  m_meaResultRect.w = 400;
+  m_meaResultRect.h = MEASURE_RES_LINES_MAX * m_meaResultLineH;
+  m_meaResultRect.x = 5;
+  m_meaResultRect.y = IMAGE_AREA_H - m_meaResultRect.h;
+
+  if (m_pixmapMeaResult != NULL) {
+    g_object_unref(m_pixmapMeaResult);
+  }
+
+  m_pixmapMeaResult = gdk_pixmap_new(widget->window, m_meaResultRect.w, m_meaResultRect.h, -1);
+
+  if (!m_gcMeaResult) {
+    m_gcMeaResult = gdk_gc_new(m_pixmapMeaResult);
+  }
+
+  gdk_gc_set_foreground(m_gcMeaResult, Utils::get_color("black"));
+  gdk_draw_rectangle(m_pixmapMeaResult, m_gcMeaResult, TRUE, 0, 0, m_meaResultRect.w, m_meaResultRect.h);
+
+  // BodyMark Area
+  int bdmk_width = BDMK_W * BDMK_MAX_SCALE;
+  int bdmk_height = BDMK_H * BDMK_MAX_SCALE;
+
+  for (int i=0; i<4; i++) {
+    if (m_pixmapBDMK[i]) {
+      g_object_unref(m_pixmapBDMK[i]);
+    }
+
+    m_pixmapBDMK[i] = gdk_pixmap_new(widget->window, bdmk_width, bdmk_height, -1);
+    GdkGC* gc_bdmk = gdk_gc_new(m_pixmapBDMK[i]);
+    gdk_gc_set_foreground(gc_bdmk, Utils::get_color("black"));
+    gdk_draw_rectangle(m_pixmapBDMK[i], gc_bdmk, TRUE, 0, 0, bdmk_width, bdmk_height);
+    g_object_unref(gc_bdmk);
+  }
+}
+
+void ImageArea::ImageAreaExpose(GtkWidget* widget, GdkEventExpose* event) {
+  unsigned char histogram_status = DrawHistogram::GetInstance()->GetOnOff();
+
+  if (histogram_status != 0) {
+    DrawHistogram::GetInstance()->HistogramDraw(m_bitsImg);
+  }
+
+  GdkImage* draw_image = gdk_drawable_get_image(m_pixmapArea, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
+
+  GdkGC* gc = gdk_gc_new(m_pixmapArea);
+  gdk_gc_set_function(gc, GDK_XOR);
+
+  bool traceStatus = ImgProcPw::GetInstance()->GetTraceStatus();
+
+  unsigned char keyColor[3] = {0, 0, 0};
+  int rgbOrderReversed[3] = {2, 1, 0};
+
+  unsigned char* pDst = NULL;
+  unsigned char* pSrc0 = NULL;
+  unsigned char* pSrc1 = NULL;
+
+  int widthSrc0 = 0;
+  int heightSrc0 = 0;
+  int widthSrc1 = 0;
+  int heightSrc1 = 0;
+
+  int roiWidthSrc = 0;
+  int roiHeightSrc = 0;
+
+  int widthDst = IMAGE_AREA_W;
+  int heightDst = IMAGE_AREA_H;
+
+  if (!m_inReadImg) {
+    if (ModeStatus::IsEFOVMode()) {
+        if (ModeStatus::IsFreezeMode()) {
+            if (ScanMode::GetInstance()->GetEFOVStatus() == ScanMode::REVIEW) {
+                EFOVRECT<int> rect = ImgProc2D::GetInstance()->GetEFOVBoxRect();
+                POINT leftup, leftdown, rightup, rightdown;
+                leftup.x = rect.leftup.x;
+                leftup.y = rect.leftup.y;
+                leftdown.x = rect.leftdown.x;
+                leftdown.y = rect.leftdown.y;
+                rightup.x = rect.rightup.x;
+                rightup.y = rect.rightup.y;
+                rightdown.x = rect.rightdown.x;
+                rightdown.y = rect.rightdown.y;
+                ImageAreaDraw::GetInstance()->DrawEFOVViewBox(leftup, leftdown, rightup, rightdown);
+            }
+
+            memcpy(m_bitsMix, m_imagePara->imageData, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+
+            // 844 * 560
+            pDst = pSrc0 = m_bitsMix;
+            pSrc1 = m_bitsEFOV;
+            widthSrc0 = IMAGE_AREA_W;
+            heightSrc0 = IMAGE_AREA_H;
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            roiWidthSrc = IMAGE_AREA_W;
+            roiHeightSrc = IMAGE_AREA_H;
+            ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+
+            //2011.21.1
+            if (ScanMode::GetInstance()->GetEFOVStatus() == ScanMode::REVIEW && Replay::GetInstance()->IsEFOVAutoReplay()) {
+                Image::AutoTracePara para;
+                Image image((unsigned int*)m_bitsMix, para);
+                Replay::GetInstance()->AddOneImg(image);
+            }
+
+            // PixmapArea的叠加(pixmap area-> m_bitsMix)
+            pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            pSrc0 = (unsigned char*)(draw_image->mem);
+            widthSrc0 = CANVAS_AREA_W;
+            heightSrc0 = CANVAS_AREA_H;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
+
+            gdk_draw_pixbuf(widget->window,
+                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                            m_mixPixbuf,
+                            0, 0,
+                            0, 0,
+                            IMAGE_AREA_W, IMAGE_AREA_H,
+                            GDK_RGB_DITHER_NORMAL, 0, 0);
+
+        } else {            // 实时情况下
+            if (ScanMode::GetInstance()->GetEFOVStatus() == ScanMode::CAPTURE) {
+                EFOVRECT<int> rect = ImgProc2D::GetInstance()->GetEFOVBoxRect();
+                POINT leftup, leftdown, rightup, rightdown;
+                leftup.x = rect.leftup.x;
+                leftup.y = rect.leftup.y;
+                leftdown.x = rect.leftdown.x;
+                leftdown.y = rect.leftdown.y;
+                rightup.x = rect.rightup.x;
+                rightup.y = rect.rightup.y;
+                rightdown.x = rect.rightdown.x;
+                rightdown.y = rect.rightdown.y;
+                ImageAreaDraw::GetInstance()->DrawEFOVViewBox(leftup, leftdown, rightup, rightdown);
+                ImageAreaDraw::GetInstance()->DrawEFOVScaleY();
+                ImageAreaDraw::GetInstance()->DrawEFOVScaleX();
+
+                int cur, total;
+                float speed;
+                ImgProc2D::GetInstance()->GetEFOVSpeed(cur, total, speed);
+                DrawEFOVSpeedbar(cur, total, speed);
+            }
+            memcpy(m_bitsMix, m_imagePara->imageData, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+
+            // 844 * 560
+            pDst = pSrc0 = m_bitsMix;
+            pSrc1 = m_bitsEFOV;
+            widthSrc0 = IMAGE_AREA_W;
+            heightSrc0 = IMAGE_AREA_H;
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            roiWidthSrc = IMAGE_AREA_W;
+            roiHeightSrc = IMAGE_AREA_H;
+            ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+            gdk_draw_pixbuf(widget->window,
+                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                            m_mixPixbuf,
+                            0, 0,
+                            0, 0,
+                            IMAGE_AREA_W, IMAGE_AREA_H,
+                            GDK_RGB_DITHER_NORMAL, 0, 0);
+
+            gdk_draw_drawable(widget->window,
+                              gc,
+                              m_pixmapReplayBar,
+                              0, 0,
+                              EFOV_SPEEDBAR_X, EFOV_SPEEDBAR_Y,
+                              REPLAY_BAR_W, REPLAY_BAR_H);
+        }
+    } else {
+        if (ModeStatus::IsPureFreezeMode() || ModeStatus::IsFreezeMode() || ModeStatus::IsAutoReplayMode()) {
+            //
+            if (ModeStatus::IsPureFreezeMode()) {
+                // m_bitsReplayMix = para
+                memcpy(m_bitsReplayMix, m_imagePara->imageData, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+
+                // 用回放区最后一帧数据(含字符数据)显示
+                // replay data layer(replay -> m_bitsReplayMix)
+                pDst = pSrc1 = m_bitsReplayMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+                pSrc0 =  m_bitsLastReplay + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+                widthSrc1 = IMAGE_AREA_W;
+                heightSrc1 = IMAGE_AREA_H;
+                widthSrc0 = IMAGE_AREA_W;
+                heightSrc0 = IMAGE_AREA_H;
+                roiWidthSrc = CANVAS_AREA_W;
+                roiHeightSrc = CANVAS_AREA_H;
+                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+
+
+                if (MultiFuncFactory::GetInstance()->GetMultiFuncType() == MultiFuncFactory::LOCAL_ZOOM) {
+                    // imageSymbol叠加(symbol -> m_bitsReplayMix)
+                    unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
+                    pDst = pSrc1 = m_bitsReplayMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+                    widthSrc1 = IMAGE_AREA_W;
+                    heightSrc1 = IMAGE_AREA_H;
+                    widthSrc0 = CANVAS_AREA_W;
+                    heightSrc0 = CANVAS_AREA_H;
+                    if (ModeStatus::IsColorVS2DMode()) {
+                        pSrc0 = symbolData;
+                        roiWidthSrc = CANVAS_AREA_W;
+                        roiHeightSrc = CANVAS_AREA_H;
+                    } else {
+                        pSrc0 = symbolData + ((m_symbolArea.y-CANVAS_IMAGE_Y)*CANVAS_AREA_W + (m_symbolArea.x-CANVAS_IMAGE_X))*CANVAS_BPP;
+                        roiWidthSrc = m_symbolArea.w;
+                        roiHeightSrc = m_symbolArea.h;
+                    }
+                    ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+                }
+            } else {
+                //printf("%s: IsFreezeMode or replay!\n", __FUNCTION__);
+                memcpy(m_bitsReplayMix, m_bitsLastReplay, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+            }
+
+            // PixmapArea的叠加(pixmap area -> m_bitsReplayMix)
+            pDst = pSrc1 = m_bitsReplayMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            pSrc0 = (unsigned char*)(draw_image->mem);
+            widthSrc0 = CANVAS_AREA_W;
+            heightSrc0 = CANVAS_AREA_H;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
+
+
+            //ImageIMT lihuamei 2012.07.06
+            unsigned char* ImtData = (unsigned char *)m_imageIMT->imageData;
+            pDst = pSrc1 = m_bitsReplayMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*3 + CANVAS_IMAGE_X*3);
+            pSrc0 = ImtData;// + ((CANVAS_IMAGE_Y-CANVAS_IMAGE_Y)*CANVAS_AREA_W + (CANVAS_IMAGE_X-CANVAS_IMAGE_X))*3
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            widthSrc0 = CANVAS_AREA_W;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+
+            //
+            gdk_draw_pixbuf(widget->window,
+                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                            // m_replayPixbuf,
+                            m_IMTPixbuf,
+                            0, 0,
+                            0, 0,
+                            IMAGE_AREA_W, IMAGE_AREA_H,
+                            GDK_RGB_DITHER_NORMAL, 0, 0);
+
+            gdk_draw_pixbuf(widget->window,
+                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                            m_mixReplayPixbuf,
+                            0, 0,
+                            0, 0,
+                            IMAGE_AREA_W, IMAGE_AREA_H,
+                            GDK_RGB_DITHER_NORMAL, 0, 0);
+            if (ModeStatus::IsFreezeMode()) {
+                gdk_draw_drawable(widget->window,
+                                  widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                                  m_pixmapFps,
+                                  0, 0,
+                                  FPS_POS_X, FPS_POS_Y,
+                                  FPS_POS_W, FPS_POS_H);
+            }
+            gdk_draw_drawable(widget->window,
+                              widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                              m_pixmapReplayBar,
+                              0, 0,
+                              REPLAY_BAR_X, REPLAY_BAR_Y,
+                              REPLAY_BAR_W, REPLAY_BAR_H);
+
+            if (traceStatus) {
+                const Image::AutoTracePara *para = Replay::GetInstance()->GetCurrentTraceData();
+                ImageAreaDraw::GetInstance()->DrawPwTraceAuto(ImgProcPw::GetInstance()->GetAutoCalc(), para);
+            } else {
+                //ClearTrace();
+            }
+
+        } else {		// 实时状况下
+            Image::AutoTracePara* para;
+            if (ImgProcPw::GetInstance()->GetDscTraceStatus()) {
+                para = ImageAreaDraw::GetInstance()->NewPwTracePara();
+                if (traceStatus) {
+                    ImageAreaDraw::GetInstance()->DrawPwTraceAuto(ImgProcPw::GetInstance()->GetAutoCalc(), para);
+                } else {
+                    //ClearTrace();
+                }
+            }
+
+            // m_bitsMix = para
+            memcpy(m_bitsMix, m_imagePara->imageData, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+
+            // data layer(image -> m_bitsMix)
+            pDst = pSrc0 = m_bitsMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+            pSrc1 = m_bitsImg;
+            widthSrc0 = IMAGE_AREA_W;
+            heightSrc0 = IMAGE_AREA_H;
+            widthSrc1 = CANVAS_AREA_W;
+            heightSrc1 = CANVAS_AREA_H;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+
+            // imageSymbol(symbol -> m_bitsMix)
+            unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
+            pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*m_symbolArea.y*CANVAS_BPP + m_symbolArea.x*CANVAS_BPP);
+            pSrc0 = symbolData + ((m_symbolArea.y-CANVAS_IMAGE_Y)*CANVAS_AREA_W + (m_symbolArea.x-CANVAS_IMAGE_X))*CANVAS_BPP;
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            widthSrc0 = CANVAS_AREA_W;
+            heightSrc0 = CANVAS_AREA_H;
+            roiWidthSrc = m_symbolArea.w;
+            roiHeightSrc = m_symbolArea.h;
+            ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+
+            // imageSpectra叠加
+            if (ModeStatus::IsMImgMode() || ModeStatus::IsAnatomicMode() || ModeStatus::IsPWImgMode() || ModeStatus::IsCWImgMode()) {
+                unsigned char* spectraData = (unsigned char *)m_imageSpectra->imageData;
+                pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*m_spectraArea.y*CANVAS_BPP + m_spectraArea.x*CANVAS_BPP);
+                pSrc0 = spectraData + ((m_spectraArea.y-CANVAS_IMAGE_Y)*CANVAS_AREA_W + (m_spectraArea.x-CANVAS_IMAGE_X))*CANVAS_BPP;
+                widthSrc1 = IMAGE_AREA_W;
+                heightSrc1 = IMAGE_AREA_H;
+                widthSrc0 = CANVAS_AREA_W;
+                heightSrc0 = CANVAS_AREA_H;
+                roiWidthSrc = m_spectraArea.w;
+                roiHeightSrc = m_spectraArea.h;
+                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+            }
+
+            // preBox叠加(box -> m_bitsMix)
+            if (ModeStatus::IsColorMode()) {
+                unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
+                pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+                widthSrc1 = IMAGE_AREA_W;
+                heightSrc1 = IMAGE_AREA_H;
+                pSrc0 = preBoxData;
+                widthSrc0 = CANVAS_AREA_W;
+                heightSrc0 = CANVAS_AREA_H;
+                roiWidthSrc = CANVAS_AREA_W;
+                roiHeightSrc = CANVAS_AREA_H;
+                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+            }
+
+
+
+            // draw IMT when unfreeze
+            if (CDrawIMT::GetInstance()->GetIMTRealStatus()) {
+                //CalcTime ct;
+                //ct.Begin(); //计时开始
+                CDrawIMT::GetInstance()->ClearInAdventIMT();
+                if (m_TpbitsIMT == NULL) {
+                } else
+                    CDrawIMT::GetInstance()->UpdateIMT();
+
+                //ct.End(); //计时结束，并且打印所用时间
+                memcpy(m_TpbitsIMT, m_bitsImg, CANVAS_AREA_W*CANVAS_AREA_H*CANVAS_BPP);
+
+            } else {
+            }
+
+            //ImageIMT
+            unsigned char* ImtData = (unsigned char *)m_imageIMT->imageData;
+            pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+            pSrc0 = ImtData;// + ((CANVAS_IMAGE_Y-CANVAS_IMAGE_Y)*CANVAS_AREA_W + (CANVAS_IMAGE_X-CANVAS_IMAGE_X))*3;
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            widthSrc0 = CANVAS_AREA_W;
+            heightSrc0 = CANVAS_AREA_H;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
+
+
+            // 存储叠加后的数据到回放
+            if (g_flagImageData) {
+                if (m_cineRemoveImg == 0) {
+                    memcpy(m_bitsLastReplay, m_bitsMix, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+                    Image::AutoTracePara para;
+                    if (ImgProcPw::GetInstance()->GetDscTraceStatus())
+                        ImageAreaDraw::GetInstance()->GetPwTracePara(para);
+                    Image image((unsigned int*)m_bitsLastReplay, para);
+                    Replay::GetInstance()->AddOneImg(image);
+                    g_flagImageData = false;
+                } else if (m_cineRemoveImg < 0) {
+                    ;
+                } else if (m_cineRemoveImg > 0) {
+                    m_cineRemoveImg--;
+                }
+            }
+
+            // PixmapArea的叠加(pixmap area-> m_bitsMix)
+            pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            pSrc0 = (unsigned char*)(draw_image->mem);
+            widthSrc0 = CANVAS_AREA_W;
+            heightSrc0 = CANVAS_AREA_H;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
+
+            // 绘制叠加完成后的数据
+            gdk_draw_pixbuf(widget->window,
+                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                            m_mixPixbuf,
+                            0, 0,
+                            0, 0,
+                            IMAGE_AREA_W, IMAGE_AREA_H,
+                            GDK_RGB_DITHER_NORMAL, 0, 0);
+        }
+    }
+  } else {
+    if (g_menuReview.GetLimit() != 2 ) {
+        if(m_frmPixbuf) {
+            //	printf("%s-%s: limit != 2\n", __FILE__, __FUNCTION__);
+            memcpy(m_bitsMix, gdk_pixbuf_get_pixels(m_frmPixbuf), IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+
+            // PixmapArea的叠加(pixmap area-> m_bitsMix)
+            pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*CANVAS_IMAGE_Y*CANVAS_BPP + CANVAS_IMAGE_X*CANVAS_BPP);
+            widthSrc1 = IMAGE_AREA_W;
+            heightSrc1 = IMAGE_AREA_H;
+            pSrc0 = (unsigned char*)(draw_image->mem);
+            widthSrc0 = CANVAS_AREA_W;
+            heightSrc0 = CANVAS_AREA_H;
+            roiWidthSrc = CANVAS_AREA_W;
+            roiHeightSrc = CANVAS_AREA_H;
+            ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
+
+            gdk_draw_pixbuf(widget->window,
+                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                            m_mixPixbuf,
+                            //m_frmPixbuf,
+                            0, 0, 0, 0,
+                            IMAGE_AREA_W, IMAGE_AREA_H,//-1, -1,
+                            GDK_RGB_DITHER_NORMAL, 0, 0);
+        }
+    } else {
+        memcpy(m_bitsMix, gdk_pixbuf_get_pixels(m_snapPixbufBak) + IMAGE_AREA_Y*IMAGE_AREA_W*CANVAS_BPP, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
+
+        // PixmapArea的叠加(pixmap area-> m_bitsMix)
+        pDst = pSrc1 = m_bitsMix + (IMAGE_AREA_W*CANVAS_AREA_Y*CANVAS_BPP + CANVAS_AREA_X*CANVAS_BPP);
+        widthSrc1 = IMAGE_AREA_W;
+        heightSrc1 = IMAGE_AREA_H;
+        pSrc0 = (unsigned char*)(draw_image->mem);
+        widthSrc0 = CANVAS_AREA_W;
+        heightSrc0 = CANVAS_AREA_H;
+        roiWidthSrc = CANVAS_AREA_W;
+        roiHeightSrc = CANVAS_AREA_H;
+        ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
+
+        gdk_draw_pixbuf(widget->window,
+                        widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
+                        m_mixPixbuf,
+                        //m_frmPixbuf,
+                        0, 0, 0, 0,
+                        IMAGE_AREA_W, IMAGE_AREA_H,//-1, -1,
+                        GDK_RGB_DITHER_NORMAL, 0, 0);
+    }
+  }
+
+  if (histogram_status != 0) {
+      gdk_draw_drawable(widget->window,
+                        gc,
+                        m_pixmapHistogram,
+                        0, 0,
+                        kHistogramX, kHistogramY,
+                        kHistogramWidth, kHistogramHeight);
+  }
+
+
+  if (m_inBDMK) {
+    gdk_gc_set_function(gc, GDK_XOR);
+
+    for (guint i=0; i<4; i++) {
+      if (m_pixmapBDMK[i]) {
+        gdk_draw_drawable(widget->window, gc, m_pixmapBDMK[i], 0, 0,
+          m_bdmkPos[i].x, m_bdmkPos[i].y, m_bdmkWidth[i], m_bdmkHeight[i]);
+      }
+    }
+  }
+
+  gdk_gc_set_function(gc, GDK_XOR);
+  gdk_draw_drawable(widget->window, gc, m_pixmapPwTrace, 0, 0,
+    CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
+
+  // 绘制测量结果
+  gdk_gc_set_function(gc, GDK_COPY);
+  vector<MeasurePos>::iterator iter;
+
+  for (iter = m_meaResultPos.begin(); iter != m_meaResultPos.end(); ++iter) {
+    gdk_draw_drawable(widget->window, gc, m_pixmapMeaResult, 0, iter->posY,
+      m_meaResultRect.x, m_meaResultRect.y + iter->posY, iter->width, (iter->lines)*m_meaResultLineH);
+  }
+
+  g_object_unref(draw_image);
+  g_object_unref(gc);
+}
+
+
+
+
+
+#include <math.h>
+
+
+#include "display/ImageAreaPara.h"
+#include "measure/MeasureFactory.h"
+
+
+#include <pango-1.0/pango/pangoft2.h>
+
+#include <DSCTypes.h>
+
+#include "keyboard/KeyDef.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/ViewSystem.h"
+
+
+
+
+
+
+
 
 static gboolean DscDraw(gpointer data) {
     if (data) {
@@ -138,36 +821,35 @@ static gboolean DscDraw(gpointer data) {
 //draw image when unfreeze, called by DSC
 void ImageArea::DrawImgData(void* pBits, int nWidth, int nHeight) {
     if (ModeStatus::IsEFOVMode()) {
-        if (nWidth==IMG_AREA_W)
-            memcpy(m_bitsEFOV, pBits, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
+        if (nWidth==IMAGE_AREA_W)
+            memcpy(m_bitsEFOV, pBits, IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP);
     } else {
-        if (nWidth==IMAGE_W)
-            memcpy(m_bitsImg, pBits, IMAGE_W*IMAGE_H*IMG_BPP);
+        if (nWidth==CANVAS_AREA_W)
+            memcpy(m_bitsImg, pBits, CANVAS_AREA_W*CANVAS_AREA_H*CANVAS_BPP);
     }
 
-    g_idle_add_full(G_PRIORITY_HIGH_IDLE, DscDraw, (gpointer)m_imageDA, NULL);
+    g_idle_add_full(G_PRIORITY_HIGH_IDLE, DscDraw, (gpointer)m_image_da, NULL);
     m_counts++;
 }
 
 //draw image when freeze, called by Replay
 void ImageArea::DrawImgDataFreeze(void* pBits, int nWidth, int nHeight) {
-    memcpy(m_bitsLastReplay, pBits, nWidth*nHeight*IMG_BPP);
+    memcpy(m_bitsLastReplay, pBits, nWidth*nHeight*CANVAS_BPP);
 
-    gtk_widget_queue_draw(m_imageDA);
+    gtk_widget_queue_draw(m_image_da);
 }
 
 //draw image when pure freeze, called by DSC
-void ImageArea::CopyImgDataToReplay(void) {
-    for (int j = 0; j < IMAGE_H; j ++) {
-        for (int i = 0; i < IMAGE_W; i ++) {
-            for (int k = 0; k < IMG_BPP; k ++) {
-                m_bitsLastReplay[(IMAGE_Y + j) * IMG_AREA_W * IMG_BPP + (IMAGE_X + i) * IMG_BPP + k] = m_bitsImg[j * IMAGE_W * IMG_BPP + i * IMG_BPP + k];
-                //m_bitsLastReplay[(IMAGE_Y + j) * IMG_AREA_W * IMG_BPP + (IMAGE_X + i) * IMG_BPP + k] = 0;
+void ImageArea::CopyImgDataToReplay() {
+    for (int j = 0; j < CANVAS_AREA_H; j ++) {
+        for (int i = 0; i < CANVAS_AREA_W; i ++) {
+            for (int k = 0; k < CANVAS_BPP; k ++) {
+                m_bitsLastReplay[(CANVAS_IMAGE_Y + j) * IMAGE_AREA_W * CANVAS_BPP + (CANVAS_IMAGE_X + i) * CANVAS_BPP + k] = m_bitsImg[j * CANVAS_AREA_W * CANVAS_BPP + i * CANVAS_BPP + k];
             }
         }
     }
-    //memcpy(m_bitsLastReplay, m_bitsImg, IMAGE_W*IMAGE_H*IMG_BPP);
-    gtk_widget_queue_draw(m_imageDA);
+
+    gtk_widget_queue_draw(m_image_da);
 }
 
 void ImageArea::UpdateSymbolArea(int x, int y, int width, int height) {
@@ -202,19 +884,7 @@ void ImageArea::UpdateMeaResultArea(int fontsize) {
     PRINTF("Line = %d, first H:%d curlines:%d\n",size,  m_meaResultLineH, m_curCountLines);
     if(m_curCountLines > 1)
         m_meaResultLineH = m_meaResultLineH / m_curCountLines;
-#ifdef TRANSDUCER
-    int measure_line_max = 14;
-    if(fontsize == 14) {
-        measure_line_max =10;
-        if(m_meaResultLineH > 25)
-                m_meaResultLineH = 25;
-    } else {
-    if(m_meaResultLineH > 18)
-            m_meaResultLineH = 18;
-    }
-    m_meaResultRect.h = measure_line_max * m_meaResultLineH;
 
-#else
     if(fontsize == 14) {
         if(m_meaResultLineH > 25)
             m_meaResultLineH = 25;
@@ -223,13 +893,12 @@ void ImageArea::UpdateMeaResultArea(int fontsize) {
             m_meaResultLineH = 18;
     }
     m_meaResultRect.h = MEASURE_RES_LINES_MAX * m_meaResultLineH;
-#endif
-    //printf("%s, H:%d h:%d\n", __FUNCTION__, m_meaResultLineH, m_meaResultRect.h);
-    m_meaResultRect.y = IMG_AREA_H - m_meaResultRect.h;
+
+    m_meaResultRect.y = IMAGE_AREA_H - m_meaResultRect.h;
 
     if (m_pixmapMeaResult)
         g_object_unref(m_pixmapMeaResult);
-    m_pixmapMeaResult = gdk_pixmap_new(m_imageDA->window,
+    m_pixmapMeaResult = gdk_pixmap_new(m_image_da->window,
                                        m_meaResultRect.w,
                                        m_meaResultRect.h,
                                        -1);
@@ -245,9 +914,9 @@ void ImageArea::UpdateMeaResultArea(int fontsize) {
 void ImageArea::DrawCFMPreBox(const RectArea& area) {
     const unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
     unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
-    const int StartPt = IMAGE_W*area.y*3 + area.x*3;
-    const int EndPt = ((area.y+area.h)*IMAGE_W - (IMAGE_W-area.x-area.w))*3;
-    for (int i = StartPt; i < EndPt; i+=IMAGE_W*3) {
+    const int StartPt = CANVAS_AREA_W*area.y*3 + area.x*3;
+    const int EndPt = ((area.y+area.h)*CANVAS_AREA_W - (CANVAS_AREA_W-area.x-area.w))*3;
+    for (int i = StartPt; i < EndPt; i+=CANVAS_AREA_W*3) {
         for (int j = 0; j < area.w*3; j+=3) {
             if (symbolData[i+j] != 0 || symbolData[i+j+1] != 0 || symbolData[i+j+2] != 0) {
                 preBoxData[i+j] = 255;
@@ -260,9 +929,9 @@ void ImageArea::DrawCFMPreBox(const RectArea& area) {
 
 void ImageArea::ClearCFMPreBox(const RectArea& area) {
     unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
-    const int StartPt = IMAGE_W*area.y*3 + area.x*3;
-    const int EndPt = ((area.y+area.h)*IMAGE_W - (IMAGE_W-area.x-area.w))*3;
-    for (int i = StartPt; i < EndPt; i+=IMAGE_W*3) {
+    const int StartPt = CANVAS_AREA_W*area.y*3 + area.x*3;
+    const int EndPt = ((area.y+area.h)*CANVAS_AREA_W - (CANVAS_AREA_W-area.x-area.w))*3;
+    for (int i = StartPt; i < EndPt; i+=CANVAS_AREA_W*3) {
         for (int j = 0; j < area.w*3; j+=3) {
             preBoxData[i+j] = 0;
             preBoxData[i+j+1] = 0;
@@ -271,710 +940,14 @@ void ImageArea::ClearCFMPreBox(const RectArea& area) {
     }
 }
 
-GtkWidget * ImageArea::Create(const int width, const int height) {
-    m_imageDA = gtk_drawing_area_new();
-    gtk_drawing_area_size(GTK_DRAWING_AREA(m_imageDA), width, height);
-    g_signal_connect(G_OBJECT(m_imageDA), "configure_event", G_CALLBACK(HandleImageAreaConfigure), this);
-    g_signal_connect(G_OBJECT(m_imageDA), "expose_event", G_CALLBACK(HandleImageAreaExpose), this);
-    return m_imageDA;
-}
 
-void ImageArea::ImageAreaConfigure(GtkWidget *widget, GdkEventConfigure *event) {
-    m_layout = gtk_widget_create_pango_layout(m_imageDA, NULL);
-    pango_layout_set_text(m_layout, "我", -1); //for calculate realy size
-    pango_layout_set_font_description(m_layout, m_baseFont);
 
-    m_imgPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsImg,
-                                           GDK_COLORSPACE_RGB, FALSE, 8,
-                                           IMAGE_W, IMAGE_H,
-                                           IMAGE_W * 3,
-                                           NULL, NULL);
 
-    m_imagePara = cvCreateImage(cvSize(IMG_AREA_W, IMG_AREA_H), IPL_DEPTH_8U, 3);
-    cvZero(m_imagePara);
-
-    m_imageSymbol = cvCreateImage(cvSize(IMAGE_W, IMAGE_H), IPL_DEPTH_8U, 3);
-    cvZero(m_imageSymbol);
-
-    m_imageIMT = cvCreateImage(cvSize(IMAGE_W, IMAGE_H), IPL_DEPTH_8U, 3);
-    cvZero(m_imageIMT);
-
-    m_imageSpectra = cvCreateImage(cvSize(IMAGE_W, IMAGE_H), IPL_DEPTH_8U, 3);
-    cvZero(m_imageSpectra);
-
-    m_imagePreBox = cvCreateImage(cvSize(IMAGE_W, IMAGE_H), IPL_DEPTH_8U, 3);
-    cvZero(m_imagePreBox);
-
-    m_mixPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsMix,
-                                           GDK_COLORSPACE_RGB, FALSE, 8,
-                                           IMG_AREA_W, IMG_AREA_H,
-                                           IMG_AREA_W * 3,
-                                           NULL, NULL);
-    //hlx
-    m_IMTPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsIMT,
-                                           GDK_COLORSPACE_RGB, FALSE, 8,
-                                           IMG_AREA_W, IMG_AREA_H,
-                                           IMG_AREA_W * 3,
-                                           NULL, NULL);
-
-    m_lastReplayPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsLastReplay,
-                         GDK_COLORSPACE_RGB, FALSE, 8,
-                         IMG_AREA_W, IMG_AREA_H,
-                         IMG_AREA_W * 3,
-                         NULL, NULL);
-
-    m_mixReplayPixbuf = gdk_pixbuf_new_from_data((unsigned char*)m_bitsReplayMix,
-                        GDK_COLORSPACE_RGB, FALSE, 8,
-                        IMG_AREA_W, IMG_AREA_H,
-                        IMG_AREA_W * 3,
-                        NULL, NULL);
-
-    if (m_pixmapFps)
-        g_object_unref(m_pixmapFps);
-    m_pixmapFps = gdk_pixmap_new(widget->window, FPS_POS_W, FPS_POS_H, -1);
-    GdkGC *gc_fps = gdk_gc_new(m_pixmapFps);
-    gdk_gc_set_foreground(gc_fps, g_black);
-    gdk_draw_rectangle(m_pixmapFps, gc_fps, TRUE, 0, 0, FPS_POS_W, FPS_POS_H);
-    g_object_unref(gc_fps);
-
-    // Histogram
-    if (m_pixmapHistogram)
-        g_object_unref(m_pixmapHistogram);
-    m_pixmapHistogram = gdk_pixmap_new(widget->window, kHistogramWidth, kHistogramHeight, -1);
-    GdkGC *gc_histogram = gdk_gc_new(m_pixmapHistogram);
-    gdk_gc_set_foreground(gc_histogram, g_black);
-    gdk_draw_rectangle(m_pixmapHistogram, gc_histogram, TRUE, 0, 0, kHistogramWidth, kHistogramHeight);
-    g_object_unref(gc_histogram);
-
-    if (m_pixmapArea)
-        g_object_unref(m_pixmapArea);
-    m_pixmapArea = gdk_pixmap_new(widget->window,
-                                  IMAGE_W,
-                                  IMAGE_H,
-                                  -1);
-    GdkGC *gc_meaArea = gdk_gc_new(m_pixmapArea);
-    gdk_gc_set_foreground(gc_meaArea, g_black);
-    gdk_draw_rectangle(m_pixmapArea, gc_meaArea, TRUE, 0, 0, IMAGE_W, IMAGE_H);
-    g_object_unref(gc_meaArea);
-
-    // Replay Area
-    if (m_pixmapReplayBar)
-        g_object_unref(m_pixmapReplayBar);
-    m_pixmapReplayBar = gdk_pixmap_new(widget->window,
-                                       REPLAY_BAR_W,
-                                       REPLAY_BAR_H,
-                                       -1);
-    GdkGC *gc_replayBar = gdk_gc_new(m_pixmapReplayBar);
-    gdk_gc_set_foreground(gc_replayBar, g_black);
-    gdk_draw_rectangle(m_pixmapReplayBar, gc_replayBar, TRUE, 0, 0, REPLAY_BAR_W, REPLAY_BAR_H);
-    g_object_unref(gc_replayBar);
-
-    // Pw Trace Area
-    if (m_pixmapPwTrace)
-        g_object_unref(m_pixmapPwTrace);
-    m_pixmapPwTrace = gdk_pixmap_new(widget->window,
-                                     IMAGE_W,
-                                     IMAGE_H,
-                                     -1);
-    if (!m_gcTrace)
-        m_gcTrace = gdk_gc_new(m_pixmapPwTrace);
-    gdk_gc_set_foreground(m_gcTrace, g_black);
-    gdk_draw_rectangle(m_pixmapPwTrace, m_gcTrace, TRUE, 0, 0, IMAGE_W, IMAGE_H);
-
-    // MeasureResult Area
-    SysMeasurementSetting sysMeasure;
-    m_meaResultFontSize = sysMeasure.GetMeasureResult();
-#ifdef TRANSDUCER
-    int measure_line_max = 14;
-    int meaResult = 10;
-    if(m_meaResultFontSize == 0)
-        meaResult = 10;
-    else if(m_meaResultFontSize == 1) {
-        meaResult = 14;
-        measure_line_max = 10;
-    } else
-        meaResult = 10;
-    m_meaResultFontSize = meaResult;
-    char str_font[256];
-    sprintf(str_font, "%s, %d", "DejaVu Sans Mono, Book", meaResult);
-    PangoFontDescription *des = pango_font_description_from_string(str_font);
-    pango_layout_set_font_description(m_layout, des);
-    pango_font_description_free(des);
-    //pango_layout_set_font_description(m_layout, m_baseFont);
-    pango_layout_set_alignment(m_layout, PANGO_ALIGN_LEFT);
-
-    pango_layout_get_pixel_size(m_layout, NULL, &m_meaResultLineH);
-    m_meaResultRect.w = 400;
-
-    if(m_meaResultFontSize == 14) {
-        measure_line_max = 10;
-        if(m_meaResultLineH >25)
-            m_meaResultLineH = 25;
-    } else {
-        if(m_meaResultLineH >18)
-            m_meaResultLineH =18;
-    }
-    m_meaResultRect.h = measure_line_max * m_meaResultLineH;
-
-#else
-    int meaResult = 10;
-    if(m_meaResultFontSize == 0)
-        meaResult = 10;
-    else if(m_meaResultFontSize == 1)
-        meaResult = 14;
-    else
-        meaResult = 10;
-    m_meaResultFontSize = meaResult;
-    char str_font[256];
-    sprintf(str_font, "%s, %d", "DejaVu Sans Mono, Book", meaResult);
-    PangoFontDescription *des = pango_font_description_from_string(str_font);
-    pango_layout_set_font_description(m_layout, des);
-    pango_font_description_free(des);
-    //pango_layout_set_font_description(m_layout, m_baseFont);
-    pango_layout_set_alignment(m_layout, PANGO_ALIGN_LEFT);
-
-    pango_layout_get_pixel_size(m_layout, NULL, &m_meaResultLineH);
-    if(m_meaResultFontSize == 14) {
-        if(m_meaResultLineH >25)
-            m_meaResultLineH = 25;
-    } else {
-        if(m_meaResultLineH >18)
-            m_meaResultLineH =18;
-    }
-    m_meaResultRect.w = 400;
-    m_meaResultRect.h = MEASURE_RES_LINES_MAX * m_meaResultLineH;
-#endif
-    PRINTF("%s: m_meaResultLineH:%d\n", __FUNCTION__,  m_meaResultLineH);
-    m_meaResultRect.x = 5;
-    m_meaResultRect.y = IMG_AREA_H - m_meaResultRect.h;
-
-    if (m_pixmapMeaResult)
-        g_object_unref(m_pixmapMeaResult);
-    m_pixmapMeaResult = gdk_pixmap_new(widget->window,
-                                       m_meaResultRect.w,
-                                       m_meaResultRect.h,
-                                       -1);
-    if (!m_gcMeaResult)
-        m_gcMeaResult = gdk_gc_new(m_pixmapMeaResult);
-    gdk_gc_set_foreground(m_gcMeaResult, g_black);
-    gdk_draw_rectangle(m_pixmapMeaResult, m_gcMeaResult, TRUE, 0, 0, m_meaResultRect.w, m_meaResultRect.h);
-
-    // BodyMark Area
-    const int bdmk_width = BDMK_W * BDMK_MAX_SCALE;
-    const int bdmk_height = BDMK_H * BDMK_MAX_SCALE;
-    for(int i=0; i<4; i++) {
-        if (m_pixmapBDMK[i])
-            g_object_unref(m_pixmapBDMK[i]);
-        m_pixmapBDMK[i] = gdk_pixmap_new(widget->window,
-                                         bdmk_width,
-                                         bdmk_height,
-                                         -1);
-        GdkGC *gc_bdmk = gdk_gc_new(m_pixmapBDMK[i]);
-        gdk_gc_set_foreground(gc_bdmk, g_black);
-        gdk_draw_rectangle(m_pixmapBDMK[i], gc_bdmk, TRUE, 0, 0, bdmk_width, bdmk_height);
-        g_object_unref(gc_bdmk);
-    }
-}
-
-void ImageArea::ImageAreaExpose(GtkWidget *widget, GdkEventExpose *event) {
-    //printf("%s-%s\n", __FUNCTION__, __FUNCTION__);
-    unsigned char keyColor[3] = {0, 0, 0};
-
-    // 重复包含头文件，待修改
-    unsigned char histogram_status = DrawHistogram::GetInstance()->GetOnOff();
-    if (histogram_status != 0) {
-        DrawHistogram::GetInstance()->HistogramDraw(m_bitsImg);
-    }
-
-    bool traceStatus = ImgProcPw::GetInstance()->GetTraceStatus();
-    unsigned char* pDst;
-    unsigned char* pSrc0;
-    unsigned char* pSrc1;
-    int roiWidthSrc, roiHeightSrc, widthSrc0, heightSrc0, widthSrc1, heightSrc1;
-    int widthDst = IMG_AREA_W;
-    int heightDst = IMG_AREA_H;
-    //	int rgbOrderNormal[3] = {0, 1, 2};
-    int rgbOrderReversed[3] = {2, 1, 0};
-
-    //Get GdkImage(about 5300~5400us) from drawable is faster than Gdkpixbuf(about 9700~9800us)
-    //	GdkPixbuf *pixbufArea = gdk_pixbuf_get_from_drawable(NULL, m_pixmapArea, NULL, 0, 0, 0, 0, -1, -1);
-    GdkImage *iA = gdk_drawable_get_image(m_pixmapArea, 0, 0, IMAGE_W, IMAGE_H); //why date order is BGR
-
-    GdkGC *gc = gdk_gc_new(m_pixmapArea);
-    gdk_gc_set_function(gc, GDK_XOR);
-
-    //	PRINTF("m_inReadImg= %d, limit= %d\n", m_inReadImg, g_menuReview.GetLimit());
-    if (!m_inReadImg) {
-        if (ModeStatus::IsEFOVMode()) {
-            if (ModeStatus::IsFreezeMode()) {
-                if (ScanMode::GetInstance()->GetEFOVStatus() == ScanMode::REVIEW) {
-                    EFOVRECT<int> rect = ImgProc2D::GetInstance()->GetEFOVBoxRect();
-                    POINT leftup, leftdown, rightup, rightdown;
-                    leftup.x = rect.leftup.x;
-                    leftup.y = rect.leftup.y;
-                    leftdown.x = rect.leftdown.x;
-                    leftdown.y = rect.leftdown.y;
-                    rightup.x = rect.rightup.x;
-                    rightup.y = rect.rightup.y;
-                    rightdown.x = rect.rightdown.x;
-                    rightdown.y = rect.rightdown.y;
-                    ImageAreaDraw::GetInstance()->DrawEFOVViewBox(leftup, leftdown, rightup, rightdown);
-                }
-
-                memcpy(m_bitsMix, m_imagePara->imageData, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-
-                // 844 * 560
-                pDst = pSrc0 = m_bitsMix;
-                pSrc1 = m_bitsEFOV;
-                widthSrc0 = IMG_AREA_W;
-                heightSrc0 = IMG_AREA_H;
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                roiWidthSrc = IMG_AREA_W;
-                roiHeightSrc = IMG_AREA_H;
-                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-
-                //2011.21.1
-                if (ScanMode::GetInstance()->GetEFOVStatus() == ScanMode::REVIEW && Replay::GetInstance()->IsEFOVAutoReplay()) {
-                    Image::AutoTracePara para;
-                    Image image((unsigned int*)m_bitsMix, para);
-                    Replay::GetInstance()->AddOneImg(image);
-                }
-
-                // PixmapArea的叠加(pixmap area-> m_bitsMix)
-                pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                pSrc0 = (unsigned char*)(iA->mem);
-                widthSrc0 = IMAGE_W;
-                heightSrc0 = IMAGE_H;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
-
-                gdk_draw_pixbuf(widget->window,
-                                widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                m_mixPixbuf,
-                                0, 0,
-                                0, 0,
-                                IMG_AREA_W, IMG_AREA_H,
-                                GDK_RGB_DITHER_NORMAL, 0, 0);
-
-            } else {            // 实时情况下
-                if (ScanMode::GetInstance()->GetEFOVStatus() == ScanMode::CAPTURE) {
-                    EFOVRECT<int> rect = ImgProc2D::GetInstance()->GetEFOVBoxRect();
-                    POINT leftup, leftdown, rightup, rightdown;
-                    leftup.x = rect.leftup.x;
-                    leftup.y = rect.leftup.y;
-                    leftdown.x = rect.leftdown.x;
-                    leftdown.y = rect.leftdown.y;
-                    rightup.x = rect.rightup.x;
-                    rightup.y = rect.rightup.y;
-                    rightdown.x = rect.rightdown.x;
-                    rightdown.y = rect.rightdown.y;
-                    ImageAreaDraw::GetInstance()->DrawEFOVViewBox(leftup, leftdown, rightup, rightdown);
-                    ImageAreaDraw::GetInstance()->DrawEFOVScaleY();
-                    ImageAreaDraw::GetInstance()->DrawEFOVScaleX();
-
-                    int cur, total;
-                    float speed;
-                    ImgProc2D::GetInstance()->GetEFOVSpeed(cur, total, speed);
-                    DrawEFOVSpeedbar(cur, total, speed);
-                }
-                memcpy(m_bitsMix, m_imagePara->imageData, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-
-                // 844 * 560
-                pDst = pSrc0 = m_bitsMix;
-                pSrc1 = m_bitsEFOV;
-                widthSrc0 = IMG_AREA_W;
-                heightSrc0 = IMG_AREA_H;
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                roiWidthSrc = IMG_AREA_W;
-                roiHeightSrc = IMG_AREA_H;
-                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-                gdk_draw_pixbuf(widget->window,
-                                widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                m_mixPixbuf,
-                                0, 0,
-                                0, 0,
-                                IMG_AREA_W, IMG_AREA_H,
-                                GDK_RGB_DITHER_NORMAL, 0, 0);
-
-                gdk_draw_drawable(widget->window,
-                                  gc,
-                                  m_pixmapReplayBar,
-                                  0, 0,
-                                  EFOV_SPEEDBAR_X, EFOV_SPEEDBAR_Y,
-                                  REPLAY_BAR_W, REPLAY_BAR_H);
-            }
-        } else {
-            if (ModeStatus::IsPureFreezeMode() || ModeStatus::IsFreezeMode() || ModeStatus::IsAutoReplayMode()) {
-                //
-                if (ModeStatus::IsPureFreezeMode()) {
-                    //printf("%s: IsPureFreezeMode\n", __FUNCTION__);
-                    // m_bitsReplayMix = para
-                    memcpy(m_bitsReplayMix, m_imagePara->imageData, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-
-                    // 用回放区最后一帧数据(含字符数据)显示
-                    // replay data layer(replay -> m_bitsReplayMix)
-                    pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                    pSrc0 =  m_bitsLastReplay + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                    widthSrc1 = IMG_AREA_W;
-                    heightSrc1 = IMG_AREA_H;
-                    widthSrc0 = IMG_AREA_W;
-                    heightSrc0 = IMG_AREA_H;
-                    roiWidthSrc = IMAGE_W;
-                    roiHeightSrc = IMAGE_H;
-                    ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-#if 0
-                    // 用DSC传来的最后一帧数据(无字符数据)显示
-                    // replay data layer(replay -> m_bitsReplayMix)
-                    pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                    pSrc0 = m_bitsImg;
-                    widthSrc1 = IMG_AREA_W;
-                    heightSrc1 = IMG_AREA_H;
-                    widthSrc0 = IMAGE_W;
-                    heightSrc0 = IMAGE_H;
-                    roiWidthSrc = IMAGE_W;
-                    roiHeightSrc = IMAGE_H;
-                    ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-#endif
-
-                    if (MultiFuncFactory::GetInstance()->GetMultiFuncType() == MultiFuncFactory::LOCAL_ZOOM) {
-                        // imageSymbol叠加(symbol -> m_bitsReplayMix)
-                        unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
-                        pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                        widthSrc1 = IMG_AREA_W;
-                        heightSrc1 = IMG_AREA_H;
-                        widthSrc0 = IMAGE_W;
-                        heightSrc0 = IMAGE_H;
-                        if (ModeStatus::IsColorVS2DMode()) {
-                            pSrc0 = symbolData;
-                            roiWidthSrc = IMAGE_W;
-                            roiHeightSrc = IMAGE_H;
-                        } else {
-                            pSrc0 = symbolData + ((m_symbolArea.y-IMAGE_Y)*IMAGE_W + (m_symbolArea.x-IMAGE_X))*IMG_BPP;
-                            roiWidthSrc = m_symbolArea.w;
-                            roiHeightSrc = m_symbolArea.h;
-                        }
-                        ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-                    }
-                } else {
-                    //printf("%s: IsFreezeMode or replay!\n", __FUNCTION__);
-                    memcpy(m_bitsReplayMix, m_bitsLastReplay, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-                }
-
-                // PixmapArea的叠加(pixmap area -> m_bitsReplayMix)
-                pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                pSrc0 = (unsigned char*)(iA->mem);
-                widthSrc0 = IMAGE_W;
-                heightSrc0 = IMAGE_H;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
-
-#if 1
-                //ImageIMT lihuamei 2012.07.06
-                unsigned char* ImtData = (unsigned char *)m_imageIMT->imageData;
-                pDst = pSrc1 = m_bitsReplayMix + (IMG_AREA_W*IMAGE_Y*3 + IMAGE_X*3);
-                pSrc0 = ImtData;// + ((IMAGE_Y-IMAGE_Y)*IMAGE_W + (IMAGE_X-IMAGE_X))*3
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                widthSrc0 = IMAGE_W;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-#endif
-                //
-                gdk_draw_pixbuf(widget->window,
-                                widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                // m_replayPixbuf,
-                                m_IMTPixbuf,
-                                0, 0,
-                                0, 0,
-                                IMG_AREA_W, IMG_AREA_H,
-                                GDK_RGB_DITHER_NORMAL, 0, 0);
-
-                gdk_draw_pixbuf(widget->window,
-                                widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                m_mixReplayPixbuf,
-                                0, 0,
-                                0, 0,
-                                IMG_AREA_W, IMG_AREA_H,
-                                GDK_RGB_DITHER_NORMAL, 0, 0);
-                if (ModeStatus::IsFreezeMode()) {
-                    gdk_draw_drawable(widget->window,
-                                      widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                      m_pixmapFps,
-                                      0, 0,
-                                      FPS_POS_X, FPS_POS_Y,
-                                      FPS_POS_W, FPS_POS_H);
-                }
-                gdk_draw_drawable(widget->window,
-                                  widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                  m_pixmapReplayBar,
-                                  0, 0,
-                                  REPLAY_BAR_X, REPLAY_BAR_Y,
-                                  REPLAY_BAR_W, REPLAY_BAR_H);
-
-                if (traceStatus) {
-                    const Image::AutoTracePara *para = Replay::GetInstance()->GetCurrentTraceData();
-                    ImageAreaDraw::GetInstance()->DrawPwTraceAuto(ImgProcPw::GetInstance()->GetAutoCalc(), para);
-                } else {
-                    //ClearTrace();
-                }
-
-            } else {		// 实时状况下
-                Image::AutoTracePara* para;
-                if (ImgProcPw::GetInstance()->GetDscTraceStatus()) {
-                    para = ImageAreaDraw::GetInstance()->NewPwTracePara();
-                    if (traceStatus) {
-                        ImageAreaDraw::GetInstance()->DrawPwTraceAuto(ImgProcPw::GetInstance()->GetAutoCalc(), para);
-                    } else {
-                        //ClearTrace();
-                    }
-                }
-
-                // m_bitsMix = para
-                memcpy(m_bitsMix, m_imagePara->imageData, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-
-                // data layer(image -> m_bitsMix)
-                pDst = pSrc0 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                pSrc1 = m_bitsImg;
-                widthSrc0 = IMG_AREA_W;
-                heightSrc0 = IMG_AREA_H;
-                widthSrc1 = IMAGE_W;
-                heightSrc1 = IMAGE_H;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-
-                // imageSymbol(symbol -> m_bitsMix)
-                unsigned char* symbolData = (unsigned char *)m_imageSymbol->imageData;
-                pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*m_symbolArea.y*IMG_BPP + m_symbolArea.x*IMG_BPP);
-                pSrc0 = symbolData + ((m_symbolArea.y-IMAGE_Y)*IMAGE_W + (m_symbolArea.x-IMAGE_X))*IMG_BPP;
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                widthSrc0 = IMAGE_W;
-                heightSrc0 = IMAGE_H;
-                roiWidthSrc = m_symbolArea.w;
-                roiHeightSrc = m_symbolArea.h;
-                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-
-                // imageSpectra叠加
-                if (ModeStatus::IsMImgMode() || ModeStatus::IsAnatomicMode() || ModeStatus::IsPWImgMode() || ModeStatus::IsCWImgMode()) {
-                    unsigned char* spectraData = (unsigned char *)m_imageSpectra->imageData;
-                    pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*m_spectraArea.y*IMG_BPP + m_spectraArea.x*IMG_BPP);
-                    pSrc0 = spectraData + ((m_spectraArea.y-IMAGE_Y)*IMAGE_W + (m_spectraArea.x-IMAGE_X))*IMG_BPP;
-                    widthSrc1 = IMG_AREA_W;
-                    heightSrc1 = IMG_AREA_H;
-                    widthSrc0 = IMAGE_W;
-                    heightSrc0 = IMAGE_H;
-                    roiWidthSrc = m_spectraArea.w;
-                    roiHeightSrc = m_spectraArea.h;
-                    ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-                }
-
-                // preBox叠加(box -> m_bitsMix)
-                if (ModeStatus::IsColorMode()) {
-                    unsigned char* preBoxData = (unsigned char *)m_imagePreBox->imageData;
-                    pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                    widthSrc1 = IMG_AREA_W;
-                    heightSrc1 = IMG_AREA_H;
-                    pSrc0 = preBoxData;
-                    widthSrc0 = IMAGE_W;
-                    heightSrc0 = IMAGE_H;
-                    roiWidthSrc = IMAGE_W;
-                    roiHeightSrc = IMAGE_H;
-                    ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-                }
-
-#if 1
-
-                // draw IMT when unfreeze
-                if (CDrawIMT::GetInstance()->GetIMTRealStatus()) {
-                    //CalcTime ct;
-                    //ct.Begin(); //计时开始
-                    CDrawIMT::GetInstance()->ClearInAdventIMT();
-                    if (m_TpbitsIMT == NULL) {
-                    } else
-                        CDrawIMT::GetInstance()->UpdateIMT();
-
-                    //ct.End(); //计时结束，并且打印所用时间
-                    memcpy(m_TpbitsIMT, m_bitsImg, IMAGE_W*IMAGE_H*IMG_BPP);
-                    //memcpy(m_TpbitsIMT, m_imagePara->imageData, IMAGE_W*IMAGE_H*IMG_BPP);
-
-                } else {
-                }
-
-                //ImageIMT
-                unsigned char* ImtData = (unsigned char *)m_imageIMT->imageData;
-                pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                pSrc0 = ImtData;// + ((IMAGE_Y-IMAGE_Y)*IMAGE_W + (IMAGE_X-IMAGE_X))*3;
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                widthSrc0 = IMAGE_W;
-                heightSrc0 = IMAGE_H;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor);
-#endif
-
-                // 存储叠加后的数据到回放
-                if (g_flagImageData) {
-                    if (m_cineRemoveImg == 0) {
-                        memcpy(m_bitsLastReplay, m_bitsMix, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-                        Image::AutoTracePara para;
-                        if (ImgProcPw::GetInstance()->GetDscTraceStatus())
-                            ImageAreaDraw::GetInstance()->GetPwTracePara(para);
-                        Image image((unsigned int*)m_bitsLastReplay, para);
-                        Replay::GetInstance()->AddOneImg(image);
-                        g_flagImageData = false;
-                    } else if (m_cineRemoveImg < 0) {
-                        ;
-                    } else if (m_cineRemoveImg > 0) {
-                        m_cineRemoveImg--;
-                    }
-                }
-
-                // PixmapArea的叠加(pixmap area-> m_bitsMix)
-                pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                pSrc0 = (unsigned char*)(iA->mem);
-                widthSrc0 = IMAGE_W;
-                heightSrc0 = IMAGE_H;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
-
-                // 绘制叠加完成后的数据
-                gdk_draw_pixbuf(widget->window,
-                                widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                m_mixPixbuf,
-                                0, 0,
-                                0, 0,
-                                IMG_AREA_W, IMG_AREA_H,
-                                GDK_RGB_DITHER_NORMAL, 0, 0);
-            }
-        }
-    } else {
-        if(g_menuReview.GetLimit() != 2 ) {
-            if(m_frmPixbuf) {
-                //	printf("%s-%s: limit != 2\n", __FILE__, __FUNCTION__);
-                memcpy(m_bitsMix, gdk_pixbuf_get_pixels(m_frmPixbuf), IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-
-                // PixmapArea的叠加(pixmap area-> m_bitsMix)
-                pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-                widthSrc1 = IMG_AREA_W;
-                heightSrc1 = IMG_AREA_H;
-                pSrc0 = (unsigned char*)(iA->mem);
-                widthSrc0 = IMAGE_W;
-                heightSrc0 = IMAGE_H;
-                roiWidthSrc = IMAGE_W;
-                roiHeightSrc = IMAGE_H;
-                ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
-
-                gdk_draw_pixbuf(widget->window,
-                                widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                                m_mixPixbuf,
-                                //m_frmPixbuf,
-                                0, 0, 0, 0,
-                                IMG_AREA_W, IMG_AREA_H,//-1, -1,
-                                GDK_RGB_DITHER_NORMAL, 0, 0);
-            }
-        } else {
-            //	printf("%s-%s: limit = 2\n", __FILE__, __FUNCTION__);
-            //printf("pixbuf width = %d, height = %d\n", gdk_pixbuf_get_width(m_snapPixbufBak), gdk_pixbuf_get_height(m_snapPixbufBak));
-            memcpy(m_bitsMix, gdk_pixbuf_get_pixels(m_snapPixbufBak) + IMG_AREA_W*IMG_AREA_Y*IMG_BPP, IMG_AREA_W*IMG_AREA_H*IMG_BPP);
-
-            // PixmapArea的叠加(pixmap area-> m_bitsMix)
-            pDst = pSrc1 = m_bitsMix + (IMG_AREA_W*IMAGE_Y*IMG_BPP + IMAGE_X*IMG_BPP);
-            widthSrc1 = IMG_AREA_W;
-            heightSrc1 = IMG_AREA_H;
-            pSrc0 = (unsigned char*)(iA->mem);
-            widthSrc0 = IMAGE_W;
-            heightSrc0 = IMAGE_H;
-            roiWidthSrc = IMAGE_W;
-            roiHeightSrc = IMAGE_H;
-            ImageMixC3C4R(pDst, pSrc0, pSrc1, widthDst, heightDst, widthSrc0, heightSrc0, widthSrc1, heightSrc1, roiWidthSrc, roiHeightSrc, keyColor, rgbOrderReversed);
-
-            gdk_draw_pixbuf(widget->window,
-                            widget->style->fg_gc[GTK_WIDGET_STATE(widget)],
-                            m_mixPixbuf,
-                            //m_frmPixbuf,
-                            0, 0, 0, 0,
-                            IMG_AREA_W, IMG_AREA_H,//-1, -1,
-                            GDK_RGB_DITHER_NORMAL, 0, 0);
-        }
-    }
-
-    if (histogram_status != 0) {
-        gdk_draw_drawable(widget->window,
-                          gc,
-                          m_pixmapHistogram,
-                          0, 0,
-                          kHistogramX, kHistogramY,
-                          kHistogramWidth, kHistogramHeight);
-    }
-
-#if 0
-    // 绘制PixmapArea
-    gdk_draw_drawable(widget->window,
-                      gc,
-                      m_pixmapArea,
-                      0, 0,
-                      IMAGE_X, IMAGE_Y,
-                      IMAGE_W, IMAGE_H);
-#endif
-
-    if (m_inBDMK) {
-        gdk_gc_set_function(gc, GDK_XOR);
-        for(guint i=0; i<4; i++) {
-            if(m_pixmapBDMK[i])
-                gdk_draw_drawable(widget->window,
-                                  gc,
-                                  m_pixmapBDMK[i],
-                                  0, 0,
-                                  m_bdmkPos[i].x, m_bdmkPos[i].y,
-                                  m_bdmkWidth[i], m_bdmkHeight[i]);
-        }
-    }
-
-    //    if (m_drawPwTrace) {
-    gdk_gc_set_function(gc, GDK_XOR);
-    gdk_draw_drawable(widget->window,
-                      gc,
-                      m_pixmapPwTrace,
-                      0, 0,
-                      IMAGE_X, IMAGE_Y,
-                      IMAGE_W, IMAGE_H);
-    //   }
-
-    // 绘制测量结果
-    gdk_gc_set_function(gc, GDK_COPY);
-    vector<MeasurePos>::iterator iter;
-    for (iter = m_meaResultPos.begin(); iter != m_meaResultPos.end(); ++iter) {
-        gdk_draw_drawable(widget->window,
-                          gc,
-                          m_pixmapMeaResult,
-                          0, iter->posY,
-                          m_meaResultRect.x, m_meaResultRect.y + iter->posY,
-                          iter->width, (iter->lines)*m_meaResultLineH);
-    }
-    g_object_unref(iA);
-    g_object_unref(gc);
-}
 
 void ImageArea::ClearScreenUnFreeze(bool update) {
     GdkGC *gc = gdk_gc_new(m_pixmapArea);
     gdk_gc_set_foreground(gc, g_black);
-    //gdk_draw_rectangle(m_pixmapArea, gc, TRUE, 0, 0, IMAGE_W, IMAGE_H);
-    //gdk_draw_rectangle(m_pixmapPwTrace, gc, TRUE, 0, 0, IMAGE_W, IMAGE_H);
-    //gdk_draw_rectangle(m_pixmapMeaResult, gc, TRUE, 0, 0, m_meaResultRect.w, m_meaResultRect.h);
+
     if(update)
         UpdateImgArea();
     g_object_unref(gc);
@@ -983,12 +956,12 @@ void ImageArea::ClearScreenUnFreeze(bool update) {
 void ImageArea::ClearScreen(bool update) {
     GdkGC *gc = gdk_gc_new(m_pixmapArea);
     gdk_gc_set_foreground(gc, g_black);
-    gdk_draw_rectangle(m_pixmapArea, gc, TRUE, 0, 0, IMAGE_W, IMAGE_H);
-    gdk_draw_rectangle(m_pixmapPwTrace, gc, TRUE, 0, 0, IMAGE_W, IMAGE_H);
+    gdk_draw_rectangle(m_pixmapArea, gc, TRUE, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
+    gdk_draw_rectangle(m_pixmapPwTrace, gc, TRUE, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
     gdk_draw_rectangle(m_pixmapMeaResult, gc, TRUE, 0, 0, m_meaResultRect.w, m_meaResultRect.h);
     POINT ps, ed;
     ps.x = ed.x = 0;
-    ps.y = ed.y = IMAGE_H/2;
+    ps.y = ed.y = CANVAS_AREA_H/2;
     ImageAreaDraw::GetInstance()->SetPsEdValue(ps, ed, 1);
     if(update)
         UpdateImgArea();
@@ -1014,18 +987,18 @@ void ImageArea::SetReadImg(bool status) {
         AddTimeOutFps();
 }
 
-void ImageArea::ResetReadImg(void) {
+void ImageArea::ResetReadImg() {
     if (!m_snapPixbufBak)
         return;
 
     int width = gdk_pixbuf_get_width(m_snapPixbufBak);
     int height = gdk_pixbuf_get_height(m_snapPixbufBak);
 
-    gdk_draw_pixbuf(m_imageDA->window,
-                    m_imageDA->style->fg_gc[GTK_WIDGET_STATE(m_imageDA)],
+    gdk_draw_pixbuf(m_image_da->window,
+                    m_image_da->style->fg_gc[GTK_WIDGET_STATE(m_image_da)],
                     m_snapPixbufBak,
-                    0, IMG_AREA_Y, 0, 0,
-                    width, height-IMG_AREA_Y,
+                    0, IMAGE_AREA_X, 0, 0,
+                    width, height-IMAGE_AREA_Y,
                     GDK_RGB_DITHER_NORMAL, 0, 0);
 }
 
@@ -1035,11 +1008,11 @@ void ImageArea::GetImgPtr(unsigned char ** image) {
 
 GdkPixbuf* ImageArea::GetDrawingAreaImage() {
     return gdk_pixbuf_get_from_drawable(NULL,
-                                        m_imageDA->window,
+                                        m_image_da->window,
                                         gdk_colormap_get_system(),
-                                        IMAGE_X, IMAGE_Y,
+                                        CANVAS_IMAGE_X, CANVAS_IMAGE_Y,
                                         0, 0,
-                                        IMAGE_W, IMAGE_H);
+                                        CANVAS_AREA_W, CANVAS_AREA_H);
 }
 
 void ImageArea::PutDrawingArea(GdkPixbuf *pixbuf) {
@@ -1047,7 +1020,7 @@ void ImageArea::PutDrawingArea(GdkPixbuf *pixbuf) {
 
 //only used for save snap
 void ImageArea::GetFrmData(guchar **pBits, int *nWidth, int *nHeight) {
-    int size = IMG_AREA_W * IMG_AREA_H * 3;
+    int size = IMAGE_AREA_W * IMAGE_AREA_H * 3;
     guchar *data = (unsigned char*)malloc(size);
     GdkPixbuf *pixbuf = NULL;
     if(!pBits || !nWidth || !nHeight || !data) {
@@ -1059,13 +1032,6 @@ void ImageArea::GetFrmData(guchar **pBits, int *nWidth, int *nHeight) {
             pixbuf = m_mixPixbuf;
         } else {
             pixbuf = m_lastReplayPixbuf;
-#if 0
-            if (ModeStatus::IsFreezeMode() || ModeStatus::IsAutoReplayMode()) {
-                pixbuf = m_mixReplayPixbuf;
-            } else {
-                pixbuf = m_mixPixbuf;
-            }
-#endif
         }
     } else {
         pixbuf = m_frmPixbuf;
@@ -1083,7 +1049,7 @@ void ImageArea::GetFrmData(guchar **pBits, int *nWidth, int *nHeight) {
 }
 
 //only used for read snap
-void ImageArea::LoadFrm(void) {
+void ImageArea::LoadFrm() {
     PRINTF("%s: load frm file %s\n", __FUNCTION__, g_menuReview.GetReadFrm());
     ImgMan::ImgItem item;
     if (ImgMan::GetInstance()->ReadSnap(g_menuReview.GetReadFrm(), &item) != 0) {
@@ -1102,11 +1068,11 @@ void ImageArea::GetSnapData(guchar **pBits, int *nWidth, int *nHeight) {
     GdkPixbuf *pixbuf = gdk_pixbuf_get_from_drawable(NULL,
                         ViewMain::GetInstance()->GetMainWindow()->window,
                         gdk_colormap_get_system(),
-                        IMG_AREA_X, 0,
+                        IMAGE_AREA_X, 0,
                         0, 0,
-                        IMG_AREA_W, IMG_AREA_H + TOP_AREA_H + GAP_AREA_H);
+                        IMAGE_AREA_W, IMAGE_AREA_H + TOP_AREA_H + GAP_AREA_H);
 
-    int size = IMG_AREA_W * (IMG_AREA_H+TOP_AREA_H+GAP_AREA_H) * 3;
+    int size = IMAGE_AREA_W * (IMAGE_AREA_H+TOP_AREA_H+GAP_AREA_H) * 3;
     guchar *data = (unsigned char*)malloc(size);
     if (pixbuf)
         memcpy(data, gdk_pixbuf_get_pixels(pixbuf), size);
@@ -1127,8 +1093,8 @@ void ImageArea::DrawSnap(GdkPixbuf *pixbuf, int src_x, int src_y, int width, int
     }
     m_snapPixbufBak = gdk_pixbuf_copy(pixbuf);
 
-    gdk_draw_pixbuf(m_imageDA->window,
-                    m_imageDA->style->fg_gc[GTK_WIDGET_STATE(m_imageDA)],
+    gdk_draw_pixbuf(m_image_da->window,
+                    m_image_da->style->fg_gc[GTK_WIDGET_STATE(m_image_da)],
                     pixbuf,
                     src_x, src_y, 0, 0,
                     width, height,
@@ -1598,7 +1564,7 @@ void ImageArea::DrawDashLine(DrawAttr &attr, const GdkColor* const color, int x1
         UpdateImgArea();
 }
 
-void ImageArea::ClearReplayBar(void) {
+void ImageArea::ClearReplayBar() {
     GdkGC *gc_replayBar = gdk_gc_new(m_pixmapReplayBar);
     gdk_gc_set_foreground(gc_replayBar, g_black);
     gdk_draw_rectangle(m_pixmapReplayBar, gc_replayBar, TRUE, 0, 0, REPLAY_BAR_W, REPLAY_BAR_H);
@@ -1639,21 +1605,17 @@ void ImageArea::DrawReplayBar(int cur_img, int total_img, int left, int right) {
 
     char buf[20];
     sprintf(buf, "%3d/%3d", cur_img, total_img);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_imageDA, buf);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_image_da, buf);
     pango_layout_set_font_description(layout, m_baseFont);
-#if 1
+
     pango_layout_set_text(layout, buf, -1);
     gdk_draw_layout(m_pixmapReplayBar, gc_replayBar, x+bar_w+5, y-2, layout);
-#else
-    pango_layout_set_text(m_layout, buf, -1);
-    gdk_draw_layout(m_pixmapReplayBar, gc_replayBar, x+bar_w+5, y-2, m_layout);
-#endif
 
     g_object_unref(layout);
     g_object_unref(gc_replayBar);
 }
 
-void ImageArea::ClearEFOVSpeedbar(void) {
+void ImageArea::ClearEFOVSpeedbar() {
     GdkGC *gc_replayBar = gdk_gc_new(m_pixmapReplayBar);
     gdk_gc_set_foreground(gc_replayBar, g_black);
     gdk_draw_rectangle(m_pixmapReplayBar, gc_replayBar, TRUE, 0, 0, REPLAY_BAR_W, REPLAY_BAR_H);
@@ -1676,7 +1638,7 @@ void ImageArea::DrawEFOVSpeedbar(int cur, int total, float speed) {
     int slip_pos = (int)(((float)cur/(float)total) * bar_w);
 
     GdkGC *gc = gdk_gc_new(m_pixmapReplayBar);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_imageDA, NULL);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_image_da, NULL);
     pango_layout_set_font_description(layout, m_baseFont);
     if (m_speedbarDraw) {
         gdk_gc_set_foreground(gc, g_white);
@@ -1690,15 +1652,12 @@ void ImageArea::DrawEFOVSpeedbar(int cur, int total, float speed) {
         gdk_draw_polygon(m_pixmapReplayBar, gc, TRUE, points, 3);
     } else {
         pango_layout_set_text(layout, _("Speed: "), -1);
-        //pango_layout_set_text(m_layout, _("Speed: "), -1);
-        //pango_layout_set_text(m_layout, N_("Focus:"), -1);
 
         gdk_gc_set_function(gc, GDK_COPY);
         gdk_gc_set_foreground(gc, g_black);
         gdk_draw_rectangle(m_pixmapReplayBar, gc, TRUE, 5, y-2, hint_w, 17);
         gdk_gc_set_foreground(gc, g_white);
         gdk_draw_layout(m_pixmapReplayBar, gc, 5, y-2, layout);
-        //gdk_draw_layout(m_pixmapReplayBar, gc, 5, y-2, m_layout);
 
         RGBTRIPLE table[ImgProc2D::MAX_EFOV_COLOR];
         ImgProc2D::GetInstance()->GetEFOVSpeedColormap(table);
@@ -1728,13 +1687,11 @@ void ImageArea::DrawEFOVSpeedbar(int cur, int total, float speed) {
     char buf[20];
     sprintf(buf, "%.1fmm/s", speed);
     pango_layout_set_text(layout, buf, -1);
-    //pango_layout_set_text(m_layout, buf, -1);
     gdk_gc_set_function(gc, GDK_COPY);
     gdk_gc_set_foreground(gc, g_black);
     gdk_draw_rectangle(m_pixmapReplayBar, gc, TRUE, x+bar_w+5, y-2, 100, 17);
     gdk_gc_set_foreground(gc, g_white);
     gdk_draw_layout(m_pixmapReplayBar, gc, x+bar_w+5, y-2, layout);
-    //gdk_draw_layout(m_pixmapReplayBar, gc, x+bar_w+5, y-2, m_layout);
 
     g_object_unref(layout);
     g_object_unref(gc);
@@ -1760,10 +1717,10 @@ void ImageArea::DrawTracePt(GdkFunction mode, const GdkColor* const color, int x
     gdk_draw_point(m_pixmapPwTrace, m_gcTrace, x, y);
 }
 
-void ImageArea::ClearTrace(void) {
+void ImageArea::ClearTrace() {
     gdk_gc_set_foreground(m_gcTrace, g_black);
     gdk_gc_set_function(m_gcTrace, GDK_COPY);
-    gdk_draw_rectangle(m_pixmapPwTrace, m_gcTrace, TRUE, 0, 0, IMAGE_W, IMAGE_H);
+    gdk_draw_rectangle(m_pixmapPwTrace, m_gcTrace, TRUE, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
 }
 
 void ImageArea::DrawTraceTag(GdkFunction mode, const GdkColor* const color, int x, int y, bool update) {
@@ -1852,9 +1809,6 @@ void ImageArea::DrawProbeMark(int x, int y, guint direction, guint directionMax,
     p8_x = (Len * 3 / (float)devide);
     p8_y = - (Len * 1 / (float)(devide*2));
 
-    //printf("1-4: (%.3f, %.3f),(%.3f, %.3f),(%.3f, %.3f),(%.3f, %.3f)\n", p1_x, p1_y, p2_x, p2_y, p3_x, p3_y, p4_x, p4_y);
-    //printf("5-8: (%.3f, %.3f),(%.3f, %.3f),(%.3f, %.3f),(%.3f, %.3f)\n", p5_x, p5_y, p6_x, p6_y, p7_x, p7_y, p8_x, p8_y);
-
     // rotate coordinate system
     t0_x = x;
     t0_y = y;
@@ -1878,23 +1832,11 @@ void ImageArea::DrawProbeMark(int x, int y, guint direction, guint directionMax,
     cosAngle = cos(angle);
     sinAngle = sin(angle);
 
-    //PRINTF("1-4t: (%f, %f),(%f, %f),(%f, %f),(%f, %f)\n", t1_x, t1_y, t2_x, t2_y, t3_x, t3_y, t4_x, t4_y);
-    //printf("1-4t: (%d, %d),(%d, %d),(%d, %d),(%d, %d)\n", t1_x, t1_y, t2_x, t2_y, t3_x, t3_y, t4_x, t4_y);
-    //printf("5-8t: (%d, %d),(%d, %d),(%d, %d),(%d, %d)\n", t5_x, t5_y, t6_x, t6_y, t7_x, t7_y, t8_x, t8_y);
-
-    // draw probe mark
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t1_x, t1_y, t2_x, t2_y);
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t3_x, t3_y, t4_x, t4_y);
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t1_x, t1_y, t3_x, t3_y);
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t2_x, t2_y, t4_x, t4_y);
     gdk_gc_set_line_attributes(gc, 1, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_MITER);
     gdk_draw_arc(m_pixmapBDMK[index], gc, TRUE, (t1_x+t3_x)/2-3, (t1_y+t3_y)/2-3, 6, 6, 0, 360*64);
 
     gdk_gc_set_line_attributes(gc, 5, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_MITER);
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t5_x, t5_y, t6_x, t6_y);
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t7_x, t7_y, t8_x, t8_y);
     gdk_draw_line(m_pixmapBDMK[index], gc, t5_x, t5_y, t7_x, t7_y);
-    //gdk_draw_line(m_pixmapBDMK[index], gc, t6_x, t6_y, t8_x, t8_y);
 
     g_object_unref(gc);
     UpdateImgArea();
@@ -2004,7 +1946,7 @@ void ImageArea::DrawPixmapPt(GdkGC *gc, int x, int y) {
 void ImageArea::DrawMeasureResult(const char *result, int pos, int lines, int cursorType, const GdkColor* const color, bool update) {
     int width, height;
     const int x = 0;
-    //PRINTF("%s-%s: result=\n%s\n", __FILE__, __FUNCTION__, result);
+
     PRINTF("%s-%s: pos=%d, lines=%d\n", __FILE__, __FUNCTION__, pos, lines);
     m_curCountLines = lines;
 
@@ -2018,13 +1960,11 @@ void ImageArea::DrawMeasureResult(const char *result, int pos, int lines, int cu
 
     int y = (pos - lines)*m_meaResultLineH;
     //从下往上显示
-    //int y = m_meaResultRect.h - pos*m_meaResultLineH;
-    //PRINTF("%s-%s: y=%d\n", __FILE__, __FUNCTION__, y);
 
     //first to draw order number
     char str[4] = {0};
     snprintf(str, 4, "%d.", cursorType);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_imageDA, str);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_image_da, str);
     char str_font[256];
     sprintf(str_font, "%s, %d", "DejaVu Sans Mono, Book", m_meaResultFontSize);
     PangoFontDescription *des = pango_font_description_from_string(str_font);
@@ -2072,11 +2012,15 @@ void ImageArea::DrawMeasureResult(const char *result, int pos, int lines, int cu
         UpdateImgArea();
 }
 
-void ImageArea::DrawStringFps(const char *str, int x, int y, const GdkColor* const color) {
+void ImageArea::DrawStringFps(const char *str, int x, int y, GdkColor* color) {
+    if (color == NULL) {
+      color = g_white;
+    }
+
     int width, height;
 
     GdkGC *gc = gdk_gc_new(m_pixmapFps);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_imageDA, str);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_image_da, str);
     pango_layout_set_font_description(layout, m_baseFont);
     pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
     pango_layout_get_pixel_size(layout, &width, &height);
@@ -2091,11 +2035,11 @@ void ImageArea::DrawStringFps(const char *str, int x, int y, const GdkColor* con
     UpdateImgArea();
 }
 
-int ImageArea::GetMeasurePosSize(void) {
+int ImageArea::GetMeasurePosSize() {
     return m_meaResultPos.size();
 }
 
-void ImageArea::ClearLastMeasureResult(void) {
+void ImageArea::ClearLastMeasureResult() {
     if (m_meaResultPos.empty())
         return ;
 
@@ -2112,7 +2056,7 @@ void ImageArea::ClearLastMeasureResult(void) {
     UpdateImgArea();
 }
 
-void ImageArea::ClearMeasureAll(void) {
+void ImageArea::ClearMeasureAll() {
     m_meaResultPos.clear();
     gdk_gc_set_foreground(m_gcMeaResult, g_black);
     gdk_gc_set_function(m_gcMeaResult, GDK_COPY);
@@ -2120,33 +2064,9 @@ void ImageArea::ClearMeasureAll(void) {
 }
 
 void ImageArea::DrawMeasureResultCursor(GdkGC *gc, int type, const GdkColor* const color, int x, int y) {
-    /*switch (type) {
-    	case 0:
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-5, y,   x+5, y);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x,   y-5, x,   y+5);
-    		break;
-    	case 1:
-    		gdk_draw_line(m_pixmapMeaResult, gc, x+5, y-5, x-5, y+5);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-5, y-5, x+5, y+5);
-    		break;
-    	case 2:
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-4, y,   x+4, y);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-5, y-2, x-5, y+2);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x+5, y-2, x+5, y+2);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x,   y-4, x,   y+4);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-2, y-5, x+2, y-5);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-2, y+5, x+2, y+5);
-    		break;
-    	case 3:
-    		gdk_draw_line(m_pixmapMeaResult, gc, x+5, y-5, x-5, y+5);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-5, y-5, x+5, y+5);
-    		gdk_draw_line(m_pixmapMeaResult, gc, x-5, y,   x+5, y);
-    		break;
-    }*/
-
     char str[4] = {0};
     snprintf(str, 4, "%d.", type);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_imageDA, str);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_image_da, str);
     char str_font[256];
     sprintf(str_font, "%s, %d", "DejaVu Sans Mono, Book", m_meaResultFontSize);
     PangoFontDescription *des = pango_font_description_from_string(str_font);
@@ -2163,7 +2083,7 @@ void ImageArea::DrawNoteText(const char *str, int x, int y, const GdkColor* cons
     char font_desc[100];
 
     GdkGC *gc = gdk_gc_new(m_pixmapArea);
-    PangoLayout *layout = gtk_widget_create_pango_layout(m_imageDA, str);
+    PangoLayout *layout = gtk_widget_create_pango_layout(m_image_da, str);
     sprintf(font_desc, "%s, %d", FONT_STRING, font_size);
     PangoFontDescription *font = pango_font_description_from_string(font_desc);
     pango_layout_set_font_description(layout, font);
@@ -2187,7 +2107,7 @@ void ImageArea::DrawFTBitmap(FT_Bitmap* bitmap, int x, int y, const GdkColor* co
 
     unsigned char* data = (unsigned char *)m_imagePara->imageData;
 
-    for (int i = IMG_AREA_W*y*3 + x*3, k=0; i < (IMG_AREA_W*(y+height)-(IMG_AREA_W-x-width))*3 && k < height; i+=IMG_AREA_W*3, k++) {
+    for (int i = IMAGE_AREA_W*y*3 + x*3, k=0; i < (IMAGE_AREA_W*(y+height)-(IMAGE_AREA_W-x-width))*3 && k < height; i+=IMAGE_AREA_W*3, k++) {
         for (int j = 0, n = 0; j < width * 3 && n < width; j+=3, n++) {
             data[i+j] = (guchar)((float)(color->red>>8) * (float)(bitmap->buffer[n+k*width]) / (float)255);
             data[i+j+1] = (guchar)((float)(color->green>>8) * (float)(bitmap->buffer[n+k*width]) / (float)255);
@@ -2201,11 +2121,11 @@ void ImageArea::DrawFTBitmap(FT_Bitmap* bitmap, int x, int y, const GdkColor* co
     int width = bitmap->pitch;
     int height = bitmap->rows;
 
-    GdkImage *iA = gdk_drawable_get_image(m_pixmapArea, 0, 0, IMAGE_W, IMAGE_H);
-    unsigned char* data = (unsigned char *)iA->mem;
+    GdkImage *draw_image = gdk_drawable_get_image(m_pixmapArea, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
+    unsigned char* data = (unsigned char *)draw_image->mem;
     GdkColor colorT;
 
-    for (int i = IMAGE_W*y*4 + x*4, k=0; i < (IMAGE_W*(y+height)-(IMAGE_W-x-width))*4 && k < height; i+=IMAGE_W*4, k++) {
+    for (int i = CANVAS_AREA_W*y*4 + x*4, k=0; i < (CANVAS_AREA_W*(y+height)-(CANVAS_AREA_W-x-width))*4 && k < height; i+=CANVAS_AREA_W*4, k++) {
         for (int j = 0, n = 0; j < width * 4 && n < width; j+=4, n++) {
             if (bitmap->buffer[n+k*width] > 0) {
                 if (xorMode) {
@@ -2225,16 +2145,12 @@ void ImageArea::DrawFTBitmap(FT_Bitmap* bitmap, int x, int y, const GdkColor* co
 
     GdkGC *gc = gdk_gc_new(m_pixmapArea);
     gdk_gc_set_function(gc, GDK_COPY);
-    gdk_draw_image(m_pixmapArea, gc, iA, 0, 0, 0, 0, IMAGE_W, IMAGE_H);
+    gdk_draw_image(m_pixmapArea, gc, draw_image, 0, 0, 0, 0, CANVAS_AREA_W, CANVAS_AREA_H);
     g_object_unref(gc);
-    g_object_unref(iA);
+    g_object_unref(draw_image);
 }
 
 void ImageArea::DrawString(GdkGC *gc, int x, int y, const char *str) {
-    //GdkFont *font;
-    //font=gdk_font_load("-adobe-helvetica-medium-r-normal--17-*-*-*-*-*-iso8859-1");
-    //gdk_draw_string(m_pixmapArea, font, gc, x, y, str);
-#if 1
     cairo_t *cr;
     cr = gdk_cairo_create(m_pixmapArea);
     cairo_set_source_rgb(cr, 1, 1, 1);
@@ -2243,10 +2159,13 @@ void ImageArea::DrawString(GdkGC *gc, int x, int y, const char *str) {
     cairo_move_to(cr, x, y);
     cairo_show_text(cr, str);
     cairo_destroy(cr);
-#endif
 }
 
-void ImageArea::DrawString(const char *str, int x, int y, const GdkColor* const color) {
+void ImageArea::DrawString(const char *str, int x, int y, GdkColor* color) {
+  if (color == NULL) {
+      color = g_white;
+    }
+
     const int xdpi = 96;
     const int ydpi = 96;
     PangoFontMap *PFM = pango_ft2_font_map_new();
@@ -2343,7 +2262,7 @@ void ImageArea::DrawString(const char *str, int x, int y, const GdkColor* const 
     g_object_unref(context);
 }
 
-void ImageArea::HideBodyMark(void) {
+void ImageArea::HideBodyMark() {
     m_inBDMK = false;
 }
 
@@ -2379,17 +2298,12 @@ void ImageArea::RedrawBodyMarkWhenModeChanged() {
             m_bdmkHeight[i] = 0;;
         }
     }
-#if 1
-    //UpdateImgArea();
-    //swap BodyMark
+
     GdkPixmap *pixmap = m_pixmapBDMK[0];
     m_bdmkWidth[0] = m_bdmkWidth[m_bdmkLast];
     m_bdmkHeight[0] = m_bdmkHeight[m_bdmkLast];
     m_pixmapBDMK[0] = m_pixmapBDMK[m_bdmkLast];
     m_pixmapBDMK[m_bdmkLast] = pixmap;
-    //m_bdmkWidth[m_bdmkLast] = 0;
-    //m_bdmkHeight[m_bdmkLast] = 0;
-#endif
 
     ModeStatus ms;
     Format2D::EFormat2D format2D = ms.GetFormat2D();
@@ -2400,34 +2314,34 @@ void ImageArea::RedrawBodyMarkWhenModeChanged() {
     if( (ms.IsD2Mode() && format2D == Format2D::BB)
             || ((ms.IsCFMMode() || ms.IsPDIMode()) && formatCfm == FormatCfm::BB) ) {
         if(curB == 0) {
-            m_bdmkPos[0].x = IMG_W / 2 - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-            m_bdmkPos[0].y = IMG_H - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+            m_bdmkPos[0].x = CANVAS_AREA_W / 2 - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+            m_bdmkPos[0].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
         } else {
-            m_bdmkPos[0].x = IMG_W - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-            m_bdmkPos[0].y = IMG_H - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+            m_bdmkPos[0].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+            m_bdmkPos[0].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
         }
     }
     // 4B Mode
     else if( (ms.IsD2Mode() && format2D == Format2D::B4)
              || ((ms.IsCFMMode() || ms.IsPDIMode()) && formatCfm == FormatCfm::B4) ) {
         if(curB == 0) {
-            m_bdmkPos[0].x = IMG_W / 2 - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-            m_bdmkPos[0].y = IMG_H / 2 - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+            m_bdmkPos[0].x = CANVAS_AREA_W / 2 - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+            m_bdmkPos[0].y = CANVAS_AREA_H / 2 - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
         } else if(curB == 1) {
-            m_bdmkPos[0].x = IMG_W - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-            m_bdmkPos[0].y = IMG_H / 2 - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+            m_bdmkPos[0].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+            m_bdmkPos[0].y = CANVAS_AREA_H / 2 - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
         } else if(curB == 2) {
-            m_bdmkPos[0].x = IMG_W / 2 - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-            m_bdmkPos[0].y = IMG_H - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+            m_bdmkPos[0].x = CANVAS_AREA_W / 2 - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+            m_bdmkPos[0].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
         } else {
-            m_bdmkPos[0].x = IMG_W - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-            m_bdmkPos[0].y = IMG_H - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+            m_bdmkPos[0].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+            m_bdmkPos[0].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
         }
     }
     //Single B Mode
     else {
-        m_bdmkPos[0].x = IMG_W - BDMK_W * BDMK_MAX_SCALE + IMAGE_X;
-        m_bdmkPos[0].y = IMG_H - BDMK_H * BDMK_MAX_SCALE + IMAGE_Y;
+        m_bdmkPos[0].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE + CANVAS_IMAGE_X;
+        m_bdmkPos[0].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE + CANVAS_IMAGE_Y;
     }
     m_bdmkLast = 0;
 
@@ -2489,11 +2403,8 @@ void ImageArea::DrawBodyMark(int x, int y, GdkPixbuf* pixbuf, double scale, guin
 }
 
 gboolean ImageArea::UpdateFps() {
-#ifndef EMP_355
     ImageAreaPara::GetInstance()->UpdateGenFps(m_counts, TRUE);
-#else
-    ImageAreaPara::GetInstance()->UpdateGenFps(g_fps, m_counts, TRUE);
-#endif
+
     ClearUpdateCounts();
 
     return TRUE;
@@ -2501,9 +2412,7 @@ gboolean ImageArea::UpdateFps() {
 
 void ImageArea::ClearUpdateCounts() {
     m_counts = 0;
-#ifdef EMP_355
     g_fps = 0;
-#endif
 }
 
 void ImageArea::SetCineRemoveImg(int count) {
@@ -2614,8 +2523,6 @@ void ImageArea::DrawArrowHollow(int x, int y, guint direction, guint directionMa
     t6_y = t0_y + p6_y*cosy - p6_x*siny;
 
     // head line
-    //gdk_draw_line(m_pixmapArea, gc, t0_x, t0_y, t1_x, t1_y);
-    //gdk_draw_line(m_pixmapArea, gc, t0_x, t0_y, t2_x, t2_y);
     gdk_draw_line(m_pixmapArea, gc, t1_x, t1_y, t0_x, t0_y);
     gdk_draw_line(m_pixmapArea, gc, t2_x, t2_y, t0_x, t0_y);
     gdk_draw_line(m_pixmapArea, gc, t1_x, t1_y, t3_x, t3_y);
@@ -2700,8 +2607,6 @@ void ImageArea::DrawArrowSimple(int x, int y, guint direction, guint directionMa
     t3_y = t0_y + p3_y*cosy - p3_x*siny;
 
     // draw arrow
-    //gdk_draw_line(m_pixmapArea, gc, t0_x, t0_y, t1_x, t1_y);
-    //gdk_draw_line(m_pixmapArea, gc, t0_x, t0_y, t2_x, t2_y);
     gdk_draw_line(m_pixmapArea, gc, t1_x, t1_y, t0_x, t0_y);
     gdk_draw_line(m_pixmapArea, gc, t2_x, t2_y, t0_x, t0_y);
     gdk_draw_line(m_pixmapArea, gc, t0_x, t0_y, t3_x, t3_y);
@@ -2739,40 +2644,6 @@ void ImageArea::DrawArrow(POINT head, POINT tail, bool draw, const GdkColor* con
         UpdateImgArea();
 }
 
-// void ImageArea::DrawArrow(int x, int y, guint direction, guint directionMax, double scale, guint colorIndex)
-// {
-//     // unimplement
-// }
-
-#ifdef TRANSDUCER
-void ImageArea::DrawTransducerResult(int x, int y, int width, int height, int TransducerGain) {
-    ImageArea::DrawAttr imgAttr;
-    imgAttr.area = ImageArea::PARA;
-    imgAttr.mode.gdkMode = GDK_XOR;
-
-    int heightdiv=height/5;
-
-    int i;
-
-    DrawRectangle(imgAttr, g_white, x, y , width, height, false, false);
-
-    DrawLine(imgAttr, g_white, x + width, y+heightdiv*5, x + width + 3, y+heightdiv*5);
-    DrawLine(imgAttr, g_white, x + width, y+heightdiv*4, x + width + 3, y+heightdiv*4);
-    DrawLine(imgAttr, g_white, x + width, y+heightdiv*3, x + width + 3, y+heightdiv*3);
-    DrawLine(imgAttr, g_white, x + width, y+heightdiv*2, x + width + 3, y+heightdiv*2);
-    DrawLine(imgAttr, g_white, x + width, y+heightdiv*1, x + width + 3, y+heightdiv*1);
-    DrawLine(imgAttr, g_white, x + width, y+heightdiv*0, x + width + 3, y+heightdiv*0);
-
-    DrawRectangle(imgAttr, g_black, x, y + height - m_transducerGainBak , width, m_transducerGainBak, true, false);
-
-    DrawRectangle(imgAttr, g_white, x, (y + height - TransducerGain) , width, TransducerGain, true, false);
-
-    DrawRectangle(imgAttr, g_white, x, y , width, height, false, false);
-
-    m_transducerGainBak = TransducerGain;
-}
-#endif
-
 void ImageArea::DrawMagnifier(int x, int y) {
     const int size = 15;
     GdkGC *gc = gdk_gc_new(m_pixmapArea);
@@ -2788,7 +2659,7 @@ void ImageArea::DrawMagnifier(int x, int y) {
 }
 
 void ImageArea::ClearEFOVImg() {
-    memset(m_bitsEFOV, 0, IMG_AREA_W*IMG_AREA_H*3);
+    memset(m_bitsEFOV, 0, IMAGE_AREA_W*IMAGE_AREA_H*3);
 }
 
 void ImageArea::DrawBiopsyLine(GdkFunction mode, const GdkColor* const color, int x1, int y1, int x2, int y2, bool update, int distance) {

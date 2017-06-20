@@ -32,6 +32,8 @@
 using namespace std;
 using std::vector;
 
+#include "utils/MainWindowConfig.h"
+
 ///>两点法测距离, 深度方向上测距离
 D2MeasureDistDot::D2MeasureDistDot(const SingleItemInfo *ptrSingleItemInfo) {
     m_item = ptrSingleItemInfo->item;
@@ -5621,8 +5623,8 @@ D2MeasureHip::~D2MeasureHip() {
 
 void D2MeasureHip::Init() {
     //m_tempP = m_draw.DrawInitialCursor();
-    m_tempP.x = IMAGE_W/2;
-    m_tempP.y = IMAGE_Y + IMAGE_H/2;
+    m_tempP.x = CANVAS_AREA_W/2;
+    m_tempP.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
     //m_draw.DrawCursor(m_tempP, true, XOR);
     m_draw.SetCursor(m_tempP);
 
@@ -5773,10 +5775,10 @@ void D2MeasureHip::MouseMove(POINT p) {
     attr.confirmColor = m_draw.GetConfirmColor();
 
     //printf("%s-%s: (%d,%d)\n", __FILE__, __FUNCTION__, p.x, p.y);
-    if(p.x > IMAGE_W-1)
-        p.x = IMAGE_W-1;
-    if(p.y > IMAGE_H-1)
-        p.y = IMAGE_H-1;
+    if(p.x > CANVAS_AREA_W-1)
+        p.x = CANVAS_AREA_W-1;
+    if(p.y > CANVAS_AREA_H-1)
+        p.y = CANVAS_AREA_H-1;
 
     if (m_isDraw)
         m_draw.DrawTanLineSegment(m_tempP, m_theta, m_len, true);
@@ -8426,9 +8428,9 @@ void D2MeasureProfile::DrawProfile(POINT start, POINT end, unsigned char *image_
     if (abs(end.x - start.x)>=abs(end.y - start.y)) {
         if (min_y > 150)
             coor_origin.y = min_y - 5;
-        else if (max_y < IMAGE_H - 150)
+        else if (max_y < CANVAS_AREA_H - 150)
             coor_origin.y = max_y + 150;
-        else if ((min_y <= 150)&&(max_y >= IMAGE_H - 150))
+        else if ((min_y <= 150)&&(max_y >= CANVAS_AREA_H - 150))
             coor_origin.y = max_y;
 
         coor_origin.x = min_x;
@@ -8452,15 +8454,15 @@ void D2MeasureProfile::DrawProfile(POINT start, POINT end, unsigned char *image_
             tmp.x = start.x + dir_sign * i;
             tmp.y = start.y + (int)((double)(i*dir_sign) * slope);//像素点的坐标
             //	m_draw.DrawPoint(tmp, FALSE);
-            tmp.y = coor_origin.y - (*(image_p + BYTES_DOT * (IMAGE_W * tmp.y + tmp.x))) / 2;//断面图点的坐标
+            tmp.y = coor_origin.y - (*(image_p + BYTES_DOT * (CANVAS_AREA_W * tmp.y + tmp.x))) / 2;//断面图点的坐标
             m_draw.DrawPoint(tmp, FALSE, COPY);
         }
     } else {
         if (min_x > 150)
             coor_origin.x = min_x - 5;
-        else if (max_x < (IMG_W-150))
+        else if (max_x < (CANVAS_AREA_W-150))
             coor_origin.x = max_x + 150;
-        else if ((min_x <= 150)&&(max_x >= (IMG_W-150)))
+        else if ((min_x <= 150)&&(max_x >= (CANVAS_AREA_W-150)))
             coor_origin.x = min_x;
 
         coor_origin.y = max_y;
@@ -8482,7 +8484,7 @@ void D2MeasureProfile::DrawProfile(POINT start, POINT end, unsigned char *image_
         for (i=0; i<abs(end.y-start.y); i++) {
             tmp.y = start.y - dir_sign * i;
             tmp.x = start.x - (int)((double)(i*dir_sign) * slope);
-            tmp.x = coor_origin.x - (*(image_p + BYTES_DOT * (IMAGE_W * tmp.y + tmp.x))) / 2;//断面图点的坐标
+            tmp.x = coor_origin.x - (*(image_p + BYTES_DOT * (CANVAS_AREA_W * tmp.y + tmp.x))) / 2;//断面图点的坐标
             m_draw.DrawPoint(tmp, FALSE, COPY);
         }
     }

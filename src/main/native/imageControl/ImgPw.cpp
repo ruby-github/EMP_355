@@ -8,6 +8,8 @@
 #include "periDevice/IoCtrl.h"
 #include "probe/ProbeMan.h"
 
+#include "utils/MainWindowConfig.h"
+
 int soundstatus=0;
 int ImgPw::SPECTRUM_SPEED[MAX_SPEED_INDEX] = {48, 64, 80, 96, 112, 127};//{24, 32, 40, 48, 56,60}; //PRF=8000hz
 ImgPw* ImgPw::m_ptrInstance = NULL;
@@ -113,7 +115,7 @@ ImgPw::ImgPw() {
     m_PRFIndexBak = m_PRFIndex;
     m_PRFIndexTempBak = m_PRFIndex;
     m_baselineIndex = 0;
-    m_baseline = IMG_H * 3 / 4;
+    m_baseline = CANVAS_AREA_H * 3 / 4;
     m_wallFilterIndex = 0;
     m_dynamicRangeIndex = 36;
     m_speedIndex = 1;
@@ -1597,28 +1599,28 @@ int ImgPw::GetBaseLineForCalc() {
 
     switch(formatPw) {
     case FormatPw::P_TOTAL:
-        offset = IMG_H / 2;
-        pwImgWidth = IMG_H;
+        offset = CANVAS_AREA_H / 2;
+        pwImgWidth = CANVAS_AREA_H;
         break;
     case FormatPw::BP11_UD:
-        offset = IMG_H * 3 / 4;
-        pwImgWidth = IMG_H / 2;
+        offset = CANVAS_AREA_H * 3 / 4;
+        pwImgWidth = CANVAS_AREA_H / 2;
         break;
     case FormatPw::BP21_UD:
-        offset = IMG_H * 5 / 6;
-        pwImgWidth = IMG_H * 1 / 3;
+        offset = CANVAS_AREA_H * 5 / 6;
+        pwImgWidth = CANVAS_AREA_H * 1 / 3;
         break;
     case FormatPw::BP12_UD:
-        offset = IMG_H * 2 / 3;
-        pwImgWidth = IMG_H * 2 / 3;
+        offset = CANVAS_AREA_H * 2 / 3;
+        pwImgWidth = CANVAS_AREA_H * 2 / 3;
         break;
     case FormatPw::BP11_LR:
-        offset = IMG_H / 2;
-        pwImgWidth = IMG_H;
+        offset = CANVAS_AREA_H / 2;
+        pwImgWidth = CANVAS_AREA_H;
         break;
     default:
-        offset = IMG_H * 3 / 4;
-        pwImgWidth = IMG_H / 2;
+        offset = CANVAS_AREA_H * 3 / 4;
+        pwImgWidth = CANVAS_AREA_H / 2;
         break;
     }
 
@@ -1922,10 +1924,10 @@ void ImgPw::SVCalc(int pwLine, int svPos, int svLen, int &dotBegin, int &dotEnd,
     dotBegin = svPos - svLenDot/2;
     dotEnd = svPos + svLenDot/2;
 
-    if (dotEnd >= IMG_H) { // out of range
-        dotEnd = IMG_H;
-        dotBegin = IMG_H - svLenDot;
-        m_svPosBefore = IMG_H - svLenDot/2;
+    if (dotEnd >= CANVAS_AREA_H) { // out of range
+        dotEnd = CANVAS_AREA_H;
+        dotBegin = CANVAS_AREA_H - svLenDot;
+        m_svPosBefore = CANVAS_AREA_H - svLenDot/2;
         m_svPos = SVPosCorrect(m_svPosBefore);
 
     }
@@ -1955,7 +1957,7 @@ void ImgPw::SVCalc(int pwLine, int svPos, int svLen, int &dotBegin, int &dotEnd,
     // depthToSample = Img2D::GetInstance()->GetDepth();
     m_depthToSample = depthToSample;
 
-    double newScale =  depthToSample / IMG_H; //mm/p
+    double newScale =  depthToSample / CANVAS_AREA_H; //mm/p
     //int newSvPosDot = svPosDetph / newScale;
     int newDotBegin = svBeginDepth/newScale;
     int newsvLenDot = (float)svLen / 10 / newScale;
@@ -2010,7 +2012,7 @@ void ImgPw::GetSvPosRange(int &begin, int &end) {
 
     int svLenDot = (float)m_svLen / 10 / scale;
     begin = svLenDot / 2;
-    end = IMG_H - offset - svLenDot / 2;
+    end = CANVAS_AREA_H - offset - svLenDot / 2;
 
     PRINTF("get sv pos range: m_svLen = %d, scale = %f, offset = %d, svLenDot = %d, begin = %d, end = %d\n", m_svLen, scale, offset, svLenDot, begin, end);
 }
@@ -2637,7 +2639,7 @@ void ImgPw::SwitchHPRF(bool on, float svPos) {
         m_ptrCalc->CalcHDotSample(m_depthToSample, speed);
         //reCalc end
 
-        double scale = m_depthToSample / (float)IMG_H;
+        double scale = m_depthToSample / (float)CANVAS_AREA_H;
         dotBegin = svBegin / scale;
         dotEnd = svEnd / scale;
         SVCorrect(dotBegin, dotEnd);
@@ -2868,8 +2870,8 @@ void ImgPw::BalanceCfmInfo(int pwLine, int pwSvPos, int pwSvLen) {
     if (cfmDot[0] > pwDotBegin) {
         cfmDot[0] = pwDotBegin;
         cfmDot[1] = cfmDot[0] + offset;
-        if (cfmDot[1] > IMG_H)
-            cfmDot[1] = IMG_H;
+        if (cfmDot[1] > CANVAS_AREA_H)
+            cfmDot[1] = CANVAS_AREA_H;
         outRange = TRUE;
     }
     if (cfmDot[1] < pwDotEnd) {

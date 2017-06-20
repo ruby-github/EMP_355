@@ -857,7 +857,7 @@ string ViewQueryRetrieve::GetDCMImageElement(DCMIMAGEELEMENT element,unsigned ch
         for(int i = 0; i<element.imgFrameNumber; i++) {
             Image::AutoTracePara para;
             Image image((unsigned int*)pImageBuf, para);
-            pImageBuf=pImageBuf+IMG_AREA_W*IMG_AREA_H*IMG_BPP;
+            pImageBuf=pImageBuf+IMAGE_AREA_W*IMAGE_AREA_H*CANVAS_BPP;
             m_ptrInstance->deq.push_back(image);
         }
         item.deq = &(m_ptrInstance->deq);

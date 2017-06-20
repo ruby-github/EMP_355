@@ -12,7 +12,7 @@ void CUpdateBodyMark::ExitBodyMark() {
 }
 
 void CUpdateBodyMark::DrawBodyMark(POINT pos, GdkPixbuf* pixbuf, double scale, int colorIndex, guint index) {
-  ImageArea::GetInstance()->DrawBodyMark(pos.x + IMAGE_X, pos.y + IMAGE_Y, pixbuf, scale, colorIndex, index);
+  ImageArea::GetInstance()->DrawBodyMark(pos.x + CANVAS_IMAGE_X, pos.y + CANVAS_IMAGE_Y, pixbuf, scale, colorIndex, index);
 }
 
 void CUpdateBodyMark::DrawProbeMark(POINT pos, int direction, int maxDir, double scale, int colorIndex, guint index) {

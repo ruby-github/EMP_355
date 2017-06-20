@@ -26,9 +26,10 @@
 #include FT_FREETYPE_H
 
 #include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
-#define IMAGE_WIDTH 400
-#define IMAGE_HEIGHT 288
+#define CANVAS_AREA_WIDTH 400
+#define CANVAS_AREA_HEIGHT 288
 #define BITMAP_OFFSET 4
 #define FONT_DOT_RATIO(font_size) font_size*5
 #define PRINT_START_X 10
@@ -728,8 +729,8 @@ int print_report( int size_x, int size_y, gint8 language) {
 
     for (i=0; i<imageNums; i++) { //现在最多能传入2幅图片
         if(ImgMan::GetInstance()->ReadSnap(imageName[i].c_str(), &printImg[i]) == 0) {
-            buf[i] = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, IMG_W*imgScale, IMG_H*imgScale);
-            gdk_pixbuf_scale(printImg[i].pixbuf, buf[i], 0, 0, IMG_W*imgScale, IMG_H*imgScale, (-80)*imgScale, (-120)*imgScale, imgScale, imgScale, GDK_INTERP_HYPER);
+            buf[i] = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, CANVAS_AREA_W*imgScale, CANVAS_AREA_H*imgScale);
+            gdk_pixbuf_scale(printImg[i].pixbuf, buf[i], 0, 0, CANVAS_AREA_W*imgScale, CANVAS_AREA_H*imgScale, (-80)*imgScale, (-120)*imgScale, imgScale, imgScale, GDK_INTERP_HYPER);
             lenOfLine = gdk_pixbuf_get_rowstride(buf[i]);
             item.image_data[i] = (char*)gdk_pixbuf_get_pixels(buf[i]);
             g_object_unref(printImg[i].pixbuf);
@@ -745,8 +746,8 @@ int print_report( int size_x, int size_y, gint8 language) {
 
     report_buffer = (unsigned char *)malloc(REPORT_WIDTH_BYTES*REPORT_HEIGHT + BMP_HEAD_LEN);
     memset(report_buffer, 255, REPORT_WIDTH_BYTES*REPORT_HEIGHT + BMP_HEAD_LEN);
-    report_to_bitmap(item, report_buffer, IMG_W*imgScale, IMG_H*imgScale, lenOfLine, language);
-//	ReportToBitmap(item, report_buffer, IMG_W*imgScale, IMG_H*imgScale, lenOfLine, language);
+    report_to_bitmap(item, report_buffer, CANVAS_AREA_W*imgScale, CANVAS_AREA_H*imgScale, lenOfLine, language);
+//	ReportToBitmap(item, report_buffer, CANVAS_AREA_W*imgScale, CANVAS_AREA_H*imgScale, lenOfLine, language);
 
     fd = open(PRINTIMAGE, O_RDWR|O_CREAT|O_TRUNC, 00777);
     if (fd < 0) {

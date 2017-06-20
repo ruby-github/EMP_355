@@ -165,21 +165,17 @@ void CDrawIMT::UpdateIMT(void) {
     if (ms.GetFreezeMode() == FreezeMode::UNFREEZE) {
         for (unsigned int i = 0; i < roi_w; i++) {
             for (unsigned int j = 0; j < roi_h; j++) {
-                pRoi[i*roi_h+j] = *(ImageArea::m_bitsImg + (m_area_start.y+j)*IMAGE_W*3 + (m_area_start.x+i)*3 + 0);
-                pRoiPre[i*roi_h+j] = *(ImageArea::m_TpbitsIMT + (m_area_start.y+j)*IMAGE_W*3 + (m_area_start.x+i)*3 + 0);
-                // pRoi[i*roi_h+j] =(unsigned char )*(Replay::GetInstance()->GetLastImgForIMT()+ (m_area_start.y+j+IMAGE_Y)*IMG_AREA_W*3/4 +
-                //                (m_area_start.x+i+IMAGE_X)*3/4 + 0);
-                //pRoiPre[i*roi_h+j] =(unsigned char )*(Replay::GetInstance()->GetNextLastImgForIMT()+ (m_area_start.y+j+IMAGE_Y)*IMG_AREA_W*3/4 +
-                //                (m_area_start.x+i+IMAGE_X)*3/4 + 0);
+                pRoi[i*roi_h+j] = *(ImageArea::m_bitsImg + (m_area_start.y+j)*CANVAS_AREA_W*3 + (m_area_start.x+i)*3 + 0);
+                pRoiPre[i*roi_h+j] = *(ImageArea::m_TpbitsIMT + (m_area_start.y+j)*CANVAS_AREA_W*3 + (m_area_start.x+i)*3 + 0);
             }
         }
     } else if ((ms.GetFreezeMode() == FreezeMode::FREEZE) || (ms.GetFreezeMode() == FreezeMode::REPLAY)) {
         for (unsigned int i = 0; i < roi_w; i++) {
             for (unsigned int j = 0; j < roi_h; j++) {
-                pRoi[i*roi_h+j] =(unsigned char )*(Replay::GetInstance()->GetSelectImgForIMT()+ (m_area_start.y+j+IMAGE_Y)*IMG_AREA_W*3/4 +
-                                                   (m_area_start.x+i+IMAGE_X)*3/4 + 0);
-                pRoiPre[i*roi_h+j] =(unsigned char )*(Replay::GetInstance()->GetSelectNextImgForIMT()+ (m_area_start.y+j+IMAGE_Y)*IMG_AREA_W*3/4 +
-                                                      (m_area_start.x+i+IMAGE_X)*3/4 + 0);
+                pRoi[i*roi_h+j] =(unsigned char )*(Replay::GetInstance()->GetSelectImgForIMT()+ (m_area_start.y+j+CANVAS_IMAGE_Y)*IMAGE_AREA_W*3/4 +
+                                                   (m_area_start.x+i+CANVAS_IMAGE_X)*3/4 + 0);
+                pRoiPre[i*roi_h+j] =(unsigned char )*(Replay::GetInstance()->GetSelectNextImgForIMT()+ (m_area_start.y+j+CANVAS_IMAGE_Y)*IMAGE_AREA_W*3/4 +
+                                                      (m_area_start.x+i+CANVAS_IMAGE_X)*3/4 + 0);
             }
         }
     } else {

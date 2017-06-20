@@ -131,8 +131,8 @@ void MenuBiopsyVerify::UpdateSubMenuAngle() {
       for(int i = 0; i < size; i++) {
         GtkWidget* menuItem=gtk_check_menu_item_new_with_label(_(vecAngleType[i].c_str()));
 
-        gtk_widget_modify_base(menuItem,GTK_STATE_NORMAL, g_deepGray);
-        gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(menuItem)), GTK_STATE_NORMAL, g_white);
+        gtk_widget_modify_base(menuItem,GTK_STATE_NORMAL, Utils::get_color("gray"));
+        gtk_widget_modify_fg(gtk_bin_get_child(GTK_BIN(menuItem)), GTK_STATE_NORMAL, Utils::get_color("white"));
 
         gtk_widget_set_usize(menuItem, WIDTH_BIOPSYVERIFY_MENU, HEIGHT_BIOPSYVERIFY_MENUITEM);
 

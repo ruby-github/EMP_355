@@ -15,6 +15,8 @@
 #include "keyboard/MultiFuncMode.h"
 #include "imageProc/Zoom.h"
 
+#include "utils/MainWindowConfig.h"
+
 ImgCfm* ImgCfm::m_ptrInstance = NULL;
 FpgaCfm ImgCfm::m_fpga;
 const int ImgCfm::CFM_PRF[MAX_PRF_INDEX] = {350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 5000, 6000, 7000, 9000};
@@ -1032,10 +1034,10 @@ void ImgCfm::SetScanLines() {
         m_boxLine[0] = boxLineRange[0];
         m_boxLine[1] = boxLineRange[1];
 #ifdef EMP_430
-        BoxDotCorrect(0, (IMG_H-1));
+        BoxDotCorrect(0, (CANVAS_AREA_H-1));
 #else
         m_boxDotBak[0] = 0;
-        m_boxDotBak[1] = IMG_H-1;
+        m_boxDotBak[1] = CANVAS_AREA_H-1;
         BoxDotCorrect(m_boxDotBak[0], m_boxDotBak[1]);
 #endif
         Box(m_boxLine[0], m_boxLine[1], m_boxDot[0], m_boxDot[1], TRUE);
@@ -1082,8 +1084,8 @@ void ImgCfm::ChangeDepth() {
 
         if ((m_boxDotBefore[1] - m_boxDotBefore[0]) < 20) {
             m_boxDotBefore[1] = m_boxDotBefore[0] + 20;
-            if (m_boxDotBefore[1] > IMG_H) {
-                m_boxDotBefore[1] = IMG_H;
+            if (m_boxDotBefore[1] > CANVAS_AREA_H) {
+                m_boxDotBefore[1] = CANVAS_AREA_H;
                 m_boxDotBefore[0] = m_boxDotBefore[1] - 20;
             }
         }
@@ -1294,8 +1296,8 @@ void ImgCfm::Box(int lineBegin, int lineEnd, int dotBegin, int dotEnd, bool draw
 
     if ((dotEnd - dotBegin) < 1) {
         dotEnd += 1;
-        if (dotEnd > IMG_H) {
-            dotEnd = IMG_H;
+        if (dotEnd > CANVAS_AREA_H) {
+            dotEnd = CANVAS_AREA_H;
         }
     }
 
@@ -1351,11 +1353,11 @@ void ImgCfm::MaxBox() {
     m_boxLine[1] = scanRange[1];
 
 #ifdef EMP_430
-    //exit BCWidth the height is not (IMG_W-1)
-    BoxDotCorrect(0, (IMG_H-1));
+    //exit BCWidth the height is not (CANVAS_AREA_W-1)
+    BoxDotCorrect(0, (CANVAS_AREA_H-1));
 #else
     m_boxDotBak[0] = 0;
-    m_boxDotBak[1] = IMG_H-1;
+    m_boxDotBak[1] = CANVAS_AREA_H-1;
     BoxDotCorrect(m_boxDotBak[0], m_boxDotBak[1]);
 #endif
     //2016.7.20
@@ -2047,7 +2049,7 @@ void ImgCfm::GetBoxDotRange(int &begin, int &end) {
     int interval = 1;
 
     begin = 0 + interval;
-    end = IMG_H - interval;
+    end = CANVAS_AREA_H - interval;
 }
 
 /*

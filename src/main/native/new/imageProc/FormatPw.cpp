@@ -17,6 +17,9 @@
 #include "imageProc/Zoom.h"
 #include "sysMan/SysOptions.h"
 
+#include "keyboard/MultiFuncFactory.h"
+#include "utils/MainWindowConfig.h"
+
 FormatPw* FormatPw::m_ptrInstance = NULL;
 
 FormatPw* FormatPw::GetInstance() {
@@ -38,7 +41,7 @@ FormatPw::FormatPw() {
 
     m_format = P_TOTAL;
     m_formatSnap = P_TOTAL;
-    m_pwDots = IMG_H / 2;
+    m_pwDots = CANVAS_AREA_H / 2;
 }
 FormatPw::~FormatPw() {
     if (m_ptrInstance != NULL)

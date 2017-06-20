@@ -22,8 +22,6 @@ int MeasureDraw::m_orderNumber = 1;
 
 MeasureDraw::MeasureDraw() {
     m_ptrImgArea = ImageArea::GetInstance();
-    // m_cursor.x = IMAGE_W/2;
-    // m_cursor.y = IMAGE_Y + IMAGE_H/2;
 
     m_imgAttr.area = ImageArea::PIXMAP;
     m_imgAttr.mode.gdkMode = GDK_XOR;
@@ -38,7 +36,6 @@ MeasureDraw::~MeasureDraw() {
 }
 
 void MeasureDraw::DrawCursor(POINT p, bool isCur, EDrawMode mode, bool restrict) {
-//	printf("%s: x=%d, y=%d, isCur=%d, Mode=%d, restrict=%d\n", __FUNCTION__, p.x, p.y, isCur, mode, restrict);
     if (restrict) {
         int boundUp, boundDown, boundLeft, boundRight;
         ImageAreaDraw::GetInstance()->GetBoundary(boundUp, boundDown, boundLeft, boundRight);
@@ -222,7 +219,7 @@ void MeasureDraw::DrawLine(POINT p1, POINT p2, bool isCur, EDrawMode mode) {
 void MeasureDraw::DrawTanBeeline(POINT point1, double tan, bool isCur, EDrawMode mode) {
     POINT endp1, endp2;
     double temp;
-    const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
+    const int bou1_x = 0, bou1_y = 0, bou2_x = CANVAS_AREA_W, bou2_y = CANVAS_AREA_H;
 
     //	ConvertPoint(point1);
 
@@ -293,7 +290,7 @@ vector<POINT> MeasureDraw::DrawTanLineSegment(POINT point1, double theta, int le
     vector<POINT> vec;
     POINT endp1, endp2;
     double tanTheta = tan(theta);
-    const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H-1;
+    const int bou1_x = 0, bou1_y = 0, bou2_x = CANVAS_AREA_W, bou2_y = CANVAS_AREA_H-1;
     const int half_len = length/2;
 
 //	printf("%s-%s: cursor (%d, %d)\n", __FILE__, __FUNCTION__, point1.x, point1.y);
@@ -353,7 +350,7 @@ void MeasureDraw::DrawDotBeeline(POINT point1, POINT point2, bool isCur, EDrawMo
     POINT endp1, endp2;
     double tan;
     double temp;
-    const int bou1_x = 0, bou1_y = 0, bou2_x = IMAGE_W, bou2_y = IMAGE_H;
+    const int bou1_x = 0, bou1_y = 0, bou2_x = CANVAS_AREA_W, bou2_y = CANVAS_AREA_H;
 
     if(point1.y == point2.y) { //水平
         endp1.x = bou1_x;
@@ -693,16 +690,16 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
         ycos = y*temp3;
         ysin = y*temp4;
 
-        if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(IMAGE_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(IMAGE_H)))
+        if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(CANVAS_AREA_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0+xcos-ysin, y0+xsin+ycos);
-        if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(IMAGE_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(IMAGE_H)))
+        if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(CANVAS_AREA_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0-xcos-ysin, y0-xsin+ycos);
-        if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(IMAGE_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(IMAGE_H)))
+        if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(CANVAS_AREA_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0+xcos+ysin, y0+xsin-ycos);
-        if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(IMAGE_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(IMAGE_H)))
+        if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(CANVAS_AREA_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0-xcos+ysin, y0-xsin-ycos);
         x++;
@@ -717,16 +714,16 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
     ycos = y*temp3;
     ysin = y*temp4;
 
-    if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(IMAGE_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(IMAGE_H)))
+    if (((x0+xcos-ysin)>(0))&&((x0+xcos-ysin)<(CANVAS_AREA_W))&&((y0+xsin+ycos)>(0))&&((y0+xsin+ycos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0+xcos-ysin, y0+xsin+ycos);
-    if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(IMAGE_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(IMAGE_H)))
+    if (((x0-xcos-ysin)>(0))&&((x0-xcos-ysin)<(CANVAS_AREA_W))&&((y0-xsin+ycos)>(0))&&((y0-xsin+ycos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0-xcos-ysin, y0-xsin+ycos);
-    if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(IMAGE_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(IMAGE_H)))
+    if (((x0+xcos+ysin)>(0))&&((x0+xcos+ysin)<(CANVAS_AREA_W))&&((y0+xsin-ycos)>(0))&&((y0+xsin-ycos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0+xcos+ysin, y0+xsin-ycos);
-    if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(IMAGE_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(IMAGE_H)))
+    if (((x0-xcos+ysin)>(0))&&((x0-xcos+ysin)<(CANVAS_AREA_W))&&((y0-xsin-ycos)>(0))&&((y0-xsin-ycos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0-xcos+ysin, y0-xsin-ycos);
 
@@ -758,16 +755,16 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
         ycos = y*temp3;
         ysin = y*temp4;
 
-        if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(IMAGE_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(IMAGE_H)))
+        if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(CANVAS_AREA_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0+ycos-xsin, y0+ysin+xcos);
-        if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(IMAGE_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(IMAGE_H)))
+        if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(CANVAS_AREA_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0-ycos-xsin, y0-ysin+xcos);
-        if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(IMAGE_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(IMAGE_H)))
+        if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(CANVAS_AREA_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0+ycos+xsin, y0+ysin-xcos);
-        if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(IMAGE_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(IMAGE_H)))
+        if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(CANVAS_AREA_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(CANVAS_AREA_H)))
             if(t)
                 m_ptrImgArea->DrawPixmapPt(gc, x0-ycos+xsin, y0-ysin-xcos);
         x++;
@@ -782,16 +779,16 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
     ycos = y*temp3;
     ysin = y*temp4;
 
-    if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(IMAGE_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(0+IMAGE_H)))
+    if (((x0+ycos-xsin)>(0))&&((x0+ycos-xsin)<(CANVAS_AREA_W))&&((y0+ysin+xcos)>(0))&&((y0+ysin+xcos)<(0+CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0+ycos-xsin, y0+ysin+xcos);
-    if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(IMAGE_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(IMAGE_H)))
+    if (((x0-ycos-xsin)>(0))&&((x0-ycos-xsin)<(CANVAS_AREA_W))&&((y0-ysin+xcos)>(0))&&((y0-ysin+xcos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0-ycos-xsin, y0-ysin+xcos);
-    if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(IMAGE_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(IMAGE_H)))
+    if (((x0+ycos+xsin)>(0))&&((x0+ycos+xsin)<(CANVAS_AREA_W))&&((y0+ysin-xcos)>(0))&&((y0+ysin-xcos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0+ycos+xsin, y0+ysin-xcos);
-    if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(IMAGE_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(IMAGE_H)))
+    if (((x0-ycos+xsin)>(0))&&((x0-ycos+xsin)<(CANVAS_AREA_W))&&((y0-ysin-xcos)>(0))&&((y0-ysin-xcos)<(CANVAS_AREA_H)))
         if(t)
             m_ptrImgArea->DrawPixmapPt(gc, x0-ycos+xsin, y0-ysin-xcos);
 
@@ -801,14 +798,11 @@ void MeasureDraw::DrawEllipse(POINT p1, POINT p2, POINT p3, bool isCur) {
 
 ///> private
 void MeasureDraw::ConvertPoint(POINT &p) {
-    // p.x = p.x + IMAGE_X;
-    // p.y = p.y + IMAGE_Y;
 }
 
 void MeasureDraw::CalcMeasureCenter() {
-    m_cursor.x = IMAGE_W/2;
-    m_cursor.y = IMAGE_Y + IMAGE_H*2/3;
-    //m_cursor.y = IMAGE_Y + IMAGE_H/2;
+    m_cursor.x = CANVAS_AREA_W/2;
+    m_cursor.y = CANVAS_IMAGE_Y + CANVAS_AREA_H*2/3;
 }
 
 void MeasureDraw::ClearPwCycle(int begin, int end) {
@@ -986,9 +980,9 @@ void MeasureDraw::DrawOrderNumber(POINT p, int orderNumber, EDrawMode mode) {
 
     p.x = p.x + 10;
     if (p.x < 0) p.x = 0;
-    if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
+    if (p.x > CANVAS_AREA_W - 20) p.x = CANVAS_AREA_W - 20;
     if (p.y < 0) p.y = 0;
-    if (p.y > IMAGE_H - 20) p.y = IMAGE_H - 20;
+    if (p.y > CANVAS_AREA_H - 20) p.y = CANVAS_AREA_H - 20;
     SysMeasurementSetting sysMeasure;
     m_colorConfirmIndex = sysMeasure.GetMeasureColorConfirm();
     GdkColor *color = MeasureColorConvert(m_colorConfirmIndex);
@@ -1005,9 +999,9 @@ void MeasureDraw::DrawOrderNumberForErase(POINT p, int orderNumber, int confirmC
 
     p.x = p.x + 10;
     if (p.x < 0) p.x = 0;
-    if (p.x > IMAGE_W - 20) p.x = IMAGE_W - 20;
+    if (p.x > CANVAS_AREA_W - 20) p.x = CANVAS_AREA_W - 20;
     if (p.y < 0) p.y = 0;
-    if (p.y > IMAGE_H - 20) p.y = IMAGE_H - 20;
+    if (p.y > CANVAS_AREA_H - 20) p.y = CANVAS_AREA_H - 20;
     GdkColor *color = MeasureColorConvert(confirmColor);
     char str[3] = {0};
     snprintf(str, 3, "%d", orderNumber);
@@ -1045,7 +1039,7 @@ void MeasureDraw::DrawFanshaped(POINT center, POINT left, POINT right, double an
     int detal = 5;
     int x1, y1;//first point
     int x2, y2;//second point
-    //m_ptrImgArea->DrawArc(m_imgAttr, g_green, center.x, center.y, 50, 100, 180 - angle, angle, false);
+
     while((alpha+detal) < angle) {
         alpha += detal;
         x1 = center.x + radius * cos(alpha);

@@ -12,6 +12,7 @@
 #include "calcPeople/MenuCalcNew.h"
 #include "Def.h"
 #include "display/TopArea.h"
+#include "keyboard/KeyDef.h"
 #include "keyboard/KeyFunc.h"
 #include "keyboard/KeyValueOpr.h"
 #include "measure/MeasureMan.h"

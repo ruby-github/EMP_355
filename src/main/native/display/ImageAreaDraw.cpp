@@ -1,6 +1,6 @@
 // +-----------------------------+----------------------------+----------------------------+-------------------------+
 // |           Symbol            |          Spectra           |            Para            |       PixmapArea        |
-// |   size:(IMAGE_W*IMAGE_H)    |   size:(IMAGE_W*IMAGE_H)   |size:(IMG_AREA_W*IMG_AREA_H)| size:(IMAGE_W*IMAGE_H)  |
+// |   size:(CANVAS_AREA_W*CANVAS_AREA_H)    |   size:(CANVAS_AREA_W*CANVAS_AREA_H)   |size:(IMAGE_AREA_W*IMAGE_AREA_H)| size:(CANVAS_AREA_W*CANVAS_AREA_H)  |
 // +-----------------------------+----------------------------+----------------------------+-------------------------+
 // |BM Line                      |Grid(M and PW)              |Focus                       |GrayReject               |
 // +-----------------------------+----------------------------+----------------------------+-------------------------+
@@ -112,8 +112,6 @@ ImageAreaDraw::ImageAreaDraw() {
     m_PIPBoxDraw = FALSE;
 
     m_LZDraw = FALSE;
-
-    //    strcpy(m_pwScaleUnit, "cm/s");
     m_pwUnit = CMPS;
     m_cfmUnit = CMPS;
 
@@ -175,10 +173,10 @@ ImageAreaDraw::ImageAreaDraw() {
 
     m_autoPara = NULL;
 
-    m_pointScaleYPw.x = IMAGE_X + IMAGE_W/2;
-    m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2;
+    m_pointScaleYPw.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+    m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
     //add by hzq
-    m_widthScaleYPw = IMAGE_W;
+    m_widthScaleYPw = CANVAS_AREA_W;
 }
 
 void ImageAreaDraw::GetProbePara(int type, int lines, int width, int r) {
@@ -274,7 +272,7 @@ void ImageAreaDraw::Update(void) {
         m_LZLineRange[0] = 0;
         m_LZLineRange[1] = m_probeLines - 1;
         m_LZDotRange[0] = 0;
-        m_LZDotRange[1] = IMAGE_H;
+        m_LZDotRange[1] = CANVAS_AREA_H;
         m_LZScale = 1.0;
 
         //calculate ScaleY Spacing of the top image
@@ -312,10 +310,6 @@ void ImageAreaDraw::Update(void) {
     case (ScanMode::CW):
         m_formatPw = modeStatus.GetFormatPw();
         ChangeFormatPw(m_formatPw);
-        // break;
-        // case (ScanMode::CW_INIT):
-        //  break;
-        // case (ScanMode::CW):
         break;
     case (ScanMode::CFM):
     case (ScanMode::PDI):
@@ -358,64 +352,64 @@ void ImageAreaDraw::ChangeFormat2D(Format2D::EFormat2D format, int curB, double 
     switch(format) {
     case (Format2D::B):
         m_format = SINGLEB;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
         // ScanDirection
         m_countSD = 1;
         if (UDStatus && !LRStatus) {
             if (m_rotate == 90) {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             } else if (m_rotate == 180) {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             } else if (m_rotate == 270) {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             } else {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             }
         } else if (LRStatus && !UDStatus) {
             if (m_rotate == 90) {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             } else if (m_rotate == 180) {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             } else if (m_rotate == 270) {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             } else {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             }
         } else if (UDStatus && LRStatus) {
             if (m_rotate == 90) {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             } else if (m_rotate == 180) {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             } else if (m_rotate == 270) {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             } else {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             }
         } else {
             if (m_rotate == 90) {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             } else if (m_rotate == 180) {
-                pointSD.x = IMAGE_X + IMAGE_W - 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             } else if (m_rotate == 270) {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + IMAGE_H - 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
             } else {
-                pointSD.x = IMAGE_X + 30;
-                pointSD.y = IMAGE_Y + 10;
+                pointSD.x = CANVAS_IMAGE_X + 30;
+                pointSD.y = CANVAS_IMAGE_Y + 10;
             }
         }
         m_pointSD.clear();
@@ -425,39 +419,39 @@ void ImageAreaDraw::ChangeFormat2D(Format2D::EFormat2D format, int curB, double 
         m_countScaleY = 1;
         if (UDStatus) {
             if (m_rotate == 90) {
-                m_widthScaleY = (IMAGE_W - (IMAGE_W - IMAGE_H) - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + (IMAGE_W - IMAGE_H)/2 + m_scaleYSpacing / ratio2D;
-                pointScaleY.y = IMAGE_Y + IMAGE_H;
+                m_widthScaleY = (CANVAS_AREA_W - (CANVAS_AREA_W - CANVAS_AREA_H) - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + (CANVAS_AREA_W - CANVAS_AREA_H)/2 + m_scaleYSpacing / ratio2D;
+                pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
             } else if (m_rotate == 180) {
-                m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + IMAGE_W;
-                pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+                pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
             } else if (m_rotate == 270) {
-                m_widthScaleY = (IMAGE_W - (IMAGE_W - IMAGE_H) - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + IMAGE_W - (IMAGE_W - IMAGE_H)/2 - m_scaleYSpacing / ratio2D;
-                pointScaleY.y = IMAGE_Y + IMAGE_H;
+                m_widthScaleY = (CANVAS_AREA_W - (CANVAS_AREA_W - CANVAS_AREA_H) - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - (CANVAS_AREA_W - CANVAS_AREA_H)/2 - m_scaleYSpacing / ratio2D;
+                pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
             } else {
-                m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + IMAGE_W;
-                pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+                pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             }
         } else {
             if (m_rotate == 90) {
-                m_widthScaleY = (IMAGE_W - (IMAGE_W - IMAGE_H) - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + IMAGE_W - (IMAGE_W - IMAGE_H)/2 - m_scaleYSpacing / ratio2D;
-                pointScaleY.y = IMAGE_Y + IMAGE_H;
+                m_widthScaleY = (CANVAS_AREA_W - (CANVAS_AREA_W - CANVAS_AREA_H) - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - (CANVAS_AREA_W - CANVAS_AREA_H)/2 - m_scaleYSpacing / ratio2D;
+                pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
             } else if (m_rotate == 180) {
-                m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + IMAGE_W;
-                pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+                pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             } else if (m_rotate == 270) {
-                m_widthScaleY = (IMAGE_W - (IMAGE_W - IMAGE_H) - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + (IMAGE_W - IMAGE_H)/2 + m_scaleYSpacing / ratio2D;
-                pointScaleY.y = IMAGE_Y + IMAGE_H;
+                m_widthScaleY = (CANVAS_AREA_W - (CANVAS_AREA_W - CANVAS_AREA_H) - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + (CANVAS_AREA_W - CANVAS_AREA_H)/2 + m_scaleYSpacing / ratio2D;
+                pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
             } else {
-                m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
-                pointScaleY.x = IMAGE_X + IMAGE_W;
-                pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
+                pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+                pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
             }
         }
         m_pointScaleY.clear();
@@ -465,50 +459,50 @@ void ImageAreaDraw::ChangeFormat2D(Format2D::EFormat2D format, int curB, double 
 
         m_clearScaleY.clear();
         if (m_rotate == 90 || m_rotate == 270) {
-            clearScaleY.x = IMAGE_X;
-            clearScaleY.y = IMAGE_Y + IMAGE_H;
-            m_widthClearScaleY = IMAGE_W;
+            clearScaleY.x = CANVAS_IMAGE_X;
+            clearScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+            m_widthClearScaleY = CANVAS_AREA_W;
         } else {
-            clearScaleY.x = IMAGE_X + IMAGE_W;
-            clearScaleY.y = IMAGE_Y;
-            m_heightClearScaleY = IMAGE_H;
+            clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+            clearScaleY.y = CANVAS_IMAGE_Y;
+            m_heightClearScaleY = CANVAS_AREA_H;
         }
         m_clearScaleY.push_back(clearScaleY);
 
         if (UDStatus) {
             if (m_rotate == 90) {
-                m_pointFocus.x = IMAGE_X + m_scaleYSpacing / ratio2D + (IMAGE_W - IMAGE_H)/2;
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - 5;
+                m_pointFocus.x = CANVAS_IMAGE_X + m_scaleYSpacing / ratio2D + (CANVAS_AREA_W - CANVAS_AREA_H)/2;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 5;
             } else if (m_rotate == 180) {
-                m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
             } else if (m_rotate == 270) {
-                m_pointFocus.x = IMAGE_X + IMAGE_W - m_scaleYSpacing / ratio2D - (IMAGE_W - IMAGE_H)/2;
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - 5;
+                m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - m_scaleYSpacing / ratio2D - (CANVAS_AREA_W - CANVAS_AREA_H)/2;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 5;
             } else {
-                m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             }
         } else {
             if (m_rotate == 90) {
-                m_pointFocus.x = IMAGE_X + IMAGE_W - m_scaleYSpacing / ratio2D - (IMAGE_W - IMAGE_H)/2;
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - 5;
+                m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - m_scaleYSpacing / ratio2D - (CANVAS_AREA_W - CANVAS_AREA_H)/2;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 5;
             } else if (m_rotate == 180) {
-                m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             } else if (m_rotate == 270) {
-                m_pointFocus.x = IMAGE_X + m_scaleYSpacing / ratio2D + (IMAGE_W - IMAGE_H)/2;
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - 5;
+                m_pointFocus.x = CANVAS_IMAGE_X + m_scaleYSpacing / ratio2D + (CANVAS_AREA_W - CANVAS_AREA_H)/2;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 5;
             } else {
-                m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
             }
         }
 
         // Local Zoom
-        m_pointLZ.x = IMAGE_W / 2;
+        m_pointLZ.x = CANVAS_AREA_W / 2;
         if (UDStatus)
-            m_pointLZ.y = IMAGE_H;
+            m_pointLZ.y = CANVAS_AREA_H;
         else
             m_pointLZ.y = 0;
 
@@ -516,236 +510,236 @@ void ImageAreaDraw::ChangeFormat2D(Format2D::EFormat2D format, int curB, double 
     case (Format2D::BB):
         m_format = DUAL;
         if (curB == 0)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
         else if (curB == 1)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
 
         //ScanDirection
         m_countSD = 2;
         m_pointSD.clear();
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         if (curB == 1 && UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (curB == 1 && LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (curB == 1 && UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/2 + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale Y
         m_countScaleY = 2;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
         m_pointScaleY.clear();
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
         if (curB == 0) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         } else if (curB == 1) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         }
 
         break;
     case (Format2D::B4):
         m_format = QUAD;
         if (curB == 0)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
         else if (curB == 1)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
         else if (curB == 2)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y+IMAGE_H/2, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
         else if (curB == 3)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y+IMAGE_H/2, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
 
         // ScanDirection
         m_countSD = 4;
         m_pointSD.clear();
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 4;
-        m_heightScaleY = (IMAGE_H/2 - m_scaleYSpacing / ratio2D) * ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D) * ratio2D;
         m_pointScaleY.clear();
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y + IMAGE_H/2;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y + IMAGE_H/2;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/2;
+        m_heightClearScaleY = CANVAS_AREA_H/2;
 
         // focus
         if (curB == 0) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         } else if (curB == 1) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         } else if (curB == 2) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         } else if (curB == 3) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         }
         break;
     }
@@ -758,7 +752,7 @@ void ImageAreaDraw::ChangeFormatM(FormatM::EFormatM format) {
 
     switch(format) {
     case (FormatM::M_TOTAL):
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
         m_ptrImg->UpdateSymbolArea(0, 0, 0, 0);
 
         m_drawMline = false;
@@ -768,301 +762,301 @@ void ImageAreaDraw::ChangeFormatM(FormatM::EFormatM format) {
         m_countScaleY = 0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         //scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointScaleYM.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
-        m_heightScaleYM = IMAGE_H;// - m_scaleYSpacing / m_ratio2D;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        m_heightScaleYM = CANVAS_AREA_H;// - m_scaleYSpacing / m_ratio2D;
 
         // scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
         break;
     case (FormatM::BM11_UD):
         m_format = U1D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/2);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/2, IMAGE_W, IMAGE_H/2);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/2);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W, CANVAS_AREA_H/2);
         // scan direction
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/2;
+        m_heightClearScaleY = CANVAS_AREA_H/2;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // BM line
         m_drawMline = true;
-        m_pointBM.x = IMAGE_W/2;
+        m_pointBM.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointBM.y = IMAGE_H/2;
+            m_pointBM.y = CANVAS_AREA_H/2;
         else
             m_pointBM.y = 0;
-        m_widthImgBM = IMAGE_W/2;
-        m_heightImgBM = IMAGE_H/2;
+        m_widthImgBM = CANVAS_AREA_W/2;
+        m_heightImgBM = CANVAS_AREA_H/2;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
         else
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H/2;
-        m_heightScaleYM = IMAGE_H/2;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
+        m_heightScaleYM = CANVAS_AREA_H/2;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
 
         break;
     case (FormatM::BM21_UD):
         m_format = U2D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0*2.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0*2.0, IMAGE_W, IMAGE_H/3.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0*2.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;    // --50-- To be confirmed --
+        m_heightScaleY = (CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;    // --50-- To be confirmed --
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0*2.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0*2.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50 - 5; // --50-- To be confirmed --
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50 - 5; // --50-- To be confirmed --
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // BM line
         m_drawMline = true;
-        m_pointBM.x = IMAGE_W/2;
+        m_pointBM.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointBM.y = IMAGE_H/3.0*2.0;
+            m_pointBM.y = CANVAS_AREA_H/3.0*2.0;
         else
             m_pointBM.y = 0;
-        m_widthImgBM = IMAGE_W/3*2;
-        m_heightImgBM = IMAGE_H/3*2;
+        m_widthImgBM = CANVAS_AREA_W/3*2;
+        m_heightImgBM = CANVAS_AREA_H/3*2;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
         else
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H/3*2;
-        m_heightScaleYM = IMAGE_H/3.0;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3*2;
+        m_heightScaleYM = CANVAS_AREA_H/3.0;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
 
         break;
     case (FormatM::BM12_UD):
         m_format = U1D2;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0, IMAGE_W, IMAGE_H/3.0*2.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // BM line
         m_drawMline = true;
-        m_pointBM.x = IMAGE_W/2;
+        m_pointBM.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointBM.y = IMAGE_H/3.0;
+            m_pointBM.y = CANVAS_AREA_H/3.0;
         else
             m_pointBM.y = 0;
-        m_widthImgBM = IMAGE_W/3;
-        m_heightImgBM = IMAGE_H/3;
+        m_widthImgBM = CANVAS_AREA_W/3;
+        m_heightImgBM = CANVAS_AREA_H/3;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
         else
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H/3;
-        m_heightScaleYM = IMAGE_H/3.0*2.0;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3;
+        m_heightScaleYM = CANVAS_AREA_H/3.0*2.0;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
 
         break;
     case (FormatM::BM11_LR):
         m_format = L1R1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
         m_countSD = 1;
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.clear();
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
         m_pointScaleY.clear();
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // BM line
         m_drawMline = true;
-        m_pointBM.x = IMAGE_W/4;
+        m_pointBM.x = CANVAS_AREA_W/4;
         if (m_UDStatus)
-            m_pointBM.y = IMAGE_H;
+            m_pointBM.y = CANVAS_AREA_H;
         else
             m_pointBM.y = 0;
-        m_widthImgBM = IMAGE_W/2;
-        m_heightImgBM = IMAGE_H;
+        m_widthImgBM = CANVAS_AREA_W/2;
+        m_heightImgBM = CANVAS_AREA_H;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointScaleYM.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
-        m_heightScaleYM = IMAGE_H; // - m_scaleYSpacing / m_ratio2D;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        m_heightScaleYM = CANVAS_AREA_H; // - m_scaleYSpacing / m_ratio2D;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X + IMAGE_W/2;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W/2;
+        m_pointScaleXM.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W/2;
         break;
     }
 }
@@ -1077,243 +1071,243 @@ void ImageAreaDraw::ChangeFormatAnatomicM(FormatM::EFormatM format) {
         break;
     case (FormatM::BM11_UD):
         m_format = U1D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/2);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/2, IMAGE_W, IMAGE_H/2);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/2);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W, CANVAS_AREA_H/2);
         // scan direction
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/2;
+        m_heightClearScaleY = CANVAS_AREA_H/2;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
         else
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H/2;
-        m_heightScaleYM = IMAGE_H/2;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
+        m_heightScaleYM = CANVAS_AREA_H/2;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
 
         break;
     case (FormatM::BM21_UD):
         m_format = U2D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0*2.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0*2.0, IMAGE_W, IMAGE_H/3.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0*2.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;    // --50-- To be confirmed --
+        m_heightScaleY = (CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;    // --50-- To be confirmed --
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0*2.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0*2.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50 - 5; // --50-- To be confirmed --
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50 - 5; // --50-- To be confirmed --
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
         else
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H/3*2;
-        m_heightScaleYM = IMAGE_H/3.0;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3*2;
+        m_heightScaleYM = CANVAS_AREA_H/3.0;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
 
         break;
     case (FormatM::BM12_UD):
         m_format = U1D2;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0, IMAGE_W, IMAGE_H/3.0*2.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
         else
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H/3;
-        m_heightScaleYM = IMAGE_H/3.0*2.0;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3;
+        m_heightScaleYM = CANVAS_AREA_H/3.0*2.0;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W;
+        m_pointScaleXM.x = CANVAS_IMAGE_X;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W;
 
         break;
     case (FormatM::BM11_LR):
         m_format = L1R1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
 
         m_countSD = 1;
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.clear();
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
         m_pointScaleY.clear();
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // Scale Y M
-        m_pointScaleYM.x = IMAGE_X + IMAGE_W;
+        m_pointScaleYM.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (m_UDStatus)
-            m_pointScaleYM.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointScaleYM.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
-        m_heightScaleYM = IMAGE_H; // - m_scaleYSpacing / m_ratio2D;
+            m_pointScaleYM.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        m_heightScaleYM = CANVAS_AREA_H; // - m_scaleYSpacing / m_ratio2D;
 
         // Scale X M
-        m_pointScaleXM.x = IMAGE_X + IMAGE_W/2;
-        m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-        m_widthScaleXM = IMAGE_W/2;
+        m_pointScaleXM.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+        m_pointScaleXM.y = CANVAS_IMAGE_Y + CANVAS_AREA_H;
+        m_widthScaleXM = CANVAS_AREA_W/2;
         break;
     }
 }
@@ -1324,60 +1318,60 @@ void ImageAreaDraw::ChangeFormatMInit(void) {
     GdkPoint clearScaleY;
 
     m_format = SINGLEB;
-    m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+    m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
     m_ptrImg->UpdateSpectraArea(0, 0, 0, 0);
 
     // scan direction
     m_countSD = 1;
     if (m_UDStatus && !m_LRStatus) {
-        pointSD.x = IMAGE_X + 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else if (m_LRStatus && !m_UDStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W - 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     } else if (m_UDStatus && m_LRStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W - 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else {
-        pointSD.x = IMAGE_X + 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     }
     m_pointSD.clear();
     m_pointSD.push_back(pointSD);
 
     // scale y
     m_countScaleY = 1;
-    m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-    pointScaleY.x = IMAGE_X + IMAGE_W;
+    m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+    pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
     if (m_UDStatus)
-        pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+        pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
     else
-        pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
     m_pointScaleY.clear();
     m_pointScaleY.push_back(pointScaleY);
 
     m_clearScaleY.clear();
-    clearScaleY.x = IMAGE_X + IMAGE_W;
-    clearScaleY.y = IMAGE_Y;
+    clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+    clearScaleY.y = CANVAS_IMAGE_Y;
     m_clearScaleY.push_back(clearScaleY);
-    m_heightClearScaleY = IMAGE_H;
+    m_heightClearScaleY = CANVAS_AREA_H;
 
     // focus
-    m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+    m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
     if (m_UDStatus)
-        m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+        m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
     else
-        m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
     // BM line
     m_drawMline = true;
-    m_pointBM.x = IMAGE_W/2;
+    m_pointBM.x = CANVAS_AREA_W/2;
     if (m_UDStatus)
-        m_pointBM.y = IMAGE_H;
+        m_pointBM.y = CANVAS_AREA_H;
     else
         m_pointBM.y = 0;
-    m_widthImgBM = IMAGE_W;
-    m_heightImgBM = IMAGE_H;
+    m_widthImgBM = CANVAS_AREA_W;
+    m_heightImgBM = CANVAS_AREA_H;
 }
 
 void ImageAreaDraw::ChangeFormatPw(FormatPw::EFormatPw format) {
@@ -1388,7 +1382,7 @@ void ImageAreaDraw::ChangeFormatPw(FormatPw::EFormatPw format) {
     switch(format) {
     case (FormatPw::P_TOTAL):
         m_ptrImg->UpdateSymbolArea(0, 0, 0, 0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
         m_countSD = 0;
 
         // scale y
@@ -1398,291 +1392,291 @@ void ImageAreaDraw::ChangeFormatPw(FormatPw::EFormatPw format) {
         m_drawSV = false;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         break;
     case (FormatPw::BP11_UD):
         m_format = U1D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/2);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/2, IMAGE_W, IMAGE_H/2);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/2);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W, CANVAS_AREA_H/2);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/2;
+        m_heightClearScaleY = CANVAS_AREA_H/2;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/2;
+        m_pointPw.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H/2;
+            m_pointPw.y = CANVAS_AREA_H/2;
         else
             m_pointPw.y = 0;
-        m_heightImgPw = IMAGE_H/2;
-        m_widthImgPw = IMAGE_W/2;
+        m_heightImgPw = CANVAS_AREA_H/2;
+        m_widthImgPw = CANVAS_AREA_W/2;
         m_zoomRatioPw = 1.0/2.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2 + IMAGE_H/4;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H/2;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + CANVAS_AREA_H/4;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H/2;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         break;
     case (FormatPw::BP21_UD):
         m_format = U2D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0*2.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0*2.0, IMAGE_W, IMAGE_H/3.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0*2.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;
+        m_heightScaleY = (CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0*2.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0*2.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50- 5; // -- To be confirmed --
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50- 5; // -- To be confirmed --
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/2;
+        m_pointPw.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H/3.0*2.0;
+            m_pointPw.y = CANVAS_AREA_H/3.0*2.0;
         else
             m_pointPw.y = 0;
-        m_heightImgPw = IMAGE_H / 3.0 * 2.0;
-        m_widthImgPw = IMAGE_W / 3.0 *2.0;
+        m_heightImgPw = CANVAS_AREA_H / 3.0 * 2.0;
+        m_widthImgPw = CANVAS_AREA_W / 3.0 *2.0;
         m_zoomRatioPw = 2.0/3.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H / 6.0 * 5.0;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H/3.0;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 6.0 * 5.0;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H/3.0;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         break;
     case (FormatPw::BP12_UD):
         m_format = U1D2;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0, IMAGE_W, IMAGE_H/3.0*2.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/2;
+        m_pointPw.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H/3.0;
+            m_pointPw.y = CANVAS_AREA_H/3.0;
         else
             m_pointPw.y = 0;
-        m_heightImgPw = IMAGE_H / 3.0;
-        m_widthImgPw = IMAGE_W / 3.0;
+        m_heightImgPw = CANVAS_AREA_H / 3.0;
+        m_widthImgPw = CANVAS_AREA_W / 3.0;
         m_zoomRatioPw = 1.0 / 3.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H / 3.0 * 2.0;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H / 3.0 * 2.0;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 3.0 * 2.0;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H / 3.0 * 2.0;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         break;
     case (FormatPw::BP11_LR):
         m_format = L1R1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
 
         m_countSD = 1;
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.clear();
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D)* m_ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D)* m_ratio2D;
         m_pointScaleY.clear();
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/4;
+        m_pointPw.x = CANVAS_AREA_W/4;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H;
+            m_pointPw.y = CANVAS_AREA_H;
         else
             m_pointPw.y = 0;
-        m_heightImgPw = IMAGE_H;
-        m_widthImgPw = IMAGE_W / 2;
+        m_heightImgPw = CANVAS_AREA_H;
+        m_widthImgPw = CANVAS_AREA_W / 2;
         m_zoomRatioPw = 1.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X + IMAGE_W/2;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2;
-        m_widthScaleYPw = IMAGE_W/2;
-        m_heightScaleYPw = IMAGE_H;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
+        m_widthScaleYPw = CANVAS_AREA_W/2;
+        m_heightScaleYPw = CANVAS_AREA_H;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X + IMAGE_W/2;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W/2 * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W/2 * m_ratioXPw;
 
         break;
     }
@@ -1694,59 +1688,59 @@ void ImageAreaDraw::ChangeFormatPwInit(void) {
     GdkPoint clearScaleY;
 
     m_format = SINGLEB;
-    m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+    m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
     m_ptrImg->UpdateSpectraArea(0, 0, 0, 0);
     // ScanDirection
     m_countSD = 1;
     if (m_UDStatus && !m_LRStatus) {
-        pointSD.x = IMAGE_X + 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else if (m_LRStatus && !m_UDStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W - 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     } else if (m_UDStatus && m_LRStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W - 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else {
-        pointSD.x = IMAGE_X + 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     }
     m_pointSD.clear();
     m_pointSD.push_back(pointSD);
 
     // Scale Y
     m_countScaleY = 1;
-    m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-    pointScaleY.x = IMAGE_X + IMAGE_W;
+    m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+    pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
     if (m_UDStatus)
-        pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+        pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
     else
-        pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
     m_pointScaleY.clear();
     m_pointScaleY.push_back(pointScaleY);
 
     m_clearScaleY.clear();
-    clearScaleY.x = IMAGE_X + IMAGE_W;
-    clearScaleY.y = IMAGE_Y;
+    clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+    clearScaleY.y = CANVAS_IMAGE_Y;
     m_clearScaleY.push_back(clearScaleY);
-    m_heightClearScaleY = IMAGE_H;
+    m_heightClearScaleY = CANVAS_AREA_H;
 
     // focus
-    m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+    m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
     if (m_UDStatus)
-        m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+        m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
     else
-        m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
     // sample volumn
     m_drawSV = true;
-    m_pointPw.x = IMAGE_W/2;
+    m_pointPw.x = CANVAS_AREA_W/2;
     if (m_UDStatus)
-        m_pointPw.y = IMAGE_H;
+        m_pointPw.y = CANVAS_AREA_H;
     else
         m_pointPw.y = 0;
-    m_widthImgPw = IMAGE_W;
-    m_heightImgPw = IMAGE_H;
+    m_widthImgPw = CANVAS_AREA_W;
+    m_heightImgPw = CANVAS_AREA_H;
     m_zoomRatioPw = 1.0;
 }
 
@@ -1760,63 +1754,61 @@ void ImageAreaDraw::ChangeFormatCfm(FormatCfm::EFormatCfm format, int curB, doub
     switch(format) {
     case (FormatCfm::B):
         m_format = SINGLEB;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
         // ScanDirection
         m_countSD = 1;
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 50;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 50;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.clear();
         m_pointSD.push_back(pointSD);
 
         // Scale Y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
         if (UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
 
         // cfm Box
-        m_pointCfm.x = IMAGE_W / 2;
+        m_pointCfm.x = CANVAS_AREA_W / 2;
         if (UDStatus)
-            m_pointCfm.y = IMAGE_H;
+            m_pointCfm.y = CANVAS_AREA_H;
         else
             m_pointCfm.y = 0;
         m_zoomRatioCfm = 1.0;
-        //	m_widthImgCfm = IMAGE_W;
-        //	m_heightImgCfm = IMAGE_H;
 
         // Local Zoom
-        m_pointLZ.x = IMAGE_W / 2;
+        m_pointLZ.x = CANVAS_AREA_W / 2;
         if (UDStatus)
-            m_pointLZ.y = IMAGE_H;
+            m_pointLZ.y = CANVAS_AREA_H;
         else
             m_pointLZ.y = 0;
 
@@ -1824,280 +1816,276 @@ void ImageAreaDraw::ChangeFormatCfm(FormatCfm::EFormatCfm format, int curB, doub
     case (FormatCfm::BB):
         m_format = DUAL;
         if (curB == 0)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
         else if (curB == 1)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
 
         m_countSD = 2;
         m_pointSD.clear();
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale Y
         m_countScaleY = 2;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / ratio2D) * ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / ratio2D) * ratio2D;
         m_pointScaleY.clear();
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
         if (curB == 0) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         } else if (curB == 1) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         }
 
         // Cfm Box
         m_zoomRatioCfm = 1.0;
         if (curB == 0) {
-            m_pointCfm.x = IMAGE_W/4;
+            m_pointCfm.x = CANVAS_AREA_W/4;
         } else if (curB == 1) {
-            m_pointCfm.x = IMAGE_W - IMAGE_W/4;
+            m_pointCfm.x = CANVAS_AREA_W - CANVAS_AREA_W/4;
         }
         if (UDStatus)
-            m_pointCfm.y = IMAGE_H;
+            m_pointCfm.y = CANVAS_AREA_H;
         else
             m_pointCfm.y = 0;
-        //	m_widthImgCfm = IMAGE_W/2;
-        //	m_heightImgCfm = IMAGE_H;
 
         break;
     case (FormatCfm::B4):
         m_format = QUAD;
         if (curB == 0)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
         else if (curB == 1)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
         else if (curB == 2)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y+IMAGE_H/2, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
         else if (curB == 3)
-            m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y+IMAGE_H/2, IMAGE_W/2, IMAGE_H/2);
+            m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W/2, CANVAS_AREA_H/2);
 
         // ScanDirection
         m_countSD = 4;
         m_pointSD.clear();
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         }
         m_pointSD.push_back(pointSD);
 
         if (UDStatus && !LRStatus) {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (LRStatus && !UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         } else if (UDStatus && LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-            pointSD.y = IMAGE_Y + 10 + IMAGE_H/2;
+            pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+            pointSD.y = CANVAS_IMAGE_Y + 10 + CANVAS_AREA_H/2;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 4;
-        m_heightScaleY = (IMAGE_H/2 - m_scaleYSpacing / ratio2D) * ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D) * ratio2D;
         m_pointScaleY.clear();
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
-        pointScaleY.x = IMAGE_X + IMAGE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
         if (UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y + IMAGE_H/2;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
         m_clearScaleY.push_back(clearScaleY);
-        clearScaleY.x = IMAGE_X + IMAGE_W;
-        clearScaleY.y = IMAGE_Y + IMAGE_H/2;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
+        clearScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/2;
+        m_heightClearScaleY = CANVAS_AREA_H/2;
 
         // focus
         if (curB == 0) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         } else if (curB == 1) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / ratio2D;
         } else if (curB == 2) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         } else if (curB == 3) {
-            m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+            m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
             if (UDStatus)
-                m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / ratio2D;
             else
-                m_pointFocus.y = IMAGE_Y + IMAGE_H/2 + m_scaleYSpacing / ratio2D;
+                m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + m_scaleYSpacing / ratio2D;
         }
 
         // Cfm Box
         m_zoomRatioCfm = 1.0 / 2.0;
         if (curB == 0) {
-            m_pointCfm.x = IMAGE_W/4;
+            m_pointCfm.x = CANVAS_AREA_W/4;
             if (UDStatus)
-                m_pointCfm.y = IMAGE_H/2;
+                m_pointCfm.y = CANVAS_AREA_H/2;
             else
                 m_pointCfm.y = 0;
         } else if (curB == 1) {
-            m_pointCfm.x = IMAGE_W - IMAGE_W/4;
+            m_pointCfm.x = CANVAS_AREA_W - CANVAS_AREA_W/4;
             if (UDStatus)
-                m_pointCfm.y = IMAGE_H/2;
+                m_pointCfm.y = CANVAS_AREA_H/2;
             else
                 m_pointCfm.y = 0;
         } else if (curB == 2) {
-            m_pointCfm.x = IMAGE_W/4;
+            m_pointCfm.x = CANVAS_AREA_W/4;
             if (UDStatus)
-                m_pointCfm.y = IMAGE_H;
+                m_pointCfm.y = CANVAS_AREA_H;
             else
-                m_pointCfm.y = IMAGE_H/2;
+                m_pointCfm.y = CANVAS_AREA_H/2;
         } else if (curB == 3) {
-            m_pointCfm.x = IMAGE_W - IMAGE_W/4;
+            m_pointCfm.x = CANVAS_AREA_W - CANVAS_AREA_W/4;
             if (UDStatus)
-                m_pointCfm.y = IMAGE_H;
+                m_pointCfm.y = CANVAS_AREA_H;
             else
-                m_pointCfm.y = IMAGE_H/2;
+                m_pointCfm.y = CANVAS_AREA_H/2;
         }
-        //	m_widthImgCfm = IMAGE_W/2;
-        //	m_heightImgCfm = IMAGE_H/2;
 
         break;
     }
@@ -2110,7 +2098,7 @@ void ImageAreaDraw::ChangeFormatPwCfm(FormatPw::EFormatPw format) {
 
     switch(format) {
     case (FormatPw::P_TOTAL):
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H);
         m_ptrImg->UpdateSymbolArea(0, 0, 0, 0);
         m_countSD = 0;
 
@@ -2121,89 +2109,89 @@ void ImageAreaDraw::ChangeFormatPwCfm(FormatPw::EFormatPw format) {
         m_drawSV = false;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         break;
     case (FormatPw::BP11_UD):
         m_format = U1D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/2);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/2, IMAGE_W, IMAGE_H/2);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/2);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/2, CANVAS_AREA_W, CANVAS_AREA_H/2);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H/2 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/2;
+        m_heightClearScaleY = CANVAS_AREA_H/2;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/2 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/2;
+        m_pointPw.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H/2;
+            m_pointPw.y = CANVAS_AREA_H/2;
         else
             m_pointPw.y = 0;
-        m_widthImgPw = IMAGE_W/2;
-        m_heightImgPw = IMAGE_H/2;
+        m_widthImgPw = CANVAS_AREA_W/2;
+        m_heightImgPw = CANVAS_AREA_H/2;
         m_zoomRatioPw = 1.0/2.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2 + IMAGE_H/4;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H/2;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2 + CANVAS_AREA_H/4;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H/2;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         // cfm Box
-        m_pointCfm.x = IMAGE_W / 2;
+        m_pointCfm.x = CANVAS_AREA_W / 2;
         if (m_UDStatus)
-            m_pointCfm.y = IMAGE_H / 2;
+            m_pointCfm.y = CANVAS_AREA_H / 2;
         else
             m_pointCfm.y = 0;
         m_zoomRatioCfm = 1.0/2.0;
@@ -2211,76 +2199,76 @@ void ImageAreaDraw::ChangeFormatPwCfm(FormatPw::EFormatPw format) {
         break;
     case (FormatPw::BP21_UD):
         m_format = U2D1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0*2.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0*2.0, IMAGE_W, IMAGE_H/3.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0*2.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0*2.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;
+        m_heightScaleY = (CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0*2.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0*2.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4 + 50- 5; // -- To be confirmed --
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4 + 50- 5; // -- To be confirmed --
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0*2.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/2;
+        m_pointPw.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H/3.0*2.0;
+            m_pointPw.y = CANVAS_AREA_H/3.0*2.0;
         else
             m_pointPw.y = 0;
-        m_widthImgPw = IMAGE_W / 3.0 * 2.0;
-        m_heightImgPw = IMAGE_H / 3.0 * 2.0;
+        m_widthImgPw = CANVAS_AREA_W / 3.0 * 2.0;
+        m_heightImgPw = CANVAS_AREA_H / 3.0 * 2.0;
         m_zoomRatioPw = 2.0/3.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H / 6.0 * 5.0;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H/3.0;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 6.0 * 5.0;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H/3.0;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         // cfm Box
-        m_pointCfm.x = IMAGE_W / 2;
+        m_pointCfm.x = CANVAS_AREA_W / 2;
         if (m_UDStatus)
-            m_pointCfm.y = IMAGE_H / 3.0 * 2.0;
+            m_pointCfm.y = CANVAS_AREA_H / 3.0 * 2.0;
         else
             m_pointCfm.y = 0;
         m_zoomRatioCfm = 2.0/3.0;
@@ -2288,76 +2276,76 @@ void ImageAreaDraw::ChangeFormatPwCfm(FormatPw::EFormatPw format) {
         break;
     case (FormatPw::BP12_UD):
         m_format = U1D2;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H/3.0);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X, IMAGE_Y+IMAGE_H/3.0, IMAGE_W, IMAGE_H/3.0*2.0);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W, CANVAS_AREA_H/3.0);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y+CANVAS_AREA_H/3.0, CANVAS_AREA_W, CANVAS_AREA_H/3.0*2.0);
 
         m_countSD = 1;
         m_pointSD.clear();
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/4*3 - 60;
-            pointSD.y = IMAGE_Y + IMAGE_H/3.0 - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4*3 - 60;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - 10;
         } else {
-            pointSD.x = IMAGE_X + IMAGE_W/4 + 60;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/4 + 60;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
-        pointScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_heightScaleY = (CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.clear();
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H/3.0;
+        m_heightClearScaleY = CANVAS_AREA_H/3.0;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W - IMAGE_W/4;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - CANVAS_AREA_W/4;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H/3.0 - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/3.0 - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/2;
+        m_pointPw.x = CANVAS_AREA_W/2;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H/3.0;
+            m_pointPw.y = CANVAS_AREA_H/3.0;
         else
             m_pointPw.y = 0;
-        m_heightImgPw = IMAGE_H / 3.0;
-        m_widthImgPw = IMAGE_W / 3.0;
+        m_heightImgPw = CANVAS_AREA_H / 3.0;
+        m_widthImgPw = CANVAS_AREA_W / 3.0;
         m_zoomRatioPw = 1.0 / 3.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H / 3.0 * 2.0;
-        m_widthScaleYPw = IMAGE_W;
-        m_heightScaleYPw = IMAGE_H / 3.0 * 2.0;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 3.0 * 2.0;
+        m_widthScaleYPw = CANVAS_AREA_W;
+        m_heightScaleYPw = CANVAS_AREA_H / 3.0 * 2.0;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W * m_ratioXPw;
 
         // cfm Box
-        m_pointCfm.x = IMAGE_W / 2;
+        m_pointCfm.x = CANVAS_AREA_W / 2;
         if (m_UDStatus)
-            m_pointCfm.y = IMAGE_H / 3.0;
+            m_pointCfm.y = CANVAS_AREA_H / 3.0;
         else
             m_pointCfm.y = 0;
         m_zoomRatioCfm = 1.0/3.0;
@@ -2365,76 +2353,76 @@ void ImageAreaDraw::ChangeFormatPwCfm(FormatPw::EFormatPw format) {
         break;
     case (FormatPw::BP11_LR):
         m_format = L1R1;
-        m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W/2, IMAGE_H);
-        m_ptrImg->UpdateSpectraArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+        m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
+        m_ptrImg->UpdateSpectraArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
 
         m_countSD = 1;
         if (m_UDStatus && !m_LRStatus) {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else if (m_LRStatus && !m_UDStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         } else if (m_UDStatus && m_LRStatus) {
-            pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-            pointSD.y = IMAGE_Y + IMAGE_H - 10;
+            pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+            pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
         } else {
-            pointSD.x = IMAGE_X + 30;
-            pointSD.y = IMAGE_Y + 10;
+            pointSD.x = CANVAS_IMAGE_X + 30;
+            pointSD.y = CANVAS_IMAGE_Y + 10;
         }
         m_pointSD.clear();
         m_pointSD.push_back(pointSD);
 
         // scale y
         m_countScaleY = 1;
-        m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D)* m_ratio2D;
+        m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D)* m_ratio2D;
         m_pointScaleY.clear();
-        pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
+        pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
         if (m_UDStatus)
-            pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
         m_pointScaleY.push_back(pointScaleY);
 
         m_clearScaleY.clear();
-        clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-        clearScaleY.y = IMAGE_Y;
+        clearScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W;
+        clearScaleY.y = CANVAS_IMAGE_Y;
         m_clearScaleY.push_back(clearScaleY);
-        m_heightClearScaleY = IMAGE_H;
+        m_heightClearScaleY = CANVAS_AREA_H;
 
         // focus
-        m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
+        m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - SCALE_W - 5;
         if (m_UDStatus)
-            m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
         else
-            m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+            m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
         // sample volumn
         m_drawSV = true;
-        m_pointPw.x = IMAGE_W/4;
+        m_pointPw.x = CANVAS_AREA_W/4;
         if (m_UDStatus)
-            m_pointPw.y = IMAGE_H;
+            m_pointPw.y = CANVAS_AREA_H;
         else
             m_pointPw.y = 0;
-        m_heightImgPw = IMAGE_H;
-        m_widthImgPw = IMAGE_W / 2;
+        m_heightImgPw = CANVAS_AREA_H;
+        m_widthImgPw = CANVAS_AREA_W / 2;
         m_zoomRatioPw = 1.0;
 
         // scale Y pw
-        m_pointScaleYPw.x = IMAGE_X + IMAGE_W/2;
-        m_pointScaleYPw.y = IMAGE_Y + IMAGE_H/2;
-        m_widthScaleYPw = IMAGE_W/2;
-        m_heightScaleYPw = IMAGE_H;
+        m_pointScaleYPw.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+        m_pointScaleYPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H/2;
+        m_widthScaleYPw = CANVAS_AREA_W/2;
+        m_heightScaleYPw = CANVAS_AREA_H;
 
         // scale X pw
-        m_pointScaleXPw.x = IMAGE_X + IMAGE_W/2;
-        m_pointScaleXPw.y = IMAGE_Y + IMAGE_H + 2;
-        m_widthScaleXPw = IMAGE_W/2 * m_ratioXPw;
+        m_pointScaleXPw.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2;
+        m_pointScaleXPw.y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 2;
+        m_widthScaleXPw = CANVAS_AREA_W/2 * m_ratioXPw;
 
         // cfm Box
-        m_pointCfm.x = IMAGE_W / 4;
+        m_pointCfm.x = CANVAS_AREA_W / 4;
         if (m_UDStatus)
-            m_pointCfm.y = IMAGE_H;
+            m_pointCfm.y = CANVAS_AREA_H;
         else
             m_pointCfm.y = 0;
         m_zoomRatioCfm = 1.0;
@@ -2446,9 +2434,9 @@ void ImageAreaDraw::ChangeFormatPwCfm(FormatPw::EFormatPw format) {
 void ImageAreaDraw::ChangeFormatPwCfmInit(void) {
     ChangeFormatPwInit();
     // cfm Box
-    m_pointCfm.x = IMAGE_W / 2;
+    m_pointCfm.x = CANVAS_AREA_W / 2;
     if (m_UDStatus)
-        m_pointCfm.y = IMAGE_H;
+        m_pointCfm.y = CANVAS_AREA_H;
     else
         m_pointCfm.y = 0;
     m_zoomRatioCfm = 1.0;
@@ -2458,92 +2446,65 @@ void ImageAreaDraw::ChangeFormatColorVs2D(void) {
     GdkPoint pointSD;
     GdkPoint pointScaleY;
     m_format = DUAL;
-    // GdkPoint clearScaleY;
-    //  m_ptrImg->UpdateSymbolArea(IMAGE_X, IMAGE_Y, IMAGE_W, IMAGE_H);
-    m_ptrImg->UpdateSymbolArea(IMAGE_X+IMAGE_W/2, IMAGE_Y, IMAGE_W/2, IMAGE_H);
+    m_ptrImg->UpdateSymbolArea(CANVAS_IMAGE_X+CANVAS_AREA_W/2, CANVAS_IMAGE_Y, CANVAS_AREA_W/2, CANVAS_AREA_H);
     m_ptrImg->UpdateSpectraArea(0, 0, 0, 0);
 
     m_countSD = 2;
     m_pointSD.clear();
 
     if (m_UDStatus && !m_LRStatus) {
-        pointSD.x = IMAGE_X + 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else if (m_LRStatus && !m_UDStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     } else if (m_UDStatus && m_LRStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W/2 - 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 - 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else {
-        pointSD.x = IMAGE_X + 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     }
     m_pointSD.push_back(pointSD);
 
     if (m_UDStatus && !m_LRStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W/2 + 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W/2 + 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else if (m_LRStatus && !m_UDStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W - 30;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     } else if (m_UDStatus && m_LRStatus) {
-        pointSD.x = IMAGE_X + IMAGE_W - 30;
-        pointSD.y = IMAGE_Y + IMAGE_H - 10;
+        pointSD.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 30;
+        pointSD.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - 10;
     } else {
-        pointSD.x = IMAGE_X + 30 + IMAGE_W/2;
-        pointSD.y = IMAGE_Y + 10;
+        pointSD.x = CANVAS_IMAGE_X + 30 + CANVAS_AREA_W/2;
+        pointSD.y = CANVAS_IMAGE_Y + 10;
     }
     m_pointSD.push_back(pointSD);
 
     // scale Y
     m_countScaleY = 1;
-    m_heightScaleY = (IMAGE_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
+    m_heightScaleY = (CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D) * m_ratio2D;
     m_pointScaleY.clear();
 
-    // pointScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-    // if (m_UDStatus)
-    // 	pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
-    // else
-    // 	pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
-    // m_pointScaleY.push_back(pointScaleY);
-
-    pointScaleY.x = IMAGE_X + IMAGE_W;
+    pointScaleY.x = CANVAS_IMAGE_X + CANVAS_AREA_W;
     if (m_UDStatus)
-        pointScaleY.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+        pointScaleY.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
     else
-        pointScaleY.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
+        pointScaleY.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
     m_pointScaleY.push_back(pointScaleY);
 
-    // m_clearScaleY.clear();
-    // clearScaleY.x = IMAGE_X + IMAGE_W/2 - SCALE_W;
-    // clearScaleY.y = IMAGE_Y;
-    // m_clearScaleY.push_back(clearScaleY);
-    // clearScaleY.x = IMAGE_X + IMAGE_W;
-    // clearScaleY.y = IMAGE_Y;
-    // m_clearScaleY.push_back(clearScaleY);
-    // m_heightClearScaleY = IMAGE_H;
-
-    // focus
-    // if (m_curB == 0) {
-    // 	m_pointFocus.x = IMAGE_X + IMAGE_W/2 - SCALE_W - 5;
-    // 	if (m_UDStatus)
-    // 	    m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
-    // 	else
-    // 	    m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
-    // } else if (m_curB == 1) {
-    m_pointFocus.x = IMAGE_X + IMAGE_W - 5;
+    m_pointFocus.x = CANVAS_IMAGE_X + CANVAS_AREA_W - 5;
     if (m_UDStatus)
-        m_pointFocus.y = IMAGE_Y + IMAGE_H - m_scaleYSpacing / m_ratio2D;
+        m_pointFocus.y = CANVAS_IMAGE_Y + CANVAS_AREA_H - m_scaleYSpacing / m_ratio2D;
     else
-        m_pointFocus.y = IMAGE_Y + m_scaleYSpacing / m_ratio2D;
-    // }
+        m_pointFocus.y = CANVAS_IMAGE_Y + m_scaleYSpacing / m_ratio2D;
 
     // Cfm Box
     m_zoomRatioCfm = 1.0;
-    m_pointCfm.x = IMAGE_W - IMAGE_W/4;
+    m_pointCfm.x = CANVAS_AREA_W - CANVAS_AREA_W/4;
     if (m_UDStatus)
-        m_pointCfm.y = IMAGE_H;
+        m_pointCfm.y = CANVAS_AREA_H;
     else
         m_pointCfm.y = 0;
 }
@@ -2586,10 +2547,10 @@ void ImageAreaDraw::GetBoundary(int &up, int &down, int &left, int &right) {
             || ((scanMode == ScanMode::CW) && (formatPw == FormatPw::BP11_UD))
             || ((scanMode == ScanMode::CWCFM) && (formatPw == FormatPw::BP11_UD))
             || ((scanMode == ScanMode::CWPDI) && (formatPw == FormatPw::BP11_UD))) {
-        up = IMAGE_H/2;
-        down = IMAGE_H-1;
+        up = CANVAS_AREA_H/2;
+        down = CANVAS_AREA_H-1;
         left = 0;
-        right = IMAGE_W-1;
+        right = CANVAS_AREA_W-1;
     } else if (((scanMode == ScanMode::M) && (formatM == FormatM::BM21_UD))
                || ((scanMode == ScanMode::ANATOMIC_M) && (formatM == FormatM::BM21_UD))
                || ((scanMode == ScanMode::PW) && (formatPw == FormatPw::BP21_UD))
@@ -2601,10 +2562,10 @@ void ImageAreaDraw::GetBoundary(int &up, int &down, int &left, int &right) {
                || ((scanMode == ScanMode::CW) && (formatPw == FormatPw::BP21_UD))
                || ((scanMode == ScanMode::CWCFM) && (formatPw == FormatPw::BP21_UD))
                || ((scanMode == ScanMode::CWPDI) && (formatPw == FormatPw::BP21_UD)) ) {
-        up = (IMAGE_H / 3.0) * 2.0;
-        down = IMAGE_H-1;
+        up = (CANVAS_AREA_H / 3.0) * 2.0;
+        down = CANVAS_AREA_H-1;
         left = 0;
-        right = IMAGE_W-1;
+        right = CANVAS_AREA_W-1;
     } else if (((scanMode == ScanMode::M) && (formatM == FormatM::BM12_UD))
                || ((scanMode == ScanMode::ANATOMIC_M) && (formatM == FormatM::BM12_UD))
                || ((scanMode == ScanMode::PW) && (formatPw == FormatPw::BP12_UD))
@@ -2616,10 +2577,10 @@ void ImageAreaDraw::GetBoundary(int &up, int &down, int &left, int &right) {
                || ((scanMode == ScanMode::CW) && (formatPw == FormatPw::BP12_UD))
                || ((scanMode == ScanMode::CWCFM) && (formatPw == FormatPw::BP12_UD))
                || ((scanMode == ScanMode::CWPDI) && (formatPw == FormatPw::BP12_UD)) ) {
-        up = IMAGE_H/3.0;
-        down = IMAGE_H-1;
+        up = CANVAS_AREA_H/3.0;
+        down = CANVAS_AREA_H-1;
         left = 0;
-        right = IMAGE_W-1;
+        right = CANVAS_AREA_W-1;
     } else if (((scanMode == ScanMode::M) && (formatM == FormatM::BM11_LR))
                || ((scanMode == ScanMode::ANATOMIC_M) && (formatM == FormatM::BM11_LR))
                || ((scanMode == ScanMode::PW) && (formatPw == FormatPw::BP11_LR))
@@ -2632,9 +2593,9 @@ void ImageAreaDraw::GetBoundary(int &up, int &down, int &left, int &right) {
                || ((scanMode == ScanMode::CWCFM) && (formatPw == FormatPw::BP11_LR))
                || ((scanMode == ScanMode::CWPDI) && (formatPw == FormatPw::BP11_LR)) ) {
         up = 0;
-        down = IMAGE_H-1;
-        left = IMAGE_W/2;
-        right = IMAGE_W-1;
+        down = CANVAS_AREA_H-1;
+        left = CANVAS_AREA_W/2;
+        right = CANVAS_AREA_W-1;
     } else if (((scanMode == ScanMode::M) && (formatM == FormatM::M_TOTAL))
                || ((scanMode == ScanMode::ANATOMIC_M) && (formatM == FormatM::M_TOTAL))
                || ((scanMode == ScanMode::PW) && (formatPw == FormatPw::P_TOTAL))
@@ -2647,9 +2608,9 @@ void ImageAreaDraw::GetBoundary(int &up, int &down, int &left, int &right) {
                || ((scanMode == ScanMode::CWCFM) && (formatPw == FormatPw::P_TOTAL))
                || ((scanMode == ScanMode::CWPDI) && (formatPw == FormatPw::P_TOTAL))) {
         up = 0;
-        down = IMAGE_H-1;
+        down = CANVAS_AREA_H-1;
         left = 0;
-        right = IMAGE_W-1;
+        right = CANVAS_AREA_W-1;
     }
 }
 
@@ -2665,20 +2626,20 @@ int ImageAreaDraw::GetPointPos(int x, int y) {
         format_cfm = modeStatus.GetFormatCfm();
 
     if (format_2d == Format2D::BB || format_cfm == FormatCfm::BB) {
-        if (x >= 0 && x <= IMAGE_W / 2)
+        if (x >= 0 && x <= CANVAS_AREA_W / 2)
             return 0;
-        else if (x > IMAGE_W / 2 && x <= IMAGE_W)
+        else if (x > CANVAS_AREA_W / 2 && x <= CANVAS_AREA_W)
             return 1;
         else
             return -1;
     } else if (format_2d == Format2D::B4 || format_cfm == FormatCfm::B4) {
-        if (x >= 0 && x <= IMAGE_W/2 && y >= 0 && y <= IMAGE_H/2)
+        if (x >= 0 && x <= CANVAS_AREA_W/2 && y >= 0 && y <= CANVAS_AREA_H/2)
             return 0;
-        else if (x > IMAGE_W/2 && x <= IMAGE_W && y >= 0 && y <= IMAGE_H/2)
+        else if (x > CANVAS_AREA_W/2 && x <= CANVAS_AREA_W && y >= 0 && y <= CANVAS_AREA_H/2)
             return 1;
-        else if (x >= 0 && x <= IMAGE_W/2 && y > IMAGE_H/2 && y <= IMAGE_H)
+        else if (x >= 0 && x <= CANVAS_AREA_W/2 && y > CANVAS_AREA_H/2 && y <= CANVAS_AREA_H)
             return 2;
-        else if (x > IMAGE_W/2 && x <= IMAGE_W && y > IMAGE_H/2 && y <= IMAGE_H)
+        else if (x > CANVAS_AREA_W/2 && x <= CANVAS_AREA_W && y > CANVAS_AREA_H/2 && y <= CANVAS_AREA_H)
             return 3;
         else
             return -1;
@@ -2699,69 +2660,68 @@ void ImageAreaDraw::GetAnatomicBoundary(int &up, int &down, int &left, int &righ
         formatM = modeStatus.GetFormatM();
     } else {
         up = 0;
-        down = IMAGE_H;
+        down = CANVAS_AREA_H;
         left = 0;
-        right = IMAGE_W;
+        right = CANVAS_AREA_W;
         return;
     }
 
     if (formatM == FormatM::BM11_UD) {
         up = 0;
-        down = IMAGE_H/2;
-        left = IMAGE_W/4;
-        right = IMAGE_W/4*3;
+        down = CANVAS_AREA_H/2;
+        left = CANVAS_AREA_W/4;
+        right = CANVAS_AREA_W/4*3;
     } else if (formatM == FormatM::BM21_UD) {
         up = 0;
-        down = (IMAGE_H / 3.0 * 2.0);
-        left = IMAGE_W/4;
-        right = IMAGE_W/4*3;
+        down = (CANVAS_AREA_H / 3.0 * 2.0);
+        left = CANVAS_AREA_W/4;
+        right = CANVAS_AREA_W/4*3;
     } else if (formatM == FormatM::BM12_UD) {
         up = 0;
-        down = (IMAGE_H / 3.0);
-        left = IMAGE_W/4;
-        right = IMAGE_W/4*3;
+        down = (CANVAS_AREA_H / 3.0);
+        left = CANVAS_AREA_W/4;
+        right = CANVAS_AREA_W/4*3;
     } else if (formatM == FormatM::BM11_LR) {
         up = 0;
-        down = IMAGE_H;
+        down = CANVAS_AREA_H;
         left = 0;
-        right = IMAGE_W/2;
+        right = CANVAS_AREA_W/2;
     } else if (formatM == FormatM::M_TOTAL) {
         up = 0;
-        down = IMAGE_H;
+        down = CANVAS_AREA_H;
         left = 0;
-        right = IMAGE_W;
+        right = CANVAS_AREA_W;
     }
 }
 
-// ========================= [2D] =========================
 void ImageAreaDraw::CalcScanDirection(int &xPos, int &yPos) {
     int width = 0, height = 0;
     switch (m_format) {
     case SINGLEB:
-        width = IMAGE_W;
-        height = IMAGE_H;
+        width = CANVAS_AREA_W;
+        height = CANVAS_AREA_H;
         break;
     case DUAL:
     case L1R1:
-        width = IMAGE_W/2;
-        height = IMAGE_H;
+        width = CANVAS_AREA_W/2;
+        height = CANVAS_AREA_H;
         break;
     case QUAD:
     case U1D1:
-        width = IMAGE_W/2;
-        height = IMAGE_H/2;
+        width = CANVAS_AREA_W/2;
+        height = CANVAS_AREA_H/2;
         break;
     case U2D1:
-        width = IMAGE_W*2/3;
-        height = IMAGE_H*2/3;
+        width = CANVAS_AREA_W*2/3;
+        height = CANVAS_AREA_H*2/3;
         break;
     case U1D2:
-        width = IMAGE_W/3;
-        height = IMAGE_H/3;
+        width = CANVAS_AREA_W/3;
+        height = CANVAS_AREA_H/3;
         break;
     default:
-        width = IMAGE_W;
-        height = IMAGE_H;
+        width = CANVAS_AREA_W;
+        height = CANVAS_AREA_H;
         break;
     }
 
@@ -2822,15 +2782,15 @@ void ImageAreaDraw::CalcScanDirection(int &xPos, int &yPos) {
         startY = 0;
         break;
     case U1D2:
-        startX = (IMAGE_W- (double)IMAGE_W/3) / 2;
+        startX = (CANVAS_AREA_W- (double)CANVAS_AREA_W/3) / 2;
         startY = 0;
         break;
     case U2D1:
-        startX = (IMAGE_W- (double)IMAGE_W*2/3) / 2;
+        startX = (CANVAS_AREA_W- (double)CANVAS_AREA_W*2/3) / 2;
         startY = 0;
         break;
     case U1D1:
-        startX = (IMAGE_W- (double)IMAGE_W/2) / 2;
+        startX = (CANVAS_AREA_W- (double)CANVAS_AREA_W/2) / 2;
         startY = 0;
         break;
     case DUAL: {
@@ -2838,7 +2798,7 @@ void ImageAreaDraw::CalcScanDirection(int &xPos, int &yPos) {
             startX = 0;
             startY = 0;
         } else {
-            startX = IMAGE_W/2;
+            startX = CANVAS_AREA_W/2;
             startY = 0;
         }
     }
@@ -2848,21 +2808,21 @@ void ImageAreaDraw::CalcScanDirection(int &xPos, int &yPos) {
             startX = 0;
             startY = 0;
         } else if (m_curB == 1) {
-            startX = IMAGE_W/2;
+            startX = CANVAS_AREA_W/2;
             startY = 0;
         } else if (m_curB == 2) {
             startX = 0;
-            startY = IMAGE_H/2;
+            startY = CANVAS_AREA_H/2;
         } else if(m_curB == 3) {
-            startX = IMAGE_W/2;
-            startY = IMAGE_H/2;
+            startX = CANVAS_AREA_W/2;
+            startY = CANVAS_AREA_H/2;
         }
     }
     break;
     }
 
-    xPos = IMAGE_X + x0 + startX;
-    yPos = IMAGE_Y + y0 + startY;
+    xPos = CANVAS_IMAGE_X + x0 + startX;
+    yPos = CANVAS_IMAGE_Y + y0 + startY;
 }
 
 void ImageAreaDraw::DrawScanDirection(bool update) {
@@ -2894,16 +2854,6 @@ void ImageAreaDraw::DrawScanDirection(bool update) {
 }
 
 void ImageAreaDraw::SetSDFreeze(bool update) {
-    // int preB;
-    // if (m_formatCfm == FormatCfm::BB || m_format2D == Format2D::BB) {
-    //     if (m_curB == 0) preB = 1;
-    //     else if (m_curB == 1) preB = 0;
-    // } else if (m_formatCfm == FormatCfm::B4 || m_format2D == Format2D::B4) {
-    //     if (m_curB == 0) preB = 3;
-    //     else if (m_curB == 1) preB = 0;
-    //     else if (m_curB == 2) preB = 1;
-    //     else if (m_curB == 3) preB = 2;
-    // }
     for (int i = 0; i < 4; ++i) {
         if (m_drawSD[i]) {
             ScanDirection(m_prePointSD[i].x, m_prePointSD[i].y, false);
@@ -2945,7 +2895,7 @@ void ImageAreaDraw::DrawHScaleY(bool L2R) {
             x = m_pointScaleY[curB].x + (int)(i/m_ratio2D) - zoom_offset_pixel;
         else
             x = m_pointScaleY[curB].x - (int)(i/m_ratio2D) + zoom_offset_pixel;
-        if (x < IMAGE_X || x > IMAGE_X + IMAGE_W)
+        if (x < CANVAS_IMAGE_X || x > CANVAS_IMAGE_X + CANVAS_AREA_W)
             continue;
         m_ptrImg->DrawLine(attr, color, x-1, y, x-1, y+SCALE_W, false);
         m_ptrImg->DrawLine(attr, color, x,   y, x,   y+SCALE_W, false);
@@ -2957,7 +2907,7 @@ void ImageAreaDraw::DrawHScaleY(bool L2R) {
             x = m_pointScaleY[curB].x + (int)(i/m_ratio2D) - zoom_offset_pixel;
         else
             x = m_pointScaleY[curB].x - (int)(i/m_ratio2D) + zoom_offset_pixel;
-        if (x < IMAGE_X || x > IMAGE_X + IMAGE_W)
+        if (x < CANVAS_IMAGE_X || x > CANVAS_IMAGE_X + CANVAS_AREA_W)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y, x, y+SCALE_W/2, false);
     }
@@ -2980,7 +2930,7 @@ void ImageAreaDraw::DrawVScaleY(bool U2D, int curB) {
         } else {
             y = m_pointScaleY[curB].y - (int)(i/m_ratio2D) + zoom_offset_pixel;
         }
-        if (y < IMAGE_Y || y > IMAGE_Y + IMAGE_H)
+        if (y < CANVAS_IMAGE_Y || y > CANVAS_IMAGE_Y + CANVAS_AREA_H)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y-1, x+SCALE_W, y-1, false);
         m_ptrImg->DrawLine(attr, color, x, y,   x+SCALE_W, y,   false);
@@ -2992,7 +2942,7 @@ void ImageAreaDraw::DrawVScaleY(bool U2D, int curB) {
             y = (int)(i/m_ratio2D) + m_pointScaleY[curB].y - zoom_offset_pixel;
         else
             y = m_pointScaleY[curB].y - (int)(i/m_ratio2D) + zoom_offset_pixel;
-        if (y < IMAGE_Y || y > IMAGE_Y + IMAGE_H) {
+        if (y < CANVAS_IMAGE_Y || y > CANVAS_IMAGE_Y + CANVAS_AREA_H) {
             continue;
         }
         m_ptrImg->DrawLine(attr, color, x, y, x+SCALE_W/2, y, false);
@@ -3008,8 +2958,8 @@ void ImageAreaDraw::DrawScaleY(bool update) {
     attr.mode.cvDraw = false;
 
     if (m_scanMode == ScanMode::D2 && m_format2D == Format2D::B) {	// must in 2D single B mode
-        m_ptrImg->DrawRectangle(attr, g_black, IMAGE_X + IMAGE_W, IMAGE_Y-1, SCALE_W+2, IMAGE_H+2, true, false);
-        m_ptrImg->DrawRectangle(attr, g_black, IMAGE_X-1, IMAGE_Y+IMAGE_H, IMAGE_W+2, SCALE_W+2, true, false);
+        m_ptrImg->DrawRectangle(attr, g_black, CANVAS_IMAGE_X + CANVAS_AREA_W, CANVAS_IMAGE_Y-1, SCALE_W+2, CANVAS_AREA_H+2, true, false);
+        m_ptrImg->DrawRectangle(attr, g_black, CANVAS_IMAGE_X-1, CANVAS_IMAGE_Y+CANVAS_AREA_H, CANVAS_AREA_W+2, SCALE_W+2, true, false);
 
         if (m_UDStatus) {
             if (m_rotate == 90)
@@ -3032,7 +2982,7 @@ void ImageAreaDraw::DrawScaleY(bool update) {
         }
     } else {
         if ((m_scanMode == ScanMode::M_INIT || m_scanMode == ScanMode::PW_INIT) && (m_rotate != 0 || m_rotate != 180))
-            m_ptrImg->DrawRectangle(attr, g_black, IMAGE_X-1, IMAGE_Y+IMAGE_H, IMAGE_W+2, SCALE_W+2, true, false);
+            m_ptrImg->DrawRectangle(attr, g_black, CANVAS_IMAGE_X-1, CANVAS_IMAGE_Y+CANVAS_AREA_H, CANVAS_AREA_W+2, SCALE_W+2, true, false);
 
         m_ptrImg->DrawRectangle(attr, g_black, m_clearScaleY[m_curB].x, m_clearScaleY[m_curB].y-1, SCALE_W+2, m_heightClearScaleY+2, true, false);
         if (m_UDStatus)
@@ -3084,7 +3034,7 @@ void ImageAreaDraw::SetGrayTable(RGBTRIPLE *table, int size, bool update) {
 }
 
 void ImageAreaDraw::DrawGrayScale(bool update) {
-    const int x = IMAGE_X + IMAGE_W + SCALE_W + TGC_W + IMAGE_TMP + 1;
+    const int x = CANVAS_IMAGE_X + CANVAS_AREA_W + SCALE_W + TGC_W + IMAGE_TMP + 1;
     const int y = 20;
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::PARA;
@@ -3181,7 +3131,7 @@ void ImageAreaDraw::VerFocus(vector<int> &focPos, bool draw, bool U2D) {
         }
         max_y = max_3(points[0].y, points[1].y, points[2].y);
         min_y = min_3(points[0].y, points[1].y, points[2].y);
-        if (min_y < IMAGE_Y - init_points[1].y || max_y > IMAGE_Y + IMAGE_H + init_points[1].y)
+        if (min_y < CANVAS_IMAGE_Y - init_points[1].y || max_y > CANVAS_IMAGE_Y + CANVAS_AREA_H + init_points[1].y)
             continue;
         m_ptrImg->DrawPolygon(attr, g_white, points, 3, false);
     }
@@ -3216,7 +3166,7 @@ void ImageAreaDraw::HorFocus(vector<int> &focPos, bool draw, bool L2R) {
         }
         max_x = max_3(points[0].x, points[1].x, points[2].x);
         min_x = min_3(points[0].x, points[1].x, points[2].x);
-        if (min_x < IMAGE_X - init_points[2].x || max_x > IMAGE_X + IMAGE_W + init_points[2].x)
+        if (min_x < CANVAS_IMAGE_X - init_points[2].x || max_x > CANVAS_IMAGE_X + CANVAS_AREA_W + init_points[2].x)
             continue;
         m_ptrImg->DrawPolygon(attr, g_white, points, 3, false);
     }
@@ -3248,8 +3198,8 @@ void ImageAreaDraw::Focus(vector<int> &focPos, bool draw) {
 }
 
 void ImageAreaDraw::DrawTGCLine(unsigned char* tgc, int tgcSize, bool update) {
-    const int x = IMAGE_X + IMAGE_W + SCALE_W + IMAGE_TMP - 5;
-    const int y = IMAGE_Y;
+    const int x = CANVAS_IMAGE_X + CANVAS_AREA_W + SCALE_W + IMAGE_TMP - 5;
+    const int y = CANVAS_IMAGE_Y;
     const int tgcWidth = 255;
 
     ImageArea::DrawAttr attr;
@@ -3257,9 +3207,9 @@ void ImageAreaDraw::DrawTGCLine(unsigned char* tgc, int tgcSize, bool update) {
     attr.mode.cvDraw = true;
 
     // clean
-    m_ptrImg->DrawRectangle(attr, g_black, x, y, TGC_W, IMAGE_H, true, false);
+    m_ptrImg->DrawRectangle(attr, g_black, x, y, TGC_W, CANVAS_AREA_H, true, false);
 
-    double spacing = (double)IMAGE_H / (tgcSize);
+    double spacing = (double)CANVAS_AREA_H / (tgcSize);
     double tgcRatio = (double)TGC_W / tgcWidth;
     for (int i=0; i<tgcSize; i++) {
         m_ptrImg->DrawPoint(attr, g_gray, x+tgc[i]*tgcRatio, y+i*spacing, false);
@@ -3269,14 +3219,14 @@ void ImageAreaDraw::DrawTGCLine(unsigned char* tgc, int tgcSize, bool update) {
 }
 
 void ImageAreaDraw::ClearTGCLine(bool update) {
-    const int x = IMAGE_X + IMAGE_W + SCALE_W + IMAGE_TMP - 5;
-    const int y = IMAGE_Y;
+    const int x = CANVAS_IMAGE_X + CANVAS_AREA_W + SCALE_W + IMAGE_TMP - 5;
+    const int y = CANVAS_IMAGE_Y;
 
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::PARA;
     attr.mode.cvDraw = true;
 
-    m_ptrImg->DrawRectangle(attr, g_black, x, y, TGC_W, IMAGE_H, true, update);
+    m_ptrImg->DrawRectangle(attr, g_black, x, y, TGC_W, CANVAS_AREA_H, true, update);
 }
 
 // 跟穿刺线的实现方法一致
@@ -3289,9 +3239,9 @@ void ImageAreaDraw::ClearCenterLine(bool update) {
     attr.mode.cvDraw = FALSE;
 
     if (rotate == 90 || rotate == 270) {
-        m_ptrImg->DrawDashLine(attr, g_red, (IMAGE_W - IMAGE_H)/2, IMAGE_H/2, (IMAGE_W - IMAGE_H)/2 + IMAGE_H, IMAGE_H/2, false);
+        m_ptrImg->DrawDashLine(attr, g_red, (CANVAS_AREA_W - CANVAS_AREA_H)/2, CANVAS_AREA_H/2, (CANVAS_AREA_W - CANVAS_AREA_H)/2 + CANVAS_AREA_H, CANVAS_AREA_H/2, false);
     } else if (rotate == 0 || rotate == 180) {
-        m_ptrImg->DrawDashLine(attr, g_red, IMAGE_W/2, 0, IMAGE_W/2, IMAGE_H, false);
+        m_ptrImg->DrawDashLine(attr, g_red, CANVAS_AREA_W/2, 0, CANVAS_AREA_W/2, CANVAS_AREA_H, false);
     }
 
     if (update)
@@ -3309,9 +3259,9 @@ void ImageAreaDraw::DrawCenterLine(bool update) {
     attr.mode.cvDraw = TRUE;
 
     if (rotate == 90 || rotate == 270) {
-        m_ptrImg->DrawDashLine(attr, g_red, (IMAGE_W - IMAGE_H)/2, IMAGE_H/2, (IMAGE_W - IMAGE_H)/2 + IMAGE_H, IMAGE_H/2, TRUE);
+        m_ptrImg->DrawDashLine(attr, g_red, (CANVAS_AREA_W - CANVAS_AREA_H)/2, CANVAS_AREA_H/2, (CANVAS_AREA_W - CANVAS_AREA_H)/2 + CANVAS_AREA_H, CANVAS_AREA_H/2, TRUE);
     } else if (rotate == 0 || rotate == 180) {
-        m_ptrImg->DrawDashLine(attr, g_red, IMAGE_W/2, 0, IMAGE_W/2, IMAGE_H, TRUE);
+        m_ptrImg->DrawDashLine(attr, g_red, CANVAS_AREA_W/2, 0, CANVAS_AREA_W/2, CANVAS_AREA_H, TRUE);
     }
 
     if (update)
@@ -3324,16 +3274,13 @@ void ImageAreaDraw::CenterLine(int rotate) {
     attr.mode.gdkMode = GDK_XOR;
 
     if (rotate == 90 || rotate == 270) {
-        m_ptrImg->DrawDashLine(attr, g_red, (IMAGE_W - IMAGE_H)/2, IMAGE_H/2, (IMAGE_W - IMAGE_H)/2 + IMAGE_H, IMAGE_H/2, false);
+        m_ptrImg->DrawDashLine(attr, g_red, (CANVAS_AREA_W - CANVAS_AREA_H)/2, CANVAS_AREA_H/2, (CANVAS_AREA_W - CANVAS_AREA_H)/2 + CANVAS_AREA_H, CANVAS_AREA_H/2, false);
     } else if (rotate == 0 || rotate == 180) {
-        m_ptrImg->DrawDashLine(attr, g_red, IMAGE_W/2, 0, IMAGE_W/2, IMAGE_H, false);
+        m_ptrImg->DrawDashLine(attr, g_red, CANVAS_AREA_W/2, 0, CANVAS_AREA_W/2, CANVAS_AREA_H, false);
     }
 }
 
 void ImageAreaDraw::ClearBiopsyLine(bool update) {
-    /* if ((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))
-         return;*/
-    /*if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI))*/
     if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode()))
 
     {
@@ -3347,9 +3294,6 @@ void ImageAreaDraw::ClearBiopsyLine(bool update) {
         m_ptrImg->UpdateImgArea();
 }
 void ImageAreaDraw::ClearBiopsyDoubleLine(bool update) {
-    /* if ((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))
-         return;*/
-    /*if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI))*/
     if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode())) {
         return;
     }
@@ -3364,27 +3308,7 @@ void ImageAreaDraw::ClearBiopsyDoubleLine(bool update) {
 
 }
 
-/*void ImageAreaDraw::ReDrawBiopsyLine(bool update)
-{
-    if ((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))
-        return;
-
-    if (!m_drawBiopsy) {
-        BiopsyLine(m_preBiopsy.xDist, m_preBiopsy.yDist, m_LRStatus, m_UDStatus, m_rotate, true);
-        m_preBiopsy.LRStatus = m_LRStatus;
-        m_preBiopsy.UDStatus = m_UDStatus;
-        m_preBiopsy.rotate = m_rotate;
-        m_drawBiopsy = true;
-    }
-    if (update)
-        m_ptrImg->UpdateImgArea();
-}*/
-
 void ImageAreaDraw::ReDrawBiopsyLine(bool update) {
-    /* if ((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))
-         return;*/
-    //-------2016.09.19--hy-----------------------------------//
-    /*if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI))*/
     if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode())) {
         return;
     }
@@ -3401,12 +3325,9 @@ void ImageAreaDraw::ReDrawBiopsyLine(bool update) {
         m_ptrImg->UpdateImgArea();
 }
 void ImageAreaDraw::ReDrawBiopsyDoubleLine(bool update) {
-    //-------2016.09.19--hy-----------------------------------//
-    /*if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI))*/
     if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode())) {
         return;
     }
-    //-------------------------------------------------------------------------------------------------------//
 
     if (!m_drawBiopsyDouble) {
         BiopsyLine(m_preBiopsyDouble0.xDist, m_preBiopsyDouble0.yDist, m_LRStatus, m_UDStatus, m_rotate, true);
@@ -3426,6 +3347,7 @@ void ImageAreaDraw::ReDrawBiopsyDoubleLine(bool update) {
         m_ptrImg->UpdateImgArea();
 
 }
+
 // xDist 为m_pointBiopsy和穿刺线起点的距离
 // yDist 为m_pointBiopsy和穿刺线终点的距离
 void ImageAreaDraw::DrawBiopsyLine(int xDist, int yDist, int size, bool update) {
@@ -3448,37 +3370,11 @@ void ImageAreaDraw::DrawBiopsyLine(int xDist, int yDist, int size, bool update) 
 
 // xDist 为m_pointBiopsy和穿刺线起点的距离
 // yDist 为m_pointBiopsy和穿刺线终点的距离
-/*void ImageAreaDraw::DrawBiopsyLine(int xDist, int yDist, bool update)
-{
-    if ((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))
-        return;
-
-    if (m_drawBiopsy)
-        BiopsyLine(m_preBiopsy.xDist, m_preBiopsy.yDist, m_preBiopsy.LRStatus, m_preBiopsy.UDStatus, m_preBiopsy.rotate, false);
-    BiopsyLine(xDist, yDist, m_LRStatus, m_UDStatus, m_rotate, true);
-
-    m_preBiopsy.LRStatus = m_LRStatus;
-    m_preBiopsy.UDStatus = m_UDStatus;
-    m_preBiopsy.rotate = m_rotate;
-    m_preBiopsy.xDist = xDist;
-    m_preBiopsy.yDist = yDist;
-    m_drawBiopsy = true;
-    if (update)
-        m_ptrImg->UpdateImgArea();
-}*/
-
-// xDist 为m_pointBiopsy和穿刺线起点的距离
-// yDist 为m_pointBiopsy和穿刺线终点的距离
 //void ImageAreaDraw::DrawBiopsyLine(int xDist, int yDist, bool update)
 void ImageAreaDraw::DrawBiopsyLine(double xDist, double  yDist, bool update) {
-    /* if ((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))
-         return;*/
-    //-------2016.09.19--hy-----------------------------------//
-    /*if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI))*/
     if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode())) {
         return;
     }
-    //-------------------------------------------------------------------------------------------------------//
 
     if (m_drawBiopsy)
         BiopsyLine(m_preBiopsy.xDist, m_preBiopsy.yDist, m_preBiopsy.LRStatus, m_preBiopsy.UDStatus, m_preBiopsy.rotate, false);
@@ -3493,39 +3389,8 @@ void ImageAreaDraw::DrawBiopsyLine(double xDist, double  yDist, bool update) {
     if (update)
         m_ptrImg->UpdateImgArea();
 }
-/*void ImageAreaDraw::DrawBiopsyDoubleLine(int xDist0, int yDist0, int xDist1, int yDist1, bool update)
-{
-    if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode()))
-	{
-		return;
-	}
-    if (m_drawBiopsyDouble)
-    {
-        BiopsyLine(m_preBiopsyDouble0.xDist, m_preBiopsyDouble0.yDist, m_preBiopsyDouble0.LRStatus, m_preBiopsyDouble0.UDStatus, m_preBiopsyDouble0.rotate, false);
-        BiopsyLine(m_preBiopsyDouble1.xDist, m_preBiopsyDouble1.yDist, m_preBiopsyDouble1.LRStatus, m_preBiopsyDouble1.UDStatus, m_preBiopsyDouble1.rotate, false);
 
-    }
-    BiopsyLine(xDist0, yDist0, m_LRStatus, m_UDStatus, m_rotate, true);
-    BiopsyLine(xDist1, yDist1, m_LRStatus, m_UDStatus, m_rotate, true);
-
-    m_preBiopsyDouble0.LRStatus = m_LRStatus;
-    m_preBiopsyDouble0.UDStatus = m_UDStatus;
-    m_preBiopsyDouble0.rotate = m_rotate;
-    m_preBiopsyDouble0.xDist = xDist0;
-    m_preBiopsyDouble0.yDist = yDist0;
-
-    m_preBiopsyDouble1.LRStatus = m_LRStatus;
-    m_preBiopsyDouble1.UDStatus = m_UDStatus;
-    m_preBiopsyDouble1.rotate = m_rotate;
-    m_preBiopsyDouble1.xDist = xDist1;
-    m_preBiopsyDouble1.yDist = yDist1;
-
-    m_drawBiopsyDouble = true;
-    if (update)
-        m_ptrImg->UpdateImgArea();
-}*/
 void ImageAreaDraw::DrawBiopsyDoubleLine(double xDist0, double yDist0, double xDist1, double yDist1, bool update) {
-    /*if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode()))*/
     if (((m_scanMode != ScanMode::D2) || (m_format2D != Format2D::B))&&((m_scanMode!=ScanMode::CFM)||(m_formatCfm != FormatCfm::B))&&(m_scanMode!=ScanMode::PDI)&&(ModeStatus::IsFreezeMode())) {
         return;
     }
@@ -3558,35 +3423,35 @@ void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatu
     int xDistPixel = xDist / m_ratio2D;
     int yDistPixel = yDist / m_ratio2D;
 
-    const int rotateSpace = (IMAGE_W - IMAGE_H)/2;
+    const int rotateSpace = (CANVAS_AREA_W - CANVAS_AREA_H)/2;
     GdkPoint start;
     GdkPoint end;
     GdkPoint center;
     if (UDStatus && !LRStatus) {
         if (rotate == 90) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x + xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y + yDistPixel;
         } else if (rotate == 270) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x - xDistPixel;
             start.y = center.y;
             end.x = center.x;
@@ -3594,28 +3459,28 @@ void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatu
         }
     } else if (LRStatus && !UDStatus) {
         if (rotate == 90) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x - xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y - yDistPixel;
         } else if (rotate == 270) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x + xDistPixel;
             start.y = center.y;
@@ -3625,28 +3490,28 @@ void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatu
     } else if (UDStatus && LRStatus) {
         if (rotate == 90) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x - xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y + yDistPixel;
         } else if (rotate == 270) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x + xDistPixel;
             start.y = center.y;
             end.x = center.x;
@@ -3654,28 +3519,28 @@ void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatu
         }
     } else {
         if (rotate == 90) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x + xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y - yDistPixel;
         } else if (rotate == 270) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x - xDistPixel;
             start.y = center.y;
@@ -3684,7 +3549,7 @@ void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatu
         }
     }
 
-    const int boundLeft = 0, boundUp = 0, boundRight = IMAGE_W, boundDown = IMAGE_H;
+    const int boundLeft = 0, boundUp = 0, boundRight = CANVAS_AREA_W, boundDown = CANVAS_AREA_H;
     double tanLine = ((double)(end.y - start.y)) / ((double)(end.x - start.x));
     double tempLine = (double)start.y + ((double)(boundRight-start.x)) * tanLine;
     GdkPoint endp1, endp2;
@@ -3719,42 +3584,41 @@ void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatu
     attr.area = ImageArea::SYMBOL;
     attr.mode.cvDraw = draw;
     m_ptrImg->DrawDashLine(attr, g_red, endp1.x, endp1.y, endp2.x, endp2.y, size, false);
-    //m_ptrImg->DrawDashLine(attr, g_white, endp1.x, endp1.y, endp2.x, endp2.y, false);
 }
-/*void ImageAreaDraw::BiopsyLine(int xDist, int yDist, bool LRStatus, bool UDStatus, int rotate, bool draw)*/
+
 void ImageAreaDraw::BiopsyLine(double xDist, double yDist, bool LRStatus, bool UDStatus, int rotate, bool draw) {
     int xDistPixel = xDist / m_ratio2D;
     int yDistPixel = yDist / m_ratio2D;
 
-    const int rotateSpace = (IMAGE_W - IMAGE_H)/2;
+    const int rotateSpace = (CANVAS_AREA_W - CANVAS_AREA_H)/2;
     GdkPoint start;
     GdkPoint end;
     GdkPoint center;
     if (UDStatus && !LRStatus) {
         if (rotate == 90) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x + xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y + yDistPixel;
         } else if (rotate == 270) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x - xDistPixel;
             start.y = center.y;
             end.x = center.x;
@@ -3762,28 +3626,28 @@ void ImageAreaDraw::BiopsyLine(double xDist, double yDist, bool LRStatus, bool U
         }
     } else if (LRStatus && !UDStatus) {
         if (rotate == 90) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x - xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y - yDistPixel;
         } else if (rotate == 270) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x + xDistPixel;
             start.y = center.y;
@@ -3793,28 +3657,28 @@ void ImageAreaDraw::BiopsyLine(double xDist, double yDist, bool LRStatus, bool U
     } else if (UDStatus && LRStatus) {
         if (rotate == 90) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x - xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y + yDistPixel;
         } else if (rotate == 270) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x + xDistPixel;
             start.y = center.y;
             end.x = center.x;
@@ -3822,28 +3686,28 @@ void ImageAreaDraw::BiopsyLine(double xDist, double yDist, bool LRStatus, bool U
         }
     } else {
         if (rotate == 90) {
-            center.x = IMAGE_W - rotateSpace;
-            center.y = IMAGE_H/2;
+            center.x = CANVAS_AREA_W - rotateSpace;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y - xDistPixel;
             end.x = center.x - yDistPixel;
             end.y = center.y;
         } else if (rotate == 180) {
-            center.x = IMAGE_W/2;
-            center.y = IMAGE_H;
+            center.x = CANVAS_AREA_W/2;
+            center.y = CANVAS_AREA_H;
             start.x = center.x + xDistPixel;
             start.y = center.y;
             end.x = center.x;
             end.y = center.y - yDistPixel;
         } else if (rotate == 270) {
             center.x = rotateSpace;
-            center.y = IMAGE_H/2;
+            center.y = CANVAS_AREA_H/2;
             start.x = center.x;
             start.y = center.y + xDistPixel;
             end.x = center.x + yDistPixel;
             end.y = center.y;
         } else {
-            center.x = IMAGE_W/2;
+            center.x = CANVAS_AREA_W/2;
             center.y = 0;
             start.x = center.x - xDistPixel;
             start.y = center.y;
@@ -3852,7 +3716,7 @@ void ImageAreaDraw::BiopsyLine(double xDist, double yDist, bool LRStatus, bool U
         }
     }
 
-    const int boundLeft = 0, boundUp = 0, boundRight = IMAGE_W, boundDown = IMAGE_H;
+    const int boundLeft = 0, boundUp = 0, boundRight = CANVAS_AREA_W, boundDown = CANVAS_AREA_H;
     double tanLine = ((double)(end.y - start.y)) / ((double)(end.x - start.x));
     double tempLine = (double)start.y + ((double)(boundRight-start.x)) * tanLine;
     GdkPoint endp1, endp2;
@@ -3947,9 +3811,6 @@ void ImageAreaDraw::ReDrawBMLine(bool update) {
 }
 
 void ImageAreaDraw::DrawScaleYM(bool update) {
-    //  m_pointScaleYM;
-    //  m_heightScaleYM;
-    //  m_ratioYM;
     if (m_scanMode != ScanMode::M && m_scanMode != ScanMode::ANATOMIC_M)
         return ;
 
@@ -3959,7 +3820,7 @@ void ImageAreaDraw::DrawScaleYM(bool update) {
     attr.mode.cvDraw = true;
 
     // clean
-    m_ptrImg->DrawRectangle(attr, g_black, m_pointScaleYM.x, IMAGE_Y+IMAGE_H-m_heightScaleYM-2, SCALE_W+1, m_heightScaleYM+4, true, false);
+    m_ptrImg->DrawRectangle(attr, g_black, m_pointScaleYM.x, CANVAS_IMAGE_Y+CANVAS_AREA_H-m_heightScaleYM-2, SCALE_W+1, m_heightScaleYM+4, true, false);
 
     int x = m_pointScaleYM.x;
     for (int i=0; i<m_heightScaleYM*m_ratioYM; i+=50) {
@@ -3968,7 +3829,7 @@ void ImageAreaDraw::DrawScaleYM(bool update) {
             y = m_pointScaleYM.y - (int)(i/m_ratioYM);
         else
             y = m_pointScaleYM.y + (int)(i/m_ratioYM);
-        if (y < IMAGE_Y || y > IMAGE_Y + IMAGE_H)
+        if (y < CANVAS_IMAGE_Y || y > CANVAS_IMAGE_Y + CANVAS_AREA_H)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y-1, x+SCALE_W, y-1, false);
         m_ptrImg->DrawLine(attr, color, x, y, x+SCALE_W, y, false);
@@ -3980,7 +3841,7 @@ void ImageAreaDraw::DrawScaleYM(bool update) {
             y = m_pointScaleYM.y - (int)(i/m_ratioYM);
         else
             y = m_pointScaleYM.y + (int)(i/m_ratioYM);
-        if (y < IMAGE_Y || y > IMAGE_Y + IMAGE_H)
+        if (y < CANVAS_IMAGE_Y || y > CANVAS_IMAGE_Y + CANVAS_AREA_H)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y, x+SCALE_W/2, y, false);
     }
@@ -3989,12 +3850,6 @@ void ImageAreaDraw::DrawScaleYM(bool update) {
 }
 
 void ImageAreaDraw::DrawScaleXM(bool update) {
-    // for test
-    // m_pointScaleXM.x = IMAGE_X;
-    // m_pointScaleXM.y = IMAGE_Y + IMAGE_H;
-    // m_widthScaleXM = IMAGE_W;
-    // m_ratioXM;
-
     GdkColor *color = g_white;
 
     ImageArea::DrawAttr attr;
@@ -4025,7 +3880,6 @@ void ImageAreaDraw::DrawGridM(bool update) {
 
     if (m_drawGridM) {
         GridM(m_ratioXMPre, m_ratioYMPre, m_prePointScaleYM, false);
-        //    	m_drawGridM = false;
     }
     GridM(m_ratioXM, m_ratioYM, m_pointScaleYM, true);
     m_ratioXMPre = m_ratioXM;
@@ -4049,26 +3903,18 @@ void ImageAreaDraw::ClearGridM(bool update) {
 }
 
 void ImageAreaDraw::GridM(double ratioX, double ratioY, GdkPoint pointScaleYM, bool draw) {
-    // for test
-    // m_pointScaleXM.x = IMAGE_X;
-    // m_pointScaleYM.y = IMAGE_Y;
-    // m_widthScaleXM = IMAGE_W;
-    // m_heightScaleYM = IMAGE_H;
-    // m_ratioXM = m_ratioX;
-    // m_ratioYM = m_ratioY;
-
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::SPECTRA;
     attr.mode.cvDraw = draw;
 
     for(int j=0; j<m_heightScaleYM*ratioY; j+=10) {
         for (int i=0; i<m_widthScaleXM*ratioX; i+=1) {
-            int x = m_pointScaleXM.x - IMAGE_X + (int)i/ratioX;
+            int x = m_pointScaleXM.x - CANVAS_IMAGE_X + (int)i/ratioX;
             int y;
             if (m_UDStatus)
-                y = pointScaleYM.y - IMAGE_Y - (int)j/ratioY;
+                y = pointScaleYM.y - CANVAS_IMAGE_Y - (int)j/ratioY;
             else
-                y = pointScaleYM.y - IMAGE_Y + (int)j/ratioY;
+                y = pointScaleYM.y - CANVAS_IMAGE_Y + (int)j/ratioY;
             m_ptrImg->DrawPoint(attr, g_green, x, y, false);
         }
     }
@@ -4096,19 +3942,6 @@ void ImageAreaDraw::ReDrawAnatomicalM(bool update) {
 
 // ========================= [PW] =========================
 void ImageAreaDraw::DrawSV(int curPwLine, int dotBegin, int dotEnd, vector<int> HPRFEmitPos, bool update) {
-#ifdef EMP_430
-    if (ModeStatus::IsSpectrumColorMode()) {
-        if (curPwLine < m_curBox.lineBegin)
-            curPwLine = m_curBox.lineBegin;
-        else if (curPwLine > m_curBox.lineEnd)
-            curPwLine = m_curBox.lineEnd;
-
-        //set curPwLine to 4 ,if not then pw line is out of cfm box when its value is less than 2.
-        if (curPwLine <=2)
-            curPwLine = 4;
-    }
-#endif
-
     if (!m_drawSV) {
         m_preSV.pwLine = curPwLine;
         m_preSV.dotBegin = dotBegin;
@@ -4253,9 +4086,6 @@ void ImageAreaDraw::SetPwBaseLine(int curLevel, int maxLevel, bool update) {
 
 // x,y is the coordinate of the base line
 void ImageAreaDraw::DrawScaleYPw(bool update) {
-    // m_pwMaxVel = 75;
-    // m_ratioYPw = m_ratio2D;
-
     GdkColor *color = g_white;
     const int hChar = 8;
     int adjustY = 1;
@@ -4267,15 +4097,13 @@ void ImageAreaDraw::DrawScaleYPw(bool update) {
 
     int BoundUp, BoundDown;
     int pwHeight = (m_pwMaxVel / m_ratioYPw);
-    // double pwHeight =(double)m_pwMaxVel / (double)m_ratioYPw;
-// double pwHeight =(double)(m_pwMaxVel / m_ratioYPw);
     PRINTF("pwHeight=%f\n", pwHeight);
     BoundUp = m_pointScaleYPw.y - pwHeight;
     BoundDown = m_pointScaleYPw.y + pwHeight;
 
     // clean
     // 擦除PwScaleY的区域，不包含baseline, 刻度值+刻度线的宽度为50
-    m_ptrImg->DrawRectangle(attr, g_black, m_pointScaleYPw.x+m_widthScaleYPw, IMAGE_Y+IMAGE_H-m_heightScaleYPw-7, 50, m_heightScaleYPw+14, true, false);
+    m_ptrImg->DrawRectangle(attr, g_black, m_pointScaleYPw.x+m_widthScaleYPw, CANVAS_IMAGE_Y+CANVAS_AREA_H-m_heightScaleYPw-7, 50, m_heightScaleYPw+14, true, false);
 
     // base line
     double pwBaseLine = (double)m_pwCurLevel / m_pwMaxLevel * (double)m_pwMaxVel;
@@ -4283,11 +4111,11 @@ void ImageAreaDraw::DrawScaleYPw(bool update) {
     baseline.x = m_pointScaleYPw.x;
     baseline.y = m_pointScaleYPw.y - (pwBaseLine / m_ratioYPw);
 
-    if (baseline.y <= BoundUp)//IMAGE_Y)
-        baseline.y = BoundUp;//IMAGE_Y+adjustY;
-    else if (baseline.y >= BoundDown)  // IMAGE_H + IMAGE_Y - adjustY)
-        baseline.y = BoundDown-adjustY; //IMAGE_H + IMAGE_Y - adjustY;
-    PwBaseline(baseline.x - IMAGE_X, baseline.y - IMAGE_Y, color); // baseline 画在spectra区域上
+    if (baseline.y <= BoundUp)//CANVAS_IMAGE_Y)
+        baseline.y = BoundUp;//CANVAS_IMAGE_Y+adjustY;
+    else if (baseline.y >= BoundDown)  // CANVAS_AREA_H + CANVAS_IMAGE_Y - adjustY)
+        baseline.y = BoundDown-adjustY; //CANVAS_AREA_H + CANVAS_IMAGE_Y - adjustY;
+    PwBaseline(baseline.x - CANVAS_IMAGE_X, baseline.y - CANVAS_IMAGE_Y, color); // baseline 画在spectra区域上
 
     PRINTF("Bound(%d, %d) baseLine.y=%d\n", BoundUp, BoundDown, baseline.y);
 
@@ -4315,10 +4143,6 @@ void ImageAreaDraw::DrawScaleYPw(bool update) {
     }
 
     int x = m_pointScaleYPw.x;
-
-#if 0
-    if(m_preScanModel==CW)
-#endif
 
         char scaleValue[10];
     int ValuePerScale = PwScaleCalc(m_pwMaxVel / m_pwMaxLevel);
@@ -4392,7 +4216,6 @@ void ImageAreaDraw::PwBaseline(int x, int y, GdkColor *color) {
         m_ptrImg->DrawLine(attr, color, m_pwBaseline.x, m_pwBaseline.y, m_pwBaseline.x+m_widthScaleYPw, m_pwBaseline.y, false);
     }
     attr.mode.cvDraw = true;
-    //m_ptrImg->DrawLine(attr, color, x, y, x+m_widthScaleYPw, y, false);
     m_ptrImg->DrawLine(attr, color, x, y, x+m_widthScaleYPw, y, true);
     m_pwBaseline.x = x;
     m_pwBaseline.y = y;
@@ -4400,12 +4223,6 @@ void ImageAreaDraw::PwBaseline(int x, int y, GdkColor *color) {
 }
 
 void ImageAreaDraw::DrawScaleXPw(bool update) {
-    // for test
-    // m_pointScaleXPw.x = IMAGE_X;
-    // m_pointScaleXPw.y = IMAGE_Y + IMAGE_H;
-    // m_ratioXPw = m_ratio2D;
-    // m_widthScaleXPw = IMAGE_W * m_ratioXPw;
-
     GdkColor *color = g_white;
 
     ImageArea::DrawAttr attr;
@@ -4460,19 +4277,19 @@ void ImageAreaDraw::GridPw(float maxVel, int maxLevel, int curLevel, float ratio
 
     int ValuePerScale = PwScaleCalc(maxVel / maxLevel);
     double pwBaseLine = (double)curLevel / maxLevel * (double)maxVel;
-    int baseline = m_pointScaleYPw.y - IMAGE_Y - (pwBaseLine / ratioY);
+    int baseline = m_pointScaleYPw.y - CANVAS_IMAGE_Y - (pwBaseLine / ratioY);
     double pwHeight = maxVel / ratioY;
 
     for(int j=ValuePerScale*2; j<maxVel*2; j+=ValuePerScale*2) {
         for (int i=0; i<m_widthScaleXPw; i+=1) {
-            int x = m_pointScaleXPw.x - IMAGE_X + (int)i/ratioX;
+            int x = m_pointScaleXPw.x - CANVAS_IMAGE_X + (int)i/ratioX;
             int y = baseline - (int)j/ratioY;
-            if (y > m_pointScaleYPw.y -IMAGE_Y - pwHeight) {
+            if (y > m_pointScaleYPw.y -CANVAS_IMAGE_Y - pwHeight) {
                 m_ptrImg->DrawPoint(attr, g_green, x, y, false);
             }
 
             y = baseline + (int)j/ratioY;
-            if (y < m_pointScaleYPw.y -IMAGE_Y + pwHeight) {
+            if (y < m_pointScaleYPw.y -CANVAS_IMAGE_Y + pwHeight) {
                 m_ptrImg->DrawPoint(attr, g_green, x, y, false);
             }
         }
@@ -4502,8 +4319,8 @@ void ImageAreaDraw::DrawPwTraceAuto(bool auto_calc, const Image::AutoTracePara* 
             if (para->vecMaxTrace.size() > 1) {
                 int cycleBegin, cycleEnd;
                 if ((ModeStatus::IsSpectrumImgMode() || ModeStatus::IsSpectrumColorImgMode())&& (m_formatPw == FormatPw::BP11_LR)) {
-                    cycleBegin = para->cycleBegin - IMAGE_W/2;
-                    cycleEnd = para->cycleEnd - IMAGE_W/2;
+                    cycleBegin = para->cycleBegin - CANVAS_AREA_W/2;
+                    cycleEnd = para->cycleEnd - CANVAS_AREA_W/2;
                 } else {
                     cycleBegin = para->cycleBegin;
                     cycleEnd = para->cycleEnd;
@@ -4582,8 +4399,8 @@ void ImageAreaDraw::DrawPwTrace(bool auto_calc, const Image::AutoTracePara* para
             if (para->vecMaxTrace.size() > 1) {
                 int cycleBegin, cycleEnd;
                 if ((ModeStatus::IsSpectrumImgMode() || ModeStatus::IsSpectrumColorImgMode())&& (m_formatPw == FormatPw::BP11_LR)) {
-                    cycleBegin = para->cycleBegin - IMAGE_W/2;
-                    cycleEnd = para->cycleEnd - IMAGE_W/2;
+                    cycleBegin = para->cycleBegin - CANVAS_AREA_W/2;
+                    cycleEnd = para->cycleEnd - CANVAS_AREA_W/2;
                 } else {
                     cycleBegin = para->cycleBegin;
                     cycleEnd = para->cycleEnd;
@@ -4605,8 +4422,6 @@ void ImageAreaDraw::DrawPwTrace(bool auto_calc, const Image::AutoTracePara* para
                     calc.DCalcTrace(buf, validTrace, psP, edP, 0);
                     memcpy(m_autoPara, buf, 350);
                     update.DTrace(buf, attr, true);
-                    // draw.DrawTraceTag(psP, FALSE);
-                    // draw.DrawTraceTag(edP, FALSE);
                 }
             }
         } else {
@@ -4618,12 +4433,6 @@ void ImageAreaDraw::DrawPwTrace(bool auto_calc, const Image::AutoTracePara* para
                     draw.DrawTraceTag(m_psP, FALSE);
                     draw.DrawTraceTag(m_edP, TRUE);
                 }
-#if 0
-                else {
-                    draw.DrawTraceTag(m_psP, FALSE);
-                    draw.DrawTraceTag(m_edP, FALSE);
-                }
-#endif
             }
         }
     }
@@ -4641,7 +4450,6 @@ void ImageAreaDraw::ClearAutoCalcPara(bool auto_calc) {
     attr.curColor = 5;
     attr.confirmColor = draw.GetConfirmColor();
     if(m_autoPara != NULL) {
-        //update.DTrace(m_autoPara, attr, true);
         update.ClearCurColorPwResult();
         free(m_autoPara);
         m_autoPara = NULL;
@@ -4679,8 +4487,8 @@ void ImageAreaDraw::DrawTraceTag(const Image::AutoTracePara* para, POINT &cycSta
     if (para->vecMaxTrace.size() > 1) {
         int cycleBegin, cycleEnd;
         if ((ModeStatus::IsSpectrumImgMode() || ModeStatus::IsSpectrumColorImgMode())&& (m_formatPw == FormatPw::BP11_LR)) {
-            cycleBegin = para->cycleBegin - IMAGE_W/2;
-            cycleEnd = para->cycleEnd - IMAGE_W/2;
+            cycleBegin = para->cycleBegin - CANVAS_AREA_W/2;
+            cycleEnd = para->cycleEnd - CANVAS_AREA_W/2;
         } else {
             cycleBegin = para->cycleBegin;
             cycleEnd = para->cycleEnd;
@@ -4746,10 +4554,7 @@ void ImageAreaDraw::GetPwTracePara(Image::AutoTracePara &para) {
 Image::AutoTracePara* ImageAreaDraw::NewPwTracePara(void) {
     m_pwTracePara.vecTrace = ImgProcPw::GetInstance()->GetTraceData();
     m_pwTracePara.vecMaxTrace = ImgProcPw::GetInstance()->GetTraceCalcData();
-#if 0
-    for(int i = 0; i < m_pwTracePara.vecMaxTrace.size(); i++)
-        printf("+++x= %d y= %d\n", m_pwTracePara.vecMaxTrace[i].x, m_pwTracePara.vecMaxTrace[i].y);
-#endif
+
     int cycleBegin = 0, cycleEnd = 0;
     ImgProcPw::GetInstance()->GetTraceCycle(cycleBegin, cycleEnd);
 
@@ -4784,7 +4589,7 @@ void ImageAreaDraw::SetColorTable(unsigned char table[][4], int len, int width, 
 }
 
 void ImageAreaDraw::DrawVelScaleRange(void) {
-    const int x = IMAGE_X + IMAGE_W + SCALE_W + TGC_W + GRAYSCALE_W + IMAGE_TMP;
+    const int x = CANVAS_IMAGE_X + CANVAS_AREA_W + SCALE_W + TGC_W + GRAYSCALE_W + IMAGE_TMP;
     const int y = 20;
 
     char RangeMax[15];
@@ -4811,7 +4616,7 @@ void ImageAreaDraw::DrawVelScaleRange(void) {
 }
 
 void ImageAreaDraw::DrawColorScale(bool update) {
-    const int x = IMAGE_X + IMAGE_W + SCALE_W + TGC_W + GRAYSCALE_W + 3 + IMAGE_TMP;
+    const int x = CANVAS_IMAGE_X + CANVAS_AREA_W + SCALE_W + TGC_W + GRAYSCALE_W + 3 + IMAGE_TMP;
     const int y = 20;
     GdkColor *color = NULL;
 
@@ -4930,42 +4735,42 @@ void ImageAreaDraw::SetCfmBoxFreeze(void) {
     if (m_formatCfm == FormatCfm::BB) {
         if (m_curB == 0) {
             preB = 1;
-            area.x = IMAGE_W/2;
+            area.x = CANVAS_AREA_W/2;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H;
         } else if (m_curB == 1) {
             preB = 0;
             area.x = 0;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H;
         }
     } else if (m_formatCfm == FormatCfm::B4) {
         if (m_curB == 0) {
             preB = 3;
-            area.x = IMAGE_W/2;
-            area.y = IMAGE_H/2;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.x = CANVAS_AREA_W/2;
+            area.y = CANVAS_AREA_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         } else if (m_curB == 1) {
             preB = 0;
             area.x = 0;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         } else if (m_curB == 2) {
             preB = 1;
-            area.x = IMAGE_W/2;
+            area.x = CANVAS_AREA_W/2;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         } else if (m_curB == 3) {
             preB = 2;
             area.x = 0;
-            area.y = IMAGE_H/2;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.y = CANVAS_AREA_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         }
     }
     // if (m_drawBox[preB]){
@@ -4986,35 +4791,35 @@ void ImageAreaDraw::UnSetCfmBoxFreeze(void) {
         if (m_curB == 0) {
             area.x = 0;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H;
         } else if (m_curB == 1) {
-            area.x = IMAGE_W/2;
+            area.x = CANVAS_AREA_W/2;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H;
         }
     } else if (m_formatCfm == FormatCfm::B4) {
         if (m_curB == 0) {
             area.x = 0;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         } else if (m_curB == 1) {
-            area.x = IMAGE_W/2;
+            area.x = CANVAS_AREA_W/2;
             area.y = 0;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         } else if (m_curB == 2) {
             area.x = 0;
-            area.y = IMAGE_H/2;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.y = CANVAS_AREA_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         } else if (m_curB == 3) {
-            area.x = IMAGE_W/2;
-            area.y = IMAGE_H/2;
-            area.w = IMAGE_W/2;
-            area.h = IMAGE_H/2;
+            area.x = CANVAS_AREA_W/2;
+            area.y = CANVAS_AREA_H/2;
+            area.w = CANVAS_AREA_W/2;
+            area.h = CANVAS_AREA_H/2;
         }
     }
 
@@ -5027,10 +4832,9 @@ void ImageAreaDraw::UnSetCfmBoxFreeze(void) {
 
 // other
 void ImageAreaDraw::DrawPIPBox(int x, int y, int width, int height, bool update) {
-#ifdef EMP_355
     if (m_clear)
         return;
-#endif
+
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::SYMBOL;
     attr.mode.cvDraw = false;
@@ -5062,9 +4866,8 @@ void ImageAreaDraw::ClearPIPBox(bool update) {
     }
     if (update)
         m_ptrImg->UpdateImgArea();
-#ifdef EMP_355
+
     m_clear=true;
-#endif
 }
 
 void ImageAreaDraw::ReDrawPIPBox(bool update) {
@@ -5086,8 +4889,8 @@ void ImageAreaDraw::DrawGrayTransCurve(unsigned char *CurveValue, unsigned char 
     unsigned char count=0;
     const int maxvalue=128;
     const int dis=16;
-    int startX = IMAGE_W - maxvalue - 5;
-    int startY = IMAGE_H - 5;
+    int startX = CANVAS_AREA_W - maxvalue - 5;
+    int startY = CANVAS_AREA_H - 5;
 
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::PIXMAP;
@@ -5108,8 +4911,6 @@ void ImageAreaDraw::DrawGrayTransCurve(unsigned char *CurveValue, unsigned char 
         m_ptrImg->DrawPixmapLine(gc, startX, startY-i, startX+maxvalue-1, startY-i);
         m_ptrImg->DrawPixmapLine(gc, startX+i, startY, startX+i, startY-maxvalue+1);
     }
-    //m_ptrImg->DrawString(gc, posX, posY, "");
-    //m_ptrImg->DrawString(gc, posX, posY, buf);
 
     // Draw Point
     for(i=0; i<=maxvalue/dis; i++) {
@@ -5155,8 +4956,8 @@ void ImageAreaDraw::DrawGrayTransCurve(unsigned char *CurveValue, unsigned char 
 
 void ImageAreaDraw::ClearGrayCurve(bool update) {
     const int maxvalue=128;
-    int startX=IMAGE_W - maxvalue - 8;
-    int startY=IMAGE_H - 8;
+    int startX=CANVAS_AREA_W - maxvalue - 8;
+    int startY=CANVAS_AREA_H - 8;
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::PIXMAP;
     attr.mode.gdkMode = GDK_COPY;
@@ -5169,8 +4970,8 @@ void ImageAreaDraw::DrawGrayRejectCurve(unsigned char Point, bool update) {
     int i;
     const int maxvalue=128;
     const int dis=32;
-    int startX=IMAGE_W - maxvalue - 8;
-    int startY=IMAGE_H - 8;
+    int startX=CANVAS_AREA_W - maxvalue - 8;
+    int startY=CANVAS_AREA_H - 8;
 
     ImageArea::DrawAttr attr;
     attr.area = ImageArea::PIXMAP;
@@ -5247,12 +5048,6 @@ void ImageAreaDraw::ReDrawLocalZoom(bool update) {
 }
 
 void ImageAreaDraw::LocalZoom(int lineBegin, int lineEnd, int dotBegin, int dotEnd, bool LRStatus, bool UDStatus, GdkPoint pointLZ, bool draw, bool dash) {
-    // for test
-    // m_probeType = 'L';
-    // m_pointLZ.x = IMAGE_X + IMAGE_W/2;
-    // m_pointLZ.y = IMAGE_Y;
-    // m_cfmAngle = -10;
-
     GdkPoint p1, p2, p3, p4;
     int boxBegin = dotBegin;
     int boxEnd = dotEnd;
@@ -5588,14 +5383,6 @@ void ImageAreaDraw::ClearMoveFlag(bool update) {
 ///> private
 //M
 void ImageAreaDraw::BMLine(int curBMLine, bool LRStatus, bool UDStatus, GdkPoint pointBM, bool draw) {
-    // for test
-    // m_pointBM.x = IMAGE_X + IMAGE_W/2;
-    // m_pointBM.y = IMAGE_Y;
-    // m_widthImgBM = IMAGE_W/2;
-    // m_heightImgBM = IMAGE_H/2;
-    // m_ratioY *= 2;
-    // m_ratioX *= 2;
-
     int x1, y1, x2, y2;
 
     if (m_probeType == 'L' || m_probeType == 'l') {
@@ -5724,29 +5511,7 @@ void ImageAreaDraw::BMLine(int curBMLine, bool LRStatus, bool UDStatus, GdkPoint
          * modifier: lihuamei
          * date:2012-09-06
          */
-#if 0
-        if (x2 < boundX1 && UDStatus) {
-            x2 = boundX1;
-            y2 = pointBM.y - boundY;
-        } else if (x2 < boundX1 && !UDStatus) {
-            x2 = boundX1;
-            y2 = pointBM.y + boundY;
-        }
 
-        if (x2 > boundX2 && UDStatus) {
-            x2 = boundX2;
-            y2 = pointBM.y - boundY;
-        } else if (x2 > boundX2 && !UDStatus) {
-            x2 = boundX2;
-            y2 = pointBM.y + boundY;
-        }
-
-        if (UDStatus && y2 < boundDown)
-            y2 = boundDown;
-
-        if (!UDStatus && y2 > boundDown)
-            y2 = boundDown;
-#endif
         PRINTF("**********bbbbbb x1 y1 x2 y2 boundX1 boundX2 UDStatus %d %d %d %d %d %d %d\n",x1,y1,x2,y2,boundX1,boundX2,UDStatus);
 
     }
@@ -5759,15 +5524,6 @@ void ImageAreaDraw::BMLine(int curBMLine, bool LRStatus, bool UDStatus, GdkPoint
 }
 
 void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector<int> HPRFEmitPos, bool LRStatus, bool UDStatus, GdkPoint pointPw, bool isCw, bool draw) {
-    // for test
-    // m_probeType = 'L';
-    // m_pointPw.x = IMAGE_X + IMAGE_W/2;
-    // m_pointPw.y = IMAGE_Y;
-    // m_heightImgPw = IMAGE_H;
-    // m_widthImgPw = IMAGE_W;
-    // m_zoomRatioPw = 1.0;
-    // m_correctAngle = 60;
-
     // 假设扫描线数为偶数
     const int svWidth = 20;	// 取样容积线宽度
     const int angleLen = 30;	// 角度线的长度
@@ -5805,10 +5561,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
         double xOffset = (curPwLine - centerLine) * delta;
 
         double svHeight = svEnd - svBegin;
-        // double xOffsetLineOn = tan(angle) * (svHeight/2);
-
-        // double xOffsetLineOff = sin(angle) * angleLen/2;
-        // double yOffsetLineOff = cos(angle) * angleLen/2;
 
         double steerAngle = (double)m_steerAngle * PI / 180;
         double sineSteer = sin(steerAngle);
@@ -6028,8 +5780,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
         double yOffsetSeg = sineTheta * (svWidth / 2);
 
         double svHeight = svEnd - svBegin;
-        // double xOffsetCenter = sineTheta * (svHeight/2 + svBegin);
-        // double yOffsetCenter = cosineTheta * (svHeight/2 + svBegin);
 
         double tempLenth = tan(angle) * (svHeight/2);
         double xOffsetLineOn = cosineTheta * tempLenth;
@@ -6073,9 +5823,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.x2 = point4.x - xOffsetSeg;
                 endSeg.y2 = point4.y + yOffsetSeg;
 
-                // pCenter.x = point1.x - xOffsetCenter;
-                // pCenter.y = point1.y - yOffsetCenter;
-
                 lineUpSeg.x1 = point3.x + xOffsetLineOn;
                 lineUpSeg.y1 = point3.y - yOffsetLineOn;
                 lineUpSeg.x2 = lineUpSeg.x1 + xOffsetLineOff;
@@ -6114,9 +5861,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.y1 = point4.y + yOffsetSeg;
                 endSeg.x2 = point4.x + xOffsetSeg;
                 endSeg.y2 = point4.y - yOffsetSeg;
-
-                // pCenter.x = point1.x + xOffsetCenter;
-                // pCenter.y = point1.y + yOffsetCenter;
 
                 lineUpSeg.x1 = point3.x - xOffsetLineOn;
                 lineUpSeg.y1 = point3.y + yOffsetLineOn;
@@ -6157,9 +5901,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.x2 = point4.x + xOffsetSeg;
                 endSeg.y2 = point4.y + yOffsetSeg;
 
-                // pCenter.x = point1.x + xOffsetCenter;
-                // pCenter.y = point1.y - yOffsetCenter;
-
                 lineUpSeg.x1 = point3.x - xOffsetLineOn;
                 lineUpSeg.y1 = point3.y - yOffsetLineOn;
                 lineUpSeg.x2 = lineUpSeg.x1 - xOffsetLineOff;
@@ -6198,9 +5939,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.y1 = point4.y + yOffsetSeg;
                 endSeg.x2 = point4.x - xOffsetSeg;
                 endSeg.y2 = point4.y - yOffsetSeg;
-
-                // pCenter.x = point1.x - xOffsetCenter;
-                // pCenter.y = point1.y + yOffsetCenter;
 
                 lineUpSeg.x1 = point3.x + xOffsetLineOn;
                 lineUpSeg.y1 = point3.y + yOffsetLineOn;
@@ -6242,9 +5980,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.x2 = point4.x + xOffsetSeg;
                 endSeg.y2 = point4.y + yOffsetSeg;
 
-                // pCenter.x = point1.x + xOffsetCenter;
-                // pCenter.y = point1.y - yOffsetCenter;
-
                 lineUpSeg.x1 = point3.x + xOffsetLineOn;
                 lineUpSeg.y1 = point3.y + yOffsetLineOn;
                 lineUpSeg.x2 = lineUpSeg.x1 + x_OffsetLineOff;
@@ -6283,9 +6018,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.y1 = point4.y + yOffsetSeg;
                 endSeg.x2 = point4.x - xOffsetSeg;
                 endSeg.y2 = point4.y - yOffsetSeg;
-
-                // pCenter.x = point1.x - xOffsetCenter;
-                // pCenter.y = point1.y + yOffsetCenter;
 
                 lineUpSeg.x1 = point3.x - xOffsetLineOn;
                 lineUpSeg.y1 = point3.y - yOffsetLineOn;
@@ -6326,9 +6058,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.x2 = point4.x - xOffsetSeg;
                 endSeg.y2 = point4.y + yOffsetSeg;
 
-                // pCenter.x = point1.x - xOffsetCenter;
-                // pCenter.y = point1.y - yOffsetCenter;
-
                 lineUpSeg.x1 = point3.x - xOffsetLineOn;
                 lineUpSeg.y1 = point3.y + yOffsetLineOn;
                 lineUpSeg.x2 = lineUpSeg.x1 - x_OffsetLineOff;
@@ -6367,9 +6096,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
                 endSeg.y1 = point4.y + yOffsetSeg;
                 endSeg.x2 = point4.x + xOffsetSeg;
                 endSeg.y2 = point4.y - yOffsetSeg;
-
-                // pCenter.x = point1.x + xOffsetCenter;
-                // pCenter.y = point1.y + yOffsetCenter;
 
                 lineUpSeg.x1 = point3.x + xOffsetLineOn;
                 lineUpSeg.y1 = point3.y - yOffsetLineOn;
@@ -6423,13 +6149,6 @@ void ImageAreaDraw::SampleVolumn(int curPwLine, int dotBegin, int dotEnd, vector
     m_ptrImg->DrawDashLine(attr, g_green, point1.x, point1.y, point3.x, point3.y, false);
     m_ptrImg->DrawDashLine(attr, g_green, point4.x, point4.y, point2.x, point2.y, false);
 
-    //     m_ptrImg->DrawSegments(GDK_XOR, g_green, &beginSeg, 1);
-    // //	if (! ((beginSeg.x1 == endSeg.x1) && (beginSeg.y1 == endSeg.y1)))
-    //     m_ptrImg->DrawSegments(GDK_XOR, g_green, &endSeg, 1);
-
-    //     m_ptrImg->DrawSegments(GDK_XOR, g_green, &lineUpSeg, 1);
-    //     m_ptrImg->DrawSegments(GDK_XOR, g_green, &lineDownSeg, 1);
-
     m_ptrImg->DrawLine(attr, g_green, beginSeg.x1, beginSeg.y1, beginSeg.x2, beginSeg.y2, false);
     m_ptrImg->DrawLine(attr, g_green, endSeg.x1, endSeg.y1, endSeg.x2, endSeg.y2, false);
     m_ptrImg->DrawLine(attr, g_green, lineUpSeg.x1, lineUpSeg.y1, lineUpSeg.x2, lineUpSeg.y2, false);
@@ -6452,12 +6171,8 @@ void ImageAreaDraw::Set2DSteerAngle(int angle) {
 }
 
 void ImageAreaDraw::CfmBox(int lineBegin, int lineEnd, int dotBegin, int dotEnd, bool LRStatus, bool UDStatus, GdkPoint pointCfm, bool draw, bool dash) {
-    //printf("lineEnd = %d, lineBegin = %d, dotBegin = %d, dotEnd = %d\n", lineEnd, lineBegin, dotBegin, dotEnd);
     PRINTF("probeLines:%d\n", m_probeLines);
-#ifdef EMP_430
-    if ((lineBegin == 8) && (lineBegin > 0))
-        lineBegin--;
-#endif
+
     GdkColor *color;
     GdkPoint p1, p2, p3, p4;
     int boxBegin;
@@ -6799,12 +6514,6 @@ void ImageAreaDraw::EFOVZoomMiniatureBox(int start_x, int start_y, int end_x, in
         return;
 
     m_ptrImg->DrawRectangle(attr, g_yellow, start_x, start_y, end_x-start_x, end_y-start_y, false, false);
-
-    // GdkGC *gc = gdk_gc_new(m_pixmapEFOV);
-    // gdk_gc_set_foreground(gc, g_green);
-    // gdk_gc_set_function(gc, GDK_XOR);
-    // gdk_draw_rectangle(m_pixmapEFOV, gc, false, start_x, start_y, end_x-start_x, end_y-start_y);
-    // g_object_unref(gc);
 }
 
 void ImageAreaDraw::DrawEFOVZoomBox(int start_x,  int start_y, int end_x, int end_y) {
@@ -6913,7 +6622,7 @@ void ImageAreaDraw::EFOVScaleY(int scale_x, int scale_y, int height, double rati
     int x = scale_x;
     for(int i=0; i<height; i+=50) {
         int y = scale_y + (int)(i/ratio);
-        if (y < 0 || y > IMG_AREA_H)
+        if (y < 0 || y > IMAGE_AREA_H)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y-1, x+SCALE_W, y-1, false);
         m_ptrImg->DrawLine(attr, color, x, y,   x+SCALE_W, y,   false);
@@ -6921,32 +6630,10 @@ void ImageAreaDraw::EFOVScaleY(int scale_x, int scale_y, int height, double rati
     }
     for(int i=0; i<height; i+=10) {
         int y = scale_y + (int)(i/ratio);
-        if (y < 0 || y > IMG_AREA_H)
+        if (y < 0 || y > IMAGE_AREA_H)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y, x+SCALE_W/2, y, false);
     }
-
-    // GdkGC *gc = gdk_gc_new(m_pixmapEFOV);
-    // gdk_gc_set_function(gc, GDK_COPY);
-    // gdk_gc_set_foreground(gc, g_black);
-    // gdk_draw_rectangle(m_pixmapEFOV, gc, true, IMAGE_X + IMAGE_W + 80, IMAGE_Y-1, SCALE_W+2, IMAGE_H+2);
-    // gdk_gc_set_foreground(gc, g_white);
-    // int x = scale_x;
-    // for(int i=0; i<height; i+=50) {
-    //     int y = scale_y + (int)(i/ratio);
-    //     if (y < 0 || y > IMG_AREA_H)
-    //         continue;
-    //     gdk_draw_line(m_pixmapEFOV, gc, x, y-1, x+SCALE_W, y-1);
-    //     gdk_draw_line(m_pixmapEFOV, gc, x, y,   x+SCALE_W, y);
-    //     gdk_draw_line(m_pixmapEFOV, gc, x, y+1, x+SCALE_W, y+1);
-    // }
-    // for(int i=0; i<height; i+=10) {
-    //     int y = scale_y + (int)(i/ratio);
-    //     if (y < 0 || y > IMG_AREA_H)
-    //         continue;
-    //     gdk_draw_line(m_pixmapEFOV, gc, x, y, x+SCALE_W/2, y);
-    // }
-    // g_object_unref(gc);
 }
 
 void ImageAreaDraw::EFOVScaleX(int scale_x, int scale_y, int width, double ratio) {
@@ -6962,7 +6649,7 @@ void ImageAreaDraw::EFOVScaleX(int scale_x, int scale_y, int width, double ratio
     int y = scale_y + SCALE_H;
     for (int i=0; i<width; i+=50) {
         int x = (int)(i/ratio) + scale_x;
-        if (x < 0 || x > IMG_AREA_W)
+        if (x < 0 || x > IMAGE_AREA_W)
             continue;
         m_ptrImg->DrawLine(attr, color, x-1, y-SCALE_H, x-1, y, false);
         m_ptrImg->DrawLine(attr, color, x,   y-SCALE_H, x,   y, false);
@@ -6970,7 +6657,7 @@ void ImageAreaDraw::EFOVScaleX(int scale_x, int scale_y, int width, double ratio
     }
     for (float i=0; i<width; i+=10) {
         int x = (int)(i/ratio) + scale_x;
-        if (x < 0 || x > IMG_AREA_W)
+        if (x < 0 || x > IMAGE_AREA_W)
             continue;
         m_ptrImg->DrawLine(attr, color, x, y-SCALE_H/2, x, y, false);
     }
@@ -6986,71 +6673,29 @@ void ImageAreaDraw::DrawEFOV2DScaleY(bool prepare_mode) {
         scale_y = 60;
     }
     const double ratio = Img2D::GetInstance()->GetScale2D();
-    const int height = IMAGE_H * ratio;
+    const int height = CANVAS_AREA_H * ratio;
     EFOVScaleY(scale_x, scale_y, height, ratio);
-
-    // const int scale_x = IMAGE_X + IMAGE_W + 80;
-    // const int scale_y = 0;
-    // const int height = IMG_AREA_H;
-    // const double ratio = Img2D::GetInstance()->GetScale2D();
-    // EFOVScaleY(scale_x, scale_y, height, ratio);
 }
 
 void ImageAreaDraw::DrawEFOVScaleY(void) {
-    const int scale_x = IMAGE_X + IMAGE_W + 50;
-    const int scale_y = IMAGE_Y;
+    const int scale_x = CANVAS_IMAGE_X + CANVAS_AREA_W + 50;
+    const int scale_y = CANVAS_IMAGE_Y;
     const double ratio = Img2D::GetInstance()->GetScaleEFOV();
-    const int height = (IMAGE_H + 50)* ratio;
-    //printf("scale y ratio = %.2f\n", ratio);
+    const int height = (CANVAS_AREA_H + 50)* ratio;
+
     EFOVScaleY(scale_x, scale_y, height, ratio);
-
-    // const int scale_x = IMAGE_X + IMAGE_W + 80;
-    // const int scale_y = 0;
-    // const int height = IMG_AREA_H;
-    // const double ratio = Img2D::GetInstance()->GetScaleEFOV();
-
-    // EFOVScaleY(scale_x, scale_y, height, ratio);
 }
 
 void ImageAreaDraw::DrawEFOVScaleX(void) {
-    const int scale_x = IMAGE_X - 50;
-    const int scale_y = IMAGE_Y + IMAGE_H + 50;
+    const int scale_x = CANVAS_IMAGE_X - 50;
+    const int scale_y = CANVAS_IMAGE_Y + CANVAS_AREA_H + 50;
     const double ratio = Img2D::GetInstance()->GetScaleEFOV();
-    const int width = (IMAGE_W + 100) * ratio;
-    //printf("scale x ratio = %.2f\n", ratio);
+    const int width = (CANVAS_AREA_W + 100) * ratio;
 
     EFOVScaleX(scale_x, scale_y, width, ratio);
-
-    // const int scale_x = IMAGE_X + IMAGE_W + 80;
-    // const int scale_y = 0;
-    // const int width = IMAGE_W;
-    // const double ratio = Img2D::GetInstance()->GetScaleEFOV();
-
-    // GdkGC *gc = gdk_gc_new(m_pixmapEFOV);
-    // gdk_gc_set_function(gc, GDK_COPY);
-    // gdk_gc_set_foreground(gc, g_black);
-    // gdk_draw_rectangle(m_pixmapEFOV, gc, true, IMAGE_X-1, IMAGE_Y+IMAGE_H, IMAGE_W+2+80, SCALE_W+2);
-    // gdk_gc_set_foreground(gc, g_white);
-    // int y = scale_y;
-    // for(int i=0; i<width; i+=50) {
-    //     int x = scale_x - (int)(i/ratio);
-    //     if (x < 0 || x > IMAGE_X + IMAGE_W + 80)
-    //         continue;
-    //     gdk_draw_line(m_pixmapEFOV, gc, x-1, y, x-1, y+SCALE_W);
-    //     gdk_draw_line(m_pixmapEFOV, gc, x,   y, x,   y+SCALE_W);
-    //     gdk_draw_line(m_pixmapEFOV, gc, x+1, y, x+1, y+SCALE_W);
-    // }
-    // for(int i=0; i<width; i+=10) {
-    //     int x = scale_x - (int)(i/ratio);
-    //     if (x < 0 || x > IMAGE_X + IMAGE_W + 100)
-    //         continue;
-    //     gdk_draw_line(m_pixmapEFOV, gc, x, y, x, y+SCALE_W/2);
-    // }
-    // g_object_unref(gc);
 }
 
-#ifdef EMP_355
+
 void ImageAreaDraw::SetClearStatus(bool on) {
     m_clear=on;
 }
-#endif

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "keyboard/KeyDef.h"
 #include "display/TopArea.h"
+#include "display/gui_global.h"
 
 ImageAreaPara* ImageAreaPara::m_ptrInstance = NULL;
 

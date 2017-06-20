@@ -118,7 +118,7 @@ FormatM::EFormatM FormatM::GetFormat() {
  * @note only used in M mode
  */
 int FormatM::GetBImgHeightDot(void) {
-    int height = IMAGE_H;
+    int height = CANVAS_AREA_H;
 
     switch (m_format) {
     case M_TOTAL:
@@ -154,33 +154,33 @@ POINT FormatM::GetBCenterPoint(void) {
 
     switch(m_format) {
     case M_TOTAL:
-        p.x = IMAGE_X + IMAGE_W / 2;
-        p.y = IMAGE_Y + IMAGE_H / 2;
+        p.x = CANVAS_IMAGE_X + CANVAS_AREA_W / 2;
+        p.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 2;
         break;
 
     case BM11_UD:
-        p.x = IMAGE_X + IMAGE_W / 4;
-        p.y = IMAGE_Y + IMAGE_H / 8;
+        p.x = CANVAS_IMAGE_X + CANVAS_AREA_W / 4;
+        p.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 8;
         break;
 
     case BM21_UD:
-        p.x = IMAGE_X + IMAGE_W / 4;
-        p.y = IMAGE_Y + IMAGE_H / 3;
+        p.x = CANVAS_IMAGE_X + CANVAS_AREA_W / 4;
+        p.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 3;
         break;
 
     case BM12_UD:
-        p.x = IMAGE_X + IMAGE_W / 3;
-        p.y = IMAGE_Y + IMAGE_H / 10;
+        p.x = CANVAS_IMAGE_X + CANVAS_AREA_W / 3;
+        p.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 10;
         break;
 
     case BM11_LR:
-        p.x = IMAGE_W / 4;
-        p.y = IMAGE_H / 2;
+        p.x = CANVAS_AREA_W / 4;
+        p.y = CANVAS_AREA_H / 2;
         break;
 
     default:
-        p.x = IMAGE_X + IMAGE_W / 2;
-        p.y = IMAGE_Y + IMAGE_H / 2;
+        p.x = CANVAS_IMAGE_X + CANVAS_AREA_W / 2;
+        p.y = CANVAS_IMAGE_Y + CANVAS_AREA_H / 2;
         break;
     }
 

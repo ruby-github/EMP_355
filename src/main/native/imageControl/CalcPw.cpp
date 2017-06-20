@@ -13,6 +13,10 @@
 #include "imageControl/BandPassFilterPw.h"
 #include <ParaDef.h>
 #include "imageControl/Calc2D.h"
+
+#include "utils/MainWindowConfig.h"
+
+
 FpgaPw CalcPw::m_fpga;
 FpgaCtrl2D CalcPw::m_fpga2D;
 #if (defined(EMP_355) || defined(EMP_340))
@@ -75,10 +79,10 @@ void CalcPw::CalcPwLine(int line) {
     m_fpga.SendScanLine(line);
 }
 void CalcPw::CalcSvPos(int dotBegin, int dotEnd) {
-    if (dotBegin > IMG_H)
-        dotBegin = IMG_H;
-    if (dotEnd > IMG_H)
-        dotEnd = IMG_H;
+    if (dotBegin > CANVAS_AREA_H)
+        dotBegin = CANVAS_AREA_H;
+    if (dotEnd > CANVAS_AREA_H)
+        dotEnd = CANVAS_AREA_H;
 
     PRINTF("calc sv pos to fpga: dotBegin = %d, dotEnd = %d\n", dotBegin, dotEnd);
     ///> send sv dot interval
@@ -360,16 +364,16 @@ double CalcPw::CalcMaxVel(int prf, int colorFreq, int angle, double soundSpeed) 
 }
 
 /*
- * @brief calc pw sample(sample dot IMG_H(440), sample freq 60Mhz, sample depth "depth")
+ * @brief calc pw sample(sample dot CANVAS_AREA_H(440), sample freq 60Mhz, sample depth "depth")
  * @para depth[in] sample depth, changed with sv pos, unit:mm
  * @para soundSpeed[in] speed of sound(normal:1540m/s), changed with TSI
  */
 void CalcPw::CalcHDotSample(int depth, double soundSpeed) {
-    const int DOTS = IMG_H;
+    const int DOTS = CANVAS_AREA_H;
     const int SAMPLE_NUM = 65536;
     const int FREQ = SAMPLE_FREQ;//60; //Mhz
 
-    int sample = (int)(soundSpeed * SAMPLE_NUM * DOTS / 2 / FREQ / depth + 0.5);	//60MHz采样频率IMG_H点
+    int sample = (int)(soundSpeed * SAMPLE_NUM * DOTS / 2 / FREQ / depth + 0.5);	//60MHz采样频率CANVAS_AREA_H点
 
     PRINTF("===== PW SampleRate = %d \n",sample);
 

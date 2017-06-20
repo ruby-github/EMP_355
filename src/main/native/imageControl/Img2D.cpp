@@ -23,6 +23,8 @@
 #include "periDevice/IoCtrl.h"
 ///> /////////////////////////////////[static const]////////////////////////////
 
+#include "utils/MainWindowConfig.h"
+
 ///> focus
 const int Img2D::FOC_DEPTH = 220; ///< value to calc focus position percent.
 const int Img2D::FOC_POS_INDEX_MAX[MAX_FOCUS] = {18, 11, 8, 6};
@@ -198,7 +200,7 @@ Img2D::~Img2D() {
 void Img2D::SetCalc2D(Calc2D* calc) {
     m_ptrCalc = calc;
 
-    m_calcPara.depthDots = IMG_H * Calc2D::INIT_SCALE;
+    m_calcPara.depthDots = CANVAS_AREA_H * Calc2D::INIT_SCALE;
     m_calcPara.imgScaleIndexMax = MAX_SCALE_INDEX;
     m_calcPara.angleIndexMax = MAX_ANGLE;
     m_calcPara.soundSpeed = SOUND_SPEED;
@@ -529,7 +531,7 @@ void Img2D::InitProbe2D(ProbeSocket::ProbePara* ptrPara, ExamItem::ParaItem* ptr
     ASSERT((ptrPara!=NULL) && (ptrParaItem != NULL));
 
     PRINTF("begin init 2D\n");
-    int dots = IMG_H * Calc2D::INIT_SCALE;
+    int dots = CANVAS_AREA_H * Calc2D::INIT_SCALE;
     m_calcPara.depthDots = dots;
     m_ptrDscPara->dcaSamplePoints = dots;
 
@@ -2568,9 +2570,9 @@ void Img2D::GetDisplayScanRange(int scanRange[2]) {
 
     if (((ModeStatus::IsMImgMode()) && (formatM == FormatM::BM11_LR))
             || ((ModeStatus::IsSpectrumImgMode() || ModeStatus::IsSpectrumColorImgMode()) && (formatPw == FormatPw::BP11_LR)))
-        m_ptrCalc->CalcDisplayScanRange(tempRange, IMG_W / 2);
+        m_ptrCalc->CalcDisplayScanRange(tempRange, CANVAS_AREA_W / 2);
     else
-        m_ptrCalc->CalcDisplayScanRange(tempRange, IMG_W);
+        m_ptrCalc->CalcDisplayScanRange(tempRange, CANVAS_AREA_W);
 
     int mbp = MBP[m_mbpIndex];
     scanRange[0] = tempRange[0] / mbp * mbp;
@@ -2801,7 +2803,7 @@ void Img2D::ExitSimult() {
 #if 0
 /*
  * @brief change dots in depth direction
- * note: not used now, in 4B mode, dots = IMG_H, but DSC select one data between two or three to restruct image
+ * note: not used now, in 4B mode, dots = CANVAS_AREA_H, but DSC select one data between two or three to restruct image
  *
  * @para dots dots of depth
  */

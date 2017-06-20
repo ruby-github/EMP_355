@@ -567,16 +567,12 @@ void MenuReview::LoadSnapToScreen(const char* path) {
         PRINTF("----frm path %s\n", frm_path);
     }
 
-//	pixels = gdk_pixbuf_get_pixels(item.pixbuf);
-//	rowstride = gdk_pixbuf_get_rowstride(item.pixbuf);
-//	n_channels = gdk_pixbuf_get_n_channels(item.pixbuf);
-//	p =	pixels + IMAGE_Y * rowstride + IMAGE_X * n_channels;
     width = gdk_pixbuf_get_width(item.pixbuf);
     height = gdk_pixbuf_get_height(item.pixbuf);
 
     //默认显示待字符的图像，存在Frm图像先加载好，待进入测量后通过刷新将Frm图像刷新出来，从而去掉字符信息
     // m_ptrTopArea->DrawSnap(item.pixbuf, 0, 0, width, TOP_AREA_H);
-    m_ptrImgArea->DrawSnap(item.pixbuf, 0, IMG_AREA_Y, width, height-IMG_AREA_Y);
+    m_ptrImgArea->DrawSnap(item.pixbuf, 0, IMAGE_AREA_Y, width, height-IMAGE_AREA_Y);
     if(!ViewSuperuser::GetInstance()->GetDemoStatus()) {
         if(m_limit != 2) {
             PRINTF("---m_limit is not equal 2\n");

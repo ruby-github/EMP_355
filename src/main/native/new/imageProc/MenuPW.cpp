@@ -551,7 +551,7 @@ void MenuPW::ChkAutoCalcClicked(GtkToggleButton *togglebutton) {
             MeasureMan::GetInstance()->ClearLast();
             POINT psP, edP;
             psP.x = edP.x = 0;
-            psP.y = edP.y = IMAGE_H/2;
+            psP.y = edP.y = CANVAS_AREA_H/2;
             ImageAreaDraw::GetInstance()->SetPsEdValue(psP, edP, 1);
         } else
             ImageAreaDraw::GetInstance()->ClearAutoCalcPara(); //只是显示，没有增加到测量管理中

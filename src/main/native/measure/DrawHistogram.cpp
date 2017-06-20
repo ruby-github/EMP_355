@@ -1,8 +1,10 @@
 #include "display/ImageArea.h"
 #include "measure/DrawHistogram.h"
 
-#define HISTOGRAM_START_X (IMAGE_W-256)
-#define HISTOGRAM_START_Y (IMAGE_H-5)
+#include "utils/MainWindowConfig.h"
+
+#define HISTOGRAM_START_X (CANVAS_AREA_W-256)
+#define HISTOGRAM_START_Y (CANVAS_AREA_H-5)
 
 DrawHistogram *DrawHistogram::m_ptrInstance = NULL;
 
@@ -150,7 +152,7 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p) {
 
     width = m_area_end.x - m_area_start.x;
     height = m_area_end.y - m_area_start.y;
-    field_p = image_p + (IMG_W * m_area_start.y + m_area_start.x) * 3;
+    field_p = image_p + (CANVAS_AREA_W * m_area_start.y + m_area_start.x) * 3;
 
     for (i=0; i<height; i++) {
         for (j=0; j<width; j++) {
@@ -158,7 +160,7 @@ void DrawHistogram::HistogramDraw(unsigned char *image_p) {
             m_sum[color]++;
             field_p += BYTES_DOT;
         }
-        field_p += (IMG_W - width) * BYTES_DOT;
+        field_p += (CANVAS_AREA_W - width) * BYTES_DOT;
     }
 
     int m;

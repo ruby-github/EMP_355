@@ -14,6 +14,8 @@
 #include "probe/ProbeMan.h"
 #include "probe/ProbeSocket.h"
 
+#include "utils/MainWindowConfig.h"
+
 //filter parament
 const unsigned char CalcCfm::m_filterLowPass[30720] = { //480*32*2
 #include "res/filter/Convex/dync_lp_12M_0M_025_480seg.h"
@@ -26,10 +28,10 @@ CalcCfm::~CalcCfm() {
 
 void CalcCfm::CalcBox(int lineBegin, int lineEnd, int dotBegin, int dotEnd) {
 //	printf("----------CFM BOX fpga:lineb = %d, linee = %d, dotb = %d, dote = %d\n", lineBegin, lineEnd, dotBegin, dotEnd);
-    if (dotBegin > IMG_H)
-        dotBegin = IMG_H;
-    if (dotEnd > IMG_H)
-        dotEnd = IMG_H;
+    if (dotBegin > CANVAS_AREA_H)
+        dotBegin = CANVAS_AREA_H;
+    if (dotEnd > CANVAS_AREA_H)
+        dotEnd = CANVAS_AREA_H;
     if (dotBegin <= 0) // dotBegin send to fpga must larger than 0
         dotBegin = 1;
 

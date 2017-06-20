@@ -13,6 +13,7 @@
 #include "imageProc/Zoom.h"
 #include "keyboard/KeyFunc.h"
 #include "keyboard/MultiFuncMode.h"
+#include "keyboard/MultiFuncFactory.h"
 #include "measure/MeasureFactory.h"
 #include "probe/MenuBiopsy.h"
 
@@ -392,11 +393,11 @@ void MultiFuncMeasure::KeyDown() {
 POINT MultiFuncMeasure::GetPoint(int offsetX, int offsetY) {
   m_p = m_draw.GetCursor();
 
-  if (((m_p.x + offsetX) >= 0) &&((m_p.x + offsetX) <= IMAGE_W))
+  if (((m_p.x + offsetX) >= 0) &&((m_p.x + offsetX) <= CANVAS_AREA_W))
     m_p.x += offsetX;
 
   offsetY = -offsetY;
-  if (((m_p.y + offsetY) >= 0) &&((m_p.y + offsetY) <= IMAGE_H))
+  if (((m_p.y + offsetY) >= 0) &&((m_p.y + offsetY) <= CANVAS_AREA_H))
     m_p.y += offsetY;
 
   m_draw.SetCursor(m_p);

@@ -3,6 +3,7 @@
 
 #include "Def.h"
 #include "display/ImageArea.h"
+#include "utils/MainWindowConfig.h"
 
 class Image {
 public:
@@ -17,8 +18,8 @@ public:
     Image(const Image &obj);
     ~Image();
 
-    static const int HEIGHT = IMG_AREA_H;
-    static const int WIDTH = IMG_AREA_W;
+    static const int HEIGHT = IMAGE_AREA_H;
+    static const int WIDTH = IMAGE_AREA_W;
 
     unsigned int* GetImg();
     const AutoTracePara* GetTraceData(void);

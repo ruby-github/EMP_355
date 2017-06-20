@@ -21,8 +21,8 @@ ImgProcM::ImgProcM() {
     m_EnhanceM = 0;
     m_MSmooth = 0;
     m_LineDraw = FALSE;
-    m_LineBegin.x = IMAGE_W / 4;
-    m_LineBegin.y = IMAGE_H / 4;
+    m_LineBegin.x = CANVAS_AREA_W / 4;
+    m_LineBegin.y = CANVAS_AREA_H / 4;
     m_LineEnd.x = m_LineBegin.x + 50;
     m_LineEnd.y = m_LineBegin.y + 50;
     m_TimeMark = FALSE;

@@ -470,7 +470,7 @@ unsigned char ImgMan::ReadSnap(unsigned int no, const char* filename, const char
 
     ReadConfigPara(item, &ini, SECTION);
     if(!strcmp(suffix, "frm"))
-        item->height = IMG_AREA_H;
+        item->height = IMAGE_AREA_H;
 
     if(!strcmp(suffix, "jpg") || !strcmp(suffix, "bmp")) {
         GError *err = NULL;
@@ -536,7 +536,7 @@ unsigned char ImgMan::ReadSnap(const char* absPath, struct ImgItem* item) {
 
     ReadConfigPara(item, &ini, SECTION);
     if(!strcmp(suffix, "frm"))
-        item->height = IMG_AREA_H;
+        item->height = IMAGE_AREA_H;
 
     GError *err = NULL;
     if(!strcmp(suffix, "jpg") || !strcmp(suffix, "bmp")) {
@@ -704,10 +704,10 @@ DCMIMAGEELEMENT ImgMan::GetImageElement(void) {
     Img.imgBitCount = 24;
     Img.imgFrameNumber = 1;
     Img.imgFilename = m_imgFileName;
-    Img.imgCalibrationRegion.left = IMAGE_X;
-    Img.imgCalibrationRegion.top = IMAGE_Y + IMG_AREA_Y;
-    Img.imgCalibrationRegion.right = IMAGE_X + IMAGE_W;
-    Img.imgCalibrationRegion.bottom = IMAGE_Y +IMG_AREA_Y +IMAGE_H;
+    Img.imgCalibrationRegion.left = CANVAS_IMAGE_X;
+    Img.imgCalibrationRegion.top = CANVAS_IMAGE_Y + IMAGE_AREA_Y;
+    Img.imgCalibrationRegion.right = CANVAS_IMAGE_X + CANVAS_AREA_W;
+    Img.imgCalibrationRegion.bottom = CANVAS_IMAGE_Y +IMAGE_AREA_Y +CANVAS_AREA_H;
     Img.imgScale = Img2D::GetInstance()->GetScale2D()/10;
     Img.imgStudyPart = ViewArchive::GetInstance()->GetExamType();
     PRINTF("imgHeigth=%d",Img.imgHeight);

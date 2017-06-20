@@ -1,14 +1,17 @@
 #include "bodymark/MultiFuncBodyMark.h"
 
 #include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
 #include "display/KnobMenu.h"
 #include "display/KnobNone.h"
 #include "display/HintArea.h"
 #include "imageProc/ModeStatus.h"
+#include "keyboard/KeyDef.h"
 #include "keyboard/KeyFunc.h"
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/LightDef.h"
+#include "keyboard/MultiFuncFactory.h"
 #include "sysMan/SysNoteSetting.h"
 #include "ViewMain.h"
 
@@ -92,8 +95,8 @@ EKnobReturn MultiFuncBodyMark::SetBodyMarkSize(EKnobOper opr) {
     }
 
     double scale = m_this->m_ptrBodyMark->GetBodyMarkScale();
-    int x = IMG_AREA_X + IMAGE_X + m_this->m_bodyPos[m_this->m_active].x + BDMK_W * scale / 2;
-    int y = IMG_AREA_Y + IMAGE_Y + m_this->m_bodyPos[m_this->m_active].y + BDMK_H * scale / 2;
+    int x = CANVAS_AREA_X + m_this->m_bodyPos[m_this->m_active].x + BDMK_W * scale / 2;
+    int y = CANVAS_AREA_Y + m_this->m_bodyPos[m_this->m_active].y + BDMK_H * scale / 2;
     SetSystemCursor(x, y);
 
     SysNoteSetting sys;
@@ -187,8 +190,8 @@ EKnobReturn MultiFuncBodyMark::PressSetBodyMarkSize() {
     m_this->ReviseProbePos(new_scale/old_scale);
 
     double scale = m_this->m_ptrBodyMark->GetBodyMarkScale();
-    int x = IMG_AREA_X + IMAGE_X + m_this->m_bodyPos[m_this->m_active].x + BDMK_W * scale / 2;
-    int y = IMG_AREA_Y + IMAGE_Y + m_this->m_bodyPos[m_this->m_active].y + BDMK_H * scale / 2;
+    int x = CANVAS_AREA_X + m_this->m_bodyPos[m_this->m_active].x + BDMK_W * scale / 2;
+    int y = CANVAS_AREA_Y + m_this->m_bodyPos[m_this->m_active].y + BDMK_H * scale / 2;
     SetSystemCursor(x, y);
 
     SysNoteSetting sys;
@@ -255,8 +258,8 @@ MultiFuncBodyMark::MultiFuncBodyMark() {
   m_ptrBodyMark  = NULL;
 
   for (int i=0; i<4; i++) {
-    m_bodyPos[i].x = IMG_W - BDMK_W * BDMK_MAX_SCALE;
-    m_bodyPos[i].y = IMG_H - BDMK_H * BDMK_MAX_SCALE;
+    m_bodyPos[i].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE;
+    m_bodyPos[i].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE;
     m_probePos[i].x = m_probePosOffset.x;
     m_probePos[i].y = m_probePosOffset.y;
   }
@@ -390,8 +393,8 @@ void MultiFuncBodyMark::MouseEvent(char offsetX, char offsetY) {
     m_ptrBodyMark->MoveBody(m_bodyPos[m_active], m_probePos[m_active], m_active);
 
     double scale = m_ptrBodyMark->GetBodyMarkScale();
-    int x = IMG_AREA_X + IMAGE_X + m_bodyPos[m_active].x + BDMK_W * scale / 2;
-    int y = IMG_AREA_Y + IMAGE_Y + m_bodyPos[m_active].y + BDMK_H * scale / 2;
+    int x = CANVAS_AREA_X + m_bodyPos[m_active].x + BDMK_W * scale / 2;
+    int y = CANVAS_AREA_Y + m_bodyPos[m_active].y + BDMK_H * scale / 2;
 
     SetSystemCursor(x, y);
   } else if ((m_bodyOpr == IDEL) || (m_bodyOpr == ADD)) {
@@ -488,57 +491,57 @@ void MultiFuncBodyMark::AddNewBodyMark(GdkPixbuf* pixbuf) {
       // BB Mode
 
       if(m_active == 0) {
-        m_bodyPos[m_active].x = IMG_W / 2 - BDMK_W * BDMK_MAX_SCALE;
-        m_bodyPos[m_active].y = IMG_H - BDMK_H * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].x = CANVAS_AREA_W / 2 - BDMK_W * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE;
         m_bodyPosRange.x = 0;
         m_bodyPosRange.y = 0;
       } else {
-        m_bodyPos[m_active].x = IMG_W - BDMK_W * BDMK_MAX_SCALE;
-        m_bodyPos[m_active].y = IMG_H - BDMK_H * BDMK_MAX_SCALE;
-        m_bodyPosRange.x = IMG_W / 2;
+        m_bodyPos[m_active].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE;
+        m_bodyPosRange.x = CANVAS_AREA_W / 2;
         m_bodyPosRange.y = 0;
       }
 
-      m_bodyPosRange.width = IMG_W / 2;
-      m_bodyPosRange.height = IMG_H;
+      m_bodyPosRange.width = CANVAS_AREA_W / 2;
+      m_bodyPosRange.height = CANVAS_AREA_H;
     } else if ((ms.IsD2Mode() && format2D == Format2D::B4)
       || ((ms.IsCFMMode() || ms.IsPDIMode()) && formatCfm == FormatCfm::B4)) {
       // 4B Mode
 
       if(m_active == 0) {
-        m_bodyPos[m_active].x = IMG_W / 2 - BDMK_W * BDMK_MAX_SCALE;
-        m_bodyPos[m_active].y = IMG_H / 2 - BDMK_H * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].x = CANVAS_AREA_W / 2 - BDMK_W * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].y = CANVAS_AREA_H / 2 - BDMK_H * BDMK_MAX_SCALE;
         m_bodyPosRange.x = 0;
         m_bodyPosRange.y = 0;
       } else if(m_active == 1) {
-        m_bodyPos[m_active].x = IMG_W - BDMK_W * BDMK_MAX_SCALE;
-        m_bodyPos[m_active].y = IMG_H / 2 - BDMK_H * BDMK_MAX_SCALE;
-        m_bodyPosRange.x = IMG_W / 2;
+        m_bodyPos[m_active].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].y = CANVAS_AREA_H / 2 - BDMK_H * BDMK_MAX_SCALE;
+        m_bodyPosRange.x = CANVAS_AREA_W / 2;
         m_bodyPosRange.y = 0;
       } else if(m_active == 2) {
-        m_bodyPos[m_active].x = IMG_W / 2 - BDMK_W * BDMK_MAX_SCALE;
-        m_bodyPos[m_active].y = IMG_H - BDMK_H * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].x = CANVAS_AREA_W / 2 - BDMK_W * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE;
         m_bodyPosRange.x = 0;
-        m_bodyPosRange.y = IMG_H / 2;
+        m_bodyPosRange.y = CANVAS_AREA_H / 2;
       } else {
-        m_bodyPos[m_active].x = IMG_W - BDMK_W * BDMK_MAX_SCALE;
-        m_bodyPos[m_active].y = IMG_H - BDMK_H * BDMK_MAX_SCALE;
-        m_bodyPosRange.x = IMG_W / 2;
-        m_bodyPosRange.y = IMG_H / 2;
+        m_bodyPos[m_active].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE;
+        m_bodyPos[m_active].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE;
+        m_bodyPosRange.x = CANVAS_AREA_W / 2;
+        m_bodyPosRange.y = CANVAS_AREA_H / 2;
       }
 
-      m_bodyPosRange.width = IMG_W / 2;
-      m_bodyPosRange.height = IMG_H / 2;
+      m_bodyPosRange.width = CANVAS_AREA_W / 2;
+      m_bodyPosRange.height = CANVAS_AREA_H / 2;
     } else {
       // Single B Mode
 
       m_active = 0;
-      m_bodyPos[m_active].x = IMG_W - BDMK_W * BDMK_MAX_SCALE;
-      m_bodyPos[m_active].y = IMG_H - BDMK_H * BDMK_MAX_SCALE;
+      m_bodyPos[m_active].x = CANVAS_AREA_W - BDMK_W * BDMK_MAX_SCALE;
+      m_bodyPos[m_active].y = CANVAS_AREA_H - BDMK_H * BDMK_MAX_SCALE;
       m_bodyPosRange.x = 0;
       m_bodyPosRange.y = 0;
-      m_bodyPosRange.width = IMG_W;
-      m_bodyPosRange.height = IMG_H;
+      m_bodyPosRange.width = CANVAS_AREA_W;
+      m_bodyPosRange.height = CANVAS_AREA_H;
     }
 
     m_ptrBodyMark->DisplayNewBodyMark(pixbuf, m_bodyPos[m_active], m_probePos[m_active], m_bodyPosRange, m_active, TRUE);
@@ -608,8 +611,8 @@ bool MultiFuncBodyMark::DClicked() {
     InvisibleCursor(FALSE);
 
     double scale = m_ptrBodyMark->GetBodyMarkScale();
-    int x = IMG_AREA_X + IMAGE_X + m_bodyPos[m_active].x + BDMK_W * scale / 2;
-    int y = IMG_AREA_Y + IMAGE_Y + m_bodyPos[m_active].y + BDMK_H * scale / 2;
+    int x = CANVAS_AREA_X + m_bodyPos[m_active].x + BDMK_W * scale / 2;
+    int y = CANVAS_AREA_Y + m_bodyPos[m_active].y + BDMK_H * scale / 2;
 
     SetSystemCursor(x, y);
     ChangeSystemCursor(GDK_HAND1);

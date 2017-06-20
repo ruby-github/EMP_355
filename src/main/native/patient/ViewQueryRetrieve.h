@@ -11,6 +11,8 @@
 #include "imageProc/Image.h"
 #include "patient/PatientInfo.h"
 
+#include "utils/MainWindowConfig.h"
+
 using std::deque;
 class ViewQueryRetrieve:public FakeXEvent,public AbsCalendarOpr {
 public:
@@ -83,7 +85,7 @@ private:
     int m_itemIndex;
     int m_imageNum;
     bool m_retrieveFlag;
-    unsigned char m_videoBit[IMG_AREA_W*IMG_AREA_H*IMG_BPP];
+    unsigned char m_videoBit[IMAGE_AREA_W * IMAGE_AREA_H * CANVAS_BPP];
     static PatientInfo m_patientInfo;
     string m_srComments;
     vector<string> m_srReferenceImageFilename;

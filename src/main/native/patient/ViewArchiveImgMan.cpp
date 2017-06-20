@@ -33,6 +33,7 @@
 #include "patient/AviEncDecH264.h"
 
 #include "utils/FakeXUtils.h"
+#include "utils/MainWindowConfig.h"
 
 // global
 static gboolean TimerReviewCineAuto(gpointer data) {

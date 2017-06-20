@@ -40,18 +40,6 @@
 #define ASSERT
 #endif
 
-///> ultrasound define
-#define IMG_W       628
-#define IMG_H       440
-#define IMG_BPP 3 //bytes per pixels
-
-///> bodymark size
-#define BDMK_W 60
-#define BDMK_H 75
-#define BDMK_PROBE_LEN 24
-#define BDMK_MAX_SCALE 1.5
-#define BDMK_PROBE_MAX_SCALE 1.2
-
 #define BYTES_DOT 3	//每个像素点用3个字节表示
 //#define USERCONFIG_LEN 50
 #define FONT_STRING "WenQuanYi Zen Hei, medium"

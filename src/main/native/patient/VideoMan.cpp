@@ -768,10 +768,10 @@ DCMIMAGEELEMENT VideoMan::GetImageElement(void) {
     Img.imgBitCount = 24;
     Img.imgFrameNumber = m_ptrVideoItem->frames;
     Img.imgFilename = m_videoFileName;
-    Img.imgCalibrationRegion.left = IMAGE_X;
-    Img.imgCalibrationRegion.top = IMAGE_Y + IMG_AREA_Y;
-    Img.imgCalibrationRegion.right = IMAGE_X + IMAGE_W;
-    Img.imgCalibrationRegion.bottom = IMAGE_Y +IMG_AREA_Y +IMAGE_H;
+    Img.imgCalibrationRegion.left = CANVAS_IMAGE_X;
+    Img.imgCalibrationRegion.top = CANVAS_IMAGE_Y + IMAGE_AREA_Y;
+    Img.imgCalibrationRegion.right = CANVAS_IMAGE_X + CANVAS_AREA_W;
+    Img.imgCalibrationRegion.bottom = CANVAS_IMAGE_Y +IMAGE_AREA_Y +CANVAS_AREA_H;
     Img.imgScale = Img2D::GetInstance()->GetScale2D()/10;
     Img.imgStudyPart = ViewArchive::GetInstance()->GetExamType();
 
