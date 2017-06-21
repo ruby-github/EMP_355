@@ -209,6 +209,12 @@ private:
 private:
   ViewNewPat();
 
+  GtkWidget* create_note_general();
+  GtkWidget* create_note_ob();
+  GtkWidget* create_note_card();
+  GtkWidget* create_note_uro();
+  GtkWidget* create_note_other();
+
 private:
   static ViewNewPat* m_instance;
 
@@ -233,6 +239,38 @@ private:
   GtkComboBoxEntry* m_comboboxentry_diagnostician;
   GtkComboBoxEntry* m_comboboxentry_physician;
 
+  // General
+  GtkEntry* m_entry_stature;
+  GtkEntry* m_entry_weight;
+  GtkEntry* m_entry_bsa;
+
+  // OB
+  GtkComboBoxText* m_combobox_ob_date;
+  GtkEntry* m_entry_ob_year;
+  GtkEntry* m_entry_ob_month;
+  GtkEntry* m_entry_ob_day;
+  GtkEntry* m_entry_ob_gw;
+  GtkEntry* m_entry_ob_edd;
+  GtkLabel* m_warming_label;
+
+  GtkEntry* m_entry_ob_gravida;
+  GtkEntry* m_entry_ob_ectopic;
+  GtkEntry* m_entry_ob_gestations;
+  GtkEntry* m_entry_ob_para;
+  GtkEntry* m_entry_ob_aborta;
+
+  // CARD
+  GtkEntry* m_entry_hr;
+  GtkEntry* m_entry_bp_high;
+  GtkEntry* m_entry_bp_low;
+
+  // URO
+  GtkEntry* m_entry_uro_psa;
+
+  // Other
+  GtkEntry* m_entry_other_tel;
+  GtkEntry* m_entry_other_address;
+
   bool m_langCN;
   int m_curYear;
   int m_curMonth;
@@ -251,9 +289,6 @@ public:
 
 private:
 
-
-
-
     void FillPatInfo(const PatientInfo::Patient &pat_info);
     void GetPatInfo(PatientInfo::Info &info);
 
@@ -265,16 +300,7 @@ private:
         return (0 == strcmp(new_text, "'"));
     }
 
-
-
-
 private:
-
-    GtkWidget* create_note_general();
-    GtkWidget* create_note_ob();
-    GtkWidget* create_note_card();
-    GtkWidget* create_note_uro();
-    GtkWidget* create_note_other();
     bool AutoCalcAge(const int year, const int month, const int day);
     void KeyEvent(unsigned char keyValue);
     void CalcBSA();
@@ -286,63 +312,17 @@ private:
     void FillCarInfo(const PatientInfo::CarExam &car);
     void FillUroInfo(const PatientInfo::UroExam &uro);
 
-
     bool m_clearAll;            // clear all or examinfo
 
-    GtkWidget *m_warming_label;
-
     DCMSTUDYELEMENT m_studyInfo;
-
-
-    // general
-    GtkWidget *m_entry_stature;
-    GtkWidget *m_entry_weight;
-    GtkWidget *m_entry_BSA;
-    // ob
-    GtkWidget *m_entry_ob_year;
-    GtkWidget *m_entry_ob_month;
-    GtkWidget *m_entry_ob_day;
-    GtkWidget *m_entry_ob_GA;
-    GtkWidget *m_entry_ob_EDD;
-    GtkWidget *m_entry_ob_gravida;
-    GtkWidget *m_entry_ob_ectopic;
-    GtkWidget *m_entry_ob_gestations;
-    GtkWidget *m_entry_ob_para;
-    GtkWidget *m_entry_ob_aborta;
-    GtkWidget *m_combobox_ob_date;
-    // card
-    GtkWidget *m_entry_hr;
-    GtkWidget *m_entry_bp_high;
-    GtkWidget *m_entry_bp_low;
-    // URO
-    GtkWidget *m_entry_uro_psa;
-    // Other
-    GtkWidget *m_entry_other_tel;
-    GtkWidget *m_entry_other_address;
-
-
 
     bool m_flagMPPS;
 
 
     DCMMPPSELEMENT GetMPPSElement(PatientInfo::Info &info);
     void EditStudyInfo(PatientInfo::Info &info);
-    // signal handle
-
-
-
-
-
 
     const gchar* GetLMP();
-
-
-
-
-
-
-
-
 
     void ComboboxOBDateChanged(GtkComboBox *widget);
 
