@@ -57,21 +57,17 @@ ViewNewPat* ViewNewPat::GetInstance() {
     return m_ptrInstance;
 }
 
-void ViewNewPat::CreateWindow(void) {
+void ViewNewPat::CreateWindow() {
     GtkWidget *fixed_window;
     GtkWidget *frame;
     GtkWidget *fixed_general_info;
     GtkWidget *label_pat_id;
     GtkWidget *label_gender;
-#ifdef VET
-    GtkWidget *label_name_animal;
-    GtkWidget *label_name_owner;
-    GtkWidget *label_species;
-#else
+
     GtkWidget *label_name_mid;
     GtkWidget *label_name_first;
     GtkWidget *label_name_last;
-#endif
+
     GtkWidget *label_age;
     GtkWidget *label_birth_date;
     GtkWidget *label_spacing_day;
@@ -122,9 +118,7 @@ void ViewNewPat::CreateWindow(void) {
     const int pat_id_len = 15;
 
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
-#ifdef VET
-    //BeforeEnterDialog();
-#endif
+
     SysGeneralSetting *sgs = new SysGeneralSetting;
     if ((ZH == sgs->GetLanguage()) || (FR == sgs->GetLanguage()))
         m_langCN = true;
@@ -139,11 +133,9 @@ void ViewNewPat::CreateWindow(void) {
     gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
     gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
     gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-#ifdef VET
-    gtk_window_set_title (GTK_WINDOW (m_window), _("Animal Information"));
-#else
+
     gtk_window_set_title (GTK_WINDOW (m_window), _("Patient Information"));
-#endif
+
 
     gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
     g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
@@ -162,11 +154,7 @@ void ViewNewPat::CreateWindow(void) {
     gtk_widget_show (fixed_general_info);
     gtk_container_add (GTK_CONTAINER (frame), fixed_general_info);
 
-#ifdef VET
-    label_pat_id = gtk_label_new (_("ID:"));
-#else
     label_pat_id = gtk_label_new (_("Patient ID:"));
-#endif
 
     gtk_widget_show (label_pat_id);
     gtk_fixed_put (GTK_FIXED (fixed_general_info), label_pat_id, 10, 8);
@@ -193,72 +181,6 @@ void ViewNewPat::CreateWindow(void) {
     gtk_widget_set_size_request (button_search_pat_info, 120, 30);
     g_signal_connect ((gpointer) button_search_pat_info, "clicked", G_CALLBACK (on_button_search_clicked), this);
 
-#ifdef VET
-    label_name_animal = gtk_label_new (_("Animal Name:"));
-    gtk_widget_show (label_name_animal);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_name_animal, 10, 45);
-    gtk_widget_set_size_request (label_name_animal, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_name_animal), 0.9, 0.5);
-
-    m_entryAnimalName = gtk_entry_new ();
-    gtk_widget_show (m_entryAnimalName);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryAnimalName, 118, 45);
-    gtk_widget_set_size_request (m_entryAnimalName, 160, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryAnimalName), pat_name_len);
-    g_signal_connect(G_OBJECT(m_entryAnimalName), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-
-    label_name_owner = gtk_label_new (_("Owner:"));
-    gtk_widget_show (label_name_owner);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_name_owner, 270, 45);
-    gtk_widget_set_size_request (label_name_owner, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_name_owner), 0.9, 0.5);
-
-    GtkListStore *store =  gtk_list_store_new (1, G_TYPE_STRING);
-    m_comboboxOwnerName = gtk_combo_box_entry_new_with_model(GTK_TREE_MODEL(store), 0);
-    //gtk_combo_box_set_model(GTK_COMBO_BOX(m_comboboxOwnerName), GTK_TREE_MODEL(store));
-    g_object_unref(store);
-    gtk_widget_show(m_comboboxOwnerName);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_comboboxOwnerName, 370, 45);
-    gtk_widget_set_size_request (m_comboboxOwnerName, 120, 30);
-    g_signal_connect(m_comboboxOwnerName, "notify::active", G_CALLBACK(HandleOwnerNameChanged), this);
-    GtkCellRenderer *renderer = gtk_cell_renderer_text_new ();
-    gtk_cell_layout_clear (GTK_CELL_LAYOUT(m_comboboxOwnerName));
-    gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (m_comboboxOwnerName), renderer, TRUE);
-    gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (m_comboboxOwnerName), renderer, "text", 0, NULL);
-    gtk_cell_layout_reorder (GTK_CELL_LAYOUT(m_comboboxOwnerName), renderer, 0);
-
-    gtk_entry_set_max_length(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))), pat_name_len);
-    g_signal_connect(G_OBJECT(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))), "insert_text", G_CALLBACK(HandleOwnerNameInsert), this);
-    g_signal_connect(G_OBJECT(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))), "delete_text", G_CALLBACK(HandleOwnerNameDelete), this);
-
-#if 0
-    m_entryOwnerName = gtk_entry_new ();
-    gtk_widget_show (m_entryOwnerName);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryOwnerName, 370, 45);
-    gtk_widget_set_size_request (m_entryOwnerName, 120, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryOwnerName), pat_name_len);
-    g_signal_connect(G_OBJECT(m_entryOwnerName), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-#endif
-    label_species = gtk_label_new (_("Species:"));
-    gtk_widget_show (label_species);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_species, 530, 45);
-    gtk_widget_set_size_request (label_species, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_species), 0.9, 0.5);
-
-    m_comboboxSpecies = gtk_combo_box_new_text ();
-    gtk_widget_show (m_comboboxSpecies);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_comboboxSpecies, 630, 45);
-    gtk_widget_set_size_request (m_comboboxSpecies, 120, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Dog"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Cat"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Sheep"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Swine"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Bovine"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Equine"));
-//    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxSpecies), _("Other"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX (m_comboboxSpecies), 0);
-
-#else
     label_name_last = gtk_label_new (_("Last Name:"));
     gtk_widget_show (label_name_last);
     gtk_fixed_put (GTK_FIXED (fixed_general_info), label_name_last, 10, 45);
@@ -297,7 +219,7 @@ void ViewNewPat::CreateWindow(void) {
     gtk_widget_set_size_request (m_entryNameMid, 120, 30);
     gtk_entry_set_max_length(GTK_ENTRY(m_entryNameMid), m_pat_name_middle);
     g_signal_connect(G_OBJECT(m_entryNameMid), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-#endif
+
     label_birth_date = gtk_label_new (_("Date of Birth:"));
     //label_birth_date = gtk_label_new (_("Birth Date:"));
     gtk_widget_show (label_birth_date);
@@ -462,13 +384,10 @@ void ViewNewPat::CreateWindow(void) {
     gtk_widget_show (m_comboboxGender);
     gtk_fixed_put (GTK_FIXED (fixed_general_info), m_comboboxGender, 630, 80);
     gtk_widget_set_size_request (m_comboboxGender, 122, 32);
-#ifdef VET
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Female "));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Male "));
-#else
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Female"));
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Male"));
-#endif
+
     gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Other"));
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxGender), -1);
 
@@ -483,40 +402,13 @@ void ViewNewPat::CreateWindow(void) {
     gtk_frame_set_label_widget (GTK_FRAME (frame), label_general_info);
     gtk_label_set_use_markup (GTK_LABEL (label_general_info), TRUE);
 
-    // button_title = gtk_button_new_with_mnemonic (_("Patient Infomation"));
-    // gtk_widget_show (button_title);
-    // gtk_fixed_put (GTK_FIXED (fixed_window), button_title, 0, 0);
-    // gtk_widget_set_size_request (button_title, 800, 30);
-    // GTK_WIDGET_UNSET_FLAGS (button_title, GTK_CAN_FOCUS);
-    // gtk_button_set_focus_on_click (GTK_BUTTON (button_title), FALSE);
+    cout << 1 << endl;
 
     notebook = gtk_notebook_new ();
     gtk_widget_show (notebook);
     gtk_fixed_put (GTK_FIXED (fixed_window), notebook, 20, 160);
     gtk_widget_set_size_request (notebook, 800, 250);
-//hlx
-#ifdef VET
-    fixed_tab_card = create_note_card();
-    gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_card);
 
-    label_card = gtk_label_new (_("CARD"));
-    gtk_widget_show (label_card);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0), label_card);
-
-    fixed_tab_uro = create_note_uro();
-    gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_uro);
-
-    label_uro = gtk_label_new (_("URO"));
-    gtk_widget_show (label_uro);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 1), label_uro);
-
-    fixed_tab_other = create_note_other();
-    gtk_container_add(GTK_CONTAINER(notebook), fixed_tab_other);
-
-    label_other = gtk_label_new (_("Other"));
-    gtk_widget_show (label_other);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), label_other);
-#else
     fixed_tab_general = create_note_general();
     gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_general);
 
@@ -541,6 +433,8 @@ void ViewNewPat::CreateWindow(void) {
     fixed_tab_uro = create_note_uro();
     gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_uro);
 
+    cout << 2 << endl;
+
     label_uro = gtk_label_new (_("URO"));
     gtk_widget_show (label_uro);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 3), label_uro);
@@ -551,7 +445,7 @@ void ViewNewPat::CreateWindow(void) {
     label_other = gtk_label_new (_("Other"));
     gtk_widget_show (label_other);
     gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 4), label_other);
-#endif
+
     label_comment = gtk_label_new (_("Comment:"));
     gtk_widget_show (label_comment);
     gtk_fixed_put (GTK_FIXED (fixed_window), label_comment, 20, 420);
@@ -570,17 +464,8 @@ void ViewNewPat::CreateWindow(void) {
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (m_textview_comment), GTK_WRAP_WORD_CHAR);
     gtk_container_add (GTK_CONTAINER (scrolledwindow_comment), m_textview_comment);
     g_signal_connect(G_OBJECT(gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_comment))), "insert-text", G_CALLBACK(on_textview_comment_insert), this);
-    // label_accession = gtk_label_new (_("Accession #:"));
-    // gtk_widget_show (label_accession);
-    // gtk_fixed_put (GTK_FIXED (fixed_window), label_accession, 5, 475);
-    // gtk_widget_set_size_request (label_accession, 100, 30);
-    // gtk_misc_set_alignment (GTK_MISC (label_accession), 0.9, 0.5);
 
-    // entry_accession = gtk_entry_new ();
-    // gtk_widget_show (entry_accession);
-    // gtk_fixed_put (GTK_FIXED (fixed_window), entry_accession, 105, 475);
-    // gtk_widget_set_size_request (entry_accession, 120, 30);
-    // gtk_entry_set_invisible_char (GTK_ENTRY (entry_accession), 8226);
+    cout << 3 << endl;
 
     label_diagnostician = gtk_label_new (_("Diagnostician:"));
     gtk_widget_show (label_diagnostician);
@@ -594,7 +479,6 @@ void ViewNewPat::CreateWindow(void) {
     gtk_widget_set_size_request (m_comboboxentry_diagnostician, 120, 30);
     GtkWidget *bin_entry_dia = gtk_bin_get_child (GTK_BIN(m_comboboxentry_diagnostician));
     gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 45);
-    //g_signal_connect(G_OBJECT(bin_entry_dia), "insert_text", G_CALLBACK(on_entry_name_insert), this);
 
     label_physician = gtk_label_new (_("Physician:"));
     gtk_widget_show (label_physician);
@@ -625,18 +509,20 @@ void ViewNewPat::CreateWindow(void) {
     gtk_fixed_put (GTK_FIXED (fixed_window), hseparator, 20, 540);
     gtk_widget_set_size_request (hseparator, 800, 15);
 
+    cout << 4 << endl;
+
     image_exam_end = gtk_image_new_from_stock ("gtk-media-stop", GTK_ICON_SIZE_BUTTON);
     label_exam_end = gtk_label_new_with_mnemonic (_("End Exam"));
     button_exam_end = create_button_icon (label_exam_end, image_exam_end);
     gtk_fixed_put (GTK_FIXED (fixed_window), button_exam_end, 20, 560);
     gtk_button_set_focus_on_click(GTK_BUTTON(button_exam_end), TRUE);
 
+    cout << 40 << endl;
+
     image_new_pat = gtk_image_new_from_stock ("gtk-orientation-portrait", GTK_ICON_SIZE_BUTTON);
-#ifdef VET
-    label_new_pat = gtk_label_new_with_mnemonic (_("New Animal"));
-#else
+
     label_new_pat = gtk_label_new_with_mnemonic (_("New Patient"));
-#endif
+
     button_new_pat = create_button_icon(label_new_pat, image_new_pat);
     gtk_fixed_put (GTK_FIXED (fixed_window), button_new_pat, 150, 560);
 
@@ -644,12 +530,8 @@ void ViewNewPat::CreateWindow(void) {
     label_new_exam = gtk_label_new_with_mnemonic (_("New Exam"));
     button_new_exam = create_button_icon(label_new_exam, image_new_exam);
     gtk_fixed_put (GTK_FIXED (fixed_window), button_new_exam, 280, 560);
-#ifndef VET
-#ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
-#else
-    if(CDCMRegister::GetMe()->IsAuthorize())
-#endif
+
+    //if(CDCMRegister::GetMe()->IsAuthorize())
     {
         //worklist
         image_worklist = gtk_image_new_from_stock ("gtk-info", GTK_ICON_SIZE_BUTTON);
@@ -658,7 +540,7 @@ void ViewNewPat::CreateWindow(void) {
         gtk_fixed_put (GTK_FIXED (fixed_window), m_button_worklist, 410, 560);
         g_signal_connect ((gpointer) m_button_worklist, "clicked", G_CALLBACK (on_button_worklist_clicked), this);
     }
-#endif
+
     image_ok = gtk_image_new_from_stock ("gtk-ok", GTK_ICON_SIZE_BUTTON);
     label_ok = gtk_label_new_with_mnemonic (_("OK"));
     button_ok = create_button_icon(label_ok, image_ok);
@@ -677,16 +559,17 @@ void ViewNewPat::CreateWindow(void) {
     g_signal_connect ((gpointer) button_ok, "clicked", G_CALLBACK (on_button_ok_clicked), this);
     g_signal_connect ((gpointer) button_cancel, "clicked", G_CALLBACK (on_button_cancel_clicked), this);
 
+    cout << 5 << endl;
+
     gtk_widget_show(m_window);
 
     g_keyInterface.Push(this);
     SetSystemCursorToCenter();
-#ifndef VET
+
     if (m_langCN) {
         gtk_widget_hide (m_entryNameMid);
         gtk_widget_hide (label_name_mid);
     }
-#endif
 
     PatientInfo::Info info;
     g_patientInfo.GetInfo(info);
@@ -720,16 +603,12 @@ void ViewNewPat::CheckPatID(const gchar *pat_id) {
     if ((db.GetPatIDExist(pat_id)).empty()) {
         return ;
     } else {
-#ifdef VET
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Animal ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
-#else
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
-#endif
 
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
     }
 }
 
-void ViewNewPat::LoadPatData(void) {
+void ViewNewPat::LoadPatData() {
     const gchar *pat_id = gtk_entry_get_text(GTK_ENTRY(m_entryPatID));
     Database db;
     PatientInfo::Patient pat_info;
@@ -760,7 +639,7 @@ void ViewNewPat::UpdateNameLength() {
     }
 }
 
-void ViewNewPat::AutoPatID(void) {
+void ViewNewPat::AutoPatID() {
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_checkbuttonPatID), TRUE);
     string ID = GenPatID();
     gtk_entry_set_text(GTK_ENTRY(m_entryPatID), ID.c_str());
@@ -923,7 +802,7 @@ gboolean ViewNewPat::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
     return FALSE;
 }
 
-void ViewNewPat::DestroyWindow(void) {
+void ViewNewPat::DestroyWindow() {
     if(GTK_IS_WIDGET(m_window))	{
         g_keyInterface.Pop();
         gtk_widget_destroy(m_window);
@@ -932,11 +811,8 @@ void ViewNewPat::DestroyWindow(void) {
         m_window = NULL;
     }
 }
-GtkWidget* ViewNewPat::create_note_general(void) {
+GtkWidget* ViewNewPat::create_note_general() {
     GtkWidget *fixed_tab_general;
-    // GtkWidget *entry_stature;
-    // GtkWidget *entry_weight;
-    // GtkWidget *entry_BSA;
     GtkWidget *label_stature;
     GtkWidget *label_weight;
     GtkWidget *label_BSA;
@@ -1005,7 +881,7 @@ GtkWidget* ViewNewPat::create_note_general(void) {
     return fixed_tab_general;
 }
 
-const gchar* ViewNewPat::GetLMP(void) {
+const gchar* ViewNewPat::GetLMP() {
     return gtk_combo_box_get_active_text(GTK_COMBO_BOX(m_combobox_ob_date));
 }
 
@@ -1243,7 +1119,7 @@ void ViewNewPat::Calc_GA_EDD(const gchar *year, const gchar *month, const gchar 
     }
 }
 
-void ViewNewPat::CalcBSA(void) {
+void ViewNewPat::CalcBSA() {
     if (!gtk_entry_get_text_length(GTK_ENTRY(m_entry_stature)) ||
             !gtk_entry_get_text_length(GTK_ENTRY(m_entry_weight)))
         return ;
@@ -1269,20 +1145,10 @@ void ViewNewPat::WeightFocusOut(GtkWidget *widget, GdkEventFocus *event) {
     CalcBSA();
 }
 
-GtkWidget* ViewNewPat::create_note_ob(void) {
+GtkWidget* ViewNewPat::create_note_ob() {
     GtkWidget *fixed_tab_ob;
-    // GtkWidget *entry_ob_year;
-    // GtkWidget *entry_ob_month;
-    // GtkWidget *entry_ob_day;
     GtkWidget *label_ob_year_spacing;
     GtkWidget *label_ob_month_spacing;
-    //    GtkWidget *entry_ob_GA;
-    //    GtkWidget *entry_ob_EDD;
-    //    GtkWidget *entry_ob_gravida;
-    //    GtkWidget *entry_ob_ectopic;
-    //    GtkWidget *entry_ob_gestations;
-    //    GtkWidget *entry_ob_para;
-    //    GtkWidget *entry_ob_aborta;
     GtkWidget *label_ob_gravida;
     GtkWidget *label_ob_ectopic;
     GtkWidget *label_ob_gestations;
@@ -1290,7 +1156,6 @@ GtkWidget* ViewNewPat::create_note_ob(void) {
     GtkWidget *label_ob_aborta;
     GtkWidget *label_ob_GA;
     GtkWidget *label_ob_edd;
-    //    GtkWidget *combobox_ob_date;
 
     fixed_tab_ob = gtk_fixed_new ();
     gtk_widget_show (fixed_tab_ob);
@@ -1481,11 +1346,8 @@ void ViewNewPat::ComboboxOBDateChanged(GtkComboBox *widget) {
     Calc_GA_EDD(year, month, day);
 }
 
-GtkWidget* ViewNewPat::create_note_card(void) {
+GtkWidget* ViewNewPat::create_note_card() {
     GtkWidget *fixed_tab_card;
-    //    GtkWidget *entry_hr;
-    //    GtkWidget *entry_bp_high;
-    //    GtkWidget *entry_bp_low;
     GtkWidget *label_bp_entry;
     GtkWidget *label_bp;
     GtkWidget *label_hr;
@@ -1545,9 +1407,8 @@ GtkWidget* ViewNewPat::create_note_card(void) {
     return fixed_tab_card;
 }
 
-GtkWidget* ViewNewPat::create_note_uro(void) {
+GtkWidget* ViewNewPat::create_note_uro() {
     GtkWidget *fixed_tab_uro;
-    //    GtkWidget *entry_uro_psa;
     GtkWidget *label_uro_psa;
     GtkWidget *label_uro_psa_unit;
 
@@ -1574,7 +1435,7 @@ GtkWidget* ViewNewPat::create_note_uro(void) {
     return fixed_tab_uro;
 }
 
-GtkWidget* ViewNewPat::create_note_other(void) {
+GtkWidget* ViewNewPat::create_note_other() {
     GtkWidget *fixed_tab_other;
 
     GtkWidget *label_other_tel;
@@ -1585,77 +1446,40 @@ GtkWidget* ViewNewPat::create_note_other(void) {
     fixed_tab_other = gtk_fixed_new ();
     gtk_widget_show (fixed_tab_other);
 
-//hlx
-#ifdef VET
-    label_other_tel = gtk_label_new (_("Owner Telephone:"));
-#else
     label_other_tel = gtk_label_new (_("Telephone:"));
-#endif
+
     gtk_widget_show (label_other_tel);
     gtk_fixed_put (GTK_FIXED (fixed_tab_other), label_other_tel, 10, 10);
-#ifdef VET
-    gtk_widget_set_size_request (label_other_tel, 140, 30);
-#else
     gtk_widget_set_size_request (label_other_tel, 100, 30);
-#endif
 
     m_entry_other_tel = gtk_entry_new ();
     gtk_entry_set_max_length(GTK_ENTRY(m_entry_other_tel), 20);
     gtk_widget_show (m_entry_other_tel);
-#ifdef VET
-    gtk_fixed_put (GTK_FIXED (fixed_tab_other), m_entry_other_tel, 150, 10);
-#else
     gtk_fixed_put (GTK_FIXED (fixed_tab_other), m_entry_other_tel, 110, 10);
-#endif
     gtk_widget_set_size_request (m_entry_other_tel, 150, 30);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_other_tel), 9679);
-#ifdef VET
-    g_signal_connect(G_OBJECT(m_entry_other_tel), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-
-    label_other_address = gtk_label_new (_("Owner Address:"));
-#else
     label_other_address = gtk_label_new (_("Address:"));
-#endif
     gtk_widget_show (label_other_address);
     gtk_fixed_put (GTK_FIXED (fixed_tab_other), label_other_address, 10, 45);
-#ifdef VET
-    gtk_widget_set_size_request (label_other_address, 140, 30);
-#else
     gtk_widget_set_size_request (label_other_address, 100, 30);
-#endif
 
     m_entry_other_address = gtk_entry_new ();
     gtk_entry_set_max_length(GTK_ENTRY(m_entry_other_address), 100);
     gtk_widget_show (m_entry_other_address);
-#ifdef VET
-    gtk_fixed_put (GTK_FIXED (fixed_tab_other), m_entry_other_address, 150, 45);
-#else
     gtk_fixed_put (GTK_FIXED (fixed_tab_other), m_entry_other_address, 110, 45);
-#endif
 
     gtk_widget_set_size_request (m_entry_other_address, 350, 30);
     gtk_entry_set_invisible_char (GTK_ENTRY (m_entry_other_address), 9679);
 
-#ifdef VET
-    g_signal_connect(G_OBJECT(m_entry_other_address), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-#endif
     return fixed_tab_other;
 }
 
 void ViewNewPat::FillPatInfo(const PatientInfo::Patient &pat_info) {
     ostringstream strm;
     gtk_entry_set_text(GTK_ENTRY(m_entryPatID), pat_info.id.c_str());
-    //gtk_widget_set_sensitive(m_entryPatID, FALSE);
-    //gtk_widget_set_sensitive(m_checkbuttonPatID, FALSE);
-#ifdef VET
-    gtk_entry_set_text(GTK_ENTRY(m_entryAnimalName), pat_info.animal_name.c_str());
-    gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))), pat_info.owner_name.c_str());
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxSpecies), pat_info.species);
-#else
     gtk_entry_set_text(GTK_ENTRY(m_entryNameLast), pat_info.name.last.c_str());
     gtk_entry_set_text(GTK_ENTRY(m_entryNameFirst), pat_info.name.first.c_str());
     gtk_entry_set_text(GTK_ENTRY(m_entryNameMid), pat_info.name.mid.c_str());
-#endif
 
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxGender), pat_info.sex);
 
@@ -1692,8 +1516,6 @@ void ViewNewPat::FillExamInfo(const PatientInfo::ExamGeneral &exam_info) {
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_comment));
     gtk_text_buffer_set_text(buffer, exam_info.comment.c_str(), -1);
 
-#ifdef VET
-#else
     // general info
     if (exam_info.height > 0) {
         strm.str("");
@@ -1710,7 +1532,7 @@ void ViewNewPat::FillExamInfo(const PatientInfo::ExamGeneral &exam_info) {
         strm << exam_info.BSA;
         gtk_entry_set_text(GTK_ENTRY(m_entry_BSA), strm.str().c_str());
     }
-#endif
+
     if (!exam_info.examDoctor.empty()) {
         int index = GetComboBoxIndex(GTK_COMBO_BOX (m_comboboxentry_diagnostician), exam_info.examDoctor);
         if (index < 0) {
@@ -1852,9 +1674,7 @@ void ViewNewPat::FillUroInfo(const PatientInfo::UroExam &uro) {
 void ViewNewPat::FillNewPat(const PatientInfo::Info &info) {
     FillPatInfo(info.p);
     FillExamInfo(info.e);
-#ifndef VET
     FillObInfo(info.ob);
-#endif
     FillCarInfo(info.car);
     FillUroInfo(info.uro);
 }
@@ -1866,27 +1686,12 @@ void ViewNewPat::SetSeneitive(bool sensitive) {
 
 void ViewNewPat::BtnSearchClicked(GtkButton *button) {
     string id, name_last, name_first, name_mid, birth_year, birth_month, birth_day, age;
-#ifdef VET
-    string animal_name, owner_name;
-    char species[2];
-
-#endif
     char gender[2], age_unit[2];
     GetEntryTextForDB(m_entryPatID, id);
 
-#ifdef VET
-    GetEntryTextForDB(m_entryAnimalName, animal_name);
-    GetEntryTextForDB(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName)), owner_name);
-    int species_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxSpecies));
-    if (species_index == -1)
-        sprintf(species, "%%");// %
-    else
-        sprintf(species, "%d", species_index);
-#else
     GetEntryTextForDB(m_entryNameLast, name_last);
     GetEntryTextForDB(m_entryNameFirst, name_first);
     GetEntryTextForDB(m_entryNameMid, name_mid);
-#endif
     GetEntryTextForDB(m_entryBirthYear, birth_year);
     GetEntryTextForDB(m_entryBirthMonth, birth_month);
     GetEntryTextForDB(m_entryBirthDay, birth_day);
@@ -1901,15 +1706,10 @@ void ViewNewPat::BtnSearchClicked(GtkButton *button) {
     Database::NewPatSearchTerm term;
     term.id = id;
 
-#ifdef VET
-    term.animal_name = animal_name;
-    term.owner_name = owner_name;
-    term.species = species;
-#else
     term.name.last = name_last;
     term.name.first = name_first;
     term.name.mid = name_mid;
-#endif
+
     term.gender = gender;
     term.birthYear = birth_year;
 
@@ -1987,13 +1787,7 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
     }
 
     db.GetExamIDNext(info.e.examNum);
-#ifndef VET
-    //MPPS
-#ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
-#else
     if(CDCMRegister::GetMe()->IsAuthorize())
-#endif
     {
         EditStudyInfo(info);
         SysDicomSetting sysDicomSetting;
@@ -2010,7 +1804,7 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
             }
         }
     }
-#endif
+
     g_patientInfo.SetInfo(info);
     TopArea* ptrTopArea = TopArea::GetInstance();
     if(ptrTopArea->GetReadImg())
@@ -2019,7 +1813,6 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
     DestroyWindow();
 }
 
-#ifndef VET
 DCMMPPSELEMENT ViewNewPat::GetMPPSElement(PatientInfo::Info &info) {
     DCMMPPSELEMENT ms;
     if(ViewWorkList::GetInstance()->GetWorkListQuery()==0) {
@@ -2153,7 +1946,7 @@ void ViewNewPat::SetStudyInfo(DCMSTUDYELEMENT element) {
     m_studyInfo = element;
 }
 
-void ViewNewPat::UpdateStudyInfo(void) {
+void ViewNewPat::UpdateStudyInfo() {
     Database db;
     string examNum;
     db.GetExamIDCurrent(examNum);
@@ -2161,7 +1954,7 @@ void ViewNewPat::UpdateStudyInfo(void) {
     CDCMMan::GetMe()->EditStudyInfo(m_studyInfo);
 }
 
-void ViewNewPat::ClearStudyInfo(void) {
+void ViewNewPat::ClearStudyInfo() {
     m_studyInfo.stSpecificCharacterSet ="";
     m_studyInfo.stPatientName = "";
     m_studyInfo.stPatientID = "";
@@ -2183,11 +1976,11 @@ void ViewNewPat::ClearStudyInfo(void) {
     m_studyInfo.stStudyNo=0;
 
 }
-#endif
+
 // DESCRIPTION: 自动生成ID, ID的生成规则, 获取当前系统时间和日期, 按规则排序生成标准ID号,
 //              如果标准ID号与数据库中的ID发生冲突, 在标准ID号后加上校验位, 校验位从0开始累加。
 // RETURN: 生成的ID号
-string ViewNewPat::GenPatID(void) {
+string ViewNewPat::GenPatID() {
     const unsigned int id_len = 14;
     char id_std[id_len+1];
     int Year, Month, Day, Hour, Minute, Second;
@@ -2227,21 +2020,6 @@ void ViewNewPat::ChkBtnPatIDClicked(GtkButton *button) {
     }
 }
 
-/*
-void ViewNewPat::BtnExamPauseClicked(GtkButton *button)
-{
-	// set patient info
-    PatientInfo::Info info;
-    GetPatInfo(info);
-    g_patientInfo.SetInfo(info);
-
-	// archive patient info to temp area
-
-	// clear data in dialog
-    ClearData();
-}
-*/
-#ifndef VET
 void ViewNewPat::BtnWorkListClicked(GtkButton *button) {
     string device = CDCMMan::GetMe()->GetDefaultWorklistServiceDevice();
     if (device == "") {
@@ -2250,7 +2028,7 @@ void ViewNewPat::BtnWorkListClicked(GtkButton *button) {
     }
     ViewWorkList::GetInstance()->CreateWorkListWin(m_window);
 }
-#endif
+
 void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
     PatientInfo::Info info;
     GetPatInfo(info);
@@ -2267,12 +2045,8 @@ void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
     db.GetExamIDNext(info.e.examNum);
 
     g_patientInfo.SetInfo(info);
-#ifndef VET
-#ifdef EMP_3410
-    if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
-#else
+
     if(CDCMRegister::GetMe()->IsAuthorize())
-#endif
     {
         SysDicomSetting sysDicomSetting;
         if(!g_patientInfo.GetExist()) {
@@ -2288,7 +2062,7 @@ void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
             }
         }
     }
-#endif
+
     // end exam
     m_clearAll = true;
     KeyEndExam kee;
@@ -2306,21 +2080,10 @@ void ViewNewPat::BtnNewPatClicked(GtkButton *button) {
         ClearData();
         // clear data in patient management
         g_patientInfo.ClearAll();
-#ifndef VET
         ClearStudyInfo();
-#endif
+    }
 
-    }
-#ifdef VET
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(m_checkbuttonPatID))) {
-        string ID = GenPatID();
-        gtk_entry_set_text(GTK_ENTRY(m_entryPatID), ID.c_str());
-    } else {
-        gtk_widget_grab_focus(m_entryPatID);
-    }
-#else
     gtk_widget_grab_focus(m_entryPatID);
-#endif
 }
 
 void ViewNewPat::BtnNewExamClicked(GtkButton *button) {
@@ -2336,74 +2099,7 @@ void ViewNewPat::BtnNewExamClicked(GtkButton *button) {
         g_patientInfo.ClearExam();
     }
 }
-#ifdef VET
-void ViewNewPat::DoneOwnerName(string name) {
-    Database db;
-    vector<string> owner_name;
-    vector<string>::const_iterator iter_name;
-    vector<string> list_name;
-    const unsigned int len = strlen(name.c_str());
-    unsigned int cnt = len;
 
-    list_name.clear();
-    GtkListStore *store;
-    store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(m_comboboxOwnerName)));
-    gtk_list_store_clear(store);
-    if (db.OwnerNameSearch(&owner_name)) {
-        for (iter_name = owner_name.begin(); iter_name<owner_name.end(); iter_name++) {
-            if (len > strlen((*iter_name).c_str()))
-                cnt = strlen((*iter_name).c_str());
-            else
-                cnt = len;
-            if ((strlen(name.c_str())!=0) && (strncmp(name.c_str(), (*iter_name).c_str(), cnt) == 0)) {
-                int size = list_name.size();
-                int i = 0;
-                if (size>0)
-                    for (i=0; i<size; i++)
-                        if (strcmp(list_name[i].c_str(), (*iter_name).c_str()) == 0)
-                            break;
-                if (i==size)
-                    list_name.push_back((*iter_name).c_str());
-            }
-        }
-    }
-
-    GtkTreeIter iter;
-    for (unsigned int i=0; i<list_name.size(); i++) {
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter, 0, list_name[i].c_str(), -1);
-        //printf("name[%d]:%s\n", i,list_name[i].c_str());
-    }
-}
-void ViewNewPat::EntryOwnerNameDelete(GtkEditable *editable, gint start_pos, gint end_pos) {
-    PRINTF("%d %d\n", start_pos, end_pos);
-    const gchar *entry_text = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))));
-    string name = entry_text;
-    name = name.erase(start_pos, end_pos-start_pos);
-    DoneOwnerName(name);
-}
-
-void ViewNewPat::EntryOwnerNameInsert(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position) {
-    gint old_text_length = strlen(gtk_entry_get_text(GTK_ENTRY(editable)));
-    const gchar *entry_text;
-    entry_text = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))));
-    string name = entry_text;
-
-    if((old_text_length + new_text_length > gtk_entry_get_max_length(GTK_ENTRY(editable)))
-            || (( 1 == new_text_length )&&(IsErrorChar(new_text)))) {
-        gtk_signal_emit_stop(GTK_OBJECT(editable), g_signal_lookup("insert-text", GTK_TYPE_EDITABLE));
-    }
-    name = name.insert(*position, new_text, new_text_length);
-    DoneOwnerName(name);
-}
-
-void ViewNewPat::EntryOwnerNameChanged(GtkComboBox *combobox_entry) {
-    const gchar *entry_text = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(combobox_entry))));
-    //if (entry_text == NULL || strlen(entry_text) == 0)
-    //    return;
-    PRINTF("entry_text:%s\n", entry_text);
-}
-#endif
 
 void ViewNewPat::CommentInsert(GtkTextBuffer *textbuffer, GtkTextIter *location, gchar *text, gint len) {
     if (g_ascii_strcasecmp(text, "'") == 0)
@@ -2433,36 +2129,8 @@ void ViewNewPat::EntryNameInsert(GtkEditable *editable, gchar *new_text, gint ne
     }
 }
 
-// void ViewNewPat::AgeFocusIn(GtkWidget *widget, GdkEventFocus *event)
-// {
-//     const char *year_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
-//     const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
-//     const char *day_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthDay));
-//     int year = atoi(year_text);
-//     int month = atoi(month_text);
-//     int day = atoi(day_text);
-
-//     if (year != 0) {
-//         if (month == 0)
-//             month = 1;
-//         if (day == 0)
-//             day = 1;
-//         AutoCalcAge(year, month, day);
-//     }
-// }
 
 bool ViewNewPat::AutoCalcAge(const int year, const int month, const int day) {
-    // const char *year_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
-    // const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
-    // const char *day_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthDay));
-
-    // if (strlen(year_text) == 0 || strlen(year_text) == 0 || strlen(year_text) == 0)
-    //     return false;
-
-    // int year = atoi(year_text);
-    // int month = atoi(month_text);
-    // int day = atoi(day_text);
-
     if (g_date_valid_dmy((GDateDay)day, (GDateMonth)month, (GDateYear)year) == FALSE) {
         return false;
     }
@@ -2481,44 +2149,32 @@ bool ViewNewPat::AutoCalcAge(const int year, const int month, const int day) {
     }
 }
 
-void ViewNewPat::ClearData(void) {
+void ViewNewPat::ClearData() {
     if (!GTK_IS_WIDGET(m_window))
         return ;
 
     gtk_entry_set_text(GTK_ENTRY(m_entryPatID), "");
     gtk_widget_set_sensitive(m_entryPatID, TRUE);
     gtk_widget_set_sensitive(m_checkbuttonPatID, TRUE);
-#ifdef VET
-    gtk_entry_set_text(GTK_ENTRY(m_entryAnimalName), "");
-    gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))), "");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxSpecies), 0);
-#else
+
     gtk_entry_set_text(GTK_ENTRY(m_entryNameFirst), "");
     gtk_entry_set_text(GTK_ENTRY(m_entryNameMid), "");
     gtk_entry_set_text(GTK_ENTRY(m_entryNameLast), "");
-#endif
+
     gtk_entry_set_text(GTK_ENTRY(m_entryAge), "");
     gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), "");
     gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth), "");
     gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), "");
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxGender), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), 0);
-#if 0
-    GtkTextBuffer *buffer;
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_comment));
-    gtk_text_buffer_set_text(buffer, "", -1);
 
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_diagnostician), -1);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_physician), -1);
-#endif
     ClearExamData();
-//    MeasureMan::GetInstance()->ClearAllValue();
 }
 
-void ViewNewPat::ClearExamData(void) {
+void ViewNewPat::ClearExamData() {
     if (!GTK_IS_WIDGET(m_window))
         return ;
-#ifndef VET
+
     // general
     if(m_clearAll) {
         gtk_entry_set_text(GTK_ENTRY(m_entry_stature), "");
@@ -2554,17 +2210,11 @@ void ViewNewPat::ClearExamData(void) {
 
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_diagnostician), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxentry_physician), -1);
-#endif
 }
 
 void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
     const gchar *pat_id = gtk_entry_get_text(GTK_ENTRY(m_entryPatID));
 
-#ifdef VET
-    const gchar *animal_name = gtk_entry_get_text(GTK_ENTRY(m_entryAnimalName));
-    const gchar *owner_name = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxOwnerName))));
-    int species_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxSpecies));
-#else
     const gchar *name_last = gtk_entry_get_text(GTK_ENTRY(m_entryNameLast));
     const gchar *name_first = gtk_entry_get_text(GTK_ENTRY(m_entryNameFirst));
     const gchar *name_mid = NULL;
@@ -2572,7 +2222,6 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
         name_mid = gtk_entry_get_text(GTK_ENTRY(m_entryNameMid));
     else
         name_mid = "";
-#endif
 
     const gchar *age_text = gtk_entry_get_text(GTK_ENTRY(m_entryAge));
     int age_unit_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxAge));
@@ -2599,15 +2248,10 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
 
     info.p.id = pat_id;
 
-#ifdef VET
-    info.p.animal_name = animal_name;
-    info.p.owner_name = owner_name;
-    info.p.species = species_index;
-#else
     info.p.name.last = name_last;
     info.p.name.first = name_first;
     info.p.name.mid = name_mid;
-#endif
+
     info.p.sex = gender_index;
     info.p.age = atoi(age_text);
     info.p.ageUnit = age_unit_index;
@@ -2631,7 +2275,6 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
     info.e.examType = TopArea::GetInstance()->GetCheckPart();
 
     // general
-#ifndef VET
     if (gtk_entry_get_text_length(GTK_ENTRY(m_entry_stature))) {
         const char *stature = gtk_entry_get_text(GTK_ENTRY(m_entry_stature));
         info.e.height = atoi(stature);
@@ -2670,11 +2313,6 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
         iYear = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_day)));
     }
     if (gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_ob_date))) {
-        /*
-        info.ob.OvulateDate.year = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_year)));
-        info.ob.OvulateDate.month = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_month)));
-        info.ob.OvulateDate.day = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_day)));
-        */
         info.ob.OvulateDate.year = iYear;
         info.ob.OvulateDate.month = iMonth;
         info.ob.OvulateDate.day = iDay;
@@ -2682,11 +2320,6 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
         info.ob.LMPDate.month = 0;
         info.ob.LMPDate.day = 0;
     } else {
-        /*
-        info.ob.LMPDate.year = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_year)));
-        info.ob.LMPDate.month = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_month)));
-        info.ob.LMPDate.day = atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_day)));
-        */
         info.ob.LMPDate.year = iYear;
         info.ob.LMPDate.month = iMonth;
         info.ob.LMPDate.day = iDay;
@@ -2718,7 +2351,6 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
         info.ob.miscarryCount= atoi(gtk_entry_get_text(GTK_ENTRY(m_entry_ob_aborta)));
     else
         info.ob.miscarryCount = -1;
-#endif
 
     // card
     if (gtk_entry_get_text_length(GTK_ENTRY(m_entry_hr)))
@@ -2799,8 +2431,7 @@ void ViewNewPat::SetStartDate(int year, int month, int day) {
         }
     }
 }
-#ifdef VET
-#else
+
 void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName, string birthDate,string age,const char *sex,const char *size,const char *weight,const char *address,const char *doctor,const char *description) {
     m_clearAll = true;
     ClearData();
@@ -2880,28 +2511,6 @@ void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName
 
             pos = 0;
             gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthDay),birth_day,2,&pos);
-#if 0
-
-            if(birthDate!=NULL) {
-                birth_pos = 0;
-                int birth_len = strlen(birthDate);
-                for(int i = 0; i<birth_len-4; i++) {
-                    sprintf(birth_str,"%c",birthDate[i]);
-                    gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthYear), birth_str, 1, &birth_pos);
-                }
-
-                birth_pos = 0;
-                for(int i = 4; i<birth_len-2; i++) {
-                    sprintf(birth_str,"%c",birthDate[i]);
-                    gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthMonth), birth_str, 1, &birth_pos);
-                }
-                birth_pos = 0;
-                for(int i = 6; i<birth_len; i++) {
-                    sprintf(birth_str,"%c",birthDate[i]);
-                    gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthDay), birth_str, 1, &birth_pos);
-                }
-            }
-#endif
         } else {
             gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear)," ");
             gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth)," ");
@@ -2932,12 +2541,8 @@ void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName
 
     GtkWidget *entry = gtk_bin_get_child(GTK_BIN(m_comboboxentry_diagnostician));
     gtk_entry_set_text(GTK_ENTRY(entry),doctor);
-    //GtkEntryBuffer *bufferDoctor = gtk_entry_get_buffer(GTK_ENTRY(entry));
-    //gtk_entry_buffer_set_text(bufferDoctor, doctor, -1);
-
     GtkTextBuffer *buffer;
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_comment));
     gtk_text_buffer_set_text(buffer, description, -1);
 
 }
-#endif

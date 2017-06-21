@@ -20,7 +20,6 @@
 #include "probe/MenuBiopsyBracket.h"
 #include "probe/MenuBiopsyVerify.h"
 #include "sysMan/MenuSystem.h"
-#include "ViewMain.h"
 
 MenuArea* MenuArea::m_instance = NULL;
 
@@ -195,14 +194,12 @@ void MenuArea::ShowMenu() {
   m_menuVisbible = true;
 
   gtk_widget_show(GTK_WIDGET(m_vbox));
-  ViewMain::GetInstance()->ShowMenu();
 }
 
 void MenuArea::HideMenu() {
   m_menuVisbible = false;
 
   gtk_widget_hide(GTK_WIDGET(m_vbox));
-  ViewMain::GetInstance()->HideMenu();
 }
 
 void MenuArea::ShowMainMenu() {

@@ -15,8 +15,6 @@ public:
   ~ViewMain();
 
   void Create();
-  void ShowMenu();
-  void HideMenu();
 
   GtkWidget* GetMainWindow();
 

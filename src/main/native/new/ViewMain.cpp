@@ -193,18 +193,9 @@ void ViewMain::Create() {
   if (g_authorizationOn) {
     CEmpAuthorization::Create(&g_keyInterface, REGISTER_FILE_PATH, 1);
   }
-}
 
-void ViewMain::ShowMenu() {
-  /*m_daMenu = gtk_drawing_area_new();
-  gtk_widget_modify_bg(m_daMenu, GTK_STATE_NORMAL, g_black);
-  gtk_drawing_area_size(GTK_DRAWING_AREA(m_daMenu), MENU_AREA_W, MENU_AREA_H - TOP_AREA_H);
-  gtk_fixed_put(GTK_FIXED(m_fixedWindow), m_daMenu, 844, TOP_AREA_H);*/
-  //gtk_widget_hide(m_daMenu);
-}
-
-void ViewMain::HideMenu() {
-  //gtk_widget_show(m_daMenu);
+  // test
+  Utils::test(GTK_WIDGET(m_window));
 }
 
 GtkWidget* ViewMain::GetMainWindow() {
