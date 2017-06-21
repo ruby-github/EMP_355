@@ -82,10 +82,10 @@ void ViewNewPat::CreateWindow() {
   g_signal_connect(button_new_patient, "clicked", G_CALLBACK(signal_button_clicked_new_patient), this);
   g_signal_connect(button_new_exam, "clicked", G_CALLBACK(signal_button_clicked_new_exam), this);
 
-  //if (CDCMRegister::GetMe()->IsAuthorize()) {
+  if (CDCMRegister::GetMe()->IsAuthorize()) {
     GtkButton* button_worklist = Utils::add_dialog_button(m_dialog, _("Worklist"), GTK_RESPONSE_NONE, GTK_STOCK_INFO);
     g_signal_connect(button_worklist, "clicked", G_CALLBACK(signal_button_clicked_worklist), this);
-  //}
+  }
 
   GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OK);
   GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);

@@ -520,5 +520,5 @@ void Utils::GetCurrentDateTime(int& year, int& month, int& day, int& hour, int& 
 #include "patient/ViewNewPat.h"
 
 void Utils::test(GtkWidget* widget) {
-  ViewNewPat::GetInstance()->CreateWindow();
+  //ViewNewPat::GetInstance()->CreateWindow();
 }
