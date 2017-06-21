@@ -64,6 +64,9 @@ public:
 
   static void SetTheme(const string rc_path);
 
+  static void GetCurrentDate(int& year, int& month, int& day);
+  static void GetCurrentDateTime(int& year, int& month, int& day, int& hour, int& minute, int& second);
+
 private:
   static GdkColor* m_color;
 

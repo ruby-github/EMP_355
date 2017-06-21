@@ -23,6 +23,8 @@
 #include "patient/FileMan.h"
 #include "sysMan/SysGeneralSetting.h"
 
+#include "utils/Utils.h"
+
 PatientInfo g_patientInfo;
 
 PatientInfo::PatientInfo() {
@@ -287,7 +289,7 @@ void PatientInfo::InitExam() {
 void PatientInfo::InitExamGen() {
     int year, mon, day;
 
-    GetCurrentDate(year, mon, day);
+    Utils::GetCurrentDate(year, mon, day);
 
     // general
     m_info.e.examNum = "0";

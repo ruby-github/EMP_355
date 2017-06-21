@@ -38,6 +38,7 @@
 #include "periDevice/DCMRegister.h"
 #include "imageProc/Replay.h"
 
+#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
 
@@ -173,7 +174,7 @@ void ViewArchive::CreateWindow(void) {
     GtkWidget *img_query_retrieve;
     GtkWidget *button_query_retrieve;
 
-    GetCurrentDate(m_curYear, m_curMonth, m_curDay);
+    Utils::GetCurrentDate(m_curYear, m_curMonth, m_curDay);
     MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
 
     //create window
@@ -1266,7 +1267,7 @@ void ViewArchive::BtnSearchClicked(GtkButton *button) {
 
     // examDateEnd
     int iYear, iMon, iDay;
-    GetCurrentDate(iYear, iMon, iDay);
+    Utils::GetCurrentDate(iYear, iMon, iDay);
     string cYear, cMon, cDay;
     ChangeDateFormatToString(iYear, iMon, iDay, cYear, cMon, cDay);
     GetEntryTextForDB(m_entryYearEnd, year);
@@ -1455,7 +1456,7 @@ void ViewArchive::BtnComboboxQSearch(GtkComboBox *combobox) {
         gtk_entry_set_text(GTK_ENTRY(m_entryDayEnd), "");
     }
 
-    GetCurrentDate(year, mon, day);
+    Utils::GetCurrentDate(year, mon, day);
     ChangeDateFormatToString(year, mon, day, sYear, sMon, sDay);
     searchInfo.examDateEndYear = sYear;
     searchInfo.examDateEndMonth = sMon;

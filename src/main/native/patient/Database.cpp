@@ -10,6 +10,7 @@
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/ViewSystem.h"
 
+#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 
 using std::ostringstream;
@@ -1561,7 +1562,7 @@ void Database::GetBirthRange(string age, string ageUnit, string &birthBegin, str
     int year, mon, day;
 
     // get current date
-    GetCurrentDate(year, mon, day);
+    Utils::GetCurrentDate(year, mon, day);
     if (strcmp(age.c_str(), "%") == 0) {
         GetDateString(0, 0, 0, birthBegin);
         GetDateString(year, mon, day, birthEnd);

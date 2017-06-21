@@ -18,8 +18,7 @@ bool init_colors(void);
 void free_init_colors(void);
 
 void CountUTF8(const void* pBuffer, long size, int *ascii, int *utf8);
-void GetCurrentDate(int &Year, int &Month, int &Day);
-void GetCurrentDateTime(int &Year, int &Month, int &Day, int &Hour, int &Minute, int &Second);
+
 void GetEntryTextForDB(GtkWidget *entry, std::string& text);
 bool CalcAge(const int year, const int month, const int day, int& age, int& age_unit);
 void ChangeDateFormatToString(int iYear, int iMon, int iDay, std::string &sYear, std::string &sMon, std::string &sDay);
@@ -37,9 +36,7 @@ int CalcLength(POINT p1, POINT p2);
 void DotToCommaLocaleNumeric(char *Comma, unsigned int size);
 void CommaToDotLocaleNumeric(char *Dot, unsigned int size);
 
-#ifdef VET
-void GetAnimalSpeciesString(int index, std::string &species);
-#endif
+
 
 GdkColor* MeasureColorConvert(int colorIndex);
 GtkWidget* create_label(const char *str, guint width, guint height, const GdkColor* const color, PangoFontDescription *font);

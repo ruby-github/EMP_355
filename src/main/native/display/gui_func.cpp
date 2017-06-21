@@ -19,6 +19,7 @@
 #include "sysMan/SysNoteSetting.h"
 #include "periDevice/DCMRegister.h"
 
+#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 
 using std::string;
@@ -134,28 +135,7 @@ void CountUTF8(const void* pBuffer, long size, int *ascii, int *utf8) {
     *utf8 = u;
 }
 
-void GetCurrentDate(int &Year, int &Month, int &Day) {
-    time_t now;
-    struct tm *now_tm;
-    time(&now);
-    now_tm = localtime(&now);
-    Year = now_tm->tm_year+1900;
-    Month = now_tm->tm_mon+1;
-    Day = now_tm->tm_mday;
-}
 
-void GetCurrentDateTime(int &Year, int &Month, int &Day, int &Hour, int &Minute, int &Second) {
-    time_t now;
-    struct tm *now_tm;
-    time(&now);
-    now_tm = localtime(&now);
-    Year = now_tm->tm_year+1900;
-    Month = now_tm->tm_mon+1;
-    Day = now_tm->tm_mday;
-    Hour = now_tm->tm_hour;
-    Minute = now_tm->tm_min;
-    Second = now_tm->tm_sec;
-}
 
 void GetEntryTextForDB(GtkWidget *entry, string& text) {
     if (gtk_entry_get_text_length(GTK_ENTRY(entry))) {
@@ -167,7 +147,7 @@ void GetEntryTextForDB(GtkWidget *entry, string& text) {
 
 bool CalcAge(const int birth_year, const int birth_month, const int birth_day, int& age, int& age_unit) {
     int cur_year, cur_month, cur_day;
-    GetCurrentDate(cur_year, cur_month, cur_day);
+    Utils::GetCurrentDate(cur_year, cur_month, cur_day);
     GDate* cur_date = g_date_new_dmy((GDateDay)cur_day, (GDateMonth)cur_month, (GDateYear)cur_year);
     if (birth_year == 0 && birth_month == 0 && birth_day == 0) {
         age = 0;

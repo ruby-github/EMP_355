@@ -173,7 +173,7 @@ int EndExam(gpointer data) {
       if(sysDicomSetting.GetMPPS()) {
           if(ViewNewPat::GetInstance()->GetMPPSFlag()) {
             int Year, Month, Day, Hour, Minute, Second;
-            GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
+            Utils::GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
 
             string year, mon, day, studyEndDate;
             ChangeDateFormatToString(Year, Month, Day, year, mon, day);

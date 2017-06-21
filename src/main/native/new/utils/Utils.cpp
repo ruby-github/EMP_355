@@ -489,6 +489,32 @@ void Utils::SetTheme(const string rc_path) {
   gtk_rc_reset_styles(gtk_settings_get_default());
 }
 
+void Utils::GetCurrentDate(int& year, int& month, int& day) {
+  time_t now;
+  time(&now);
+
+  tm* timeinfo = localtime(&now);
+
+  year = timeinfo->tm_year + 1900;
+  month = timeinfo->tm_mon + 1;
+  day = timeinfo->tm_mday;
+}
+
+void Utils::GetCurrentDateTime(int& year, int& month, int& day, int& hour, int& minute, int& second) {
+  time_t now;
+  time(&now);
+
+  tm* timeinfo = localtime(&now);
+
+  year = timeinfo->tm_year + 1900;
+  month = timeinfo->tm_mon + 1;
+  day = timeinfo->tm_mday;
+
+  hour = timeinfo->tm_hour;
+  minute = timeinfo->tm_min;
+  second = timeinfo->tm_sec;
+}
+
 // ---------------------------------------------------------
 
 #include "patient/ViewNewPat.h"

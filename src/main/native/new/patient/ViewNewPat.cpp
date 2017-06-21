@@ -1,591 +1,401 @@
-#include <gtk/gtk.h>
-#include "display/gui_func.h"
-#include "display/gui_global.h"
 #include "patient/ViewNewPat.h"
-#include "keyboard/KeyValueOpr.h"
+
+#include "calcPeople/MeaCalcFun.h"
+#include "display/TopArea.h"
+#include "display/ViewCalendar.h"
 #include "keyboard/KeyDef.h"
-#include "ViewMain.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <time.h>
-#include "sysMan/SysGeneralSetting.h"
-#include "sysMan/SysCalculateSetting.h"
-#include <string.h>
+#include "keyboard/KeyFunc.h"
+#include "keyboard/KeyValueOpr.h"
+#include "keyboard/MultiFuncFactory.h"
 #include "patient/Database.h"
 #include "patient/ViewPatSearch.h"
-#include <sstream>
-#include <glib.h>
-#include "keyboard/KeyFunc.h"
-#include "calcPeople/MeaCalcFun.h"
-#include "measure/MeasureMan.h"
-#include "display/ViewCalendar.h"
-#include "utils/MessageDialog.h"
-#include "display/TopArea.h"
-#include "sysMan/ViewSystem.h"
 #include "patient/ViewWorkList.h"
 #include "periDevice/DCMMan.h"
-#include "sysMan/UpgradeMan.h"
-#include "sysMan/SysDicomSetting.h"
 #include "periDevice/DCMRegister.h"
-
+#include "sysMan/SysCalculateSetting.h"
+#include "sysMan/SysDicomSetting.h"
+#include "sysMan/SysGeneralSetting.h"
+#include "sysMan/UpgradeMan.h"
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
+#include "utils/MessageDialog.h"
+#include "ViewMain.h"
 
-using std::ostringstream;
-using std::string;
-ViewNewPat* ViewNewPat::m_ptrInstance = NULL;
+#include "display/gui_func.h"
+
+#define PATIENT_NAME_MAX_LEN  31
+
+ViewNewPat* ViewNewPat::m_instance = NULL;
+
+// ---------------------------------------------------------
+
+ViewNewPat* ViewNewPat::GetInstance() {
+  if (m_instance == NULL) {
+    m_instance = new ViewNewPat();
+  }
+
+  return m_instance;
+}
 
 ViewNewPat::ViewNewPat() {
-    m_langCN = 0;
-    m_curYear = 0;
-    m_curMonth = 0;
-    m_curDay = 0;
-    m_window = NULL;
-    m_flagMPPS = false;
-    UpdateNameLength();
+  m_dialog = NULL;
+
+  m_langCN = 0;
+  m_curYear = 0;
+  m_curMonth = 0;
+  m_curDay = 0;
+  m_flagMPPS = false;
+
+  UpdateNameLength();
 }
 
 ViewNewPat::~ViewNewPat() {
-    if (m_ptrInstance != NULL)
-        delete m_ptrInstance;
-}
+  if (m_instance != NULL) {
+    delete m_instance;
+  }
 
-ViewNewPat* ViewNewPat::GetInstance() {
-    if (m_ptrInstance == NULL)
-        m_ptrInstance = new ViewNewPat;
-
-    return m_ptrInstance;
+  m_instance = NULL;
 }
 
 void ViewNewPat::CreateWindow() {
-    GtkWidget *fixed_window;
-    GtkWidget *frame;
-    GtkWidget *fixed_general_info;
-    GtkWidget *label_pat_id;
-    GtkWidget *label_gender;
-
-    GtkWidget *label_name_mid;
-    GtkWidget *label_name_first;
-    GtkWidget *label_name_last;
-
-    GtkWidget *label_age;
-    GtkWidget *label_birth_date;
-    GtkWidget *label_spacing_day;
-    GtkWidget *label_spacing_year;
-    GtkWidget *label_spacing_month;
-    GtkWidget *img_birth_calendar;
-    GtkWidget *eventbox_birth_calendar;
-    GtkWidget *button_search_pat_info;
-
-    GtkWidget *label_general_info;
-    //GtkWidget *button_title;
-    GtkWidget *notebook;
-    GtkWidget *label_general;
-    GtkWidget *fixed_tab_general;
-    GtkWidget *label_ob;
-    GtkWidget *fixed_tab_ob;
-    GtkWidget *label_card;
-    GtkWidget *fixed_tab_card;
-    GtkWidget *label_uro;
-    GtkWidget *fixed_tab_uro;
-    GtkWidget *label_other;
-    GtkWidget *fixed_tab_other;
-    GtkWidget *label_comment;
-    GtkWidget *scrolledwindow_comment;
-    GtkWidget *label_diagnostician;
-    GtkWidget *label_physician;
-    GtkWidget *hseparator;
-
-    GtkWidget *button_exam_end;
-    GtkWidget *image_exam_end;
-    GtkWidget *label_exam_end;
-    GtkWidget *button_new_pat;
-    GtkWidget *image_new_pat;
-    GtkWidget *label_new_pat;
-    GtkWidget *button_new_exam;
-    GtkWidget *image_new_exam;
-    GtkWidget *label_new_exam;
-    GtkWidget *button_ok;
-    GtkWidget *image_ok;
-    GtkWidget *label_ok;
-    GtkWidget *button_cancel;
-    GtkWidget *image_cancel;
-    GtkWidget *label_cancel;
-
-    GtkWidget *image_worklist;
-    GtkWidget *label_worklist;
-    const int pat_name_len = 12;
-    const int pat_id_len = 15;
-
-    MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
-
-    SysGeneralSetting *sgs = new SysGeneralSetting;
-    if ((ZH == sgs->GetLanguage()) || (FR == sgs->GetLanguage()))
-        m_langCN = true;
-    else
-        m_langCN = false;
-    delete sgs;
-
-    GetCurrentDate(m_curYear, m_curMonth, m_curDay);
-
-    m_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request (m_window, 840, 640);
-    gtk_window_set_position (GTK_WINDOW (m_window), GTK_WIN_POS_CENTER);
-    gtk_window_set_modal (GTK_WINDOW (m_window), TRUE);
-    gtk_window_set_resizable (GTK_WINDOW (m_window), FALSE);
-
-    gtk_window_set_title (GTK_WINDOW (m_window), _("Patient Information"));
-
-
-    gtk_window_set_transient_for(GTK_WINDOW(m_window), GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()));
-    g_signal_connect (G_OBJECT(m_window), "delete-event", G_CALLBACK(on_window_delete_event), this);
-
-    fixed_window = gtk_fixed_new ();
-    gtk_widget_show (fixed_window);
-    gtk_container_add (GTK_CONTAINER (m_window), fixed_window);
-
-    frame = gtk_frame_new (NULL);
-    gtk_widget_show (frame);
-    gtk_fixed_put (GTK_FIXED (fixed_window), frame, 20, 10);
-    gtk_widget_set_size_request (frame, 800, 140);
-    gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
-
-    fixed_general_info = gtk_fixed_new ();
-    gtk_widget_show (fixed_general_info);
-    gtk_container_add (GTK_CONTAINER (frame), fixed_general_info);
-
-    label_pat_id = gtk_label_new (_("Patient ID:"));
-
-    gtk_widget_show (label_pat_id);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_pat_id, 10, 8);
-    gtk_widget_set_size_request (label_pat_id, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_pat_id), 0.9, 0.5);
-
-    m_entryPatID = gtk_entry_new ();
-    gtk_widget_show (m_entryPatID);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryPatID, 110+8, 8);
-    gtk_widget_set_size_request (m_entryPatID, 180, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryPatID), pat_id_len);
-    g_signal_connect(G_OBJECT(m_entryPatID), "insert_text", G_CALLBACK(on_entry_pat_id), this);
-    g_signal_connect(G_OBJECT(m_entryPatID), "focus-out-event", G_CALLBACK(HandlePatIDFocusOut), this);
-
-    m_checkbuttonPatID = gtk_check_button_new_with_mnemonic (_("Auto Generated ID"));
-    gtk_widget_show (m_checkbuttonPatID);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_checkbuttonPatID, 300+8, 8);
-    gtk_widget_set_size_request (m_checkbuttonPatID, 150+100, 30);
-    g_signal_connect (G_OBJECT(m_checkbuttonPatID), "clicked", G_CALLBACK(on_chkbutton_pad_id), this);
-
-    button_search_pat_info = gtk_button_new_with_mnemonic (_("Search"));
-    gtk_widget_show (button_search_pat_info);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), button_search_pat_info, 630, 8);
-    gtk_widget_set_size_request (button_search_pat_info, 120, 30);
-    g_signal_connect ((gpointer) button_search_pat_info, "clicked", G_CALLBACK (on_button_search_clicked), this);
-
-    label_name_last = gtk_label_new (_("Last Name:"));
-    gtk_widget_show (label_name_last);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_name_last, 10, 45);
-    gtk_widget_set_size_request (label_name_last, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_name_last), 0.9, 0.5);
-
-    m_entryNameLast = gtk_entry_new ();
-    gtk_widget_show (m_entryNameLast);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryNameLast, 110+8, 45);
-    gtk_widget_set_size_request (m_entryNameLast, 120, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryNameLast), m_pat_name_last);
-    g_signal_connect(G_OBJECT(m_entryNameLast), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-
-    label_name_first = gtk_label_new (_("First Name:"));
-    gtk_widget_show (label_name_first);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_name_first, 270+40-50-10, 45);
-    gtk_widget_set_size_request (label_name_first, 110, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_name_first), 0.9, 0.5);
-
-    m_entryNameFirst = gtk_entry_new ();
-    gtk_widget_show (m_entryNameFirst);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryNameFirst, 370+40-50, 45);
-    gtk_widget_set_size_request (m_entryNameFirst, 120, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryNameFirst), m_pat_name_first);
-    g_signal_connect(G_OBJECT(m_entryNameFirst), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-
-    label_name_mid = gtk_label_new (_("Middle Name:"));
-    gtk_widget_show (label_name_mid);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_name_mid, 530-10-10, 45);
-    gtk_widget_set_size_request (label_name_mid, 100+10+10, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_name_mid), 0.9, 0.5);
-
-    m_entryNameMid = gtk_entry_new ();
-    gtk_widget_show (m_entryNameMid);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryNameMid, 630, 45);
-    gtk_widget_set_size_request (m_entryNameMid, 120, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryNameMid), m_pat_name_middle);
-    g_signal_connect(G_OBJECT(m_entryNameMid), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-
-    label_birth_date = gtk_label_new (_("Date of Birth:"));
-    //label_birth_date = gtk_label_new (_("Birth Date:"));
-    gtk_widget_show (label_birth_date);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_birth_date, 10, 80);
-    gtk_widget_set_size_request (label_birth_date, 100+8, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_birth_date), 0.9, 0.5);
-    SysGeneralSetting *sys_date = new SysGeneralSetting;
-    m_date_format = sys_date->GetDateFormat();
-    if(0==m_date_format) {
-        m_entryBirthYear = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthYear);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthYear, 110+8, 80);
-        gtk_widget_set_size_request (m_entryBirthYear, 48, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthYear), 4);
-        g_signal_connect(G_OBJECT(m_entryBirthYear), "insert_text", G_CALLBACK(on_entry_birth_date_year), this);
-        g_signal_connect(G_OBJECT(m_entryBirthYear), "delete_text", G_CALLBACK(on_entry_delete_birth_date_year), this);
-
-        label_spacing_year = gtk_label_new (_("Y  "));
-        gtk_widget_show (label_spacing_year);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_year, 158+8, 80);
-        gtk_widget_set_size_request (label_spacing_year, 12+12, 30);
-
-        m_entryBirthMonth = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthMonth);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthMonth, 170+8+12, 80);
-        gtk_widget_set_size_request (m_entryBirthMonth, 24, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthMonth), 2);
-        g_signal_connect(G_OBJECT(m_entryBirthMonth), "insert_text", G_CALLBACK(on_entry_birth_date_month), this);
-        g_signal_connect(G_OBJECT(m_entryBirthMonth), "delete_text", G_CALLBACK(on_entry_delete_birth_date_month), this);
-
-        label_spacing_month = gtk_label_new (_("M  "));
-        gtk_widget_show (label_spacing_month);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_month, 194+8+12, 80);
-        gtk_widget_set_size_request (label_spacing_month, 12+12, 30);
-
-        m_entryBirthDay = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthDay);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthDay, 206+8+24, 80);
-        gtk_widget_set_size_request (m_entryBirthDay, 24, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthDay), 2);
-        g_signal_connect(G_OBJECT(m_entryBirthDay), "insert_text", G_CALLBACK(on_entry_birth_date_day), this);
-        g_signal_connect(G_OBJECT(m_entryBirthDay), "delete_text", G_CALLBACK(on_entry_delete_birth_date_day), this);
-
-        label_spacing_day = gtk_label_new (_("D  "));
-        gtk_widget_show (label_spacing_day);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_day, 240+24, 80);
-        gtk_widget_set_size_request (label_spacing_day, 12+12, 30);
-    }
-
-    else if(2==m_date_format) {
-        m_entryBirthYear = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthYear);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthYear, 206+8, 80);
-        gtk_widget_set_size_request (m_entryBirthYear, 48, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthYear), 4);
-        g_signal_connect(G_OBJECT(m_entryBirthYear), "insert_text", G_CALLBACK(on_entry_birth_date_year), this);
-        g_signal_connect(G_OBJECT(m_entryBirthYear), "delete_text", G_CALLBACK(on_entry_delete_birth_date_year), this);
-
-        label_spacing_year = gtk_label_new(_("D  "));
-        gtk_widget_show (label_spacing_year);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_year, 158+8-24, 80);
-        gtk_widget_set_size_request (label_spacing_year, 12+12, 30);
-
-        m_entryBirthMonth = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthMonth);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthMonth, 170+8-24+12, 80);
-        gtk_widget_set_size_request (m_entryBirthMonth, 24, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthMonth), 2);
-        g_signal_connect(G_OBJECT(m_entryBirthMonth), "insert_text", G_CALLBACK(on_entry_birth_date_month), this);
-        g_signal_connect(G_OBJECT(m_entryBirthMonth), "delete_text", G_CALLBACK(on_entry_delete_birth_date_month), this);
-
-        label_spacing_month = gtk_label_new (_("M  "));
-        gtk_widget_show (label_spacing_month);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_month, 194+8-24+12, 80);
-        gtk_widget_set_size_request (label_spacing_month, 12+12, 30);
-
-        m_entryBirthDay = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthDay);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthDay, 118, 80);
-        gtk_widget_set_size_request (m_entryBirthDay, 24, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthDay), 2);
-        g_signal_connect(G_OBJECT(m_entryBirthDay), "insert_text", G_CALLBACK(on_entry_birth_date_day), this);
-        g_signal_connect(G_OBJECT(m_entryBirthDay), "delete_text", G_CALLBACK(on_entry_delete_birth_date_day), this);
-
-        label_spacing_day = gtk_label_new (_("Y  "));
-        gtk_widget_show (label_spacing_day);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_day, 240+24, 80);
-        gtk_widget_set_size_request (label_spacing_day, 12+12, 30);
-    }
-
-    else {
-        m_entryBirthYear = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthYear);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthYear, 206+8-24+24, 80);
-        gtk_widget_set_size_request (m_entryBirthYear, 48, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthYear), 4);
-        g_signal_connect(G_OBJECT(m_entryBirthYear), "insert_text", G_CALLBACK(on_entry_birth_date_year), this);
-        g_signal_connect(G_OBJECT(m_entryBirthYear), "delete_text", G_CALLBACK(on_entry_delete_birth_date_year), this);
-
-        label_spacing_year = gtk_label_new (_("M  "));
-        gtk_widget_show (label_spacing_year);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_year, 158+8-24, 80);
-        gtk_widget_set_size_request (label_spacing_year, 12+12, 30);
-
-        m_entryBirthMonth = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthMonth);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthMonth, 118, 80);
-        gtk_widget_set_size_request (m_entryBirthMonth, 24, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthMonth), 2);
-        g_signal_connect(G_OBJECT(m_entryBirthMonth), "insert_text", G_CALLBACK(on_entry_birth_date_month), this);
-        g_signal_connect(G_OBJECT(m_entryBirthMonth), "delete_text", G_CALLBACK(on_entry_delete_birth_date_month), this);
-
-        label_spacing_month = gtk_label_new (_("D  "));
-        gtk_widget_show (label_spacing_month);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_month, 194+8-24+12, 80);
-        gtk_widget_set_size_request (label_spacing_month, 12+12, 30);
-
-        m_entryBirthDay = gtk_entry_new ();
-        gtk_widget_show (m_entryBirthDay);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryBirthDay, 170+8-24+12, 80);
-        gtk_widget_set_size_request (m_entryBirthDay, 24, 30);
-        gtk_entry_set_max_length(GTK_ENTRY(m_entryBirthDay), 2);
-        g_signal_connect(G_OBJECT(m_entryBirthDay), "insert_text", G_CALLBACK(on_entry_birth_date_day), this);
-        g_signal_connect(G_OBJECT(m_entryBirthDay), "delete_text", G_CALLBACK(on_entry_delete_birth_date_day), this);
-
-        label_spacing_day = gtk_label_new (_("Y  "));
-        gtk_widget_show (label_spacing_day);
-        gtk_fixed_put (GTK_FIXED (fixed_general_info), label_spacing_day, 240+24, 80);
-        gtk_widget_set_size_request (label_spacing_day, 12+12, 30);
-    }
-    img_birth_calendar = gtk_image_new_from_file ("./res/icon/Calendar.png");
-    gtk_widget_show (img_birth_calendar);
-    eventbox_birth_calendar = gtk_event_box_new ();
-    gtk_widget_show (eventbox_birth_calendar);
-    gtk_widget_set_size_request (eventbox_birth_calendar, 40, 30);
-    gtk_container_add (GTK_CONTAINER (eventbox_birth_calendar), img_birth_calendar);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), eventbox_birth_calendar, 254+36, 80);
-    g_signal_connect (G_OBJECT(eventbox_birth_calendar), "button_press_event", G_CALLBACK(HandleEventBoxCalendarPress), this);
-
-    m_entryAge = gtk_entry_new ();
-    gtk_widget_show (m_entryAge);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_entryAge, 370+40, 80);
-    gtk_widget_set_size_request (m_entryAge, 70, 30);
-    gtk_entry_set_max_length(GTK_ENTRY(m_entryAge), 3);
-    g_signal_connect(G_OBJECT(m_entryAge), "insert_text", G_CALLBACK(on_entry_age), this);
-
-    m_comboboxAge = gtk_combo_box_new_text ();
-    gtk_widget_show (m_comboboxAge);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_comboboxAge, 440+40, 80);
-    gtk_widget_set_size_request (m_comboboxAge, 50, 30);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxAge), _("Y"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxAge), _("M"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxAge), _("D"));
-
-    label_gender = gtk_label_new (_("Gender:"));
-    gtk_widget_show (label_gender);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_gender, 530, 80);
-    gtk_widget_set_size_request (label_gender, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_gender), 0.9, 0.5);
-
-    m_comboboxGender = gtk_combo_box_new_text ();
-    gtk_widget_show (m_comboboxGender);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), m_comboboxGender, 630, 80);
-    gtk_widget_set_size_request (m_comboboxGender, 122, 32);
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Female"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Male"));
-
-    gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxGender), _("Other"));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxGender), -1);
-
-    label_age = gtk_label_new (_("Age:"));
-    gtk_widget_show (label_age);
-    gtk_fixed_put (GTK_FIXED (fixed_general_info), label_age, 270+40, 80);
-    gtk_widget_set_size_request (label_age, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_age), 0.9, 0.5);
-
-    label_general_info = gtk_label_new (_("General Information"));
-    gtk_widget_show (label_general_info);
-    gtk_frame_set_label_widget (GTK_FRAME (frame), label_general_info);
-    gtk_label_set_use_markup (GTK_LABEL (label_general_info), TRUE);
-
-    cout << 1 << endl;
-
-    notebook = gtk_notebook_new ();
-    gtk_widget_show (notebook);
-    gtk_fixed_put (GTK_FIXED (fixed_window), notebook, 20, 160);
-    gtk_widget_set_size_request (notebook, 800, 250);
-
-    fixed_tab_general = create_note_general();
-    gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_general);
-
-    label_general = gtk_label_new (_("General"));
-    gtk_widget_show (label_general);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0), label_general);
-
-    fixed_tab_ob = create_note_ob();
-    gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_ob);
-
-    label_ob = gtk_label_new (_("OB"));
-    gtk_widget_show (label_ob);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 1), label_ob);
-
-    fixed_tab_card = create_note_card();
-    gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_card);
-
-    label_card = gtk_label_new (_("CARD"));
-    gtk_widget_show (label_card);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), label_card);
-
-    fixed_tab_uro = create_note_uro();
-    gtk_container_add (GTK_CONTAINER (notebook), fixed_tab_uro);
-
-    cout << 2 << endl;
-
-    label_uro = gtk_label_new (_("URO"));
-    gtk_widget_show (label_uro);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 3), label_uro);
-
-    fixed_tab_other = create_note_other();
-    gtk_container_add(GTK_CONTAINER(notebook), fixed_tab_other);
-
-    label_other = gtk_label_new (_("Other"));
-    gtk_widget_show (label_other);
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 4), label_other);
-
-    label_comment = gtk_label_new (_("Comment:"));
-    gtk_widget_show (label_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_window), label_comment, 20, 420);
-    gtk_widget_set_size_request (label_comment, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_comment), 0.9, 0.5);
-
-    scrolledwindow_comment = gtk_scrolled_window_new (NULL, NULL);
-    gtk_widget_show (scrolledwindow_comment);
-    gtk_fixed_put (GTK_FIXED (fixed_window), scrolledwindow_comment, 120, 420);
-    gtk_widget_set_size_request (scrolledwindow_comment, 700, 60);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow_comment), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow_comment), GTK_SHADOW_OUT);
-
-    m_textview_comment = gtk_text_view_new ();
-    gtk_widget_show (m_textview_comment);
-    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (m_textview_comment), GTK_WRAP_WORD_CHAR);
-    gtk_container_add (GTK_CONTAINER (scrolledwindow_comment), m_textview_comment);
-    g_signal_connect(G_OBJECT(gtk_text_view_get_buffer(GTK_TEXT_VIEW(m_textview_comment))), "insert-text", G_CALLBACK(on_textview_comment_insert), this);
-
-    cout << 3 << endl;
-
-    label_diagnostician = gtk_label_new (_("Diagnostician:"));
-    gtk_widget_show (label_diagnostician);
-    gtk_fixed_put (GTK_FIXED (fixed_window), label_diagnostician, 20, 490);
-    gtk_widget_set_size_request (label_diagnostician, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_diagnostician), 0.9, 0.5);
-
-    m_comboboxentry_diagnostician = gtk_combo_box_entry_new_text ();
-    gtk_widget_show (m_comboboxentry_diagnostician);
-    gtk_fixed_put (GTK_FIXED (fixed_window), m_comboboxentry_diagnostician, 120, 490);
-    gtk_widget_set_size_request (m_comboboxentry_diagnostician, 120, 30);
-    GtkWidget *bin_entry_dia = gtk_bin_get_child (GTK_BIN(m_comboboxentry_diagnostician));
-    gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 45);
-
-    label_physician = gtk_label_new (_("Physician:"));
-    gtk_widget_show (label_physician);
-    gtk_fixed_put (GTK_FIXED (fixed_window), label_physician, 240, 490);
-    gtk_widget_set_size_request (label_physician, 100, 30);
-    gtk_misc_set_alignment (GTK_MISC (label_physician), 0.9, 0.5);
-
-    m_comboboxentry_physician = gtk_combo_box_entry_new_text ();
-    gtk_widget_show (m_comboboxentry_physician);
-    gtk_fixed_put (GTK_FIXED (fixed_window), m_comboboxentry_physician, 340, 490);
-    gtk_widget_set_size_request (m_comboboxentry_physician, 120, 30);
-    GtkWidget *bin_entry_phy = gtk_bin_get_child (GTK_BIN(m_comboboxentry_physician));
-    gtk_entry_set_max_length(GTK_ENTRY(bin_entry_phy), 45);
-    g_signal_connect(G_OBJECT(bin_entry_phy), "insert_text", G_CALLBACK(on_entry_name_insert), this);
-
-    Database db;
-    vector<string> doc_name;
-    vector<string>::const_iterator iter_doc;
-    if (db.DoctorSearch(&doc_name)) {
-        for (iter_doc = doc_name.begin(); iter_doc != doc_name.end(); ++iter_doc) {
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxentry_diagnostician), (*iter_doc).c_str());
-            gtk_combo_box_append_text (GTK_COMBO_BOX (m_comboboxentry_physician), (*iter_doc).c_str());
-        }
-    }
-
-    hseparator = gtk_hseparator_new ();
-    gtk_widget_show (hseparator);
-    gtk_fixed_put (GTK_FIXED (fixed_window), hseparator, 20, 540);
-    gtk_widget_set_size_request (hseparator, 800, 15);
-
-    cout << 4 << endl;
-
-    image_exam_end = gtk_image_new_from_stock ("gtk-media-stop", GTK_ICON_SIZE_BUTTON);
-    label_exam_end = gtk_label_new_with_mnemonic (_("End Exam"));
-    button_exam_end = create_button_icon (label_exam_end, image_exam_end);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_exam_end, 20, 560);
-    gtk_button_set_focus_on_click(GTK_BUTTON(button_exam_end), TRUE);
-
-    cout << 40 << endl;
-
-    image_new_pat = gtk_image_new_from_stock ("gtk-orientation-portrait", GTK_ICON_SIZE_BUTTON);
-
-    label_new_pat = gtk_label_new_with_mnemonic (_("New Patient"));
-
-    button_new_pat = create_button_icon(label_new_pat, image_new_pat);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_new_pat, 150, 560);
-
-    image_new_exam = gtk_image_new_from_stock ("gtk-new", GTK_ICON_SIZE_BUTTON);
-    label_new_exam = gtk_label_new_with_mnemonic (_("New Exam"));
-    button_new_exam = create_button_icon(label_new_exam, image_new_exam);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_new_exam, 280, 560);
-
-    //if(CDCMRegister::GetMe()->IsAuthorize())
+  MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
+
+  SysGeneralSetting setting;
+
+  if (ZH == setting.GetLanguage() || FR == setting.GetLanguage()) {
+    m_langCN = true;
+  } else {
+    m_langCN = false;
+  }
+
+  Utils::GetCurrentDate(m_curYear, m_curMonth, m_curDay);
+
+  m_dialog = Utils::create_dialog(
+    GTK_WINDOW(ViewMain::GetInstance()->GetMainWindow()),
+    _("Patient Information"), 800, 600);
+
+  GtkButton* button_end_exam = Utils::add_dialog_button(m_dialog, _("End Exam"), GTK_RESPONSE_NONE, GTK_STOCK_MEDIA_STOP);
+  GtkButton* button_new_patient = Utils::add_dialog_button(m_dialog, _("New Patient"), GTK_RESPONSE_NONE, GTK_STOCK_ORIENTATION_PORTRAIT);
+  GtkButton* button_new_exam = Utils::add_dialog_button(m_dialog, _("New Exam"), GTK_RESPONSE_NONE, GTK_STOCK_NEW);
+
+  g_signal_connect(button_end_exam, "clicked", G_CALLBACK(signal_button_clicked_end_exam), this);
+  g_signal_connect(button_new_patient, "clicked", G_CALLBACK(signal_button_clicked_new_patient), this);
+  g_signal_connect(button_new_exam, "clicked", G_CALLBACK(signal_button_clicked_new_exam), this);
+
+  //if (CDCMRegister::GetMe()->IsAuthorize()) {
+    GtkButton* button_worklist = Utils::add_dialog_button(m_dialog, _("Worklist"), GTK_RESPONSE_NONE, GTK_STOCK_INFO);
+    g_signal_connect(button_worklist, "clicked", G_CALLBACK(signal_button_clicked_worklist), this);
+  //}
+
+  GtkButton* button_ok = Utils::add_dialog_button(m_dialog, _("OK"), GTK_RESPONSE_OK, GTK_STOCK_OK);
+  GtkButton* button_cancel = Utils::add_dialog_button(m_dialog, _("Cancel"), GTK_RESPONSE_CANCEL, GTK_STOCK_CANCEL);
+
+  g_signal_connect(button_ok, "clicked", G_CALLBACK(signal_button_clicked_ok), this);
+  g_signal_connect(button_cancel, "clicked", G_CALLBACK(signal_button_clicked_cancel), this);
+
+  // table
+
+  GtkTable* table = Utils::create_table(13, 9);
+  gtk_container_set_border_width(GTK_CONTAINER(table), 10);
+  gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(table));
+
+  // General Information
+
+  GtkFrame* frame = Utils::create_frame(_("General Information"));
+  gtk_table_attach_defaults(table, GTK_WIDGET(frame), 0, 9, 0, 4);
+
+  GtkTable* table_frame = Utils::create_table(3, 45);
+  gtk_container_set_border_width(GTK_CONTAINER(table_frame), 5);
+  gtk_table_set_col_spacings(table_frame, 5);
+
+  gtk_container_add(GTK_CONTAINER(frame), GTK_WIDGET(table_frame));
+
+  // Patient ID
+
+  GtkLabel* label_patient_id = Utils::create_label(_("Patient ID:"));
+  m_entry_patient_id = Utils::create_entry();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_patient_id), 0, 6, 0, 1);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_patient_id), 6, 15, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_patient_id, 15);
+
+  g_signal_connect(m_entry_patient_id, "insert_text", G_CALLBACK(signal_entry_insert_patient_id), this);
+  g_signal_connect(m_entry_patient_id, "focus-out-event", G_CALLBACK(signal_entry_focusout_patient_id), this);
+
+  // Auto Generated ID
+
+  GtkCheckButton* m_checkbutton_patient_id = Utils::create_check_button(_("Auto Generated ID"));
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(m_checkbutton_patient_id), 15, 30, 0, 1);
+
+  g_signal_connect(m_checkbutton_patient_id, "clicked", G_CALLBACK(signal_checkbutton_clicked_patient_id), this);
+
+  // Search
+
+  GtkButton* button_search_patient_info = Utils::create_button(_("Search"));
+  gtk_table_attach(table_frame, GTK_WIDGET(button_search_patient_info), 36, 45, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  g_signal_connect(button_search_patient_info, "clicked", G_CALLBACK (signal_button_clicked_search), this);
+
+  // Last Name
+
+  GtkLabel* label_last_name = Utils::create_label(_("Last Name:"));
+  m_entry_last_name = Utils::create_entry();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_last_name), 0, 6, 1, 2);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_last_name), 6, 15, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_last_name, m_patient_name_last);
+
+  g_signal_connect(G_OBJECT(m_entry_last_name), "insert_text", G_CALLBACK(signal_entry_insert_name), this);
+
+  // First Name
+
+  GtkLabel* label_first_name = Utils::create_label(_("First Name:"));
+  m_entry_first_name = Utils::create_entry();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_first_name), 15, 21, 1, 2);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_first_name), 21, 30, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_first_name, m_patient_name_first);
+
+  g_signal_connect(G_OBJECT(m_entry_first_name), "insert_text", G_CALLBACK(signal_entry_insert_name), this);
+
+  // Middle Name
+
+  GtkLabel* label_mid_name = Utils::create_label(_("Middle Name:"));
+  m_entry_mid_name = Utils::create_entry();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_mid_name), 30, 26, 1, 2);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_mid_name), 36, 45, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_mid_name, m_patient_name_middle);
+
+  g_signal_connect(G_OBJECT(m_entry_mid_name), "insert_text", G_CALLBACK(signal_entry_insert_name), this);
+
+  // Date of Birth
+
+  GtkLabel* label_birth_date = Utils::create_label(_("Date of Birth:"));
+
+  m_entry_birth_year = Utils::create_entry();
+  GtkLabel* label_birth_year = Utils::create_label(_("Y"));
+  gtk_entry_set_max_length(m_entry_birth_year, 4);
+
+  m_entry_birth_month = Utils::create_entry();
+  GtkLabel* label_birth_month = Utils::create_label(_("M"));
+  gtk_entry_set_max_length(m_entry_birth_month, 2);
+
+  m_entry_birth_day = Utils::create_entry();
+  GtkLabel* label_birth_day = Utils::create_label(_("D"));
+  gtk_entry_set_max_length(m_entry_birth_day, 2);
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_date), 0, 6, 2, 3);
+
+  m_date_format = setting.GetDateFormat();
+
+  switch (m_date_format) {
+  case 1:
+    // M/D/Y
     {
-        //worklist
-        image_worklist = gtk_image_new_from_stock ("gtk-info", GTK_ICON_SIZE_BUTTON);
-        label_worklist = gtk_label_new_with_mnemonic (_(" Worklist"));
-        m_button_worklist = create_button_icon(label_worklist, image_worklist);
-        gtk_fixed_put (GTK_FIXED (fixed_window), m_button_worklist, 410, 560);
-        g_signal_connect ((gpointer) m_button_worklist, "clicked", G_CALLBACK (on_button_worklist_clicked), this);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 6, 8, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_month), 8, 9, 2, 3);
+
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 9, 11, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_day), 11, 12, 2, 3);
+
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 12, 16, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_year), 16, 17, 2, 3);
     }
 
-    image_ok = gtk_image_new_from_stock ("gtk-ok", GTK_ICON_SIZE_BUTTON);
-    label_ok = gtk_label_new_with_mnemonic (_("OK"));
-    button_ok = create_button_icon(label_ok, image_ok);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_ok, 570, 560);
-    gtk_button_set_focus_on_click(GTK_BUTTON(button_ok), TRUE);
+    break;
+  case 2:
+    // D/M/Y
+    {
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 6, 8, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_day), 8, 9, 2, 3);
 
-    image_cancel = gtk_image_new_from_stock ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
-    label_cancel = gtk_label_new_with_mnemonic (_("Cancel"));
-    button_cancel = create_button_icon(label_cancel, image_cancel);
-    gtk_fixed_put (GTK_FIXED (fixed_window), button_cancel, 700, 560);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 9, 11, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_month), 11, 12, 2, 3);
 
-    g_signal_connect ((gpointer) button_exam_end, "clicked", G_CALLBACK (on_button_exam_end_clicked), this);
-    g_signal_connect ((gpointer) button_new_pat, "clicked", G_CALLBACK (on_button_new_pat_clicked), this);
-    g_signal_connect ((gpointer) button_new_exam, "clicked", G_CALLBACK (on_button_new_exam_clicked), this);
-
-    g_signal_connect ((gpointer) button_ok, "clicked", G_CALLBACK (on_button_ok_clicked), this);
-    g_signal_connect ((gpointer) button_cancel, "clicked", G_CALLBACK (on_button_cancel_clicked), this);
-
-    cout << 5 << endl;
-
-    gtk_widget_show(m_window);
-
-    g_keyInterface.Push(this);
-    SetSystemCursorToCenter();
-
-    if (m_langCN) {
-        gtk_widget_hide (m_entryNameMid);
-        gtk_widget_hide (label_name_mid);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 12, 16, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_year), 16, 17, 2, 3);
     }
 
-    PatientInfo::Info info;
-    g_patientInfo.GetInfo(info);
-    FillNewPat(info);
+    break;
+  default:
+    // Y/M/D
+    {
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 6, 8, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_year), 8, 9, 2, 3);
 
-    if (info.p.id.empty()) {
-        SysGeneralSetting sgs;
-        if(sgs.GetAutoGeneratedID())AutoPatID();
-    } else {
-        gtk_widget_set_sensitive(m_entryPatID, FALSE);
-        gtk_widget_set_sensitive(m_checkbuttonPatID, FALSE);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 9, 11, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_month), 11, 12, 2, 3);
+
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 12, 16, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_day), 16, 17, 2, 3);
     }
 
-    delete(sys_date);
-    return ;
+    break;
+  }
+
+  g_signal_connect(G_OBJECT(m_entry_birth_year), "insert_text", G_CALLBACK(signal_entry_insert_birth_date_year), this);
+  g_signal_connect(G_OBJECT(m_entry_birth_year), "delete_text", G_CALLBACK(signal_entry_delete_birth_date_year), this);
+  g_signal_connect(G_OBJECT(m_entry_birth_month), "insert_text", G_CALLBACK(signal_entry_insert_birth_date_month), this);
+  g_signal_connect(G_OBJECT(m_entry_birth_month), "delete_text", G_CALLBACK(signal_entry_delete_birth_date_month), this);
+  g_signal_connect(G_OBJECT(m_entry_birth_day), "insert_text", G_CALLBACK(signal_entry_insert_birth_date_day), this);
+  g_signal_connect(G_OBJECT(m_entry_birth_day), "delete_text", G_CALLBACK(signal_entry_delete_birth_date_day), this);
+
+  // calendar
+
+  GtkButton* button_birth_calendar = Utils::create_button();
+  gtk_table_attach(table_frame, GTK_WIDGET(button_birth_calendar), 17, 20, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  Utils::set_button_image(button_birth_calendar, Utils::create_image("./res/icon/Calendar.png"));
+  g_signal_connect(button_birth_calendar, "clicked", G_CALLBACK(signal_button_clicked_calendar), this);
+
+  // Age
+
+  GtkLabel* label_age = Utils::create_label(_("Age:"));
+  m_entry_age = Utils::create_entry();
+  m_combobox_text_age = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_age), 21, 24, 2, 3);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_age), 24, 27, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_text_age), 27, 30, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_entry_set_max_length(m_entry_age, 3);
+  g_signal_connect(m_entry_age, "insert_text", G_CALLBACK(signal_entry_age), this);
+
+  gtk_combo_box_text_append_text(m_combobox_text_age, _("Y"));
+  gtk_combo_box_text_append_text(m_combobox_text_age, _("M"));
+  gtk_combo_box_text_append_text(m_combobox_text_age, _("D"));
+
+  // Gender
+
+  GtkLabel* label_gender = Utils::create_label(_("Gender:"));
+  m_combobox_text_gender = Utils::create_combobox_text();
+
+  gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_gender), 30, 36, 2, 3);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_text_gender), 36, 45, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  gtk_combo_box_text_append_text(m_combobox_text_gender, _("Female"));
+  gtk_combo_box_text_append_text(m_combobox_text_gender, _("Male"));
+  gtk_combo_box_text_append_text(m_combobox_text_gender, _("Other"));
+
+  gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_gender), -1);
+
+  // Notebook
+
+  GtkNotebook* notebook = Utils::create_notebook();
+  gtk_table_attach_defaults(table, GTK_WIDGET(notebook), 0, 9, 4, 10);
+
+  gtk_notebook_append_page(notebook, create_note_general(), GTK_WIDGET(Utils::create_label(_("General"))));
+  gtk_notebook_append_page(notebook, create_note_ob(), GTK_WIDGET(Utils::create_label(_("OB"))));
+  gtk_notebook_append_page(notebook, create_note_card(), GTK_WIDGET(Utils::create_label(_("CARD"))));
+  gtk_notebook_append_page(notebook, create_note_uro(), GTK_WIDGET(Utils::create_label(_("URO"))));
+  gtk_notebook_append_page(notebook, create_note_other(), GTK_WIDGET(Utils::create_label(_("Other"))));
+
+  // Comment
+
+  GtkLabel* label_comment = Utils::create_label(_("Comment:"));
+  GtkScrolledWindow* scrolled_window = Utils::create_scrolled_window();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_comment), 0, 1, 10, 12);
+  gtk_table_attach_defaults(table, GTK_WIDGET(scrolled_window), 1, 9, 10, 12);
+
+  gtk_misc_set_alignment(GTK_MISC(label_comment), 0, 0);
+
+  m_textview_comment = Utils::create_text_view();
+  gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_textview_comment));
+
+  g_signal_connect(G_OBJECT(gtk_text_view_get_buffer(m_textview_comment)), "insert-text", G_CALLBACK(signal_textview_insert_comment), this);
+
+  // Diagnostician
+
+  GtkLabel* label_diagnostician = Utils::create_label(_("Diagnostician:"));
+  m_comboboxentry_diagnostician = Utils::create_combobox_entry();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_diagnostician), 0, 1, 12, 13);
+  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_diagnostician), 1, 3, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  GtkEntry* bin_entry_diagnostician = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_diagnostician)));
+  gtk_entry_set_max_length(bin_entry_diagnostician, 45);
+
+  // Physician
+
+  GtkLabel* label_physician = Utils::create_label(_("Physician:"));
+  m_comboboxentry_physician = Utils::create_combobox_entry();
+
+  gtk_table_attach_defaults(table, GTK_WIDGET(label_physician), 3, 4, 12, 13);
+  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_physician), 4, 6, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+
+  GtkEntry* bin_entry_physician = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_physician)));
+  gtk_entry_set_max_length(bin_entry_physician, 45);
+
+  g_signal_connect(bin_entry_physician, "insert_text", G_CALLBACK(signal_entry_insert_name), this);
+
+  Database db;
+  vector<string> doc_name;
+
+  if (db.DoctorSearch(&doc_name)) {
+    for (int i = 0; i < doc_name.size(); i++) {
+      gtk_combo_box_append_text(GTK_COMBO_BOX(m_comboboxentry_diagnostician), doc_name[i].c_str());
+      gtk_combo_box_append_text(GTK_COMBO_BOX(m_comboboxentry_physician), doc_name[i].c_str());
+    }
+  }
+
+  gtk_widget_show_all(GTK_WIDGET(m_dialog));
+  g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  g_keyInterface.Push(this);
+  SetSystemCursorToCenter();
+
+  if (m_langCN) {
+    gtk_widget_hide(GTK_WIDGET(label_mid_name));
+    gtk_widget_hide(GTK_WIDGET(m_entry_mid_name));
+  }
+
+  PatientInfo::Info info;
+  g_patientInfo.GetInfo(info);
+  FillNewPat(info);
+
+  if (info.p.id.empty()) {
+    if (setting.GetAutoGeneratedID()) {
+      AutoPatID();
+    }
+  } else {
+    gtk_widget_set_sensitive(GTK_WIDGET(m_entry_patient_id), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_patient_id), FALSE);
+  }
 }
+
+void ViewNewPat::DestroyWindow() {
+  if (GTK_IS_WIDGET(m_dialog))	{
+    g_keyInterface.Pop();
+    gtk_widget_destroy(GTK_WIDGET(m_dialog));
+
+    if (g_keyInterface.Size() == 1) {
+      SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
+    }
+
+    m_dialog = NULL;
+  }
+}
+
+GtkWidget* ViewNewPat::GetWindow() {
+  return GTK_WIDGET(m_dialog);
+}
+
+// ---------------------------------------------------------
+
+
+
+#include "display/gui_global.h"
+
+
+
+
+
 
 namespace {
 int CallBackLoadPatData(gpointer data) {
@@ -604,45 +414,45 @@ void ViewNewPat::CheckPatID(const gchar *pat_id) {
         return ;
     } else {
 
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
     }
 }
 
 void ViewNewPat::LoadPatData() {
-    const gchar *pat_id = gtk_entry_get_text(GTK_ENTRY(m_entryPatID));
+    const gchar *pat_id = gtk_entry_get_text(GTK_ENTRY(m_entry_patient_id));
     Database db;
     PatientInfo::Patient pat_info;
     db.GetPatInfo(pat_id, pat_info);
     FillPatInfo(pat_info);
-    gtk_widget_set_sensitive(m_entryPatID, FALSE);
-    gtk_widget_set_sensitive(m_checkbuttonPatID, FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_entry_patient_id), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_patient_id), FALSE);
 }
 
 void ViewNewPat::UpdateNameLength() {
     SysGeneralSetting sgs;
     if(ZH == sgs.GetLanguage()) {
-        m_pat_name_last = 31;
-        m_pat_name_middle = 0;
-        m_pat_name_first = 31;
+        m_patient_name_last = 31;
+        m_patient_name_middle = 0;
+        m_patient_name_first = 31;
     } else if(RU == sgs.GetLanguage()) {
-        m_pat_name_last = 30;
-        m_pat_name_middle = 16;
-        m_pat_name_first = 16;
+        m_patient_name_last = 30;
+        m_patient_name_middle = 16;
+        m_patient_name_first = 16;
     } else if(FR == sgs.GetLanguage()) {
-        m_pat_name_last = 31;
-        m_pat_name_middle = 0;
-        m_pat_name_first = 31;
+        m_patient_name_last = 31;
+        m_patient_name_middle = 0;
+        m_patient_name_first = 31;
     } else {
-        m_pat_name_last = 20;
-        m_pat_name_middle = 20;
-        m_pat_name_first = 20;
+        m_patient_name_last = 20;
+        m_patient_name_middle = 20;
+        m_patient_name_first = 20;
     }
 }
 
 void ViewNewPat::AutoPatID() {
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_checkbuttonPatID), TRUE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(m_checkbutton_patient_id), TRUE);
     string ID = GenPatID();
-    gtk_entry_set_text(GTK_ENTRY(m_entryPatID), ID.c_str());
+    gtk_entry_set_text(GTK_ENTRY(m_entry_patient_id), ID.c_str());
 }
 
 void ViewNewPat::PatIDFocusOut(GtkWidget *widget, GdkEventFocus *event) {
@@ -661,19 +471,19 @@ void ViewNewPat::BirthDateYearInsert(GtkEditable *editable, gchar *new_text, gin
         int year = atoi(old_str.c_str());
         if (year < 1900) {
             *position = 4;      // 移动光标之输入框末尾
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), "1900");
+            gtk_entry_set_text(m_entry_birth_year, "1900");
             year = 1900;
         } else if (year > m_curYear) {
             *position = 4;
             char curYear[5];
             sprintf(curYear, "%d", m_curYear);
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), curYear);
+            gtk_entry_set_text(m_entry_birth_year, curYear);
             year = m_curYear;
         }
-        const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
-        const char *day_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthDay));
+        const char *month_text = gtk_entry_get_text(m_entry_birth_month);
+        const char *day_text = gtk_entry_get_text(m_entry_birth_day);
         AutoCalcAge(year, atoi(month_text), atoi(day_text));
-        gtk_widget_grab_focus(m_entryBirthMonth);
+        gtk_widget_grab_focus(GTK_WIDGET(m_entry_birth_month));
     }
     return;
 }
@@ -682,8 +492,8 @@ void ViewNewPat::BirthDateYearDelete(GtkEditable *editable, gint start_pos, gint
     string new_str = gtk_entry_get_text(GTK_ENTRY(editable));
     new_str.erase(start_pos, end_pos);
     if (new_str.length() != 4) {
-        gtk_entry_set_text(GTK_ENTRY(m_entryAge), "");
-        gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), 0);
+        gtk_entry_set_text(m_entry_age, "");
+        gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), 0);
     }
 }
 
@@ -700,16 +510,16 @@ void ViewNewPat::BirthDateMonthInsert(GtkEditable *editable, gchar *new_text, gi
             return ;
         } else if (month > 12) {
             *position = 2;      // 移动光标之输入框末尾
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth), "12");
+            gtk_entry_set_text(m_entry_birth_month, "12");
             month = 12;
         }
-        const char *year_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
+        const char *year_text = gtk_entry_get_text(m_entry_birth_year);
         if (strlen(year_text) != 4)
             return;
-        const char *day_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthDay));
+        const char *day_text = gtk_entry_get_text(m_entry_birth_day);
         AutoCalcAge(atoi(year_text), month, atoi(day_text));
         if (old_str.length() == 2)
-            gtk_widget_grab_focus(m_entryBirthDay);
+            gtk_widget_grab_focus(GTK_WIDGET(m_entry_birth_day));
     }
     return;
 }
@@ -724,14 +534,14 @@ void ViewNewPat::BirthDateMonthDelete(GtkEditable *editable, gint start_pos, gin
             g_signal_stop_emission_by_name((gpointer)editable, "delete_text");
             return ;
         }
-        const char *year_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
+        const char *year_text = gtk_entry_get_text(m_entry_birth_year);
         if (strlen(year_text) != 4)
             return;
-        const char *day_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthDay));
+        const char *day_text = gtk_entry_get_text(m_entry_birth_day);
         AutoCalcAge(atoi(year_text), month, atoi(day_text));
     } else {
-        gtk_entry_set_text(GTK_ENTRY(m_entryAge), "");
-        gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), 0);
+        gtk_entry_set_text(m_entry_age, "");
+        gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), 0);
     }
 }
 
@@ -747,12 +557,12 @@ void ViewNewPat::BirthDateDayInsert(GtkEditable *editable, gchar *new_text, gint
         g_signal_stop_emission_by_name((gpointer)editable, "insert_text");
         return ;
     }
-    const char *year_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
-    const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
+    const char *year_text = gtk_entry_get_text(m_entry_birth_year);
+    const char *month_text = gtk_entry_get_text(m_entry_birth_month);
     if (strlen(year_text) == 0 || strlen(year_text) < 4 || strlen(month_text) == 0) {
         if (day > 31) {
             *position = 2;      // 移动光标之输入框末尾
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), "31");
+            gtk_entry_set_text(m_entry_birth_day, "31");
         }
         return ;
     } else {
@@ -763,7 +573,7 @@ void ViewNewPat::BirthDateDayInsert(GtkEditable *editable, gchar *new_text, gint
             *position = 2;      // 移动光标之输入框末尾
             char str_last_day[3];
             sprintf(str_last_day, "%d", last_day);
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), str_last_day);
+            gtk_entry_set_text(m_entry_birth_day, str_last_day);
             day = last_day;
         }
         AutoCalcAge(year, month, day);
@@ -781,8 +591,8 @@ void ViewNewPat::BirthDateDayDelete(GtkEditable *editable, gint start_pos, gint 
             g_signal_stop_emission_by_name((gpointer)editable, "delete_text");
             return ;
         }
-        const char *year_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
-        const char *month_text = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
+        const char *year_text = gtk_entry_get_text(m_entry_birth_year);
+        const char *month_text = gtk_entry_get_text(m_entry_birth_month);
         if (strlen(year_text) == 0 || strlen(year_text) < 4 || strlen(month_text) == 0) {
             return ;
         } else {
@@ -791,26 +601,13 @@ void ViewNewPat::BirthDateDayDelete(GtkEditable *editable, gint start_pos, gint 
             AutoCalcAge(year, month, day);
         }
     } else {
-        gtk_entry_set_text(GTK_ENTRY(m_entryAge), "");
-        gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), 0);
+        gtk_entry_set_text(m_entry_age, "");
+        gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), 0);
     }
 }
 
-gboolean ViewNewPat::WindowDeleteEvent(GtkWidget *widget, GdkEvent *event) {
-    DestroyWindow();
 
-    return FALSE;
-}
 
-void ViewNewPat::DestroyWindow() {
-    if(GTK_IS_WIDGET(m_window))	{
-        g_keyInterface.Pop();
-        gtk_widget_destroy(m_window);
-        if (g_keyInterface.Size() == 1)
-            SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
-        m_window = NULL;
-    }
-}
 GtkWidget* ViewNewPat::create_note_general() {
     GtkWidget *fixed_tab_general;
     GtkWidget *label_stature;
@@ -1083,7 +880,7 @@ void ViewNewPat::OBFocusOut(GtkWidget *widget, GdkEventFocus *event) {
 void ViewNewPat::Calc_GA_EDD(const gchar *year, const gchar *month, const gchar *day) {
     if(g_date_valid_dmy((GDateDay)atoi(day), (GDateMonth)atoi(month), (GDateYear)atoi(year))) {
         int cur_year, cur_month, cur_day;
-        GetCurrentDate(cur_year, cur_month, cur_day);
+        Utils::GetCurrentDate(cur_year, cur_month, cur_day);
         GDate* cur_date = g_date_new_dmy((GDateDay)cur_day, (GDateMonth)cur_month, (GDateYear)cur_year);
         GDate* date = g_date_new_dmy((GDateDay)atoi(day), (GDateMonth)atoi(month), (GDateYear)atoi(year));
         if(g_date_compare(cur_date, date) > 0) {
@@ -1476,34 +1273,34 @@ GtkWidget* ViewNewPat::create_note_other() {
 
 void ViewNewPat::FillPatInfo(const PatientInfo::Patient &pat_info) {
     ostringstream strm;
-    gtk_entry_set_text(GTK_ENTRY(m_entryPatID), pat_info.id.c_str());
-    gtk_entry_set_text(GTK_ENTRY(m_entryNameLast), pat_info.name.last.c_str());
-    gtk_entry_set_text(GTK_ENTRY(m_entryNameFirst), pat_info.name.first.c_str());
-    gtk_entry_set_text(GTK_ENTRY(m_entryNameMid), pat_info.name.mid.c_str());
+    gtk_entry_set_text(m_entry_patient_id, pat_info.id.c_str());
+    gtk_entry_set_text(m_entry_last_name, pat_info.name.last.c_str());
+    gtk_entry_set_text(m_entry_first_name, pat_info.name.first.c_str());
+    gtk_entry_set_text(m_entry_mid_name, pat_info.name.mid.c_str());
 
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxGender), pat_info.sex);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_gender), pat_info.sex);
 
     if (pat_info.birthDate.year) {
         strm.str("");
         strm << pat_info.birthDate.year;
-        gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), strm.str().c_str());
+        gtk_entry_set_text(m_entry_birth_year, strm.str().c_str());
     }
     if (pat_info.birthDate.month) {
         strm.str("");
         strm << pat_info.birthDate.month;
-        gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth), strm.str().c_str());
+        gtk_entry_set_text(m_entry_birth_month, strm.str().c_str());
     }
     if (pat_info.birthDate.day) {
         strm.str("");
         strm << pat_info.birthDate.day;
-        gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), strm.str().c_str());
+        gtk_entry_set_text(m_entry_birth_day, strm.str().c_str());
     }
 
     if (pat_info.age) {
         strm.str("");
         strm << pat_info.age;
-        gtk_entry_set_text(GTK_ENTRY(m_entryAge), strm.str().c_str());
-        gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), pat_info.ageUnit);
+        gtk_entry_set_text(m_entry_age, strm.str().c_str());
+        gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), pat_info.ageUnit);
     }
     // Other
     gtk_entry_set_text(GTK_ENTRY(m_entry_other_address), pat_info.address.c_str());
@@ -1680,24 +1477,24 @@ void ViewNewPat::FillNewPat(const PatientInfo::Info &info) {
 }
 
 void ViewNewPat::SetSeneitive(bool sensitive) {
-    gtk_widget_set_sensitive(m_entryPatID, sensitive);
-    gtk_widget_set_sensitive(m_checkbuttonPatID, sensitive);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_entry_patient_id), sensitive);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_patient_id), sensitive);
 }
 
 void ViewNewPat::BtnSearchClicked(GtkButton *button) {
     string id, name_last, name_first, name_mid, birth_year, birth_month, birth_day, age;
     char gender[2], age_unit[2];
-    GetEntryTextForDB(m_entryPatID, id);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_patient_id), id);
 
-    GetEntryTextForDB(m_entryNameLast, name_last);
-    GetEntryTextForDB(m_entryNameFirst, name_first);
-    GetEntryTextForDB(m_entryNameMid, name_mid);
-    GetEntryTextForDB(m_entryBirthYear, birth_year);
-    GetEntryTextForDB(m_entryBirthMonth, birth_month);
-    GetEntryTextForDB(m_entryBirthDay, birth_day);
-    GetEntryTextForDB(m_entryAge, age);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_last_name), name_last);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_first_name), name_first);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_mid_name), name_mid);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_birth_year), birth_year);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_birth_month), birth_month);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_birth_day), birth_day);
+    GetEntryTextForDB(GTK_WIDGET(m_entry_age), age);
 
-    int gender_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxGender));
+    int gender_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text_gender));
     if (gender_index == -1)
         sprintf(gender, "%%");// %
     else
@@ -1728,7 +1525,7 @@ void ViewNewPat::BtnSearchClicked(GtkButton *button) {
     term.birthMonth = birth_month;
     term.birthDay = birth_day;
     if (age != "%") {
-        int age_unit_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxAge));
+        int age_unit_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text_age));
         sprintf(age_unit, "%d", age_unit_index);
     } else {
         sprintf(age_unit, "%%");
@@ -1740,10 +1537,10 @@ void ViewNewPat::BtnSearchClicked(GtkButton *button) {
     vector<Database::NewPatSearchResult> vecResult;
     db.NewPatSearch(term, vecResult);
     if (vecResult.empty()) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_INFO, _("No result found!"), NULL);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_INFO, _("No result found!"), NULL);
         return;
     }
-    ViewPatSearch::GetInstance()->CreateWindow(GTK_WINDOW(m_window), vecResult);
+    ViewPatSearch::GetInstance()->CreateWindow(GTK_WINDOW(m_dialog), vecResult);
 }
 
 static gboolean ExitWindow(gpointer data) {
@@ -1778,8 +1575,8 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
     GetPatInfo(info);
 
     Database db;
-    if (!(db.GetPatIDExist(info.p.id.c_str())).empty() && GTK_WIDGET_IS_SENSITIVE(m_entryPatID)) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+    if (!(db.GetPatIDExist(info.p.id.c_str())).empty() && GTK_WIDGET_IS_SENSITIVE(m_entry_patient_id)) {
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
                                           MessageDialog::DLG_ERROR,
                                           _("Please enter patient ID again!"),
                                           NULL);
@@ -1795,7 +1592,7 @@ void ViewNewPat::BtnOkClicked(GtkButton *button) {
             if(sysDicomSetting.GetMPPS()) {
                 if(!m_flagMPPS) {
                     if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
-                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
+                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
                         return ;
                     }
                     CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
@@ -1984,7 +1781,7 @@ string ViewNewPat::GenPatID() {
     const unsigned int id_len = 14;
     char id_std[id_len+1];
     int Year, Month, Day, Hour, Minute, Second;
-    GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
+    Utils::GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
     sprintf(id_std, "%02d%02d%4d%02d%02d%02d", Month, Day, Year, Hour, Minute, Second);
     string ID = id_std;
     Database db;
@@ -2009,12 +1806,12 @@ void ViewNewPat::ChkBtnPatIDClicked(GtkButton *button) {
     gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
     if (value) {
         string ID = GenPatID();
-        gtk_entry_set_text(GTK_ENTRY(m_entryPatID), ID.c_str());
+        gtk_entry_set_text(GTK_ENTRY(m_entry_patient_id), ID.c_str());
         sys.SetAutoGeneratedID(1);
         sys.SyncFile();
     } else {
-        gtk_entry_set_text(GTK_ENTRY(m_entryPatID), "");
-        gtk_widget_grab_focus(m_entryPatID);
+        gtk_entry_set_text(GTK_ENTRY(m_entry_patient_id), "");
+        gtk_widget_grab_focus(GTK_WIDGET(m_entry_patient_id));
         sys.SetAutoGeneratedID(0);
         sys.SyncFile();
     }
@@ -2026,7 +1823,7 @@ void ViewNewPat::BtnWorkListClicked(GtkButton *button) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default worklist service in system setting"), NULL);
         return ;
     }
-    ViewWorkList::GetInstance()->CreateWorkListWin(m_window);
+    ViewWorkList::GetInstance()->CreateWorkListWin(GTK_WIDGET(m_dialog));
 }
 
 void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
@@ -2034,8 +1831,8 @@ void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
     GetPatInfo(info);
 
     Database db;
-    if (!(db.GetPatIDExist(info.p.id.c_str())).empty() && GTK_WIDGET_IS_SENSITIVE(m_entryPatID)) {
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
+    if (!(db.GetPatIDExist(info.p.id.c_str())).empty() && GTK_WIDGET_IS_SENSITIVE(m_entry_patient_id)) {
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
                                           MessageDialog::DLG_ERROR,
                                           _("Please enter patient ID again!"),
                                           NULL);
@@ -2053,7 +1850,7 @@ void ViewNewPat::BtnExamEndClicked(GtkButton *button) {
             if(sysDicomSetting.GetMPPS()) {
                 if(!m_flagMPPS) {
                     if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
-                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
+                        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
                         return ;
                     }
                     CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
@@ -2083,7 +1880,7 @@ void ViewNewPat::BtnNewPatClicked(GtkButton *button) {
         ClearStudyInfo();
     }
 
-    gtk_widget_grab_focus(m_entryPatID);
+    gtk_widget_grab_focus(GTK_WIDGET(m_entry_patient_id));
 }
 
 void ViewNewPat::BtnNewExamClicked(GtkButton *button) {
@@ -2139,40 +1936,40 @@ bool ViewNewPat::AutoCalcAge(const int year, const int month, const int day) {
     if (CalcAge (year, month, day, age, age_unit)) {
         ostringstream strm;
         strm << age;
-        gtk_entry_set_text(GTK_ENTRY(m_entryAge), strm.str().c_str());
-        gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), age_unit);
+        gtk_entry_set_text(m_entry_age, strm.str().c_str());
+        gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), age_unit);
         return true;
     } else {
-        gtk_entry_set_text(GTK_ENTRY(m_entryAge), "");
-        gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), 0);
+        gtk_entry_set_text(m_entry_age, "");
+        gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), 0);
         return false;
     }
 }
 
 void ViewNewPat::ClearData() {
-    if (!GTK_IS_WIDGET(m_window))
+    if (!GTK_IS_WIDGET(m_dialog))
         return ;
 
-    gtk_entry_set_text(GTK_ENTRY(m_entryPatID), "");
-    gtk_widget_set_sensitive(m_entryPatID, TRUE);
-    gtk_widget_set_sensitive(m_checkbuttonPatID, TRUE);
+    gtk_entry_set_text(GTK_ENTRY(m_entry_patient_id), "");
+    gtk_widget_set_sensitive(GTK_WIDGET(m_entry_patient_id), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_checkbutton_patient_id), TRUE);
 
-    gtk_entry_set_text(GTK_ENTRY(m_entryNameFirst), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entryNameMid), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entryNameLast), "");
+    gtk_entry_set_text(m_entry_first_name, "");
+    gtk_entry_set_text(m_entry_mid_name, "");
+    gtk_entry_set_text(m_entry_last_name, "");
 
-    gtk_entry_set_text(GTK_ENTRY(m_entryAge), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth), "");
-    gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), "");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxGender), -1);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxAge), 0);
+    gtk_entry_set_text(m_entry_age, "");
+    gtk_entry_set_text(m_entry_birth_year, "");
+    gtk_entry_set_text(m_entry_birth_month, "");
+    gtk_entry_set_text(m_entry_birth_day, "");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_gender), -1);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(m_combobox_text_age), 0);
 
     ClearExamData();
 }
 
 void ViewNewPat::ClearExamData() {
-    if (!GTK_IS_WIDGET(m_window))
+    if (!GTK_IS_WIDGET(m_dialog))
         return ;
 
     // general
@@ -2213,23 +2010,23 @@ void ViewNewPat::ClearExamData() {
 }
 
 void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
-    const gchar *pat_id = gtk_entry_get_text(GTK_ENTRY(m_entryPatID));
+    const gchar *pat_id = gtk_entry_get_text(GTK_ENTRY(m_entry_patient_id));
 
-    const gchar *name_last = gtk_entry_get_text(GTK_ENTRY(m_entryNameLast));
-    const gchar *name_first = gtk_entry_get_text(GTK_ENTRY(m_entryNameFirst));
+    const gchar *name_last = gtk_entry_get_text(m_entry_last_name);
+    const gchar *name_first = gtk_entry_get_text(m_entry_first_name);
     const gchar *name_mid = NULL;
     if (!m_langCN)
-        name_mid = gtk_entry_get_text(GTK_ENTRY(m_entryNameMid));
+        name_mid = gtk_entry_get_text(m_entry_mid_name);
     else
         name_mid = "";
 
-    const gchar *age_text = gtk_entry_get_text(GTK_ENTRY(m_entryAge));
-    int age_unit_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxAge));
-    const gchar *birth_year = gtk_entry_get_text(GTK_ENTRY(m_entryBirthYear));
-    const gchar *birth_month = gtk_entry_get_text(GTK_ENTRY(m_entryBirthMonth));
-    const gchar *birth_day = gtk_entry_get_text(GTK_ENTRY(m_entryBirthDay));
+    const gchar *age_text = gtk_entry_get_text(m_entry_age);
+    int age_unit_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text_age));
+    const gchar *birth_year = gtk_entry_get_text(m_entry_birth_year);
+    const gchar *birth_month = gtk_entry_get_text(m_entry_birth_month);
+    const gchar *birth_day = gtk_entry_get_text(m_entry_birth_day);
 
-    int gender_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_comboboxGender));
+    int gender_index = gtk_combo_box_get_active(GTK_COMBO_BOX(m_combobox_text_gender));
     // if (gender_index == -1)
     // 	gender_index = 0;
 
@@ -2264,7 +2061,7 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
 
     int examYear, examMonth, examDay;
     int examHour, examMin, examSec;
-    GetCurrentDateTime(examYear, examMonth, examDay, examHour, examMin, examSec);
+    Utils::GetCurrentDateTime(examYear, examMonth, examDay, examHour, examMin, examSec);
     info.e.examDate.year = examYear;
     info.e.examDate.month = examMonth;
     info.e.examDate.day = examDay;
@@ -2377,8 +2174,8 @@ void ViewNewPat::GetPatInfo(PatientInfo::Info &info) {
     info.p.address = address;
 }
 
-void ViewNewPat::EventBoxCalendarPress(GtkWidget *widget, GdkEventButton *event) {
-    ViewCalendar::GetInstance()->CreateWindow(m_window, ViewCalendar::START, this);
+void ViewNewPat::ButtonClickedCalendar(GtkButton* button) {
+  ViewCalendar::GetInstance()->CreateWindow(GTK_WIDGET(m_dialog), ViewCalendar::START, this);
 }
 
 void ViewNewPat::SetStartDate(int year, int month, int day) {
@@ -2402,27 +2199,27 @@ void ViewNewPat::SetStartDate(int year, int month, int day) {
     } else {
 
         pos = 0;
-        gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear), "");
+        gtk_entry_set_text(m_entry_birth_year, "");
         sprintf(tmp, "%d", year);
         for(i=0; i<strlen(tmp); i++) {
             sprintf(str, "%c", tmp[i]);
-            gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthYear), str, 1, &pos);
+            gtk_editable_insert_text(GTK_EDITABLE(m_entry_birth_year), str, 1, &pos);
         }
 
         pos = 0;
-        gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth), "");
+        gtk_entry_set_text(m_entry_birth_month, "");
         sprintf(tmp, "%d", month);
         for(i=0; i<strlen(tmp); i++) {
             sprintf(str, "%c", tmp[i]);
-            gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthMonth), str, 1, &pos);
+            gtk_editable_insert_text(GTK_EDITABLE(m_entry_birth_month), str, 1, &pos);
         }
 
         pos = 0;
-        gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay), "");
+        gtk_entry_set_text(m_entry_birth_day, "");
         sprintf(tmp, "%d", day);
         for(i=0; i<strlen(tmp); i++) {
             sprintf(str, "%c", tmp[i]);
-            gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthDay), str, 1, &pos);
+            gtk_editable_insert_text(GTK_EDITABLE(m_entry_birth_day), str, 1, &pos);
         }
 
         // auto fill age
@@ -2443,23 +2240,23 @@ void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName
     char birth_str[2];
     int birth_pos ;
 
-    gtk_entry_set_text(GTK_ENTRY(m_entryPatID),ID);
+    gtk_entry_set_text(GTK_ENTRY(m_entry_patient_id),ID);
     // CheckPatID(ID);
     Database db;
-    if(!((db.GetPatIDExist(ID)).empty() && GTK_WIDGET_IS_SENSITIVE(m_entryPatID))) {
-        gtk_widget_set_sensitive(m_entryPatID,false);
-        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
+    if(!((db.GetPatIDExist(ID)).empty() && GTK_WIDGET_IS_SENSITIVE(m_entry_patient_id))) {
+        gtk_widget_set_sensitive(GTK_WIDGET(m_entry_patient_id), false);
+        MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog), MessageDialog::DLG_QUESTION, _("Patient ID exist, load data?"), CallBackLoadPatData, CallBackAutoPatID);
 
     } else {
-        char name_last[m_pat_name_max_len+1] = {0};
-        char name_first[m_pat_name_max_len+1]= {0};
-        char name_mid[m_pat_name_max_len+1]= {0};
-        strncpy(name_last, patientName.last.c_str(), m_pat_name_max_len);
-        strncpy(name_first, patientName.first.c_str(), m_pat_name_max_len);
-        strncpy(name_mid, patientName.mid.c_str(), m_pat_name_max_len);
-        gtk_entry_set_text(GTK_ENTRY(m_entryNameLast), name_last);
-        gtk_entry_set_text(GTK_ENTRY(m_entryNameFirst), name_first);
-        gtk_entry_set_text(GTK_ENTRY(m_entryNameMid), name_mid);
+        char name_last[PATIENT_NAME_MAX_LEN+1] = {0};
+        char name_first[PATIENT_NAME_MAX_LEN+1]= {0};
+        char name_mid[PATIENT_NAME_MAX_LEN+1]= {0};
+        strncpy(name_last, patientName.last.c_str(), PATIENT_NAME_MAX_LEN);
+        strncpy(name_first, patientName.first.c_str(), PATIENT_NAME_MAX_LEN);
+        strncpy(name_mid, patientName.mid.c_str(), PATIENT_NAME_MAX_LEN);
+        gtk_entry_set_text(m_entry_last_name, name_last);
+        gtk_entry_set_text(m_entry_first_name, name_first);
+        gtk_entry_set_text(m_entry_mid_name, name_mid);
 
         //Age
         if(strlen(age.c_str())!=0) {
@@ -2468,31 +2265,31 @@ void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName
             char str[256]="\0";
             sprintf(str,"%c%c%c",age[0],age[1],age[2]);
             sprintf(age_tmp,"%d",atoi(str));
-            gtk_entry_set_text(GTK_ENTRY(m_entryAge),age_tmp);
+            gtk_entry_set_text(m_entry_age,age_tmp);
 
             char str_tmp[2];
             sprintf(str_tmp,"%c",age[age_len-1]);
             if(strcmp(str_tmp,"Y")==0)
-                gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboboxAge),0);
+                gtk_combo_box_set_active (GTK_COMBO_BOX(m_combobox_text_age),0);
             else if(strcmp(str_tmp,"M")==0)
-                gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboboxAge),1);
+                gtk_combo_box_set_active (GTK_COMBO_BOX(m_combobox_text_age),1);
             else if(strcmp(str_tmp,"D")==0)
-                gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboboxAge),2);
+                gtk_combo_box_set_active (GTK_COMBO_BOX(m_combobox_text_age),2);
         } else {
-            gtk_entry_set_text(GTK_ENTRY(m_entryAge)," ");
-            gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboboxAge),-1);
+            gtk_entry_set_text(m_entry_age," ");
+            gtk_combo_box_set_active (GTK_COMBO_BOX(m_combobox_text_age),-1);
         }
         //sex
         if (sex !=NULL) {
             if(strcmp(sex ,"F")==0)
-                gtk_combo_box_set_active (GTK_COMBO_BOX (m_comboboxGender),0);
+                gtk_combo_box_set_active (GTK_COMBO_BOX (m_combobox_text_gender),0);
             else if(strcmp(sex , "M")==0)
-                gtk_combo_box_set_active(GTK_COMBO_BOX (m_comboboxGender), 1);
+                gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_text_gender), 1);
             else if(strcmp(sex , "O")==0)
-                gtk_combo_box_set_active(GTK_COMBO_BOX (m_comboboxGender), 2);
+                gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_text_gender), 2);
 
         } else
-            gtk_combo_box_set_active(GTK_COMBO_BOX (m_comboboxGender),-1);
+            gtk_combo_box_set_active(GTK_COMBO_BOX (m_combobox_text_gender),-1);
 
         //birthDate
         if(strlen(birthDate.c_str())!=0) {
@@ -2504,17 +2301,17 @@ void ViewNewPat::InsertPatientInfo(const char *ID, PatientInfo::Name patientName
             sprintf(birth_month,"%c%c",birthDate[4],birthDate[5]);
             sprintf(birth_day,"%c%c",birthDate[6],birthDate[7]);
             pos = 0;
-            gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthYear),birth_year,4,&pos);
+            gtk_editable_insert_text(GTK_EDITABLE(m_entry_birth_year),birth_year,4,&pos);
 
             pos = 0;
-            gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthMonth),birth_month,2,&pos);
+            gtk_editable_insert_text(GTK_EDITABLE(m_entry_birth_month),birth_month,2,&pos);
 
             pos = 0;
-            gtk_editable_insert_text(GTK_EDITABLE(m_entryBirthDay),birth_day,2,&pos);
+            gtk_editable_insert_text(GTK_EDITABLE(m_entry_birth_day),birth_day,2,&pos);
         } else {
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthYear)," ");
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthMonth)," ");
-            gtk_entry_set_text(GTK_ENTRY(m_entryBirthDay)," ");
+            gtk_entry_set_text(m_entry_birth_year," ");
+            gtk_entry_set_text(m_entry_birth_month," ");
+            gtk_entry_set_text(m_entry_birth_day," ");
         }
 
         char sizeT[256];

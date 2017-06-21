@@ -13,6 +13,8 @@
 #include "patient/PatientInfo.h"
 #include "calcPeople/MenuCalcNew.h"
 
+#include "utils/Utils.h"
+
 #define GW_TABLE_HEAD_LEN	3//产科表表头长度
 
 int g_cer_custom[272];    // x10
@@ -1460,7 +1462,7 @@ int MeaCalcFun::CalcGW_LMP(unsigned int LMP_Y, unsigned int LMP_M, unsigned int 
     int i;
     unsigned char monthdays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    GetCurrentDate(year, month, day);
+    Utils::GetCurrentDate(year, month, day);
 
     if( LMP_Y!=0 && LMP_M!=0 && LMP_D!=0 ) {
         if ((year-LMP_Y)>1) {

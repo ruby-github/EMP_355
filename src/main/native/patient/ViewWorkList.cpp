@@ -21,6 +21,7 @@
 #include "sysMan/ViewSystem.h"
 #include "sysMan/UpgradeMan.h"
 
+#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
 
@@ -575,7 +576,7 @@ int StartExam(gpointer data) {
             if(sysDicomSetting.GetMPPS()) {
                 if(ViewNewPat::GetInstance()->GetMPPSFlag()) {
                     int Year, Month, Day, Hour, Minute, Second;
-                    GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
+                    Utils::GetCurrentDateTime(Year, Month, Day, Hour, Minute, Second);
 
                     string year, mon, day, studyEndDate;
                     ChangeDateFormatToString(Year, Month, Day, year, mon, day);
@@ -831,7 +832,7 @@ void ViewWorkList::GetSelectedPatInfo() {
 
     int examYear, examMonth, examDay;
     int examHour, examMin, examSec;
-    GetCurrentDateTime(examYear, examMonth, examDay, examHour, examMin, examSec);
+    Utils::GetCurrentDateTime(examYear, examMonth, examDay, examHour, examMin, examSec);
     info.e.examDate.year = examYear;
     info.e.examDate.month = examMonth;
     info.e.examDate.day = examDay;
