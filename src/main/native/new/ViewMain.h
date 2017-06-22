@@ -19,6 +19,10 @@ public:
   GtkWidget* GetMainWindow();
 
   void KeyEvent(unsigned char keyValue);
+  void KnobEvent(unsigned char keyValue, unsigned char offset);
+  void SliderEvent(unsigned char keyValue, unsigned char offset);
+  void MouseEvent(char offsetX, char offsetY);
+
   void KnobKeyEvent(unsigned char keyValue);
   void MenuReviewCallBack();
 
@@ -48,13 +52,22 @@ private:
     return FALSE;
   }
 
+  static gboolean signal_callback_tgc(gpointer data) {
+    ViewMain* viewMain = (ViewMain*)data;
+
+    if (viewMain != NULL) {
+      viewMain->CallBackTgc();
+    }
+
+    return FALSE;
+  }
+
   void IsAuthenValid();
   void IsSuperAuthenValid();
+  void CallBackTgc();
 
 private:
   ViewMain();
-
-  void KnobEvent(unsigned char keyValue, unsigned char offset);
 
 private:
   static ViewMain* m_instance;
@@ -72,30 +85,10 @@ private:
   vector<unsigned char> m_vecSuperAuthenInfo;
 
 private:
+  unsigned char m_keyValue;
 
-
-    unsigned char m_keyValue;
-
-    int countN;
-
-
-    //signal handle
-    //signal connect
-
-
-    int keyTSIN;
-
-
-    // anthen
-
-
-
-
-    int m_timer;
-    int m_super_timer;
-
-
-
+  int m_timer;
+  int m_super_timer;
 };
 
 #endif

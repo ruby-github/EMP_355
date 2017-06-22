@@ -92,8 +92,9 @@ ViewMain* ViewMain::GetInstance() {
 
 ViewMain::ViewMain() {
   m_window = NULL;
-  countN = 0;
-  keyTSIN = 0;
+
+  m_timer = 0;
+  m_super_timer = 0;
 }
 
 ViewMain::~ViewMain() {
@@ -1142,6 +1143,101 @@ void ViewMain::KeyEvent(unsigned char keyValue) {
   }
 }
 
+void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
+  if (offset != 1 && offset != 0) {
+    offset = 1;
+  }
+
+  EKnobOper knob;
+
+  if (offset == 0) {
+    knob = SUB;
+  }
+
+  if (offset == 1) {
+    knob = ADD;
+  }
+
+  if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW &&
+    ViewSuperuser::GetInstance()->GetDemoStatus()) {
+    return;
+  }
+
+  switch (keyValue) {
+  case KNOB_VALUE:
+    {
+      MultiFuncFactory::GetInstance()->GetObject()->Value(knob);
+      break;
+    }
+  case KNOB_GAIN:
+    {
+      ModeStatus MStatus;
+      int mode = MStatus.GetScanMode();
+
+      if (ModeStatus::IsEFOVMode()) {
+        HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
+        break;
+      }
+
+      if (ModeStatus::IsUnFreezeMode()) {
+        if (mode == ScanMode::D2) {
+          Img2D::GetInstance()->ChangeGain2D(knob);
+        }
+
+        if (mode == ScanMode::M) {
+          Img2D::GetInstance()->ChangeGainM(knob);
+        }
+        if (ModeStatus::IsColorImgMode()) {
+          ImgCfm::GetInstance()->ChangeGainCfm(knob);
+        }
+
+        if (ModeStatus::IsPWImgMode()) {
+          ImgPw::GetInstance()->ChangeGainPw(knob);
+        }
+
+        if (ModeStatus::IsCWImgMode()) {
+          ImgPw::GetInstance()->ChangeGainCw(knob);
+        }
+      }
+
+      break;
+    }
+  default:
+    {
+      CKnobEvent::KnobEvent(keyValue, offset);
+      break;
+    }
+  }
+}
+
+void ViewMain::SliderEvent(unsigned char keyValue, unsigned char offset) {
+  if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW &&
+    ViewSuperuser::GetInstance()->GetDemoStatus()) {
+    return;
+  }
+
+  if (ModeStatus::IsEFOVMode()) {
+    HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
+
+    if (offset >= SLIDER_OFF && offset <= (SLIDER_OFF + 8)) {
+      g_tgcSlider[offset - SLIDER_OFF] = keyValue;
+    }
+
+    return ;
+  }
+
+  if (offset >= SLIDER_OFF && offset <= (SLIDER_OFF + 7)) {
+    g_tgcSlider[offset - SLIDER_OFF] = keyValue;
+
+    g_timeout_add(10, signal_callback_tgc, this);
+  }
+}
+
+void ViewMain::MouseEvent(char offsetX, char offsetY) {
+  AbsMultiFunc* ptrMulti = MultiFuncFactory::GetInstance()->GetObject();
+  ptrMulti->Mouse(offsetX, offsetY);
+}
+
 void ViewMain::KnobKeyEvent(unsigned char keyValue) {
   KnobMenu* knobMenu = KnobMenu::GetInstance();
 
@@ -1262,69 +1358,13 @@ void ViewMain::IsSuperAuthenValid() {
   }
 }
 
-void ViewMain::KnobEvent(unsigned char keyValue, unsigned char offset) {
-  if (offset != 1 && offset != 0) {
-    offset = 1;
-  }
+void ViewMain::CallBackTgc() {
+  ModeStatus s;
+  int mode = s.GetScanMode();
 
-  EKnobOper knob;
+  Img2D::GetInstance()->ChangeTgc2D(g_tgcSlider);
 
-  if (offset == 0) {
-    knob = SUB;
-  }
-
-  if (offset == 1) {
-    knob = ADD;
-  }
-
-  if (MenuArea::GetInstance()->GetMenuType() == MenuArea::REVIEW &&
-    ViewSuperuser::GetInstance()->GetDemoStatus()) {
-    return;
-  }
-
-  switch (keyValue) {
-  case KNOB_VALUE:
-    {
-      MultiFuncFactory::GetInstance()->GetObject()->Value(knob);
-      break;
-    }
-  case KNOB_GAIN:
-    {
-      ModeStatus MStatus;
-      int mode = MStatus.GetScanMode();
-
-      if (ModeStatus::IsEFOVMode()) {
-        HintArea::GetInstance()->UpdateHint(_("Invalid in current mode."), 1);
-        break;
-      }
-
-      if (ModeStatus::IsUnFreezeMode()) {
-        if (mode == ScanMode::D2) {
-          Img2D::GetInstance()->ChangeGain2D(knob);
-        }
-
-        if (mode == ScanMode::M) {
-          Img2D::GetInstance()->ChangeGainM(knob);
-        }
-        if (ModeStatus::IsColorImgMode()) {
-          ImgCfm::GetInstance()->ChangeGainCfm(knob);
-        }
-
-        if (ModeStatus::IsPWImgMode()) {
-          ImgPw::GetInstance()->ChangeGainPw(knob);
-        }
-
-        if (ModeStatus::IsCWImgMode()) {
-          ImgPw::GetInstance()->ChangeGainCw(knob);
-        }
-      }
-
-      break;
-    }
-  default:
-    {
-      CKnobEvent::KnobEvent(keyValue, offset);
-      break;
-    }
+  if (mode == ScanMode::M || mode == ScanMode::M_INIT) {
+    Img2D::GetInstance()->ChangeTgcM(g_tgcSlider);
   }
 }
