@@ -53,7 +53,6 @@ public:
 private:
   KnobMenu();
 
-  string Display(KnobItem item, const string tmp);
   void Refresh();
 
 private:
@@ -63,7 +62,8 @@ private:
 private:
   GtkButton* m_button_left;
   GtkButton* m_button_right;
-  GtkButton* m_button_Knob[KNOB_NUM];
+  GtkButton* m_button_knob[KNOB_NUM];
+  GtkLabel* m_label_knob[KNOB_NUM];
 
   KnobItem* m_KnobItem;
 

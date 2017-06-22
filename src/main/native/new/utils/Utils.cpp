@@ -1,5 +1,10 @@
 #include "utils/Utils.h"
 
+#include "sysMan/SysGeneralSetting.h"
+#include "utils/FakeXUtils.h"
+
+#include <cstdlib>
+
 GdkColor* Utils::m_color = NULL;
 
 // ---------------------------------------------------------
@@ -483,6 +488,41 @@ GdkColor* Utils::get_color(const string color_name) {
   return m_color;
 }
 
+// 返回Combobox的index值, 失败返回-1
+int Utils::GetComboBoxIndex(GtkComboBox* combobox, string name) {
+  GtkTreeIter iter;
+  GtkTreeModel* model = gtk_combo_box_get_model(combobox);
+
+  if (gtk_tree_model_get_iter_first(model, &iter)) {
+    char* new_name = NULL;
+    gtk_tree_model_get(model, &iter, 0, &new_name, -1);
+    string str_name = new_name;
+
+    delete new_name;
+    new_name = NULL;
+
+    while (str_name != name) {
+      if (gtk_tree_model_iter_next(model, &iter)) {
+        gtk_tree_model_get(model, &iter, 0, &new_name, -1);
+        str_name = new_name;
+
+        delete new_name;
+        new_name = NULL;
+      } else {
+        return -1;
+      }
+    }
+
+    GtkTreePath* path = gtk_tree_model_get_path(model, &iter);
+    string path_str = gtk_tree_path_to_string(path);
+    gtk_tree_path_free(path);
+
+    return atoi(path_str.c_str());
+  } else {
+      return -1;
+  }
+}
+
 void Utils::SetTheme(const string rc_path) {
   gtk_rc_parse(rc_path.c_str());
   gtk_rc_reparse_all();
@@ -515,10 +555,41 @@ void Utils::GetCurrentDateTime(int& year, int& month, int& day, int& hour, int& 
   second = timeinfo->tm_sec;
 }
 
+string Utils::CommaToDotLocaleNumeric(string dot) {
+  SysGeneralSetting sysGS;
+  int language= sysGS.GetLanguage();
+
+  string tmp = dot;
+
+  if (PL == language || RU == language || FR == language || DE == language || ES == language) {
+    size_t pos = tmp.find(',');
+
+    if (pos != string::npos) {
+      tmp[pos] = '.';
+    }
+  }
+
+  return tmp;
+}
+
+string Utils::DotToCommaLocaleNumeric(string comma) {
+  SysGeneralSetting sysGS;
+  int language= sysGS.GetLanguage();
+
+  string tmp = comma;
+
+  if (PL == language || RU == language || FR == language || DE == language || ES == language) {
+    size_t pos = tmp.find('.');
+
+    if (pos != string::npos) {
+      tmp[pos] = ',';
+    }
+  }
+
+  return tmp;
+}
+
 // ---------------------------------------------------------
 
-#include "patient/ViewNewPat.h"
-
 void Utils::test(GtkWidget* widget) {
-  //ViewNewPat::GetInstance()->CreateWindow();
 }

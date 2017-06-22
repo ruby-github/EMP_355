@@ -61,11 +61,15 @@ public:
   static string combobox_active_text(GtkComboBoxText* combobox_text);
 
   static GdkColor* get_color(const string color_name);
+  static int GetComboBoxIndex(GtkComboBox* combobox, string name);
 
   static void SetTheme(const string rc_path);
 
   static void GetCurrentDate(int& year, int& month, int& day);
   static void GetCurrentDateTime(int& year, int& month, int& day, int& hour, int& minute, int& second);
+
+  static string CommaToDotLocaleNumeric(string dot);
+  static string DotToCommaLocaleNumeric(string comma);
 
 private:
   static GdkColor* m_color;

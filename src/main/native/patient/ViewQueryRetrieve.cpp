@@ -20,6 +20,7 @@
 #include "calcPeople/ViewReport.h"
 #include "sysMan/ViewSystem.h"
 
+#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 #include "utils/MainWindowConfig.h"
 
@@ -694,21 +695,17 @@ unsigned int ViewQueryRetrieve::GetDCMStudyElement(DCMSTUDYELEMENT element) {
     info.p.comment = "";
 
     //Size
-    char sizeT[256];
-    strcpy(sizeT,element.stPatientSize.c_str());
-    DotToCommaLocaleNumeric(sizeT, sizeof(sizeT));
+    string sizeT = Utils::DotToCommaLocaleNumeric(element.stPatientSize);
 
     //weight
-    char weightT[256];
-    strcpy(weightT,element.stPatientWeight.c_str());
-    DotToCommaLocaleNumeric(weightT, sizeof(weightT));
+    string weightT = Utils::DotToCommaLocaleNumeric(element.stPatientWeight);
 
-    if(sizeT!= 0)
-        info.e.height = int(atof(sizeT)*100);
+    if(!sizeT.empty())
+        info.e.height = int(atof(sizeT.c_str())*100);
     else
         info.e.height = 0.0;
-    if(weightT!= 0)
-        info.e.weight = atof(weightT);
+    if(!weightT.empty())
+        info.e.weight = atof(weightT.c_str());
     else
         info.e.weight = 0.0;
 
@@ -1141,14 +1138,10 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
             ChangePersonNameFormatForShow(QueryRes[index].qrStudyDoctor, doctorName);
 
             //Size
-            char sizeT[256];
-            strcpy(sizeT,QueryRes[index].qrPatientSize.c_str());
-            DotToCommaLocaleNumeric(sizeT, sizeof(sizeT));
+            string sizeT = Utils::DotToCommaLocaleNumeric(QueryRes[index].qrPatientSize);
 
             //weight
-            char weightT[256];
-            strcpy(weightT,QueryRes[index].qrPatientWeight.c_str());
-            DotToCommaLocaleNumeric(weightT, sizeof(weightT));
+            string weightT = Utils::DotToCommaLocaleNumeric(QueryRes[index].qrPatientWeight);
 
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_detination));
             gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -1157,8 +1150,8 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
                                COL_NAME_D,patientName.c_str(),
                                COL_Gender_D,QueryRes[index].qrPatientSex.c_str(),
                                COL_AGE_D,QueryRes[index].qrPatientAge.c_str(),
-                               COL_SIZE_D,sizeT,
-                               COL_WEIGHT_D,weightT,
+                               COL_SIZE_D,sizeT.c_str(),
+                               COL_WEIGHT_D,weightT.c_str(),
                                COL_ACCESSION_NUMBER_D,QueryRes[index].qrAccessionNumber.c_str(),
                                COL_BIRTH_DATE_D,QueryRes[index].qrPatientBirthDate.c_str(),
                                COL_EXAM_DATE_D,QueryRes[index].qrStudyDate.c_str(),
@@ -1246,14 +1239,10 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
             string doctorName;
             ChangePersonNameFormatForShow(QueryRes[index].qrStudyDoctor, doctorName);
             //Size
-            char sizeT[256];
-            strcpy(sizeT,QueryRes[index].qrPatientSize.c_str());
-            DotToCommaLocaleNumeric(sizeT, sizeof(sizeT));
+            string sizeT = Utils::DotToCommaLocaleNumeric(QueryRes[index].qrPatientSize);
 
             //weight
-            char weightT[256];
-            strcpy(weightT,QueryRes[index].qrPatientWeight.c_str());
-            DotToCommaLocaleNumeric(weightT, sizeof(weightT));
+            string weightT = Utils::DotToCommaLocaleNumeric(QueryRes[index].qrPatientWeight);
 
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview_detination));
             gtk_list_store_append(GTK_LIST_STORE(model), &iter);
@@ -1262,8 +1251,8 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
                                COL_NAME_D,patientName.c_str(),
                                COL_Gender_D,QueryRes[index].qrPatientSex.c_str(),
                                COL_AGE_D,QueryRes[index].qrPatientAge.c_str(),
-                               COL_SIZE_D,sizeT,
-                               COL_WEIGHT_D,weightT,
+                               COL_SIZE_D,sizeT.c_str(),
+                               COL_WEIGHT_D,weightT.c_str(),
                                COL_ACCESSION_NUMBER_D,QueryRes[index].qrAccessionNumber.c_str(),
                                COL_BIRTH_DATE_D,QueryRes[index].qrPatientBirthDate.c_str(),
                                COL_EXAM_DATE_D,QueryRes[index].qrStudyDate.c_str(),

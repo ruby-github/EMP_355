@@ -23,27 +23,23 @@ public:
   void UpdateStudyInfo();
 
   void ClearData();
-    void ClearExamData();
-    bool GetClearStatus() {
-        return m_clearAll;
-    }
-
-  bool GetMPPSFlag() {
-        return m_flagMPPS;
-    }
-    void SetMPPSFlag(bool flag) {
-        m_flagMPPS = flag;
-    }
-
+  void ClearExamData();
   void ClearStudyInfo();
 
-  void InsertPatientInfo(const char *ID, PatientInfo::Name patientName, string birthDate,string age,const char *sex,const char *size,const char *weight,const char *address,const char *doctor,const char *description);
+  bool GetClearStatus();
 
-    void SetStudyInfo(DCMWORKLISTELEMENT element);
-    void SetStudyInfo(DCMSTUDYELEMENT element);
+  bool GetMPPSFlag();
+  void SetMPPSFlag(bool flag);
 
-    void FillNewPat(const PatientInfo::Info &info);
-    void SetSeneitive(bool sensitive);
+  void InsertPatientInfo(const string id, PatientInfo::Name patientName,
+    string birthDate, string age, const string sex, const string size, const string weight,
+    const string address, const string doctor, const string description);
+
+  void SetStudyInfo(DCMWORKLISTELEMENT element);
+  void SetStudyInfo(DCMSTUDYELEMENT element);
+
+  void FillNewPat(const PatientInfo::Info &info);
+  void SetSeneitive(bool sensitive);
 
 public:
 
@@ -52,49 +48,49 @@ private:
 
   static void signal_button_clicked_end_exam(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnExamEndClicked(button);
+      data->ButtonClickedEndExam(button);
     }
   }
 
   static void signal_button_clicked_new_patient(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnNewPatClicked(button);
+      data->ButtonClickedNewPatient(button);
     }
   }
 
   static void signal_button_clicked_new_exam(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnNewExamClicked(button);
+      data->ButtonClickedNewExam(button);
     }
   }
 
   static void signal_button_clicked_worklist(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnWorkListClicked(button);
+      data->ButtonClickedWorkList(button);
     }
   }
 
   static void signal_button_clicked_ok(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnOkClicked(button);
+      data->ButtonClickedOk(button);
     }
   }
 
   static void signal_button_clicked_cancel(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnCancelClicked(button);
+      data->ButtonClickedCancel(button);
     }
   }
 
   static void signal_entry_insert_patient_id(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
     if (data != NULL) {
-      data->EntryAlNumInsert(editable, new_text, new_text_length, position);
+      data->EntryInsertPatientId(editable, new_text, new_text_length, position);
     }
   }
 
   static gboolean signal_entry_focusout_patient_id(GtkWidget* widget, GdkEventFocus* event, ViewNewPat* data) {
     if (data != NULL) {
-      data->PatIDFocusOut(widget, event);
+      data->EntryFocusOutPatientId(widget, event);
     }
 
     return FALSE;
@@ -110,55 +106,55 @@ private:
 
   static void signal_checkbutton_clicked_patient_id(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->ChkBtnPatIDClicked(button);
+      data->CheckButtonClickedPatientId(button);
     }
   }
 
   static void signal_button_clicked_search(GtkButton* button, ViewNewPat* data) {
     if (data != NULL) {
-      data->BtnSearchClicked(button);
+      data->ButtonClickedSearch(button);
     }
   }
 
   static void signal_entry_insert_name(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
     if (data != NULL) {
-      data->EntryNameInsert(editable, new_text, new_text_length, position);
+      data->EntryInsertName(editable, new_text, new_text_length, position);
     }
   }
 
   static void signal_entry_insert_birth_date_year(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
     if (data != NULL) {
-      data->BirthDateYearInsert(editable, new_text, new_text_length, position);
+      data->EntryInsertBirthDateYear(editable, new_text, new_text_length, position);
     }
   }
 
   static void signal_entry_delete_birth_date_year(GtkEditable* editable, gint start_pos, gint end_pos, ViewNewPat* data) {
     if (data != NULL) {
-      data->BirthDateYearDelete(editable, start_pos, end_pos);
+      data->EntryDeleteBirthDateYear(editable, start_pos, end_pos);
     }
   }
 
   static void signal_entry_insert_birth_date_month(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
     if (data != NULL) {
-      data->BirthDateMonthInsert(editable, new_text, new_text_length, position);
+      data->EntryInsertBirthDateMonth(editable, new_text, new_text_length, position);
     }
   }
 
   static void signal_entry_delete_birth_date_month(GtkEditable* editable, gint start_pos, gint end_pos, ViewNewPat* data) {
     if (data != NULL) {
-      data->BirthDateMonthDelete(editable, start_pos, end_pos);
+      data->EntryDeleteBirthDateMonth(editable, start_pos, end_pos);
     }
   }
 
   static void signal_entry_insert_birth_date_day(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
     if (data != NULL) {
-      data->BirthDateDayInsert(editable, new_text, new_text_length, position);
+      data->EntryInsertBirthDateDay(editable, new_text, new_text_length, position);
     }
   }
 
   static void signal_entry_delete_birth_date_day(GtkEditable* editable, gint start_pos, gint end_pos, ViewNewPat* data) {
     if (data != NULL) {
-      data->BirthDateDayDelete(editable, start_pos, end_pos);
+      data->EntryDeleteBirthDateDay(editable, start_pos, end_pos);
     }
   }
 
@@ -170,50 +166,169 @@ private:
 
   static void signal_entry_age(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
     if (data != NULL) {
-      data->EntryNumInsert(editable, new_text, new_text_length, position);
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
     }
   }
 
   static void signal_textview_insert_comment(GtkTextBuffer* textbuffer, GtkTextIter* location, gchar* text, gint len, ViewNewPat* data) {
     if (data != NULL) {
-      data->CommentInsert(textbuffer, location, text, len);
+      data->TextViewInsertComment(textbuffer, location, text, len);
     }
+  }
+
+  static void signal_entry_insert_stature(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static gboolean signal_entry_focusout_stature(GtkWidget* widget, GdkEventFocus* event, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryFocusOutStature(widget, event);
+    }
+
+    return FALSE;
+  }
+
+  static void signal_entry_insert_weight(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static gboolean signal_entry_focusout_weight(GtkWidget* widget, GdkEventFocus* event, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryFocusOutWeight(widget, event);
+    }
+
+    return FALSE;
+  }
+
+  static void signal_combobox_changed_ob_date(GtkComboBox* combobox, ViewNewPat* data) {
+    if (data != NULL) {
+      data->ComboboxChangedOBDate(combobox);
+    }
+  }
+
+  static void signal_entry_insert_ob_year(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static void signal_entry_insert_ob_month(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static void signal_entry_insert_ob_day(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static gboolean signal_entry_focusout_ob(GtkWidget* widget, GdkEventFocus* event, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryFocusOutOB(widget, event);
+    }
+
+    return FALSE;
+  }
+
+  static void signal_entry_insert_hr(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position, ViewNewPat* data) {
+    if (data != NULL) {
+      data->EntryInsertNum(editable, new_text, new_text_length, position);
+    }
+  }
+
+  static gboolean signal_callback_exitwindow(gpointer data) {
+    ViewNewPat* viewNewPat = (ViewNewPat*)data;
+
+    if (viewNewPat != NULL) {
+      viewNewPat->DestroyWindow();
+    }
+
+    return FALSE;
+  }
+
+
+  static int signal_callback_load_patdata(gpointer data) {
+    ViewNewPat::GetInstance()->LoadPatData();
+
+    return 0;
+  }
+
+  static int signal_callback_auto_patid(gpointer data) {
+    ViewNewPat::GetInstance()->AutoPatID();
+
+    return 0;
   }
 
   // signal
 
-  void BtnExamEndClicked(GtkButton* button);
-  void BtnNewPatClicked(GtkButton* button);
-  void BtnNewExamClicked(GtkButton* button);
-  void BtnWorkListClicked(GtkButton* button);
-  void BtnOkClicked(GtkButton* button);
-  void BtnCancelClicked(GtkButton* button);
+  void ButtonClickedEndExam(GtkButton* button);
+  void ButtonClickedNewPatient(GtkButton* button);
+  void ButtonClickedNewExam(GtkButton* button);
+  void ButtonClickedWorkList(GtkButton* button);
+  void ButtonClickedOk(GtkButton* button);
+  void ButtonClickedCancel(GtkButton* button);
 
-  void EntryAlNumInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
-  void PatIDFocusOut(GtkWidget* widget, GdkEventFocus* event);
-  void ChkBtnPatIDClicked(GtkButton* button);
-  void BtnSearchClicked(GtkButton* button);
-  void EntryNameInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void EntryInsertPatientId(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void EntryFocusOutPatientId(GtkWidget* widget, GdkEventFocus* event);
+  void CheckButtonClickedPatientId(GtkButton* button);
+  void ButtonClickedSearch(GtkButton* button);
+  void EntryInsertName(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
 
-  void BirthDateYearInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
-  void BirthDateYearDelete(GtkEditable* editable, gint start_pos, gint end_pos);
-  void BirthDateMonthInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
-  void BirthDateMonthDelete(GtkEditable* editable, gint start_pos, gint end_pos);
-  void BirthDateDayInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
-  void BirthDateDayDelete(GtkEditable* editable, gint start_pos, gint end_pos);
+  void EntryInsertBirthDateYear(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void EntryDeleteBirthDateYear(GtkEditable* editable, gint start_pos, gint end_pos);
+  void EntryInsertBirthDateMonth(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void EntryDeleteBirthDateMonth(GtkEditable* editable, gint start_pos, gint end_pos);
+  void EntryInsertBirthDateDay(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void EntryDeleteBirthDateDay(GtkEditable* editable, gint start_pos, gint end_pos);
   void ButtonClickedCalendar(GtkButton* button);
-  void EntryNumInsert(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
+  void EntryInsertNum(GtkEditable* editable, gchar* new_text, gint new_text_length, gint* position);
 
-  void CommentInsert(GtkTextBuffer* textbuffer, GtkTextIter* location, gchar* text, gint len);
+  void TextViewInsertComment(GtkTextBuffer* textbuffer, GtkTextIter* location, gchar* text, gint len);
+
+  void EntryFocusOutStature(GtkWidget* widget, GdkEventFocus* event);
+  void EntryFocusOutWeight(GtkWidget* widget, GdkEventFocus* event);
+  void ComboboxChangedOBDate(GtkComboBox* combobox);
+
+  void EntryFocusOutOB(GtkWidget* widget, GdkEventFocus* event);
+
+  void LoadPatData();
+  void AutoPatID();
 
 private:
   ViewNewPat();
+
+  void KeyEvent(unsigned char keyValue);
 
   GtkWidget* create_note_general();
   GtkWidget* create_note_ob();
   GtkWidget* create_note_card();
   GtkWidget* create_note_uro();
   GtkWidget* create_note_other();
+
+  void CalcBSA();
+  void Calc_GW_EDD(const string year, const string month, const string day);
+  void CheckPatientId(const string pat_id);
+
+  string GenPatID();
+
+  void FillPatInfo(const PatientInfo::Patient& pat_info);
+  void FillExamInfo(const PatientInfo::ExamGeneral& exam_info);
+  void FillObInfo(const PatientInfo::ObExam& ob);
+  void FillCarInfo(const PatientInfo::CarExam& car);
+  void FillUroInfo(const PatientInfo::UroExam& uro);
+
+  void GetPatInfo(PatientInfo::Info &info);
+  const string GetLMP();
+  DCMMPPSELEMENT GetMPPSElement(PatientInfo::Info &info);
+
+  bool AutoCalcAge(const int year, const int month, const int day);
+  void EditStudyInfo(PatientInfo::Info& info);
 
 private:
   static ViewNewPat* m_instance;
@@ -271,6 +386,8 @@ private:
   GtkEntry* m_entry_other_tel;
   GtkEntry* m_entry_other_address;
 
+  DCMSTUDYELEMENT m_studyInfo;
+
   bool m_langCN;
   int m_curYear;
   int m_curMonth;
@@ -282,94 +399,8 @@ private:
 
   int m_date_format;
 
-public:
-  void LoadPatData();
-    void AutoPatID();
-
-
-private:
-
-    void FillPatInfo(const PatientInfo::Patient &pat_info);
-    void GetPatInfo(PatientInfo::Info &info);
-
-    virtual void SetStartDate(int year, int month, int day);
-
-
-
-    bool IsErrorChar(gchar *new_text) {
-        return (0 == strcmp(new_text, "'"));
-    }
-
-private:
-    bool AutoCalcAge(const int year, const int month, const int day);
-    void KeyEvent(unsigned char keyValue);
-    void CalcBSA();
-    std::string GenPatID();
-    void Calc_GA_EDD(const gchar *year, const gchar *month, const gchar *day);
-    void CheckPatID(const gchar *pat_id);
-    void FillExamInfo(const PatientInfo::ExamGeneral &exam_info);
-    void FillObInfo(const PatientInfo::ObExam &ob);
-    void FillCarInfo(const PatientInfo::CarExam &car);
-    void FillUroInfo(const PatientInfo::UroExam &uro);
-
-    bool m_clearAll;            // clear all or examinfo
-
-    DCMSTUDYELEMENT m_studyInfo;
-
-    bool m_flagMPPS;
-
-
-    DCMMPPSELEMENT GetMPPSElement(PatientInfo::Info &info);
-    void EditStudyInfo(PatientInfo::Info &info);
-
-    const gchar* GetLMP();
-
-    void ComboboxOBDateChanged(GtkComboBox *widget);
-
-    void OBFocusOut(GtkWidget *widget, GdkEventFocus *event);
-    void StatureFocusOut(GtkWidget *widget, GdkEventFocus *event);
-    void WeightFocusOut(GtkWidget *widget, GdkEventFocus *event);
-
-    // signal connect
-    static gboolean HandleOBFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewNewPat *data) {
-        data->OBFocusOut(widget, event);
-        return FALSE;
-    }
-    static gboolean HandleStatureFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewNewPat *data) {
-        data->StatureFocusOut(widget, event);
-        return FALSE;
-    }
-    static gboolean HandleWeightFocusOut(GtkWidget *widget, GdkEventFocus *event, ViewNewPat *data) {
-        data->WeightFocusOut(widget, event);
-        return FALSE;
-    }
-
-    static void on_entry_stature(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewNewPat *data) {
-        data->EntryNumInsert(editable, new_text, new_text_length, position);
-    }
-    static void on_entry_weight(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewNewPat *data) {
-        data->EntryNumInsert(editable, new_text, new_text_length, position);
-    }
-
-    static void on_combobox_ob_date_changed(GtkComboBox *widget, ViewNewPat *data) {
-        data->ComboboxOBDateChanged(widget);
-    }
-    static void on_entry_ob_year(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewNewPat *data) {
-        data->EntryNumInsert(editable, new_text, new_text_length, position);
-    }
-    static void on_entry_ob_month(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewNewPat *data) {
-        data->EntryNumInsert(editable, new_text, new_text_length, position);
-    }
-    static void on_entry_ob_day(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewNewPat *data) {
-        data->EntryNumInsert(editable, new_text, new_text_length, position);
-    }
-
-    static void on_entry_hr(GtkEditable *editable, gchar *new_text, gint new_text_length, gint *position, ViewNewPat *data) {
-        data->EntryNumInsert(editable, new_text, new_text_length, position);
-    }
-
+  bool m_clearAll;  // clear all or examinfo
+  bool m_flagMPPS;
 };
-
-
 
 #endif

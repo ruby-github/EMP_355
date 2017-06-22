@@ -33,9 +33,6 @@ void GenAgeStr(int age, int ageUnit, std::string &strAge); //age 090Y/M/D
 void GetSexString(int iSex, std::string &sSex);
 void GetTypeStr(string &src, string &des);
 int CalcLength(POINT p1, POINT p2);
-void DotToCommaLocaleNumeric(char *Comma, unsigned int size);
-void CommaToDotLocaleNumeric(char *Dot, unsigned int size);
-
 
 
 GdkColor* MeasureColorConvert(int colorIndex);
@@ -56,7 +53,6 @@ PangoLayout * create_pango_text(GtkWidget *widget,
 
 int CountLines(std::string& text);
 void trim(std::string& str);
-int GetComboBoxIndex(GtkComboBox *combobox, string name);
 
 PangoFontDescription* AdaptStringFont(const char *font_family, const char *font_style, int font_size, PangoLayout *layout, const char *str, const int max_width);
 

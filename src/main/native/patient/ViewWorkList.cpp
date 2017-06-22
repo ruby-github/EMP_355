@@ -814,17 +814,13 @@ void ViewWorkList::GetSelectedPatInfo() {
     info.p.address = m_query[selectedIndex].wlPatientAddress;
 
     //Size
-    char size[256];
-    strcpy(size, m_query[selectedIndex].wlPatientSize.c_str());
-    DotToCommaLocaleNumeric(size, sizeof(size));
-    int height = atoi(size);
-    info.e.height = height*100;
+    string size = Utils::DotToCommaLocaleNumeric(m_query[selectedIndex].wlPatientSize);
+    int height = atoi(size.c_str());
+    info.e.height = height * 100;
 
     //Weight
-    char Weight[256];
-    strcpy(Weight, m_query[selectedIndex].wlPatientWeight.c_str());
-    DotToCommaLocaleNumeric(Weight,sizeof(Weight));
-    float weight = atof(Weight);
+    string Weight = Utils::DotToCommaLocaleNumeric(m_query[selectedIndex].wlPatientWeight);
+    float weight = atof(Weight.c_str());
     info.e.weight = weight;
 
     ChangePersonNameFormatForShow(m_query[selectedIndex].wlStudyDoctor, info.e.examDoctor);
@@ -1833,25 +1829,23 @@ void PatDetail::InsertPatDetail(const char *ID,const char *name,string birthDate
 
     gtk_entry_set_text(GTK_ENTRY(m_entry_doctor),doctor);
 
-    char sizeT[256];
-    strcpy(sizeT,size);
-    char weightT[256];
-    strcpy(weightT,weight);
+    string sizeT = size;
+    string weightT = weight;
 
-    if(sizeT !=NULL) {
-        DotToCommaLocaleNumeric(sizeT, sizeof(sizeT));
+    if(!sizeT.empty()) {
+        sizeT = Utils::DotToCommaLocaleNumeric(sizeT);
 
-        float stature = atof(sizeT);
+        float stature = atof(sizeT.c_str());
         int stature_real=stature*100;
         sprintf(size_tmp,"%dcm",stature_real);
         gtk_entry_set_text(GTK_ENTRY(m_entry_stature),size_tmp);
     }
 
-    if(weightT != NULL) {
+    if(!weightT.empty()) {
         char weight_buf[30]="\0";
-        DotToCommaLocaleNumeric(weightT, sizeof(weightT));
+        weightT = Utils::DotToCommaLocaleNumeric(weightT);
 
-        float weight_tmp = atof(weightT);
+        float weight_tmp = atof(weightT.c_str());
         sprintf(weight_buf,"%.1fkg",weight_tmp);
         gtk_entry_set_text(GTK_ENTRY(m_entry_weight),weight_buf);
     }

@@ -388,38 +388,6 @@ int CalcLength(POINT p1, POINT p2) {
     return len;
 }
 
-void CommaToDotLocaleNumeric(char *Dot, unsigned int size) {
-    SysGeneralSetting sysGS;
-    int language= sysGS.GetLanguage();
-
-    if ((PL == language)||(RU == language)||(FR == language)||(DE == language)||(ES == language)) {
-
-        for(unsigned int i=0; i<size; i++) {
-            if(Dot[i]==',') {
-                Dot[i]='.';
-                break;
-            }
-        }
-    }
-
-}
-
-void DotToCommaLocaleNumeric(char *Comma, unsigned int size) {
-
-    SysGeneralSetting sysGS;
-    int language= sysGS.GetLanguage();
-
-    if ((PL == language)||(RU == language)||(FR == language)||(DE == language)||(ES == language)) {
-        for(unsigned int i=0; i<size; i++) {
-            if(Comma[i]=='.') {
-                Comma[i]=',';
-                break;
-            }
-        }
-    }
-
-}
-
 GtkWidget *create_label(const char *str, guint width, guint height, const GdkColor* const color, PangoFontDescription *font) {
     GtkWidget *label = gtk_label_new(str);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
@@ -623,39 +591,6 @@ void trim(string& str) {
     static const char whitespace[] = " \n\t\v\r\f";
     str.erase(0, str.find_first_not_of(whitespace));
     str.erase(str.find_last_not_of(whitespace) + 1);
-}
-
-// 返回Combobox的index值, 失败返回-1
-int GetComboBoxIndex(GtkComboBox *combobox, string name) {
-    GtkTreeIter iter;
-    GtkTreeModel* model = gtk_combo_box_get_model(GTK_COMBO_BOX (combobox));
-    char *new_name = 0;
-    string str_name;
-    if (gtk_tree_model_get_iter_first (model, &iter)) {
-        gtk_tree_model_get(model, &iter, 0, &new_name, -1);
-        str_name = new_name;
-        delete new_name;
-        new_name = 0;
-        while (str_name != name) {
-            if (gtk_tree_model_iter_next(model, &iter)) {
-                gtk_tree_model_get(model, &iter, 0, &new_name, -1);
-                str_name = new_name;
-                delete new_name;
-                new_name = 0;
-            } else {
-                PRINTF("Do not exist in combobox\n");
-                return -1;
-            }
-        }
-        GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-        char *path_str = gtk_tree_path_to_string(path);
-        gtk_tree_path_free(path);
-        int ret = atoi(path_str);
-        delete path_str;
-        return ret;
-    } else {
-        return -1;
-    }
 }
 
 

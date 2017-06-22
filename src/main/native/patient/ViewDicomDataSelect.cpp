@@ -20,6 +20,7 @@
 #include "periDevice/ViewPrintPreview.h"
 #include "imageProc/Replay.h"
 
+#include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
 
 ViewDicomDataSelect* ViewDicomDataSelect::m_ptrInstance = NULL;
@@ -483,22 +484,18 @@ unsigned int ViewDicomDataSelect::GetDCMStudyElement(DCMSTUDYELEMENT element) {
     info.p.comment = "";
 
     //Size
-    char sizeT[256];
-    strcpy(sizeT,element.stPatientSize.c_str());
-    DotToCommaLocaleNumeric(sizeT, sizeof(sizeT));
+    string sizeT = Utils::DotToCommaLocaleNumeric(element.stPatientSize);
 
     //weight
-    char weightT[256];
-    strcpy(weightT,element.stPatientWeight.c_str());
-    DotToCommaLocaleNumeric(weightT, sizeof(weightT));
+    string weightT = Utils::DotToCommaLocaleNumeric(element.stPatientWeight);
 
-    if(sizeT!= 0)
-        info.e.height =(int)(atof(sizeT)*100);
+    if(!sizeT.empty())
+        info.e.height =(int)(atof(sizeT.c_str())*100);
     else
         info.e.height = 0.0;
 
-    if(weightT!= 0)
-        info.e.weight = atof(weightT);
+    if(!weightT.empty())
+        info.e.weight = atof(weightT.c_str());
     else
         info.e.weight = 0.0;
 
