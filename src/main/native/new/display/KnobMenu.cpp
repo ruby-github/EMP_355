@@ -80,12 +80,12 @@ GtkWidget* KnobMenu::Create() {
   gtk_table_attach_defaults(table, GTK_WIDGET(m_button_knob[5]), 11, 13, 1, 5);
   gtk_table_attach_defaults(table, GTK_WIDGET(m_button_right), 13, 14, 0, 5);
 
-  Utils::set_button_image(m_button_knob[0], Utils::create_image("res/menu/menu1.png", 60, 60), GTK_POS_BOTTOM);
-  Utils::set_button_image(m_button_knob[1], Utils::create_image("res/menu/menu2.png", 60, 60), GTK_POS_BOTTOM);
-  Utils::set_button_image(m_button_knob[2], Utils::create_image("res/menu/menu3.png", 60, 60), GTK_POS_BOTTOM);
-  Utils::set_button_image(m_button_knob[3], Utils::create_image("res/menu/menu4.png", 60, 60), GTK_POS_BOTTOM);
-  Utils::set_button_image(m_button_knob[4], Utils::create_image("res/menu/menu5.png", 60, 60), GTK_POS_BOTTOM);
-  Utils::set_button_image(m_button_knob[5], Utils::create_image("res/menu/menu6.png", 60, 60), GTK_POS_BOTTOM);
+  Utils::set_button_image(m_button_knob[0], Utils::create_image("res/menu/menu1.png", 70, 60), GTK_POS_BOTTOM);
+  Utils::set_button_image(m_button_knob[1], Utils::create_image("res/menu/menu2.png", 70, 60), GTK_POS_BOTTOM);
+  Utils::set_button_image(m_button_knob[2], Utils::create_image("res/menu/menu3.png", 70, 60), GTK_POS_BOTTOM);
+  Utils::set_button_image(m_button_knob[3], Utils::create_image("res/menu/menu4.png", 70, 60), GTK_POS_BOTTOM);
+  Utils::set_button_image(m_button_knob[4], Utils::create_image("res/menu/menu5.png", 70, 60), GTK_POS_BOTTOM);
+  Utils::set_button_image(m_button_knob[5], Utils::create_image("res/menu/menu6.png", 70, 60), GTK_POS_BOTTOM);
 
   GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_left), GTK_CAN_FOCUS);
   GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_right), GTK_CAN_FOCUS);
@@ -137,8 +137,13 @@ void KnobMenu::Update() {
         value = "【 " + value + " 】";
       }
 
-      gtk_label_set_text(m_label_knob[i], name.c_str());
-      gtk_button_set_label(m_button_knob[i], value.c_str());
+      if (name.empty()) {
+        gtk_label_set_text(m_label_knob[i], "");
+        gtk_button_set_label(m_button_knob[i], "");
+      } else {
+        gtk_label_set_text(m_label_knob[i], name.c_str());
+        gtk_button_set_label(m_button_knob[i], value.c_str());
+      }
     } else {
       gtk_label_set_text(m_label_knob[i], "");
       gtk_button_set_label(m_button_knob[i], "");
