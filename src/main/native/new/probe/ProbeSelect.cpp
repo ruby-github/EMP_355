@@ -57,11 +57,15 @@ bool ProbeSelect::Execute() {
 bool ProbeSelect::ProbeRead() {
   int select = MAX_SOCKET;
 
+  cout << "ProbeSelect::ProbeRead() 0" << endl;
+
   // power off HV
   m_ptrProbe->ActiveHV(FALSE);
 
   // read probe
   m_ptrProbe->GetAllProbe(m_para);
+
+  cout << "ProbeSelect::ProbeRead() 1" << endl;
 
   // get exam item list
   for (int i = 0; i < MAX_SOCKET; i ++) {
@@ -73,6 +77,8 @@ bool ProbeSelect::ProbeRead() {
       m_itemList[i].clear();
     }
   }
+
+  cout << "ProbeSelect::ProbeRead() 2" << endl;
 
   if (select == MAX_SOCKET) {
     return false;

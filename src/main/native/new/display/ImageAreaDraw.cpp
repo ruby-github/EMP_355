@@ -2875,7 +2875,7 @@ void ImageAreaDraw::ScanDirection(int x, int y, bool CurB) {
     else
         color = g_white;
 
-    m_ptrImg->DrawString("<b><big>m</big></b>", x - 10, y - 10, color);
+    m_ptrImg->DrawString("<b><big>W</big></b>", x - 10, y - 10, color);
 }
 
 void ImageAreaDraw::DrawHScaleY(bool L2R) {

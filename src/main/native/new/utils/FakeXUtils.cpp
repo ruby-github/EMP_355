@@ -100,7 +100,7 @@ void FakeXMotionEventMenu(int &x, int &y, int offsetx, int offsety) {
 
   Display* display = getXDisplay();
 
-  XTestFakeMotionEvent(display, DefaultScreen(display), x, y, 0);
+  //XTestFakeMotionEvent(display, DefaultScreen(display), x, y, 0);
   XFlush(display);
   XCloseDisplay(display);
 }

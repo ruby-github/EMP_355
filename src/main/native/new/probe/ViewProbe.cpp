@@ -138,11 +138,15 @@ void ViewProbe::Destroy() {
 }
 
 void ViewProbe::ReadProbe() {
+  cout << "ViewProbe::ReadProbe() 0" << endl;
+
   if (!m_pKps.ProbeRead()) {  // no probe is found
     HintArea::GetInstance()->UpdateHint(_("[Probe Select]: No Probe was found."), 2);
 
     return ;
   }
+
+  cout << "ViewProbe::ReadProbe() 1" << endl;
 
   HintArea::GetInstance()->ClearHint();
 
@@ -150,7 +154,11 @@ void ViewProbe::ReadProbe() {
   ProbeSocket::ProbePara* para = NULL;
   int maxSocket = 0;
 
+  cout << "ViewProbe::ReadProbe() 2" << endl;
+
   m_pKps.GetPara(para, m_itemList, maxSocket);
+
+  cout << "ViewProbe::ReadProbe() 3" << endl;
 
   if (para == NULL) {
     return;
