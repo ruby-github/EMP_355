@@ -851,49 +851,73 @@ void ViewSystem::CreateWindow() {
   GtkNotebook* m_notebook = Utils::create_notebook();
   gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(m_dialog)), GTK_WIDGET(m_notebook));
 
+  cout << "ViewSystem::CreateWindow: General" << endl;
+
   // General
   gtk_notebook_append_page(m_notebook, create_note_general(), GTK_WIDGET(Utils::create_label(_("General"))));
   init_general_setting();
+
+  cout << "ViewSystem::CreateWindow: Options" << endl;
 
   // Options
   gtk_notebook_append_page(m_notebook, create_note_options(), GTK_WIDGET(Utils::create_label(_("Options"))));
   init_option_setting(NULL);
 
+  cout << "ViewSystem::CreateWindow: Image Preset" << endl;
+
   // Image Preset
   m_flag_notebook_image = gtk_notebook_get_n_pages(m_notebook);
   gtk_notebook_append_page(m_notebook, create_note_image(), GTK_WIDGET(Utils::create_label(_("Image"))));
+
+  cout << "ViewSystem::CreateWindow: Measure" << endl;
 
   // Measure
   gtk_notebook_append_page(m_notebook, create_note_measure(), GTK_WIDGET(Utils::create_label(_("Measure"))));
   init_measure_setting(NULL);
 
+  cout << "ViewSystem::CreateWindow: Calculate And Measure" << endl;
+
   // Calculate And Measure
   gtk_notebook_append_page(m_notebook, create_note_calc_measure(), GTK_WIDGET(Utils::create_label(_("Calc & Measure"))));
+
+  cout << "ViewSystem::CreateWindow: OB" << endl;
 
   // OB
   gtk_notebook_append_page(m_notebook, create_note_calc(), GTK_WIDGET(Utils::create_label(_("OB"))));
   init_calc_setting(NULL);
 
+  cout << "ViewSystem::CreateWindow: Comment" << endl;
+
   // Comment
   gtk_notebook_append_page(m_notebook, create_note_comment(), GTK_WIDGET(Utils::create_label(_("Comment"))));
   init_comment_setting(NULL);
+
+  cout << "ViewSystem::CreateWindow: Peripheral" << endl;
 
   // Peripheral
   m_flag_notebook_tvout = gtk_notebook_get_n_pages(m_notebook);
   gtk_notebook_append_page(m_notebook, create_note_tvout(), GTK_WIDGET(Utils::create_label(_("Peripheral"))));
 
+  cout << "ViewSystem::CreateWindow: Custom Report" << endl;
+
   // Custom Report
   m_flag_notebook_coustomreport = gtk_notebook_get_n_pages(m_notebook);
   gtk_notebook_append_page(m_notebook, create_set_report(), GTK_WIDGET(Utils::create_label(_("Report"))));
+
+  cout << "ViewSystem::CreateWindow: DICOM" << endl;
 
   // DICOM
   if (MyDCMRegister::IsAuthorize()) {
     gtk_notebook_append_page(m_notebook, create_note_dicom(), GTK_WIDGET(Utils::create_label(_("DICOM"))));
   }
 
+  cout << "ViewSystem::CreateWindow: P1-P3" << endl;
+
   // P1-P3
   gtk_notebook_append_page(m_notebook, create_note_key_config(), GTK_WIDGET(Utils::create_label(_("P1-P3"))));
   init_key_config();
+
+  cout << "ViewSystem::CreateWindow: System Info" << endl;
 
   // System Info
   gtk_notebook_append_page(m_notebook, create_note_info(), GTK_WIDGET(Utils::create_label(_("System"))));
