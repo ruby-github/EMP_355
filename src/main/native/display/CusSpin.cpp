@@ -73,9 +73,10 @@ void CusSpin::UpdateLabel(void) {
     gtk_label_set_text(GTK_LABEL(m_labelText), _(m_item->name));
 }
 
-void CusSpin::SetValue(const char* str, EKnobReturn flag) {
-    if(str)
-        gtk_entry_set_text(GTK_ENTRY(m_entry), str);
+void CusSpin::SetValue(const string str, EKnobReturn flag) {
+    if (!str.empty()) {
+      gtk_entry_set_text(GTK_ENTRY(m_entry), str.c_str());
+    }
 
     switch(flag) {
     case OK:

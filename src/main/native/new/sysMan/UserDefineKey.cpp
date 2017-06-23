@@ -103,7 +103,7 @@ void UserDefineKey::FactoryCreate(EKeyFunc type) {
 
       break;
     case PIP:
-      g_menu2D.BtnPIP(NULL);
+      g_menu2D.ButtonClickedPIP(NULL);
 
       break;
     case PW_SOUND:

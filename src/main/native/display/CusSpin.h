@@ -24,7 +24,7 @@ public:
     void SetItem(CusSpinItem* item) {
         m_item = item;
     }
-    void SetValue(const char *str, EKnobReturn flag);
+    void SetValue(const string str, EKnobReturn flag);
     void UpdateLabel(void);
     void Show();
 

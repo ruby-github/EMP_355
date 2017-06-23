@@ -839,7 +839,7 @@ void Update2D::Chroma(const char* data, EKnobReturn status) {
 
 void Update2D::ImgEhn(int data, EKnobReturn status) {
     sprintf(m_str, "%d", data);
-    g_menu2D.UpdateImgEhn(m_str, status);
+    g_menu2D.UpdateIPurity(m_str, status);
 }
 
 void Update2D::CompoundSpace(int angle, EKnobReturn status) {

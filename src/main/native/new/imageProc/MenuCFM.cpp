@@ -269,7 +269,7 @@ void MenuCFM::ChkBgHideClicked(GtkButton *button) {
 }
 
 void MenuCFM::Chk4BCFM(GtkButton *button) {
-    g_menu2D.Btn4B(button);
+    g_menu2D.ButtonClicked4B(button);
     //ScanMode::GetInstance()->EnterCwCfmFromCfm();
 }
 
