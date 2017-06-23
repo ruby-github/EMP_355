@@ -5,7 +5,7 @@
 
 class MyDCMRegister {
 public:
-  static CDCMRegister* GetMe();
+  static CDCMRegister* GetMe(bool init = false);
 
   static void Create(string resfiledir);
   static void Destroy();

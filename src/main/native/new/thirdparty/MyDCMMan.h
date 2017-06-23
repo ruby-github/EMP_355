@@ -5,6 +5,8 @@
 
 class MyDCMMan {
 public:
+  static CDCMMan* GetMe(bool init = false);
+
   static void Create(string dcm_database_dir);
   static void Destroy();
 

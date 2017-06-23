@@ -1,629 +1,411 @@
 #include "thirdparty/MyDCMMan.h"
 
+#include "Def.h"
+
 #include <exception>
 #include <iostream>
 
 using namespace std;
 
-void MyDCMMan::Create(string dcm_database_dir) {
-  try {
-    CDCMMan::Create(dcm_database_dir);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::Create: " << dcm_database_dir << endl;
+CDCMMan* MyDCMMan::GetMe(bool init) {
+  cout << "MyDCMMan::GetMe" << endl;
+
+  CDCMMan* reg = GetMe(true);
+
+  if (reg == NULL) {
+    if (init) {
+      CDCMMan::Create(DCMDB_DIR);
+
+      reg = GetMe(true);
+    }
   }
+
+  return reg;
+}
+
+void MyDCMMan::Create(string dcm_database_dir) {
+  cout << "MyDCMMan::Create: " << dcm_database_dir << endl;
+
+  CDCMMan::Create(dcm_database_dir);
 }
 
 void MyDCMMan::Destroy() {
-  try {
-    CDCMMan::Destroy();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::Destroy" << endl;
-  }
+  cout << "MyDCMMan::Destroy" << endl;
+
+  CDCMMan::Destroy();
 }
 
 void MyDCMMan::AddImage(DCMIMAGEELEMENT element) {
-  try {
-    CDCMMan::GetMe()->AddImage(element);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddImage" << endl;
-  }
+  cout << "MyDCMMan::AddImage" << endl;
+
+  GetMe(true)->AddImage(element);
 }
 
 bool MyDCMMan::AddMPPSService(string device, string serviceName, string aeTitle, int port) {
-  try {
-    return CDCMMan::GetMe()->AddMPPSService(device, serviceName, aeTitle, port);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddMPPSService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
+  cout << "MyDCMMan::AddMPPSService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
 
-    return false;
-  }
+  return GetMe(true)->AddMPPSService(device, serviceName, aeTitle, port);
 }
 
 bool MyDCMMan::AddQueryRetrieveService(string device, string serviceName, string aeTitle, int port) {
-  try {
-    return CDCMMan::GetMe()->AddQueryRetrieveService(device, serviceName, aeTitle, port);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddQueryRetrieveService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
+  cout << "MyDCMMan::AddQueryRetrieveService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
 
-    return false;
-  }
+  return GetMe(true)->AddQueryRetrieveService(device, serviceName, aeTitle, port);
 }
 
 bool MyDCMMan::AddServer(string device, string ip) {
-  try {
-    return CDCMMan::GetMe()->AddServer(device, ip);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddServer: " << device << ", " << ip << endl;
+  cout << "MyDCMMan::AddServer: " << device << ", " << ip << endl;
 
-    return false;
-  }
+  return GetMe(true)->AddServer(device, ip);
 }
 
 bool MyDCMMan::AddStorageCommitService(string device, string serviceName, string aeTitle, int port) {
-  try {
-    return CDCMMan::GetMe()->AddStorageCommitService(device, serviceName, aeTitle, port);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddStorageCommitService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
+  cout << "MyDCMMan::AddStorageCommitService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
 
-    return false;
-  }
+  return GetMe(true)->AddStorageCommitService(device, serviceName, aeTitle, port);
 }
 
 bool MyDCMMan::AddStorageService(string device, string serviceName, string aeTitle, int port) {
-  try {
-    return CDCMMan::GetMe()->AddStorageService(device, serviceName, aeTitle, port);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddStorageService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
+  cout << "MyDCMMan::AddStorageService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
 
-    return false;
-  }
+  return GetMe(true)->AddStorageService(device, serviceName, aeTitle, port);
 }
 
 bool MyDCMMan::AddWorklistService(string device, string serviceName, string aeTitle, int port) {
-  try {
-    return CDCMMan::GetMe()->AddWorklistService(device, serviceName, aeTitle, port);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::AddWorklistService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
+  cout << "MyDCMMan::AddWorklistService: " << device << ", " << serviceName << ", " << aeTitle << ", " << port << endl;
 
-    return false;
-  }
+  return GetMe(true)->AddWorklistService(device, serviceName, aeTitle, port);
 }
 
 EDCMReturnStatus MyDCMMan::BrowseDICOMDIR(string destDirStorageMedia, vector<DCMDICOMDIRSTUDYLEVEL>& vecStudyLevel) {
-  try {
-    return CDCMMan::GetMe()->BrowseDICOMDIR(destDirStorageMedia, vecStudyLevel);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::BrowseDICOMDIR: " << destDirStorageMedia << endl;
+  cout << "MyDCMMan::BrowseDICOMDIR: " << destDirStorageMedia << endl;
 
-    return DCMNONEXISTDICOMDIR;
-  }
+  return GetMe(true)->BrowseDICOMDIR(destDirStorageMedia, vecStudyLevel);
 }
 
 void MyDCMMan::DeleteImageBeforeEndStudy(string filename) {
-  try {
-    CDCMMan::GetMe()->DeleteImageBeforeEndStudy(filename);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteImageBeforeEndStudy: " << filename << endl;
-  }
+  cout << "MyDCMMan::DeleteImageBeforeEndStudy: " << filename << endl;
+
+  GetMe(true)->DeleteImageBeforeEndStudy(filename);
 }
 
 bool MyDCMMan::DeleteMPPSService(string device) {
-  try {
-    return CDCMMan::GetMe()->DeleteMPPSService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteMPPSService: " << device << endl;
+  cout << "MyDCMMan::DeleteMPPSService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteMPPSService(device);
 }
 
 bool MyDCMMan::DeleteQueryRetrieveService(string device) {
-  try {
-    return CDCMMan::GetMe()->DeleteQueryRetrieveService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteQueryRetrieveService: " << device << endl;
+  cout << "MyDCMMan::DeleteQueryRetrieveService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteQueryRetrieveService(device);
 }
 
 bool MyDCMMan::DeleteServer(string device) {
-  try {
-    return CDCMMan::GetMe()->DeleteServer(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteServer: " << device << endl;
+  cout << "MyDCMMan::DeleteServer: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteServer(device);
 }
 
 bool MyDCMMan::DeleteStorageCommitService(string device) {
-  try {
-    return CDCMMan::GetMe()->DeleteStorageCommitService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteStorageCommitService: " << device << endl;
+  cout << "MyDCMMan::DeleteStorageCommitService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteStorageCommitService(device);
 }
 
 bool MyDCMMan::DeleteStorageService(string device) {
-  try {
-    return CDCMMan::GetMe()->DeleteStorageService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteStorageService: " << device << endl;
+  cout << "MyDCMMan::DeleteStorageService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteStorageService(device);
 }
 
 bool MyDCMMan::DeleteStudy(unsigned int studyNo) {
-  try {
-    return CDCMMan::GetMe()->DeleteStudy(studyNo);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteStudy: " << studyNo << endl;
+  cout << "MyDCMMan::DeleteStudy: " << studyNo << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteStudy(studyNo);
 }
 
 bool MyDCMMan::DeleteWorklistService(string device) {
-  try {
-    return CDCMMan::GetMe()->DeleteWorklistService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::DeleteWorklistService: " << device << endl;
+  cout << "MyDCMMan::DeleteWorklistService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->DeleteWorklistService(device);
 }
 
 void MyDCMMan::EditSR(DCMSRELEMENT element) {
-  try {
-    CDCMMan::GetMe()->EditSR(element);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::EditSR" << endl;
-  }
+  cout << "MyDCMMan::EditSR" << endl;
+
+  GetMe(true)->EditSR(element);
 }
 
 void MyDCMMan::EditStudyInfo(DCMSTUDYELEMENT element) {
-  try {
-    CDCMMan::GetMe()->EditStudyInfo(element);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::EditStudyInfo" << endl;
-  }
+  cout << "MyDCMMan::EditStudyInfo" << endl;
+
+  GetMe(true)->EditStudyInfo(element);
 }
 
 bool MyDCMMan::EndMPPS(string studyEndDate, string studyEndTime) {
-  try {
-    return CDCMMan::GetMe()->EndMPPS(studyEndDate, studyEndTime);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::EndMPPS: " << studyEndDate << ", " << studyEndTime << endl;
+  cout << "MyDCMMan::EndMPPS: " << studyEndDate << ", " << studyEndTime << endl;
 
-    return false;
-  }
+  return GetMe(true)->EndMPPS(studyEndDate, studyEndTime);
 }
 
 bool MyDCMMan::EndStudy() {
-  try {
-    return CDCMMan::GetMe()->EndStudy();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::EndStudy" << endl;
+  cout << "MyDCMMan::EndStudy" << endl;
 
-    return false;
-  }
+  return GetMe(true)->EndStudy();
 }
 
 EDCMReturnStatus MyDCMMan::ExportStudy(unsigned int studyNo, string srcDirImage, string destDirStorageMedia, PROGRESSSTATUS psCallback) {
-  try {
-    return CDCMMan::GetMe()->ExportStudy(studyNo, srcDirImage, destDirStorageMedia, psCallback);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::ExportStudy: " << studyNo << ", " << srcDirImage << ", " << destDirStorageMedia << endl;
+  cout << "MyDCMMan::ExportStudy: " << studyNo << ", " << srcDirImage << ", " << destDirStorageMedia << endl;
 
-    return DCMEXPORTFAILURE;
-  }
+  return GetMe(true)->ExportStudy(studyNo, srcDirImage, destDirStorageMedia, psCallback);
 }
 
 vector<string> MyDCMMan::GetAllDevice() {
-  try {
-    return CDCMMan::GetMe()->GetAllDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllDevice" << endl;
+  cout << "MyDCMMan::GetAllDevice" << endl;
 
-    vector<string> vec;
-
-    return vec;
-  }
+  return GetMe(true)->GetAllDevice();
 }
 
 bool MyDCMMan::GetAllMPPSService(GetSingleServiceAttribute callback, void* pData) {
-  try {
-    return CDCMMan::GetMe()->GetAllMPPSService(callback, pData);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllMPPSService" << endl;
+  cout << "MyDCMMan::GetAllMPPSService" << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetAllMPPSService(callback, pData);
 }
 
 bool MyDCMMan::GetAllQueryRetrieveService(GetSingleServiceAttribute callback, void* pData) {
-  try {
-    return CDCMMan::GetMe()->GetAllQueryRetrieveService(callback, pData);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllQueryRetrieveService" << endl;
+  cout << "MyDCMMan::GetAllQueryRetrieveService" << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetAllQueryRetrieveService(callback, pData);
 }
 
 vector<string> MyDCMMan::GetAllRetrieveDestinationServerDevice() {
-  try {
-    return CDCMMan::GetMe()->GetAllRetrieveDestinationServerDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllRetrieveDestinationServerDevice" << endl;
+  cout << "MyDCMMan::GetAllRetrieveDestinationServerDevice" << endl;
 
-    vector<string> vec;
-
-    return vec;
-  }
+  return GetMe(true)->GetAllRetrieveDestinationServerDevice();
 }
 
 bool MyDCMMan::GetAllServer(GetSingleServerAttribute callback, void* pData) {
-  try {
-    return CDCMMan::GetMe()->GetAllServer(callback, pData);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllServer" << endl;
+  cout << "MyDCMMan::GetAllServer" << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetAllServer(callback, pData);
 }
 
 bool MyDCMMan::GetAllStorageCommitService(GetSingleServiceAttribute callback, void* pData) {
-  try {
-    return CDCMMan::GetMe()->GetAllStorageCommitService(callback, pData);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllStorageCommitService" << endl;
+  cout << "MyDCMMan::GetAllStorageCommitService" << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetAllStorageCommitService(callback, pData);
 }
 
 bool MyDCMMan::GetAllStorageService(GetSingleServiceAttribute callback, void* pData) {
-  try {
-    return CDCMMan::GetMe()->GetAllStorageService(callback, pData);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllStorageService" << endl;
+  cout << "MyDCMMan::GetAllStorageService" << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetAllStorageService(callback, pData);
 }
 
 bool MyDCMMan::GetAllWorklistService(GetSingleServiceAttribute callback, void* pData) {
-  try {
-    return CDCMMan::GetMe()->GetAllWorklistService(callback, pData);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetAllWorklistService" << endl;
+  cout << "MyDCMMan::GetAllWorklistService" << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetAllWorklistService(callback, pData);
 }
 
 string MyDCMMan::GetDefaultMPPSServiceDevice() {
-  try {
-    return CDCMMan::GetMe()->GetDefaultMPPSServiceDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetDefaultMPPSServiceDevice" << endl;
+  cout << "MyDCMMan::GetDefaultMPPSServiceDevice" << endl;
 
-    return "";
-  }
+  return GetMe(true)->GetDefaultMPPSServiceDevice();
 }
 
 string MyDCMMan::GetDefaultQueryRetrieveServiceDevice() {
-  try {
-    return CDCMMan::GetMe()->GetDefaultQueryRetrieveServiceDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetDefaultQueryRetrieveServiceDevice" << endl;
+  cout << "MyDCMMan::GetDefaultQueryRetrieveServiceDevice" << endl;
 
-    return "";
-  }
+  return GetMe(true)->GetDefaultQueryRetrieveServiceDevice();
 }
 
 string MyDCMMan::GetDefaultStorageCommitServiceDevice() {
-  try {
-    return CDCMMan::GetMe()->GetDefaultStorageCommitServiceDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetDefaultStorageCommitServiceDevice" << endl;
+  cout << "MyDCMMan::GetDefaultStorageCommitServiceDevice" << endl;
 
-    return "";
-  }
+  return GetMe(true)->GetDefaultStorageCommitServiceDevice();
 }
 
 string MyDCMMan::GetDefaultStorageServiceDevice() {
-  try {
-    return CDCMMan::GetMe()->GetDefaultStorageServiceDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetDefaultStorageServiceDevice" << endl;
+  cout << "MyDCMMan::GetDefaultStorageServiceDevice" << endl;
 
-    return "";
-  }
+  return GetMe(true)->GetDefaultStorageServiceDevice();
 }
 
 string MyDCMMan::GetDefaultWorklistServiceDevice() {
-  try {
-    return CDCMMan::GetMe()->GetDefaultWorklistServiceDevice();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetDefaultWorklistServiceDevice" << endl;
+  cout << "MyDCMMan::GetDefaultWorklistServiceDevice" << endl;
 
-    return "";
-  }
+  return GetMe(true)->GetDefaultWorklistServiceDevice();
 }
 
 string MyDCMMan::GetLocalAE() {
-  try {
-    return CDCMMan::GetMe()->GetLocalAE();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetLocalAE" << endl;
+  cout << "MyDCMMan::GetLocalAE" << endl;
 
-    return "";
-  }
+  return GetMe(true)->GetLocalAE();
 }
 
 int MyDCMMan::GetLocalPort() {
-  try {
-    return CDCMMan::GetMe()->GetLocalPort();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetLocalPort" << endl;
+  cout << "MyDCMMan::GetLocalPort" << endl;
 
-    return 0;
-  }
+  return GetMe(true)->GetLocalPort();
 }
 
 bool MyDCMMan::GetStudyBackupStatus(unsigned int studyNo) {
-  try {
-    return CDCMMan::GetMe()->GetStudyBackupStatus(studyNo);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::GetStudyBackupStatus: " << studyNo << endl;
+  cout << "MyDCMMan::GetStudyBackupStatus: " << studyNo << endl;
 
-    return false;
-  }
+  return GetMe(true)->GetStudyBackupStatus(studyNo);
 }
 
 EDCMReturnStatus MyDCMMan::ImportStudy(int studyIndex, string destDirStorageMedia,
   GetDCMStudyElement callbackGetStudy, GetDCMImageElement callbackGetImage, GetDCMSRElement callbackGetSR, PROGRESSSTATUS psCallback) {
-  try {
-    return CDCMMan::GetMe()->ImportStudy(studyIndex, destDirStorageMedia, callbackGetStudy, callbackGetImage, callbackGetSR, psCallback);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::ImportStudy: " << studyIndex << ", " << destDirStorageMedia << endl;
+  cout << "MyDCMMan::ImportStudy: " << studyIndex << ", " << destDirStorageMedia << endl;
 
-    return DCMIMPORTFAILURE;
-  }
+  return GetMe(true)->ImportStudy(studyIndex, destDirStorageMedia, callbackGetStudy, callbackGetImage, callbackGetSR, psCallback);
 }
 
 bool MyDCMMan::IsExistedWorklistStudy(DCMWORKLISTELEMENT wlElement) {
-  try {
-    return CDCMMan::GetMe()->IsExistedWorklistStudy(wlElement);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::IsExistedWorklistStudy" << endl;
+  cout << "MyDCMMan::IsExistedWorklistStudy" << endl;
 
-    return false;
-  }
+  return GetMe(true)->IsExistedWorklistStudy(wlElement);
 }
 
 bool MyDCMMan::Ping(string ip) {
-  try {
-    return CDCMMan::GetMe()->Ping((char*)ip.c_str());
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::Ping: " << ip << endl;
+  cout << "MyDCMMan::Ping: " << ip << endl;
 
-    return false;
-  }
+  return GetMe(true)->Ping((char*)ip.c_str());
 }
 
 EDCMReturnStatus MyDCMMan::Query(string patientName, string patientID,
   string accessionNumber, string startStudyDate, string endStudyDate, vector<DCMQRQUERYRES>& vQueryRes) {
-  try {
-    return CDCMMan::GetMe()->Query(patientName, patientID, accessionNumber, startStudyDate, endStudyDate, vQueryRes);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::Query: " << patientName << ", " << patientID << ", "
-      << accessionNumber << ", " << startStudyDate << ", " << endStudyDate << endl;
+  cout << "MyDCMMan::Query: " << patientName << ", " << patientID << ", "
+    << accessionNumber << ", " << startStudyDate << ", " << endStudyDate << endl;
 
-    return DCMIMPORTFAILURE;
-  }
+  return GetMe(true)->Query(patientName, patientID, accessionNumber, startStudyDate, endStudyDate, vQueryRes);
 }
 
 vector<DCMWORKLISTELEMENT> MyDCMMan::QueryWorklist(string patientID, string patientName,
   string accessionNumber, string requestedProcedureID, string startDate, string endDate) {
-  try {
-    return CDCMMan::GetMe()->QueryWorklist(patientID, patientName, accessionNumber, requestedProcedureID, startDate, endDate);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::QueryWorklist: " << patientID << ", " << patientName << ", "
-      << accessionNumber << ", " << requestedProcedureID << ", " << startDate << ", " << endDate << endl;
+  cout << "MyDCMMan::QueryWorklist: " << patientID << ", " << patientName << ", "
+    << accessionNumber << ", " << requestedProcedureID << ", " << startDate << ", " << endDate << endl;
 
-    vector<DCMWORKLISTELEMENT> vec;
-
-    return vec;
-  }
+  return GetMe(true)->QueryWorklist(patientID, patientName, accessionNumber, requestedProcedureID, startDate, endDate);
 }
 
 EDCMReturnStatus MyDCMMan::Retrieve(unsigned int itemIndex, string destDevice,
   GetDCMStudyElement callbackGetStudy, GetDCMImageElement callbackGetImage, GetDCMSRElement callbackGetSR, PROGRESSSTATUS psCallback) {
-  try {
-    return CDCMMan::GetMe()->Retrieve(itemIndex, destDevice, callbackGetStudy, callbackGetImage, callbackGetSR, psCallback);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::Retrieve: " << itemIndex << ", " << destDevice << endl;
+  cout << "MyDCMMan::Retrieve: " << itemIndex << ", " << destDevice << endl;
 
-    return DCMRETRIEVEFAILURE;
-  }
+  return GetMe(true)->Retrieve(itemIndex, destDevice, callbackGetStudy, callbackGetImage, callbackGetSR, psCallback);
 }
 
 bool MyDCMMan::SendStudy(unsigned int studyNo, string srcDirImage, string destDirImage,
   bool onStorageCommitment, bool enableStorageSR, bool enableStorageMultiFrame, int maxFrameNumber, PROGRESSSTATUS psCallback) {
-  try {
-    return CDCMMan::GetMe()->SendStudy(studyNo, srcDirImage, destDirImage,
-      onStorageCommitment, enableStorageSR, enableStorageMultiFrame, maxFrameNumber, psCallback);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SendStudy: " << studyNo << ", " << srcDirImage << ", " << destDirImage << ", "
-      << onStorageCommitment << ", " << enableStorageSR << ", " << enableStorageMultiFrame << ", " << maxFrameNumber << endl;
+  cout << "MyDCMMan::SendStudy: " << studyNo << ", " << srcDirImage << ", " << destDirImage << ", "
+    << onStorageCommitment << ", " << enableStorageSR << ", " << enableStorageMultiFrame << ", " << maxFrameNumber << endl;
 
-    return false;
-  }
+  return GetMe(true)->SendStudy(studyNo, srcDirImage, destDirImage,
+    onStorageCommitment, enableStorageSR, enableStorageMultiFrame, maxFrameNumber, psCallback);
 }
 
 bool MyDCMMan::SetDefaultMPPSService(string device) {
-  try {
-    return CDCMMan::GetMe()->SetDefaultMPPSService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetDefaultMPPSService: " << device << endl;
+  cout << "MyDCMMan::SetDefaultMPPSService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->SetDefaultMPPSService(device);
 }
 
 bool MyDCMMan::SetDefaultQueryRetrieveService(string device) {
-  try {
-    return CDCMMan::GetMe()->SetDefaultQueryRetrieveService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetDefaultQueryRetrieveService: " << device << endl;
+  cout << "MyDCMMan::SetDefaultQueryRetrieveService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->SetDefaultQueryRetrieveService(device);
 }
 
 bool MyDCMMan::SetDefaultStorageCommitService(string device) {
-  try {
-    return CDCMMan::GetMe()->SetDefaultStorageCommitService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetDefaultStorageCommitService: " << device << endl;
+  cout << "MyDCMMan::SetDefaultStorageCommitService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->SetDefaultStorageCommitService(device);
 }
 
 bool MyDCMMan::SetDefaultStorageService(string device) {
-  try {
-    return CDCMMan::GetMe()->SetDefaultStorageService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetDefaultStorageService: " << device << endl;
+  cout << "MyDCMMan::SetDefaultStorageService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->SetDefaultStorageService(device);
 }
 
 bool MyDCMMan::SetDefaultWorklistService(string device) {
-  try {
-    return CDCMMan::GetMe()->SetDefaultWorklistService(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetDefaultWorklistService: " << device << endl;
+  cout << "MyDCMMan::SetDefaultWorklistService: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->SetDefaultWorklistService(device);
 }
 
 void MyDCMMan::SetLocalAE(string strAE) {
-  try {
-    CDCMMan::GetMe()->SetLocalAE(strAE);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetLocalAE: " << strAE << endl;
-  }
+  cout << "MyDCMMan::SetLocalAE: " << strAE << endl;
+
+  GetMe(true)->SetLocalAE(strAE);
 }
 
 void MyDCMMan::SetLocalPort(int port) {
-  try {
-    CDCMMan::GetMe()->SetLocalPort(port);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetLocalPort: " << port << endl;
-  }
+  cout << "MyDCMMan::SetLocalPort: " << port << endl;
+
+  GetMe(true)->SetLocalPort(port);
 }
 
 void MyDCMMan::SetSRVerifierName(string name) {
-  try {
-    CDCMMan::GetMe()->SetSRVerifierName(name);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetSRVerifierName: " << name << endl;
-  }
+  cout << "MyDCMMan::SetSRVerifierName: " << name << endl;
+
+  GetMe(true)->SetSRVerifierName(name);
 }
 
 void MyDCMMan::SetSRVerifyFlag(bool flag) {
-  try {
-    CDCMMan::GetMe()->SetSRVerifyFlag(flag);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetSRVerifyFlag: " << flag << endl;
-  }
+  cout << "MyDCMMan::SetSRVerifyFlag: " << flag << endl;
+
+  GetMe(true)->SetSRVerifyFlag(flag);
 }
 
 void MyDCMMan::SetSRVerifyOrganization(string organization) {
-  try {
-    CDCMMan::GetMe()->SetSRVerifyOrganization(organization);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::SetSRVerifyOrganization: " << organization << endl;
-  }
+  cout << "MyDCMMan::SetSRVerifyOrganization: " << organization << endl;
+
+  GetMe(true)->SetSRVerifyOrganization(organization);
 }
 
 bool MyDCMMan::StartMPPS(DCMMPPSELEMENT mppsElement) {
-  try {
-    return CDCMMan::GetMe()->StartMPPS(mppsElement);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::StartMPPS" << endl;
+  cout << "MyDCMMan::StartMPPS" << endl;
 
-    return false;
-  }
+  return GetMe(true)->StartMPPS(mppsElement);
 }
 
 bool MyDCMMan::TestLinkDefaultWorklist() {
-  try {
-    return CDCMMan::GetMe()->TestLinkDefaultWorklist();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::TestLinkDefaultWorklist" << endl;
+  cout << "MyDCMMan::TestLinkDefaultWorklist" << endl;
 
-    return false;
-  }
+  return GetMe(true)->TestLinkDefaultWorklist();
 }
 
 bool MyDCMMan::TestLinkMPPS(string device) {
-  try {
-    return CDCMMan::GetMe()->TestLinkMPPS(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::TestLinkMPPS: " << device << endl;
+  cout << "MyDCMMan::TestLinkMPPS: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->TestLinkMPPS(device);
 }
 
 bool MyDCMMan::TestLinkQueryRetrieve(string device) {
-  try {
-    return CDCMMan::GetMe()->TestLinkQueryRetrieve(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::TestLinkQueryRetrieve: " << device << endl;
+  cout << "MyDCMMan::TestLinkQueryRetrieve: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->TestLinkQueryRetrieve(device);
 }
 
 bool MyDCMMan::TestLinkStorage(string device) {
-  try {
-    return CDCMMan::GetMe()->TestLinkStorage(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::TestLinkStorage: " << device << endl;
+  cout << "MyDCMMan::TestLinkStorage: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->TestLinkStorage(device);
 }
 
 bool MyDCMMan::TestLinkStorageCommit(string device) {
-  try {
-    return CDCMMan::GetMe()->TestLinkStorageCommit(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::TestLinkStorageCommit: " << device << endl;
+  cout << "MyDCMMan::TestLinkStorageCommit: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->TestLinkStorageCommit(device);
 }
 
 bool MyDCMMan::TestLinkWorklist(string device) {
-  try {
-    return CDCMMan::GetMe()->TestLinkWorklist(device);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMMan::TestLinkWorklist: " << device << endl;
+  cout << "MyDCMMan::TestLinkWorklist: " << device << endl;
 
-    return false;
-  }
+  return GetMe(true)->TestLinkWorklist(device);
 }

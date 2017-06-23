@@ -1,62 +1,54 @@
 #include "thirdparty/MyDCMRegister.h"
 
+#include "Def.h"
+
 #include <exception>
 #include <iostream>
 
 using namespace std;
 
-CDCMRegister* MyDCMRegister::GetMe() {
-  try {
-    return CDCMRegister::GetMe();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMRegister::GetMe" << endl;
+CDCMRegister* MyDCMRegister::GetMe(bool init) {
+  cout << "MyDCMRegister::GetMe" << endl;
 
-    return NULL;
+  CDCMRegister* reg = CDCMRegister::GetMe();
+
+  if (reg == NULL) {
+    if (init) {
+      CDCMRegister::Create(DCMRES_DIR);
+
+      reg = CDCMRegister::GetMe();
+    }
   }
+
+  return reg;
 }
 
 void MyDCMRegister::Create(string resfiledir) {
-  try {
-    CDCMRegister::Create(resfiledir);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMRegister::Create: " << resfiledir << endl;
-  }
+  cout << "MyDCMRegister::Create: " << resfiledir << endl;
+
+  CDCMRegister::Create(resfiledir);
 }
 
 void MyDCMRegister::Destroy() {
-  try {
-    CDCMRegister::Destroy();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMRegister::Destroy" << endl;
-  }
+  cout << "MyDCMRegister::Destroy" << endl;
+
+  CDCMRegister::Destroy();
 }
 
 bool MyDCMRegister::GenerateLicenseFile(string destFileDir) {
-  try {
-    return CDCMRegister::GetMe()->GenerateLicenseFile(destFileDir);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMRegister::GenerateLicenseFile: " << destFileDir << endl;
+  cout << "MyDCMRegister::GenerateLicenseFile: " << destFileDir << endl;
 
-    return false;
-  }
+  return GetMe(true)->GenerateLicenseFile(destFileDir);
 }
 
 bool MyDCMRegister::CheckAuthorize(string registerKey) {
-  try {
-    return CDCMRegister::GetMe()->CheckAuthorize(registerKey);
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMRegister::CheckAuthorize: " << registerKey << endl;
+  cout << "MyDCMRegister::CheckAuthorize: " << registerKey << endl;
 
-    return false;
-  }
+  return GetMe(true)->CheckAuthorize(registerKey);
 }
 
 bool MyDCMRegister::IsAuthorize() {
-  try {
-    return CDCMRegister::GetMe()->IsAuthorize();
-  } catch (exception e) {
-    cerr << "[ERROR] MyDCMRegister::IsAuthorize" << endl;
+  cout << "MyDCMRegister::IsAuthorize" << endl;
 
-    return false;
-  }
+  return GetMe(true)->IsAuthorize();
 }
