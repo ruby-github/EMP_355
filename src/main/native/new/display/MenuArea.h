@@ -17,7 +17,7 @@ public:
     SYSTEM
   };
 
-  GtkWidget* Create();
+  GtkWidget* Create(const int width, const int height);
 
   EMenuType GetMenuType();
   int GetMenuIndex();

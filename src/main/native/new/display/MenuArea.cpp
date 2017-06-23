@@ -109,13 +109,14 @@ MenuArea::~MenuArea() {
   m_instance = NULL;
 }
 
-GtkWidget* MenuArea::Create() {
+GtkWidget* MenuArea::Create(const int width, const int height) {
   m_vbox = Utils::create_vbox();
+  gtk_widget_set_size_request(GTK_WIDGET(m_vbox), width, height);
 
   m_label_sub = Utils::create_label(_("Sub Menu"));
   m_notebook = Utils::create_notebook();
 
-  gtk_widget_set_size_request(GTK_WIDGET(m_label_sub), -1, TOP_AREA_H);
+  gtk_widget_set_size_request(GTK_WIDGET(m_label_sub), width, TOP_AREA_H);
 
   gtk_box_pack_start(m_vbox, GTK_WIDGET(m_label_sub), FALSE, FALSE, 0);
   gtk_box_pack_start(m_vbox, GTK_WIDGET(m_notebook), TRUE, TRUE, 0);

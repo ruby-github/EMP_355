@@ -13,6 +13,8 @@ CDCMRegister* MyDCMRegister::GetMe(bool init) {
   CDCMRegister* reg = CDCMRegister::GetMe();
 
   if (reg == NULL) {
+    cout << "CDCMRegister::GetMe() is NULL" << endl;
+
     if (init) {
       CDCMRegister::Create(DCMRES_DIR);
 
@@ -24,31 +26,37 @@ CDCMRegister* MyDCMRegister::GetMe(bool init) {
 }
 
 void MyDCMRegister::Create(string resfiledir) {
-  cout << "MyDCMRegister::Create: " << resfiledir << endl;
-
+  cout << "MyDCMRegister::Create start: " << resfiledir << endl;
   CDCMRegister::Create(resfiledir);
+  cout << "MyDCMRegister::Create finish" << endl;
 }
 
 void MyDCMRegister::Destroy() {
-  cout << "MyDCMRegister::Destroy" << endl;
-
+  cout << "MyDCMRegister::Destroy start" << endl;
   CDCMRegister::Destroy();
+  cout << "MyDCMRegister::Destroy finish" << endl;
 }
 
 bool MyDCMRegister::GenerateLicenseFile(string destFileDir) {
-  cout << "MyDCMRegister::GenerateLicenseFile: " << destFileDir << endl;
+  cout << "MyDCMRegister::GenerateLicenseFile start: " << destFileDir << endl;
+  bool ret = GetMe(true)->GenerateLicenseFile(destFileDir);
+  cout << "MyDCMRegister::GenerateLicenseFile finish" << endl;
 
-  return GetMe(true)->GenerateLicenseFile(destFileDir);
+  return ret;
 }
 
 bool MyDCMRegister::CheckAuthorize(string registerKey) {
-  cout << "MyDCMRegister::CheckAuthorize: " << registerKey << endl;
+  cout << "MyDCMRegister::CheckAuthorize start: " << registerKey << endl;
+  bool ret = GetMe(true)->CheckAuthorize(registerKey);
+  cout << "MyDCMRegister::CheckAuthorize finish" << endl;
 
-  return GetMe(true)->CheckAuthorize(registerKey);
+  return ret;
 }
 
 bool MyDCMRegister::IsAuthorize() {
-  cout << "MyDCMRegister::IsAuthorize" << endl;
+  cout << "MyDCMRegister::IsAuthorize start" << endl;
+  bool ret = GetMe(true)->IsAuthorize();
+  cout << "MyDCMRegister::IsAuthorize finish" << endl;
 
-  return GetMe(true)->IsAuthorize();
+  return ret;
 }

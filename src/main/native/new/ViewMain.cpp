@@ -140,8 +140,7 @@ void ViewMain::Create() {
   GtkBox* vbox_top_left = Utils::create_vbox();
 
   // Menu Area
-  GtkWidget* menuArea = MenuArea::GetInstance()->Create();
-  gtk_widget_set_size_request(menuArea, MENU_AREA_W, MENU_AREA_H);
+  GtkWidget* menuArea = MenuArea::GetInstance()->Create(MENU_AREA_W, MENU_AREA_H);
 
   gtk_box_pack_start(hbox_top, GTK_WIDGET(vbox_top_left), TRUE, TRUE, 0);
   gtk_box_pack_start(hbox_top, menuArea, FALSE, FALSE, 0);

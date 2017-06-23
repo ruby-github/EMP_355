@@ -32,7 +32,9 @@ MenuSystem::~MenuSystem() {
 GtkWidget* MenuSystem::Create() {
   m_table = Utils::create_table(2, 1);
 
-  GtkButton* button_general = Utils::create_button(_("General System Setting"));
+  gtk_container_set_border_width(GTK_CONTAINER(m_table), 10);
+
+  GtkButton* button_general = Utils::create_button(_("System Setting"));
   GtkButton* button_biopsy = Utils::create_button(_("Biopsy Setting"));
 
   g_signal_connect(button_general, "clicked", G_CALLBACK(signal_button_clicked_general), this);
