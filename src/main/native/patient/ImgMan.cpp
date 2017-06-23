@@ -19,7 +19,7 @@
 #include "display/HintArea.h"
 #include "sysMan/SysOptions.h"
 #include "display/ImageArea.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "patient/ViewArchive.h"
 #include "ViewMain.h"
 
@@ -172,7 +172,7 @@ unsigned char ImgMan::SaveSnap(unsigned int no, const char* filename, const char
         HintArea::GetInstance()->UpdateHint(hint, 2);
 
         m_imgFileName = (string)imgFileNameTmp;
-        CDCMMan::GetMe()->AddImage(GetImageElement());
+        MyDCMMan::AddImage(GetImageElement());
     }
 
     return 0;

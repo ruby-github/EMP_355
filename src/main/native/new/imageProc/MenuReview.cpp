@@ -29,7 +29,7 @@
 #include "bodymark/UpdateBodyMark.h"
 #include "imageProc/ScanMode.h"
 #include "comment/Arrow.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "sysMan/SysOptions.h"
 #include "patient/VideoMan.h"
 #include "patient/AviEncDecH264.h"
@@ -911,7 +911,7 @@ void MenuReview::DelSelClicked(GtkButton *button) {
         int length = strlen(strName.c_str());
         int index = strName.find_last_of("/");
         string nameTmp = strName.substr(index+1,length-index-1);
-        CDCMMan::GetMe()->DeleteImageBeforeEndStudy(nameTmp);
+        MyDCMMan::DeleteImageBeforeEndStudy(nameTmp);
     }
 
     UpdatePreviewList();

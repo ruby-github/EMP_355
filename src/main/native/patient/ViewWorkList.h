@@ -4,7 +4,7 @@
 #include <gtk/gtk.h>
 #include "utils/FakeXEvent.h"
 #include <vector>
-#include "periDevice/DCMDef.h"
+#include "thirdparty/DCMDef.h"
 #include "AbsCalendarOpr.h"
 #include "patient/PatientInfo.h"
 

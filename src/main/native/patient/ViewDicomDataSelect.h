@@ -6,7 +6,7 @@
 #include <gtk/gtk.h>
 #include <deque>
 #include "utils/FakeXEvent.h"
-#include "periDevice/DCMDef.h"
+#include "thirdparty/DCMDef.h"
 #include "patient/PatientInfo.h"
 #include "imageProc/Image.h"
 

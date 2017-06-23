@@ -3,7 +3,7 @@
 #include <gdk/gdkkeysyms.h>
 #include "utils/MessageDialog.h"
 
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "probe/ExamItem.h"
 #include "sysMan/SysDicomSetting.h"
 #include "sysMan/ViewSystem.h"
@@ -249,7 +249,7 @@ void DicomServiceSetting::ButtonClickedAddStorage(GtkButton* button) {
     exist = gtk_tree_model_iter_next(model, &iter);
   }
 
-  if(!CDCMMan::GetMe()->AddStorageService(device, serviceName, ae, atoi(port.c_str()))) {
+  if(!MyDCMMan::AddStorageService(device, serviceName, ae, atoi(port.c_str()))) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("Add failed, device has been existed"), NULL);
 
@@ -276,7 +276,7 @@ void DicomServiceSetting::ButtonClickedDeleteStorage(GtkButton* button) {
 
   if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
-    CDCMMan::GetMe()->DeleteStorageService(device);
+    MyDCMMan::DeleteStorageService(device);
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
   } else {
@@ -312,7 +312,7 @@ void DicomServiceSetting::ButtonClickedDefaultStorage(GtkButton* button) {
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_DEFAULT, _("Yes"), -1);
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
 
-    CDCMMan::GetMe()->SetDefaultStorageService(device);
+    MyDCMMan::SetDefaultStorageService(device);
   } else {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("No device is selected!"), NULL);
@@ -418,7 +418,7 @@ void DicomServiceSetting::ButtonClickedAddWorklist(GtkButton* button) {
     exist = gtk_tree_model_iter_next(model, &iter);
   }
 
-  if(!CDCMMan::GetMe()->AddWorklistService(device, serviceName, ae, atoi(port.c_str()))) {
+  if(!MyDCMMan::AddWorklistService(device, serviceName, ae, atoi(port.c_str()))) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("Add failed, device has been existed"), NULL);
 
@@ -452,7 +452,7 @@ void DicomServiceSetting::ButtonClickedDeleteWorklist(GtkButton* button) {
 
   if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
-    CDCMMan::GetMe()->DeleteWorklistService(device);
+    MyDCMMan::DeleteWorklistService(device);
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
   } else {
@@ -481,7 +481,7 @@ void DicomServiceSetting::ButtonClickedDefaultWorklist(GtkButton* button) {
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_DEFAULT, _("Yes"), -1);
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
 
-    CDCMMan::GetMe()->SetDefaultWorklistService(device);
+    MyDCMMan::SetDefaultWorklistService(device);
   } else {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("No device is selected!"), NULL);
@@ -510,7 +510,7 @@ void DicomServiceSetting::ButtonClickedConnectWorklist(GtkButton* button) {
 }
 
 void DicomServiceSetting::CheckButtonToggledAutoWorklist(GtkToggleButton* togglebutton) {
-  string device = CDCMMan::GetMe()->GetDefaultWorklistServiceDevice();
+  string device = MyDCMMan::GetDefaultWorklistServiceDevice();
 
   if (device.empty()) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
@@ -581,7 +581,7 @@ void DicomServiceSetting::ButtonClickedAddMpps(GtkButton* button) {
     exist = gtk_tree_model_iter_next(model, &iter);
   }
 
-  if(!CDCMMan::GetMe()->AddMPPSService(device, serviceName, ae, atoi(port.c_str()))) {
+  if(!MyDCMMan::AddMPPSService(device, serviceName, ae, atoi(port.c_str()))) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("Add failed, device has been existed"), NULL);
 
@@ -615,7 +615,7 @@ void DicomServiceSetting::ButtonClickedDeleteMpps(GtkButton* button) {
 
   if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
-    CDCMMan::GetMe()->DeleteMPPSService(device);
+    MyDCMMan::DeleteMPPSService(device);
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
   } else {
@@ -644,7 +644,7 @@ void DicomServiceSetting::ButtonClickedDefaultMpps(GtkButton* button) {
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_DEFAULT, _("Yes"), -1);
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
 
-    CDCMMan::GetMe()->SetDefaultMPPSService(device);
+    MyDCMMan::SetDefaultMPPSService(device);
   } else {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("No device is selected!"), NULL);
@@ -673,7 +673,7 @@ void DicomServiceSetting::ButtonClickedConnectMpps(GtkButton* button) {
 }
 
 void DicomServiceSetting::CheckButtonToggledSendMpps(GtkToggleButton* togglebutton) {
-  string device = CDCMMan::GetMe()->GetDefaultMPPSServiceDevice();
+  string device = MyDCMMan::GetDefaultMPPSServiceDevice();
 
   if (device.empty()) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
@@ -744,7 +744,7 @@ void DicomServiceSetting::ButtonClickedAddStorageCommitment(GtkButton* button) {
     exist = gtk_tree_model_iter_next(model, &iter);
   }
 
-  if(!CDCMMan::GetMe()->AddStorageCommitService(device, serviceName, ae, atoi(port.c_str()))) {
+  if(!MyDCMMan::AddStorageCommitService(device, serviceName, ae, atoi(port.c_str()))) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("Add failed, device has been existed"), NULL);
 
@@ -778,7 +778,7 @@ void DicomServiceSetting::ButtonClickedDeleteStorageCommitment(GtkButton* button
 
   if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
-    CDCMMan::GetMe()->DeleteStorageCommitService(device);
+    MyDCMMan::DeleteStorageCommitService(device);
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
   } else {
@@ -807,7 +807,7 @@ void DicomServiceSetting::ButtonClickedDefaultStorageCommitment(GtkButton* butto
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_DEFAULT, _("Yes"), -1);
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
 
-    CDCMMan::GetMe()->SetDefaultStorageCommitService(device);
+    MyDCMMan::SetDefaultStorageCommitService(device);
   } else {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("No device is selected!"), NULL);
@@ -836,7 +836,7 @@ void DicomServiceSetting::ButtonClickedConnectStorageCommitment(GtkButton* butto
 }
 
 void DicomServiceSetting::CheckButtonToggledSendStorageCommitment(GtkToggleButton* togglebutton) {
-  string device = CDCMMan::GetMe()->GetDefaultStorageCommitServiceDevice();
+  string device = MyDCMMan::GetDefaultStorageCommitServiceDevice();
 
   if (device.empty()) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
@@ -911,7 +911,7 @@ void DicomServiceSetting::ButtonClickedAddQueryRetrieve(GtkButton* button) {
     exist = gtk_tree_model_iter_next(model, &iter);
   }
 
-  if(!CDCMMan::GetMe()->AddQueryRetrieveService(device, serviceName, ae, atoi(port.c_str()))) {
+  if(!MyDCMMan::AddQueryRetrieveService(device, serviceName, ae, atoi(port.c_str()))) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("Add failed, device has been existed"), NULL);
 
@@ -945,7 +945,7 @@ void DicomServiceSetting::ButtonClickedDeleteQueryRetrieve(GtkButton* button) {
 
   if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
-    CDCMMan::GetMe()->DeleteQueryRetrieveService(device);
+    MyDCMMan::DeleteQueryRetrieveService(device);
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
   } else {
@@ -974,7 +974,7 @@ void DicomServiceSetting::ButtonClickedDefaultQueryRetrieve(GtkButton* button) {
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, COL_DEFAULT, _("Yes"), -1);
     gtk_tree_model_get(model, &iter, COL_STORAGE_DEVICE, &device, -1);
 
-    CDCMMan::GetMe()->SetDefaultQueryRetrieveService(device);
+    MyDCMMan::SetDefaultQueryRetrieveService(device);
   } else {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("No device is selected!"), NULL);
@@ -1007,7 +1007,7 @@ void DicomServiceSetting::ButtonClickedConnectQueryRetrieve(GtkButton* button) {
 void DicomServiceSetting::TimeoutConnectStorage() {
   string info;
 
-  if(CDCMMan::GetMe()->TestLinkStorage(m_selected_device)) {
+  if(MyDCMMan::TestLinkStorage(m_selected_device)) {
     PRINTF("Dicom test link OK!!\n");
 
     info = _("Connection test successfully!");
@@ -1024,7 +1024,7 @@ void DicomServiceSetting::TimeoutConnectStorage() {
 void DicomServiceSetting::TimeoutConnectWorklist() {
   string info;
 
-  if(CDCMMan::GetMe()->TestLinkWorklist(m_selected_device)) {
+  if(MyDCMMan::TestLinkWorklist(m_selected_device)) {
     PRINTF("Dicom test link OK!!\n");
 
     info = _("Connection test successfully!");
@@ -1041,7 +1041,7 @@ void DicomServiceSetting::TimeoutConnectWorklist() {
 void DicomServiceSetting::TimeoutConnectMpps() {
   string info;
 
-  if(CDCMMan::GetMe()->TestLinkMPPS(m_selected_device)) {
+  if(MyDCMMan::TestLinkMPPS(m_selected_device)) {
     PRINTF("Dicom test link OK!!\n");
 
     info = _("Connection test successfully!");
@@ -1058,7 +1058,7 @@ void DicomServiceSetting::TimeoutConnectMpps() {
 void DicomServiceSetting::TimeoutConnectStorageCommitment() {
   string info;
 
-  if(CDCMMan::GetMe()->TestLinkStorageCommit(m_selected_device)) {
+  if(MyDCMMan::TestLinkStorageCommit(m_selected_device)) {
     PRINTF("Dicom test link OK!!\n");
 
     info = _("Connection test successfully!");
@@ -1075,7 +1075,7 @@ void DicomServiceSetting::TimeoutConnectStorageCommitment() {
 void DicomServiceSetting::TimeoutConnectQueryRetrieve() {
   string info;
 
-  if(CDCMMan::GetMe()->TestLinkQueryRetrieve(m_selected_device)) {
+  if(MyDCMMan::TestLinkQueryRetrieve(m_selected_device)) {
     PRINTF("Dicom test link OK!!\n");
 
     info = _("Connection test successfully!");
@@ -1786,7 +1786,7 @@ void DicomServiceSetting::InitStorageSetting() {
     gtk_combo_box_text_remove(m_combobox_storage_device, path_num);
   }
 
-  vector<string> vec = CDCMMan::GetMe()->GetAllDevice();
+  vector<string> vec = MyDCMMan::GetAllDevice();
 
   for(int i = 0; i < vec.size(); i++) {
     gtk_combo_box_text_append_text(m_combobox_storage_device, vec[i].c_str());
@@ -1822,7 +1822,7 @@ void DicomServiceSetting::InitStorageSetting() {
       break;
   }
 
-  CDCMMan::GetMe()->GetAllStorageService(signal_callback_get_service_attribute, this);
+  MyDCMMan::GetAllStorageService(signal_callback_get_service_attribute, this);
 }
 
 void DicomServiceSetting::InitWorklistSetting() {
@@ -1839,7 +1839,7 @@ void DicomServiceSetting::InitWorklistSetting() {
     gtk_combo_box_text_remove(m_combobox_worklist_device, path_num);
   }
 
-  vector<string> vec = CDCMMan::GetMe()->GetAllDevice();
+  vector<string> vec = MyDCMMan::GetAllDevice();
 
   for(int i = 0; i< vec.size(); i++) {
     gtk_combo_box_text_append_text(m_combobox_worklist_device, vec[i].c_str());
@@ -1848,7 +1848,7 @@ void DicomServiceSetting::InitWorklistSetting() {
   SysDicomSetting sysDicomSetting;
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_worklist_auto), sysDicomSetting.GetAutoQuery());
 
-  CDCMMan::GetMe()->GetAllWorklistService(signal_callback_get_service_attribute, this);
+  MyDCMMan::GetAllWorklistService(signal_callback_get_service_attribute, this);
 }
 
 void DicomServiceSetting::InitMppsSetting() {
@@ -1865,7 +1865,7 @@ void DicomServiceSetting::InitMppsSetting() {
     gtk_combo_box_text_remove(m_combobox_mpps_device, path_num);
   }
 
-  vector<string> vec = CDCMMan::GetMe()->GetAllDevice();
+  vector<string> vec = MyDCMMan::GetAllDevice();
 
   for(int i = 0; i< vec.size(); i++) {
     gtk_combo_box_text_append_text(m_combobox_mpps_device, vec[i].c_str());
@@ -1874,7 +1874,7 @@ void DicomServiceSetting::InitMppsSetting() {
   SysDicomSetting sysDicomSetting;
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_mpps_send), sysDicomSetting.GetMPPS());
 
-  CDCMMan::GetMe()->GetAllMPPSService(signal_callback_get_service_attribute, this);
+  MyDCMMan::GetAllMPPSService(signal_callback_get_service_attribute, this);
 }
 
 void DicomServiceSetting::InitStorageCommitmentSetting() {
@@ -1891,7 +1891,7 @@ void DicomServiceSetting::InitStorageCommitmentSetting() {
     gtk_combo_box_text_remove(m_combobox_storage_commitment_device, path_num);
   }
 
-  vector<string> vec = CDCMMan::GetMe()->GetAllDevice();
+  vector<string> vec = MyDCMMan::GetAllDevice();
 
   for(int i = 0; i< vec.size(); i++) {
     gtk_combo_box_text_append_text(m_combobox_mpps_device, vec[i].c_str());
@@ -1900,7 +1900,7 @@ void DicomServiceSetting::InitStorageCommitmentSetting() {
   SysDicomSetting sysDicomSetting;
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_checkbutton_storage_commitment_send), sysDicomSetting.GetStorageCommitment());
 
-  CDCMMan::GetMe()->GetAllStorageCommitService(signal_callback_get_service_attribute, this);
+  MyDCMMan::GetAllStorageCommitService(signal_callback_get_service_attribute, this);
 }
 
 void DicomServiceSetting::InitQueryRetrieveSetting() {
@@ -1917,13 +1917,13 @@ void DicomServiceSetting::InitQueryRetrieveSetting() {
     gtk_combo_box_text_remove(m_combobox_query_retrieve_device, path_num);
   }
 
-  vector<string> vec = CDCMMan::GetMe()->GetAllDevice();
+  vector<string> vec = MyDCMMan::GetAllDevice();
 
   for(int i = 0; i< vec.size(); i++) {
     gtk_combo_box_text_append_text(m_combobox_query_retrieve_device, vec[i].c_str());
   }
 
-  CDCMMan::GetMe()->GetAllQueryRetrieveService(signal_callback_get_service_attribute, this);
+  MyDCMMan::GetAllQueryRetrieveService(signal_callback_get_service_attribute, this);
 }
 
 GtkTreeView* DicomServiceSetting::CreateServiceTreeview() {

@@ -6,7 +6,7 @@
 #include "utils/MessageDialog.h"
 
 #include "keyboard/KeyDef.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "periDevice/NetworkMan.h"
 #include "sysMan/SysDicomSetting.h"
 
@@ -141,10 +141,10 @@ void DicomLocalSetting::InitLocalSetting() {
     string local_gateway = sysDicomSetting->GetLocalGateWay();
     gtk_entry_set_text(GTK_ENTRY(m_entry_network_gateway), local_gateway.c_str());
 
-    string host_ae = CDCMMan::GetMe()->GetLocalAE();
+    string host_ae = MyDCMMan::GetLocalAE();
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_ae), host_ae.c_str());
 
-    int host_port = CDCMMan::GetMe()->GetLocalPort();
+    int host_port = MyDCMMan::GetLocalPort();
     char tmp[256] = {0};
     sprintf(tmp, "%d", host_port);
     gtk_entry_set_text(GTK_ENTRY(m_entry_host_port), tmp);
@@ -180,8 +180,8 @@ void DicomLocalSetting::ButtonClickedSetting(GtkButton* button) {
 
   CNetworkMan localIP;
   if(localIP.SetLocalIP(local_ip, local_gateway, local_mask)) {
-    CDCMMan::GetMe()->SetLocalAE(host_ae);
-    CDCMMan::GetMe()->SetLocalPort(atoi(host_port.c_str()));
+    MyDCMMan::SetLocalAE(host_ae);
+    MyDCMMan::SetLocalPort(atoi(host_port.c_str()));
     info = _("Sucess to set the local network!");
 
     SysDicomSetting sysDicomSetting;

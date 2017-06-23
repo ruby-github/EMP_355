@@ -17,7 +17,7 @@
 #include "periDevice/ManRegister.h"
 #include "sysMan/ViewSystem.h"
 #include "sysMan/SysNoteSetting.h"
-#include "periDevice/DCMRegister.h"
+#include "thirdparty/MyDCMRegister.h"
 
 #include "utils/Utils.h"
 #include "utils/FakeXUtils.h"
@@ -429,7 +429,7 @@ using namespace std;
 
 GtkWidget* create_button_icon(GtkWidget *label, GtkWidget *icon_image) {
     int size =0;
-    //if(CDCMRegister::GetMe()->IsAuthorize())
+    //if(MyDCMRegister::IsAuthorize())
         size = 20;
     //else
     //    size = 0;

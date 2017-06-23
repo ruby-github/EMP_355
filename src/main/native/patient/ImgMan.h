@@ -6,8 +6,7 @@
 #include <list>
 #include "patient/FileMan.h"
 #include "imageProc/ScanMode.h"
-#include "periDevice/DCMMan.h"
-
+#include "thirdparty/MyDCMMan.h"
 
 using std::list;
 

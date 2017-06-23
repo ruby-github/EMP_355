@@ -30,7 +30,7 @@
 #include "patient/PatientInfo.h"
 #include "patient/ViewNewPat.h"
 #include "patient/ViewWorkList.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "periDevice/PeripheralMan.h"
 #include "probe/MenuBiopsy.h"
 #include "sysMan/SysDicomSetting.h"
@@ -167,7 +167,7 @@ int EndExam(gpointer data) {
 
     setlocale(LC_NUMERIC, "en_US.UTF-8");
 
-    if(CDCMMan::GetMe()->EndStudy()) {
+    if(MyDCMMan::EndStudy()) {
       SysDicomSetting sysDicomSetting;
 
       if(sysDicomSetting.GetMPPS()) {
@@ -183,7 +183,7 @@ int EndExam(gpointer data) {
             ChangeTimeFormatToString(Hour, Minute, Second, hour, min, sec);
             studyEndTime = hour + min + sec;
 
-            CDCMMan::GetMe()->EndMPPS(studyEndDate,studyEndTime);
+            MyDCMMan::EndMPPS(studyEndDate,studyEndTime);
             ViewNewPat::GetInstance()->SetMPPSFlag(false);
           }
         }

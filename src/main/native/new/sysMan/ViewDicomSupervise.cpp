@@ -6,7 +6,7 @@
 #include "keyboard/KeyDef.h"
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/MultiFuncFactory.h"
-#include "periDevice/DCMRegister.h"
+#include "thirdparty/MyDCMRegister.h"
 #include "periDevice/PeripheralMan.h"
 
 ViewDicomSupervise* ViewDicomSupervise::m_instance = NULL;
@@ -123,11 +123,11 @@ void ViewDicomSupervise::ButtonClickedExport(GtkButton* button) {
   }
 
   string destFileDir = UDISK_PATH;
-  if(CDCMRegister::GetMe() == NULL) {
+  if(MyDCMRegister::GetMe() == NULL) {
     return;
   }
 
-  bool value = CDCMRegister::GetMe()->GenerateLicenseFile(destFileDir);
+  bool value = MyDCMRegister::GenerateLicenseFile(destFileDir);
   string info;
 
   if(value) {
@@ -144,11 +144,11 @@ void ViewDicomSupervise::ButtonClickedExport(GtkButton* button) {
 void ViewDicomSupervise::ButtonClickedRegister(GtkButton* button) {
   string registerKey = gtk_entry_get_text(m_entry_key);
 
-  if(CDCMRegister::GetMe() == NULL) {
+  if(MyDCMRegister::GetMe() == NULL) {
     return;
   }
 
-  bool value = CDCMRegister::GetMe()->CheckAuthorize(registerKey);
+  bool value = MyDCMRegister::CheckAuthorize(registerKey);
   string info;
 
   if(value) {

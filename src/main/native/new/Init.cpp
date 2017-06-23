@@ -10,8 +10,8 @@
 #include "measure/MeasureMan.h"
 #include "patient/Database.h"
 #include "patient/PatientInfo.h"
-#include "periDevice/DCMMan.h"
-#include "periDevice/DCMRegister.h"
+#include "thirdparty/MyDCMMan.h"
+#include "thirdparty/MyDCMRegister.h"
 #include "periDevice/IoCtrl.h"
 #include "periDevice/PeripheralMan.h"
 #include "probe/ExamItem.h"
@@ -162,8 +162,8 @@ void Init::ParaInit() {
   ScreenSaver::GetInstance()->SetPeriod(sgs.GetScreenProtect() * 60);
 
   // creat dicom manual object
-  CDCMMan::Create(DCMDB_DIR);
-  CDCMRegister::Create(DCMRES_DIR);
+  MyDCMMan::Create(DCMDB_DIR);
+  MyDCMRegister::Create(DCMRES_DIR);
 }
 
 void Init::ProbeCheck() {
@@ -243,8 +243,8 @@ void Init::CreatMainWindow() {
 
 void Init::ExitSystem() {
   // destory dicom manual object
-  CDCMMan::Destroy();
-  CDCMRegister::Destroy();
+  MyDCMMan::Destroy();
+  MyDCMRegister::Destroy();
 
   // remove device info
   PeripheralMan::GetInstance()->RemoveWatch();

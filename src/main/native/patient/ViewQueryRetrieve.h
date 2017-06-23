@@ -6,7 +6,7 @@
 #include "utils/FakeXEvent.h"
 #include "AbsCalendarOpr.h"
 #include <vector>
-#include "periDevice/DCMDef.h"
+#include "thirdparty/DCMDef.h"
 #include "display/ImageArea.h"
 #include "imageProc/Image.h"
 #include "patient/PatientInfo.h"

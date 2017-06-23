@@ -3,7 +3,7 @@
 
 #include "AbsCalendarOpr.h"
 #include "patient/PatientInfo.h"
-#include "periDevice/DCMDef.h"
+#include "thirdparty/DCMDef.h"
 #include "utils/FakeXEvent.h"
 #include "utils/Utils.h"
 

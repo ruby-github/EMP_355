@@ -3,7 +3,7 @@
 #include "utils/MessageDialog.h"
 
 #include "Def.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 
 enum {
   COL_DEVICE,
@@ -115,7 +115,7 @@ void DicomServerSetting::InitServerSetting() {
 
   GtkTreeModel* model = gtk_tree_view_get_model(GTK_TREE_VIEW(m_treeview));
   gtk_list_store_clear(GTK_LIST_STORE(model));
-  CDCMMan::GetMe()->GetAllServer(signal_callback_attribute, this);
+  MyDCMMan::GetAllServer(signal_callback_attribute, this);
 }
 
 // ---------------------------------------------------------
@@ -171,7 +171,7 @@ void DicomServerSetting::ButtonClickedAdd(GtkButton* button) {
     }
   }
 
-  if(!CDCMMan::GetMe()->AddServer(device,ip)) {
+  if(!MyDCMMan::AddServer(device,ip)) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(m_parent),
       MessageDialog::DLG_INFO, _("Add failed,device or IP has been existed"), NULL);
 
@@ -213,7 +213,7 @@ void DicomServerSetting::ButtonClickedDelete(GtkButton* button) {
 
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
 
-    printf("-----------Delete:%d %s\n",CDCMMan::GetMe()->DeleteServer(device),device);
+    printf("-----------Delete:%d %s\n",MyDCMMan::DeleteServer(device),device);
   }
 }
 
@@ -221,7 +221,7 @@ void DicomServerSetting::PingTimeout() {
   const char* ip = gtk_entry_get_text(GTK_ENTRY(m_entry_ip));
   char strHint[256] = {0};
 
-  if (CDCMMan::GetMe()->Ping((char*)ip)) {
+  if (MyDCMMan::Ping((char*)ip)) {
     sprintf(strHint, "%s %s\n", _("Success to ping ip"), ip);
   } else {
     sprintf(strHint, "%s %s\n", _("Failed to ping ip"), ip);

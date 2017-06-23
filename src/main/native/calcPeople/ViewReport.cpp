@@ -26,7 +26,7 @@
 #include "probe/ProbeSelect.h"
 #include "sysMan/ViewSystem.h"
 #include "calcPeople/MenuCalcNew.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 
 #include "patient/CreateBitmap.h"
 #include "keyboard/MultiFuncFactory.h"
@@ -832,16 +832,16 @@ string ViewReport::GetHospitalName() {
 
 void ViewReport::BtnAddOKClicked(GtkButton *button) {
     m_vecNameSel = m_vecNameTmp;
-    CDCMMan::GetMe()->EditSR(GetSRElement());
-    CDCMMan::GetMe()->SetSRVerifyFlag(true);
+    MyDCMMan::EditSR(GetSRElement());
+    MyDCMMan::SetSRVerifyFlag(true);
     string name = GetExamDoctor();
     if(name =="")
         name = "VerifierName";
-    CDCMMan::GetMe()->SetSRVerifierName(name);
+    MyDCMMan::SetSRVerifierName(name);
     string organization = GetHospitalName();
     if(organization =="")
         organization = "VerifyOrganization";
-    CDCMMan::GetMe()->SetSRVerifyOrganization(organization);
+    MyDCMMan::SetSRVerifyOrganization(organization);
 
     HideImageView();
 }
@@ -981,16 +981,16 @@ void ViewReport::BtnEditOKClicked(GtkButton *button) {
     text = gtk_text_buffer_get_text(m_buffer_comments, &iter_start, &iter_end, FALSE);
     m_strReport[1] = text;
 
-    CDCMMan::GetMe()->EditSR(GetSRElement());
-    CDCMMan::GetMe()->SetSRVerifyFlag(true);
+    MyDCMMan::EditSR(GetSRElement());
+    MyDCMMan::SetSRVerifyFlag(true);
     string name = GetExamDoctor();
     if(name =="")
         name = "VerifierName";
-    CDCMMan::GetMe()->SetSRVerifierName(name);
+    MyDCMMan::SetSRVerifierName(name);
     string organization = GetHospitalName();
     if(organization =="")
         organization = "VerifyOrganization";
-    CDCMMan::GetMe()->SetSRVerifyOrganization(organization);
+    MyDCMMan::SetSRVerifyOrganization(organization);
 
     HideEditView();
 }

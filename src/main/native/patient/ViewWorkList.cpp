@@ -3,7 +3,7 @@
 #include "display/gui_func.h"
 #include "keyboard/KeyValueOpr.h"
 #include "ViewMain.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "sysMan/SysGeneralSetting.h"
 #include "sysMan/SysDicomSetting.h"
 #include "display/ViewCalendar.h"
@@ -539,7 +539,7 @@ void ViewWorkList::LoadPatientInfo() {
     snprintf(name, 256, "*%s*", patientName);
     name[255] = '\0';
 
-    m_query = CDCMMan::GetMe()->QueryWorklist(patientID, name,accessionNumber,requestedProcedureID, startDate, endDate);
+    m_query = MyDCMMan::QueryWorklist(patientID, name,accessionNumber,requestedProcedureID, startDate, endDate);
 }
 #ifndef VET
 int StartExam(gpointer data) {
@@ -571,7 +571,7 @@ int StartExam(gpointer data) {
         }
 #endif
         setlocale(LC_NUMERIC, "en_US.UTF-8");
-        if(CDCMMan::GetMe()->EndStudy()) {
+        if(MyDCMMan::EndStudy()) {
             SysDicomSetting sysDicomSetting;
             if(sysDicomSetting.GetMPPS()) {
                 if(ViewNewPat::GetInstance()->GetMPPSFlag()) {
@@ -586,7 +586,7 @@ int StartExam(gpointer data) {
                     ChangeTimeFormatToString(Hour, Minute, Second, hour, min, sec);
                     studyEndTime = hour + min + sec;
 
-                    CDCMMan::GetMe()->EndMPPS(studyEndDate,studyEndTime);
+                    MyDCMMan::EndMPPS(studyEndDate,studyEndTime);
                     ViewNewPat::GetInstance()->SetMPPSFlag(false);
                 }
             }
@@ -707,7 +707,7 @@ void ViewWorkList::ButtonNewExamClicked(GtkButton *button) {
 }
 #endif
 void ViewWorkList::ImportPatInfo() {
-    if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[selectedIndex])) {
+    if(MyDCMMan::IsExistedWorklistStudy(m_query[selectedIndex])) {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                                           MessageDialog::DLG_INFO,
                                           _("The exam record  has exsited, please select other record again!"),
@@ -841,16 +841,16 @@ void ViewWorkList::GetSelectedPatInfo() {
     Database db;
     db.GetExamIDNext(info.e.examNum);
 
-    CDCMMan::GetMe()->EditStudyInfo(EditStudyInfo(info));
+    MyDCMMan::EditStudyInfo(EditStudyInfo(info));
     //MPPS
     if(!g_patientInfo.GetExist()) {
         SysDicomSetting sysDicomSetting;
         if(sysDicomSetting.GetMPPS()) {
-            if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
+            if(MyDCMMan::GetDefaultMPPSServiceDevice()=="") {
                 MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window), MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
                 return ;
             }
-            CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
+            MyDCMMan::StartMPPS(GetMPPSElement(info));
         }
     }
 
@@ -920,7 +920,7 @@ void ViewWorkList::ButtonTransferClicked(GtkButton *button) {
         int path_num = atoi(path_string);
         selectedIndex = path_num;
         //printf("----%s %s %s %s\n",m_query[path_num].wlPatientID.c_str(),m_query[path_num].wlPatientName.c_str(),m_query[path_num].wlPatientBirthDate.c_str(),m_query[path_num].wlPatientSex.c_str());
-        if(CDCMMan::GetMe()->IsExistedWorklistStudy(m_query[path_num])) {
+        if(MyDCMMan::IsExistedWorklistStudy(m_query[path_num])) {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(m_window),
                                               MessageDialog::DLG_INFO,
                                               _("The exam record  has exsited, please select other record again!"),
@@ -1072,7 +1072,7 @@ void ViewWorkList::AutoQuery() {
 
     if(m_autoQueryFlag) {
 #if 0
-        if(!(CDCMMan::GetMe()->TestLinkDefaultWorklist())) {
+        if(!(MyDCMMan::TestLinkDefaultWorklist())) {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Test Link is failed"), NULL);
             return;
         }

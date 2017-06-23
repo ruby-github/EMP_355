@@ -10,8 +10,8 @@
 #include "patient/Database.h"
 #include "patient/ViewPatSearch.h"
 #include "patient/ViewWorkList.h"
-#include "periDevice/DCMMan.h"
-#include "periDevice/DCMRegister.h"
+#include "thirdparty/MyDCMMan.h"
+#include "thirdparty/MyDCMRegister.h"
 #include "sysMan/SysCalculateSetting.h"
 #include "sysMan/SysDicomSetting.h"
 #include "sysMan/SysGeneralSetting.h"
@@ -82,7 +82,7 @@ void ViewNewPat::CreateWindow() {
   g_signal_connect(button_new_patient, "clicked", G_CALLBACK(signal_button_clicked_new_patient), this);
   g_signal_connect(button_new_exam, "clicked", G_CALLBACK(signal_button_clicked_new_exam), this);
 
-  if (CDCMRegister::GetMe()->IsAuthorize()) {
+  if (MyDCMRegister::IsAuthorize()) {
     GtkButton* button_worklist = Utils::add_dialog_button(m_dialog, _("Worklist"), GTK_RESPONSE_NONE, GTK_STOCK_INFO);
     g_signal_connect(button_worklist, "clicked", G_CALLBACK(signal_button_clicked_worklist), this);
   }
@@ -415,7 +415,7 @@ void ViewNewPat::UpdateStudyInfo() {
   string examNum;
   db.GetExamIDCurrent(examNum);
   m_studyInfo.stStudyNo = atoi(examNum.c_str());
-  CDCMMan::GetMe()->EditStudyInfo(m_studyInfo);
+  MyDCMMan::EditStudyInfo(m_studyInfo);
 }
 
 void ViewNewPat::ClearData() {
@@ -665,20 +665,20 @@ void ViewNewPat::ButtonClickedEndExam(GtkButton* button) {
 
   g_patientInfo.SetInfo(info);
 
-  if (CDCMRegister::GetMe()->IsAuthorize()) {
+  if (MyDCMRegister::IsAuthorize()) {
     SysDicomSetting sysDicomSetting;
 
     if(!g_patientInfo.GetExist()) {
       if(sysDicomSetting.GetMPPS()) {
         if(!m_flagMPPS) {
-          if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
+          if(MyDCMMan::GetDefaultMPPSServiceDevice()=="") {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
               MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
 
             return ;
           }
 
-          CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
+          MyDCMMan::StartMPPS(GetMPPSElement(info));
           m_flagMPPS = true;
         }
       }
@@ -723,7 +723,7 @@ void ViewNewPat::ButtonClickedNewExam(GtkButton* button) {
 }
 
 void ViewNewPat::ButtonClickedWorkList(GtkButton* button) {
-  string device = CDCMMan::GetMe()->GetDefaultWorklistServiceDevice();
+  string device = MyDCMMan::GetDefaultWorklistServiceDevice();
 
   if (device.empty()) {
     MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewNewPat::GetInstance()->GetWindow()),
@@ -748,7 +748,7 @@ void ViewNewPat::ButtonClickedOk(GtkButton* button) {
 
   db.GetExamIDNext(info.e.examNum);
 
-  if(CDCMRegister::GetMe()->IsAuthorize()) {
+  if(MyDCMRegister::IsAuthorize()) {
     EditStudyInfo(info);
 
     SysDicomSetting sysDicomSetting;
@@ -756,13 +756,13 @@ void ViewNewPat::ButtonClickedOk(GtkButton* button) {
     if(!g_patientInfo.GetExist()) {
       if(sysDicomSetting.GetMPPS()) {
         if(!m_flagMPPS) {
-          if(CDCMMan::GetMe()->GetDefaultMPPSServiceDevice()=="") {
+          if(MyDCMMan::GetDefaultMPPSServiceDevice()=="") {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(m_dialog),
               MessageDialog::DLG_ERROR, _("Please Set the default MPPS service in system setting"), NULL);
             return;
           }
 
-          CDCMMan::GetMe()->StartMPPS(GetMPPSElement(info));
+          MyDCMMan::StartMPPS(GetMPPSElement(info));
           m_flagMPPS = true;
         }
       }
@@ -2324,5 +2324,5 @@ void ViewNewPat::EditStudyInfo(PatientInfo::Info& info) {
   m_studyInfo.stMechineSN ="";
   m_studyInfo.stStudyNo = atoi(info.e.examNum.c_str());
 
-  CDCMMan::GetMe()->EditStudyInfo(m_studyInfo);
+  MyDCMMan::EditStudyInfo(m_studyInfo);
 }

@@ -26,7 +26,7 @@
 #include "patient/ImgMan.h"
 #include "patient/VideoMan.h"
 #include "patient/ViewNewPat.h"
-#include "periDevice/DCMRegister.h"
+#include "thirdparty/MyDCMRegister.h"
 #include "periDevice/PeripheralMan.h"
 #include "periDevice/Printer.h"
 #include "periDevice/ViewPrinterAdd.h"
@@ -887,7 +887,7 @@ void ViewSystem::CreateWindow() {
   gtk_notebook_append_page(m_notebook, create_set_report(), GTK_WIDGET(Utils::create_label(_("Report"))));
 
   // DICOM
-  if (CDCMRegister::GetMe()->IsAuthorize()) {
+  if (MyDCMRegister::IsAuthorize()) {
     gtk_notebook_append_page(m_notebook, create_note_dicom(), GTK_WIDGET(Utils::create_label(_("DICOM"))));
   }
 
@@ -7448,7 +7448,7 @@ void ViewSystem::init_info_setting() {
 }
 
 
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
@@ -9883,9 +9883,9 @@ void ViewSystem::BtnExportClicked(GtkButton *button) {
     string destFileDir = UDISK_PATH;
     bool value(false);
     if(row == 0) {
-        if(CDCMRegister::GetMe()==NULL)
+        if(MyDCMRegister::GetMe() == NULL)
             return;
-        value = CDCMRegister::GetMe()->GenerateLicenseFile(destFileDir);
+        value = MyDCMRegister::GenerateLicenseFile(destFileDir);
     } else {
         if(CManRegister::GetInstance()==NULL)
             return;
@@ -9922,7 +9922,7 @@ void ViewSystem::BtnRegisterClicked(GtkButton *button) {
 
     bool value(false);
     if(row == 0) {
-        value =CDCMRegister::GetMe()->CheckAuthorize(registerKey);
+        value =MyDCMRegister::CheckAuthorize(registerKey);
         CManRegister::GetInstance()->CheckAuthorize(registerKey, row);
     } else
         value =CManRegister::GetInstance()->CheckAuthorize(registerKey, row);

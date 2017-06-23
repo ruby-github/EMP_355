@@ -14,7 +14,7 @@
 #include <time.h>
 #include <sys/vfs.h>
 #include <errno.h>
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "keyboard/KeyValueOpr.h"
 #include "patient/ViewArchive.h"
 #include "patient/ImgMan.h"
@@ -35,7 +35,7 @@
 #include "patient/ViewQueryRetrieve.h"
 #include "patient/ViewDicomDataSelect.h"
 #include "sysMan/SysGeneralSetting.h"
-#include "periDevice/DCMRegister.h"
+#include "thirdparty/MyDCMRegister.h"
 #include "imageProc/Replay.h"
 
 #include "utils/Utils.h"
@@ -739,7 +739,7 @@ void ViewArchive::CreateWindow(void) {
 #ifdef EMP_3410
     if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
 #else
-    if(CDCMRegister::GetMe()->IsAuthorize())
+    if(MyDCMRegister::IsAuthorize())
 #endif
     {
         //create button area
@@ -944,7 +944,7 @@ void ViewArchive::DisplaySearchResult(vector<Database::NewPatSearchResult> &Resu
         //	cout << "examType = " << Result[i].examType << endl;
 #ifndef VET
         int studyNo = atoi(Result[i].examID.c_str());
-        bool value = CDCMMan::GetMe()->GetStudyBackupStatus(studyNo);
+        bool value = MyDCMMan::GetStudyBackupStatus(studyNo);
         string backupStatus = "";
         if(value)
             backupStatus = _("Yes");
@@ -1166,7 +1166,7 @@ void ViewArchive::BtnUdiskClicked(GtkButton *button) {
 #ifdef EMP_3410
     if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
 #else
-    if(CDCMRegister::GetMe()->IsAuthorize())
+    if(MyDCMRegister::IsAuthorize())
 #endif
     {
         PRINTF("Load From U disk!\n");
@@ -1337,7 +1337,7 @@ void ViewArchive::BtnDisplayClicked(GtkButton *button) {
 }
 #ifndef VET
 void ViewArchive::BtnQueryRetrieveClicked(GtkButton *button) {
-    string device = CDCMMan::GetMe()->GetDefaultQueryRetrieveServiceDevice();
+    string device = MyDCMMan::GetDefaultQueryRetrieveServiceDevice();
     if (device == "") {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default query/retrieve service in system setting"), NULL);
         return ;
@@ -1380,7 +1380,7 @@ int SureToDelete(gpointer data) {
             db.DeleteRecord(examID);
 
             int studyID = atoi(sid);
-            if(CDCMMan::GetMe()->DeleteStudy(studyID)) {
+            if(MyDCMMan::DeleteStudy(studyID)) {
                 PRINTF("------DeleteStudy successfully\n");
             }
 
@@ -2190,7 +2190,7 @@ void ViewArchive::GetSelToDicom() {
     int count_success = 0;
     int count_failed = 0;
 
-    string device = CDCMMan::GetMe()->GetDefaultStorageServiceDevice();
+    string device = MyDCMMan::GetDefaultStorageServiceDevice();
     if (device == "") {
         MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()), MessageDialog::DLG_ERROR, _("Please Set the default storage service in system setting"), NULL);
         return ;
@@ -2252,7 +2252,7 @@ void ViewArchive::GetSelToDicom() {
             else
                 maxFrameNumber =0;
 
-            if(CDCMMan::GetMe()->SendStudy(studyNo,strSrcDir,strDesDir,onStorageCommitment,enableStorageSR,enableStorageMultiFrame,maxFrameNumber,PROGRESSSTATUS)) {
+            if(MyDCMMan::SendStudy(studyNo,strSrcDir,strDesDir,onStorageCommitment,enableStorageSR,enableStorageMultiFrame,maxFrameNumber,PROGRESSSTATUS)) {
                 m_selNum++;
                 count_success ++;
                 PRINTF("send dicom successfully!\n");
@@ -2261,7 +2261,7 @@ void ViewArchive::GetSelToDicom() {
                 PRINTF("send dicom failed!\n");
             }
 
-            bool value = CDCMMan::GetMe()->GetStudyBackupStatus(studyNo);
+            bool value = MyDCMMan::GetStudyBackupStatus(studyNo);
             string backupStatus = "";
             if(value)
                 backupStatus = _("Yes");
@@ -2751,7 +2751,7 @@ GtkWidget* CustomType::CreateWin(GtkWidget *parent) {
 #ifdef EMP_3410
     if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
 #else
-    if(CDCMRegister::GetMe()->IsAuthorize())
+    if(MyDCMRegister::IsAuthorize())
 #endif
     {
         m_radiobutton_dicom = gtk_radio_button_new_with_mnemonic (NULL, _("DICOM"));
@@ -2839,8 +2839,8 @@ void CustomType::ExportStudy(void) {
         char strSrcDir[256];
         sprintf(strSrcDir,"%s/%s",STORE_PATH,vec[0].c_str());
         string destDirStorageMedia = UDISK_PATH;
-        EDCMReturnStatus status = CDCMMan::GetMe()->ExportStudy(studyNo,strSrcDir,destDirStorageMedia,PROGRESSSTATUS);
-        //EDCMReturnStatus status = CDCMMan::GetMe()->ExportStudy(studyNo,strSrcDir,destDirStorageMedia,NULL);
+        EDCMReturnStatus status = MyDCMMan::ExportStudy(studyNo,strSrcDir,destDirStorageMedia,PROGRESSSTATUS);
+        //EDCMReturnStatus status = MyDCMMan::ExportStudy(studyNo,strSrcDir,destDirStorageMedia,NULL);
         if(status == DCMSUCCESS) {
             MessageDialog::GetInstance()->Create(GTK_WINDOW(ViewArchive::GetInstance()->GetWindow()),
                                               MessageDialog::DLG_INFO,
@@ -2881,7 +2881,7 @@ void CustomType::ExportStudy(void) {
             char strSrcDir[256];
             sprintf(strSrcDir,"%s/%s",STORE_PATH,vec[i].c_str());
             string destDirStorageMedia = UDISK_PATH;
-            EDCMReturnStatus status = CDCMMan::GetMe()->ExportStudy(studyNo,strSrcDir,destDirStorageMedia,PROGRESSSTATUS);
+            EDCMReturnStatus status = MyDCMMan::ExportStudy(studyNo,strSrcDir,destDirStorageMedia,PROGRESSSTATUS);
             //MessageDialog::GetInstance()->Destroy();
             if(status == DCMSUCCESS) {
                 count_success++;
@@ -2924,7 +2924,7 @@ void CustomType::BtnOkClicked(GtkButton *button) {
 #ifdef EMP_3410
     if(CManRegister::GetInstance()->IsAuthorize(CManRegister::Optional[0]))
 #else
-    if(CDCMRegister::GetMe()->IsAuthorize())
+    if(MyDCMRegister::IsAuthorize())
 #endif
     {
 

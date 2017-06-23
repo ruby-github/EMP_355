@@ -20,7 +20,7 @@
 #include "sysMan/SysOptions.h"
 #include "display/ImageArea.h"
 #include "patient/ViewArchive.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "imageControl/Img2D.h"
 #include "ViewMain.h"
 #include "patient/AviEncDecH264.h"
@@ -155,7 +155,7 @@ char VideoMan::SaveVideo(unsigned int no, const char* filename, const char* file
     HintArea::GetInstance()->UpdateHint(hint, 2);
 
     m_videoFileName = (string)videoFileNameTmp;
-    CDCMMan::GetMe()->AddImage(GetImageElement());
+    MyDCMMan::AddImage(GetImageElement());
     return 0;
 }
 

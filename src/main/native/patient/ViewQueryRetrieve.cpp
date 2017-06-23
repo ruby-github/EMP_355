@@ -6,7 +6,7 @@
 #include "display/gui_func.h"
 #include "keyboard/KeyValueOpr.h"
 #include "ViewMain.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "utils/MessageDialog.h"
 #include "patient/ImgMan.h"
 #include "patient/Database.h"
@@ -252,7 +252,7 @@ GtkWidget* ViewQueryRetrieve::CreateQueryRetrieveWin(GtkWidget *parent) {
     gtk_fixed_put (GTK_FIXED (fixed), m_combobox_device, 220, 300+80);
     gtk_widget_set_size_request (m_combobox_device, 100, 30);
 
-    vector<string> group_device_service = CDCMMan::GetMe()->GetAllRetrieveDestinationServerDevice();
+    vector<string> group_device_service = MyDCMMan::GetAllRetrieveDestinationServerDevice();
     if(group_device_service.size()>0) {
         for(int i = 0; i<group_device_service.size(); i++) {
             gtk_combo_box_insert_text (GTK_COMBO_BOX (m_combobox_device),i,group_device_service[i].c_str());
@@ -577,7 +577,7 @@ void ViewQueryRetrieve::ButtonQueryClicked(GtkButton *button) {
     char name[256] = {0};
     snprintf(name, 256, "*%s*", patientName);
     name[255] = '\0';
-    EDCMReturnStatus status = CDCMMan::GetMe()->Query(name,patientID,accessionNumber,startDate,endDate,QueryRes);
+    EDCMReturnStatus status = MyDCMMan::Query(name,patientID,accessionNumber,startDate,endDate,QueryRes);
     if(status == DCMSUCCESS) {
         GtkTreeModel *model;
         GtkTreeIter iter;
@@ -1099,7 +1099,7 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
     m_ptrInstance->m_srReferenceImageFilename.clear();
 
     if(num ==1) {
-        EDCMReturnStatus status = CDCMMan::GetMe()->Retrieve(index,(string)device,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement, SetProgressPos);
+        EDCMReturnStatus status = MyDCMMan::Retrieve(index,(string)device,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement, SetProgressPos);
         if(status == DCMSUCCESS) {
             string errmsg;
             string studyNo;
@@ -1200,7 +1200,7 @@ void ViewQueryRetrieve::InsertPatInfo(int index ,string device,int num) {
         }
     } else {
 
-        EDCMReturnStatus status = CDCMMan::GetMe()->Retrieve(index,(string)device,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement, SetProgressPos);
+        EDCMReturnStatus status = MyDCMMan::Retrieve(index,(string)device,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement, SetProgressPos);
         if(status == DCMSUCCESS) {
             m_count_success++;
             string errmsg;

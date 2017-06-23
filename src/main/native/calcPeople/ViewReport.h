@@ -7,7 +7,7 @@
 #include "AbsCalendarOpr.h"
 #include "patient/FileMan.h"
 #include "calcPeople/MeaResult.h"
-#include "periDevice/DCMDef.h"
+#include "thirdparty/DCMDef.h"
 
 using std::string;
 using std::vector;

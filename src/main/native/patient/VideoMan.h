@@ -7,7 +7,7 @@
 #include <list>
 #include "imageProc/Image.h"
 #include "patient/FileMan.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 
 using std::deque;
 using std::list;

@@ -5,7 +5,7 @@
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/KeyDef.h"
 #include "patient/FileMan.h"
-#include "periDevice/DCMMan.h"
+#include "thirdparty/MyDCMMan.h"
 #include "patient/ViewQueryRetrieve.h"
 #include "utils/MessageDialog.h"
 #include "patient/PatientInfo.h"
@@ -133,7 +133,7 @@ void ViewDicomDataSelect::CreateWindow(GtkWindow *parent) {
 
 void ViewDicomDataSelect::UpdateDicomDirList(void) {
     string destDirStorageMedia = UDISK_PATH;
-    EDCMReturnStatus status = CDCMMan::GetMe()->BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
+    EDCMReturnStatus status = MyDCMMan::BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
     if(status == DCMSUCCESS) {
         int size = vecStudyLevel.size();
         if(size == 0) {
@@ -202,7 +202,7 @@ GtkTreeModel* ViewDicomDataSelect::create_root_model() {
     GtkTreeStore *store = gtk_tree_store_new(2, G_TYPE_STRING,G_TYPE_INT);
 #if 0
     string destDirStorageMedia = UDISK_PATH;
-    EDCMReturnStatus status = CDCMMan::GetMe()->BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
+    EDCMReturnStatus status = MyDCMMan::BrowseDICOMDIR(destDirStorageMedia,vecStudyLevel);
     int size = vecStudyLevel.size();
     if(size == 0)
         return NULL;
@@ -741,7 +741,7 @@ void ViewDicomDataSelect::ImportStudy(void) {
     m_ptrInstance->m_srIndication = "";
     m_ptrInstance->m_srComments = "";
     m_ptrInstance->m_srReferenceImageFilename.clear();
-    EDCMReturnStatus status = CDCMMan::GetMe()->ImportStudy(m_studyIndex,destDirStorageMedia,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement,PROGRESSSTATUS);
+    EDCMReturnStatus status = MyDCMMan::ImportStudy(m_studyIndex,destDirStorageMedia,GetDCMStudyElement,GetDCMImageElement,GetDCMSRElement,PROGRESSSTATUS);
 
     if(status == DCMSUCCESS) {
         string errmsg;
