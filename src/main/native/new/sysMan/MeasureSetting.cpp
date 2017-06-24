@@ -55,7 +55,7 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget* parent) {
   m_combobox_exam_type = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_exam_type), 0, 1, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_exam_type), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_exam_type), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   vector<string> vec_exam_type = CalcSetting::GetInstance()->GetExamItemsCalc();
   CreateDefineItemCalc(vec_exam_type);
@@ -79,7 +79,7 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget* parent) {
 
   // Available Items
   GtkLabel* label_department = Utils::create_label(_("Available Items:"));
-  gtk_table_attach(table, GTK_WIDGET(label_department), 0, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(label_department), 0, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // scrolled_window
   GtkScrolledWindow* scrolled_window_item = Utils::create_scrolled_window();
@@ -96,7 +96,7 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget* parent) {
   m_combobox_sequence = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_sequence), 4, 6, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_sequence), 6, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_sequence), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_sequence, _("None"));
   gtk_combo_box_text_append_text(m_combobox_sequence, _("Repeat"));
@@ -142,10 +142,10 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget* parent) {
   GtkButton* button_back_all = Utils::create_button("<<");
   g_signal_connect(button_back_all, "clicked", G_CALLBACK(signal_button_clicked_backall), this);
 
-  gtk_table_attach(table, GTK_WIDGET(button_select_one), 3, 4, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_select_all), 3, 4, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_back_one), 3, 4, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_back_all), 3, 4, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_select_one), 3, 4, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_select_all), 3, 4, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_back_one), 3, 4, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_back_all), 3, 4, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   GtkButton* button_up = Utils::create_button(_("Up"));
   g_signal_connect(button_up, "clicked", G_CALLBACK(signal_button_clicked_up), this);
@@ -153,13 +153,13 @@ GtkWidget* MeasureSetting::CreateMeasureWindow(GtkWidget* parent) {
   GtkButton* button_down = Utils::create_button(_("Down"));
   g_signal_connect(button_down, "clicked", G_CALLBACK(signal_button_clicked_down), this);
 
-  gtk_table_attach(table, GTK_WIDGET(button_up), 7, 8, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_down), 7, 8, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_up), 7, 8, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_down), 7, 8, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_default), this);
 
-  gtk_table_attach(table, GTK_WIDGET(button_default), 5, 7, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 5, 7, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   return GTK_WIDGET(table);
 }

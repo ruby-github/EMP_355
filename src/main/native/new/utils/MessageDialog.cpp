@@ -131,7 +131,7 @@ void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text
       gtk_image_set_from_stock(image, GTK_STOCK_DIALOG_INFO, GTK_ICON_SIZE_DIALOG);
 
       m_progress_bar = Utils::create_progress_bar();
-      gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 1, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 1, 5, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
       break;
     }
@@ -151,8 +151,8 @@ void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text
 
       Utils::set_button_image(button_cancel, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_STOP, GTK_ICON_SIZE_DND)));
 
-      gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 1, 4, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
-      gtk_table_attach(table, GTK_WIDGET(button_cancel), 4, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 1, 4, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(button_cancel), 4, 5, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
       break;
     }
@@ -171,7 +171,7 @@ void MessageDialog::Create(GtkWindow* parent, DialogType type, const string text
 
       m_entry = Utils::create_entry();
       gtk_entry_set_max_length(m_entry, 64);
-      gtk_table_attach(table, GTK_WIDGET(m_entry), 1, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry), 1, 5, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
       g_signal_connect((gpointer)m_entry, "insert_text", G_CALLBACK(signal_entry_insert_text), this);
 

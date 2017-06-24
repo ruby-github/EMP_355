@@ -54,7 +54,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
 
   gtk_table_attach_defaults(table, GTK_WIDGET(frame_network), 0, 3, 0, 8);
   gtk_table_attach_defaults(table, GTK_WIDGET(frame_host), 3, 6, 0, 4);
-  gtk_table_attach(table, GTK_WIDGET(button_setting), 3, 4, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_setting), 3, 4, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_setting, "clicked", G_CALLBACK(signal_button_clicked_setting), this);
 
@@ -70,7 +70,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   GtkLabel* label_network_ip_style = Utils::create_label(_("(xxx.xxx.xxx.xxx)"));
 
   gtk_table_attach_defaults(table_network, GTK_WIDGET(label_network_ip), 0, 1, 0, 1);
-  gtk_table_attach(table_network, GTK_WIDGET(m_entry_network_ip), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_network, GTK_WIDGET(m_entry_network_ip), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_network, GTK_WIDGET(label_network_ip_style), 1, 3, 1, 2);
 
   gtk_entry_set_max_length(m_entry_network_ip, 15);
@@ -82,7 +82,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   GtkLabel* label_network_mask_style = Utils::create_label(_("(xxx.xxx.xxx.xxx)"));
 
   gtk_table_attach_defaults(table_network, GTK_WIDGET(label_network_mask), 0, 1, 2, 3);
-  gtk_table_attach(table_network, GTK_WIDGET(m_entry_network_mask), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_network, GTK_WIDGET(m_entry_network_mask), 1, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_network, GTK_WIDGET(label_network_mask_style), 1, 3, 3, 4);
 
   gtk_entry_set_max_length(m_entry_network_mask, 15);
@@ -94,7 +94,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   GtkLabel* label_network_gateway_style = Utils::create_label(_("(xxx.xxx.xxx.xxx)"));
 
   gtk_table_attach_defaults(table_network, GTK_WIDGET(label_network_gateway), 0, 1, 4, 5);
-  gtk_table_attach(table_network, GTK_WIDGET(m_entry_network_gateway), 1, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_network, GTK_WIDGET(m_entry_network_gateway), 1, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_network, GTK_WIDGET(label_network_gateway_style), 1, 3, 5, 6);
 
   gtk_entry_set_max_length(m_entry_network_gateway, 15);
@@ -111,7 +111,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   m_entry_host_ae = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_host, GTK_WIDGET(label_host_ae), 0, 1, 0, 1);
-  gtk_table_attach(table_host, GTK_WIDGET(m_entry_host_ae), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_host, GTK_WIDGET(m_entry_host_ae), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_host_ae, 15);
 
@@ -120,7 +120,7 @@ GtkWidget* DicomLocalSetting::CreateDicomWindow(GtkWidget* parent) {
   m_entry_host_port = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_host, GTK_WIDGET(label_host_port), 0, 1, 1, 2);
-  gtk_table_attach(table_host, GTK_WIDGET(m_entry_host_port), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_host, GTK_WIDGET(m_entry_host_port), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_host_port, 15);
   g_signal_connect(m_entry_host_port, "key-press-event", G_CALLBACK(signal_entry_keyfilter), this);

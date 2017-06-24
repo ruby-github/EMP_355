@@ -53,7 +53,7 @@ void ViewDicomSupervise::CreateWindow() {
   GtkTable* table_register = Utils::create_table(2, 3);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(table_export), 0, 1, 0, 6);
-  gtk_table_attach(table, GTK_WIDGET(hseparator), 0, 1, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(hseparator), 0, 1, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(table_register), 0, 1, 7, 10);
 
   gtk_container_set_border_width(GTK_CONTAINER(table_export), 10);
@@ -68,7 +68,7 @@ void ViewDicomSupervise::CreateWindow() {
   gtk_misc_set_alignment(GTK_MISC(label_note), 0, 0);
 
   gtk_table_attach_defaults(table_export, GTK_WIDGET(label_note), 0, 3, 0, 5);
-  gtk_table_attach(table_export, GTK_WIDGET(button_export), 0, 1, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_export, GTK_WIDGET(button_export), 0, 1, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_export, GTK_WIDGET(m_label_export), 1, 3, 5, 6);
 
   g_signal_connect(button_export, "clicked", G_CALLBACK(signal_button_clicked_export), this);
@@ -78,12 +78,12 @@ void ViewDicomSupervise::CreateWindow() {
   m_entry_key = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_register, GTK_WIDGET(label_key), 0, 1, 0, 1);
-  gtk_table_attach(table_register, GTK_WIDGET(m_entry_key), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_register, GTK_WIDGET(m_entry_key), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   GtkButton* button_register = Utils::create_button(_("Register"));
   m_label_register = Utils::create_label("");
 
-  gtk_table_attach(table_register, GTK_WIDGET(button_register), 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_register, GTK_WIDGET(button_register), 0, 1, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_register, GTK_WIDGET(m_label_register), 1, 3, 1, 2);
 
   g_signal_connect(button_register, "clicked", G_CALLBACK(signal_button_clicked_register), this);

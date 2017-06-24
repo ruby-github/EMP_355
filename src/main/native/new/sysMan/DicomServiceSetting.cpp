@@ -1273,7 +1273,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   m_combobox_storage_device = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_device), 0, 1, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_storage_device), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_storage_device), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_combobox_storage_device), "changed", G_CALLBACK(signal_combobox_changed_storage_device), this);
 
@@ -1282,7 +1282,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   m_entry_storage_service = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_service), 0, 1, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_service), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_service), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_storage_service, 45);
 
@@ -1291,7 +1291,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   m_entry_storage_ae = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ae), 3, 4, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_ae), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_ae), 4, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_storage_ae, 15);
 
@@ -1300,7 +1300,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   m_entry_storage_port = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_port), 3, 4, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_port), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_port), 4, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_storage_port, 15);
   g_signal_connect(m_entry_storage_port, "key-press-event", G_CALLBACK(signal_entry_keyfilter), this);
@@ -1309,8 +1309,8 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   GtkButton* button_add = Utils::create_button(_("Add"));
   GtkButton* button_clear = Utils::create_button(_("Clear"));
 
-  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_add, "clicked", G_CALLBACK(signal_button_clicked_storage_add), this);
   g_signal_connect(button_clear, "clicked", G_CALLBACK(signal_button_clicked_storage_clear), this);
@@ -1335,9 +1335,9 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   GtkButton* button_default = Utils::create_button(_("Default"));
   GtkButton* button_connect = Utils::create_button(_("Connect Test"));
 
-  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_storage_delete), this);
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_storage_default), this);
@@ -1349,10 +1349,10 @@ GtkWidget* DicomServiceSetting::CreateNoteStorage() {
   GtkLabel* label_frames = Utils::create_label(_("Max number of frames:"));
   m_combobox_storage_frames = Utils::create_combobox_text();
 
-  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_report), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_frame), 2, 4, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_report), 0, 2, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_frame), 2, 4, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_frames), 4, 6, 8, 9);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_storage_frames), 6, 7, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_storage_frames), 6, 7, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   size_t size = sizeof(frames) / sizeof(frames[0]);
 
@@ -1391,7 +1391,7 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   m_combobox_worklist_device = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_device), 0, 1, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_worklist_device), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_worklist_device), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_combobox_worklist_device), "changed", G_CALLBACK(signal_combobox_changed_worklist_device), this);
 
@@ -1400,7 +1400,7 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   m_entry_worklist_service = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_service), 0, 1, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_worklist_service), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_worklist_service), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_worklist_service, 45);
 
@@ -1409,7 +1409,7 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   m_entry_worklist_ae = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ae), 3, 4, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_worklist_ae), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_worklist_ae), 4, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_worklist_ae, 15);
 
@@ -1418,7 +1418,7 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   m_entry_worklist_port = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_port), 3, 4, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_worklist_port), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_worklist_port), 4, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_worklist_port, 15);
   g_signal_connect(m_entry_worklist_port, "key-press-event", G_CALLBACK(signal_entry_keyfilter), this);
@@ -1427,8 +1427,8 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   GtkButton* button_add = Utils::create_button(_("Add"));
   GtkButton* button_clear = Utils::create_button(_("Clear"));
 
-  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_add, "clicked", G_CALLBACK(signal_button_clicked_worklist_add), this);
   g_signal_connect(button_clear, "clicked", G_CALLBACK(signal_button_clicked_worklist_clear), this);
@@ -1453,9 +1453,9 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   GtkButton* button_default = Utils::create_button(_("Default"));
   GtkButton* button_connect = Utils::create_button(_("Connect Test"));
 
-  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_worklist_delete), this);
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_worklist_default), this);
@@ -1464,7 +1464,7 @@ GtkWidget* DicomServiceSetting::CreateNoteWorklist() {
   // Check Button
   m_checkbutton_worklist_auto = Utils::create_check_button(_("Auto Query"));
 
-  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_worklist_auto), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_worklist_auto), 0, 2, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_checkbutton_worklist_auto), "toggled", G_CALLBACK(signal_checkbutton_toggled_worklist_auto), this);
 
@@ -1493,7 +1493,7 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   m_combobox_mpps_device = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_device), 0, 1, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_mpps_device), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_mpps_device), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_combobox_mpps_device), "changed", G_CALLBACK(signal_combobox_changed_mpps_device), this);
 
@@ -1502,7 +1502,7 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   m_entry_mpps_service = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_service), 0, 1, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_mpps_service), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_mpps_service), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_mpps_service, 45);
 
@@ -1511,7 +1511,7 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   m_entry_mpps_ae = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ae), 3, 4, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_mpps_ae), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_mpps_ae), 4, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_mpps_ae, 15);
 
@@ -1520,7 +1520,7 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   m_entry_mpps_port = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_port), 3, 4, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_mpps_port), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_mpps_port), 4, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_mpps_port, 15);
   g_signal_connect(m_entry_mpps_port, "key-press-event", G_CALLBACK(signal_entry_keyfilter), this);
@@ -1529,8 +1529,8 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   GtkButton* button_add = Utils::create_button(_("Add"));
   GtkButton* button_clear = Utils::create_button(_("Clear"));
 
-  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_add, "clicked", G_CALLBACK(signal_button_clicked_mpps_add), this);
   g_signal_connect(button_clear, "clicked", G_CALLBACK(signal_button_clicked_mpps_clear), this);
@@ -1555,9 +1555,9 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   GtkButton* button_default = Utils::create_button(_("Default"));
   GtkButton* button_connect = Utils::create_button(_("Connect Test"));
 
-  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_mpps_delete), this);
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_mpps_default), this);
@@ -1566,7 +1566,7 @@ GtkWidget* DicomServiceSetting::CreateNoteMpps() {
   // Check Button
   m_checkbutton_mpps_send = Utils::create_check_button(_("Send MPPS after start exam and end exam"));
 
-  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_mpps_send), 0, 3, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_mpps_send), 0, 3, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_checkbutton_mpps_send), "toggled", G_CALLBACK(signal_checkbutton_toggled_mpps_send), this);
 
@@ -1595,7 +1595,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   m_combobox_storage_commitment_device = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_device), 0, 1, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_storage_commitment_device), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_storage_commitment_device), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_combobox_storage_commitment_device), "changed", G_CALLBACK(signal_combobox_changed_storage_commitment_device), this);
 
@@ -1604,7 +1604,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   m_entry_storage_commitment_service = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_service), 0, 1, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_commitment_service), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_commitment_service), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_storage_commitment_service, 45);
 
@@ -1613,7 +1613,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   m_entry_storage_commitment_ae = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ae), 3, 4, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_commitment_ae), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_commitment_ae), 4, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_storage_commitment_ae, 15);
 
@@ -1622,7 +1622,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   m_entry_storage_commitment_port = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_port), 3, 4, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_commitment_port), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_storage_commitment_port), 4, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_storage_commitment_port, 15);
   g_signal_connect(m_entry_storage_commitment_port, "key-press-event", G_CALLBACK(signal_entry_keyfilter), this);
@@ -1631,8 +1631,8 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   GtkButton* button_add = Utils::create_button(_("Add"));
   GtkButton* button_clear = Utils::create_button(_("Clear"));
 
-  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_add, "clicked", G_CALLBACK(signal_button_clicked_storage_commitment_add), this);
   g_signal_connect(button_clear, "clicked", G_CALLBACK(signal_button_clicked_storage_commitment_clear), this);
@@ -1657,9 +1657,9 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   GtkButton* button_default = Utils::create_button(_("Default"));
   GtkButton* button_connect = Utils::create_button(_("Connect Test"));
 
-  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_storage_commitment_delete), this);
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_storage_commitment_default), this);
@@ -1668,7 +1668,7 @@ GtkWidget* DicomServiceSetting::CreateNoteStorageCommitment() {
   // Check Button
   m_checkbutton_storage_commitment_send = Utils::create_check_button(_("Send storage commitment after storage"));
 
-  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_commitment_send), 0, 3, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_checkbutton_storage_commitment_send), 0, 3, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_checkbutton_storage_commitment_send), "toggled", G_CALLBACK(signal_checkbutton_toggled_storage_commitment_send), this);
 
@@ -1697,7 +1697,7 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   m_combobox_query_retrieve_device = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_device), 0, 1, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_query_retrieve_device), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_combobox_query_retrieve_device), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(G_OBJECT(m_combobox_query_retrieve_device), "changed", G_CALLBACK(signal_combobox_changed_query_retrieve_device), this);
 
@@ -1706,7 +1706,7 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   m_entry_query_retrieve_service = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_service), 0, 1, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_query_retrieve_service), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_query_retrieve_service), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_query_retrieve_service, 45);
 
@@ -1715,7 +1715,7 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   m_entry_query_retrieve_ae = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ae), 3, 4, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_query_retrieve_ae), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_query_retrieve_ae), 4, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_query_retrieve_ae, 15);
 
@@ -1724,7 +1724,7 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   m_entry_query_retrieve_port = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_port), 3, 4, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_query_retrieve_port), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_query_retrieve_port), 4, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_query_retrieve_port, 15);
   g_signal_connect(m_entry_query_retrieve_port, "key-press-event", G_CALLBACK(signal_entry_keyfilter), this);
@@ -1733,8 +1733,8 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   GtkButton* button_add = Utils::create_button(_("Add"));
   GtkButton* button_clear = Utils::create_button(_("Clear"));
 
-  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_add), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_clear), 6, 7, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_add, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_add), this);
   g_signal_connect(button_clear, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_clear), this);
@@ -1759,9 +1759,9 @@ GtkWidget* DicomServiceSetting::CreateNoteQueryRetrieve() {
   GtkButton* button_default = Utils::create_button(_("Default"));
   GtkButton* button_connect = Utils::create_button(_("Connect Test"));
 
-  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_delete), 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_default), 1, 2, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_service, GTK_WIDGET(button_connect), 2, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_delete), this);
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_query_retrieve_default), this);

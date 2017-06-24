@@ -454,7 +454,7 @@ GtkWidget* ViewCustomOB::CreateCustomOB() {
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_gw), 0, 1, 0, 1);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_value), 1, 3, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_text), 4, 5, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_text), 4, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   string StringOBType[] = {
     {"CER"},  {"HL"},   {"BPD"},  {"FL"},   {"CRL"},
@@ -3714,7 +3714,7 @@ GtkWidget* ViewSystem::create_note_general() {
   m_entry_hospital = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_hospital), 0, 1, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_hospital), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_hospital), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_hospital, 46);
   g_signal_connect(G_OBJECT(m_entry_hospital), "insert_text", G_CALLBACK(signal_entry_insert_hospital), this);
@@ -3764,7 +3764,7 @@ GtkWidget* ViewSystem::create_note_general() {
   g_signal_connect(G_OBJECT(m_spinbutton_second), "insert_text", G_CALLBACK(signal_spinbutton_insert_time), this);
 
   GtkButton* button_adjust_time = Utils::create_button(_("Adjust Time&Date"));
-  gtk_table_attach(table_frame, GTK_WIDGET(button_adjust_time), 3, 5, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_adjust_time), 3, 5, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_adjust_time, "clicked", G_CALLBACK (signal_button_clicked_adjust_time), this);
 
@@ -3773,7 +3773,7 @@ GtkWidget* ViewSystem::create_note_general() {
   m_combobox_language = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_language), 0, 1, 6, 7);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_language), 1, 2, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_language), 1, 2, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_language, "English");
   gtk_combo_box_text_append_text(m_combobox_language, "中文");
@@ -3790,7 +3790,7 @@ GtkWidget* ViewSystem::create_note_general() {
   m_combobox_vga = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_vga), 2, 3, 6, 7);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_vga), 3, 4, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_vga), 3, 4, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_vga, _("Internal"));
   gtk_combo_box_text_append_text(m_combobox_vga, _("External"));
@@ -3803,7 +3803,7 @@ GtkWidget* ViewSystem::create_note_general() {
   m_combobox_date_format = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_date_format), 0, 1, 7, 8);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_date_format), 1, 2, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_date_format), 1, 2, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_date_format, _("Y/M/D"));
   gtk_combo_box_text_append_text(m_combobox_date_format, _("M/D/Y"));
@@ -3814,7 +3814,7 @@ GtkWidget* ViewSystem::create_note_general() {
   m_combobox_screen_saver = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_screen_saver), 2, 3, 7, 8);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_screen_saver), 3, 4, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_screen_saver), 3, 4, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_screen_saver, _("none"));
   gtk_combo_box_text_append_text(m_combobox_screen_saver, _("5 Min."));
@@ -3826,7 +3826,7 @@ GtkWidget* ViewSystem::create_note_general() {
 
   // Default Factory
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
-  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_general_default), this);
 
@@ -4115,9 +4115,9 @@ GtkWidget* ViewSystem::create_note_options() {
   m_combobox_img_file = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_image_options, GTK_WIDGET(label_img_format), 0, 1, 0, 1);
-  gtk_table_attach(table_image_options, GTK_WIDGET(m_combobox_img_format), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_image_options, GTK_WIDGET(m_combobox_img_format), 1, 2, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_image_options, GTK_WIDGET(label_img_file), 0, 1, 1, 2);
-  gtk_table_attach(table_image_options, GTK_WIDGET(m_combobox_img_file), 1, 2, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_image_options, GTK_WIDGET(m_combobox_img_file), 1, 2, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_img_format, _("BMP"));
   gtk_combo_box_text_append_text(m_combobox_img_format, _("JPEG"));
@@ -4141,9 +4141,9 @@ GtkWidget* ViewSystem::create_note_options() {
   m_combobox_video_file = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_video_options, GTK_WIDGET(label_video_format), 0, 1, 0, 1);
-  gtk_table_attach(table_video_options, GTK_WIDGET(m_combobox_video_format), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_video_options, GTK_WIDGET(m_combobox_video_format), 1, 2, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_video_options, GTK_WIDGET(label_video_file), 0, 1, 1, 2);
-  gtk_table_attach(table_video_options, GTK_WIDGET(m_combobox_video_file), 1, 2, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_video_options, GTK_WIDGET(m_combobox_video_file), 1, 2, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_video_format, _("AVI"));
   gtk_combo_box_text_append_text(m_combobox_video_format, _("CINE"));
@@ -4155,7 +4155,7 @@ GtkWidget* ViewSystem::create_note_options() {
 
   // Default Factory
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
-  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_options_default), this);
 
@@ -4356,8 +4356,8 @@ GtkWidget* ViewSystem::create_note_image() {
   GtkButton* button_delete_user = Utils::create_button();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_user_select), 6, 9, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_user_select), 9, 15, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_delete_user), 15, 17, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_user_select), 9, 15, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_delete_user), 15, 17, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   GtkWidget* bin_entry_dia = gtk_bin_get_child (GTK_BIN(m_comboboxentry_user_select));
   gtk_entry_set_max_length(GTK_ENTRY(bin_entry_dia), 40);
@@ -4392,7 +4392,7 @@ GtkWidget* ViewSystem::create_note_image() {
   m_combobox_probe_type = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_probe_type), 0, 3, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_probe_type), 3, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_probe_type), 3, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   for (int i = 0; i < NUM_PROBE; i++) {
     string probeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
@@ -4424,8 +4424,8 @@ GtkWidget* ViewSystem::create_note_image() {
   GtkButton* button_add_item = Utils::create_button();
   GtkButton* button_delete_item = Utils::create_button();
 
-  gtk_table_attach(table, GTK_WIDGET(button_add_item), 0, 2, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_delete_item), 2, 4, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_add_item), 0, 2, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_delete_item), 2, 4, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   Utils::set_button_image(button_add_item, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_BUTTON)));
   Utils::set_button_image(button_delete_item, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_BUTTON)));
@@ -4439,9 +4439,9 @@ GtkWidget* ViewSystem::create_note_image() {
   GtkButton* button_new = Utils::create_button(_("New"));
   GtkButton* button_delete = Utils::create_button(_("Delete"));
 
-  gtk_table_attach(table, GTK_WIDGET(button_save), 6, 10, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_new), 10, 14, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_delete), 14, 18, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_save), 6, 10, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_new), 10, 14, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_delete), 14, 18, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_save, "clicked", G_CALLBACK(signal_button_clicked_image_save), this);
   g_signal_connect(button_new, "clicked", G_CALLBACK(signal_button_clicked_image_new), this);
@@ -4451,9 +4451,9 @@ GtkWidget* ViewSystem::create_note_image() {
   GtkButton* button_import = Utils::create_button(_("Import From USB"));
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
 
-  gtk_table_attach(table, GTK_WIDGET(button_export), 6, 10, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_import), 10, 14, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(button_default), 14, 18, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_export), 6, 10, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_import), 10, 14, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 14, 18, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_export, "clicked", G_CALLBACK(signal_button_clicked_image_export), this);
   g_signal_connect(button_import, "clicked", G_CALLBACK(signal_button_clicked_image_import), this);
@@ -4473,9 +4473,9 @@ GtkWidget* ViewSystem::create_note_image() {
   GtkButton* button_cancel = Utils::create_button(_("Cancel"));
 
   gtk_table_attach_defaults(table_new_check_part, GTK_WIDGET(m_label_check_part), 0, 3, 0, 1);
-  gtk_table_attach(table_new_check_part, GTK_WIDGET(m_entry_new_check_part), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_new_check_part, GTK_WIDGET(button_ok), 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_new_check_part, GTK_WIDGET(button_cancel), 2, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_new_check_part, GTK_WIDGET(m_entry_new_check_part), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_new_check_part, GTK_WIDGET(button_ok), 0, 1, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_new_check_part, GTK_WIDGET(button_cancel), 2, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   Utils::set_button_image(button_ok, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON)));
   Utils::set_button_image(button_cancel, GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_CANCEL, GTK_ICON_SIZE_BUTTON)));
@@ -5422,19 +5422,19 @@ GtkWidget* ViewSystem::create_note_measure() {
   m_combobox_unit_efw = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_dist), 0, 1, 0, 1);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_dist), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_dist), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_area), 0, 1, 1, 2);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_area), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_area), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_vol), 0, 1, 2, 3);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_vol), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_vol), 1, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_time), 0, 1, 3, 4);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_time), 1, 3, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_time), 1, 3, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_vel), 0, 1, 4, 5);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_vel), 1, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_vel), 1, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_accel), 0, 1, 5, 6);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_accel), 1, 3, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_accel), 1, 3, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_unit_setting, GTK_WIDGET(label_unit_efw), 0, 1, 6, 7);
-  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_efw), 1, 3, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_unit_setting, GTK_WIDGET(m_combobox_unit_efw), 1, 3, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_unit_dist, "cm");
   gtk_combo_box_text_append_text(m_combobox_unit_dist, "mm");
@@ -5458,7 +5458,7 @@ GtkWidget* ViewSystem::create_note_measure() {
   m_combobox_heart_beat = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_heart_beat), 0, 1, 11, 12);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_heart_beat), 1, 2, 11, 12, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_heart_beat), 1, 2, 11, 12, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_heart_beat, "1");
   gtk_combo_box_text_append_text(m_combobox_heart_beat, "2");
@@ -5519,9 +5519,9 @@ GtkWidget* ViewSystem::create_note_measure() {
   m_combobox_confirmed_line = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_line_color, GTK_WIDGET(label_current_line), 0, 1, 0, 1);
-  gtk_table_attach(table_line_color, GTK_WIDGET(m_combobox_current_line), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_line_color, GTK_WIDGET(m_combobox_current_line), 1, 2, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_line_color, GTK_WIDGET(label_confirmed_line), 2, 3, 0, 1);
-  gtk_table_attach(table_line_color, GTK_WIDGET(m_combobox_confirmed_line), 3, 4, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_line_color, GTK_WIDGET(m_combobox_confirmed_line), 3, 4, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_current_line, _("Red"));
   gtk_combo_box_text_append_text(m_combobox_current_line, _("Yellow"));
@@ -5618,7 +5618,7 @@ GtkWidget* ViewSystem::create_note_measure() {
 
   // Default Factory
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
-  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 12, 13, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_default, "clicked", G_CALLBACK (signal_button_clicked_measure_default), this);
 
@@ -5931,35 +5931,35 @@ GtkWidget* ViewSystem::create_note_calc() {
   m_combobox_ob_efw = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_cer), 0, 1, 0, 1);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_cer), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_cer), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_hl), 3, 4, 0, 1);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_hl), 4, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_hl), 4, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_bpd), 6, 7, 0, 1);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_bpd), 7, 9, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_bpd), 7, 9, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_fl), 0, 1, 1, 2);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_fl), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_fl), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_crl), 3, 4, 1, 2);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_crl), 4, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_crl), 4, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_gs), 6, 7, 1, 2);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_gs), 7, 9, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_gs), 7, 9, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_ac), 0, 1, 2, 3);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_ac), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_ac), 1, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_hc), 3, 4, 2, 3);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_hc), 4, 6, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_hc), 4, 6, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_tad), 6, 7, 2, 3);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_tad), 7, 9, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_tad), 7, 9, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_apad), 0, 1, 3, 4);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_apad), 1, 3, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_apad), 1, 3, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_thd), 3, 4, 3, 4);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_thd), 4, 6, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_thd), 4, 6, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_ofd), 6, 7, 3, 4);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_ofd), 7, 9, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_ofd), 7, 9, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_table_attach_defaults(table_ob_calc, GTK_WIDGET(label_ob_efw), 0, 1, 4, 5);
-  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_efw), 1, 3, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_ob_calc, GTK_WIDGET(m_combobox_ob_efw), 1, 3, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_ob_cer, _("Goldstein"));
   gtk_combo_box_text_append_text(m_combobox_ob_cer, _("Custom"));
@@ -6020,9 +6020,9 @@ GtkWidget* ViewSystem::create_note_calc() {
   GtkLabel* label_bsa = Utils::create_label(_("BSA:"));
   m_combobox_bsa = Utils::create_combobox_text();
 
-  gtk_table_attach(table, GTK_WIDGET(button_ob_custom), 0, 2, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_ob_custom), 0, 2, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_bsa), 3, 4, 6, 7);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_bsa), 4, 6, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_bsa), 4, 6, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_ob_custom, "clicked", G_CALLBACK(signal_button_clicked_ob_custom), this);
 
@@ -6031,7 +6031,7 @@ GtkWidget* ViewSystem::create_note_calc() {
 
   // Default Factory
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
-  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 2, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 2, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_calc_default), this);
 
@@ -6147,7 +6147,7 @@ GtkWidget* ViewSystem::create_note_comment() {
   m_combobox_probe_comment = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_probe_comment), 0, 2, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_probe_comment), 2, 5, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_probe_comment), 2, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   for (int i = 0; i < NUM_PROBE; i++) {
     string newProbeName = ProbeMan::GetInstance()->VerifyProbeName(g_probe_list[i]);
@@ -6178,7 +6178,7 @@ GtkWidget* ViewSystem::create_note_comment() {
   m_combobox_exam_comment = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_exam_comment), 5, 7, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_exam_comment), 7, 10, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_exam_comment), 7, 10, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   ExamItem examItem;
   vector<ExamItem::EItem> itemIndex = examItem.GetItemListOfProbe(g_probe_list[probe_comment_index]);
@@ -6199,7 +6199,7 @@ GtkWidget* ViewSystem::create_note_comment() {
   m_combobox_department_comment = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_department_comment), 0, 2, 0, 1);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_department_comment), 2, 5, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_department_comment), 2, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_department_comment, _("Abdomen"));
   gtk_combo_box_text_append_text(m_combobox_department_comment, _("Urology"));
@@ -6229,10 +6229,10 @@ GtkWidget* ViewSystem::create_note_comment() {
   GtkButton* button_comment_add = Utils::create_button(_("Add"));
   GtkButton* button_comment_delete_select = Utils::create_button(_("Delete"));
 
-  gtk_table_attach(table_frame, GTK_WIDGET(button_select_one), 3, 5, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(button_select_all), 3, 5, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_add), 3, 5, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete_select), 3, 5, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_select_one), 3, 5, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_select_all), 3, 5, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_add), 3, 5, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete_select), 3, 5, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_select_one, "clicked", G_CALLBACK(signal_button_clicked_selectone_comment), this);
   g_signal_connect(button_select_all, "clicked", G_CALLBACK(signal_button_clicked_selectall_comment), this);
@@ -6255,10 +6255,10 @@ GtkWidget* ViewSystem::create_note_comment() {
   GtkButton* button_comment_delete = Utils::create_button(_("Delete"));
   GtkButton* button_comment_delete_all = Utils::create_button(_("All Delete"));
 
-  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_up), 8, 10, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_down), 8, 10, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete), 8, 10, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete_all), 8, 10, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_up), 8, 10, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_down), 8, 10, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete), 8, 10, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_comment_delete_all), 8, 10, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_comment_up, "clicked", G_CALLBACK(signal_button_clicked_up), this);
   g_signal_connect(button_comment_down, "clicked", G_CALLBACK(signal_button_clicked_down), this);
@@ -6306,7 +6306,7 @@ GtkWidget* ViewSystem::create_note_comment() {
   m_combobox_font_color = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_font_color), 5, 7, 9, 11);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_font_color), 7, 10, 9, 11, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_font_color), 7, 10, 9, 11, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_font_color, _("Red"));
   gtk_combo_box_text_append_text(m_combobox_font_color, _("Green"));
@@ -6318,7 +6318,7 @@ GtkWidget* ViewSystem::create_note_comment() {
   m_combobox_bodymark_color = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_bodymark_color), 5, 7, 11, 13);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_bodymark_color), 7, 10, 11, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_bodymark_color), 7, 10, 11, 13, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("White"));
   gtk_combo_box_text_append_text(m_combobox_bodymark_color, _("Gray"));
@@ -6329,7 +6329,7 @@ GtkWidget* ViewSystem::create_note_comment() {
 
   // Default Factory
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
-  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 2, 13, 14, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 2, 13, 14, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_default, "clicked", G_CALLBACK (on_button_comment_default_clicked), this);
 
@@ -6422,7 +6422,7 @@ GtkWidget* ViewSystem::create_note_tvout() {
   m_combobox_video = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_video), 0, 1, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_video), 1, 2, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_video), 1, 2, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_video, _("NTSC"));
   gtk_combo_box_text_append_text(m_combobox_video, _("PAL"));
@@ -6498,15 +6498,15 @@ GtkWidget* ViewSystem::create_note_tvout() {
   GtkButton* button_add_printer = Utils::create_button(_("Add"));
   GtkButton* button_del_printer = Utils::create_button(_("Delete"));
 
-  gtk_table_attach(table_printer, GTK_WIDGET(button_add_printer), 4, 5, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_printer, GTK_WIDGET(button_del_printer), 4, 5, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_printer, GTK_WIDGET(button_add_printer), 4, 5, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_printer, GTK_WIDGET(button_del_printer), 4, 5, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_add_printer, "clicked", G_CALLBACK(signal_button_clicked_add_printer), this);
   g_signal_connect(button_del_printer, "clicked", G_CALLBACK(signal_button_clicked_del_printer), this);
 
   // Default Factory
   GtkButton* button_default = Utils::create_button(_("Default Factory"));
-  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 11, 12, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_default), 0, 1, 11, 12, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_default, "clicked", G_CALLBACK(signal_button_clicked_tvout_default), this);
 
@@ -6664,18 +6664,18 @@ GtkWidget* ViewSystem::create_set_report() {
   m_button_report_ok = Utils::create_button(_("OK"));
   m_button_report_cancel = Utils::create_button(_("Cancel"));
 
-  gtk_table_attach(table, GTK_WIDGET(m_button_report_recovery), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(m_button_report_add), 1, 2, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_recovery), 0, 1, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_add), 1, 2, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(m_label_templet), 1, 3, 9, 10);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_templet), 3, 5, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_templet), 3, 5, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(m_label_childsection), 1, 3, 9, 10);
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_childsection), 3, 5, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_childsection), 3, 5, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
-  gtk_table_attach(table, GTK_WIDGET(m_button_report_save), 5, 6, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(m_button_report_delete), 6, 7, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(m_button_report_ok), 5, 6, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table, GTK_WIDGET(m_button_report_cancel), 6, 7, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_save), 5, 6, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_delete), 6, 7, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_ok), 5, 6, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_button_report_cancel), 6, 7, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_templet, 46);
 
@@ -7434,7 +7434,7 @@ GtkWidget* ViewSystem::create_note_info() {
 
   // button
   GtkButton* button_upgrade = Utils::create_button(_("Upgrade"));
-  gtk_table_attach(table, GTK_WIDGET(button_upgrade), 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(button_upgrade), 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_upgrade, "clicked", G_CALLBACK (signal_button_clicked_upgrade), this);
 

@@ -152,7 +152,7 @@ void ConfigToHost::CreateCalcImportWindow(GtkWidget* parent) {
 
   // progress_bar
   m_progress_bar = Utils::create_progress_bar();
-  gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 0, 6, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_progress_bar), 0, 6, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // image, notice
 

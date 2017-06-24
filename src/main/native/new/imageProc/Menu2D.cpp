@@ -44,36 +44,36 @@ GtkWidget* Menu2D::Create() {
   // Rotate: 90/270/OFF
   m_spin_rotate.SetItem(&m_item_rotate);
   GtkWidget* rotate = m_spin_rotate.Create();
-  gtk_table_attach(m_table, rotate, 0, 1, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, rotate, 0, 1, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Frame aver: 1-8
   m_spin_frame.SetItem(&m_item_frame);
   GtkWidget* frame = m_spin_frame.Create();
-  gtk_table_attach(m_table, frame, 0, 1, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, frame, 0, 1, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Line aver: 1-4
   m_spin_line.SetItem(&m_item_line);
   GtkWidget* line = m_spin_line.Create();
-  gtk_table_attach(m_table, line, 0, 1, 4, 5, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, line, 0, 1, 4, 5, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Smooth: 1-8
   m_spin_smooth.SetItem(&m_item_smooth);
   GtkWidget* smooth = m_spin_smooth.Create();
-  gtk_table_attach(m_table, smooth, 0, 1, 5, 6, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, smooth, 0, 1, 5, 6, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Gamma: 1-8
   m_spin_gamma.SetItem(&m_item_gamma);
   GtkWidget* gamma = m_spin_gamma.Create();
-  gtk_table_attach(m_table, gamma, 0, 1, 6, 7, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, gamma, 0, 1, 6, 7, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // iPurity: 1-5
   m_spin_ipurity.SetItem(&m_item_ipurity);
   GtkWidget* ipurity = m_spin_ipurity.Create();
-  gtk_table_attach(m_table, ipurity, 0, 1, 7, 8, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, ipurity, 0, 1, 7, 8, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Gray Trans
   m_button_gray_trans = Utils::create_button(_("Gray Trans"));
-  gtk_table_attach(m_table, GTK_WIDGET(m_button_gray_trans), 0, 1, 8, 9, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(m_button_gray_trans), 0, 1, 8, 9, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_gray_trans), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_gray_trans, FALSE);
@@ -81,7 +81,7 @@ GtkWidget* Menu2D::Create() {
 
   // Gray Rejection
   m_button_gray_rejection = Utils::create_button(_("Gray Rejection"));
-  gtk_table_attach(m_table, GTK_WIDGET(m_button_gray_rejection), 0, 1, 9, 10, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(m_button_gray_rejection), 0, 1, 9, 10, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_gray_rejection), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_gray_rejection, FALSE);
@@ -89,7 +89,7 @@ GtkWidget* Menu2D::Create() {
 
   // Global Zoom
   m_button_global_zoom = Utils::create_button(_("Global Zoom"));
-  gtk_table_attach(m_table, GTK_WIDGET(m_button_global_zoom), 0, 1, 10, 11, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(m_button_global_zoom), 0, 1, 10, 11, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_global_zoom), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_global_zoom, FALSE);
@@ -97,7 +97,7 @@ GtkWidget* Menu2D::Create() {
 
   // Picture In Picture
   m_button_pip = Utils::create_button(_("Picture In Picture"));
-  gtk_table_attach(m_table, GTK_WIDGET(m_button_pip), 0, 1, 11, 12, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(m_button_pip), 0, 1, 11, 12, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_pip), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_pip, FALSE);
@@ -105,7 +105,7 @@ GtkWidget* Menu2D::Create() {
 
   // 4B
   m_button_4b = Utils::create_button(_("4B"));
-  gtk_table_attach(m_table, GTK_WIDGET(m_button_4b), 0, 1, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(m_button_4b), 0, 1, 12, 13, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_4b), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_4b, FALSE);
@@ -113,7 +113,7 @@ GtkWidget* Menu2D::Create() {
 
   // pScape Mode
   m_button_efov = Utils::create_button(_("pScape Mode"));
-  gtk_table_attach(m_table, GTK_WIDGET(m_button_efov), 0, 1, 13, 14, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(m_button_efov), 0, 1, 13, 14, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_efov), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_efov, FALSE);

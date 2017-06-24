@@ -38,8 +38,8 @@ GtkWidget* MenuSystem::Create() {
   g_signal_connect(button_general, "clicked", G_CALLBACK(signal_button_clicked_general), this);
   g_signal_connect(button_biopsy, "clicked", G_CALLBACK(signal_button_clicked_biopsy), this);
 
-  gtk_table_attach(m_table, GTK_WIDGET(button_general), 0, 1, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(m_table, GTK_WIDGET(button_biopsy), 0, 1, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(button_general), 0, 1, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_table, GTK_WIDGET(button_biopsy), 0, 1, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   return GTK_WIDGET(m_table);
 }

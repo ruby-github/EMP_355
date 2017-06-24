@@ -424,7 +424,7 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
   m_comboboxtext_user = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_user, GTK_WIDGET(label), 0, 2, 0, 1);
-  gtk_table_attach(table_user, GTK_WIDGET(m_comboboxtext_user), 2, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_user, GTK_WIDGET(m_comboboxtext_user), 2, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   UserSelect::GetInstance()->read_default_username(GTK_COMBO_BOX(m_comboboxtext_user));
   UserSelect::GetInstance()->read_username_db(USERNAME_DB, GTK_COMBO_BOX(m_comboboxtext_user));

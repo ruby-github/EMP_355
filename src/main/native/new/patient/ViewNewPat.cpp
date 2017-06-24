@@ -116,7 +116,7 @@ void ViewNewPat::CreateWindow() {
   m_entry_patient_id = Utils::create_entry();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_patient_id), 0, 2, 0, 1);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_patient_id), 2, 6, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_patient_id), 2, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_patient_id, 15);
 
@@ -133,7 +133,7 @@ void ViewNewPat::CreateWindow() {
   // Search
 
   GtkButton* button_search_patient_info = Utils::create_button(_("Search"));
-  gtk_table_attach(table_frame, GTK_WIDGET(button_search_patient_info), 14, 18, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(button_search_patient_info), 14, 18, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_search_patient_info, "clicked", G_CALLBACK (signal_button_clicked_search), this);
 
@@ -143,7 +143,7 @@ void ViewNewPat::CreateWindow() {
   m_entry_last_name = Utils::create_entry();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_last_name), 0, 2, 1, 2);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_last_name), 2, 6, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_last_name), 2, 6, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_last_name, m_patient_name_last);
 
@@ -155,7 +155,7 @@ void ViewNewPat::CreateWindow() {
   m_entry_first_name = Utils::create_entry();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_first_name), 6, 8, 1, 2);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_first_name), 8, 12, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_first_name), 8, 12, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_first_name, m_patient_name_first);
 
@@ -167,7 +167,7 @@ void ViewNewPat::CreateWindow() {
   m_entry_mid_name = Utils::create_entry();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_mid_name), 12, 14, 1, 2);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_mid_name), 14, 18, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_mid_name), 14, 18, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_mid_name, m_patient_name_middle);
 
@@ -197,13 +197,13 @@ void ViewNewPat::CreateWindow() {
   case 1:
     // M/D/Y
     {
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 2, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 2, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_month), 3, 4, 2, 3);
 
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 4, 5, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 4, 5, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_day), 5, 6, 2, 3);
 
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 6, 7, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 6, 7, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_year), 7, 8, 2, 3);
     }
 
@@ -211,13 +211,13 @@ void ViewNewPat::CreateWindow() {
   case 2:
     // D/M/Y
     {
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 2, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 2, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_day), 3, 4, 2, 3);
 
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 4, 5, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 4, 5, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_month), 5, 6, 2, 3);
 
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 6, 7, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 6, 7, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_year), 7, 8, 2, 3);
     }
 
@@ -225,13 +225,13 @@ void ViewNewPat::CreateWindow() {
   default:
     // Y/M/D
     {
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 2, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_year), 2, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_year), 3, 4, 2, 3);
 
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 4, 5, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_month), 4, 5, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_month), 5, 6, 2, 3);
 
-      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 6, 7, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table_frame, GTK_WIDGET(m_entry_birth_day), 6, 7, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_birth_day), 7, 8, 2, 3);
     }
 
@@ -260,8 +260,8 @@ void ViewNewPat::CreateWindow() {
   m_combobox_text_age = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_age), 9, 10, 2, 3);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_age), 10, 11, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_text_age), 11, 12, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_entry_age), 10, 11, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_text_age), 11, 12, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_misc_set_alignment(GTK_MISC(label_age), 0.5, 0.5);
 
@@ -278,7 +278,7 @@ void ViewNewPat::CreateWindow() {
   m_combobox_text_gender = Utils::create_combobox_text();
 
   gtk_table_attach_defaults(table_frame, GTK_WIDGET(label_gender), 12, 14, 2, 3);
-  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_text_gender), 14, 18, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_frame, GTK_WIDGET(m_combobox_text_gender), 14, 18, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_combo_box_text_append_text(m_combobox_text_gender, _("Female"));
   gtk_combo_box_text_append_text(m_combobox_text_gender, _("Male"));
@@ -318,7 +318,7 @@ void ViewNewPat::CreateWindow() {
   m_comboboxentry_diagnostician = Utils::create_combobox_entry();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_diagnostician), 0, 1, 12, 13);
-  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_diagnostician), 1, 3, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_diagnostician), 1, 3, 12, 13, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   GtkEntry* bin_entry_diagnostician = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_diagnostician)));
   gtk_entry_set_max_length(bin_entry_diagnostician, 45);
@@ -329,7 +329,7 @@ void ViewNewPat::CreateWindow() {
   m_comboboxentry_physician = Utils::create_combobox_entry();
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_physician), 3, 4, 12, 13);
-  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_physician), 4, 6, 12, 13, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_comboboxentry_physician), 4, 6, 12, 13, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   GtkEntry* bin_entry_physician = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(m_comboboxentry_physician)));
   gtk_entry_set_max_length(bin_entry_physician, 45);
@@ -1379,7 +1379,7 @@ GtkWidget* ViewNewPat::create_note_general() {
   GtkLabel* label_cm = Utils::create_label(_("cm"));
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_stature), 0, 1, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_stature), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_stature), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_cm), 3, 4, 0, 1);
 
   gtk_entry_set_max_length(m_entry_stature, 3);
@@ -1393,7 +1393,7 @@ GtkWidget* ViewNewPat::create_note_general() {
   GtkLabel* label_kg = Utils::create_label(_("kg"));
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_weight), 0, 1, 1, 2);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_weight), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_weight), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_kg), 3, 4, 1, 2);
 
   gtk_entry_set_max_length(m_entry_weight, 6);
@@ -1407,7 +1407,7 @@ GtkWidget* ViewNewPat::create_note_general() {
   GtkLabel* label_m2 = Utils::create_label(_("m²"));
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_bsa), 0, 1, 2, 3);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_bsa), 1, 3, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_bsa), 1, 3, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_m2), 3, 4, 2, 3);
 
   gtk_editable_set_editable(GTK_EDITABLE(m_entry_bsa), FALSE);
@@ -1434,19 +1434,19 @@ GtkWidget* ViewNewPat::create_note_ob() {
   GtkLabel* label_ob_day = Utils::create_label(_("D"));
   gtk_entry_set_max_length(m_entry_ob_day, 2);
 
-  gtk_table_attach(table, GTK_WIDGET(m_combobox_ob_date), 0, 5, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_combobox_ob_date), 0, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   switch (m_date_format) {
   case 1:
     // M/D/Y
     {
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_month), 5, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_month), 5, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_month), 7, 8, 0, 1);
 
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_day), 8, 10, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_day), 8, 10, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_day), 10, 11, 0, 1);
 
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_year), 11, 14, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_year), 11, 14, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_year), 14, 15, 0, 1);
     }
 
@@ -1454,13 +1454,13 @@ GtkWidget* ViewNewPat::create_note_ob() {
   case 2:
     // D/M/Y
     {
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_day), 5, 7, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_day), 5, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_day), 7, 8, 0, 1);
 
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_month), 8, 10, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_month), 8, 10, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_month), 10, 11, 0, 1);
 
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_year), 11, 14, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_year), 11, 14, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_year), 14, 15, 0, 1);
     }
 
@@ -1468,13 +1468,13 @@ GtkWidget* ViewNewPat::create_note_ob() {
   default:
     // Y/M/D
     {
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_year), 5, 8, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_year), 5, 8, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_year), 8, 9, 0, 1);
 
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_month), 9, 11, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_month), 9, 11, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_month), 11, 12, 0, 1);
 
-      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_day), 12, 14, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+      gtk_table_attach(table, GTK_WIDGET(m_entry_ob_day), 12, 14, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
       gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_day), 14, 15, 0, 1);
     }
 
@@ -1499,7 +1499,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_gw = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_gw), 15, 20, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_gw), 20, 30, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_gw), 20, 30, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_editable_set_editable(GTK_EDITABLE(m_entry_ob_gw), FALSE);
 
@@ -1509,7 +1509,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_edd = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_edd), 0, 5, 1, 2);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_edd), 5, 15, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_edd), 5, 15, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_editable_set_editable(GTK_EDITABLE(m_entry_ob_edd), FALSE);
 
@@ -1519,7 +1519,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_gravida = Utils::create_entry(8226);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_gravida), 15, 20, 1, 2);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_gravida), 20, 30, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_gravida), 20, 30, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Ectopic
 
@@ -1527,7 +1527,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_ectopic = Utils::create_entry(8226);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_ectopic), 0, 5, 2, 3);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_ectopic), 5, 15, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_ectopic), 5, 15, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Gestations
 
@@ -1535,7 +1535,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_gestations = Utils::create_entry(8226);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_gestations), 15, 20, 2, 3);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_gestations), 20, 30, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_gestations), 20, 30, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Para
 
@@ -1543,7 +1543,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_para = Utils::create_entry(8226);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_para), 0, 5, 3, 4);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_para), 5, 15, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_para), 5, 15, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Aborta
 
@@ -1551,7 +1551,7 @@ GtkWidget* ViewNewPat::create_note_ob() {
   m_entry_ob_aborta = Utils::create_entry(8226);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_ob_aborta), 15, 20, 3, 4);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_aborta), 20, 30, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_ob_aborta), 20, 30, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // warming
 
@@ -1573,7 +1573,7 @@ GtkWidget* ViewNewPat::create_note_card() {
   GtkLabel* label_bpm = Utils::create_label(_("bpm"));
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_hr), 0, 5, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_hr), 5, 15, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_hr), 5, 15, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_bpm), 15, 20, 0, 1);
 
   gtk_entry_set_max_length(m_entry_hr, 4);
@@ -1588,9 +1588,9 @@ GtkWidget* ViewNewPat::create_note_card() {
   GtkLabel* label_mmhg = Utils::create_label(_("mmHg"));
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_bp), 0, 5, 1, 2);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_bp_high), 5, 9, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_bp_high), 5, 9, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_bp_div), 9, 11, 1, 2);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_bp_low), 11, 15, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_bp_low), 11, 15, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_mmhg), 15, 20, 1, 2);
 
   gtk_misc_set_alignment(GTK_MISC(label_bp_div), 0.5, 0.5);
@@ -1606,7 +1606,7 @@ GtkWidget* ViewNewPat::create_note_uro() {
   GtkLabel* label_uro_psa_unit = Utils::create_label(_("ng / ml"));
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_uro_psa), 0, 1, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_uro_psa), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_uro_psa), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table, GTK_WIDGET(label_uro_psa_unit), 3, 4, 0, 1);
 
   return GTK_WIDGET(table);
@@ -1621,7 +1621,7 @@ GtkWidget* ViewNewPat::create_note_other() {
   m_entry_other_tel = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_other_tel), 0, 1, 0, 1);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_other_tel), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_other_tel), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_other_tel, 20);
 
@@ -1631,7 +1631,7 @@ GtkWidget* ViewNewPat::create_note_other() {
   m_entry_other_address = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table, GTK_WIDGET(label_other_address), 0, 1, 1, 2);
-  gtk_table_attach(table, GTK_WIDGET(m_entry_other_address), 1, 5, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table, GTK_WIDGET(m_entry_other_address), 1, 5, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_other_address, 100);
 

@@ -61,7 +61,7 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
   m_entry_device = Utils::create_entry(9679);
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_device), 0, 1, 0, 1);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_device), 1, 3, 0, 1, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_device), 1, 3, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_entry_set_max_length(m_entry_device, 15);
 
@@ -71,7 +71,7 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
   GtkLabel* label_ip_style = Utils::create_label(_("(xxx.xxx.xxx.xxx)"));
 
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ip), 0, 1, 1, 2);
-  gtk_table_attach(table_device, GTK_WIDGET(m_entry_ip), 1, 3, 1, 2, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(m_entry_ip), 1, 3, 1, 2, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach_defaults(table_device, GTK_WIDGET(label_ip_style), 3, 5, 1, 2);
 
   gtk_entry_set_max_length(m_entry_ip, 15);
@@ -83,8 +83,8 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
   g_signal_connect(button_ping, "clicked", G_CALLBACK(signal_button_clicked_ping), this);
   g_signal_connect(button_add, "clicked", G_CALLBACK(signal_button_clicked_add), this);
 
-  gtk_table_attach(table_device, GTK_WIDGET(button_ping), 0, 1, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
-  gtk_table_attach(table_device, GTK_WIDGET(button_add), 1, 2, 2, 3, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_ping), 0, 1, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device, GTK_WIDGET(button_add), 1, 2, 2, 3, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   // Device List
   GtkTable* table_device_list = Utils::create_table(4, 6);
@@ -103,7 +103,7 @@ GtkWidget* DicomServerSetting::CreateDicomWindow(GtkWidget* parent) {
 
   // button delete
   GtkButton* button_delete = Utils::create_button(_("Delete"));
-  gtk_table_attach(table_device_list, GTK_WIDGET(button_delete), 0, 1, 3, 4, GTK_FILL, GTK_SHRINK, 0, 0);
+  gtk_table_attach(table_device_list, GTK_WIDGET(button_delete), 0, 1, 3, 4, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   g_signal_connect(button_delete, "clicked", G_CALLBACK(signal_button_clicked_delete), this);
 
