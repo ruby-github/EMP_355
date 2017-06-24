@@ -118,31 +118,31 @@ GtkWidget* MenuCFM::Create(void) {
     spin_persist.SetItem(&item_persist);
     GtkWidget *table_persist= spin_persist.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_persist, 0, 8, 5, 6);
-    spin_persist.Show();
+    //spin_persist.Show();
 
     // Threshold
     spin_threshold.SetItem(&item_threshold);
     GtkWidget *table_threshold = spin_threshold.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_threshold, 0, 8, 6, 7);
-    spin_threshold.Show();
+    //spin_threshold.Show();
 
     // Color Reject
     spin_reject.SetItem(&item_reject);
     GtkWidget *table_reject = spin_reject.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_reject, 0, 8, 7, 8);
-    spin_reject.Show();
+    //spin_reject.Show();
 
     // Smooth
     spin_smooth.SetItem(&item_smooth);
     GtkWidget *table_smooth = spin_smooth.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_smooth, 0, 8, 8, 9);
-    spin_smooth.Show();
+    //spin_smooth.Show();
 
     // Artifact
     spin_artifact.SetItem(&item_artifact);
     GtkWidget *table_artifact = spin_artifact.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_artifact, 0, 8, 9, 10);
-    spin_artifact.Show();
+    //spin_artifact.Show();
 
 #if defined(K24C)
     //m_label4BCFM = create_label("", 0, 0, g_lightGray, NULL);

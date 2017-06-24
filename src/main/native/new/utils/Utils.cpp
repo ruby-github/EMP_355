@@ -591,7 +591,7 @@ string Utils::DotToCommaLocaleNumeric(string comma) {
 
 // ---------------------------------------------------------
 
-#include "patient/ViewNewPat.h"
+#include "imageProc/Menu2D.h"
 
 void Utils::test(GtkWidget* widget) {
   //ViewNewPat::GetInstance()->CreateWindow();

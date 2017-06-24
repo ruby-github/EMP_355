@@ -336,7 +336,7 @@ GtkWidget* MenuPW::Create(void) {
     spin_timeres.SetItem(&item_timeres);
     GtkWidget *table_timeres= spin_timeres.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_timeres, 0, 8, 5, 6);
-    spin_timeres.Show();
+    //spin_timeres.Show();
 
     // Scale Unit
     m_labelScale = create_label("", 0, 0, g_lightGray, NULL);

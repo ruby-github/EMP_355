@@ -1,50 +1,53 @@
 #ifndef __CUS_SPIN__
 #define __CUS_SPIN__
 
-#include <gtk/gtk.h>
-#include "Def.h"
+#include "utils/Utils.h"
 
 class CusSpin {
 public:
-    CusSpin();
-    ~CusSpin();
+  CusSpin();
+  ~CusSpin();
 
-    typedef void (*CusSpinFunc)(EKnobOper opr);
+public:
+  GtkWidget* Create();
 
-    struct CusSpinItem {
-        const char *name;
-        const char *val;
-        // unsigned int width;
-        // unsigned int height;
-        EKnobReturn status;
-        CusSpinFunc func;
-    };
+  typedef void (*CusSpinFunc)(EKnobOper opr);
 
-    GtkWidget* Create();
-    void SetItem(CusSpinItem* item) {
-        m_item = item;
-    }
-    void SetValue(const string str, EKnobReturn flag);
-    void UpdateLabel(void);
-    void Show();
+  struct CusSpinItem {
+    string name;
+    string val;
+    EKnobReturn status;
+    CusSpinFunc func;
+  };
+
+  void SetItem(CusSpinItem* item);
+  void SetValue(const string str, EKnobReturn flag);
+
+  void UpdateLabel();
 
 private:
-    GtkWidget* m_cusspin;
-    GtkWidget* m_entry;
-    GtkWidget* m_labelAdd;
-    GtkWidget* m_labelSub;
-    GtkWidget* m_btnAdd;
-    GtkWidget* m_btnSub;
-    GtkWidget *m_labelText;
+  // signal
 
-    CusSpinItem* m_item;
+  static void signal_button_clicked_sub(GtkButton* button, CusSpin* data) {
+    if (data != NULL) {
+      data->m_item->func(SUB);
+    }
+  }
 
-    static void HandleBtnAdd(GtkButton *button, CusSpin *data) {
-        data->m_item->func(ADD);
+  static void signal_button_clicked_add(GtkButton* button, CusSpin* data) {
+    if (data != NULL) {
+      data->m_item->func(ADD);
     }
-    static void HandleBtnSub(GtkButton *button, CusSpin *data) {
-        data->m_item->func(SUB);
-    }
+  }
+
+private:
+  GtkTable* m_cusspin;
+  GtkButton* m_button_label;
+  GtkButton* m_button_sub;
+  GtkEntry* m_entry;
+  GtkButton* m_button_add;
+
+  CusSpinItem* m_item;
 };
 
 #endif

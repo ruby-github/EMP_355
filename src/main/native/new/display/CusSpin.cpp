@@ -1,112 +1,104 @@
-#include <gtk/gtk.h>
 #include "display/CusSpin.h"
-#include "display/gui_func.h"
-#include "display/gui_global.h"
-#include "imageProc/ModeStatus.h"
 
-CusSpin::CusSpin(void) {
-    m_cusspin = 0;
+// ---------------------------------------------------------
+
+CusSpin::CusSpin() {
+  m_cusspin = NULL;
+  m_button_label = NULL;
+  m_button_sub = NULL;
+  m_entry = NULL;
+  m_button_add = NULL;
+
+  m_item = NULL;
 }
 
-CusSpin::~CusSpin(void) {
-    gtk_widget_destroy(m_cusspin);
-}
+CusSpin::~CusSpin() {
+  if (m_cusspin != NULL) {
+    gtk_widget_destroy(GTK_WIDGET(m_cusspin));
+  }
 
-void CusSpin::Show(void) {
-    gtk_widget_show_all(m_cusspin);
+  m_cusspin = NULL;
 }
 
 GtkWidget* CusSpin::Create() {
-    m_cusspin = gtk_table_new(1, 4, FALSE);
-    gtk_widget_set_usize(m_cusspin, -1, -1);
+  m_cusspin = Utils::create_table(1, 8);
+  gtk_container_set_border_width(GTK_CONTAINER(m_cusspin), 0);
+  gtk_table_set_col_spacings(m_cusspin, 1);
 
-    m_labelText = create_label("", 0, 0, g_lightGray, NULL);
-    gtk_widget_modify_fg(m_labelText, GTK_STATE_PRELIGHT, g_lightGray);
-    gtk_widget_modify_fg(m_labelText, GTK_STATE_ACTIVE, g_lightGray);
-    GtkWidget *btn = create_button(m_labelText, 100, 0, g_deep); // 128
-    gtk_widget_modify_bg(btn, GTK_STATE_INSENSITIVE, g_deepGray);
-    gtk_table_attach_defaults(GTK_TABLE(m_cusspin), btn, 0, 1, 0, 1);
-    GTK_WIDGET_UNSET_FLAGS (btn, GTK_CAN_FOCUS);
+  m_button_label = Utils::create_button();
+  m_button_sub = Utils::create_button("◁");
+  m_entry = Utils::create_entry();
+  m_button_add = Utils::create_button("▷");
 
-    modify_widget_bg(btn);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_label), 0, 4, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_sub), 4, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_entry), 5, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_add), 7, 8, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
-    m_labelSub = create_label("◀", 0, 0, g_black, NULL);
-    m_btnSub = create_button(m_labelSub, 18, 0, g_white); // 20
-    gtk_widget_modify_bg(m_btnSub, GTK_STATE_INSENSITIVE, g_white);
-    gtk_table_attach_defaults(GTK_TABLE(m_cusspin), m_btnSub, 1, 2, 0, 1);
-    gtk_button_set_focus_on_click(GTK_BUTTON(m_btnSub), FALSE);
-    g_signal_connect(m_btnSub, "clicked", G_CALLBACK(HandleBtnSub), this);
+  gtk_widget_modify_bg(GTK_WIDGET(m_button_label), GTK_STATE_NORMAL, Utils::get_color("black"));
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_button_label), GTK_CAN_FOCUS);
+  GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(m_entry), GTK_CAN_FOCUS);
+  gtk_entry_set_editable(m_entry, FALSE);
 
-    modify_widget_bg(m_btnSub);
+  gtk_button_set_focus_on_click(m_button_sub, FALSE);
+  gtk_button_set_focus_on_click(m_button_add, FALSE);
 
-    m_entry = gtk_entry_new();
-    gtk_widget_set_usize(m_entry, 30, -1); // 32
-    gtk_entry_set_editable(GTK_ENTRY(m_entry), FALSE);
-    GTK_WIDGET_UNSET_FLAGS (m_entry, GTK_CAN_FOCUS);
-    gtk_table_attach_defaults(GTK_TABLE(m_cusspin), m_entry, 2, 3, 0, 1);
+  g_signal_connect(m_button_sub, "clicked", G_CALLBACK(signal_button_clicked_sub), this);
+  g_signal_connect(m_button_add, "clicked", G_CALLBACK(signal_button_clicked_add), this);
 
-    m_labelAdd = create_label("▶", 0, 0, g_black, NULL);
-    m_btnAdd = create_button(m_labelAdd, 18, 0, g_white); // 25
-    gtk_widget_modify_bg(m_btnAdd, GTK_STATE_INSENSITIVE, g_white);
-    gtk_table_attach_defaults(GTK_TABLE(m_cusspin), m_btnAdd, 3, 4, 0, 1);
-    gtk_button_set_focus_on_click(GTK_BUTTON(m_btnAdd), FALSE);
-    g_signal_connect(m_btnAdd, "clicked", G_CALLBACK(HandleBtnAdd), this);
-
-    modify_widget_bg(m_btnAdd);
-
+  if (m_item != NULL) {
     UpdateLabel();
 
-    if(m_item->val)
-        SetValue(m_item->val, m_item->status);
-    if((strcmp(m_item->name, "Threshold") == 0)|| (strcmp(m_item->name, "Color Reject") == 0)) {
-        gtk_widget_modify_fg(m_labelText,GTK_STATE_NORMAL, g_deepGray );
-        gtk_label_set_text(GTK_LABEL(m_labelAdd), "▷");
-        gtk_label_set_text(GTK_LABEL(m_labelSub), "◁");
-        gtk_widget_set_sensitive(m_btnAdd, FALSE);
-        gtk_widget_set_sensitive(m_btnSub, FALSE);
+    if (!m_item->val.empty()) {
+      SetValue(m_item->val, m_item->status);
     }
+  }
 
-    return m_cusspin;
+  return GTK_WIDGET(m_cusspin);
 }
 
-void CusSpin::UpdateLabel(void) {
-    gtk_label_set_text(GTK_LABEL(m_labelText), _(m_item->name));
+void CusSpin::SetItem(CusSpinItem* item) {
+  m_item = item;
 }
 
 void CusSpin::SetValue(const string str, EKnobReturn flag) {
-    if (!str.empty()) {
-      gtk_entry_set_text(GTK_ENTRY(m_entry), str.c_str());
-    }
+  if (!str.empty()) {
+    gtk_entry_set_text(m_entry, str.c_str());
+  }
 
-    switch(flag) {
-    case OK:
-        gtk_label_set_text(GTK_LABEL(m_labelSub), "◀");
-        gtk_label_set_text(GTK_LABEL(m_labelAdd), "▶");
-        gtk_widget_set_sensitive(m_btnSub, true);
-        gtk_widget_set_sensitive(m_btnAdd, true);
-        break;
-    case MIN:
-        gtk_label_set_text(GTK_LABEL(m_labelSub), "◁");
-        gtk_label_set_text(GTK_LABEL(m_labelAdd), "▶");
-        gtk_widget_set_sensitive(m_btnSub, false);
-        gtk_widget_set_sensitive(m_btnAdd, true);
-        break;
-    case MAX:
-        gtk_label_set_text(GTK_LABEL(m_labelSub), "◀");
-        gtk_label_set_text(GTK_LABEL(m_labelAdd), "▷");
-        gtk_widget_set_sensitive(m_btnSub, true);
-        gtk_widget_set_sensitive(m_btnAdd, false);
-        break;
-    case ERROR:
-        break;
-    case PRESS:
-        break;
-    }
+  switch(flag) {
+  case OK:
+    gtk_button_set_label(m_button_sub, "◁");
+    gtk_button_set_label(m_button_add, "▷");
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_sub), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_add), TRUE);
+    break;
+  case MIN:
+    gtk_button_set_label(m_button_sub, "◁");
+    gtk_button_set_label(m_button_add, "▷");
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_sub), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_add), TRUE);
+    break;
+  case MAX:
+    gtk_button_set_label(m_button_sub, "◁");
+    gtk_button_set_label(m_button_add, "▷");
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_sub), TRUE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_add), FALSE);
+    break;
+  case ERROR:
+    break;
+  case PRESS:
+    break;
+  }
 
-    if((strcmp(m_item->name, "Threshold") == 0)|| (strcmp(m_item->name, "Color Reject") == 0)) {
-        gtk_label_set_text(GTK_LABEL(m_labelAdd), "▷");
-        gtk_label_set_text(GTK_LABEL(m_labelSub), "◁");
-        gtk_widget_set_sensitive(m_btnAdd, FALSE);
-        gtk_widget_set_sensitive(m_btnSub, FALSE);
-    }
+  if (m_item->name == "Threshold" ||  m_item->name == "Color Reject") {
+    gtk_button_set_label(m_button_sub, "◁");
+    gtk_button_set_label(m_button_add, "▷");
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_sub), FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET(m_button_add), FALSE);
+  }
+}
+
+void CusSpin::UpdateLabel() {
+  gtk_button_set_label(m_button_label, _(m_item->name.c_str()));
 }

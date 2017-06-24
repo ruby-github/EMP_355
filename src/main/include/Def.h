@@ -257,23 +257,7 @@
 #include "utils/Settings.h"
 
 ///> define new type
-enum EKnobOper {SUB, ADD, ROTATE};
 
-enum EKnobReturn {ERROR, OK, MIN, MAX, PRESS};
-
-enum EDrawMode {COPY, XOR};
-
-#ifdef VET
-enum EStudy {ANIMAL, PART};
-#else
-
-#if (defined(EMP_322) || defined(EMP_313))
-enum EStudy {ABD, OB, GYN, UR, CAR, SP, ORT, EXTRA};
-#else
-enum EStudy {ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
-#endif
-//enum EStudy{ABD, OB, GYN, UR, CAR, SP, VES, ORT, EXTRA};
-#endif
 
 /* The RGBTRIPLE structure describes a color consisting of relative intensities of red, green, and blue.
 */

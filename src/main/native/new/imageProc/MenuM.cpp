@@ -70,19 +70,19 @@ GtkWidget * MenuM::Create(void) {
     spin_line.SetItem(&item_line);
     GtkWidget *table_line = spin_line.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_line, 0, 1, 3, 4);
-    spin_line.Show();
+    //spin_line.Show();
 
     // smooth 1-8
     spin_smooth.SetItem(&item_smooth);
     GtkWidget *table_smooth = spin_smooth.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_smooth, 0, 1, 4, 5);
-    spin_smooth.Show();
+    //spin_smooth.Show();
 
     // enhance M
     spin_enhanceM.SetItem(&item_enhanceM);
     GtkWidget *table_enhanceM = spin_enhanceM.Create();
     gtk_table_attach_defaults(GTK_TABLE(m_table), table_enhanceM, 0, 1, 5, 6);
-    spin_enhanceM.Show();
+    //spin_enhanceM.Show();
 
     //anatomic
 #ifdef EMP_3410
