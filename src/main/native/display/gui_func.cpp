@@ -675,7 +675,7 @@ void SetSystemCursor(int x, int y) {
     XCloseDisplay(display);
 }
 void ResetIfOutOfRange(void) {
-    if ((g_sysCursor.x > MENU_AREA_W) || (g_sysCursor.y > MENU_AREA_H))
+    if ((g_sysCursor.x < SCREEN_WIDTH - MENU_AREA_W) || (g_sysCursor.y > MENU_AREA_H))
         SetSystemCursor(SYSCURSOR_X, SYSCUROSR_Y);
 }
 
@@ -728,14 +728,14 @@ void fakeXMotionEventImage(int &x0, int &y0, int offsetX, int offsetY) {
 }
 
 void fakeXMotionEventMenu(int &x0, int &y0, int offsetX, int offsetY) {
-    int x_start = 0;
+    int x_start = SCREEN_WIDTH - MENU_AREA_W;
     int y_start = 0;
 
     //Mouse x direction Move
-    if (((x0+offsetX) > x_start) && (x0+offsetX) < (x_start + MENU_AREA_W))
+    if (((x0+offsetX) >= x_start) && (x0+offsetX) <= (x_start + MENU_AREA_W))
         x0 += offsetX;
 
-    if (((y0-offsetY) > y_start) && ((y0-offsetY) < (y_start + MENU_AREA_H)))
+    if (((y0-offsetY) >= y_start) && ((y0-offsetY) <= (y_start + MENU_AREA_H)))
         y0 -= offsetY;
 
     Display *display = getXDisplay();
@@ -783,7 +783,7 @@ void SetMenuBiopsyCursorYRange(int y0,int y1) { //2016.08.25
     g_cursorRangeY1=y1;
 }
 void fakeXMotionEventMenuBiopsy(int offsetX, int offsetY) { //2016.08.24
-    int x_start = 0;
+    int x_start = SCREEN_WIDTH - MENU_AREA_W;
     // int y_start =98+30; //TOP_AREA_H;
     int x0=g_sysCursor.x;
     int y0=g_sysCursor.y;

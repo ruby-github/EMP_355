@@ -4,6 +4,8 @@
 
 #include "keyboard/KeyValueOpr.h"
 #include "keyboard/KnobEvent.h"
+#include "display/MenuArea.h"
+
 
 //       |------------------------------------- 1024 --------------------------------------|
 //           130       130                                          150          180
@@ -51,8 +53,8 @@
 #define KNOB_X 0 //ModLayout 180 PreLayout 220
 #define KNOB_Y 628 //ModLayout 705 PreLayout 685
 
-#define SYSCURSOR_X (TOP_AREA_X/2)//110//238
-#define SYSCUROSR_Y (SCREEN_HEIGHT/4)//90
+#define SYSCURSOR_X             (SCREEN_WIDTH - MENU_AREA_W + MENU_AREA_W / 2)
+#define SYSCUROSR_Y             (0 + MENU_AREA_H / 2)
 
 gboolean UpdateTopArea(gpointer data);
 void InvisibleCursor(bool invisible, bool resetCursor=TRUE);
