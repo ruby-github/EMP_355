@@ -10,7 +10,7 @@
 Menu2D g_menu2D;
 
 CusSpin::CusSpinItem Menu2D::m_item_rotate  = {N_("Rotate"),      "0", OK, ChgRotate};
-CusSpin::CusSpinItem Menu2D::m_item_frame   = {N_("Frame aver."), "1", OK, ChgFrame};
+CusSpin::CusSpinItem Menu2D::m_item_frame   = {N_("Frame aver"),  "1", OK, ChgFrame};
 CusSpin::CusSpinItem Menu2D::m_item_line    = {N_("Line aver"),   "1", OK, ChgLine};
 CusSpin::CusSpinItem Menu2D::m_item_smooth  = {N_("Smooth"),      "1", OK, ChgSmooth};
 CusSpin::CusSpinItem Menu2D::m_item_gamma   = {N_("Gamma"),       "1", OK, ChgGamma};
@@ -35,7 +35,7 @@ GtkWidget* Menu2D::Create() {
 
   g_signal_connect(m_checkbutton_polarity, "clicked", G_CALLBACK(signal_checkbutton_clicked_polarity), this);
 
-  // Noise Reject: ON/OFF
+  // Noise Reject
   m_checkbutton_restric = Utils::create_check_button(_("Noise Reject"));
   gtk_table_attach_defaults(m_table, GTK_WIDGET(m_checkbutton_restric), 0, 1, 1, 2);
 
@@ -118,6 +118,8 @@ GtkWidget* Menu2D::Create() {
   gtk_widget_modify_bg(GTK_WIDGET(m_button_efov), GTK_STATE_NORMAL, Utils::get_color("black"));
   gtk_button_set_focus_on_click(m_button_efov, FALSE);
   g_signal_connect(m_button_efov, "clicked", G_CALLBACK(signal_button_clicked_efov), this);
+
+  UpdateLabel();
 
   return GTK_WIDGET(m_table);
 }

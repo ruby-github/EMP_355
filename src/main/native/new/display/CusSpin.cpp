@@ -30,9 +30,9 @@ GtkWidget* CusSpin::Create() {
   m_entry = Utils::create_entry();
   m_button_add = Utils::create_button("▷");
 
-  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_label), 0, 4, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
-  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_sub), 4, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
-  gtk_table_attach(m_cusspin, GTK_WIDGET(m_entry), 5, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_label), 0, 5, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_sub), 5, 6, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
+  gtk_table_attach(m_cusspin, GTK_WIDGET(m_entry), 6, 7, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
   gtk_table_attach(m_cusspin, GTK_WIDGET(m_button_add), 7, 8, 0, 1, (GtkAttachOptions)(GTK_FILL | GTK_EXPAND), GTK_SHRINK, 0, 0);
 
   gtk_widget_modify_bg(GTK_WIDGET(m_button_label), GTK_STATE_NORMAL, Utils::get_color("black"));
