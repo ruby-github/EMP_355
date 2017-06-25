@@ -160,11 +160,14 @@ void ViewProbe::ReadProbe() {
 
   cout << "ViewProbe::ReadProbe() 3" << endl;
 
-  if (para == NULL) {
-    return;
-  }
+  //if (para == NULL) {
+    cout << "ViewProbe::ReadProbe NULL" << endl;
+  //  return;
+  //}
 
-  CreateWindow(para, m_itemList, maxSocket);
+  cout << "ViewProbe::ReadProbe CreateWindow" << endl;
+
+  //CreateWindow(para, m_itemList, maxSocket);
 }
 
 void ViewProbe::ReadOneProbe(int socket) {
@@ -370,7 +373,10 @@ void ViewProbe::KeyEvent(unsigned char keyValue) {
 }
 
 void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EItem>* itemList, int maxSocket) {
+  cout << "ViewProbe::CreateWindow 0" << endl;
   MultiFuncFactory::GetInstance()->Create(MultiFuncFactory::NONE);
+
+  cout << "ViewProbe::CreateWindow 1" << endl;
 
   m_dialog = Utils::create_dialog(NULL, _("Probe Select"), 550, 600);
 
@@ -387,12 +393,19 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
     gtk_container_set_border_width(GTK_CONTAINER(table_probe), 10);
     gtk_table_set_row_spacings(table_probe, 0);
 
+    cout << "ViewProbe::CreateWindow 10" << endl;
+
     for (int i = 0; i < maxSocket; i++) {
       GtkWidget* probe = NULL;
 
+      cout << "ViewProbe::CreateWindow 11" << endl;
+
       if (para != NULL && para[i].exist) {
+        cout << "ViewProbe::CreateWindow 12" << endl;
         ProbeSocket::ProbePara probe_para;
         ProbeMan::GetInstance()->GetCurProbe(probe_para);
+
+        cout << "ViewProbe::CreateWindow 13" << endl;
 
         if (probe_para.model == para[i].model) {
           m_preSocketIndex = i;
@@ -400,21 +413,37 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
           m_preSocketIndex = -1;
         }
 
+        cout << "ViewProbe::CreateWindow 000 1 " << i << endl;
+
         vector<string> exam_type = CreateAllExamType(para[i].model, itemList[i]);
 
+        cout << "ViewProbe::CreateWindow 000 2 " << endl;
+
         probe = CreateProbe(para[i].model, para[i].type, exam_type, i);
+
+        cout << "ViewProbe::CreateWindow 000 3 " << endl;
       } else {
+        cout << "ViewProbe::CreateWindow 16" << endl;
+
         m_examItemIndex = -1;
 
         vector<string> exam_type;
         probe = CreateProbe("", 0, exam_type, i);
+
+        cout << "ViewProbe::CreateWindow 17" << endl;
       }
+
+      cout << "ViewProbe::CreateWindow 18" << endl;
 
       gtk_table_attach_defaults(table_probe, probe, i, i + 1, 0, 1);
     }
 
+    cout << "ViewProbe::CreateWindow 19" << endl;
+
     gtk_table_attach_defaults(table, GTK_WIDGET(table_probe), 0, 1, 0, 7);
   }
+
+  cout << "ViewProbe::CreateWindow 2" << endl;
 
   GtkTable* table_user = Utils::create_table(1, 9);
   gtk_container_set_border_width(GTK_CONTAINER(table_user), 10);
@@ -432,6 +461,8 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
 
   IniFile ini(string(CFG_RES_PATH) + string(STORE_DEFAULT_ITEM_PATH));
 
+  cout << "ViewProbe::CreateWindow 3" << endl;
+
   ExamItem exam;
   int index_username = exam.ReadDefaultUserIndex(&ini);
   gtk_combo_box_set_active(GTK_COMBO_BOX(m_comboboxtext_user), index_username);
@@ -440,6 +471,8 @@ void ViewProbe::CreateWindow(ProbeSocket::ProbePara* para, vector<ExamItem::EIte
 
   gtk_widget_show_all(GTK_WIDGET(m_dialog));
   g_signal_connect(G_OBJECT(m_dialog), "delete-event", G_CALLBACK(signal_window_delete_event), this);
+
+  cout << "ViewProbe::CreateWindow 4" << endl;
 
   g_keyInterface.Push(this);
   SetSystemCursorToCenter();
